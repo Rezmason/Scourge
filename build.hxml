@@ -1,0 +1,12 @@
+#build file
+--times
+#-v
+-cp src
+-cp lib/ktween/hxclasses
+-main ScourgeProject
+-swf9 deploy/scourge.swf
+-swf-version 10
+--flash-strict
+
+-swf-lib lib/ktween/library.swf
+-swf-lib assets/ScourgeLib.swf
