@@ -3,6 +3,8 @@ package net.rezmason.scourge;
 import flash.display.BitmapData;
 import flash.display.BitmapDataChannel;
 import flash.display.BlendMode;
+import flash.display.CapsStyle;
+import flash.display.LineScaleMode;
 import flash.display.Shape;
 import flash.display.SimpleButton;
 import flash.display.Sprite;
@@ -59,6 +61,7 @@ class Board {
 	private static var GLOW_FILTER:GlowFilter = new GlowFilter(0xFFFFFF, 1, 7, 7, 20, 1, true);
 	private static var GLOW_FILTER_2:GlowFilter = new GlowFilter(0xFFFFFF, 1, 10, 10, 20, 1, true);
 	private static var BITE_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 7, 7, 20, 1, true);
+	private static var TOOTH_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 7, 7, 1);
 	private static var BLUR_FILTER:BlurFilter = new BlurFilter(6, 6, 2);
 	private static var GRID_BLUR:BlurFilter = new BlurFilter(4, 4, 1);
 	private static var SWAP_FILTER:GlowFilter = new GlowFilter(0xFFFFFF, 1, 10, 10, 8, 1);
@@ -74,6 +77,7 @@ class Board {
 	private var teamCTs:Array<ColorTransform>;
 	private var currentPlayer:Player;
 	private var currentPlayerIndex:Int;
+	private var shiftBite:Bool;
 	private var background:Shape;
 	private var grid:Sprite;
 	private var gridBackground:Shape;
@@ -87,6 +91,9 @@ class Board {
 	private var bar:Sprite;
 	private var toothContainer:Sprite;
 	private var biteTooth:Sprite;
+	private var bt1:Sprite;
+	private var bBody:Shape;
+	private var bt2:Sprite;
 	private var barBackground:Shape;
 	private var well:Sprite;
 	private var somethingElse:Sprite;
@@ -116,6 +123,7 @@ class Board {
 	private var handleGoalY:Float;
 	private var handlePushTimer:Timer;
 	private var keyList:Array<Bool>;
+	private var biteLimits:Array<Int>;
 	
 	private var pieceRecipe:Array<Int>;
 	private var pieceCenter:Array<Float>;
@@ -129,6 +137,9 @@ class Board {
 	private var guiColorTransform:ColorTransform;
 	private var pieceBlockJobs:Array<KTJob>;
 	private var pieceBiteJob:KTJob;
+	private var toothContainerJob:KTJob;
+	private var biteToothJob:KTJob;
+	
 	private var currentBlockForSwapHint:Int;
 	
 	private var pieceHomeX:Float;
@@ -205,11 +216,19 @@ class Board {
 		clouds.blendMode = BlendMode.OVERLAY;
 		toothContainer = new Sprite();
 		toothContainer.visible = false;
+		toothContainer.mouseEnabled = toothContainer.mouseChildren = false;
+		toothContainer.alpha = 0;
 		toothContainer.filters = [BITE_GLOW];
 		toothContainer.x = toothContainer.y = BOARD_BORDER;
-		biteTooth = GUIFactory.makeExpandingTooth(UNIT_SIZE * 1.5);
+		bt1 = GUIFactory.makeTooth(UNIT_SIZE * 1.2);
+		bBody = new Shape();
+		bt2 = GUIFactory.makeTooth(UNIT_SIZE * 1.2);
+		biteTooth = GUIFactory.makeContainer([bt1, bBody, bt2]);
+		biteTooth.filters = [TOOTH_GLOW];
 		biteTooth.visible = false;
-		biteTooth.mouseEnabled = false;
+		biteTooth.mouseEnabled = biteTooth.mouseChildren = false;
+		biteTooth.transform.colorTransform = WHITE_CT;
+		biteTooth.filters = [TOOTH_GLOW];
 		grid = GUIFactory.makeContainer([gridBackground, gridPattern, gridBlurredPattern, gridTeams, toothContainer, gridHeads, clouds, biteTooth]);
 		grid.cacheAsBitmap = true;
 		grid.tabEnabled = !(grid.buttonMode = grid.useHandCursor = true);
@@ -283,8 +302,11 @@ class Board {
 		pieceHandle.addEventListener(MouseEvent.MOUSE_DOWN, liftPiece);
 		grid.addEventListener(MouseEvent.MOUSE_DOWN, liftPiece);
 		scene.addEventListener(MouseEvent.MOUSE_UP, dropPiece);
-		toothContainer.addEventListener(MouseEvent.MOUSE_MOVE, popTooth);
-		toothContainer.addEventListener(MouseEvent.ROLL_OUT, popTooth);
+		
+		toothContainer.addEventListener(MouseEvent.MOUSE_OVER, updateBiteTooth);
+		toothContainer.addEventListener(MouseEvent.ROLL_OUT, updateBiteTooth);
+		toothContainer.addEventListener(MouseEvent.MOUSE_DOWN, startBite);
+		scene.addEventListener(MouseEvent.MOUSE_UP, endBite);
 		
 		stage.addEventListener(Event.ADDED, resize, true);
 		stage.addEventListener(Event.RESIZE, resize);
@@ -347,7 +369,6 @@ class Board {
 	
 	private function update(?thePiece:Bool, ?thePlay:Bool):Void {
 		if (thePlay) {
-			if (biting) toggleBite();
 			updateGrid();
 			updateHeads();
 			updateGUIColors();
@@ -607,8 +628,6 @@ class Board {
 			ike += 2;
 		}
 		
-		//Lib.trace([goodX, goodY]);
-		
 		var goodPt:Point = well.globalToLocal(piece.localToGlobal(new Point(goodX * UNIT_SIZE, goodY * UNIT_SIZE)));
 		
 		piece.x += pieceHandle.x;
@@ -791,7 +810,11 @@ class Board {
 		if (down != wasDown) {
 			switch (event.keyCode) {
 				case Keyboard.SPACE: if (down) rotatePiece();
-				case Keyboard.SHIFT: toggleBite();
+				case Keyboard.SHIFT: 
+					if (!biting || shiftBite) {
+						shiftBite = down;
+						toggleBite(down);
+					}
 				case Keyboard.TAB: if (down) swapPiece();
 				case Keyboard.ESCAPE: if (down) skipTurn();
 			}
@@ -802,8 +825,8 @@ class Board {
 	private function mouseHandler(event:MouseEvent):Void {
 		if (draggingPiece) {
 			dragPiece(__snap);
-		} else if (biting) {
-			
+		} else if (draggingBite) {
+			dragBite(__snap);
 		}
 	}
 	
@@ -826,17 +849,25 @@ class Board {
 		}
 	}
 	
-	private function toggleBite(?event:Event):Void {
+	private function toggleBite(?event:Event, ?isBiting:Null<Bool>):Void {
 		if (!biteButton.mouseEnabled) return;
-		biting = !biting;
+		cancelDragBite();
+		if (isBiting == null) {
+			biting = !biting;
+		} else {
+			biting = isBiting;
+		}
+		if (toothContainerJob != null) toothContainerJob.close();
 		if (biting) {
 			toothContainer.visible = true;
+			toothContainer.mouseEnabled = toothContainer.mouseChildren = true;
+			toothContainerJob = KTween.to(toothContainer, QUICK * 2, {alpha:1}, POUNCE);
 			BITE_GLOW.color = TEAM_COLORS[currentPlayerIndex];
 			toothContainer.filters = [BITE_GLOW];
 			
 			// We can optimize this to only happen when the baord is updated
 			
-			var br:Array<Bool> = game.getBiteRegion();
+			var br:Array<Bool> = game.getBiteGrid();
 			var bx:Int, by:Int;
 			for (ike in 0...br.length) {
 				if (!br[ike]) continue;
@@ -846,6 +877,7 @@ class Board {
 				var tooth:Sprite;
 				if (toothContainer.numChildren > ike) {
 					tooth = cast(toothContainer.getChildAt(ike), Sprite);
+					tooth.visible = true;
 				} else {
 					tooth = GUIFactory.makeTooth(UNIT_SIZE * 1.25);
 				}
@@ -855,15 +887,21 @@ class Board {
 				toothContainer.addChild(tooth);
 			}
 		} else {
-			for (ike in 0...toothContainer.numChildren) toothContainer.getChildAt(ike).visible = false;
-			toothContainer.visible = false;
+			toothContainer.mouseEnabled = toothContainer.mouseChildren = false;
+			toothContainerJob = KTween.to(toothContainer, QUICK * 2, {alpha:0, visible:false}, POUNCE, hideTeeth);
 		}
 	}
 	
-	private function popTooth(event:Event):Void {
-		if (event.type == MouseEvent.MOUSE_MOVE) {
+	private function hideTeeth():Void {
+		for (ike in 0...toothContainer.numChildren) toothContainer.getChildAt(ike).visible = false;
+	}
+	
+	private function updateBiteTooth(event:Event):Void {
+		if (draggingBite) return;
+		if (event.type == MouseEvent.MOUSE_OVER) {
+			// find the tooth beneath the mouse
 			var teeth:Array<Dynamic> = grid.getObjectsUnderPoint(new Point(stage.mouseX, stage.mouseY));
-		
+			if (biteToothJob != null) biteToothJob.complete();
 			var bX:Int = Std.int(toothContainer.mouseX / UNIT_SIZE);
 			var bY:Int = Std.int(toothContainer.mouseY / UNIT_SIZE);
 			for (ike in 0...teeth.length) {
@@ -871,31 +909,79 @@ class Board {
 				var tooth:Sprite = cast(teeth[ike], Sprite);
 				if (Std.int(tooth.x / UNIT_SIZE - 0.5) == bX && Std.int(tooth.y / UNIT_SIZE - 0.5) == bY) {
 					biteTooth.visible = true;
+					biteToothJob = KTween.to(biteTooth, QUICK, {scaleX:1, scaleY:1, alpha:1}, POUNCE);
 					biteTooth.x = tooth.x + BOARD_BORDER;
 					biteTooth.y = tooth.y + BOARD_BORDER;
+					break;
 				}
 			}
 		} else {
-			biteTooth.visible = false;
+			biteToothJob = KTween.to(biteTooth, QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, POUNCE, resetBiteTooth);
 		}
 	}
 	
 	private function startBite(?event:Event):Void {
-		if (!biting || draggingBite) return;
+		if (draggingBite) return;
 		draggingBite = true;
 		var bX:Int = Std.int(toothContainer.mouseX / UNIT_SIZE);
 		var bY:Int = Std.int(toothContainer.mouseY / UNIT_SIZE);
-		//game.processPlayerAction(PlayerAction.START_BITE(x, y));
+		if (!game.processPlayerAction(PlayerAction.START_BITE(bX, bY))) return;
+		biteLimits = game.getBiteLimits();
 	}
 	
-	private function updateBite(?event:Event):Void {
+	private function dragBite(?snap:Bool):Void {
 		
+		var dX:Int = Std.int(biteTooth.mouseX / UNIT_SIZE);
+		var dY:Int = Std.int(biteTooth.mouseY / UNIT_SIZE);
+		var horiz:Bool = false;
+		
+		if (bt2.x != bt1.x) {
+			horiz = true;
+		} else if (bt2.y != bt1.y) {
+			horiz = false;
+		} else if (dX == 0) {
+			horiz = false;
+		} else if (dY == 0) {
+			horiz = true;
+		} else {
+			horiz = Math.abs(dX) > Math.abs(dY);
+		}
+		
+		if (horiz) {
+			bt2.x = Math.max(biteLimits[3], Math.min(biteLimits[1], dX)) * UNIT_SIZE;
+		} else {
+			bt2.y = Math.max(biteLimits[0], Math.min(biteLimits[2], dY)) * UNIT_SIZE;
+		}
+		
+		bBody.graphics.clear();
+		bBody.graphics.lineStyle(bt1.width, 0xFFFFFF, 1, null, LineScaleMode.NORMAL, CapsStyle.NONE);
+		bBody.graphics.lineTo(bt2.x, bt2.y);
 	}
 	
 	private function endBite(?event:Event):Void {
 		if (!draggingBite) return;
 		draggingBite = false;
-		//game.processPlayerAction(PlayerAction.END_BITE(x, y));
+		if (biteToothJob != null) biteToothJob.complete();
+		var pt:Point = gridPattern.globalToLocal(bt2.localToGlobal(new Point()));
+		var bX:Int = Std.int(pt.x / UNIT_SIZE);
+		var bY:Int = Std.int(pt.y / UNIT_SIZE);
+		if (bt2.x != bt1.x || bt2.y != bt1.y) {
+			biteToothJob = KTween.to(biteTooth, QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, POUNCE, resetBiteTooth);
+		}
+		if (game.processPlayerAction(PlayerAction.END_BITE(bX, bY))) {
+			toggleBite(null, false);
+			update(false, true);
+		}
+	}
+	
+	private function resetBiteTooth():Void {
+		bt2.x = bt2.y = 0;
+		bBody.graphics.clear();
+	}
+	
+	private function cancelDragBite():Void {
+		if (!draggingBite) return;
+		draggingBite = false;
 	}
 	
 	private function swapHint(event:Event):Void {

@@ -2,20 +2,18 @@ package net.rezmason.scourge;
 
 import flash.display.BitmapData;
 import flash.display.BlendMode;
-import flash.display.CapsStyle;
 import flash.display.DisplayObject;
 import flash.display.GradientType;
-import flash.display.LineScaleMode;
-import flash.display.JointStyle;
 import flash.display.Shape;
 import flash.display.SimpleButton;
 import flash.display.Sprite;
 import flash.events.Event;
+import flash.events.IEventDispatcher;
+import flash.events.MouseEvent;
+import flash.filters.GlowFilter;
 import flash.geom.ColorTransform;
 import flash.geom.Matrix;
 import flash.geom.Rectangle;
-import flash.events.IEventDispatcher;
-import flash.events.MouseEvent;
 import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.Lib;
@@ -66,7 +64,7 @@ class GUIFactory {
 	public static function makeTooth(?size:Null<Float>):Sprite {
 		if (size == null) size = 15;
 		var tooth:Sprite = new Sprite();
-		tooth.graphics.beginFill(0x555555);
+		tooth.graphics.beginFill(0xAAAAAA);
 		tooth.graphics.moveTo(0, -size / 2);
 		tooth.graphics.moveTo(0, -size / 2);
 		tooth.graphics.lineTo(size / 2, 0);
@@ -81,7 +79,7 @@ class GUIFactory {
 		numTeeth++;
 		return tooth;
 	}
-	
+	/*
 	public static function makeExpandingTooth(?size:Null<Float>):Sprite {
 		if (size == null) size = 15;
 		var gap:Float = 1;
@@ -101,9 +99,10 @@ class GUIFactory {
 		tooth.graphics.endFill();
 		tooth.scale9Grid = new Rectangle(0, 0, gap, gap);
 		tooth.width = tooth.height = size;
+		tooth.filters = [new GlowFilter(0xFFFFFF, 1, 5, 5, 1, 1)];
 		return tooth;
 	}
-
+	*/
 	public static function makePointer():Sprite {
 		return new ScourgeLib_MousePointer();
 	}
