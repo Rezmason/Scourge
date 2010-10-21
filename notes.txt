@@ -157,6 +157,13 @@ UI Ideas
 		Opponents skipping will speed up replenishment rate
 		
 	Other players' board actions should be tweened
+	
+	Bite animations
+		Single: Sharp glinting shark tooth
+		Double: Fat snapping mandibles
+		Triple: roaring lamprey maw
+		
+		All flat, white, graphical, with a gradient
 		
 MULTIPLAYER
 	Same machine

@@ -10,7 +10,6 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.IEventDispatcher;
 import flash.events.MouseEvent;
-import flash.filters.GlowFilter;
 import flash.geom.ColorTransform;
 import flash.geom.Matrix;
 import flash.geom.Rectangle;
@@ -66,43 +65,17 @@ class GUIFactory {
 		var tooth:Sprite = new Sprite();
 		tooth.graphics.beginFill(0xAAAAAA);
 		tooth.graphics.moveTo(0, -size / 2);
-		tooth.graphics.moveTo(0, -size / 2);
-		tooth.graphics.lineTo(size / 2, 0);
 		tooth.graphics.lineTo(size / 2, 0);
 		tooth.graphics.lineTo(0, size / 2);
-		tooth.graphics.lineTo(0, size / 2);
-		tooth.graphics.lineTo(-size / 2, 0);
 		tooth.graphics.lineTo(-size / 2, 0);
 		tooth.graphics.lineTo(0, -size / 2);
 		tooth.graphics.endFill();
 		tooth.name = "tooth" + numTeeth;
+		tooth.blendMode = BlendMode.ADD;
 		numTeeth++;
 		return tooth;
 	}
-	/*
-	public static function makeExpandingTooth(?size:Null<Float>):Sprite {
-		if (size == null) size = 15;
-		var gap:Float = 1;
-		var tooth:Sprite = new Sprite();
-		tooth.graphics.beginFill(0xFFFFFF);
-		tooth.graphics.moveTo(0, -size / 2);
-		tooth.graphics.moveTo(gap, -size / 2);
-		tooth.graphics.lineTo(gap + size / 2, 0);
-		tooth.graphics.lineTo(gap + size / 2, gap);
-		tooth.graphics.lineTo(gap, gap + size / 2);
-		tooth.graphics.lineTo(0, gap + size / 2);
-		tooth.graphics.lineTo(-size / 2, gap);
-		tooth.graphics.lineTo(-size / 2, 0);
-		tooth.graphics.lineTo(0, -size / 2);
-		tooth.graphics.endFill();
-		tooth.graphics.beginFill(0xFFFFFF, 0.5);
-		tooth.graphics.endFill();
-		tooth.scale9Grid = new Rectangle(0, 0, gap, gap);
-		tooth.width = tooth.height = size;
-		tooth.filters = [new GlowFilter(0xFFFFFF, 1, 5, 5, 1, 1)];
-		return tooth;
-	}
-	*/
+	
 	public static function makePointer():Sprite {
 		return new ScourgeLib_MousePointer();
 	}
