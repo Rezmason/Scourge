@@ -1,4 +1,0 @@
-emergy
-exodus
-quorum
-localhost
