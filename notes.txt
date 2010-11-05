@@ -169,3 +169,12 @@ MULTIPLAYER
 	Same machine
 	LAN
 	Server
+	P2P
+	
+Player data is presented when the user hovers over a given player
+	Stats
+		Hex logo
+		Name
+		Bite icon and number of bites
+		In-game growth graph
+		Community rank graph

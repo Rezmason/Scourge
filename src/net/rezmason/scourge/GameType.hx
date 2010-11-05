@@ -2,6 +2,6 @@ package net.rezmason.scourge;
 
 enum GameType {
 	CLASSIC;
-	DELUXE(?startSwaps:Int, ?startBites:Int, ?timeLimit:Float);
+	DELUXE(?firstSwaps:Int, ?firstBites:Int, ?timeLimit:Float);
 	MAYHEM;
 }

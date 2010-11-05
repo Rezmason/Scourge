@@ -1,7 +1,5 @@
 package net.rezmason.scourge;
 
-import flash.display.BitmapData;
-import flash.Vector;
 import flash.Lib;
 
 class Game {
@@ -12,11 +10,12 @@ class Game {
 	private var currentAngle:Int;
 	private var hat:Array<Int>;
 	private var _numPlayers:Int;
-
-	private var colorGrid:Vector<UInt>;
-	private var freshGrid:Vector<UInt>;
+	
+	private var defaultGrid:Array<Dynamic>;
+	private var colorGrid:Array<Int>;
+	private var freshGrid:Array<Int>;
 	private var biteGrid:Array<Bool>;
-	private var bitmap:BitmapData;
+	private var aliveGrid:Array<Bool>;
 	private var validPositionCache:Hash<Bool>;
 	private var playerPool:Array<Player>;
 	private var players:Array<Player>;
@@ -38,13 +37,15 @@ class Game {
 
 	private var changeIncrements:Array<Int>;
 
-	public function new() {
+	public function new(?_defaultGrid:Array<Dynamic>) {
+		defaultGrid = _defaultGrid;
 		// Set up data structure
 		biteX = biteY = -1;
 		hat = [];
-		colorGrid = new Vector<UInt>(Common.BOARD_NUM_CELLS);
-		freshGrid = new Vector<UInt>(Common.BOARD_NUM_CELLS);
+		colorGrid = [];
+		freshGrid = [];
 		biteGrid = [];
+		aliveGrid = [];
 		validPositionCache = new Hash();
 		playerPool = [];
 		players = [];
@@ -105,7 +106,7 @@ class Game {
 		return Pieces.PIECES[currentPiece][cA];
 	}
 
-	public function getGrid():Vector<UInt> {
+	public function getColorGrid():Array<Int> {
 		return colorGrid.slice(0, Common.BOARD_NUM_CELLS);
 	}
 
@@ -150,7 +151,7 @@ class Game {
 				rotatePiece(cc);
 				return true;
 			case START_BITE(xCoord, yCoord):
-				return beginBite(xCoord, yCoord);
+				return startBite(xCoord, yCoord);
 			case END_BITE(xCoord, yCoord):
 				return endBite(xCoord, yCoord);
 		}
@@ -200,10 +201,10 @@ class Game {
 		return true;
 	}
 
-	private function beginBite(xCoord:Int, yCoord:Int):Bool {
+	private function startBite(xCoord:Int, yCoord:Int):Bool {
 		var m:Int = Common.BOARD_SIZE;
 		var index:Int = yCoord * m + xCoord;
-		if (!biteGrid[index]) return false;
+		if (!biteGrid[index] || currentPlayer.bites == 0) return false;
 
 		// find the cardinal limits of the bite
 		biteLimits = [0, 0, 0, 0];
@@ -214,39 +215,57 @@ class Game {
 		var rightDone:Bool = false;
 		var bottomDone:Bool = false;
 		var leftDone:Bool = false;
+		var newIndex:Int;
 
 		for (ike in 1...lim) {
-			if (!topDone    && yCoord - ike >= 0 && colorGrid[index - ike * m] != 0 && colorGrid[index - ike * m] != currentPlayer.id) {
-				biteLimits[0]--;
-				validBiteEnds.push(index - ike * m);
-			} else {
-				topDone = true;
+			
+			if (!topDone) {
+				newIndex = index - ike * m;
+				if (yCoord - ike    >= 0 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.id) {
+					biteLimits[0]--;
+					validBiteEnds.push(index - ike * m);
+				} else {
+					topDone = true;
+				}
 			}
-			if (!rightDone  && xCoord - ike <  m - 1 && colorGrid[index + ike    ] != 0 && colorGrid[index + ike    ] != currentPlayer.id) {
-				biteLimits[1]++;
-				validBiteEnds.push(index + ike);
-			} else {
-				rightDone = true;
+			
+			if (!rightDone) {
+				newIndex = index + ike;
+				if (xCoord + ike < m - 1 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.id) {
+					biteLimits[1]++;
+					validBiteEnds.push(index + ike);
+				} else {
+					rightDone = true;
+				}
 			}
-			if (!bottomDone && yCoord - ike <  m - 1 && colorGrid[index + ike * m] != 0 && colorGrid[index + ike * m] != currentPlayer.id) {
-				biteLimits[2]++;
-				validBiteEnds.push(index + ike * m);
-			} else {
-				bottomDone = true;
+			
+			if (!bottomDone) {
+				newIndex = index + ike * m;
+				if (yCoord + ike < m - 1 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.id) {
+					biteLimits[2]++;
+					validBiteEnds.push(index + ike * m);
+				} else {
+					bottomDone = true;
+				}
 			}
-			if (!leftDone   && xCoord - ike >= 0 && colorGrid[index - ike    ] != 0 && colorGrid[index - ike    ] != currentPlayer.id) {
-				biteLimits[3]--;
-				validBiteEnds.push(index - ike);
+			
+			if (!leftDone) {
+				newIndex = index - ike;
+				if (xCoord - ike    >= 0 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.id) {
+					biteLimits[3]--;
+					validBiteEnds.push(index - ike);
 				} else {
 					leftDone = true;
 				}
 			}
-
+			
 			biteX = xCoord;
 			biteY = yCoord;
-
-			return true;
+				
 		}
+		
+		return true;
+	}
 
 	private function endBite(xCoord:Int, yCoord:Int):Bool {
 		if (biteX == -1 || biteY == -1) return false;
@@ -277,6 +296,7 @@ class Game {
 		killCheck();
 		biteX = biteY = -1;
 		updateBiteGrid();
+		currentPlayer.bites--;
 		return true;
 	}
 
@@ -292,7 +312,10 @@ class Game {
 			newElements.push(index);
 			ike += 2;
 		}
+		var oldSize:Int = currentPlayer.size;
 		eatAlgorithm();
+		var changeInSize:Float = (currentPlayer.size - oldSize) / currentPlayer.size;
+		Lib.trace(changeInSize);
 		killCheck();
 		nextTurn();
 		return true;
@@ -360,7 +383,7 @@ class Game {
 		var heads:Array<Int>;
 		var tails:Array<Int>;
 		var stack:Array<Int>;
-
+		
 		for (ike in 0...newElements.length) {
 
 			index = newElements[ike];
@@ -401,27 +424,71 @@ class Game {
 	}
 
 	private function killCheck():Void {
-
-		var data:BitmapData = new BitmapData(Common.BOARD_SIZE, Common.BOARD_SIZE, false, 0x0);
-		data.setVector(data.rect, colorGrid);
-
+		
+		aliveGrid.splice(0, aliveGrid.length);
+		aliveGrid[Common.BOARD_NUM_CELLS - 1] = false;
+		
+		// start with the living heads
 		for (ike in 0...players.length) {
 			var player:Player = players[ike];
 			if (player.alive) player.alive = colorGrid[player.headIndex] != DEAD;
-			if (player.alive) data.floodFill(player.headX, player.headY, 0x0);
-		}
-
-		var output:Vector<UInt> = data.getVector(data.rect);
-		for (ike in 0...output.length) {
-			if (output[ike] & 0xF != 0) {
-				// change current player's size
-				playerPool[colorGrid[ike] - 1].size--;
-				colorGrid[ike] = DEAD;
+			if (player.alive) {
+				newElements.push(player.headIndex);
+				aliveGrid[player.headIndex] = true;
 			}
 		}
-
+		
+		var w:Int = Common.BOARD_SIZE;
+		var ike:Int = 0;
+		var num:Int = newElements.length;
+		
+		// throw neighbors into newElements
+		while (ike < num) {
+			var index:Int = newElements[ike];
+			var yCoord:Int = Std.int(index / w);
+			var xCoord:Int = index - (yCoord * w);
+			var color:Int = colorGrid[index];
+			var amt:Int;
+			
+			amt = index - 1;
+			if (xCoord > 0     && !aliveGrid[amt] && color == colorGrid[amt]) {
+				aliveGrid[amt] = true;
+				newElements.push(amt);
+				num++;
+			}
+			
+			amt = index + 1;
+			if (xCoord < w - 1 && !aliveGrid[amt] && color == colorGrid[amt]) {
+				aliveGrid[amt] = true;
+				newElements.push(amt);
+				num++;
+			}
+			
+			amt = index - w;
+			if (yCoord > 0     && !aliveGrid[amt] && color == colorGrid[amt]) {
+				aliveGrid[amt] = true;
+				newElements.push(amt);
+				num++;
+			}
+			
+			amt = index + w;
+			if (yCoord < w - 1 && !aliveGrid[amt] && color == colorGrid[amt]) {
+				aliveGrid[amt] = true;
+				newElements.push(amt);
+				num++;
+			}
+			
+			ike++;
+		}
+		
+		// delete the cells that aren't flagged
+		for (ike in 0...aliveGrid.length) {
+			if (colorGrid[ike] == DEAD || aliveGrid[ike]) continue;
+			playerPool[colorGrid[ike] - 1].size--;
+			colorGrid[ike] = DEAD;
+		}
+		
 		// resize the players
-
 		for (ike in 0...players.length) {
 			var player:Player = players[ike];
 			if (player.alive) {
@@ -434,11 +501,26 @@ class Game {
 				}
 			}
 		}
+		
+		newElements.splice(0, newElements.length);
 	}
 
 	private function nextTurn():Void {
 		var lastPlayer:Player = currentPlayer;
 		// give some players some powerups if this is a deluxe game
+		for (ike in 0...players.length) {
+			var player:Player = players[ike];
+			if (player.alive) {
+				if (player.biteGrowth >= 1) {
+					player.bites++;
+					player.biteGrowth = 0;
+				}
+				if (player.swapGrowth >= 1) {
+					player.swaps++;
+					player.swapGrowth = 0;
+				}
+			}
+		}
 		do {
 			currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
 			currentPlayer = players[currentPlayerIndex];
@@ -453,12 +535,16 @@ class Game {
 		if (gameType == null) gameType = GameType.CLASSIC;
 		switch (gameType) {
 			case CLASSIC:
-			case DELUXE(startSwaps, startBites, timeLimit):
+			case DELUXE(firstSwaps, firstBites, timeLimit):
 			case MAYHEM:
 		}
 
 		// Prime the grid
-		for (ike in 0...Common.BOARD_NUM_CELLS) colorGrid[ike] = DEAD;
+		if (defaultGrid != null) {
+			for (ike in 0...Common.BOARD_NUM_CELLS) colorGrid[ike] = Std.int(defaultGrid[ike]);
+		} else {
+			for (ike in 0...Common.BOARD_NUM_CELLS) colorGrid[ike] = DEAD;
+		}
 		var currentHeads:Array<Int> = Common.HEADS[_numPlayers - 1];
 		players.splice(0, players.length);
 
@@ -466,8 +552,10 @@ class Game {
 		for (ike in 0..._numPlayers) {
 			var player:Player = playerPool[ike];
 			players.push(player);
-			player.bites = 100;
-			player.swaps = 100;
+			player.bites = 2;
+			player.swaps = 10;
+			player.biteGrowth = 0;
+			player.swapGrowth = 0;
 			player.size = 1;
 			player.biteSize = 1;
 			player.headX = currentHeads[ike * 2];
@@ -492,7 +580,6 @@ class Game {
 				var valid:Bool = false;
 				var x:Int = ike % w;
 				var y:Int = Std.int((ike - x) / w);
-				//Lib.trace(ike);
 				if ((x > 0 && colorGrid[ike - 1] != 0 && colorGrid[ike - 1] != currentPlayer.id) ||
 					(x < w - 1 && colorGrid[ike + 1] != 0 && colorGrid[ike + 1] != currentPlayer.id) ||
 					(y > 0 && colorGrid[ike - w] != 0 && colorGrid[ike - w] != currentPlayer.id) ||

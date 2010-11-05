@@ -8,8 +8,10 @@ class Player {
 	public var headIndex:Int;
 	public var headX:Int;
 	public var headY:Int;
-	public var id:UInt;
+	public var id:Int;
 	public var alive:Bool;
+	public var biteGrowth:Float;
+	public var swapGrowth:Float;
 	
 	public function new(_id:Int):Void {
 		id = _id;

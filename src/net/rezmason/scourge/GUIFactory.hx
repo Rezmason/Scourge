@@ -15,6 +15,7 @@ import flash.geom.Matrix;
 import flash.geom.Rectangle;
 import flash.text.TextField;
 import flash.text.TextFormat;
+import flash.text.TextFormatAlign;
 import flash.Lib;
 
 class GUIFactory {
@@ -63,7 +64,7 @@ class GUIFactory {
 	public static function makeTooth(?size:Null<Float>):Sprite {
 		if (size == null) size = 15;
 		var tooth:Sprite = new Sprite();
-		tooth.graphics.beginFill(0xAAAAAA);
+		tooth.graphics.beginFill(0x888888);
 		tooth.graphics.moveTo(0, -size / 2);
 		tooth.graphics.lineTo(size / 2, 0);
 		tooth.graphics.lineTo(0, size / 2);
@@ -99,8 +100,10 @@ class GUIFactory {
 	}
 	
 	public static function makeContainer(children:Array<Dynamic>):Sprite {
-		var sprite:Sprite = new Sprite();
-		// ASK ABOUT THIS
+		return fillSprite(new Sprite(), children);
+	}
+	
+	public static function fillSprite(sprite:Sprite, children:Array<Dynamic>):Sprite {
 		while (children.length > 0) sprite.addChildAt(children.pop(), 0);
 		return sprite;
 	}
@@ -114,13 +117,24 @@ class GUIFactory {
 		return ct;
 	}
 	
-	public static function makeTraceBox(?w:Float = 0, ?h:Float = 0):TextField {
-		var traceBox:TextField = new TextField();
-		if (w > 0) traceBox.width = w;
-		if (h > 0) traceBox.height = h;
-		traceBox.defaultTextFormat = new TextFormat("_sans", 12, 0xFFFFFF);
-		traceBox.mouseEnabled = false;
-		return traceBox;
+	public static function makeTextBox(?w:Float = 0, ?h:Float = 0, ?fontName:String = "_sans", 
+			?fontSize:Float = 12, ?color:Int = 0xFFFFFF, ?rightAlign:Bool = false, ?multiline:Bool = false):TextField {
+		var textBox:TextField = new TextField();
+		//textBox.border = true;
+		//textBox.borderColor = 0xFFFFFF;
+		
+		if (w > 0) textBox.width = w;
+		if (h > 0) textBox.height = h;
+		var format:TextFormat = new TextFormat(fontName, fontSize, color);
+		if (rightAlign) format.align = TextFormatAlign.RIGHT;
+		textBox.defaultTextFormat = format;
+		textBox.mouseEnabled = false;
+		textBox.selectable = false;
+		textBox.embedFonts = fontName.charAt(0) != "_";
+		textBox.multiline = multiline;
+		textBox.blendMode = BlendMode.LAYER;
+		
+		return textBox;
 	}
 	
 	public static function gray(value:Int):UInt {
