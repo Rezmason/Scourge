@@ -6,12 +6,10 @@ import flash.display.Sprite;
 import flash.geom.ColorTransform;
 import flash.geom.Rectangle;
 
-import flash.text.Font;
 import flash.text.TextField;
 
 class TimerPanel extends Sprite {
 	
-	private var numericFontName:String;
 	private var background:Shape;
 	public var counter:TextField;
 	public var skipButton:SimpleButton;
@@ -19,13 +17,10 @@ class TimerPanel extends Sprite {
 	public function new():Void {
 		
 		super();
-	
-		var font:Font = new ScourgeLib_MISO();
-		numericFontName = font.fontName;
 		
 		background = GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, 0, 0, Layout.WELL_WIDTH, Layout.TIMER_HEIGHT, 40);
 		
-		counter = GUIFactory.makeTextBox(100, 30, numericFontName, 28);
+		counter = GUIFactory.makeTextBox(100, 30, GUIFactory.MISO, 28);
 		counter.text = "0:00";
 		
 		skipButton = GUIFactory.makeButton(ScourgeLib_SkipSymbol, ScourgeLib_SkipButtonHitState, 1.3);

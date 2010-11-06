@@ -7,7 +7,6 @@ import flash.display.SimpleButton;
 import flash.display.Sprite;
 import flash.geom.ColorTransform;
 import flash.geom.Rectangle;
-import flash.text.Font;
 import flash.text.TextField;
 
 class Well extends Sprite {
@@ -18,7 +17,6 @@ class Well extends Sprite {
 	public var biteButton:SimpleButton;
 	public var swapButton:SimpleButton;
 	
-	private var numericFontName:String;
 	public var biteCounter:TextField;
 	public var swapCounter:TextField;
 	
@@ -29,9 +27,6 @@ class Well extends Sprite {
 	public function new():Void {
 		
 		super();
-		
-		var font:Font = new ScourgeLib_MISO();
-		numericFontName = font.fontName;
 		
 		background = GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, 0, 0, Layout.WELL_WIDTH, Layout.WELL_WIDTH, 40);
 		
@@ -49,8 +44,8 @@ class Well extends Sprite {
 		biteButton.x = Layout.WELL_WIDTH - Layout.WELL_BORDER;
 		biteButton.y = Layout.WELL_WIDTH - Layout.WELL_BORDER;
 		
-		swapCounter = GUIFactory.makeTextBox(100, 30, numericFontName, 28);
-		biteCounter = GUIFactory.makeTextBox(100, 30, numericFontName, 28, 0xFFFFFF, true);
+		swapCounter = GUIFactory.makeTextBox(100, 30, GUIFactory.MISO, 28);
+		biteCounter = GUIFactory.makeTextBox(100, 30, GUIFactory.MISO, 28, 0xFFFFFF, true);
 		
 		smallBiteIndicator = new SmallTeeth();
 		smallBiteIndicator.visible = false;

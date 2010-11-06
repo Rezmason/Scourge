@@ -97,6 +97,13 @@ class Game {
 		return biteLimits;
 		// TOP RIGHT BOTTOM LEFT
 	}
+	
+	public function getPlayer(index:Int):Player {
+		var returnVal:Player = null;
+		if (index < players.length) returnVal = players[index];
+		if (!returnVal.alive) returnVal = null;
+		return returnVal;
+	}
 
 	private function rotatePiece(?cc:Bool):Array<Int> {
 		for (n in validPositionCache.keys()) validPositionCache.remove(n);
@@ -312,10 +319,7 @@ class Game {
 			newElements.push(index);
 			ike += 2;
 		}
-		var oldSize:Int = currentPlayer.size;
 		eatAlgorithm();
-		var changeInSize:Float = (currentPlayer.size - oldSize) / currentPlayer.size;
-		Lib.trace(changeInSize);
 		killCheck();
 		nextTurn();
 		return true;
@@ -506,21 +510,21 @@ class Game {
 	}
 
 	private function nextTurn():Void {
-		var lastPlayer:Player = currentPlayer;
 		// give some players some powerups if this is a deluxe game
-		for (ike in 0...players.length) {
-			var player:Player = players[ike];
-			if (player.alive) {
-				if (player.biteGrowth >= 1) {
-					player.bites++;
-					player.biteGrowth = 0;
-				}
-				if (player.swapGrowth >= 1) {
-					player.swaps++;
-					player.swapGrowth = 0;
-				}
+		if (Math.random() < 0.3) {
+			if (currentPlayer.bites == Common.MAX_BITES && currentPlayer.swaps < Common.MAX_SWAPS) {
+				currentPlayer.swaps++;
+			} else if (currentPlayer.swaps == Common.MAX_SWAPS && currentPlayer.bites < Common.MAX_BITES) {
+				currentPlayer.bites++;
+			} else if (Math.random() > 0.5) {
+				currentPlayer.bites++;
+			} else {
+				currentPlayer.swaps++;
 			}
 		}
+		
+		var lastPlayer:Player = currentPlayer;
+		
 		do {
 			currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
 			currentPlayer = players[currentPlayerIndex];
@@ -554,8 +558,6 @@ class Game {
 			players.push(player);
 			player.bites = 2;
 			player.swaps = 10;
-			player.biteGrowth = 0;
-			player.swapGrowth = 0;
 			player.size = 1;
 			player.biteSize = 1;
 			player.headX = currentHeads[ike * 2];

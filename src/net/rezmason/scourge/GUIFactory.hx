@@ -13,6 +13,7 @@ import flash.events.MouseEvent;
 import flash.geom.ColorTransform;
 import flash.geom.Matrix;
 import flash.geom.Rectangle;
+import flash.text.Font;
 import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
@@ -22,6 +23,9 @@ class GUIFactory {
 	
 	// QUESTION FOR THE LIST: How do I determine whether an instance extends a class?
 	// QUESTION FOR THE LIST: How might I merge types? var n:Dynamic<Class1, Class2>
+	
+	public static var MISO:String = "miso";
+	private static var __miso:Font = null;
 	
 	private static var numTeeth:Int = 0;
 	
@@ -122,6 +126,14 @@ class GUIFactory {
 		var textBox:TextField = new TextField();
 		//textBox.border = true;
 		//textBox.borderColor = 0xFFFFFF;
+		
+		if (fontName == MISO) {
+			if (__miso == null) {
+				Font.registerFont(ScourgeLib_MISO);
+				__miso = new ScourgeLib_MISO();
+			}
+			fontName = __miso.fontName;
+		}
 		
 		if (w > 0) textBox.width = w;
 		if (h > 0) textBox.height = h;

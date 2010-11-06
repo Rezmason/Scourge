@@ -17,7 +17,6 @@ import flash.geom.ColorTransform;
 import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
-import flash.text.Font;
 import flash.text.TextField;
 import flash.ui.Keyboard;
 import flash.utils.Timer;
@@ -93,6 +92,8 @@ class Board {
 	private var biteIndicator:MovieClip;
 	private var teeth:Array<Sprite>;
 	
+	private var statIndex:Int;
+	
 	private var pieceRecipe:Array<Int>;
 	private var pieceCenter:Array<Float>;
 	
@@ -139,9 +140,6 @@ class Board {
 	
 	private function initialize():Void {
 		
-		// Register that font
-		Font.registerFont(ScourgeLib_MISO);
-		
 		// initialize the primitive variables
 		draggingPiece = false;
 		pieceScaledDown = false;
@@ -154,6 +152,7 @@ class Board {
 		guiColorTransform = new ColorTransform();
 		overSwapButton = false;
 		overBiteButton = false;
+		statIndex = -1;
 		
 		// create the team color transforms
 		teamCTs = [];
@@ -246,6 +245,10 @@ class Board {
 		grid.teeth.addEventListener(MouseEvent.MOUSE_DOWN, firstBite);
 		scene.addEventListener(MouseEvent.MOUSE_UP, endBite);
 		
+		grid.teams.addEventListener(MouseEvent.ROLL_OVER, updateStats, false, 0, true);
+		grid.teams.addEventListener(MouseEvent.ROLL_OUT, updateStats, false, 0, true);
+		grid.teams.addEventListener(MouseEvent.MOUSE_MOVE, updateStats, false, 0, true);
+		
 		stage.addEventListener(Event.ADDED, resize, true);
 		stage.addEventListener(Event.RESIZE, resize);
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
@@ -332,6 +335,7 @@ class Board {
 				showPiece();
 			}
 			updateWell();
+			updateStats();
 		}
 	}
 	
@@ -348,7 +352,6 @@ class Board {
 	private function tweenGUIColors():Void {
 		well.tint(guiColorTransform);
 		timerPanel.tint(guiColorTransform);
-		statPanel.tint(guiColorTransform);
 		barBackground.transform.colorTransform = guiColorTransform;
 	}
 	
@@ -727,6 +730,35 @@ class Board {
 		if (swapCounterJob != null) swapCounterJob.complete();
 		if (biteCounterJob != null) biteCounterJob.complete();
 		well.updateCounters(currentPlayer.swaps, currentPlayer.bites);
+	}
+	
+	private function updateStats(?event:Event):Void {
+		var hilightedPlayerIndex:Int = -1;
+		if (draggingPiece || draggingBite) {
+			hilightedPlayerIndex = currentPlayerIndex;
+		} else if (event != null) {
+			if (event.type == MouseEvent.ROLL_OUT) {
+				hilightedPlayerIndex = currentPlayerIndex;
+			} else {
+				var pt:Point = new Point();
+				pt.x = grid.teams.mouseX;
+				pt.y = grid.teams.mouseY;
+				for (ike in 0...teamBitmaps.length) {
+					if (teamBitmaps[ike].hitTest(ORIGIN, 1, pt)) {
+						hilightedPlayerIndex = ike;
+						break;
+					}
+				}
+				if (hilightedPlayerIndex == -1) hilightedPlayerIndex = currentPlayerIndex;
+			}
+		} else {
+			hilightedPlayerIndex = currentPlayerIndex;
+		}
+		
+		if (statIndex == -1 || statIndex != hilightedPlayerIndex) {
+			statIndex = hilightedPlayerIndex;
+			statPanel.update(game.getPlayer(statIndex), teamCTs[statIndex]);
+		}
 	}
 	
 	private function rotatePiece(?event:Event):Void {

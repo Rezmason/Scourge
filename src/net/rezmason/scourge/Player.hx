@@ -10,10 +10,10 @@ class Player {
 	public var headY:Int;
 	public var id:Int;
 	public var alive:Bool;
-	public var biteGrowth:Float;
-	public var swapGrowth:Float;
+	public var name:String;
 	
 	public function new(_id:Int):Void {
 		id = _id;
+		name = "Player " + id;
 	}
 }
