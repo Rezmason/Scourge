@@ -123,6 +123,8 @@ class Board {
 		scene = __scene;
 		game = __game;
 		
+		scene.mouseEnabled = scene.mouseChildren = false;
+		
 		if (scene.stage != null) {
 			connectToStage();
 		} else {
@@ -245,9 +247,9 @@ class Board {
 		grid.teeth.addEventListener(MouseEvent.MOUSE_DOWN, firstBite);
 		scene.addEventListener(MouseEvent.MOUSE_UP, endBite);
 		
-		grid.teams.addEventListener(MouseEvent.ROLL_OVER, updateStats, false, 0, true);
-		grid.teams.addEventListener(MouseEvent.ROLL_OUT, updateStats, false, 0, true);
-		grid.teams.addEventListener(MouseEvent.MOUSE_MOVE, updateStats, false, 0, true);
+		//grid.teams.addEventListener(MouseEvent.ROLL_OVER, updateStatsOnEvent, false, 0, true);
+		grid.teams.addEventListener(MouseEvent.ROLL_OUT, updateStatsOnEvent, false, 0, true);
+		grid.teams.addEventListener(MouseEvent.MOUSE_MOVE, updateStatsOnEvent, false, 0, true);
 		
 		stage.addEventListener(Event.ADDED, resize, true);
 		stage.addEventListener(Event.RESIZE, resize);
@@ -265,6 +267,7 @@ class Board {
 		update(true, true);
 		initHeads();
 		//fillBoardRandomly();
+		scene.mouseEnabled = scene.mouseChildren = true;
 	}
 	
 	private function resize(?event:Event):Void {
@@ -549,6 +552,7 @@ class Board {
 	private function liftPiece(event:Event):Void {
 		if (draggingPiece || biting) return;
 		draggingPiece = true;
+		updateStats(null, true);
 		pieceHandle.mouseEnabled = pieceHandle.mouseChildren = false;
 		
 		if (pieceHandleJob != null) pieceHandleJob.complete();
@@ -732,10 +736,16 @@ class Board {
 		well.updateCounters(currentPlayer.swaps, currentPlayer.bites);
 	}
 	
-	private function updateStats(?event:Event):Void {
-		var hilightedPlayerIndex:Int = -1;
-		if (draggingPiece || draggingBite) {
+	private function updateStatsOnEvent(event:Event):Void {
+		updateStats(event);
+	}
+	
+	private function updateStats(?event:Event, ?showCurrentPlayer:Bool):Void {
+		var hilightedPlayerIndex:Int = statIndex;
+		if (showCurrentPlayer) {
 			hilightedPlayerIndex = currentPlayerIndex;
+		} else if (draggingPiece || draggingBite) {
+			//hilightedPlayerIndex = currentPlayerIndex;
 		} else if (event != null) {
 			if (event.type == MouseEvent.ROLL_OUT) {
 				hilightedPlayerIndex = currentPlayerIndex;
@@ -749,11 +759,12 @@ class Board {
 						break;
 					}
 				}
-				if (hilightedPlayerIndex == -1) hilightedPlayerIndex = currentPlayerIndex;
 			}
-		} else {
+		} else if (!grid.teams.hitTestPoint(scene.mouseX, scene.mouseY)) {
 			hilightedPlayerIndex = currentPlayerIndex;
 		}
+		
+		if (hilightedPlayerIndex == -1) hilightedPlayerIndex = currentPlayerIndex;
 		
 		if (statIndex == -1 || statIndex != hilightedPlayerIndex) {
 			statIndex = hilightedPlayerIndex;

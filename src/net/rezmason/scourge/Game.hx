@@ -100,8 +100,10 @@ class Game {
 	
 	public function getPlayer(index:Int):Player {
 		var returnVal:Player = null;
-		if (index < players.length) returnVal = players[index];
-		if (!returnVal.alive) returnVal = null;
+		if (players != null && players.length > 0) {
+			if (index < players.length) returnVal = players[index];
+			if (returnVal != null && !returnVal.alive) returnVal = null;
+		}
 		return returnVal;
 	}
 

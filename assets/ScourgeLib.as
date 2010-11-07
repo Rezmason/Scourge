@@ -17,6 +17,13 @@ package {
 		[Embed(source='swap.svg')]
 		public static const SwapSymbol:Class;
 		
+		[Embed(source='biteicon1.svg')]
+		public static const BiteIcon1:Class;
+		[Embed(source='biteicon2.svg')]
+		public static const BiteIcon2:Class;
+		[Embed(source='biteicon3.svg')]
+		public static const BiteIcon3:Class;
+		
 		[Embed(source='skip.svg')]
 		public static const SkipSymbol:Class;
 		[Embed(source='skip_button_base.svg')]

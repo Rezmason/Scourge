@@ -33,6 +33,8 @@ class TimerPanel extends Sprite {
 		skipButton.x = background.width - skipButton.width - Layout.WELL_BORDER;
 		
 		GUIFactory.fillSprite(this, [background, counter, skipButton]);
+		
+		counter.text = "---";
 	}
 	
 	public function tint(ct:ColorTransform):Void {
