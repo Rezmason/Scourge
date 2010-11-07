@@ -240,7 +240,7 @@ class Game {
 			
 			if (!rightDone) {
 				newIndex = index + ike;
-				if (xCoord + ike < m - 1 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.id) {
+				if (xCoord + ike < m && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.id) {
 					biteLimits[1]++;
 					validBiteEnds.push(index + ike);
 				} else {
@@ -250,7 +250,7 @@ class Game {
 			
 			if (!bottomDone) {
 				newIndex = index + ike * m;
-				if (yCoord + ike < m - 1 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.id) {
+				if (yCoord + ike < m && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.id) {
 					biteLimits[2]++;
 					validBiteEnds.push(index + ike * m);
 				} else {
@@ -272,7 +272,7 @@ class Game {
 			biteY = yCoord;
 				
 		}
-		
+		Lib.trace(biteLimits);
 		return true;
 	}
 

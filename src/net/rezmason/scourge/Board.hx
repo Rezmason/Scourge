@@ -240,12 +240,12 @@ class Board {
 		// add events
 		pieceHandle.addEventListener(MouseEvent.MOUSE_DOWN, liftPiece);
 		grid.addEventListener(MouseEvent.MOUSE_DOWN, liftPiece);
-		scene.addEventListener(MouseEvent.MOUSE_UP, dropPiece);
+		stage.addEventListener(MouseEvent.MOUSE_UP, dropPiece);
 		
 		grid.teeth.addEventListener(MouseEvent.MOUSE_OVER, updateBiteTooth);
 		grid.teeth.addEventListener(MouseEvent.ROLL_OUT, updateBiteTooth);
 		grid.teeth.addEventListener(MouseEvent.MOUSE_DOWN, firstBite);
-		scene.addEventListener(MouseEvent.MOUSE_UP, endBite);
+		stage.addEventListener(MouseEvent.MOUSE_UP, endBite);
 		
 		//grid.teams.addEventListener(MouseEvent.ROLL_OVER, updateStatsOnEvent, false, 0, true);
 		grid.teams.addEventListener(MouseEvent.ROLL_OUT, updateStatsOnEvent, false, 0, true);
@@ -338,7 +338,7 @@ class Board {
 				showPiece();
 			}
 			updateWell();
-			updateStats();
+			updateStats(null, true, true);
 		}
 	}
 	
@@ -740,7 +740,7 @@ class Board {
 		updateStats(event);
 	}
 	
-	private function updateStats(?event:Event, ?showCurrentPlayer:Bool):Void {
+	private function updateStats(?event:Event, ?showCurrentPlayer:Bool, ?forceUpdate:Bool):Void {
 		var hilightedPlayerIndex:Int = statIndex;
 		if (showCurrentPlayer) {
 			hilightedPlayerIndex = currentPlayerIndex;
@@ -766,7 +766,7 @@ class Board {
 		
 		if (hilightedPlayerIndex == -1) hilightedPlayerIndex = currentPlayerIndex;
 		
-		if (statIndex == -1 || statIndex != hilightedPlayerIndex) {
+		if (statIndex == -1 || statIndex != hilightedPlayerIndex || forceUpdate) {
 			statIndex = hilightedPlayerIndex;
 			statPanel.update(game.getPlayer(statIndex), teamCTs[statIndex]);
 		}
