@@ -4,8 +4,7 @@ import flash.Lib;
 import net.rezmason.scourge.Board;
 import net.rezmason.scourge.Game;
 
-
-class ScourgeProject extends Sprite {
+class ScourgeFlashProject extends Sprite {
 	public static function main():Void { 
 		var defaultGrid:String = Lib.current.loaderInfo.parameters.defaultGrid;
 		if (defaultGrid == null) defaultGrid = "";
