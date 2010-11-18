@@ -106,9 +106,18 @@ class Game {
 		}
 		return returnVal;
 	}
+	
+	public function getRollCall():Array<Player> {
+		// Order the players by their turn and by whether they are alive
+		var returnVal:Array<Player> = [];
+		for (ike in currentPlayerIndex...players.length) if (players[ike].alive) returnVal.push(players[ike]);
+		for (ike in 0...currentPlayerIndex) if (players[ike].alive) returnVal.push(players[ike]);
+		for (ike in 0...players.length) if (!players[ike].alive) returnVal.push(players[ike]);
+		return returnVal;
+	}
 
 	private function rotatePiece(?cc:Bool):Array<Int> {
-		for (n in validPositionCache.keys()) validPositionCache.remove(n);
+		for (ike in validPositionCache.keys()) validPositionCache.remove(ike);
 		currentAngle += cc ? 1 : 3;
 		currentAngle %= 4;
 		var cA:Int = currentAngle % Pieces.PIECES[currentPiece].length;
@@ -272,7 +281,6 @@ class Game {
 			biteY = yCoord;
 				
 		}
-		Lib.trace(biteLimits);
 		return true;
 	}
 

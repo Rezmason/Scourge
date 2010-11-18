@@ -92,8 +92,6 @@ class Board {
 	private var biteIndicator:MovieClip;
 	private var teeth:Array<Sprite>;
 	
-	private var statIndex:Int;
-	
 	private var pieceRecipe:Array<Int>;
 	private var pieceCenter:Array<Float>;
 	
@@ -154,7 +152,6 @@ class Board {
 		guiColorTransform = new ColorTransform();
 		overSwapButton = false;
 		overBiteButton = false;
-		statIndex = -1;
 		
 		// create the team color transforms
 		teamCTs = [];
@@ -185,7 +182,7 @@ class Board {
 		well = new Well();
 		timerPanel = new TimerPanel();
 		statPanel = new StatPanel(Layout.STAT_PANEL_HEIGHT);
-		barBackground = GUIFactory.drawSolidRect(new Shape(), 0x777777, 1, 150, 0, Layout.BAR_WIDTH - 150, Layout.BAR_HEIGHT);
+		barBackground = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 150, 0, Layout.BAR_WIDTH - 150, Layout.BAR_HEIGHT);
 		bar = GUIFactory.makeContainer([barBackground, timerPanel, statPanel, well]);
 		
 		// wire up the scene
@@ -246,10 +243,6 @@ class Board {
 		grid.teeth.addEventListener(MouseEvent.ROLL_OUT, updateBiteTooth);
 		grid.teeth.addEventListener(MouseEvent.MOUSE_DOWN, firstBite);
 		stage.addEventListener(MouseEvent.MOUSE_UP, endBite);
-		
-		//grid.teams.addEventListener(MouseEvent.ROLL_OVER, updateStatsOnEvent, false, 0, true);
-		grid.teams.addEventListener(MouseEvent.ROLL_OUT, updateStatsOnEvent, false, 0, true);
-		grid.teams.addEventListener(MouseEvent.MOUSE_MOVE, updateStatsOnEvent, false, 0, true);
 		
 		stage.addEventListener(Event.ADDED, resize, true);
 		stage.addEventListener(Event.RESIZE, resize);
@@ -338,7 +331,7 @@ class Board {
 				showPiece();
 			}
 			updateWell();
-			updateStats(null, true, true);
+			updateStats();
 		}
 	}
 	
@@ -354,8 +347,9 @@ class Board {
 	
 	private function tweenGUIColors():Void {
 		well.tint(guiColorTransform);
+		statPanel.tint(guiColorTransform);
 		timerPanel.tint(guiColorTransform);
-		barBackground.transform.colorTransform = guiColorTransform;
+		//barBackground.transform.colorTransform = guiColorTransform;
 	}
 	
 	private function updateHeads():Void {
@@ -552,7 +546,6 @@ class Board {
 	private function liftPiece(event:Event):Void {
 		if (draggingPiece || biting) return;
 		draggingPiece = true;
-		updateStats(null, true);
 		pieceHandle.mouseEnabled = pieceHandle.mouseChildren = false;
 		
 		if (pieceHandleJob != null) pieceHandleJob.complete();
@@ -736,40 +729,8 @@ class Board {
 		well.updateCounters(currentPlayer.swaps, currentPlayer.bites);
 	}
 	
-	private function updateStatsOnEvent(event:Event):Void {
-		updateStats(event);
-	}
-	
-	private function updateStats(?event:Event, ?showCurrentPlayer:Bool, ?forceUpdate:Bool):Void {
-		var hilightedPlayerIndex:Int = statIndex;
-		if (showCurrentPlayer) {
-			hilightedPlayerIndex = currentPlayerIndex;
-		} else if (draggingPiece || draggingBite) {
-			//hilightedPlayerIndex = currentPlayerIndex;
-		} else if (event != null) {
-			if (event.type == MouseEvent.ROLL_OUT) {
-				hilightedPlayerIndex = currentPlayerIndex;
-			} else {
-				var pt:Point = new Point();
-				pt.x = grid.teams.mouseX;
-				pt.y = grid.teams.mouseY;
-				for (ike in 0...teamBitmaps.length) {
-					if (teamBitmaps[ike].hitTest(ORIGIN, 1, pt)) {
-						hilightedPlayerIndex = ike;
-						break;
-					}
-				}
-			}
-		} else if (!grid.teams.hitTestPoint(scene.mouseX, scene.mouseY)) {
-			hilightedPlayerIndex = currentPlayerIndex;
-		}
-		
-		if (hilightedPlayerIndex == -1) hilightedPlayerIndex = currentPlayerIndex;
-		
-		if (statIndex == -1 || statIndex != hilightedPlayerIndex || forceUpdate) {
-			statIndex = hilightedPlayerIndex;
-			statPanel.update(game.getPlayer(statIndex), teamCTs[statIndex]);
-		}
+	private function updateStats():Void {
+		statPanel.update(game.getRollCall(), teamCTs);
 	}
 	
 	private function rotatePiece(?event:Event):Void {
