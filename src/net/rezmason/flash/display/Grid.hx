@@ -1,4 +1,4 @@
-package net.rezmason.scourge.flash.display;
+package net.rezmason.flash.display;
 
 import flash.display.BitmapData;
 import flash.display.Sprite;

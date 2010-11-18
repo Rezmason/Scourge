@@ -10,7 +10,7 @@ import flash.geom.Rectangle;
 
 import net.rezmason.scourge.Common;
 import net.rezmason.scourge.Layout;
-import net.rezmason.scourge.flash.display.Grid;
+import net.rezmason.flash.display.Grid;
 
 class GameGrid extends Sprite {
 	
