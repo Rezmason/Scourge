@@ -1,10 +1,13 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.flash;
 
 import flash.display.BitmapData;
 import flash.display.Shape;
 import flash.display.Sprite;
 import flash.geom.ColorTransform;
 import flash.text.TextField;
+
+import net.rezmason.scourge.Player;
+import net.rezmason.scourge.Common;
 
 import flash.Lib;
 

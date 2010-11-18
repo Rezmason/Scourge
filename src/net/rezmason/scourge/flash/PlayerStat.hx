@@ -1,4 +1,4 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.flash;
 
 import flash.display.DisplayObject;
 import flash.display.Shape;
@@ -9,6 +9,9 @@ import flash.text.TextField;
 import net.kawa.tween.KTJob;
 import net.kawa.tween.KTween;
 import net.kawa.tween.easing.Quad;
+
+import net.rezmason.scourge.Player;
+import net.rezmason.scourge.Layout;
 
 import flash.Lib;
 

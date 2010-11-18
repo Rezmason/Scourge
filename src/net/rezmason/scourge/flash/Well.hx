@@ -1,4 +1,4 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.flash;
 
 import flash.display.BlendMode;
 import flash.display.MovieClip;
@@ -8,6 +8,8 @@ import flash.display.Sprite;
 import flash.geom.ColorTransform;
 import flash.geom.Rectangle;
 import flash.text.TextField;
+
+import net.rezmason.scourge.Layout;
 
 class Well extends Sprite {
 	

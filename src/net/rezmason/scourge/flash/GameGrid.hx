@@ -1,4 +1,4 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.flash;
 
 import flash.display.BitmapData;
 import flash.display.BlendMode;
@@ -8,7 +8,9 @@ import flash.filters.GlowFilter;
 import flash.geom.ColorTransform;
 import flash.geom.Rectangle;
 
-import net.rezmason.display.Grid;
+import net.rezmason.scourge.Common;
+import net.rezmason.scourge.Layout;
+import net.rezmason.scourge.flash.display.Grid;
 
 class GameGrid extends Sprite {
 	

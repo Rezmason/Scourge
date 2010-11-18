@@ -1,4 +1,4 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.flash;
 
 import flash.display.CapsStyle;
 import flash.display.LineScaleMode;
@@ -6,6 +6,8 @@ import flash.display.Shape;
 import flash.display.Sprite;
 import flash.filters.GlowFilter;
 import flash.geom.ColorTransform;
+
+import net.rezmason.scourge.Layout;
 
 import flash.Lib;
 

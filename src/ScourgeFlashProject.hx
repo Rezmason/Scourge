@@ -1,7 +1,7 @@
 import flash.display.Sprite;
 import flash.Lib;
 
-import net.rezmason.scourge.Board;
+import net.rezmason.scourge.flash.Board;
 import net.rezmason.scourge.Game;
 
 class ScourgeFlashProject extends Sprite {

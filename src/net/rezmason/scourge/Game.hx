@@ -1,7 +1,5 @@
 package net.rezmason.scourge;
 
-import flash.Lib;
-
 class Game {
 
 	inline static var DEAD:Int = 0;

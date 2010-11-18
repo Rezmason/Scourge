@@ -1,7 +1,7 @@
 #build file
 --times
 
-#-v
+
 -cp src
 -cp lib/ktween/hxclasses
 -main ScourgeFlashProject

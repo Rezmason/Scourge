@@ -1,4 +1,4 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.flash;
 
 import flash.display.BitmapData;
 import flash.display.BitmapDataChannel;
@@ -26,6 +26,13 @@ import net.kawa.tween.KTJob;
 import net.kawa.tween.easing.Elastic;
 import net.kawa.tween.easing.Linear;
 import net.kawa.tween.easing.Quad;
+
+import net.rezmason.scourge.Common;
+import net.rezmason.scourge.Layout;
+import net.rezmason.scourge.Game;
+import net.rezmason.scourge.Player;
+import net.rezmason.scourge.PlayerAction;
+import net.rezmason.scourge.Pieces;
 
 import flash.Lib;
 

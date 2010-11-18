@@ -166,10 +166,10 @@ UI Ideas
 		All flat, white, graphical, with a gradient
 		
 MULTIPLAYER
-	Same machine
-	LAN
-	Server
-	P2P
+	Same machine (PC)
+	LAN (PC)
+	Server (PC, mobile)
+	P2P / Game Thing (mobile)
 	
 Player data is presented when the user hovers over a given player
 	Stats
@@ -178,3 +178,11 @@ Player data is presented when the user hovers over a given player
 		Bite icon and number of bites
 		In-game growth graph
 		Community rank graph
+		
+		
+Ad placement
+	sponsorship
+		If a player wears a logo and wins, he gets a promo code from the sponsor
+	last words
+		Before a player dies, he gets to say whatever he wants. OR he can force everyone to watch an ad for 15 seconds.
+	
