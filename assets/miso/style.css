@@ -1,0 +1,30 @@
+@font-face {
+	font-family: 'Miso Light';
+	src: url('miso-light.eot');
+	src: local('☺'), 
+	url('miso-light.woff') format('woff'), 
+	url('miso-light.ttf') format('truetype'), 
+	url('miso-light.svg#webfontR7AhzoT1') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'Miso';
+	src: url('miso.eot');
+	src: local('☺'), 
+	url('miso.woff') format('woff'), 
+	url('miso.ttf') format('truetype'), 
+	url('miso.svg#webfontBBcFGKvP') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'Miso Bold';
+	src: url('miso-bold.eot');
+	src: local('☺'), 
+	url('miso-bold.woff') format('woff'), 
+	url('miso-bold.ttf') format('truetype'), 
+	url('miso-bold.svg#webfontkr2cXK5S') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
