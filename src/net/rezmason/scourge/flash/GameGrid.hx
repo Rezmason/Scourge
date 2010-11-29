@@ -22,7 +22,7 @@ class GameGrid extends Sprite {
 	public var blurredPattern:Shape;
 	public var biteRegion:Shape;
 	public var clouds:Shape;
-	public var teams:Sprite;
+	public var bodies:Sprite;
 	public var heads:Sprite;
 	public var teeth:Sprite;
 	public var faderBitmap:BitmapData;
@@ -38,9 +38,9 @@ class GameGrid extends Sprite {
 		background = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 0, 0, bmpSize + 20, bmpSize + 20, 6);
 		GUIFactory.drawSolidRect(background, 0x101010, 1, 4, 4, bmpSize + 12, bmpSize + 12, 4);
 		biteRegion = new Shape();
-		teams = new Sprite();
-		teams.transform.colorTransform = new ColorTransform(0.6, 0.6, 0.6, 3);
-		teams.blendMode = BlendMode.ADD;
+		bodies = new Sprite();
+		bodies.transform.colorTransform = new ColorTransform(0.6, 0.6, 0.6, 3);
+		bodies.blendMode = BlendMode.ADD;
 		heads = new Sprite();
 		heads.x = heads.y = Layout.BOARD_BORDER;
 		heads.mouseEnabled = heads.mouseChildren = false;
@@ -67,12 +67,13 @@ class GameGrid extends Sprite {
 		fader.blendMode = BlendMode.LAYER;
 		fader.x = fader.y = Layout.BOARD_BORDER;
 		biteTooth = new BiteTooth();
+		biteTooth.x = biteTooth.y = bmpSize / 2;
 		
 		GUIFactory.fillSprite(this, [
 			background, 
 			pattern, 
 			blurredPattern, 
-			teams, 
+			bodies, 
 			heads, 
 			clouds, 
 			fader, 

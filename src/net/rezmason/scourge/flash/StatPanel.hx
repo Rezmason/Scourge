@@ -8,7 +8,7 @@ import flash.text.TextField;
 
 import net.rezmason.scourge.Player;
 import net.rezmason.scourge.Common;
-
+import net.rezmason.scourge.Layout;
 import flash.Lib;
 
 class StatPanel extends Sprite {
@@ -22,9 +22,9 @@ class StatPanel extends Sprite {
 		
 		playerStatPool = [];
 		
-		background = GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, 0, 0, 210, hgt, 40);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, 0, 0, 210, hgt, Layout.BAR_CORNER_RADIUS);
 		container = new Sprite();
-		container.mask = GUIFactory.drawSolidRect(new Shape(), 0x0, 1, 0, 0, 210, hgt, 40);
+		container.mask = GUIFactory.drawSolidRect(new Shape(), 0x0, 1, 0, 0, 210, hgt, Layout.BAR_CORNER_RADIUS);
 		GUIFactory.fillSprite(this, [background, container, container.mask]);
 		
 		for (ike in 0...Common.MAX_PLAYERS) playerStatPool.push(new PlayerStat(ike + 1, hgt / Common.MAX_PLAYERS));

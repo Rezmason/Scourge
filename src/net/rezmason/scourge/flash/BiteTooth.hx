@@ -16,9 +16,9 @@ class BiteTooth extends Sprite {
 	private static var TOOTH_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 7, 7, 1);
 	private static var WHITE_CT:ColorTransform = new ColorTransform(1, 1, 1, 1, 0xFF, 0xFF, 0xFF);
 	
-	private var bt1:Sprite;
-	private var body:Shape;
-	private var bt2:Sprite;
+	private var startTooth:Sprite;
+	private var toothMiddle:Shape;
+	private var endTooth:Sprite;
 	
 	public var endX:Int;
 	public var endY:Int;
@@ -29,11 +29,11 @@ class BiteTooth extends Sprite {
 		
 		endX = endY = 0;
 		
-		bt1 = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.2);
-		body = new Shape();
-		bt2 = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.2);
+		startTooth = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.2);
+		toothMiddle = new Shape();
+		endTooth = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.2);
 		
-		GUIFactory.fillSprite(this, [bt1, body, bt2]);
+		GUIFactory.fillSprite(this, [startTooth, toothMiddle, endTooth]);
 		
 		filters = [TOOTH_GLOW];
 		visible = false;
@@ -44,20 +44,20 @@ class BiteTooth extends Sprite {
 	
 	public function stretchTo(val:Int, horiz:Bool):Void {
 		if (horiz) {
-			bt2.x = val * Layout.UNIT_SIZE;
+			endTooth.x = val * Layout.UNIT_SIZE;
 			endX = val;
 		} else {
-			bt2.y = val * Layout.UNIT_SIZE;
+			endTooth.y = val * Layout.UNIT_SIZE;
 			endY = val;
 		}
-		body.graphics.clear();
-		body.graphics.lineStyle(bt1.width, 0xFFFFFF, 1, null, LineScaleMode.NORMAL, CapsStyle.NONE);
-		body.graphics.lineTo(bt2.x, bt2.y);
+		toothMiddle.graphics.clear();
+		toothMiddle.graphics.lineStyle(startTooth.width, 0xFFFFFF, 1, null, LineScaleMode.NORMAL, CapsStyle.NONE);
+		toothMiddle.graphics.lineTo(endTooth.x, endTooth.y);
 	}
 	
 	public function reset():Void {
-		bt2.x = bt2.y = 0;
+		endTooth.x = endTooth.y = 0;
 		endX = endY = 0;
-		body.graphics.clear();
+		toothMiddle.graphics.clear();
 	}
 }

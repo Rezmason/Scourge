@@ -9,6 +9,7 @@ class Layout {
 	public static var BAR_MARGIN:Float = (BAR_WIDTH - WELL_WIDTH) / 2;
 	public static var BAR_HEIGHT:Float = 600;
 	public static var BOARD_BORDER:Int = 10;
+	public static var BAR_CORNER_RADIUS:Int = 40;
 	public static var TIMER_HEIGHT:Float = 40;
 	public static var STAT_PANEL_HEIGHT:Float = Layout.BAR_HEIGHT - 4 * Layout.BAR_MARGIN - Layout.WELL_WIDTH - Layout.TIMER_HEIGHT;
 	

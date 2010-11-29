@@ -36,7 +36,7 @@ class Game {
 	private var changeIncrements:Array<Int>;
 
 	public function new(?_defaultGrid:Array<Dynamic>) {
-		defaultGrid = _defaultGrid;
+		defaultGrid = (_defaultGrid[0] == -1) ? null : _defaultGrid;
 		// Set up data structure
 		biteX = biteY = -1;
 		hat = [];
@@ -146,6 +146,8 @@ class Game {
 		if (action == null) action = PlayerAction.SKIP;
 		switch (action) {
 			case SKIP: 
+				// If a player with no bites skips, they're probably desparate or the game got boring.
+				if (currentPlayer.bites == 0 && Math.random() < 0.4) currentPlayer.bites++;
 				nextTurn();
 				return true;
 			case FORFEIT:
@@ -341,8 +343,8 @@ class Game {
 
 		processChangesIntoSlices(-1);
 
-		var colorSlice:Array<UInt> = [];
-		var freshSlice:Array<UInt> = [];
+		var colorSlice:Array<Int> = [];
+		var freshSlice:Array<Int> = [];
 		var flatElements:Array<Int> = [];
 
 		var stack:Array<Int>;
@@ -519,7 +521,7 @@ class Game {
 
 	private function nextTurn():Void {
 		// give some players some powerups if this is a deluxe game
-		if (Math.random() < 0.3) {
+		if (Math.random() < 0.4) {
 			if (currentPlayer.bites == Common.MAX_BITES && currentPlayer.swaps < Common.MAX_SWAPS) {
 				currentPlayer.swaps++;
 			} else if (currentPlayer.swaps == Common.MAX_SWAPS && currentPlayer.bites < Common.MAX_BITES) {
@@ -550,13 +552,12 @@ class Game {
 			case DELUXE(firstSwaps, firstBites, timeLimit):
 			case MAYHEM:
 		}
-
+		
 		// Prime the grid
-		if (defaultGrid != null) {
-			for (ike in 0...Common.BOARD_NUM_CELLS) colorGrid[ike] = Std.int(defaultGrid[ike]);
-		} else {
+		if (defaultGrid == null) {
 			for (ike in 0...Common.BOARD_NUM_CELLS) colorGrid[ike] = DEAD;
 		}
+		
 		var currentHeads:Array<Int> = Common.HEADS[_numPlayers - 1];
 		players.splice(0, players.length);
 
@@ -574,7 +575,18 @@ class Game {
 			player.alive = true;
 			colorGrid[player.headIndex] = player.id;
 		}
-
+		
+		// Prime the grid
+		if (defaultGrid != null) {
+			for (ike in 0..._numPlayers) playerPool[ike].size = 0;
+			for (ike in 0...Common.BOARD_NUM_CELLS) {
+				colorGrid[ike] = Std.int(defaultGrid[ike]);
+				if (colorGrid[ike] > 0) playerPool[colorGrid[ike] - 1].size++;
+			}
+		}
+		
+		killCheck();
+		
 		// It's player 1's turn
 		currentPlayerIndex = 0;
 		currentPlayer = players[currentPlayerIndex];

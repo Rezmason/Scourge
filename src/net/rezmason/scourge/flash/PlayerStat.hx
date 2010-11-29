@@ -48,16 +48,17 @@ class PlayerStat extends Sprite {
 		biteIcon2 = new ScourgeLib_BiteIcon2(); biteIcon2.visible = false;
 		biteIcon3 = new ScourgeLib_BiteIcon3(); biteIcon3.visible = false;
 		biteIcons = GUIFactory.fillSprite(new Sprite(), [biteIcon1, biteIcon2, biteIcon3]);
+		biteIcons.cacheAsBitmap = true;
 		biteIcons.width = biteIcons.height = hgt * 0.6;
 		biteIcons.x = biteIcons.y = hgt * 0.2;
 		txtName = GUIFactory.makeTextBox(210 - 3 * Layout.BAR_MARGIN - biteIcons.width, hgt * 0.4, GUIFactory.MISO, 28, 0xFFFFFF);
 		txtData = GUIFactory.makeTextBox(210 - 2 * Layout.BAR_MARGIN, hgt * 0.3, GUIFactory.MISO, 18, 0xFFFFFF);
 		
-		txtName.x = biteIcons.x + biteIcons.width + 3;
-		txtName.y = biteIcons.y - 4;
+		txtName.x = biteIcons.x + biteIcons.width + 6;
+		txtName.y = biteIcons.y - 7;
 		
 		txtData.x = txtName.x;
-		txtData.y = txtName.y + txtName.height;
+		txtData.y = txtName.y + txtName.height + 4;
 		
 		GUIFactory.fillSprite(this, [background, biteIcons, txtName, txtData]);
 	}

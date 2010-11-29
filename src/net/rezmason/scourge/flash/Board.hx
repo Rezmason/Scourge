@@ -3,6 +3,8 @@ package net.rezmason.scourge.flash;
 import flash.display.BitmapData;
 import flash.display.BitmapDataChannel;
 import flash.display.BlendMode;
+import flash.display.DisplayObject;
+import flash.display.DisplayObjectContainer;
 import flash.display.MovieClip;
 import flash.display.Shape;
 import flash.display.Sprite;
@@ -62,7 +64,7 @@ class Board {
 	private var game:Game;
 	private var scene:Sprite;
 	private var stage:Stage;
-	private var teamCTs:Array<ColorTransform>;
+	private var playerCTs:Array<ColorTransform>;
 	private var currentPlayer:Player;
 	private var currentPlayerIndex:Int;
 	private var shiftBite:Bool;
@@ -79,9 +81,9 @@ class Board {
 	private var piecePlug:Shape;
 	private var pieceBite:Sprite;
 	private var pieceHandle:Sprite;
-	private var teamBodies:Array<Shape>;
-	private var teamHeads:Array<Shape>;
-	private var teamBitmaps:Array<BitmapData>;
+	private var playerBodies:Array<Shape>;
+	private var playerHeads:Array<Shape>;
+	private var playerBitmaps:Array<BitmapData>;
 	private var draggingPiece:Bool;
 	private var biting:Bool;
 	private var draggingBite:Bool;
@@ -160,36 +162,39 @@ class Board {
 		overSwapButton = false;
 		overBiteButton = false;
 		
-		// create the team color transforms
-		teamCTs = [];
-		for (ike in 0...TEAM_COLORS.length) teamCTs[ike] = GUIFactory.makeCT(TEAM_COLORS[ike]);
+		// create the player color transforms
+		playerCTs = [];
+		for (ike in 0...TEAM_COLORS.length) playerCTs[ike] = GUIFactory.makeCT(TEAM_COLORS[ike]);
 		
-		// populate teamHeads and teamBodies
-		teamHeads = [];
-		teamBodies = [];
-		teamBitmaps = [];
+		// populate playerHeads and playerBodies
+		playerHeads = [];
+		playerBodies = [];
+		playerBitmaps = [];
 		var bmp:BitmapData;
 		var shp:Shape;
 		var bmpSize:Int = Common.BOARD_SIZE * Layout.UNIT_SIZE + 2 * Layout.BOARD_BORDER;
 		for (ike in 0...Common.MAX_PLAYERS) {
 			bmp = new BitmapData(bmpSize, bmpSize, true, 0x0);
-			teamBitmaps.push(bmp);
+			playerBitmaps.push(bmp);
 			
-			teamBodies.push(GUIFactory.makeBitmapShape(bmp, 1, true, teamCTs[ike]));
-			teamHeads.push(GUIFactory.makeHead(Layout.UNIT_SIZE, teamCTs[ike]));
+			playerBodies.push(GUIFactory.makeBitmapShape(bmp, 1, true, playerCTs[ike]));
+			playerHeads.push(GUIFactory.makeHead(Layout.UNIT_SIZE, playerCTs[ike]));
 		}
 		
 		// build the scene
 		background = GUIFactory.drawSolidRect(new Shape(), 0x0, 1, 0, 0, 800, 600);
+		background.cacheAsBitmap = true;
+		
 		grid = new GameGrid();
 		biteTooth = grid.biteTooth;
-		GUIFactory.fillSprite(grid.heads, teamHeads.copy());
-		GUIFactory.fillSprite(grid.teams, teamBodies.copy());
+		GUIFactory.fillSprite(grid.heads, playerHeads.copy());
+		GUIFactory.fillSprite(grid.bodies, playerBodies.copy());
 		traceBox = GUIFactory.makeTextBox(400, 100, "_sans", 24);
 		well = new Well();
 		timerPanel = new TimerPanel();
 		statPanel = new StatPanel(Layout.STAT_PANEL_HEIGHT);
-		barBackground = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 150, 0, Layout.BAR_WIDTH - 150, Layout.BAR_HEIGHT);
+		barBackground = GUIFactory.drawSolidRect(new Shape(), 0x888888, 1, 0, 0, Layout.BAR_WIDTH * 0.6, Layout.BAR_HEIGHT);
+		barBackground.cacheAsBitmap = true;
 		bar = GUIFactory.makeContainer([barBackground, timerPanel, statPanel, well]);
 		
 		// wire up the scene
@@ -268,6 +273,32 @@ class Board {
 		initHeads();
 		//fillBoardRandomly();
 		scene.mouseEnabled = scene.mouseChildren = true;
+		
+		//traceHierarchy();
+	}
+	
+	private function traceHierarchy(?target:DisplayObject = null, ?spit:Bool = true):String {
+		
+		if (target == null) target = untyped __as__(scene, DisplayObject);
+		
+		var str:String = "\n<element id='" + target.name + "' value='" + target.toString() + "'";
+		var container:DisplayObjectContainer = untyped __as__(target, DisplayObjectContainer);
+		if (container != null && container.numChildren > 0) {
+			str += ">";
+			for (ike in 0...container.numChildren) str += traceHierarchy(container.getChildAt(ike), false);
+			str += "\n</element>";
+		} else {
+			str += "/>";
+		}
+		
+		if (spit) {
+			var box:TextField = new TextField();
+			box.text = str;
+			box.background = true;
+			scene.addChild(box);
+		}
+		
+		return str;
 	}
 	
 	private function resize(?event:Event):Void {
@@ -292,21 +323,23 @@ class Board {
 		
 		bar.height = sh;
 		bar.scaleX = bar.scaleY;
-		bar.x = sw - bar.scaleX * Layout.BAR_WIDTH;
+		bar.x = 0;
 		bar.y = 0;
+		
+		var barWidth:Float = Layout.BAR_WIDTH * bar.scaleX;
 		
 		// scale and reposition grid
 		
-		if (bar.x > sh) {
-			grid.width = sh - 20;
+		if (sw - barWidth < sh) {
+			grid.width = sw - barWidth - 40;
 			grid.scaleY = grid.scaleX;
 		} else {
-			grid.height = bar.x - 20;
+			grid.height = sh - 40;
 			grid.scaleX = grid.scaleY;
 		}
 		
-		grid.x = (bar.x - grid.width ) * 0.5;
-		grid.y = (sh -    grid.height) * 0.5;
+		grid.x = barWidth + (sw - barWidth - grid.width) * 0.5;
+		grid.y = (sh - grid.height) * 0.5;
 	}
 	
 	private function update(?thePiece:Bool, ?thePlay:Bool, ?fade:Bool):Void {
@@ -344,9 +377,9 @@ class Board {
 	
 	private function cycleGUIColors():Void {
 		var tween:Dynamic = {};
-		tween.redMultiplier = teamCTs[currentPlayerIndex].redMultiplier;
-		tween.greenMultiplier = teamCTs[currentPlayerIndex].greenMultiplier;
-		tween.blueMultiplier = teamCTs[currentPlayerIndex].blueMultiplier;
+		tween.redMultiplier = playerCTs[currentPlayerIndex].redMultiplier;
+		tween.greenMultiplier = playerCTs[currentPlayerIndex].greenMultiplier;
+		tween.blueMultiplier = playerCTs[currentPlayerIndex].blueMultiplier;
 		if (guiColorJob != null) guiColorJob.complete();
 		guiColorJob = KTween.to(guiColorTransform, QUICK * 3, tween, POUNCE);
 		guiColorJob.onChange = tweenGUIColors;
@@ -356,13 +389,13 @@ class Board {
 		well.tint(guiColorTransform);
 		statPanel.tint(guiColorTransform);
 		timerPanel.tint(guiColorTransform);
-		//barBackground.transform.colorTransform = guiColorTransform;
+		barBackground.transform.colorTransform = guiColorTransform;
 	}
 	
 	private function updateHeads():Void {
 		var numPlayers:Int = game.getNumPlayers();
 		for (ike in 0...numPlayers) {
-			var head:Shape = teamHeads[ike];
+			var head:Shape = playerHeads[ike];
 			if (head.alpha == 1 && !game.isPlayerAlive(ike)) {
 				KTween.to(head, QUICK * 5, {scaleX:1, scaleY:1, alpha:0, visible:false}, Linear.easeOut);
 			} else {
@@ -403,7 +436,7 @@ class Board {
 		pieceCenter = game.getPieceCenter();
 		pieceHandle.rotation = 0;
 		var lastAlpha:Float = pieceHandle.alpha;
-		pieceHandle.transform.colorTransform = teamCTs[currentPlayerIndex];
+		pieceHandle.transform.colorTransform = playerCTs[currentPlayerIndex];
 		pieceHandle.alpha = lastAlpha;
 		
 		var c2X:Float = Layout.UNIT_SIZE * pieceCenter[0];
@@ -449,7 +482,7 @@ class Board {
 		rect.inflate(1, 1);
 		var rx:Int, ry:Int;
 		
-		prepareTeamBitmaps();
+		preparePlayerBitmaps();
 		
 		for (ike in 0...len) {
 			if (gameGrid[ike] > 0) {
@@ -459,20 +492,20 @@ class Board {
 				rect.y = ry * Layout.UNIT_SIZE + Layout.BOARD_BORDER;
 				rect.x -= 1;
 				rect.y -= 1;
-				teamBitmaps[gameGrid[ike] - 1].fillRect(rect, 0xFFFFFFFF);
+				playerBitmaps[gameGrid[ike] - 1].fillRect(rect, 0xFFFFFFFF);
 			}
 		}
 		
-		finishTeamBitmaps();
+		finishPlayerBitmaps();
 		
-		grid.teams.addChild(teamBodies[currentPlayerIndex]);
+		grid.bodies.addChild(playerBodies[currentPlayerIndex]);
 	}
 	
 	private function initHeads():Void {
 		var heads:Array<Int> = Common.HEADS[game.getNumPlayers() - 1];
 		
 		for (ike in 0...Common.MAX_PLAYERS) {
-			var head:Shape = teamHeads[ike];
+			var head:Shape = playerHeads[ike];
 			if (ike * 2 < heads.length) {
 				head.visible = true;
 				head.alpha = 1;
@@ -484,17 +517,17 @@ class Board {
 		}
 	}
 	
-	private function prepareTeamBitmaps():Void {
-		for (ike in 0...Common.MAX_PLAYERS) teamBitmaps[ike].fillRect(teamBitmaps[ike].rect, 0x0);
+	private function preparePlayerBitmaps():Void {
+		for (ike in 0...Common.MAX_PLAYERS) playerBitmaps[ike].fillRect(playerBitmaps[ike].rect, 0x0);
 	}
 	
-	private function finishTeamBitmaps():Void {
+	private function finishPlayerBitmaps():Void {
 		var bmp:BitmapData;
 		var bmpSize:Int = Common.BOARD_SIZE * Layout.UNIT_SIZE + 2 * Layout.BOARD_BORDER;
 		var bmp2:BitmapData = new BitmapData(bmpSize, bmpSize, true, 0x0);
 		
 		for (ike in 0...Common.MAX_PLAYERS) {
-			bmp = teamBitmaps[ike];
+			bmp = playerBitmaps[ike];
 			
 			bmp.applyFilter(bmp, bmp.rect, ORIGIN, SLIME_MAKER);
 			bmp2.fillRect(bmp.rect, 0x0);
@@ -509,7 +542,7 @@ class Board {
 		var mat:Matrix = new Matrix();
 		mat.tx = -grid.pattern.x;
 		mat.ty = -grid.pattern.y;
-		for (ike in 0...Common.MAX_PLAYERS) bmp2.draw(teamBitmaps[ike], mat, null, BlendMode.ADD);
+		for (ike in 0...Common.MAX_PLAYERS) bmp2.draw(playerBitmaps[ike], mat, null, BlendMode.ADD);
 		grid.blurredPatternData.draw(grid.pattern);
 		grid.blurredPatternData.applyFilter(grid.blurredPatternData, grid.blurredPatternData.rect, ORIGIN, GRID_BLUR);
 		//grid.blurredPatternData.fillRect(grid.blurredPatternData.rect, 0xFFFFFFFF);
@@ -521,10 +554,10 @@ class Board {
 		var whatev:Array<Array<Null<Bool>>> = [];
 		var rect:Rectangle = new Rectangle();
 		
-		prepareTeamBitmaps();
+		preparePlayerBitmaps();
 		
 		for (ike in 0...Common.MAX_PLAYERS) {
-			bmp = teamBitmaps[ike];
+			bmp = playerBitmaps[ike];
 			
 			for (jen in 0...80) {
 				var rx:Int = 0;
@@ -547,7 +580,7 @@ class Board {
 			}
 		}
 		
-		finishTeamBitmaps();
+		finishPlayerBitmaps();
 	}
 	
 	private function liftPiece(event:Event):Void {
@@ -638,7 +671,7 @@ class Board {
 			pieceLocX = Std.int(Math.round(gp.x / Layout.UNIT_SIZE));
 			pieceLocY = Std.int(Math.round(gp.y / Layout.UNIT_SIZE));
 			
-			pieceHandle.transform.colorTransform = game.evaluatePosition(pieceLocX, pieceLocY) ? PLAIN_CT : teamCTs[currentPlayerIndex];
+			pieceHandle.transform.colorTransform = game.evaluatePosition(pieceLocX, pieceLocY) ? PLAIN_CT : playerCTs[currentPlayerIndex];
 			
 			var gp2:Point = new Point(pieceLocX * Layout.UNIT_SIZE, pieceLocY * Layout.UNIT_SIZE);
 			
@@ -691,7 +724,7 @@ class Board {
 		
 		dragPiece();
 		
-		pieceHandle.transform.colorTransform = teamCTs[currentPlayerIndex];
+		pieceHandle.transform.colorTransform = playerCTs[currentPlayerIndex];
 		piece.filters = [PIECE_GLOW];
 		pieceScaledDown = false;
 		if (pieceHandleJob != null) pieceHandleJob.close();
@@ -737,7 +770,7 @@ class Board {
 	}
 	
 	private function updateStats():Void {
-		statPanel.update(game.getRollCall(), teamCTs);
+		statPanel.update(game.getRollCall(), playerCTs);
 	}
 	
 	private function rotatePiece(?event:Event):Void {
@@ -854,7 +887,7 @@ class Board {
 				case 3:biteIndicator = well.superBiteIndicator;
 			}
 			biteIndicator.visible = true;
-			biteIndicator.transform.colorTransform = teamCTs[currentPlayerIndex];
+			biteIndicator.transform.colorTransform = playerCTs[currentPlayerIndex];
 			pieceHandle.visible = false;
 			biteIndicator.gotoAndPlay("in");
 			
@@ -878,7 +911,7 @@ class Board {
 			grid.teeth.mouseEnabled = grid.teeth.mouseChildren = false;
 			gridTeethJob = KTween.to(grid.teeth, QUICK * 2, {alpha:0, visible:false}, POUNCE, hideTeeth);
 			biteToothJob = KTween.to(biteTooth, QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, POUNCE, biteTooth.reset);
-			teamHeads[currentPlayerIndex].visible = true;
+			playerHeads[currentPlayerIndex].visible = true;
 			pieceBite.visible = false;
 			
 			if (!overBiteButton && switched) {
@@ -897,7 +930,7 @@ class Board {
 	private function updateTeeth():Void {
 		
 		// We can optimize this to only happen when the baord is updated
-		var head:Shape = teamHeads[currentPlayerIndex];
+		var head:Shape = playerHeads[currentPlayerIndex];
 		var br:Array<Bool> = game.getBiteGrid();
 		var bx:Int, by:Int;
 		var totalTeeth:Int = grid.teeth.numChildren;
@@ -921,7 +954,7 @@ class Board {
 				tooth.visible = true;
 			}
 			
-			tooth.transform.colorTransform = teamCTs[currentPlayerIndex];
+			tooth.transform.colorTransform = playerCTs[currentPlayerIndex];
 			tooth.x = (bx + 0.5) * Layout.UNIT_SIZE;
 			tooth.y = (by + 0.5) * Layout.UNIT_SIZE;
 			grid.teeth.addChild(tooth);
@@ -935,7 +968,7 @@ class Board {
 		if (draggingBite) return;
 		if (biteToothJob != null) biteToothJob.complete();
 		if (event.type == MouseEvent.MOUSE_OVER) {
-			var tooth:Sprite = cast(event.target, Sprite);
+			var tooth:Sprite = untyped __as__(event.target, Sprite);
 			biteTooth.visible = true;
 			biteToothJob = KTween.to(biteTooth, QUICK, {scaleX:1, scaleY:1, alpha:1}, POUNCE);
 			biteTooth.x = tooth.x + Layout.BOARD_BORDER;

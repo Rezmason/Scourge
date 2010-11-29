@@ -30,7 +30,8 @@ class Well extends Sprite {
 		
 		super();
 		
-		background = GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, 0, 0, Layout.WELL_WIDTH, Layout.WELL_WIDTH, 40);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, 0, 0, Layout.WELL_WIDTH, Layout.WELL_WIDTH, Layout.BAR_CORNER_RADIUS);
+		background.cacheAsBitmap = true;
 		
 		rotateRightButton = GUIFactory.makeButton(ScourgeLib_RotateSymbol, ScourgeLib_WellButtonHitState, 1.5, 180, true);
 		rotateLeftButton = GUIFactory.makeButton(ScourgeLib_RotateSymbol, ScourgeLib_WellButtonHitState, 1.5, 270);
@@ -46,8 +47,8 @@ class Well extends Sprite {
 		biteButton.x = Layout.WELL_WIDTH - Layout.WELL_BORDER;
 		biteButton.y = Layout.WELL_WIDTH - Layout.WELL_BORDER;
 		
-		swapCounter = GUIFactory.makeTextBox(100, 30, GUIFactory.MISO, 28);
-		biteCounter = GUIFactory.makeTextBox(100, 30, GUIFactory.MISO, 28, 0xFFFFFF, true);
+		swapCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO, 28);
+		biteCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO, 28, 0xFFFFFF, true);
 		
 		smallBiteIndicator = new SmallTeeth();
 		smallBiteIndicator.visible = false;
