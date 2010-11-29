@@ -34,7 +34,7 @@ package {
 		[Embed(source='mousepointer.svg')]
 		public static const MousePointer:Class;
 		
-		[Embed(source='MISO-typeface (1)/MISO-BOL.OTF', fontName='MISO', embedAsCFF='false')]
+		[Embed(source='miso/miso-bold.ttf', fontName='MISO', embedAsCFF='false')]
 		public static const MISO:Class;
 	}
 }
