@@ -5,10 +5,17 @@
 -cp src
 -cp lib/ktween/hxclasses
 -main ScourgeFlashProject
--swf9 deploy/scourge.swf
+-swf9 deploy-flash/scourge.swf
 -swf-version 10
 --flash-strict
 -swf-lib lib/ktween/library.swf
 -swf-lib assets/ScourgeLib.swf
 # For now, these animations are Flash authored. I need to figure out how to make this platform independent
 -swf-lib assets/ScourgeBiteSymbols.swf
+
+
+--next
+
+-cp src
+-js deploy-js/js/scourge.js
+-main ScourgeJSProject
