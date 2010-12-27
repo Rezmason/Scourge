@@ -51,7 +51,6 @@ class GUIFactory {
 	public static function makeHead(size:Float, ?ct:ColorTransform):Shape {
 		var shp:Shape = new Shape();
 		var gMat:Matrix = new Matrix();
-		shp.visible = false;
 		gMat.createGradientBox(size * 2, size * 2, 0, -size, -size);
 		shp.graphics.beginGradientFill(GradientType.RADIAL, [0xFFFFFF, 0xFFFFFF], [0.5, 0], [0x80, 0xFF], gMat);
 		shp.graphics.drawCircle(0, 0, size);
@@ -60,6 +59,7 @@ class GUIFactory {
 		shp.graphics.beginFill(0x222222);
 		shp.graphics.drawCircle(0, 0, size * 0.5);
 		shp.graphics.endFill();
+		shp.visible = false;
 		shp.blendMode = BlendMode.ADD;
 		if (ct != null) shp.transform.colorTransform = ct;
 		return shp;
@@ -108,6 +108,7 @@ class GUIFactory {
 	}
 	
 	public static function fillSprite(sprite:Sprite, children:Array<Dynamic>):Sprite {
+		children = children.copy();
 		while (children.length > 0) sprite.addChildAt(children.pop(), 0);
 		return sprite;
 	}

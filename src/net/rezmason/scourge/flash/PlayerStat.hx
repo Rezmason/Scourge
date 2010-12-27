@@ -84,7 +84,7 @@ class PlayerStat extends Sprite {
 		tween.redMultiplier = ct.redMultiplier;
 		tween.greenMultiplier = ct.greenMultiplier;
 		tween.blueMultiplier = ct.blueMultiplier;
-		tintJob = KTween.to(tint, 0.5, tween, Quad.easeOut);
+		tintJob = KTween.to(tint, 0.5, tween, Quad.easeInOut);
 		tintJob.onChange = updateTint;
 	}
 	
@@ -95,6 +95,6 @@ class PlayerStat extends Sprite {
 	private function shiftTo(newY:Float):Void {
 		// tween to this new position
 		if (shiftJob != null) shiftJob.close();
-		shiftJob = KTween.to(this, 0.2, {y:newY}, Quad.easeOut);
+		shiftJob = KTween.to(this, 0.2, {y:newY}, Quad.easeInOut);
 	}
 }

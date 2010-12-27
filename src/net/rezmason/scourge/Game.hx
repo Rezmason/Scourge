@@ -6,7 +6,7 @@ class Game {
 
 	private var currentPiece:Int;
 	private var currentAngle:Int;
-	private var hat:Array<Int>;
+	private var pieceHat:Array<Int>;
 	private var _numPlayers:Int;
 	
 	private var defaultGrid:Array<Dynamic>;
@@ -20,7 +20,7 @@ class Game {
 	private var currentPlayerIndex:Int;
 	private var currentPlayer:Player;
 	private var newElements:Array<Int>;
-	private var freshest:Int;
+	private var freshness:Int;
 
 	private var stacks:Array<Array<Int>>;
 	private var hStack:Array<Int>;
@@ -39,7 +39,7 @@ class Game {
 		defaultGrid = (_defaultGrid[0] == -1) ? null : _defaultGrid;
 		// Set up data structure
 		biteX = biteY = -1;
-		hat = [];
+		pieceHat = [];
 		colorGrid = [];
 		freshGrid = [];
 		biteGrid = [];
@@ -60,20 +60,20 @@ class Game {
 
 	private function resetPieces():Void {
 		var len:Int = Pieces.PIECES.length;
-		for (ike in 0...len) hat.push(ike);
+		for (ike in 0...len) pieceHat.push(ike);
 	}
 
 	private function makePiece(?swap:Bool = false):Void {
 		for (n in validPositionCache.keys()) {
 			validPositionCache.remove(n);
 		}
-		if (!swap || hat.length == 0) resetPieces();
+		if (!swap || pieceHat.length == 0) resetPieces();
 		var rand:Int;
 		var currentBlocks:Array<Array<Int>> = Pieces.PIECES[currentPiece];
 		do {
-			rand = Std.int(Math.random() * hat.length);
-			} while (Pieces.PIECES[hat[rand]] == currentBlocks);
-		currentPiece = hat.splice(rand, 1)[0];
+			rand = Std.int(Math.random() * pieceHat.length);
+			} while (Pieces.PIECES[pieceHat[rand]] == currentBlocks);
+		currentPiece = pieceHat.splice(rand, 1)[0];
 		currentAngle = Std.int(Math.random() * 4);
 	}
 
@@ -125,6 +125,14 @@ class Game {
 	public function getColorGrid():Array<Int> {
 		return colorGrid.slice(0, Common.BOARD_NUM_CELLS);
 	}
+	
+	public function getFreshGrid():Array<Int> {
+		return freshGrid.slice(0, Common.BOARD_NUM_CELLS);
+	}
+	
+	public function getMaxFreshness():Int {
+		return freshness;
+	}
 
 	public function getCurrentPlayer():Player {
 		return currentPlayer;
@@ -147,11 +155,12 @@ class Game {
 		switch (action) {
 			case SKIP: 
 				// If a player with no bites skips, they're probably desparate or the game got boring.
-				if (currentPlayer.bites == 0 && Math.random() < 0.4) currentPlayer.bites++;
+				if (currentPlayer.bites == 0 && currentPlayer.hat.pick() <= 1) currentPlayer.bites++;
 				nextTurn();
 				return true;
 			case FORFEIT:
 				colorGrid[currentPlayer.headIndex] = 0;
+				resetFreshness();
 				killCheck();
 				currentPlayer.alive = false;
 				nextTurn();
@@ -299,11 +308,14 @@ class Game {
 			}
 		}
 		if (!valid) return false;
-
+		
+		resetFreshness();
+		
 		var step:Int = (xCoord == biteX) ? Common.BOARD_SIZE : 1;
 
 		do {
 			colorGrid[index] = DEAD;
+			freshGrid[index] = freshness;
 			if (index < biteIndex) {
 				index += step;
 			} else {
@@ -329,18 +341,20 @@ class Game {
 			newElements.push(index);
 			ike += 2;
 		}
+		resetFreshness();
 		eatAlgorithm();
 		killCheck();
 		nextTurn();
 		return true;
 	}
-
-	private function eatAlgorithm():Void {	
-
-		freshest = 1;
-
+	
+	private function resetFreshness():Void {
+		freshness = 1;
 		for (ike in 0...Common.BOARD_NUM_CELLS) freshGrid[ike] = 0;
-
+	}
+	
+	private function eatAlgorithm():Void {	
+		
 		processChangesIntoSlices(-1);
 
 		var colorSlice:Array<Int> = [];
@@ -406,7 +420,7 @@ class Game {
 			currentPlayer.size++;
 
 			colorGrid[index] = currentPlayer.id;
-			freshGrid[index] = freshest;
+			freshGrid[index] = freshness;
 
 			cell = GridCell.get(index);
 			heads = cell.heads;
@@ -422,7 +436,7 @@ class Game {
 		}
 
 		newElements.splice(0, newElements.length);
-		freshest++;
+		freshness++;
 	}
 
 	private function linearEatAlgorithm(cSlice:Array<Int>, fSlice:Array<Int>, elementList:Array<Int>):Void {
@@ -500,6 +514,7 @@ class Game {
 			if (colorGrid[ike] == DEAD || aliveGrid[ike]) continue;
 			playerPool[colorGrid[ike] - 1].size--;
 			colorGrid[ike] = DEAD;
+			freshGrid[ike] = freshness;
 		}
 		
 		// resize the players
@@ -521,7 +536,7 @@ class Game {
 
 	private function nextTurn():Void {
 		// give some players some powerups if this is a deluxe game
-		if (Math.random() < 0.4) {
+		if (currentPlayer.hat.pick() <= 1) {
 			if (currentPlayer.bites == Common.MAX_BITES && currentPlayer.swaps < Common.MAX_SWAPS) {
 				currentPlayer.swaps++;
 			} else if (currentPlayer.swaps == Common.MAX_SWAPS && currentPlayer.bites < Common.MAX_BITES) {
@@ -573,6 +588,7 @@ class Game {
 			player.headY = currentHeads[ike * 2 + 1];
 			player.headIndex = player.headY * Common.BOARD_SIZE + player.headX;
 			player.alive = true;
+			player.hat.fill();
 			colorGrid[player.headIndex] = player.id;
 		}
 		
@@ -585,6 +601,7 @@ class Game {
 			}
 		}
 		
+		resetFreshness();
 		killCheck();
 		
 		// It's player 1's turn
