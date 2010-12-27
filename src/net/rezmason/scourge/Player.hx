@@ -13,11 +13,13 @@ class Player {
 	public var id:Int;
 	public var alive:Bool;
 	public var name:String;
-	public var hat:Hat;
+	public var biteHat:Hat;
+	public var swapHat:Hat;
 	
 	public function new(_id:Int):Void {
 		
-		hat = new Hat(5);
+		biteHat = new Hat(6);
+		swapHat = new Hat(4);
 		
 		id = _id;
 		name = "Player " + id;

@@ -155,7 +155,7 @@ class Game {
 		switch (action) {
 			case SKIP: 
 				// If a player with no bites skips, they're probably desparate or the game got boring.
-				if (currentPlayer.bites == 0 && currentPlayer.hat.pick() <= 1) currentPlayer.bites++;
+				if (currentPlayer.bites == 0 && currentPlayer.biteHat.pick() <= 1) currentPlayer.bites++;
 				nextTurn();
 				return true;
 			case FORFEIT:
@@ -536,16 +536,11 @@ class Game {
 
 	private function nextTurn():Void {
 		// give some players some powerups if this is a deluxe game
-		if (currentPlayer.hat.pick() <= 1) {
-			if (currentPlayer.bites == Common.MAX_BITES && currentPlayer.swaps < Common.MAX_SWAPS) {
-				currentPlayer.swaps++;
-			} else if (currentPlayer.swaps == Common.MAX_SWAPS && currentPlayer.bites < Common.MAX_BITES) {
-				currentPlayer.bites++;
-			} else if (Math.random() > 0.5) {
-				currentPlayer.bites++;
-			} else {
-				currentPlayer.swaps++;
-			}
+		
+		if (currentPlayer.bites < Common.MAX_BITES && currentPlayer.biteHat.pick() <= 1) {
+			currentPlayer.bites++;
+		} else if (currentPlayer.swaps < Common.MAX_SWAPS && currentPlayer.swapHat.pick() <= 1) {
+			currentPlayer.swaps++;
 		}
 		
 		var lastPlayer:Player = currentPlayer;
@@ -588,7 +583,8 @@ class Game {
 			player.headY = currentHeads[ike * 2 + 1];
 			player.headIndex = player.headY * Common.BOARD_SIZE + player.headX;
 			player.alive = true;
-			player.hat.fill();
+			player.swapHat.fill();
+			player.biteHat.fill();
 			colorGrid[player.headIndex] = player.id;
 		}
 		
