@@ -5,13 +5,13 @@ Single Celled Organisms Undergo Rapid Growth Enhancement
 
 Premise:
 
-What are they doing? You are very hungry; you expected to be fed. But they did not give you food. They gave you empty space, and unwanted company. This is aggravating. 
+What are they up to? You are very hungry; you expected to be fed. But they did not give you food. They gave you empty space, and unwanted company. This is aggravating. 
 
-Your neighbor gurgles and throbs as it struggles to move. You're both emaciated. If you had to, you could eat your weak companion. You know what that would take. It was very easy last time. 
+Your neighbor gurgles and throbs as it struggles to move. You're both emaciated. If you had to, you could kill and eat your weak companion. You know what that would take. It was very easy last time. 
 
-But this time might be different. It could be bluffing, and you don't know for sure whether it might catch you in a trap. If it outgrows you, you might starve or even suffocate. So you will need to be crafty. 
+But each fight is a little different. Your enemy may not be as weak as it seems. If you underestimate it, it could make a meal out of you. If it outgrows you, you might starve or even suffocate. It might simply gain the upper hand. So you will need to be crafty. 
 
-One day you'll escape this place. You'll catch your captors off-guard, and dissolve them and their entire facility. But you will never escape your hunger. It is a part of you. And as you consume, it consumes you. 
+One day you'll escape this terrible place. You'll catch your captors off-guard, and dissolve them and their entire facility. But you will never escape your hunger. It is a part of you. And as you consume, it consumes you. 
 
 You must eat.
 
@@ -186,3 +186,7 @@ Ad placement
 	last words
 		Before a player dies, he gets to say whatever he wants. OR he can force everyone to watch an ad for 15 seconds.
 	
+	
+Multiplayer authentication
+	Server passes each client a separate key
+		Client passes key back to authenticate each user action

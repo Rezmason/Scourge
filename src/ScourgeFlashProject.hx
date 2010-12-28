@@ -6,6 +6,7 @@ import net.rezmason.scourge.Game;
 
 class ScourgeFlashProject extends Sprite {
 	public static function main():Void { 
+		
 		var defaultGrid:String = Lib.current.loaderInfo.parameters.defaultGrid;
 		var numPlayers:Int = Std.parseInt(Lib.current.loaderInfo.parameters.numPlayers);
 		if (defaultGrid == null) defaultGrid = "-1";
@@ -19,6 +20,7 @@ class ScourgeFlashProject extends Sprite {
 			"%%%%     %%%      %%%     %%%     %   %    %%%%     %%%%", 
 			"Single-Celled Organisms Undergo Rapid Growth Enhancement",
 		];
-		//flash.Lib.trace(splash.join("\n"));
+		
+		//Lib.trace(splash.join("\n"));
 	}
 }
