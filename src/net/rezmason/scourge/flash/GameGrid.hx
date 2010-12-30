@@ -39,9 +39,10 @@ class GameGrid extends Sprite {
 	
 	public var firstBiteCheck:Int->Int->Array<Int>;
 	public var endBiteCheck:Int->Int->Void;
+	public var space:Shape;
 	
 	private var background:Shape;
-	public var pattern:Grid;
+	private var pattern:Grid;
 	private var blurredPatternData:BitmapData;
 	private var blurredPattern:Shape;
 	private var clouds:Shape;
@@ -90,6 +91,8 @@ class GameGrid extends Sprite {
 		heads = new Sprite();
 		heads.x = heads.y = Layout.BOARD_BORDER;
 		heads.mouseEnabled = heads.mouseChildren = false;
+		space = new Shape();
+		space.x = space.y = Layout.BOARD_BORDER;
 		pattern = new Grid(Layout.UNIT_SIZE * 2, bmpSize, bmpSize, 0xFF111111, 0xFF222222);
 		pattern.x = pattern.y = Layout.BOARD_BORDER;
 		blurredPatternData = new BitmapData(bmpSize, bmpSize, true, 0x0);
@@ -119,6 +122,7 @@ class GameGrid extends Sprite {
 		
 		GUIFactory.fillSprite(this, [
 			background, 
+			space,
 			pattern, 
 			blurredPattern, 
 			bodies,

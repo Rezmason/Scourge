@@ -35,7 +35,7 @@ import flash.Lib;
 
 class Board {
 	
-	inline static var __snap:Bool = true; // not sure if I want this
+	inline static var __snapHard:Bool = true; // not sure if I want this
 	
 	inline static var MIN_WIDTH:Int = 400;
 	inline static var MIN_HEIGHT:Int = 300;
@@ -166,6 +166,7 @@ class Board {
 		GUIFactory.wireUp(well.rotateLeftButton, rotateHint, rotateHint, rotatePiece);
 		GUIFactory.wireUp(well.biteButton, biteHint, biteHint, toggleBite);
 		GUIFactory.wireUp(well.swapButton, swapHint, swapHint, swapPiece);
+		
 		GUIFactory.wireUp(timerPanel.skipButton, null, null, skipTurn);
 		
 		gridHitBox = grid.getHitBox();
@@ -267,7 +268,7 @@ class Board {
 	
 	private function resize(?event:Event):Void {
 		
-		if (event.type == Event.ADDED && event.target != flash.Lib.current) return;
+		if (event.type == Event.ADDED && event.target != scene) return;
 		
 		var sw:Float = stage.stageWidth;
 		var sh:Float = stage.stageHeight;
@@ -275,7 +276,7 @@ class Board {
 		sw = Math.max(sw, MIN_WIDTH);
 		sh = Math.max(sh, MIN_HEIGHT);
 		
-		// size the background. This is more //////important later when I texture it
+		// size the background. This is more ////////important later when I texture it
 		background.scaleX = background.scaleY = 1;
 		if (background.width / background.height < sw / sh) {
 			background.width = sw;
@@ -435,7 +436,7 @@ class Board {
 			pt = piece.globalToLocal(pieceHandle.localToGlobal(ORIGIN));
 			piece.x = (pt.x - c2X + offY) * piece.scaleX;
 			piece.y = (pt.y - c2Y + offX) * piece.scaleY;
-			dragPiece(__snap);
+			dragPiece(__snapHard);
 		} else {
 			piece.x = pieceHomeX;
 			piece.y = pieceHomeY;
@@ -452,7 +453,7 @@ class Board {
 		if (pieceJob != null) pieceJob.complete();
 		if (pieceHandleSpinJob != null) pieceHandleSpinJob.complete();
 		
-		pieceBoardScale = grid.pattern.transform.concatenatedMatrix.a / piece.transform.concatenatedMatrix.a;
+		pieceBoardScale = grid.scaleX / (piece.scaleX * pieceHandle.scaleX * bar.scaleX);
 		
 		popPiece(true);
 		
@@ -508,7 +509,7 @@ class Board {
 		var oldX:Float = pieceHandle.x;
 		var oldY:Float = pieceHandle.y;
 		
-		var overGrid:Bool = gridHitBox.contains(grid.pattern.mouseX, grid.pattern.mouseY);
+		var overGrid:Bool = gridHitBox.contains(grid.space.mouseX, grid.space.mouseY);
 		var scale:Float;
 		
 		if (overGrid != pieceScaledDown) {
@@ -522,11 +523,11 @@ class Board {
 		pieceHandle.y = well.mouseY;
 		well.addChild(pieceHandle);
 		
-		if (overGrid && gridHitBox.containsRect(pieceHandle.getBounds(grid.pattern))) {
+		if (overGrid && gridHitBox.containsRect(pieceHandle.getBounds(grid.space))) {
 			
 			// grid snapping.
 			
-			var gp:Point = grid.pattern.globalToLocal(piece.localToGlobal(ORIGIN));
+			var gp:Point = grid.space.globalToLocal(piece.localToGlobal(ORIGIN));
 			
 			pieceLocX = Std.int(Math.round(gp.x / Layout.UNIT_SIZE));
 			pieceLocY = Std.int(Math.round(gp.y / Layout.UNIT_SIZE));
@@ -535,8 +536,8 @@ class Board {
 			
 			var gp2:Point = new Point(pieceLocX * Layout.UNIT_SIZE, pieceLocY * Layout.UNIT_SIZE);
 			
-			gp  = pieceHandle.globalToLocal(grid.pattern.localToGlobal(gp));
-			gp2 = pieceHandle.globalToLocal(grid.pattern.localToGlobal(gp2));
+			gp  = pieceHandle.globalToLocal(grid.space.localToGlobal(gp));
+			gp2 = pieceHandle.globalToLocal(grid.space.localToGlobal(gp2));
 			
 			gp2.x = pieceHandle.x + (gp2.x - gp.x) * pieceHandle.scaleX;
 			gp2.y = pieceHandle.y + (gp2.y - gp.y) * pieceHandle.scaleY;
@@ -566,7 +567,9 @@ class Board {
 		if (!draggingPiece) return;
 		pieceHandle.x = pieceHandle.x * (1 - SNAP_RATE) + handleGoalX * SNAP_RATE;
 		pieceHandle.y = pieceHandle.y * (1 - SNAP_RATE) + handleGoalY * SNAP_RATE;
-		if (Math.abs(pieceHandle.x + pieceHandle.y - handleGoalX - handleGoalY) < 2) finishHandlePush();
+		var dx:Float = pieceHandle.x - handleGoalX;
+		var dy:Float = pieceHandle.y - handleGoalY;
+		if (Math.sqrt(dx * dx + dy * dy) < 0.01) finishHandlePush();
 	}
 	
 	private function finishHandlePush():Void {
@@ -696,7 +699,7 @@ class Board {
 	
 	private function mouseHandler(event:MouseEvent):Void {
 		if (draggingPiece) {
-			dragPiece(__snap);
+			dragPiece(__snapHard);
 		}
 	}
 	
