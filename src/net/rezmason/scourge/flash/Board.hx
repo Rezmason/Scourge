@@ -1,7 +1,5 @@
 package net.rezmason.scourge.flash;
 
-import flash.display.BitmapData;
-import flash.display.BitmapDataChannel;
 import flash.display.BlendMode;
 import flash.display.DisplayObject;
 import flash.display.DisplayObjectContainer;
@@ -13,10 +11,8 @@ import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.events.TimerEvent;
-import flash.filters.BlurFilter;
 import flash.filters.GlowFilter;
 import flash.geom.ColorTransform;
-import flash.geom.Matrix;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.text.TextField;
@@ -26,7 +22,6 @@ import flash.utils.Timer;
 import net.kawa.tween.KTween;
 import net.kawa.tween.KTJob;
 import net.kawa.tween.easing.Linear;
-import net.kawa.tween.easing.Elastic;
 import net.kawa.tween.easing.Quad;
 
 import net.rezmason.scourge.Common;
@@ -46,21 +41,13 @@ class Board {
 	inline static var MIN_HEIGHT:Int = 300;
 	inline static var SNAP_RATE:Float = 0.3;
 	
-	private static var SLIME_MAKER:GlowFilter = new GlowFilter(0x0, 1, 14, 14, 2.5, 1, true);
-	private static var BLUR_FILTER:BlurFilter = new BlurFilter(6, 6, 2);
 	private static var PIECE_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 7, 7, 20, 1, true);
 	private static var PIECE_POP_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 10, 10, 20, 1, true);
 	private static var PIECE_SWAP_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 10, 10, 8, 1);
-	private static var GRID_BLUR:BlurFilter = new BlurFilter(4, 4, 1);
 	
 	private static var PLAIN_CT:ColorTransform = GUIFactory.makeCT(0xFFFFFF);
 	private static var TEAM_COLORS:Array<Int> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF];
 	private static var ORIGIN:Point = new Point();
-	
-	public static var QUICK:Float = 0.1;
-	public static var POUNCE:Float -> Float = Quad.easeOut;
-	public static var SLIDE:Float -> Float = Quad.easeInOut;
-	public static var ZIGZAG:Float -> Float = Elastic.easeOut;
 	
 	private var game:Game;
 	private var scene:Sprite;
@@ -73,7 +60,6 @@ class Board {
 	private var background:Shape;
 	private var grid:GameGrid;
 	private var bar:Sprite;
-	private var biteTooth:BiteTooth;
 	private var barBackground:Shape;
 	private var well:Well;
 	private var statPanel:StatPanel;
@@ -83,12 +69,8 @@ class Board {
 	private var piecePlug:Shape;
 	private var pieceBite:Sprite;
 	private var pieceHandle:Sprite;
-	private var playerBodies:Array<Shape>;
-	private var playerHeads:Array<Shape>;
-	private var playerBitmaps:Array<BitmapData>;
 	private var draggingPiece:Bool;
 	private var biting:Bool;
-	private var draggingBite:Bool;
 	private var swapHinting:Bool;
 	private var gridHitBox:Rectangle;
 	private var pieceBoardScale:Float;
@@ -100,9 +82,7 @@ class Board {
 	private var handleGoalY:Float;
 	private var handlePushTimer:Timer;
 	private var keyList:Array<Bool>;
-	private var biteLimits:Array<Int>;
 	private var biteIndicator:MovieClip;
-	private var teeth:Array<Sprite>;
 	
 	private var pieceRecipe:Array<Int>;
 	private var pieceCenter:Array<Float>;
@@ -114,8 +94,6 @@ class Board {
 	private var guiColorTransform:ColorTransform;
 	private var pieceBlockJobs:Array<KTJob>;
 	private var pieceBiteJob:KTJob;
-	private var gridTeethJob:KTJob;
-	private var biteToothJob:KTJob;
 	private var swapCounterJob:KTJob;
 	private var biteCounterJob:KTJob;
 	
@@ -156,11 +134,9 @@ class Board {
 		// initialize the primitive variables
 		draggingPiece = false;
 		pieceScaledDown = false;
-		draggingBite = false;
 		swapHinting = false;
 		biting = false;
 		pieceBlockJobs = [];
-		teeth = [];
 		keyList = [];
 		guiColorTransform = new ColorTransform();
 		overSwapButton = false;
@@ -171,33 +147,19 @@ class Board {
 		playerCTs = [];
 		for (ike in 0...TEAM_COLORS.length) playerCTs[ike] = GUIFactory.makeCT(TEAM_COLORS[ike]);
 		
-		// populate playerHeads and playerBodies
-		playerHeads = [];
-		playerBodies = [];
-		playerBitmaps = [];
-		var bmp:BitmapData;
-		var shp:Shape;
-		var bmpSize:Int = Common.BOARD_SIZE * Layout.UNIT_SIZE + 2 * Layout.BOARD_BORDER;
-		for (ike in 0...Common.MAX_PLAYERS) {
-			bmp = new BitmapData(bmpSize, bmpSize, true, 0x0);
-			playerBitmaps.push(bmp);
-			
-			playerBodies.push(GUIFactory.makeBitmapShape(bmp, 1, true, playerCTs[ike]));
-			playerHeads.push(GUIFactory.makeHead(Layout.UNIT_SIZE, playerCTs[ike]));
-		}
-		
 		// build the scene
 		background = GUIFactory.drawSolidRect(new Shape(), 0x0, 1, 0, 0, 800, 600);
 		background.cacheAsBitmap = true;
 		
-		grid = new GameGrid(playerHeads, playerBodies);
-		biteTooth = grid.biteTooth;
+		grid = new GameGrid();
+		for (ike in 0...Common.MAX_PLAYERS) grid.makePlayerHeadAndBody(playerCTs[ike]);
 		well = new Well();
 		timerPanel = new TimerPanel();
 		statPanel = new StatPanel(Layout.STAT_PANEL_HEIGHT);
 		barBackground = GUIFactory.drawSolidRect(new Shape(), 0x888888, 1, 0, 0, Layout.BAR_WIDTH * 0.6, Layout.BAR_HEIGHT);
 		barBackground.cacheAsBitmap = true;
 		bar = GUIFactory.makeContainer([barBackground, timerPanel, statPanel, well]);
+		
 		
 		// wire up the scene
 		GUIFactory.wireUp(well.rotateRightButton, rotateHint, rotateHint, rotatePiece);
@@ -253,10 +215,8 @@ class Board {
 		grid.addEventListener(MouseEvent.MOUSE_DOWN, liftPiece);
 		stage.addEventListener(MouseEvent.MOUSE_UP, dropPiece);
 		
-		grid.teeth.addEventListener(MouseEvent.MOUSE_OVER, updateBiteTooth);
-		grid.teeth.addEventListener(MouseEvent.ROLL_OUT, updateBiteTooth);
-		grid.teeth.addEventListener(MouseEvent.MOUSE_DOWN, firstBite);
-		stage.addEventListener(MouseEvent.MOUSE_UP, endBite);
+		grid.firstBiteCheck = firstBiteCheck;
+		grid.endBiteCheck = endBiteCheck;
 		
 		stage.addEventListener(Event.ADDED, resize, true);
 		stage.addEventListener(Event.RESIZE, resize);
@@ -273,7 +233,7 @@ class Board {
 		currentPlayerIndex = game.getCurrentPlayerIndex();
 		lastGUIColorCycle = -1;
 		update(true, true);
-		initHeads();
+		grid.initHeads(game.getNumPlayers());
 		grid.updateFadeSourceBitmap();
 		//fillBoardRandomly();
 		scene.mouseEnabled = scene.mouseChildren = true;
@@ -315,7 +275,7 @@ class Board {
 		sw = Math.max(sw, MIN_WIDTH);
 		sh = Math.max(sh, MIN_HEIGHT);
 		
-		// size the background. This is more //important later when I texture it
+		// size the background. This is more //////important later when I texture it
 		background.scaleX = background.scaleY = 1;
 		if (background.width / background.height < sw / sh) {
 			background.width = sw;
@@ -355,8 +315,9 @@ class Board {
 			} else {
 				cycleGUIColors();
 			}
-			updateGrid();
-			updateHeads();
+			
+			grid.updateBodies(game.getColorGrid());
+			grid.updateHeads(game.getPlayers());
 			
 			if (fade) return;
 		}
@@ -400,7 +361,7 @@ class Board {
 		tween.greenMultiplier = ct.greenMultiplier;
 		tween.blueMultiplier = ct.blueMultiplier;
 		if (guiColorJob != null) guiColorJob.complete();
-		guiColorJob = KTween.to(guiColorTransform, QUICK * 3, tween, SLIDE);
+		guiColorJob = KTween.to(guiColorTransform, Layout.QUICK * 3, tween, Layout.SLIDE);
 		guiColorJob.onChange = tweenGUIColors;
 	}
 	
@@ -409,18 +370,6 @@ class Board {
 		statPanel.tint(guiColorTransform);
 		timerPanel.tint(guiColorTransform);
 		barBackground.transform.colorTransform = guiColorTransform;
-	}
-	
-	private function updateHeads():Void {
-		var numPlayers:Int = game.getNumPlayers();
-		for (ike in 0...numPlayers) {
-			var head:Shape = playerHeads[ike];
-			if (head.alpha == 1 && !game.isPlayerAlive(ike)) {
-				KTween.to(head, QUICK * 5, {scaleX:1, scaleY:1, alpha:0, visible:false}, Linear.easeOut);
-			} else {
-				head.visible = true;
-			}
-		}
 	}
 	
 	private function updatePiece(?previousAngle:Int = 0):Void {
@@ -494,112 +443,6 @@ class Board {
 		enableDrag();
 	}
 	
-	private function updateGrid():Void {
-		var gameGrid:Array<Int> = game.getColorGrid();
-		var len:Int = Common.BOARD_NUM_CELLS;
-		var rect:Rectangle = new Rectangle(0, 0, Layout.UNIT_SIZE, Layout.UNIT_SIZE);
-		rect.inflate(1, 1);
-		var rx:Int, ry:Int;
-		
-		preparePlayerBitmaps();
-		
-		for (ike in 0...len) {
-			if (gameGrid[ike] > 0) {
-				rx = ike % Common.BOARD_SIZE;
-				ry = Std.int((ike - rx) / Common.BOARD_SIZE);
-				rect.x = rx * Layout.UNIT_SIZE + Layout.BOARD_BORDER;
-				rect.y = ry * Layout.UNIT_SIZE + Layout.BOARD_BORDER;
-				rect.x -= 1;
-				rect.y -= 1;
-				playerBitmaps[gameGrid[ike] - 1].fillRect(rect, 0xFFFFFFFF);
-			}
-		}
-		
-		finishPlayerBitmaps();
-	}
-	
-	private function initHeads():Void {
-		var heads:Array<Int> = Common.HEADS[game.getNumPlayers() - 1];
-		
-		for (ike in 0...Common.MAX_PLAYERS) {
-			var head:Shape = playerHeads[ike];
-			if (ike * 2 < heads.length) {
-				head.visible = true;
-				head.alpha = 1;
-				head.x = (heads[ike * 2    ] + 0.5) * Layout.UNIT_SIZE;
-				head.y = (heads[ike * 2 + 1] + 0.5) * Layout.UNIT_SIZE;
-			} else {
-				head.visible = false;
-			}
-		}
-	}
-	
-	private function preparePlayerBitmaps():Void {
-		for (ike in 0...Common.MAX_PLAYERS) playerBitmaps[ike].fillRect(playerBitmaps[ike].rect, 0x0);
-	}
-	
-	private function finishPlayerBitmaps():Void {
-		var bmp:BitmapData;
-		var bmpSize:Int = Common.BOARD_SIZE * Layout.UNIT_SIZE + 2 * Layout.BOARD_BORDER;
-		var bmp2:BitmapData = new BitmapData(bmpSize, bmpSize, true, 0x0);
-		
-		for (ike in 0...Common.MAX_PLAYERS) {
-			bmp = playerBitmaps[ike];
-			
-			bmp.applyFilter(bmp, bmp.rect, ORIGIN, SLIME_MAKER);
-			bmp2.fillRect(bmp.rect, 0x0);
-			bmp2.draw(bmp);
-			
-			bmp.fillRect(bmp.rect, 0xFFFFFFFF);
-			bmp.copyChannel(bmp2, bmp.rect, ORIGIN, BitmapDataChannel.RED, BitmapDataChannel.ALPHA);
-			bmp.applyFilter(bmp, bmp.rect, ORIGIN, BLUR_FILTER);
-		}
-		
-		bmp2.fillRect(bmp2.rect, 0xFF000000);
-		var mat:Matrix = new Matrix();
-		mat.tx = -grid.pattern.x;
-		mat.ty = -grid.pattern.y;
-		for (ike in 0...Common.MAX_PLAYERS) bmp2.draw(playerBitmaps[ike], mat, null, BlendMode.ADD);
-		grid.blurredPatternData.draw(grid.pattern);
-		grid.blurredPatternData.applyFilter(grid.blurredPatternData, grid.blurredPatternData.rect, ORIGIN, GRID_BLUR);
-		//grid.blurredPatternData.fillRect(grid.blurredPatternData.rect, 0xFFFFFFFF);
-		grid.blurredPatternData.copyChannel(bmp2, bmp2.rect, ORIGIN, BitmapDataChannel.RED, BitmapDataChannel.ALPHA);
-	}
-	
-	private function fillBoardRandomly(?event:Event):Void {
-		var bmp:BitmapData;
-		var whatev:Array<Array<Null<Bool>>> = [];
-		var rect:Rectangle = new Rectangle();
-		
-		preparePlayerBitmaps();
-		
-		for (ike in 0...Common.MAX_PLAYERS) {
-			bmp = playerBitmaps[ike];
-			
-			for (jen in 0...80) {
-				var rx:Int = 0;
-				var ry:Int = 0;
-				while (true) {
-					rx = Std.int(Math.random() * Common.BOARD_SIZE) * Layout.UNIT_SIZE;
-					ry = Std.int(Math.random() * Common.BOARD_SIZE) * Layout.UNIT_SIZE;
-					if (whatev[ry] == null) {
-						whatev[ry] = [];
-					}
-					if (whatev[ry][rx] == null) {
-						whatev[ry][rx] = true;
-						break;
-					}
-				}	
-				rect.x = rx + Layout.BOARD_BORDER;
-				rect.y = ry + Layout.BOARD_BORDER;
-				rect.width = rect.height = Layout.UNIT_SIZE;
-				bmp.fillRect(rect, 0xFFFFFFFF);
-			}
-		}
-		
-		finishPlayerBitmaps();
-	}
-	
 	private function liftPiece(event:Event):Void {
 		if (draggingPiece || biting) return;
 		draggingPiece = true;
@@ -653,8 +496,8 @@ class Board {
 			var toY:Float = piece.y  - goodPt.y;
 			piece.x -= well.mouseX;
 			piece.y -= well.mouseY;
-			pieceJob = KTween.to(piece, 3 * QUICK, {x:toX, y:toY}, POUNCE);
-			pieceHandleJob = KTween.to(pieceHandle, QUICK, {scaleX:1.2, scaleY:1.2}, Linear.easeOut);
+			pieceJob = KTween.to(piece, 3 * Layout.QUICK, {x:toX, y:toY}, Layout.POUNCE);
+			pieceHandleJob = KTween.to(pieceHandle, Layout.QUICK, {scaleX:1.2, scaleY:1.2}, Linear.easeOut);
 		}
 		
 		dragPiece();
@@ -672,7 +515,7 @@ class Board {
 			pieceScaledDown = overGrid;
 			if (pieceHandleJob != null) pieceHandleJob.complete();
 			scale = overGrid ? pieceBoardScale : 1.2;
-			pieceHandleJob = KTween.to(pieceHandle, 2 * QUICK, {scaleX:scale, scaleY:scale}, Linear.easeOut);
+			pieceHandleJob = KTween.to(pieceHandle, 2 * Layout.QUICK, {scaleX:scale, scaleY:scale}, Linear.easeOut);
 		}
 		
 		pieceHandle.x = well.mouseX;
@@ -755,8 +598,8 @@ class Board {
 			update(true, true, true);
 		} else {
 			var pieceHandleHome:Float = Layout.WELL_WIDTH / 2;
-			pieceHandleJob = KTween.to(pieceHandle, 2 * QUICK, {x:pieceHandleHome, y:pieceHandleHome, scaleX:1, scaleY:1}, POUNCE, enableDrag);
-			pieceJob = KTween.to(piece, 2 * QUICK, {x:pieceHomeX, y:pieceHomeY}, POUNCE);
+			pieceHandleJob = KTween.to(pieceHandle, 2 * Layout.QUICK, {x:pieceHandleHome, y:pieceHandleHome, scaleX:1, scaleY:1}, Layout.POUNCE, enableDrag);
+			pieceJob = KTween.to(piece, 2 * Layout.QUICK, {x:pieceHomeX, y:pieceHomeY}, Layout.POUNCE);
 			well.addChild(pieceHandle);
 		}
 	}
@@ -777,7 +620,7 @@ class Board {
 		pieceHandle.mouseEnabled = pieceHandle.mouseChildren = false;
 		if (pieceHandleJob != null) pieceHandleJob.close();
 		if (pieceHandleSpinJob != null) pieceHandleSpinJob.complete();
-		pieceHandleJob = KTween.to(pieceHandle, 3 * QUICK, {alpha:1, scaleX:1, scaleY:1}, SLIDE, enableDrag);
+		pieceHandleJob = KTween.to(pieceHandle, 3 * Layout.QUICK, {alpha:1, scaleX:1, scaleY:1}, Layout.SLIDE, enableDrag);
 	}
 	
 	private function updateWell():Void {
@@ -799,8 +642,8 @@ class Board {
 		game.processPlayerAction(PlayerAction.SPIN_PIECE(cc));
 		var angle:Int = cc ? -90 : 90;
 		updatePiece(angle);
-		pieceHandleSpinJob = KTween.from(pieceHandle, 2 * QUICK, {rotation:-angle}, POUNCE, enableDrag);
-		if (!draggingPiece) pieceJob = KTween.to(piece, 2 * QUICK, {x:pieceHomeX, y:pieceHomeY}, POUNCE);
+		pieceHandleSpinJob = KTween.from(pieceHandle, 2 * Layout.QUICK, {rotation:-angle}, Layout.POUNCE, enableDrag);
+		if (!draggingPiece) pieceJob = KTween.to(piece, 2 * Layout.QUICK, {x:pieceHomeX, y:pieceHomeY}, Layout.POUNCE);
 		pieceHandle.mouseEnabled = pieceHandle.mouseChildren = false;
 	}
 	
@@ -808,7 +651,7 @@ class Board {
 		if (draggingPiece || biting) return;
 		if (pieceHandleSpinJob != null) pieceHandleSpinJob.complete();
 		var angle:Float = (event.type == MouseEvent.ROLL_OUT) ? 0 : ((event.currentTarget == well.rotateLeftButton) ? -10 : 10);
-		pieceHandleSpinJob = KTween.to(pieceHandle, QUICK, {rotation:angle}, POUNCE);
+		pieceHandleSpinJob = KTween.to(pieceHandle, Layout.QUICK, {rotation:angle}, Layout.POUNCE);
 	}
 	
 	private function popPieceOnRollover(event:Event):Void {
@@ -854,8 +697,6 @@ class Board {
 	private function mouseHandler(event:MouseEvent):Void {
 		if (draggingPiece) {
 			dragPiece(__snap);
-		} else if (draggingBite) {
-			dragBite(__snap);
 		}
 	}
 	
@@ -871,22 +712,22 @@ class Board {
 			pieceBite.alpha = 1;
 			var wham:Float = Layout.WELL_WIDTH * 0.05;
 			//pieceHandle.rotation = 30;
-			pieceHandleJob = KTween.from(pieceHandle, 3 * QUICK, {x:pieceHandle.x + wham, y:pieceHandle.y + wham, rotation:0}, ZIGZAG);
+			pieceHandleJob = KTween.from(pieceHandle, 3 * Layout.QUICK, {x:pieceHandle.x + wham, y:pieceHandle.y + wham, rotation:0}, Layout.ZIGZAG);
 			well.biteCounter.visible = true;
 			well.biteCounter.alpha = 0;
-			biteCounterJob = KTween.to(well.biteCounter, 3 * QUICK, {alpha:1}, POUNCE);
+			biteCounterJob = KTween.to(well.biteCounter, 3 * Layout.QUICK, {alpha:1}, Layout.POUNCE);
 		} else {
 			pieceBite.alpha = 0.05;
-			pieceBiteJob = KTween.to(pieceBite, 3 * QUICK, {alpha:0, visible:false}, POUNCE);
-			//pieceHandleJob = KTween.to(pieceHandle, 3 * QUICK, {rotation:0}, POUNCE);
+			pieceBiteJob = KTween.to(pieceBite, 3 * Layout.QUICK, {alpha:0, visible:false}, Layout.POUNCE);
+			//pieceHandleJob = KTween.to(pieceHandle, 3 * Layout.QUICK, {rotation:0}, Layout.POUNCE);
 			well.biteCounter.alpha = 1;
-			biteCounterJob = KTween.to(well.biteCounter, 3 * QUICK, {alpha:0, visible:false}, POUNCE);
+			biteCounterJob = KTween.to(well.biteCounter, 3 * Layout.QUICK, {alpha:0, visible:false}, Layout.POUNCE);
 		}
 	}
 	
 	private function toggleBite(?event:Event, ?isBiting:Null<Bool>):Void {
 		if (draggingPiece || currentPlayer.bites < 1 && isBiting != false) return;
-		cancelDragBite();
+		grid.cancelDragBite();
 		var switched:Bool = false;
 		if (isBiting == null) {
 			biting = !biting;
@@ -895,8 +736,6 @@ class Board {
 			switched = biting != isBiting;
 			biting = isBiting;
 		}
-		if (gridTeethJob != null) gridTeethJob.close();
-		if (biteToothJob != null) biteToothJob.close();
 		if (biting) {
 			switch (game.getCurrentPlayer().biteSize) {
 				case 1:biteIndicator = well.smallBiteIndicator;
@@ -908,151 +747,53 @@ class Board {
 			pieceHandle.visible = false;
 			biteIndicator.gotoAndPlay("in");
 			
-			grid.teeth.visible = true;
-			grid.teeth.mouseEnabled = grid.teeth.mouseChildren = true;
-			gridTeethJob = KTween.to(grid.teeth, QUICK * 2, {alpha:1}, POUNCE);
-			grid.tint(TEAM_COLORS[currentPlayerIndex]);
+			var headPositions:Array<Int> = Common.HEAD_POSITIONS[game.getNumPlayers() - 1];
+			var headX:Int = headPositions[currentPlayerIndex * 2    ];
+			var headY:Int = headPositions[currentPlayerIndex * 2 + 1];
 			
+			grid.showTeeth();
+			grid.updateTeeth(game.getBiteGrid(), currentPlayerIndex, headX, headY, playerCTs[currentPlayerIndex]);
+			grid.tintTeeth(TEAM_COLORS[currentPlayerIndex]);
 			
 			if (!overBiteButton) {
 				if (biteCounterJob != null) biteCounterJob.complete();
 				well.biteCounter.visible = true;
 				well.biteCounter.alpha = 0;
-				biteCounterJob = KTween.to(well.biteCounter, 3 * QUICK, {alpha:1}, POUNCE);
+				biteCounterJob = KTween.to(well.biteCounter, 3 * Layout.QUICK, {alpha:1}, Layout.POUNCE);
 			}
-			
-			updateTeeth();
 			
 		} else {
 			if (biteIndicator != null && biteIndicator.visible) showPiece();
-			grid.teeth.mouseEnabled = grid.teeth.mouseChildren = false;
-			gridTeethJob = KTween.to(grid.teeth, QUICK * 2, {alpha:0, visible:false}, POUNCE, hideTeeth);
-			biteToothJob = KTween.to(biteTooth, QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, POUNCE, biteTooth.reset);
-			playerHeads[currentPlayerIndex].visible = true;
+			grid.hideTeeth(currentPlayerIndex);
 			pieceBite.visible = false;
 			
 			if (!overBiteButton && switched) {
 				if (biteCounterJob != null) biteCounterJob.complete();
 				well.biteCounter.visible = true;
 				well.biteCounter.alpha = 1;
-				biteCounterJob = KTween.to(well.biteCounter, 3 * QUICK, {alpha:0, visible:false}, POUNCE);
+				biteCounterJob = KTween.to(well.biteCounter, 3 * Layout.QUICK, {alpha:0, visible:false}, Layout.POUNCE);
 			}
 		}
 	}
 	
-	private function hideTeeth():Void {
-		//for (ike in 0...grid.teeth.numChildren) grid.teeth.getChildAt(ike).visible = false;
+	private function firstBiteCheck(bX:Int, bY:Int):Array<Int> {
+		if (!game.processPlayerAction(PlayerAction.START_BITE(bX, bY))) return null;
+		return game.getBiteLimits();
 	}
 	
-	private function updateTeeth():Void {
-		
-		// We can optimize this to only happen when the baord is updated
-		var head:Shape = playerHeads[currentPlayerIndex];
-		var br:Array<Bool> = game.getBiteGrid();
-		var bx:Int, by:Int;
-		var totalTeeth:Int = grid.teeth.numChildren;
-		var heads:Array<Int> = Common.HEADS[game.getNumPlayers() - 1];
-		var headX:Int = heads[currentPlayerIndex * 2    ];
-		var headY:Int = heads[currentPlayerIndex * 2 + 1];
-		var tooth:Sprite;
-		var toothItr:Int = 0;
-		
-		for (ike in 0...br.length) {
-			if (!br[ike]) continue;
-			by = Std.int(ike / Common.BOARD_SIZE);
-			bx = ike - by * Common.BOARD_SIZE;
-			if (bx == headX && by == headY) head.visible = false;
-			
-			if (toothItr > teeth.length - 1) {
-				tooth = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.25);
-				teeth.push(tooth);
-			} else {
-				tooth = teeth[toothItr];
-				tooth.visible = true;
-			}
-			
-			tooth.transform.colorTransform = playerCTs[currentPlayerIndex];
-			tooth.x = (bx + 0.5) * Layout.UNIT_SIZE;
-			tooth.y = (by + 0.5) * Layout.UNIT_SIZE;
-			grid.teeth.addChild(tooth);
-			
-			toothItr++;
-		}
-		for (ike in toothItr...teeth.length) teeth[ike].visible = false;
-	}
-	
-	private function updateBiteTooth(event:Event):Void {
-		if (draggingBite) return;
-		if (biteToothJob != null) biteToothJob.complete();
-		if (event.type == MouseEvent.MOUSE_OVER) {
-			var tooth:Sprite = untyped __as__(event.target, Sprite);
-			biteTooth.visible = true;
-			biteToothJob = KTween.to(biteTooth, QUICK, {scaleX:1, scaleY:1, alpha:1}, POUNCE);
-			biteTooth.x = tooth.x + Layout.BOARD_BORDER;
-			biteTooth.y = tooth.y + Layout.BOARD_BORDER;
-		} else {
-			biteToothJob = KTween.to(biteTooth, QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, POUNCE, biteTooth.reset);
-		}
-	}
-	
-	private function firstBite(?event:Event):Void {
-		if (draggingBite) return;
-		draggingBite = true;
-		var bX:Int = Std.int(grid.teeth.mouseX / Layout.UNIT_SIZE);
-		var bY:Int = Std.int(grid.teeth.mouseY / Layout.UNIT_SIZE);
-		if (!game.processPlayerAction(PlayerAction.START_BITE(bX, bY))) return;
-		biteLimits = game.getBiteLimits();
-	}
-	
-	private function dragBite(?snap:Bool):Void {
-		
-		var dX:Int = Std.int(biteTooth.mouseX / Layout.UNIT_SIZE);
-		var dY:Int = Std.int(biteTooth.mouseY / Layout.UNIT_SIZE);
-		var horiz:Bool = false;
-		
-		if (biteTooth.endX != 0) {
-			horiz = true;
-		} else if (biteTooth.endY != 0) {
-			horiz = false;
-		} else if (dY == 0) {
-			horiz = true;
-		} else if (dX == 0) {
-			horiz = false;
-		} else {
-			horiz = Math.abs(dX) > Math.abs(dY);
-		}
-		
-		var min:Int = horiz ? biteLimits[3] : biteLimits[0];
-		var max:Int = horiz ? biteLimits[1] : biteLimits[2];
-		var val:Int = horiz ? dX : dY;
-		
-		biteTooth.stretchTo(Std.int(Math.max(min, Math.min(val, max))), horiz);
-	}
-	
-	private function endBite(?event:Event):Void {
-		if (!draggingBite) return;
-		draggingBite = false;
-		if (biteToothJob != null) biteToothJob.complete();
-		var pt:Point = grid.pattern.globalToLocal(biteTooth.localToGlobal(new Point()));
-		var bX:Int = Std.int(pt.x / Layout.UNIT_SIZE) + biteTooth.endX;
-		var bY:Int = Std.int(pt.y / Layout.UNIT_SIZE) + biteTooth.endY;
-		if (biteTooth.endX != 0 || biteTooth.endY != 0 || !biteTooth.hitTestPoint(biteTooth.mouseX, biteTooth.mouseY)) {
-			biteToothJob = KTween.to(biteTooth, QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, POUNCE, biteTooth.reset);
-		}
+	private function endBiteCheck(bX:Int, bY:Int):Void {
 		if (game.processPlayerAction(PlayerAction.END_BITE(bX, bY))) {
 			if (shiftBite && currentPlayer.bites > 0) {
 				update(true, true, true);
-				updateTeeth();
+				var headPositions:Array<Int> = Common.HEAD_POSITIONS[game.getNumPlayers() - 1];
+				var headX:Int = headPositions[currentPlayerIndex * 2    ];
+				var headY:Int = headPositions[currentPlayerIndex * 2 + 1];
+				grid.updateTeeth(game.getBiteGrid(), currentPlayerIndex, headX, headY, playerCTs[currentPlayerIndex]);
 			} else {
 				toggleBite(null, false);
 				update(true, true, true);
 			}
 		}
-	}
-	
-	private function cancelDragBite():Void {
-		if (!draggingBite) return;
-		draggingBite = false;
 	}
 	
 	private function swapHint(event:Event):Void {
@@ -1067,7 +808,7 @@ class Board {
 			pieceHandle.filters = [PIECE_SWAP_GLOW];
 			well.swapCounter.visible = true;
 			well.swapCounter.alpha = 0;
-			swapCounterJob = KTween.to(well.swapCounter, 3 * QUICK, {alpha:1}, POUNCE);
+			swapCounterJob = KTween.to(well.swapCounter, 3 * Layout.QUICK, {alpha:1}, Layout.POUNCE);
 		} else {
 			swapHinting = false;
 			var oldPieceX:Float = piece.x;
@@ -1080,14 +821,14 @@ class Board {
 				if (pieceBlockJobs[ike] != null) pieceBlockJobs[ike].abort();
 			}
 			updatePiece();
-			KTween.from(piece, QUICK, {x:oldPieceX, y:oldPieceY}, POUNCE);
+			KTween.from(piece, Layout.QUICK, {x:oldPieceX, y:oldPieceY}, Layout.POUNCE);
 			for (ike in 0...pieceBlocks.length) {
-				pieceBlockJobs[ike] = KTween.from(pieceBlocks[ike], QUICK, {x:oldXs[ike], y:oldYs[ike]}, SLIDE);
+				pieceBlockJobs[ike] = KTween.from(pieceBlocks[ike], Layout.QUICK, {x:oldXs[ike], y:oldYs[ike]}, Layout.SLIDE);
 			}
 			pieceHandle.filters = [];
 			piece.filters = [PIECE_GLOW];
 			well.swapCounter.alpha = 1;
-			swapCounterJob = KTween.to(well.swapCounter, 3 * QUICK, {alpha:0, visible:false}, POUNCE);
+			swapCounterJob = KTween.to(well.swapCounter, 3 * Layout.QUICK, {alpha:0, visible:false}, Layout.POUNCE);
 		}
 	}
 	
@@ -1110,7 +851,7 @@ class Board {
 		}
 		
 		if (pieceBlockJobs[currentBlockForSwapHint] != null) pieceBlockJobs[currentBlockForSwapHint].close();
-		pieceBlockJobs[currentBlockForSwapHint] = KTween.to(block, QUICK * 0.7, {x:spotX, y:spotY}, Linear.easeOut, pushCurrentSwapBlock);
+		pieceBlockJobs[currentBlockForSwapHint] = KTween.to(block, Layout.QUICK * 0.7, {x:spotX, y:spotY}, Linear.easeOut, pushCurrentSwapBlock);
 		
 		currentBlockForSwapHint = (currentBlockForSwapHint + 1) % pieceBlocks.length;
 	}
@@ -1124,17 +865,17 @@ class Board {
 			if (pieceBlockJobs[ike] != null) pieceBlockJobs[ike].abort();
 		}
 		update(true);
-		if (pieceRecipe == Pieces.O_PIECE) KTween.from(piecePlug, QUICK, {alpha:0}, POUNCE);
+		if (pieceRecipe == Pieces.O_PIECE) KTween.from(piecePlug, Layout.QUICK, {alpha:0}, Layout.POUNCE);
 		if (!overSwapButton) {
 			if (swapCounterJob != null) swapCounterJob.complete();
 			well.swapCounter.visible = true;
 			well.swapCounter.alpha = 1;
-			swapCounterJob = KTween.to(well.swapCounter, 20 * QUICK, {alpha:0, visible:false}, Quad.easeIn);
+			swapCounterJob = KTween.to(well.swapCounter, 20 * Layout.QUICK, {alpha:0, visible:false}, Quad.easeIn);
 		}
 	}
 	
 	private function skipTurn(?event:Event):Void {
-		if (draggingPiece || draggingBite) return;
+		if (draggingPiece || grid.isDraggingBite()) return;
 		toggleBite(null, false);
 		if (swapCounterJob != null) swapCounterJob.complete();
 		game.processPlayerAction(PlayerAction.SKIP);

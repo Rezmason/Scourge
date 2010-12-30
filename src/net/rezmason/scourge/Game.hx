@@ -96,15 +96,6 @@ class Game {
 		// TOP RIGHT BOTTOM LEFT
 	}
 	
-	public function getPlayer(index:Int):Player {
-		var returnVal:Player = null;
-		if (players != null && players.length > 0) {
-			if (index < players.length) returnVal = players[index];
-			if (returnVal != null && !returnVal.alive) returnVal = null;
-		}
-		return returnVal;
-	}
-	
 	public function getRollCall():Array<Player> {
 		// Order the players by their turn and by whether they are alive
 		var returnVal:Array<Player> = [];
@@ -145,11 +136,11 @@ class Game {
 	public function getNumPlayers():Int {
 		return _numPlayers;
 	}
-
-	public function isPlayerAlive(index:Int):Bool {
-		return players[index].alive;
+	
+	public function getPlayers():Array<Player> {
+		return players.copy();
 	}
-
+	
 	public function processPlayerAction(?action:PlayerAction):Bool {
 		if (action == null) action = PlayerAction.SKIP;
 		switch (action) {
@@ -568,7 +559,7 @@ class Game {
 			for (ike in 0...Common.BOARD_NUM_CELLS) colorGrid[ike] = DEAD;
 		}
 		
-		var currentHeads:Array<Int> = Common.HEADS[_numPlayers - 1];
+		var currentHeads:Array<Int> = Common.HEAD_POSITIONS[_numPlayers - 1];
 		players.splice(0, players.length);
 
 		// Populate the player list
