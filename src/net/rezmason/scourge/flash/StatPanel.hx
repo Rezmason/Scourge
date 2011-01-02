@@ -6,10 +6,9 @@ import flash.display.Sprite;
 import flash.geom.ColorTransform;
 import flash.text.TextField;
 
-import net.rezmason.scourge.Player;
 import net.rezmason.scourge.Common;
 import net.rezmason.scourge.Layout;
-import flash.Lib;
+import net.rezmason.scourge.Player;
 
 class StatPanel extends Sprite {
 	
@@ -22,7 +21,7 @@ class StatPanel extends Sprite {
 		
 		playerStatPool = [];
 		
-		background = GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, 0, 0, 210, hgt, Layout.BAR_CORNER_RADIUS);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x333333, 1, 0, 0, 210, hgt, Layout.BAR_CORNER_RADIUS);
 		container = new Sprite();
 		container.mask = GUIFactory.drawSolidRect(new Shape(), 0x0, 1, 0, 0, 210, hgt, Layout.BAR_CORNER_RADIUS);
 		GUIFactory.fillSprite(this, [background, container, container.mask]);

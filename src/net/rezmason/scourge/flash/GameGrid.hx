@@ -23,8 +23,6 @@ import net.kawa.tween.KTween;
 import net.kawa.tween.KTJob;
 import net.kawa.tween.easing.Linear;
 
-import flash.Lib;
-
 class GameGrid extends Sprite {
 	
 	private static var BITE_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 9, 9, 20, 1, true);
@@ -159,17 +157,13 @@ class GameGrid extends Sprite {
 		teeth.filters = [BITE_GLOW];
 	}
 	
-	public function getHitBox():Rectangle {
-		return pattern.getBounds(pattern);
-	}
+	public function getHitBox():Rectangle { return pattern.getBounds(pattern); }
 	
 	public function fadeByFreshness(arr:Array<Int>, max:Int):Void {
 		
 		if (fadeJob != null) fadeJob.complete();
 		
 		// Sequence the changed indices
-		
-		fadeSequence = [];
 		
 		var fadeSequences:Array<Array<Int>> = [];
 		for (ike in 0...Common.BOARD_NUM_CELLS) {
@@ -181,63 +175,21 @@ class GameGrid extends Sprite {
 			}
 		}
 		
+		fadeSequence = [];
+		
 		for (ike in 0...fadeSequences.length) {
 			var seq:Array<Int> = fadeSequences[ike];
 			seq.sort(randSort);
 			fadeSequence = fadeSequence.concat(seq);
 		}
 		
-		fadeDuration = fadeSequence.length * 0.05;
+		fadeDuration = Math.log(fadeSequence.length) * 0.2;
 		
 		fadeCount = 0;
 		fadeJob = KTween.to(this, fadeDuration, {fadeCount:fadeSequence.length + fadeMult / 2}, Linear.easeOut, fadeComplete);
 		fadeJob.onChange = fadeUpdate;
 		fadeUpdate();
 		fader.visible = true;
-	}
-	
-	private function randSort(one:Int, two:Int):Int {
-		return Math.random() > 0.5 ? 1 : -1;
-	}
-	
-	private function fadeUpdate():Void {
-		
-		fadeAlphaBitmap.fillRect(fadeAlphaBitmap.rect, 0xFFFFFFFF);
-		
-		// draw the patches to fadeAlphaBitmap
-		
-		var rect:Rectangle = new Rectangle();
-		var totalRect:Rectangle = null;
-		var w:Int = Common.BOARD_SIZE;
-		var margin:Float = Layout.UNIT_SIZE * 0.5;
-		rect.width = rect.height = Layout.UNIT_SIZE + 2 * margin;
-		var ike:Int = Std.int(fadeCount);
-		while (ike >= 0) {
-			var val:Float = (fadeMult - Math.min(fadeMult, fadeCount - ike)) / fadeMult;
-			var alpha:Int = Std.int(0xFF * val * val);
-			var index:Int = fadeSequence[ike];
-			var tx:Int = (index % w);
-			var ty:Int = Std.int((index - tx) / w);
-			rect.x = tx * Layout.UNIT_SIZE - margin;
-			rect.y = ty * Layout.UNIT_SIZE - margin;
-			if (totalRect == null) {
-				totalRect = rect.clone();
-			} else {
-				totalRect = totalRect.union(rect);
-			}
-			fadeAlphaBitmap.fillRect(rect, alpha | 0xFFFFFF00);
-			ike--;
-		}
-		
-		fadeAlphaBitmap.applyFilter(fadeAlphaBitmap, totalRect, totalRect.topLeft, ALPHA_BLUR);
-		fadeBitmap.copyPixels(fadeSourceBitmap, fadeSourceBitmap.rect, ORIGIN);
-		fadeBitmap.copyChannel(fadeAlphaBitmap, fadeAlphaBitmap.rect, ORIGIN, BitmapDataChannel.BLUE, BitmapDataChannel.ALPHA);
-	}
-	
-	private function fadeComplete():Void {
-		fader.visible = false;
-		updateFadeSourceBitmap();
-		dispatchEvent(COMPLETE_EVENT);
 	}
 	
 	public function updateFadeSourceBitmap():Void {
@@ -286,6 +238,131 @@ class GameGrid extends Sprite {
 		}
 		
 		finishPlayerBitmaps();
+	}
+	
+	public function updateHeads(players:Array<Player>):Void {
+		for (ike in 0...players.length) {
+			var head:Shape = playerHeads[ike];
+			if (head.alpha == 1 && !players[ike].alive) {
+				KTween.to(head, Layout.QUICK * 5, {scaleX:1, scaleY:1, alpha:0, visible:false}, Linear.easeOut);
+			} else {
+				head.visible = true;
+			}
+		}
+	}
+	
+	public function initHeads(numPlayers:Int):Void {
+		var headPositions:Array<Int> = Common.HEAD_POSITIONS[numPlayers - 1];
+		
+		for (ike in 0...Common.MAX_PLAYERS) {
+			var head:Shape = playerHeads[ike];
+			if (ike * 2 < headPositions.length) {
+				head.visible = true;
+				head.alpha = 1;
+				head.x = (headPositions[ike * 2    ] + 0.5) * Layout.UNIT_SIZE;
+				head.y = (headPositions[ike * 2 + 1] + 0.5) * Layout.UNIT_SIZE;
+			} else {
+				head.visible = false;
+			}
+		}
+	}
+	
+	public function showTeeth():Void {
+		if (gridTeethJob != null) gridTeethJob.close();
+		if (biteToothJob != null) biteToothJob.close();
+		teeth.visible = true;
+		teeth.mouseEnabled = teeth.mouseChildren = true;
+		gridTeethJob = KTween.to(teeth, Layout.QUICK * 2, {alpha:1}, Layout.POUNCE);
+	}
+	
+	public function hideTeeth(playerIndex:Int):Void {
+		if (gridTeethJob != null) gridTeethJob.close();
+		if (biteToothJob != null) biteToothJob.close();
+		draggingBite = false;
+		teeth.mouseEnabled = teeth.mouseChildren = false;
+		gridTeethJob = KTween.to(teeth, Layout.QUICK * 2, {alpha:0, visible:false}, Layout.POUNCE);
+		biteToothJob = KTween.to(biteTooth, Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
+		playerHeads[playerIndex].visible = true;
+	}
+	
+	public function updateTeeth(br:Array<Bool>, index:Int, headX:Int, headY:Int, ct:ColorTransform):Void {
+		
+		if (br == null) br = [];
+		
+		var head:Shape = playerHeads[index];
+		var bx:Int, by:Int;
+		var totalTeeth:Int = teeth.numChildren;
+		var tooth:Sprite;
+		var toothItr:Int = 0;
+		
+		var arr:Array<Int> = [];
+		for (ike in 0...br.length) {
+			if (!br[ike]) continue;
+			by = Std.int(ike / Common.BOARD_SIZE);
+			bx = ike - by * Common.BOARD_SIZE;
+			if (bx == headX && by == headY) head.visible = false;
+			if (toothItr > toothPool.length - 1) {
+				tooth = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.25);
+				toothPool.push(tooth);
+			} else {
+				tooth = toothPool[toothItr];
+				tooth.visible = true;
+			}
+			
+			tooth.transform.colorTransform = ct;
+			tooth.x = (bx + 0.5) * Layout.UNIT_SIZE;
+			tooth.y = (by + 0.5) * Layout.UNIT_SIZE;
+			teeth.addChild(tooth);
+			
+			toothItr++;
+		}
+		for (ike in toothItr...toothPool.length) toothPool[ike].visible = false;
+	}
+	
+	public function isDraggingBite():Bool { return draggingBite; }
+	
+	private function randSort(one:Int, two:Int):Int {
+		return Math.random() > 0.5 ? 1 : -1;
+	}
+	
+	private function fadeUpdate():Void {
+		
+		fadeAlphaBitmap.fillRect(fadeAlphaBitmap.rect, 0xFFFFFFFF);
+		
+		// draw the patches to fadeAlphaBitmap
+		
+		var rect:Rectangle = new Rectangle();
+		var totalRect:Rectangle = null;
+		var w:Int = Common.BOARD_SIZE;
+		var margin:Float = Layout.UNIT_SIZE * 0.5;
+		rect.width = rect.height = Layout.UNIT_SIZE + 2 * margin;
+		var ike:Int = Std.int(fadeCount);
+		while (ike >= 0) {
+			var val:Float = (fadeMult - Math.min(fadeMult, fadeCount - ike)) / fadeMult;
+			var alpha:Int = Std.int(0xFF * val * val);
+			var index:Int = fadeSequence[ike];
+			var tx:Int = (index % w);
+			var ty:Int = Std.int((index - tx) / w);
+			rect.x = tx * Layout.UNIT_SIZE - margin;
+			rect.y = ty * Layout.UNIT_SIZE - margin;
+			if (totalRect == null) {
+				totalRect = rect.clone();
+			} else {
+				totalRect = totalRect.union(rect);
+			}
+			fadeAlphaBitmap.fillRect(rect, alpha | 0xFFFFFF00);
+			ike--;
+		}
+		
+		fadeAlphaBitmap.applyFilter(fadeAlphaBitmap, totalRect, totalRect.topLeft, ALPHA_BLUR);
+		fadeBitmap.copyPixels(fadeSourceBitmap, fadeSourceBitmap.rect, ORIGIN);
+		fadeBitmap.copyChannel(fadeAlphaBitmap, fadeAlphaBitmap.rect, ORIGIN, BitmapDataChannel.BLUE, BitmapDataChannel.ALPHA);
+	}
+	
+	private function fadeComplete():Void {
+		fader.visible = false;
+		updateFadeSourceBitmap();
+		dispatchEvent(COMPLETE_EVENT);
 	}
 	
 	private function preparePlayerBitmaps():Void {
@@ -354,89 +431,6 @@ class GameGrid extends Sprite {
 		finishPlayerBitmaps();
 	}
 	
-	public function updateHeads(players:Array<Player>):Void {
-		for (ike in 0...players.length) {
-			var head:Shape = playerHeads[ike];
-			if (head.alpha == 1 && !players[ike].alive) {
-				KTween.to(head, Layout.QUICK * 5, {scaleX:1, scaleY:1, alpha:0, visible:false}, Linear.easeOut);
-			} else {
-				head.visible = true;
-			}
-		}
-	}
-	
-	public function initHeads(numPlayers:Int):Void {
-		var headPositions:Array<Int> = Common.HEAD_POSITIONS[numPlayers - 1];
-		
-		for (ike in 0...Common.MAX_PLAYERS) {
-			var head:Shape = playerHeads[ike];
-			if (ike * 2 < headPositions.length) {
-				head.visible = true;
-				head.alpha = 1;
-				head.x = (headPositions[ike * 2    ] + 0.5) * Layout.UNIT_SIZE;
-				head.y = (headPositions[ike * 2 + 1] + 0.5) * Layout.UNIT_SIZE;
-			} else {
-				head.visible = false;
-			}
-		}
-	}
-	
-	public function showTeeth():Void {
-		if (gridTeethJob != null) gridTeethJob.close();
-		if (biteToothJob != null) biteToothJob.close();
-		teeth.visible = true;
-		teeth.mouseEnabled = teeth.mouseChildren = true;
-		gridTeethJob = KTween.to(teeth, Layout.QUICK * 2, {alpha:1}, Layout.POUNCE);
-	}
-	
-	public function hideTeeth(playerIndex:Int):Void {
-		if (gridTeethJob != null) gridTeethJob.close();
-		if (biteToothJob != null) biteToothJob.close();
-		teeth.mouseEnabled = teeth.mouseChildren = false;
-		gridTeethJob = KTween.to(teeth, Layout.QUICK * 2, {alpha:0, visible:false}, Layout.POUNCE, hideTeethFinally);
-		biteToothJob = KTween.to(biteTooth, Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
-		playerHeads[playerIndex].visible = true;
-	}
-	
-	private function hideTeethFinally():Void {
-		//for (ike in 0...teeth.numChildren) teeth.getChildAt(ike).visible = false;
-	}
-	
-	public function updateTeeth(br:Array<Bool>, index:Int, headX:Int, headY:Int, ct:ColorTransform):Void {
-		
-		if (br == null || br.length == 0) return;
-		
-		// We can optimize this to only happen when the baord is updated
-		var head:Shape = playerHeads[index];
-		var bx:Int, by:Int;
-		var totalTeeth:Int = teeth.numChildren;
-		var tooth:Sprite;
-		var toothItr:Int = 0;
-		
-		for (ike in 0...br.length) {
-			if (!br[ike]) continue;
-			by = Std.int(ike / Common.BOARD_SIZE);
-			bx = ike - by * Common.BOARD_SIZE;
-			if (bx == headX && by == headY) head.visible = false;
-			if (toothItr > toothPool.length - 1) {
-				tooth = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.25);
-				toothPool.push(tooth);
-			} else {
-				tooth = toothPool[toothItr];
-				tooth.visible = true;
-			}
-			
-			tooth.transform.colorTransform = ct;
-			tooth.x = (bx + 0.5) * Layout.UNIT_SIZE;
-			tooth.y = (by + 0.5) * Layout.UNIT_SIZE;
-			teeth.addChild(tooth);
-			
-			toothItr++;
-		}
-		for (ike in toothItr...toothPool.length) toothPool[ike].visible = false;
-	}
-	
-	
 	private function firstBite(?event:Event):Void {
 		if (draggingBite) return;
 		draggingBite = true;
@@ -495,14 +489,5 @@ class GameGrid extends Sprite {
 		} else {
 			biteToothJob = KTween.to(biteTooth, Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
 		}
-	}
-	
-	public function cancelDragBite():Void {
-		if (!draggingBite) return;
-		draggingBite = false;
-	}
-	
-	public function isDraggingBite():Bool {
-		return draggingBite;
 	}
 }

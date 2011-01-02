@@ -7,7 +7,6 @@ import flash.display.GradientType;
 import flash.display.Shape;
 import flash.display.SimpleButton;
 import flash.display.Sprite;
-import flash.events.Event;
 import flash.events.IEventDispatcher;
 import flash.events.MouseEvent;
 import flash.geom.ColorTransform;
@@ -52,15 +51,15 @@ class GUIFactory {
 		var shp:Shape = new Shape();
 		var gMat:Matrix = new Matrix();
 		gMat.createGradientBox(size * 2, size * 2, 0, -size, -size);
-		shp.graphics.beginGradientFill(GradientType.RADIAL, [0xFFFFFF, 0xFFFFFF], [0.5, 0], [0x80, 0xFF], gMat);
+		shp.graphics.beginGradientFill(GradientType.RADIAL, [0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF], [1, 0.5, 0.15, 0], [0xA0, 0xA8, 0xC0, 0xFF], gMat);
 		shp.graphics.drawCircle(0, 0, size);
 		shp.graphics.endFill();
-		shp.graphics.lineStyle(4, 0xFFFFFF);
-		shp.graphics.beginFill(0x222222);
-		shp.graphics.drawCircle(0, 0, size * 0.5);
+		shp.graphics.beginFill(0x111111);
+		shp.graphics.drawCircle(0, 0, size * 0.425);
 		shp.graphics.endFill();
 		shp.visible = false;
 		shp.blendMode = BlendMode.ADD;
+		shp.cacheAsBitmap = true;
 		if (ct != null) shp.transform.colorTransform = ct;
 		return shp;
 	}

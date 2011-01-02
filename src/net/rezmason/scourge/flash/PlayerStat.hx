@@ -10,10 +10,8 @@ import net.kawa.tween.KTJob;
 import net.kawa.tween.KTween;
 import net.kawa.tween.easing.Quad;
 
-import net.rezmason.scourge.Player;
 import net.rezmason.scourge.Layout;
-
-import flash.Lib;
+import net.rezmason.scourge.Player;
 
 class PlayerStat extends Sprite {
 	

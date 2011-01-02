@@ -5,34 +5,50 @@ import flash.display.MovieClip;
 import flash.display.Shape;
 import flash.display.SimpleButton;
 import flash.display.Sprite;
+import flash.events.MouseEvent;
 import flash.geom.ColorTransform;
 import flash.geom.Rectangle;
 import flash.text.TextField;
 
 import net.rezmason.scourge.Layout;
 
+import net.kawa.tween.KTween;
+import net.kawa.tween.KTJob;
+import net.kawa.tween.easing.Quad;
+
 class Well extends Sprite {
 	
+	public var rotateHint:Bool->Bool->Void;
+	public var rotatePiece:Bool->Void;
+	public var biteHint:Bool->Void;
+	public var toggleBite:Void->Void;
+	public var swapHint:Bool->Void;
+	public var swapPiece:Void->Void;
+	
+	public var pieceHandle:Sprite;
+	
 	private var background:Shape;
-	public var rotateRightButton:SimpleButton;
-	public var rotateLeftButton:SimpleButton;
-	public var biteButton:SimpleButton;
-	public var swapButton:SimpleButton;
+	private var rotateRightButton:SimpleButton;
+	private var rotateLeftButton:SimpleButton;
+	private var biteButton:SimpleButton;
+	private var swapButton:SimpleButton;
+	private var biteCounter:TextField;
+	private var swapCounter:TextField;
+	private var swapCounterJob:KTJob;
+	private var biteCounterJob:KTJob;
 	
-	public var biteCounter:TextField;
-	public var swapCounter:TextField;
-	
-	public var smallBiteIndicator:MovieClip;
-	public var bigBiteIndicator:MovieClip;
-	public var superBiteIndicator:MovieClip;
+	private var smallBiteIndicator:MovieClip;
+	private var bigBiteIndicator:MovieClip;
+	private var superBiteIndicator:MovieClip;
+	private var biteIndicators:Sprite;
+	private var currentBiteIndicator:MovieClip;
 	
 	public function new():Void {
 		
 		super();
 		
-		background = GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, 0, 0, Layout.WELL_WIDTH, Layout.WELL_WIDTH, Layout.BAR_CORNER_RADIUS);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 0, 0, Layout.WELL_WIDTH, Layout.WELL_WIDTH, Layout.BAR_CORNER_RADIUS);
 		background.cacheAsBitmap = true;
-		
 		rotateRightButton = GUIFactory.makeButton(ScourgeLib_RotateSymbol, ScourgeLib_WellButtonHitState, 1.5, 180, true);
 		rotateLeftButton = GUIFactory.makeButton(ScourgeLib_RotateSymbol, ScourgeLib_WellButtonHitState, 1.5, 270);
 		biteButton = GUIFactory.makeButton(ScourgeLib_BiteSymbol, ScourgeLib_WellButtonHitState, 1.5, 180);
@@ -46,37 +62,41 @@ class Well extends Sprite {
 		swapButton.y = Layout.WELL_BORDER;
 		biteButton.x = Layout.WELL_WIDTH - Layout.WELL_BORDER;
 		biteButton.y = Layout.WELL_WIDTH - Layout.WELL_BORDER;
-		
 		swapCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO, 28);
 		biteCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO, 28, 0xFFFFFF, true);
 		
+		biteIndicators = new Sprite();
+		
 		smallBiteIndicator = new SmallTeeth();
 		smallBiteIndicator.visible = false;
-		smallBiteIndicator.blendMode = BlendMode.ADD;
 		smallBiteIndicator.width = smallBiteIndicator.height = Layout.WELL_WIDTH - 40;
 		smallBiteIndicator.x = smallBiteIndicator.y = 20;
 		bigBiteIndicator = new BigTeeth();
 		bigBiteIndicator.visible = false;
-		bigBiteIndicator.blendMode = BlendMode.ADD;
 		bigBiteIndicator.x = bigBiteIndicator.y = 20;
 		bigBiteIndicator.width = bigBiteIndicator.height = Layout.WELL_WIDTH - 40;
 		superBiteIndicator = new SuperTeeth();
 		superBiteIndicator.visible = false;
-		superBiteIndicator.blendMode = BlendMode.ADD;
 		superBiteIndicator.x = superBiteIndicator.y = 20;
 		superBiteIndicator.width = superBiteIndicator.height = Layout.WELL_WIDTH - 40;
 		
-		addChild(background);
-		addChild(smallBiteIndicator); 
-		addChild(bigBiteIndicator); 
-		addChild(superBiteIndicator); 
-		addChild(rotateRightButton); 
-		addChild(rotateLeftButton); 
-		addChild(swapCounter);
-		addChild(biteCounter);
-		addChild(swapButton); 
-		addChild(biteButton);
+		biteIndicators.blendMode = BlendMode.ADD;
+		biteIndicators.soundTransform = new flash.media.SoundTransform(0); // for now
+		GUIFactory.fillSprite(biteIndicators, [smallBiteIndicator, bigBiteIndicator, superBiteIndicator]);
 		
+		pieceHandle = new Sprite();
+		
+		GUIFactory.fillSprite(this, [
+			background, 
+			pieceHandle,
+			biteIndicators, 
+			rotateRightButton, 
+			rotateLeftButton, 
+			swapButton, 
+			biteButton,
+			swapCounter, 
+			biteCounter
+		]);
 		biteCounter.text = "888";
 		swapCounter.text = "888";
 		
@@ -89,11 +109,15 @@ class Well extends Sprite {
 		swapCounter.y = swapButtonRect.top - swapCounterRect.top;
 		biteCounter.x = biteButtonRect.left - 5 - biteCounterRect.right;
 		biteCounter.y = biteButtonRect.bottom - biteCounterRect.bottom;
-		
 		biteCounter.text = "0";
 		swapCounter.text = "0";
 		biteCounter.visible = false;
 		swapCounter.visible = false;
+		
+		GUIFactory.wireUp(rotateRightButton, hint, hint, click);
+		GUIFactory.wireUp(rotateLeftButton, hint, hint, click);
+		GUIFactory.wireUp(biteButton, hint, hint, click);
+		GUIFactory.wireUp(swapButton, hint, hint, click);
 	}
 	
 	public function tint(ct:ColorTransform):Void {
@@ -102,15 +126,74 @@ class Well extends Sprite {
 		rotateRightButton.upState.transform.colorTransform = ct;
 		swapButton.upState.transform.colorTransform = ct;
 		biteButton.upState.transform.colorTransform = ct;
-		
 		biteCounter.transform.colorTransform = ct;
 		swapCounter.transform.colorTransform = ct;
 	}
 	
+	public function bringPieceHandleForward():Void { addChild(pieceHandle); }
+	public function bringPieceHandleBackward():Void { addChildAt(pieceHandle, 1); }
+	
 	public function updateCounters(swaps:Int, bites:Int):Void {
+		
+		if (swapCounterJob != null) swapCounterJob.complete();
+		if (biteCounterJob != null) biteCounterJob.complete();
 		swapCounter.alpha = swapButton.alpha = (swapButton.mouseEnabled = swaps > 0) ? 1 : 0.5;
 		biteCounter.alpha = biteButton.alpha = (biteButton.mouseEnabled = bites > 0) ? 1 : 0.5;
 		swapCounter.text = Std.string(swaps);
 		biteCounter.text = Std.string(bites);
 	}
+	
+	public function showBiteIndicator(index:Int, ct:ColorTransform):Void {
+		currentBiteIndicator = cast(biteIndicators.getChildAt(index - 1), MovieClip);
+		currentBiteIndicator.visible = true;
+		currentBiteIndicator.gotoAndPlay("in");
+		biteIndicators.transform.colorTransform = offsetCT(ct, 0.2);
+	}
+	
+	public function hideBiteIndicator():Void {
+		if (currentBiteIndicator != null) {
+			currentBiteIndicator.gotoAndStop(0);
+			currentBiteIndicator.visible = false;
+			currentBiteIndicator = null;
+		}
+	}
+	
+	public function displayBiteCounter(show:Bool):Void {
+		if (biteCounterJob != null) biteCounterJob.complete();
+		biteCounter.visible = true;
+		biteCounter.alpha = show ? 0 : 1;
+		biteCounterJob = KTween.to(biteCounter, 3 * Layout.QUICK, {alpha:(show ? 1 : 0), visible:show}, Layout.POUNCE);
+	}
+
+	public function displaySwapCounter(show:Bool, ?slowly:Bool):Void {
+		if (swapCounterJob != null) swapCounterJob.complete();
+		swapCounter.visible = true;
+		swapCounter.alpha = show ? 0 : 1;
+		swapCounterJob = KTween.to(swapCounter, (slowly ? 3 : 3 * Layout.QUICK), {alpha:(show ? 1 : 0), visible:show}, (slowly ? Quad.easeOut : Layout.POUNCE));
+	}
+	private function hint(event:MouseEvent):Void {
+		var over:Bool = event.type == MouseEvent.ROLL_OVER;
+		switch (event.currentTarget) {
+			case rotateLeftButton: rotateHint(true, over);
+			case rotateRightButton: rotateHint(false, over);
+			case biteButton: biteHint(over);
+			case swapButton: swapHint(over);
+		}
+	}
+	
+	private function click(event:MouseEvent):Void {
+		switch (event.currentTarget) {
+			case rotateLeftButton: rotatePiece(true);
+			case rotateRightButton: rotatePiece(false);
+			case biteButton: toggleBite();
+			case swapButton: swapPiece();
+		}
+	}
+	private static function offsetCT(ct:ColorTransform, mult:Float):ColorTransform {
+		var red:Int = Std.int(ct.redMultiplier * 0xFF * mult);
+		var green:Int = Std.int(ct.greenMultiplier * 0xFF * mult);
+		var blue:Int = Std.int(ct.blueMultiplier * 0xFF * mult);
+		return new ColorTransform(1, 1, 1, 1, red, green, blue);
+	}
+	
 }
