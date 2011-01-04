@@ -2,7 +2,7 @@ package com.gskinner.display;
 
 extern class Shape extends DisplayObject {
 	var instructions:String;
-	function new(instructions:String):Void;
+	function new(?instructions:String):Void;
 	
 	override function draw(ctx:Dynamic, ?ignoreCache:Bool):Bool;
 	function clear():Void;
