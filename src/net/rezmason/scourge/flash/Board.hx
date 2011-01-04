@@ -99,7 +99,7 @@ class Board {
 	private var pieceBiteJob:KTJob;
 	private var handlePushTimer:Timer;
 	
-	public function new(__game:Game, __scene:Sprite, __debugNumPlayers) {
+	public function new(__game:Game, __scene:Sprite, __debugNumPlayers:Int) {
 		scene = __scene;
 		game = __game;
 		debugNumPlayers = __debugNumPlayers;

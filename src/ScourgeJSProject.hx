@@ -12,12 +12,13 @@ class ScourgeJSProject {
 	
 	private static function begin(event:Event):Void {
 		Lib.window.onload = null;
+		var defaultGrid:String = untyped __js__("window.defaultGrid");
+		var numPlayers:Int = untyped __js__("window.numPlayers");
+		if (defaultGrid == null) defaultGrid = "-1";
+		if (numPlayers == 0) numPlayers = 4;
+		var viewTarget = Lib.document.getElementById("scourge:target");
 		
-		//var defaultGrid:String = Lib.current.loaderInfo.parameters.defaultGrid;
-		//if (defaultGrid == null) defaultGrid = "-1";
-		
-		var viewTarget = Lib.document.getElementById("thingy");
-		var board:Board = new Board(new Game([]), viewTarget);
+		var board:Board = new Board(new Game([]), viewTarget, numPlayers);
 		
 		var splash:Array<String> = [
 			" %%%%    %%%      %%%    %   %    %%%%      %%%%    %%%", 
