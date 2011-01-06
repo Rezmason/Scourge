@@ -7,6 +7,7 @@ import net.rezmason.scourge.Game;
 
 import com.gskinner.display.Stage;
 import com.gskinner.display.Container;
+import com.gskinner.display.Graphics;
 import com.gskinner.display.Shape;
 
 class Board {
@@ -62,16 +63,20 @@ class Board {
 		
 		width = _div.offsetWidth;
 		height = _div.offsetHeight;
+		
 		Reflect.setField(_canvas, "width", width);
 		Reflect.setField(_canvas, "height", height);
 		
 		var shp:Shape = new Shape();
+		var gfx:Graphics = shp.graphics;
 		
-		shp.setFillStyle("#" + StringTools.hex(Std.int(Math.random() * 0xFFFFFF)));
-		shp.fillRect(0, 0, Math.random() * 100, Math.random() * 100);
+		var color:String = Graphics.getHSL(Math.random() * 360, 100, 50);
+		var wid:Float = Math.random() * 100 + 50;
+		var hgt:Float = Math.random() * 100 + 50;
+		gfx.beginFill(color).drawRect(0, 0, wid, hgt).endFill();
 		shp.x = Math.random() * _div.offsetWidth;
 		shp.y = Math.random() * _div.offsetHeight;
-		shp.fill();
+		shp.rotation = Math.random() * 45;
 		
 		scene.addChild(shp);
 		
