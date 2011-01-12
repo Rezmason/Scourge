@@ -16,6 +16,6 @@
 --next
 
 -cp src
--cp lib/EaselJS/hxclasses
+-cp lib/easeljs-externs
 -js deploy-js/js/scourge.js
 -main ScourgeJSProject
