@@ -71,7 +71,7 @@ class Board {
 	private var currentPlayerIndex:Int;
 	private var currentPlayer:Player;
 	private var keyList:Array<Bool>;
-	private var gridHitBox:Rectangle;
+	private var box:Rectangle;
 	private var lastGUIColorCycle:Int;
 	private var guiColorJob:KTJob;
 	private var guiColorTransform:ColorTransform;
@@ -155,8 +155,8 @@ class Board {
 		
 		timerPanel.skipFunc = skipTurn;
 		
-		gridHitBox = grid.getHitBox();
-		gridHitBox.inflate(Layout.UNIT_SIZE * 1.5, Layout.UNIT_SIZE * 1.5);
+		box = new Rectangle(0, 0, Common.BOARD_SIZE * Layout.UNIT_SIZE, Common.BOARD_SIZE * Layout.UNIT_SIZE);
+		box.inflate(Layout.UNIT_SIZE * 1.5, Layout.UNIT_SIZE * 1.5);
 		
 		// position things
 		well.x = well.y = Layout.BAR_MARGIN;
@@ -480,7 +480,7 @@ class Board {
 		var oldX:Float = pieceHandle.x;
 		var oldY:Float = pieceHandle.y;
 		
-		var _pieceOverGrid:Bool = gridHitBox.contains(grid.space.mouseX, grid.space.mouseY);
+		var _pieceOverGrid:Bool = box.contains(grid.space.mouseX, grid.space.mouseY);
 		var scale:Float;
 		
 		if (_pieceOverGrid != pieceOverGrid) {
@@ -493,7 +493,7 @@ class Board {
 		pieceHandle.x = well.mouseX;
 		pieceHandle.y = well.mouseY;
 		
-		if (_pieceOverGrid && gridHitBox.containsRect(pieceHandle.getBounds(grid.space))) {
+		if (_pieceOverGrid && box.containsRect(pieceHandle.getBounds(grid.space))) {
 			
 			// grid snapping.
 			

@@ -157,8 +157,6 @@ class GameGrid extends Sprite {
 		teeth.filters = [BITE_GLOW];
 	}
 	
-	public function getHitBox():Rectangle { return pattern.getBounds(pattern); }
-	
 	public function fadeByFreshness(arr:Array<Int>, max:Int):Void {
 		
 		if (fadeJob != null) fadeJob.complete();
@@ -388,8 +386,8 @@ class GameGrid extends Sprite {
 		
 		bmp2.fillRect(bmp2.rect, 0xFF000000);
 		var mat:Matrix = new Matrix();
-		mat.tx = -pattern.x;
-		mat.ty = -pattern.y;
+		mat.tx = -space.x;
+		mat.ty = -space.y;
 		for (ike in 0...Common.MAX_PLAYERS) bmp2.draw(playerBitmaps[ike], mat, null, BlendMode.ADD);
 		blurredPatternData.draw(pattern);
 		blurredPatternData.applyFilter(blurredPatternData, blurredPatternData.rect, ORIGIN, GRID_BLUR);
@@ -468,7 +466,7 @@ class GameGrid extends Sprite {
 		if (!draggingBite) return;
 		draggingBite = false;
 		if (biteToothJob != null) biteToothJob.complete();
-		var pt:Point = pattern.globalToLocal(biteTooth.localToGlobal(new Point()));
+		var pt:Point = space.globalToLocal(biteTooth.localToGlobal(new Point()));
 		var bX:Int = Std.int(pt.x / Layout.UNIT_SIZE) + biteTooth.endX;
 		var bY:Int = Std.int(pt.y / Layout.UNIT_SIZE) + biteTooth.endY;
 		if (biteTooth.endX != 0 || biteTooth.endY != 0 || !biteTooth.hitTestPoint(biteTooth.mouseX, biteTooth.mouseY)) {
