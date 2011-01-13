@@ -25,6 +25,7 @@ extern class Graphics extends DisplayObject {
 	function drawEllipse(x:Float, y:Float, w:Float, h:Float):Graphics;
 	function drawRoundRect(x:Float, y:Float, w:Float, h:Float, radius:Float):Graphics;
 	function drawRoundRectComplex(x:Float, y:Float, w:Float, h:Float, radiusTL:Float, radiusTR:Float, radiusBR:Float, radiusBL:Float):Graphics;
+	function drawPolyStar(x:Float, y:Float, radius:Float, sides:Int, pointSize:Float, angle:Float):Graphics;
 	function endFill():Graphics;
 	function endStroke():Graphics;
 	function lineTo(x:Float, y:Float):Graphics;
