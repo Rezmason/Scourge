@@ -1,24 +1,19 @@
-package net.rezmason.scourge.flash;
+package net.rezmason.scourge.js;
 
-import flash.display.CapsStyle;
-import flash.display.LineScaleMode;
-import flash.display.Shape;
-import flash.display.Sprite;
-import flash.filters.GlowFilter;
-import flash.geom.ColorTransform;
+import com.gskinner.display.Container;
+import com.gskinner.display.Shape;
 
 import net.rezmason.scourge.Layout;
 
-import flash.Lib;
-
-class BiteTooth extends Sprite {
-	
+class BiteTooth extends Container {
+	/*
 	private static var TOOTH_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 7, 7, 1);
 	private static var WHITE_CT:ColorTransform = new ColorTransform(1, 1, 1, 1, 0xFF, 0xFF, 0xFF);
+	*/
 	
-	private var startTooth:Sprite;
+	private var startTooth:Container;
 	private var toothMiddle:Shape;
-	private var endTooth:Sprite;
+	private var endTooth:Container;
 	
 	public var endX:Int;
 	public var endY:Int;
@@ -33,12 +28,12 @@ class BiteTooth extends Sprite {
 		toothMiddle = new Shape();
 		endTooth = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.2);
 		
-		GUIFactory.fillSprite(this, [startTooth, toothMiddle, endTooth]);
+		GUIFactory.fillContainer(this, [startTooth, toothMiddle, endTooth]);
 		
 		visible = false;
 		mouseEnabled = mouseChildren = false;
-		transform.colorTransform = WHITE_CT;
-		filters = [TOOTH_GLOW];
+		//transform.colorTransform = WHITE_CT;
+		//filters = [TOOTH_GLOW];
 	}
 	
 	public function stretchTo(val:Int, horiz:Bool):Void {
@@ -49,9 +44,8 @@ class BiteTooth extends Sprite {
 			endTooth.y = val * Layout.UNIT_SIZE;
 			endY = val;
 		}
-		toothMiddle.graphics.clear();
-		toothMiddle.graphics.lineStyle(startTooth.width, 0xFFFFFF, 1, false, LineScaleMode.NORMAL, CapsStyle.NONE);
-		toothMiddle.graphics.lineTo(endTooth.x, endTooth.y);
+		
+		toothMiddle.graphics.clear().setStrokeStyle(Layout.UNIT_SIZE * 1.2).beginStroke(GUIFactory.colorString(0xFFFFFF)).lineTo(endTooth.x, endTooth.y).endFill();
 	}
 	
 	public function reset():Void {

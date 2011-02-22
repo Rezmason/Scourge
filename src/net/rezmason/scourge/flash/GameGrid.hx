@@ -87,12 +87,12 @@ class GameGrid extends Sprite {
 		bodies.transform.colorTransform = new ColorTransform(0.6, 0.6, 0.6, 3);
 		bodies.blendMode = BlendMode.ADD;
 		heads = new Sprite();
-		heads.x = heads.y = Layout.BOARD_BORDER;
+		heads.x = heads.y = Layout.GRID_BORDER;
 		heads.mouseEnabled = heads.mouseChildren = false;
 		space = new Shape();
-		space.x = space.y = Layout.BOARD_BORDER;
+		space.x = space.y = Layout.GRID_BORDER;
 		pattern = new Grid(Layout.UNIT_SIZE * 2, bmpSize, bmpSize, 0xFF111111, 0xFF222222);
-		pattern.x = pattern.y = Layout.BOARD_BORDER;
+		pattern.x = pattern.y = Layout.GRID_BORDER;
 		blurredPatternData = new BitmapData(bmpSize, bmpSize, true, 0x0);
 		blurredPattern = GUIFactory.makeBitmapShape(blurredPatternData, 1, true);
 		blurredPattern.x = blurredPattern.y = pattern.x;
@@ -101,7 +101,7 @@ class GameGrid extends Sprite {
 		var cloudAmount:Float = 0.7;
 		cloudCover.colorTransform(cloudCover.rect, new ColorTransform(cloudAmount, cloudAmount, cloudAmount));
 		clouds = GUIFactory.makeBitmapShape(cloudCover, 1, true);
-		clouds.x = clouds.y = Layout.BOARD_BORDER;
+		clouds.x = clouds.y = Layout.GRID_BORDER;
 		clouds.blendMode = BlendMode.OVERLAY;
 		toothPool = [];
 		teeth = new Sprite();
@@ -109,12 +109,12 @@ class GameGrid extends Sprite {
 		teeth.mouseEnabled = teeth.mouseChildren = false;
 		teeth.alpha = 0;
 		teeth.filters = [BITE_GLOW];
-		teeth.x = teeth.y = Layout.BOARD_BORDER;
+		teeth.x = teeth.y = Layout.GRID_BORDER;
 		fadeSourceBitmap = new BitmapData(bmpSize, bmpSize, true, 0x0);
 		fadeBitmap = fadeSourceBitmap.clone();
 		fader = GUIFactory.makeBitmapShape(fadeBitmap, 1, true);
 		fadeAlphaBitmap = fadeSourceBitmap.clone();
-		fader.x = fader.y = Layout.BOARD_BORDER;
+		fader.x = fader.y = Layout.GRID_BORDER;
 		biteTooth = new BiteTooth();
 		biteTooth.x = biteTooth.y = bmpSize / 2;
 		
@@ -193,7 +193,7 @@ class GameGrid extends Sprite {
 	public function updateFadeSourceBitmap():Void {
 		var biteToothWasVisible:Bool = biteTooth.visible;
 		heads.visible = teeth.visible = biteTooth.visible = fader.visible = false;
-		var mat:Matrix = new Matrix(1, 0, 0, 1, -Layout.BOARD_BORDER, -Layout.BOARD_BORDER);
+		var mat:Matrix = new Matrix(1, 0, 0, 1, -Layout.GRID_BORDER, -Layout.GRID_BORDER);
 		fadeSourceBitmap.fillRect(fadeSourceBitmap.rect, 0x0);
 		fadeSourceBitmap.draw(this, mat);
 		teeth.visible = heads.visible = true;
@@ -201,7 +201,7 @@ class GameGrid extends Sprite {
 	}
 	
 	public function makePlayerHeadAndBody(ct:ColorTransform):Void {
-		var bmpSize:Int = Common.BOARD_SIZE * Layout.UNIT_SIZE + 2 * Layout.BOARD_BORDER;
+		var bmpSize:Int = Common.BOARD_SIZE * Layout.UNIT_SIZE + 2 * Layout.GRID_BORDER;
 		
 		var bmp:BitmapData = new BitmapData(bmpSize, bmpSize, true, 0x0);
 		playerBitmaps.push(bmp);
@@ -227,8 +227,8 @@ class GameGrid extends Sprite {
 			if (colorGrid[ike] > 0) {
 				rx = ike % Common.BOARD_SIZE;
 				ry = Std.int((ike - rx) / Common.BOARD_SIZE);
-				rect.x = rx * Layout.UNIT_SIZE + Layout.BOARD_BORDER;
-				rect.y = ry * Layout.UNIT_SIZE + Layout.BOARD_BORDER;
+				rect.x = rx * Layout.UNIT_SIZE + Layout.GRID_BORDER;
+				rect.y = ry * Layout.UNIT_SIZE + Layout.GRID_BORDER;
 				rect.x -= 1;
 				rect.y -= 1;
 				playerBitmaps[colorGrid[ike] - 1].fillRect(rect, 0xFFFFFFFF);
@@ -369,7 +369,7 @@ class GameGrid extends Sprite {
 	
 	private function finishPlayerBitmaps():Void {
 		var bmp:BitmapData;
-		var bmpSize:Int = Common.BOARD_SIZE * Layout.UNIT_SIZE + 2 * Layout.BOARD_BORDER;
+		var bmpSize:Int = Common.BOARD_SIZE * Layout.UNIT_SIZE + 2 * Layout.GRID_BORDER;
 		var bmp2:BitmapData = new BitmapData(bmpSize, bmpSize, true, 0x0);
 		
 		for (ike in 0...Common.MAX_PLAYERS) {
@@ -419,8 +419,8 @@ class GameGrid extends Sprite {
 						break;
 					}
 				}	
-				rect.x = rx + Layout.BOARD_BORDER;
-				rect.y = ry + Layout.BOARD_BORDER;
+				rect.x = rx + Layout.GRID_BORDER;
+				rect.y = ry + Layout.GRID_BORDER;
 				rect.width = rect.height = Layout.UNIT_SIZE;
 				bmp.fillRect(rect, 0xFFFFFFFF);
 			}
@@ -482,8 +482,8 @@ class GameGrid extends Sprite {
 			var tooth:Sprite = untyped __as__(event.target, Sprite);
 			biteTooth.visible = true;
 			biteToothJob = KTween.to(biteTooth, Layout.QUICK, {scaleX:1, scaleY:1, alpha:1}, Layout.POUNCE);
-			biteTooth.x = tooth.x + Layout.BOARD_BORDER;
-			biteTooth.y = tooth.y + Layout.BOARD_BORDER;
+			biteTooth.x = tooth.x + Layout.GRID_BORDER;
+			biteTooth.y = tooth.y + Layout.GRID_BORDER;
 		} else {
 			biteToothJob = KTween.to(biteTooth, Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
 		}

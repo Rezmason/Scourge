@@ -13,4 +13,6 @@ class Common {
 		[ 5, 14,  9,  5,         14, 13, ], 
 		[ 5, 14,  5,  5, 14,  5, 14, 14, ], 
 	];
+	
+	public static var TEAM_COLORS:Array<Int> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF];
 }

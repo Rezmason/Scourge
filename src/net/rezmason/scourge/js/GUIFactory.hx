@@ -1,5 +1,6 @@
-package net.rezmason.scourge.flash;
+package net.rezmason.scourge.js;
 
+/*
 import flash.display.BitmapData;
 import flash.display.BlendMode;
 import flash.display.DisplayObject;
@@ -17,17 +18,19 @@ import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 import flash.Lib;
+*/
 
+import com.gskinner.display.Container;
+import com.gskinner.display.Graphics;
+import com.gskinner.display.Shape;
+	
 class GUIFactory {
 	
-	// QUESTION FOR THE LIST: How do I determine whether an instance extends a class?
-	// QUESTION FOR THE LIST: How might I merge types? var n:Dynamic<Class1, Class2>
-	
 	public static var MISO:String = "miso";
-	private static var __miso:Font = null;
+	//private static var __miso:Font = null;
 	
 	private static var numTeeth:Int = 0;
-	
+	/*
 	public static function makeButton(clazz:Class<DisplayObject>, hitClazz:Class<DisplayObject>, ?scale:Float = 1, ?angle:Float = 0, ?flip:Bool = false):SimpleButton {
 		var returnVal:SimpleButton = new SimpleButton();
 		returnVal.upState = returnVal.downState = Type.createEmptyInstance(clazz);
@@ -40,13 +43,15 @@ class GUIFactory {
 		if (flip) returnVal.scaleY *= -1;
 		return returnVal;
 	}
-	
+	*/
+	/*
 	public static function wireUp(target:IEventDispatcher, ?onRollOver:Dynamic, ?onRollOut:Dynamic, ?onClick:Dynamic):Void {
 		if (onRollOver) target.addEventListener(MouseEvent.ROLL_OVER, onRollOver);
 		if (onRollOut) target.addEventListener(MouseEvent.ROLL_OUT, onRollOut);
 		if (onClick) target.addEventListener(MouseEvent.CLICK, onClick);
 	}
-	
+	*/
+	/*
 	public static function makeHead(size:Float, ?ct:ColorTransform):Shape {
 		var shp:Shape = new Shape();
 		var gMat:Matrix = new Matrix();
@@ -59,15 +64,17 @@ class GUIFactory {
 		shp.graphics.endFill();
 		shp.visible = false;
 		shp.blendMode = BlendMode.ADD;
-		shp.cacheAsBitmap = true;
 		if (ct != null) shp.transform.colorTransform = ct;
 		return shp;
 	}
+	*/
 	
-	public static function makeTooth(?size:Null<Float>):Sprite {
+	public static function makeTooth(?size:Null<Float>):Container {
 		if (size == null) size = 15;
-		var tooth:Sprite = new Sprite();
-		tooth.graphics.beginFill(0x888888);
+		var toothContainer:Container = new Container();
+		var tooth:Shape = new Shape();
+		toothContainer.addChild(tooth);
+		tooth.graphics.beginFill(colorString(0x888888));
 		tooth.graphics.moveTo(0, -size / 2);
 		tooth.graphics.lineTo(size / 2, 0);
 		tooth.graphics.lineTo(0, size / 2);
@@ -75,22 +82,20 @@ class GUIFactory {
 		tooth.graphics.lineTo(0, -size / 2);
 		tooth.graphics.endFill();
 		tooth.name = "tooth" + numTeeth;
-		tooth.blendMode = BlendMode.ADD;
+		//tooth.blendMode = BlendMode.ADD;
 		numTeeth++;
-		return tooth;
+		return toothContainer;
 	}
-	
+	/*
 	public static function makePointer():Sprite {
 		return new ScourgeLib_MousePointer();
 	}
-	
-	public static function drawSolidRect(targ:Dynamic, color:Int, alpha:Float, x:Float, y:Float, width:Float, height:Float, ?cornerRadius:Float = 0):Dynamic {
-		targ.graphics.beginFill(color, alpha);
-		targ.graphics.drawRoundRect(x, y, width, height, cornerRadius, cornerRadius);
-		targ.graphics.endFill();
+	*/
+	public static function drawSolidRect(targ:Shape, color:Int, alpha:Float, x:Float, y:Float, width:Float, height:Float, ?cornerRadius:Float = 0):Shape {
+		targ.graphics.beginFill(colorString(color, alpha)).drawRoundRect(x, y, width, height, cornerRadius / 2).endFill();
 		return targ;
 	}
-	
+	/*
 	public static function makeBitmapShape(bitmap:BitmapData, ?scale:Float = 1, ?smooth:Bool = true, ?ct:ColorTransform):Shape {
 		var shp:Shape = new Shape();
 		var mat:Matrix = new Matrix();
@@ -101,17 +106,16 @@ class GUIFactory {
 		if (ct != null) shp.transform.colorTransform = ct;
 		return shp;
 	}
-	
-	public static function makeContainer(children:Array<Dynamic>):Sprite {
-		return fillSprite(new Sprite(), children);
+	*/
+	public static function makeContainer(children:Array<Dynamic>):Container {
+		return fillContainer(new Container(), children);
 	}
-	
-	public static function fillSprite(sprite:Sprite, children:Array<Dynamic>):Sprite {
+	public static function fillContainer(container:Container, children:Array<Dynamic>):Container {
 		children = children.copy();
-		while (children.length > 0) sprite.addChildAt(children.pop(), 0);
-		return sprite;
+		while (children.length > 0) container.addChildAt(children.pop(), 0);
+		return container;
 	}
-	
+	/*
 	public static function makeCT(color:Int, ?alpha:Float = 1.0):ColorTransform {
 		var ct:ColorTransform = new ColorTransform();
 		ct.redMultiplier = ((color >> 16) & 0xFF) / 0xFF;
@@ -120,7 +124,8 @@ class GUIFactory {
 		ct.alphaMultiplier = alpha;
 		return ct;
 	}
-	
+	*/
+	/*
 	public static function makeTextBox(?w:Float = 0, ?h:Float = 0, ?fontName:String = "_sans", 
 			?fontSize:Float = 12, ?color:Int = 0xFFFFFF, ?rightAlign:Bool = false, ?multiline:Bool = false):TextField {
 		var textBox:TextField = new TextField();
@@ -147,5 +152,14 @@ class GUIFactory {
 		textBox.blendMode = BlendMode.LAYER;
 		
 		return textBox;
+	}
+	*/
+	public static function colorString(color:Int, ?alpha:Float = 1):String {
+		var alphaInt:Int = 0;
+		if (alpha != 1) {
+			alphaInt = Std.int(alpha / 0xFF) << 24;
+			color = color | alphaInt;
+		}
+		return "#" + StringTools.hex(color);
 	}
 }

@@ -31,16 +31,16 @@ class PlayerStat extends Sprite {
 	private var alive:Bool;
 	private var biteIcon:DisplayObject;
 	
-	public var id:Int;
+	public var uid:Int;
 	
-	public function new(_id:Int, hgt:Float):Void {
+	public function new(_uid:Int, hgt:Float):Void {
 		super();
 		
 		alive = false;
 		cacheAsBitmap = true;
 		tint = new ColorTransform();
 		
-		id = _id;
+		uid = _uid;
 		background = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 0, 0, 210, hgt);
 		biteIcon1 = new ScourgeLib_BiteIcon1(); biteIcon1.visible = false;
 		biteIcon2 = new ScourgeLib_BiteIcon2(); biteIcon2.visible = false;

@@ -1,0 +1,2 @@
+mx.core.IFlexDisplayObject.blendMode : flash.display.BlendMode;
+mx.core.IFlexDisplayObject.opaqueBackground : Null<UInt>;

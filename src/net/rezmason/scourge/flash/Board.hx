@@ -44,7 +44,6 @@ class Board {
 	private static var PIECE_SWAP_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 10, 10, 4, 1);
 	
 	private static var PLAIN_CT:ColorTransform = GUIFactory.makeCT(0xFFFFFF);
-	private static var TEAM_COLORS:Array<Int> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF];
 	private static var ORIGIN:Point = new Point();
 	
 	private var game:Game;
@@ -131,7 +130,7 @@ class Board {
 		
 		// create the player color transforms
 		playerCTs = [];
-		for (ike in 0...TEAM_COLORS.length) playerCTs[ike] = GUIFactory.makeCT(TEAM_COLORS[ike]);
+		for (ike in 0...Common.TEAM_COLORS.length) playerCTs[ike] = GUIFactory.makeCT(Common.TEAM_COLORS[ike]);
 		
 		// build the scene
 		background = GUIFactory.drawSolidRect(new Shape(), 0x0, 1, 0, 0, 800, 600);
@@ -161,9 +160,9 @@ class Board {
 		// position things
 		well.x = well.y = Layout.BAR_MARGIN;
 		timerPanel.x = Layout.BAR_MARGIN;
-		timerPanel.y = well.y + well.height + Layout.BAR_MARGIN;
+		timerPanel.y = well.y + Layout.WELL_WIDTH + Layout.BAR_MARGIN;
 		statPanel.x = Layout.BAR_MARGIN;
-		statPanel.y = timerPanel.y + timerPanel.height + Layout.BAR_MARGIN;
+		statPanel.y = timerPanel.y + Layout.TIMER_HEIGHT + Layout.BAR_MARGIN;
 		
 		GUIFactory.fillSprite(scene, [background, grid, bar]);
 		
@@ -253,10 +252,10 @@ class Board {
 		
 		// scale and reposition grid
 		if (sw - barWidth < sh) {
-			grid.width = sw - barWidth - 40;
+			grid.width = sw - barWidth - Layout.GRID_MARGIN * 2;
 			grid.scaleY = grid.scaleX;
 		} else {
-			grid.height = sh - 40;
+			grid.height = sh - Layout.GRID_MARGIN * 2;
 			grid.scaleX = grid.scaleY;
 		}
 		grid.x = barWidth + (sw - barWidth - grid.width) * 0.5;
@@ -308,6 +307,7 @@ class Board {
 				showPiece();
 			}
 			well.updateCounters(currentPlayer.swaps, currentPlayer.bites);
+			
 			statPanel.update(game.getRollCall(), playerCTs);
 		}
 	}
@@ -633,7 +633,7 @@ class Board {
 			
 			grid.showTeeth();
 			grid.updateTeeth(game.getBiteGrid(), currentPlayerIndex, headX, headY, playerCTs[currentPlayerIndex]);
-			grid.tintTeeth(TEAM_COLORS[currentPlayerIndex]);
+			grid.tintTeeth(Common.TEAM_COLORS[currentPlayerIndex]);
 			if (!overBiteButton) well.displayBiteCounter(true);
 		} else {
 			if (biting) showPiece();
@@ -665,7 +665,7 @@ class Board {
 	}
 	
 	private function swapPiece():Void {
-		if (draggingPiece) return;
+		if (draggingPiece || currentPlayer.swaps < 1) return;
 		displayBite(false);
 		swapHinting = false;
 		game.processPlayerAction(PlayerAction.SWAP_PIECE);

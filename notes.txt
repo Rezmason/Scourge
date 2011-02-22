@@ -190,3 +190,15 @@ Ad placement
 Multiplayer authentication
 	Server passes each client a separate key
 		Client passes key back to authenticate each user action
+		
+		
+Scourge game architecture needs to be made immutable
+	Right now it's basically rules operating on a single state
+	Needs to accept a state and spit out another
+
+Advanced Scourge game functions
+
+findPlayerEdges
+	Returns a list of indices that are adjacent to a player
+
+evaluatePiece
