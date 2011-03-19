@@ -7,7 +7,6 @@
 -swf9 deploy-flash/scourge.swf
 -swf-version 10.1
 --flash-strict
--lib feffects
 -swf-lib assets/ScourgeLib.swf
 # For now, these animations are Flash authored. I need to figure out how to make this platform independent
 -swf-lib assets/ScourgeBiteSymbols.swf

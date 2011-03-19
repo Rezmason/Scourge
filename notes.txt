@@ -202,3 +202,27 @@ findPlayerEdges
 	Returns a list of indices that are adjacent to a player
 
 evaluatePiece
+
+
+
+
+JavaScript, non-EaselJS ideas
+	Glows and shadows are pretty much the same
+	Figure out how to work with Klingemann's stackblur and alpha channels
+	CSS box shadows allow for inset; maybe I should div some stuff
+	Translate SVG somehow into shapes
+		http://code.google.com/p/canvg/source/browse/trunk/canvg.js
+	Blend modes??
+		Look on Stack Overflow for that guy's library
+		
+	WHAT THE FUCK AM I DOING
+		
+		
+	function importCanvas(sourceCanvas, targetSVG) {
+		var image = sourceCanvas.toDataURL("image/png");
+		var svgimg = document.createElementNS("http://www.w3.org/2000/svg", "image");
+		svgimg.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', image);
+		targetSVG.appendChild(svgimg);
+	}
+	
+	<foreignobject /> tag in SVG lets you stick canvases inside
