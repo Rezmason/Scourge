@@ -20,9 +20,9 @@ import flash.text.TextFormatAlign;
 import flash.Lib;
 */
 
-import com.gskinner.display.Container;
-import com.gskinner.display.Graphics;
-import com.gskinner.display.Shape;
+import easeljs.Container;
+import easeljs.Graphics;
+import easeljs.Shape;
 	
 class GUIFactory {
 	

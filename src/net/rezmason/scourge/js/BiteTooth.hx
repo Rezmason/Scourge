@@ -1,7 +1,7 @@
 package net.rezmason.scourge.js;
 
-import com.gskinner.display.Container;
-import com.gskinner.display.Shape;
+import easeljs.Container;
+import easeljs.Shape;
 
 import net.rezmason.scourge.Layout;
 
@@ -31,7 +31,7 @@ class BiteTooth extends Container {
 		GUIFactory.fillContainer(this, [startTooth, toothMiddle, endTooth]);
 		
 		visible = false;
-		mouseEnabled = mouseChildren = false;
+		mouseEnabled = false;
 		//transform.colorTransform = WHITE_CT;
 		//filters = [TOOTH_GLOW];
 	}

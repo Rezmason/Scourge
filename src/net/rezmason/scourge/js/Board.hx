@@ -4,10 +4,10 @@ import js.Dom;
 import js.Lib;
 import net.rezmason.js.Canvas;
 
-import com.gskinner.display.Stage;
-import com.gskinner.display.Container;
-import com.gskinner.display.Graphics;
-import com.gskinner.display.Shape;
+import easeljs.Stage;
+import easeljs.Container;
+import easeljs.Graphics;
+import easeljs.Shape;
 
 import net.kawa.tween.KTween;
 import net.kawa.tween.KTJob;
@@ -121,7 +121,7 @@ class Board {
 		grid.x = barWidth + (sw - barWidth - gridWidth) * 0.5;
 		grid.y = (sh - gridWidth) * 0.5;
 		
-		stage.tick();
+		stage.update();
 	}
 	
 	private function keyHandler(event:Event):Void {

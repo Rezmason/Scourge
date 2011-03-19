@@ -1,8 +1,8 @@
 package net.rezmason.scourge.js;
 
-import com.gskinner.display.Container;
-import com.gskinner.display.Graphics;
-import com.gskinner.display.Shape;
+import easeljs.Container;
+import easeljs.Graphics;
+import easeljs.Shape;
 
 import net.rezmason.scourge.Common;
 import net.rezmason.scourge.Layout;

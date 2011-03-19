@@ -1,9 +1,9 @@
 package net.rezmason.scourge.js;
 
-import com.gskinner.display.Container;
-import com.gskinner.display.DisplayObject;
-import com.gskinner.display.Shape;
-import com.gskinner.display.Text;
+import easeljs.Container;
+import easeljs.DisplayObject;
+import easeljs.Shape;
+import easeljs.Text;
 
 import net.rezmason.scourge.Layout;
 import net.rezmason.scourge.Player;

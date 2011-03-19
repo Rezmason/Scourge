@@ -1,8 +1,8 @@
 package net.rezmason.scourge.js;
 
-import com.gskinner.display.Container;
-import com.gskinner.display.Shape;
-import com.gskinner.display.Text;
+import easeljs.Container;
+import easeljs.Shape;
+import easeljs.Text;
 
 class TimerPanel extends Container {
 	

@@ -1,8 +1,8 @@
 package net.rezmason.scourge.js;
 
-import com.gskinner.display.Bitmap;
-import com.gskinner.display.Container;
-import com.gskinner.display.Shape;
+import easeljs.Bitmap;
+import easeljs.Container;
+import easeljs.Shape;
 
 import net.kawa.tween.KTween;
 import net.kawa.tween.KTJob;
