@@ -124,8 +124,7 @@ class GUIFactory {
 	public static function makeTextBox(?w:Float = 0, ?h:Float = 0, ?fontName:String = "_sans", 
 			?fontSize:Float = 12, ?color:Int = 0xFFFFFF, ?rightAlign:Bool = false, ?multiline:Bool = false):TextField {
 		var textBox:TextField = new TextField();
-		//textBox.border = true;
-		//textBox.borderColor = 0xFFFFFF;
+		//textBox.border = true; textBox.borderColor = 0xFFFFFF;
 		
 		if (fontName == MISO) {
 			if (__miso == null) {

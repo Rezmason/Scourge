@@ -30,6 +30,7 @@ class StatPanel extends Sprite {
 	}
 	
 	public function update(playerData:Array<Player>, cts:Array<ColorTransform>):Void {
+		
 		while (container.numChildren > 0) container.removeChildAt(0);
 		for (ike in 0...playerData.length) {
 			var stat:PlayerStat = playerStatPool[playerData[ike].uid - 1];

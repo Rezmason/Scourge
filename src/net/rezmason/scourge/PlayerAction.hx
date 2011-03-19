@@ -1,11 +1,9 @@
 package net.rezmason.scourge;
 
 enum PlayerAction {
-	SKIP;
 	FORFEIT;
-	PLACE_PIECE(xCoord:Int, yCoord:Int);
+	SKIP;
 	SWAP_PIECE;
-	SPIN_PIECE(?cc:Bool);
-	START_BITE(xCoord:Int, yCoord:Int);
-	END_BITE(xCoord:Int, yCoord:Int);
+	BITE(bSX:Int, bSY:Int, bEX:Int, bEY:Int);
+	PLACE_PIECE(xCoord:Int, yCoord:Int, angle:Int);
 }

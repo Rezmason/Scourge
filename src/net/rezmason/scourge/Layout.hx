@@ -16,8 +16,11 @@ class Layout {
 	public static var BAR_CORNER_RADIUS:Int = 40;
 	public static var TIMER_HEIGHT:Float = 40;
 	public static var STAT_PANEL_HEIGHT:Float = Layout.BAR_HEIGHT - 4 * Layout.BAR_MARGIN - Layout.WELL_WIDTH - Layout.TIMER_HEIGHT;
+	public static var PIECE_SCALE:Float = WELL_WIDTH * 0.2 / UNIT_SIZE;
+	public static var PIECE_BLOCK_BORDER:Float = 1;
 	
-	public static var QUICK:Float = 0.1;
+	public static var QUICK:Float = 0.1; // 0.1
+	public static var GRID_SNAP_RATE:Float = 0.25; // 0.25
 	public static var POUNCE:Float -> Float = Quad.easeOut;
 	public static var SLIDE:Float -> Float = Quad.easeInOut;
 	public static var ZIGZAG:Float -> Float = Elastic.easeOut;

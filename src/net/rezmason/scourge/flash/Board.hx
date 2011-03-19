@@ -9,14 +9,14 @@ import flash.display.Stage;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
-import flash.events.TimerEvent;
 import flash.filters.GlowFilter;
 import flash.geom.ColorTransform;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.text.TextField;
 import flash.ui.Keyboard;
-import flash.utils.Timer;
+
+import haxe.Timer;
 
 import net.kawa.tween.KTween;
 import net.kawa.tween.KTJob;
@@ -37,7 +37,6 @@ class Board {
 	
 	inline static var MIN_WIDTH:Int = 400;
 	inline static var MIN_HEIGHT:Int = 300;
-	inline static var SNAP_RATE:Float = 0.45;
 	
 	private static var PIECE_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 7, 7, 20, 1, true);
 	private static var PIECE_POP_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 10, 10, 20, 1, true);
@@ -81,14 +80,13 @@ class Board {
 	private var piecePlug:Shape;
 	private var pieceBite:Sprite;
 	private var pieceHandle:Sprite;
-	private var pieceOverGrid:Bool;
+	private var pieceWasOverGrid:Bool;
 	private var pieceBoardScale:Float;
 	private var pieceLocX:Int;
 	private var pieceLocY:Int;
 	private var pieceHomeX:Float;
 	private var pieceHomeY:Float;
-	private var handleGoalX:Float;
-	private var handleGoalY:Float;
+	private var pieceAngle:Int;
 	private var pieceRecipe:Array<Int>;
 	private var pieceCenter:Array<Float>;
 	private var pieceHandleJob:KTJob;
@@ -96,7 +94,10 @@ class Board {
 	private var pieceJob:KTJob;
 	private var pieceBlockJobs:Array<KTJob>;
 	private var pieceBiteJob:KTJob;
-	private var handlePushTimer:Timer;
+	private var handlePushTimer:haxe.Timer;
+	
+	private var stoicPiece:Shape;
+	private var stoicPieceHandle:Sprite;
 	
 	public function new(__game:Game, __scene:Sprite, __debugNumPlayers:Int) {
 		scene = __scene;
@@ -105,6 +106,7 @@ class Board {
 		scene.mouseEnabled = scene.mouseChildren = false;
 		if (scene.stage != null) connectToStage();
 		else scene.addEventListener(Event.ADDED_TO_STAGE, connectToStage);
+		pieceAngle = 0;
 	}
 	
 	private function connectToStage(?event:Event):Void {
@@ -118,7 +120,7 @@ class Board {
 		
 		// initialize the primitive variables
 		draggingPiece = false;
-		pieceOverGrid = false;
+		pieceWasOverGrid = false;
 		swapHinting = false;
 		biting = false;
 		pieceBlockJobs = [];
@@ -168,10 +170,9 @@ class Board {
 		
 		// Set up the piece, piece handle, piece blocks and piece bite
 		pieceBlocks = [];
-		var bW:Int = Layout.UNIT_SIZE + 2;
-		for (ike in 0...Common.MOST_BLOCKS_IN_PIECE + 1) {
-			pieceBlocks.push(GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, -1, -1, bW, bW, bW * 0.5));
-		}
+		var pBB:Float = Layout.PIECE_BLOCK_BORDER;
+		var bW:Float = Layout.UNIT_SIZE + 2 * pBB;
+		for (ike in 0...Common.MOST_BLOCKS_IN_PIECE + 1) pieceBlocks.push(GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, -pBB, -pBB, bW, bW, bW * 0.5));
 		piece = GUIFactory.makeContainer(pieceBlocks);
 		piecePlug = GUIFactory.drawSolidRect(new Shape(), 0x222222, 1, 0, 0, bW, bW, bW);
 		piecePlug.visible = false;
@@ -190,7 +191,12 @@ class Board {
 		pieceHandle.tabEnabled = !(pieceHandle.buttonMode = pieceHandle.useHandCursor = true);
 		pieceHandle.x = Layout.WELL_WIDTH  / 2;
 		pieceHandle.y = Layout.WELL_WIDTH / 2;
-		piece.scaleX = piece.scaleY = Layout.WELL_WIDTH / (Layout.UNIT_SIZE * 5);
+		piece.scaleX = piece.scaleY = Layout.PIECE_SCALE;
+		
+		stoicPiece = new Shape();
+		stoicPiece.scaleX = stoicPiece.scaleY = Layout.PIECE_SCALE;
+		stoicPieceHandle = well.stoicPieceHandle;
+		stoicPieceHandle.addChild(stoicPiece);
 		
 		// wire up the piece handle
 		GUIFactory.wireUp(pieceHandle, popPieceOnRollover, popPieceOnRollover);
@@ -199,18 +205,13 @@ class Board {
 		pieceHandle.addEventListener(MouseEvent.MOUSE_DOWN, liftPiece);
 		grid.addEventListener(MouseEvent.MOUSE_DOWN, liftPiece);
 		stage.addEventListener(MouseEvent.MOUSE_UP, dropPiece);
-		
-		grid.firstBiteCheck = firstBiteCheck;
-		grid.endBiteCheck = endBiteCheck;
+		grid.bite = takeBite;
 		
 		stage.addEventListener(Event.ADDED, resize, true);
 		stage.addEventListener(Event.RESIZE, resize);
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
 		stage.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
 		stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseHandler);
-		
-		handlePushTimer = new Timer(10);
-		handlePushTimer.addEventListener(TimerEvent.TIMER, updateHandlePush);
 		
 		// kick things off
 		game.begin(debugNumPlayers);
@@ -279,9 +280,7 @@ class Board {
 				case Keyboard.F2:
 					if (down) {
 						var gridString:String = game.getColorGrid().toString() + ",";
-						for (ike in 0...Common.BOARD_SIZE) {
-							Lib.trace(gridString.substr(ike * Common.BOARD_SIZE * 2, Common.BOARD_SIZE * 2));
-						}
+						for (ike in 0...Common.BOARD_SIZE) Lib.trace(gridString.substr(ike * Common.BOARD_SIZE * 2, Common.BOARD_SIZE * 2));
 					}
 			}
 		}
@@ -304,18 +303,27 @@ class Board {
 		if (thePiece) {
 			if (!biting) {
 				updatePiece();
+				pieceAngle = Std.int(Math.random() * 4);
 				showPiece();
 			}
 			well.updateCounters(currentPlayer.swaps, currentPlayer.bites);
 			
-			statPanel.update(game.getRollCall(), playerCTs);
+			
+			// Order the players by their turn and by whether they are alive
+			var rollCall:Array<Player> = [];
+			var players:Array<Player> = game.getPlayers();
+			for (ike in currentPlayerIndex...players.length) if (players[ike].alive) rollCall.push(players[ike]);
+			for (ike in 0...currentPlayerIndex) if (players[ike].alive) rollCall.push(players[ike]);
+			for (ike in 0...players.length) if (!players[ike].alive) rollCall.push(players[ike]);
+			
+			statPanel.update(rollCall, playerCTs);
 		}
 	}
 	
-	private function waitForGridUpdate(updatePiece:Bool):Void {
+	private function waitForGridUpdate(thePiece:Bool):Void {
 		grid.fadeByFreshness(game.getFreshGrid(), game.getMaxFreshness());
 		grid.addEventListener(Event.COMPLETE, gridUpdateResponder, false, 0, true);
-		waitingForGrid = updatePiece;
+		waitingForGrid = thePiece;
 		pieceHandle.visible = false;
 		lockScene();
 	}
@@ -365,20 +373,16 @@ class Board {
 		if (pieceCenter != null) {
 			c1X = Layout.UNIT_SIZE * pieceCenter[0];
 			c1Y = Layout.UNIT_SIZE * pieceCenter[1];
-			pt = piece.globalToLocal(pieceHandle.localToGlobal(ORIGIN));
+			pt = stoicPiece.globalToLocal(stoicPieceHandle.localToGlobal(ORIGIN));
 			offX = pt.x - c1X;
 			offY = pt.y - c1Y;
 			if (previousAngle > 0)		offX *= -1;
 			else if (previousAngle < 0)	offY *= -1;
 		}
 		
-		pieceRecipe = game.getPiece();
-		pieceCenter = game.getPieceCenter();
-		pieceHandle.rotation = 0;
-		
-		var lastAlpha:Float = pieceHandle.alpha;
-		pieceHandle.transform.colorTransform = playerCTs[currentPlayerIndex];
-		pieceHandle.alpha = lastAlpha;
+		pieceRecipe = game.getPiece()[pieceAngle];
+		pieceCenter = game.getPieceCenter()[pieceAngle];
+		stoicPieceHandle.rotation = pieceHandle.rotation = 0;
 		
 		var c2X:Float = Layout.UNIT_SIZE * pieceCenter[0];
 		var c2Y:Float = Layout.UNIT_SIZE * pieceCenter[1];
@@ -393,25 +397,37 @@ class Board {
 			jen++;
 		}
 		
+		// draw the piece's bounds to the stoic piece
+		var pieceBounds:Rectangle = piece.getBounds(piece);
+		stoicPiece.graphics.clear();
+		stoicPiece.graphics.beginFill(0x0);
+		stoicPiece.graphics.drawRect(pieceBounds.x, pieceBounds.y, pieceBounds.width, pieceBounds.height);
+		stoicPiece.graphics.endFill();
+		
 		pieceBite.x = pieceRecipe[ike    ] * Layout.UNIT_SIZE + pieceBlocks[jen - 1].width;
 		pieceBite.y = pieceRecipe[ike + 1] * Layout.UNIT_SIZE + pieceBlocks[jen - 1].height;
 		piecePlug.visible = (pieceRecipe == Pieces.O_PIECE);
 		
 		// update the position
-		pieceHomeX = -c2X * piece.scaleX;
-		pieceHomeY = -c2Y * piece.scaleY;
+		pieceHomeX = -c2X * Layout.PIECE_SCALE;
+		pieceHomeY = -c2Y * Layout.PIECE_SCALE;
 		
 		if (draggingPiece) {
-			piece.x = 0;
-			piece.y = 0;
-			pt = piece.globalToLocal(pieceHandle.localToGlobal(ORIGIN));
-			piece.x = (pt.x - c2X + offY) * piece.scaleX;
-			piece.y = (pt.y - c2Y + offX) * piece.scaleY;
+			stoicPiece.x = 0;
+			stoicPiece.y = 0;
+			pt = stoicPiece.globalToLocal(stoicPieceHandle.localToGlobal(ORIGIN));
+			stoicPiece.x = piece.x = (pt.x - c2X + offY) * Layout.PIECE_SCALE;
+			stoicPiece.y = piece.y = (pt.y - c2Y + offX) * Layout.PIECE_SCALE;
 			dragPiece(__softSnap);
 		} else {
-			piece.x = pieceHomeX;
-			piece.y = pieceHomeY;
+			stoicPiece.x = piece.x = pieceHomeX;
+			stoicPiece.y = piece.y = pieceHomeY;
 		}
+		
+		var lastAlpha:Float = pieceHandle.alpha;
+		pieceHandle.transform.colorTransform = playerCTs[currentPlayerIndex];
+		pieceHandle.alpha = lastAlpha;
+		
 		enableDrag();
 	}
 	
@@ -424,7 +440,7 @@ class Board {
 		if (pieceJob != null) pieceJob.complete();
 		if (pieceHandleSpinJob != null) pieceHandleSpinJob.complete();
 		
-		pieceBoardScale = grid.scaleX / (piece.scaleX * pieceHandle.scaleX * bar.scaleX);
+		pieceBoardScale = grid.scaleX / (Layout.PIECE_SCALE * stoicPieceHandle.scaleX * bar.scaleX);
 		
 		popPiece(true);
 		
@@ -433,8 +449,8 @@ class Board {
 			mX = pieceCenter[0];
 			mY = pieceCenter[1];
 		} else {
-			mX = piece.mouseX / Layout.UNIT_SIZE;
-			mY = piece.mouseY / Layout.UNIT_SIZE;
+			mX = stoicPiece.mouseX / Layout.UNIT_SIZE;
+			mY = stoicPiece.mouseY / Layout.UNIT_SIZE;
 		}
 		
 		var goodX:Float = mX, testX:Float;
@@ -454,123 +470,139 @@ class Board {
 			ike += 2;
 		}
 		
-		var goodPt:Point = well.globalToLocal(piece.localToGlobal(new Point(goodX * Layout.UNIT_SIZE, goodY * Layout.UNIT_SIZE)));
+		var goodPt:Point = well.globalToLocal(stoicPiece.localToGlobal(new Point(goodX * Layout.UNIT_SIZE, goodY * Layout.UNIT_SIZE)));
 		
-		piece.x += pieceHandle.x;
-		piece.y += pieceHandle.y;
+		stoicPiece.x += stoicPieceHandle.x;
+		stoicPiece.y += stoicPieceHandle.y;
+		
+		piece.x = stoicPiece.x;
+		piece.y = stoicPiece.y;
 		
 		if (event.currentTarget == grid) {
-			piece.x -= goodPt.x;
-			piece.y -= goodPt.y;
+			stoicPiece.x -= goodPt.x;
+			stoicPiece.y -= goodPt.y;
+			piece.x = stoicPiece.x;
+			piece.y = stoicPiece.y;
+			stoicPieceHandle.scaleX = stoicPieceHandle.scaleY = pieceBoardScale;
 			pieceHandle.scaleX = pieceHandle.scaleY = pieceBoardScale;
 		} else {
-			var toX:Float = piece.x  - goodPt.x;
-			var toY:Float = piece.y  - goodPt.y;
+			stoicPiece.x -= goodPt.x;
+			stoicPiece.y -= goodPt.y;
 			piece.x -= well.mouseX;
 			piece.y -= well.mouseY;
-			pieceJob = KTween.to(piece, 3 * Layout.QUICK, {x:toX, y:toY}, Layout.POUNCE);
+			pieceJob = KTween.to(piece, 3 * Layout.QUICK, {x:stoicPiece.x, y:stoicPiece.y}, Layout.POUNCE);
+			stoicPieceHandle.scaleX = stoicPieceHandle.scaleY = 1.2;
 			pieceHandleJob = KTween.to(pieceHandle, Layout.QUICK, {scaleX:1.2, scaleY:1.2}, Linear.easeOut);
 		}
 		
-		dragPiece();
+		dragPiece(false);
 	}
 	
-	private function dragPiece(?snap:Bool):Void {
-		if (!draggingPiece) return;
-		var oldX:Float = pieceHandle.x;
-		var oldY:Float = pieceHandle.y;
+	private function dragPiece(?softSnap:Bool):Void {
 		
-		var _pieceOverGrid:Bool = box.contains(grid.space.mouseX, grid.space.mouseY);
+		if (!draggingPiece) return;
+		
+		var oldX:Float = stoicPieceHandle.x;
+		var oldY:Float = stoicPieceHandle.y;
+		
+		var pieceOverGrid:Bool = box.contains(grid.space.mouseX, grid.space.mouseY);
 		var scale:Float;
 		
-		if (_pieceOverGrid != pieceOverGrid) {
-			pieceOverGrid = _pieceOverGrid;
+		// If the piece has moved onto or off of the grid, it needs to grow or shrink
+		if (pieceOverGrid != pieceWasOverGrid) {
+			pieceWasOverGrid = pieceOverGrid;
 			if (pieceHandleJob != null) pieceHandleJob.complete();
-			scale = _pieceOverGrid ? pieceBoardScale : 1.2;
+			scale = pieceOverGrid ? pieceBoardScale : 1.2;
+			stoicPieceHandle.scaleX = stoicPieceHandle.scaleY = scale;
 			pieceHandleJob = KTween.to(pieceHandle, 2 * Layout.QUICK, {scaleX:scale, scaleY:scale}, Linear.easeOut);
 		}
 		
-		pieceHandle.x = well.mouseX;
-		pieceHandle.y = well.mouseY;
+		stoicPieceHandle.x = well.mouseX;
+		stoicPieceHandle.y = well.mouseY;
 		
-		if (_pieceOverGrid && box.containsRect(pieceHandle.getBounds(grid.space))) {
+		// If the piece is over the area of the grid where snapping should occur, it should snap
+		if (pieceOverGrid && box.containsRect(stoicPieceHandle.getBounds(grid.space))) {
+			var gp:Point = grid.space.globalToLocal(stoicPiece.localToGlobal(ORIGIN));
 			
-			// grid snapping.
+			var newPieceLocX:Int = Std.int(Math.round(gp.x / Layout.UNIT_SIZE));
+			var newPieceLocY:Int = Std.int(Math.round(gp.y / Layout.UNIT_SIZE));
 			
-			var gp:Point = grid.space.globalToLocal(piece.localToGlobal(ORIGIN));
-			
-			pieceLocX = Std.int(Math.round(gp.x / Layout.UNIT_SIZE));
-			pieceLocY = Std.int(Math.round(gp.y / Layout.UNIT_SIZE));
-			
-			pieceHandle.transform.colorTransform = game.evaluatePosition(pieceLocX, pieceLocY) ? PLAIN_CT : playerCTs[currentPlayerIndex];
-			
-			var gp2:Point = new Point(pieceLocX * Layout.UNIT_SIZE, pieceLocY * Layout.UNIT_SIZE);
-			
-			gp  = pieceHandle.globalToLocal(grid.space.localToGlobal(gp));
-			gp2 = pieceHandle.globalToLocal(grid.space.localToGlobal(gp2));
-			
-			gp2.x = pieceHandle.x + (gp2.x - gp.x) * pieceHandle.scaleX;
-			gp2.y = pieceHandle.y + (gp2.y - gp.y) * pieceHandle.scaleY;
-			
-			if (!snap || Math.abs(pieceHandle.x + pieceHandle.y - handleGoalX - handleGoalY) < 2) {
-				if (handlePushTimer.running) {
-					pieceHandle.x = oldX;
-					pieceHandle.y = oldY;
+			if (pieceLocX == newPieceLocX && pieceLocY == newPieceLocY) {
+				stoicPieceHandle.x = oldX;
+				stoicPieceHandle.y = oldY;
+			} else {
+				
+				pieceLocX = newPieceLocX;
+				pieceLocY = newPieceLocY;
+				
+				pieceHandle.transform.colorTransform = game.testPosition(pieceLocX, pieceLocY, pieceAngle) ? PLAIN_CT : playerCTs[currentPlayerIndex];
+				
+				var gp2:Point = new Point(pieceLocX * Layout.UNIT_SIZE, pieceLocY * Layout.UNIT_SIZE);
+
+				gp  = stoicPieceHandle.globalToLocal(grid.space.localToGlobal(gp));
+				gp2 = stoicPieceHandle.globalToLocal(grid.space.localToGlobal(gp2));
+
+				stoicPieceHandle.x += (gp2.x - gp.x) * stoicPieceHandle.scaleX;
+				stoicPieceHandle.y += (gp2.y - gp.y) * stoicPieceHandle.scaleY;
+				
+				if (softSnap) {
+					if (handlePushTimer == null) {
+						handlePushTimer = new haxe.Timer(10);
+						handlePushTimer.run = updateHandlePush;
+					}
 				} else {
-					pieceHandle.x = gp2.x;
-					pieceHandle.y = gp2.y;
+					pieceHandle.x = stoicPieceHandle.x;
+					pieceHandle.y = stoicPieceHandle.y;
 				}
-			} else if (snap) {
-				handleGoalX = gp2.x;
-				handleGoalY = gp2.y;
-				pieceHandle.x = oldX;
-				pieceHandle.y = oldY;
-				handlePushTimer.start();
 			}
 		} else {
 			pieceLocX = pieceLocY = -1;
-			handlePushTimer.reset();
+			if (handlePushTimer != null) handlePushTimer.stop();
+			handlePushTimer = null;
+			pieceHandle.x = stoicPieceHandle.x;
+			pieceHandle.y = stoicPieceHandle.y;
 		}
 	}
 	
-	private function updateHandlePush(event:Event):Void {
+	private function updateHandlePush():Void {
 		if (!draggingPiece) return;
-		pieceHandle.x = pieceHandle.x * (1 - SNAP_RATE) + handleGoalX * SNAP_RATE;
-		pieceHandle.y = pieceHandle.y * (1 - SNAP_RATE) + handleGoalY * SNAP_RATE;
-		var dx:Float = pieceHandle.x - handleGoalX;
-		var dy:Float = pieceHandle.y - handleGoalY;
-		if (Math.sqrt(dx * dx + dy * dy) < 0.01) finishHandlePush();
+		pieceHandle.x = pieceHandle.x * (1 - Layout.GRID_SNAP_RATE) + stoicPieceHandle.x * Layout.GRID_SNAP_RATE;
+		pieceHandle.y = pieceHandle.y * (1 - Layout.GRID_SNAP_RATE) + stoicPieceHandle.y * Layout.GRID_SNAP_RATE;
+		if (stoicPieceHandle.x == pieceHandle.x && stoicPieceHandle.y == pieceHandle.y) finishHandlePush();
 	}
 	
 	private function finishHandlePush():Void {
-		if (!(draggingPiece && handlePushTimer.running)) return;
-		handlePushTimer.stop();
-		pieceHandle.x = handleGoalX;
-		pieceHandle.y = handleGoalY;
+		if (!(draggingPiece && handlePushTimer != null)) return;
+		if (handlePushTimer != null) handlePushTimer.stop();
+		handlePushTimer = null;
 	}
 	
 	private function dropPiece(?event:Event):Void {
 		if (!draggingPiece) return;
-		pieceHandle.x = handleGoalX;
-		pieceHandle.y = handleGoalY;
-		handlePushTimer.stop();
+		if (handlePushTimer != null) handlePushTimer.stop();
+		handlePushTimer = null;
 		
-		dragPiece();
+		dragPiece(false);
 		
 		pieceHandle.transform.colorTransform = playerCTs[currentPlayerIndex];
 		piece.filters = [PIECE_GLOW];
-		pieceOverGrid = false;
+		pieceWasOverGrid = false;
 		if (pieceHandleJob != null) pieceHandleJob.close();
 		if (pieceJob != null) pieceJob.close();
 		
 		draggingPiece = false;
 		
-		if (pieceLocX != -1 && game.processPlayerAction(PlayerAction.PLACE_PIECE(pieceLocX, pieceLocY))) {
+		if (pieceLocX != -1 && game.act(PlayerAction.PLACE_PIECE(pieceLocX, pieceLocY, pieceAngle))) {
 			currentPlayer = game.getCurrentPlayer();
 			currentPlayerIndex = game.getCurrentPlayerIndex();
 			update(true, true, true);
 		} else {
+			pieceLocX = pieceLocY = -1;
 			var pieceHandleHome:Float = Layout.WELL_WIDTH / 2;
+			stoicPieceHandle.x = stoicPieceHandle.y = pieceHandleHome;
+			stoicPieceHandle.scaleX = stoicPieceHandle.scaleY = 1;
+			stoicPiece.x = pieceHomeX;
+			stoicPiece.y = pieceHomeY;
 			pieceHandleJob = KTween.to(pieceHandle, 2 * Layout.QUICK, {x:pieceHandleHome, y:pieceHandleHome, scaleX:1, scaleY:1}, Layout.POUNCE, enableDrag);
 			pieceJob = KTween.to(piece, 2 * Layout.QUICK, {x:pieceHomeX, y:pieceHomeY}, Layout.POUNCE);
 		}
@@ -578,17 +610,18 @@ class Board {
 	
 	private function showPiece():Void {
 		well.hideBiteIndicator();
-		piece.x = pieceHomeX;
-		piece.y = pieceHomeY;
+		stoicPiece.x = piece.x = pieceHomeX;
+		stoicPiece.y = piece.y = pieceHomeY;
 		pieceHandle.visible = true;
-		pieceHandle.x = Layout.WELL_WIDTH  / 2;
-		pieceHandle.y = Layout.WELL_WIDTH / 2;
-		pieceHandle.scaleX = pieceHandle.scaleY = 0.7;
+		stoicPieceHandle.x = pieceHandle.x = Layout.WELL_WIDTH  / 2;
+		stoicPieceHandle.y = pieceHandle.y = Layout.WELL_WIDTH / 2;
+		stoicPieceHandle.scaleX = stoicPieceHandle.scaleY = pieceHandle.scaleX = pieceHandle.scaleY = 0.7;
 		pieceHandle.alpha = 0;
 		pieceHandle.mouseEnabled = pieceHandle.mouseChildren = false;
 		if (pieceHandleJob != null) pieceHandleJob.close();
 		if (pieceHandleSpinJob != null) pieceHandleSpinJob.complete();
 		well.bringPieceHandleBackward();
+		stoicPieceHandle.scaleX = stoicPieceHandle.scaleY = 1;
 		pieceHandleJob = KTween.to(pieceHandle, 3 * Layout.QUICK, {alpha:1, scaleX:1, scaleY:1}, Layout.SLIDE, enableDrag);
 	}
 	
@@ -597,12 +630,22 @@ class Board {
 		finishHandlePush();
 		if (pieceHandleSpinJob != null) pieceHandleSpinJob.complete();
 		if (pieceJob != null) pieceJob.complete();
-		game.processPlayerAction(PlayerAction.SPIN_PIECE(cc));
-		var angle:Int = cc ? -90 : 90;
-		updatePiece(angle);
-		pieceHandleSpinJob = KTween.from(pieceHandle, 2 * Layout.QUICK, {rotation:-angle}, Layout.POUNCE, enableDrag);
-		if (!draggingPiece) pieceJob = KTween.to(piece, 2 * Layout.QUICK, {x:pieceHomeX, y:pieceHomeY}, Layout.POUNCE);
+		
+		pieceAngle += cc ? 1 : 3;
+		pieceAngle %= 4;
+		
+		var turnAngle:Int = cc ? -90 : 90;
+		updatePiece(turnAngle);
+		
+		pieceHandleSpinJob = KTween.from(pieceHandle, 2 * Layout.QUICK, {rotation:-turnAngle}, Layout.POUNCE, enableDrag);
+		
+		if (!draggingPiece) {
+			stoicPiece.x = pieceHomeX;
+			stoicPiece.y = pieceHomeY;
+			pieceJob = KTween.to(piece, 2 * Layout.QUICK, {x:pieceHomeX, y:pieceHomeY}, Layout.POUNCE);
+		}
 		pieceHandle.mouseEnabled = pieceHandle.mouseChildren = false;
+		if (pieceLocX != -1) pieceHandle.transform.colorTransform = game.testPosition(pieceLocX, pieceLocY, pieceAngle) ? PLAIN_CT : playerCTs[currentPlayerIndex];
 	}
 	
 	private function enableDrag():Void {
@@ -632,7 +675,7 @@ class Board {
 			var headY:Int = headPositions[currentPlayerIndex * 2 + 1];
 			
 			grid.showTeeth();
-			grid.updateTeeth(game.getBiteGrid(), currentPlayerIndex, headX, headY, playerCTs[currentPlayerIndex]);
+			grid.updateTeeth(game.getLegalBiteGrid(), currentPlayerIndex, headX, headY, playerCTs[currentPlayerIndex]);
 			grid.tintTeeth(Common.TEAM_COLORS[currentPlayerIndex]);
 			if (!overBiteButton) well.displayBiteCounter(true);
 		} else {
@@ -644,19 +687,14 @@ class Board {
 		biting = _biting;
 	}
 	
-	private function firstBiteCheck(bX:Int, bY:Int):Array<Int> {
-		if (!game.processPlayerAction(PlayerAction.START_BITE(bX, bY))) return null;
-		return game.getBiteLimits();
-	}
-	
-	private function endBiteCheck(bX:Int, bY:Int):Void {
-		if (game.processPlayerAction(PlayerAction.END_BITE(bX, bY))) {
+	private function takeBite(bSX:Int, bSY:Int, bEX:Int, bEY:Int):Void {
+		if (game.act(PlayerAction.BITE(bSX, bSY, bEX, bEY))) {
 			if (shiftBite && currentPlayer.bites > 0) {
 				update(true, true, true);
 				var headPositions:Array<Int> = Common.HEAD_POSITIONS[game.getNumPlayers() - 1];
 				var headX:Int = headPositions[currentPlayerIndex * 2    ];
 				var headY:Int = headPositions[currentPlayerIndex * 2 + 1];
-				grid.updateTeeth(game.getBiteGrid(), currentPlayerIndex, headX, headY, playerCTs[currentPlayerIndex]);
+				grid.updateTeeth(game.getLegalBiteGrid(), currentPlayerIndex, headX, headY, playerCTs[currentPlayerIndex]);
 			} else {
 				displayBite(false);
 				update(true, true, true);
@@ -668,10 +706,8 @@ class Board {
 		if (draggingPiece || currentPlayer.swaps < 1) return;
 		displayBite(false);
 		swapHinting = false;
-		game.processPlayerAction(PlayerAction.SWAP_PIECE);
-		for (ike in 0...pieceBlocks.length) {
-			if (pieceBlockJobs[ike] != null) pieceBlockJobs[ike].abort();
-		}
+		game.act(PlayerAction.SWAP_PIECE);
+		for (ike in 0...pieceBlocks.length) if (pieceBlockJobs[ike] != null) pieceBlockJobs[ike].abort();
 		update(true);
 		if (pieceRecipe == Pieces.O_PIECE) KTween.from(piecePlug, Layout.QUICK, {alpha:0}, Layout.POUNCE);
 		if (!overSwapButton) well.displaySwapCounter(false, true);
@@ -681,7 +717,7 @@ class Board {
 		if (draggingPiece || grid.isDraggingBite()) return;
 		displayBite(false);
 		well.displaySwapCounter(false);
-		game.processPlayerAction(PlayerAction.SKIP);
+		game.act(PlayerAction.SKIP);
 		currentPlayer = game.getCurrentPlayer();
 		currentPlayerIndex = game.getCurrentPlayerIndex();
 		update(true, true);
@@ -704,7 +740,7 @@ class Board {
 			pieceBite.alpha = 1;
 			var wham:Float = Layout.WELL_WIDTH * 0.05;
 			//pieceHandle.rotation = 30;
-			pieceHandleJob = KTween.from(pieceHandle, 3 * Layout.QUICK, {x:pieceHandle.x + wham, y:pieceHandle.y + wham, rotation:0}, Layout.ZIGZAG);
+			pieceHandleJob = KTween.from(pieceHandle, 3 * Layout.QUICK, {x:pieceHandle.x + wham, y:pieceHandle.y + wham/*, rotation:0*/}, Layout.ZIGZAG);
 		} else {
 			pieceBite.alpha = 0.05;
 			pieceBiteJob = KTween.to(pieceBite, 3 * Layout.QUICK, {alpha:0, visible:false}, Layout.POUNCE);
@@ -720,10 +756,12 @@ class Board {
 			swapHinting = true;
 			piecePlug.visible = false;
 			currentBlockForSwapHint = 0;
+			pieceHandle.mouseEnabled = pieceHandle.mouseChildren = false;
 			pushCurrentSwapBlock();
 			pieceHandle.filters = [PIECE_SWAP_GLOW];
 		} else {
 			swapHinting = false;
+			pieceHandle.mouseEnabled = pieceHandle.mouseChildren = true;
 			var oldPieceX:Float = piece.x;
 			var oldPieceY:Float = piece.y;
 			var oldXs:Array<Float> = [];
@@ -735,9 +773,7 @@ class Board {
 			}
 			updatePiece();
 			KTween.from(piece, Layout.QUICK, {x:oldPieceX, y:oldPieceY}, Layout.POUNCE);
-			for (ike in 0...pieceBlocks.length) {
-				pieceBlockJobs[ike] = KTween.from(pieceBlocks[ike], Layout.QUICK, {x:oldXs[ike], y:oldYs[ike]}, Layout.SLIDE);
-			}
+			for (ike in 0...pieceBlocks.length) pieceBlockJobs[ike] = KTween.from(pieceBlocks[ike], Layout.QUICK, {x:oldXs[ike], y:oldYs[ike]}, Layout.SLIDE);
 			pieceHandle.filters = [];
 			piece.filters = [PIECE_GLOW];
 		}

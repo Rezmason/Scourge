@@ -1,325 +1,254 @@
 package net.rezmason.scourge;
 
 class Game {
-
-	inline static var DEAD:Int = 0;
-	
-	private var currentPiece:Int;
-	private var currentAngle:Int;
-	private var pieceHat:Array<Int>;
-	private var _numPlayers:Int;
 	
 	private var defaultGrid:Array<Dynamic>;
+	
+	private var g:GameState;
+	private var allUniquePlayers:Array<Player>;
+	private var allPlayerActions:Array<Dynamic>;
+	
+	// the game state
+	private var currentPiece:Int;
+	private var pieceHat:Hat;
+	private var numPlayers:Int;
+	private var numAlivePlayers:Int;
 	private var colorGrid:Array<Int>;
 	private var freshGrid:Array<Int>;
-	private var biteGrid:Array<Bool>;
+	private var legalMoveGrids:Array<Array<Bool>>;
+	private var legalBiteGrid:Array<Array<Int>>;
 	private var aliveGrid:Array<Bool>;
-	//private var validPositionCache:Hash<Bool>;
-	private var playerPool:Array<Player>;
 	private var players:Array<Player>;
 	private var currentPlayerIndex:Int;
 	private var currentPlayer:Player;
-	private var newElements:Array<Int>;
 	private var freshness:Int;
-
-	private var stacks:Array<Array<Int>>;
+	private var turnItr:Int;
+	private var turnCount:Int;
+	
+	// specific to the eat algorithm
+	private var eatStacks:Array<Array<Int>>;
 	private var hStack:Array<Int>;
 	private var vStack:Array<Int>;
 	private var uStack:Array<Int>;
 	private var dStack:Array<Int>;
-	private var validBiteEnds:Array<Int>;
-
-	private var biteX:Int;
-	private var biteY:Int;
-	private var biteLimits:Array<Int>;
 	private var changeIncrements:Array<Int>;
+	private var newElements:Array<Int>;
 
 	public function new(?_defaultGrid:Array<Dynamic>) {
 		defaultGrid = (_defaultGrid[0] == -1) ? null : _defaultGrid;
 		// Set up data structure
-		biteX = biteY = -1;
-		pieceHat = [];
+		pieceHat = new Hat(Pieces.PIECES.length, Pieces.PIECES);
 		colorGrid = [];
 		freshGrid = [];
-		biteGrid = [];
+		legalBiteGrid = [];
 		aliveGrid = [];
-		//validPositionCache = new Hash();
-		playerPool = [];
+		allUniquePlayers = [];
+		legalMoveGrids = [];
 		players = [];
 		newElements = [];
 		hStack = [];
 		vStack = [];
 		uStack = [];
 		dStack = [];
-		validBiteEnds = [];
-		stacks = [hStack, vStack, uStack, dStack]; // H, V, U, D
+		eatStacks = [hStack, vStack, uStack, dStack]; // H, V, U, D
 		changeIncrements = [1, Common.BOARD_SIZE, Common.BOARD_SIZE + 1, Common.BOARD_SIZE - 1];
-		for (ike in 0...Common.MAX_PLAYERS) playerPool[ike] = new Player(ike + 1);
-	}
-
-	private function resetPieces():Void {
-		var len:Int = Pieces.PIECES.length;
-		for (ike in 0...len) pieceHat.push(ike);
-	}
-
-	private function makePiece(?swap:Bool = false):Void {
-		// for (n in validPositionCache.keys()) validPositionCache.remove(n);
-		if (!swap || pieceHat.length == 0) resetPieces();
-		var rand:Int;
-		var currentBlocks:Array<Array<Int>> = Pieces.PIECES[currentPiece];
-		do {
-			rand = Std.int(Math.random() * pieceHat.length);
-			} while (Pieces.PIECES[pieceHat[rand]] == currentBlocks);
-		currentPiece = pieceHat.splice(rand, 1)[0];
-		currentAngle = Std.int(Math.random() * 4);
-	}
-
-	public function getPiece():Array<Int> {
-		var cA:Int = currentAngle % Pieces.PIECES[currentPiece].length;
-		return Pieces.PIECES[currentPiece][cA];
-	}
-
-	public function getPieceCenter():Array<Float> {
-		var cA:Int = currentAngle % Pieces.CENTERS[currentPiece].length;
-		return Pieces.CENTERS[currentPiece][cA];
-	}
-
-	public function getBiteGrid():Array<Bool> {
-		return biteGrid;
-	}
-
-	public function getBiteLimits():Array<Int> {
-		return biteLimits;
-		// TOP RIGHT BOTTOM LEFT
+		for (ike in 0...Common.MAX_PLAYERS) allUniquePlayers[ike] = new Player(ike + 1);
+		fillTable(Pieces.PIECES);
+		fillTable(Pieces.CENTERS);
+		fillTable(Pieces.NEIGHBORS);
+		allPlayerActions = [forfeit, endTurn, swapPiece, takeBite, placePiece];
 	}
 	
-	public function getRollCall():Array<Player> {
-		// Order the players by their turn and by whether they are alive
-		var returnVal:Array<Player> = [];
-		for (ike in currentPlayerIndex...players.length) if (players[ike].alive) returnVal.push(players[ike]);
-		for (ike in 0...currentPlayerIndex) if (players[ike].alive) returnVal.push(players[ike]);
-		for (ike in 0...players.length) if (!players[ike].alive) returnVal.push(players[ike]);
-		return returnVal;
-	}
-
-	private function rotatePiece(?cc:Bool):Array<Int> {
-		// for (ike in validPositionCache.keys()) validPositionCache.remove(ike);
-		currentAngle += cc ? 1 : 3;
-		currentAngle %= 4;
-		var cA:Int = currentAngle % Pieces.PIECES[currentPiece].length;
-		return Pieces.PIECES[currentPiece][cA];
-	}
-
-	public function getColorGrid():Array<Int> {
-		return colorGrid.slice(0, Common.BOARD_NUM_CELLS);
-	}
 	
-	public function getFreshGrid():Array<Int> {
-		return freshGrid.slice(0, Common.BOARD_NUM_CELLS);
-	}
-	
-	public function getMaxFreshness():Int {
-		return freshness;
-	}
-
-	public function getCurrentPlayer():Player {
-		return currentPlayer;
-	}
-
-	public function getCurrentPlayerIndex():Int {
-		return currentPlayerIndex;
-	}
-
-	public function getNumPlayers():Int {
-		return _numPlayers;
-	}
-	
-	public function getPlayers():Array<Player> {
-		return players.copy();
-	}
-	
-	public function processPlayerAction(?action:PlayerAction):Bool {
-		if (action == null) action = PlayerAction.SKIP;
-		switch (action) {
-			case SKIP: 
-				// If a player with no bites skips, they're probably desparate or the game got boring.
-				if (currentPlayer.bites == 0 && currentPlayer.biteHat.pick() <= 1) currentPlayer.bites++;
-				nextTurn();
-				return true;
-			case FORFEIT:
-				colorGrid[currentPlayer.headIndex] = 0;
-				resetFreshness();
-				killCheck();
-				currentPlayer.alive = false;
-				nextTurn();
-				return true;
-			case PLACE_PIECE(xCoord, yCoord): 
-				return placePiece(xCoord, yCoord);
-			case SWAP_PIECE:
-				if (_numPlayers == 1 || currentPlayer.swaps > 0) {
-					currentPlayer.swaps--;
-					makePiece(true);
-					return true;
-				}
-				return false;
-			case SPIN_PIECE(cc):
-				rotatePiece(cc);
-				return true;
-			case START_BITE(xCoord, yCoord):
-				return startBite(xCoord, yCoord);
-			case END_BITE(xCoord, yCoord):
-				return endBite(xCoord, yCoord);
+	public function begin(?_numPlayers:Int = 1, ?gameType:GameType):Void {
+		numPlayers = (_numPlayers < 0) ? 1 : ((_numPlayers > 4) ? 4 : _numPlayers);
+		numAlivePlayers = numPlayers;
+		
+		if (gameType == null) gameType = GameType.CLASSIC;
+		
+		switch (gameType) {
+			case CLASSIC:
+			case DELUXE(firstSwaps, firstBites, timeLimit):
+			case MAYHEM:
 		}
+		
+		// Prime the grid
+		if (defaultGrid == null) for (ike in 0...Common.BOARD_NUM_CELLS) colorGrid[ike] = 0;
+		
+		var currentHeads:Array<Int> = Common.HEAD_POSITIONS[numPlayers - 1];
+		players.splice(0, players.length);
+
+		// Populate the player list
+		for (ike in 0...numPlayers) {
+			var player:Player = allUniquePlayers[ike];
+			players.push(player);
+			player.bites = 2;
+			player.swaps = 10;
+			player.size = 1;
+			player.biteSize = 1;
+			player.headX = currentHeads[ike * 2];
+			player.headY = currentHeads[ike * 2 + 1];
+			player.headIndex = player.headY * Common.BOARD_SIZE + player.headX;
+			player.alive = true;
+			colorGrid[player.headIndex] = player.uid;
+		}
+		
+		// Prime the grid
+		if (defaultGrid != null) {
+			for (ike in 0...numPlayers) allUniquePlayers[ike].size = 0;
+			for (ike in 0...Common.BOARD_NUM_CELLS) {
+				colorGrid[ike] = Std.int(defaultGrid[ike]);
+				if (colorGrid[ike] > 0) allUniquePlayers[colorGrid[ike] - 1].size++;
+			}
+		}
+		
+		resetFreshness();
+		killCheck();
+		
+		// It's player 1's turn
+		currentPlayerIndex = 0;
+		turnItr = 0;
+		turnCount = 0;
+		currentPlayer = players[currentPlayerIndex];
+		currentPiece = -1;
+		makePiece();
+		updateLegalBiteGrid();
+	}
+	
+	public function getPiece():Array<Array<Int>> { return Pieces.PIECES[currentPiece]; }
+	public function getPieceCenter():Array<Array<Float>> { return Pieces.CENTERS[currentPiece]; }
+	public function getLegalBiteGrid():Array<Array<Int>> { return legalBiteGrid; }
+	public function getColorGrid():Array<Int> { return colorGrid.copy(); }
+	public function getFreshGrid():Array<Int> { return freshGrid.copy(); }
+	public function getMaxFreshness():Int { return freshness; }
+	public function getCurrentPlayer():Player { return currentPlayer; }
+	public function getCurrentPlayerIndex():Int { return currentPlayerIndex; }
+	public function getNumPlayers():Int { return numPlayers; }
+	public function getPlayers():Array<Player> { return players.copy(); }
+	public function testPosition(xCoord:Int, yCoord:Int, angle:Int):Bool { return legalMoveGrids[angle][yCoord * Common.BOARD_SIZE + xCoord]; }
+	
+	public function act(action:PlayerAction):Bool {
+		return Reflect.callMethod(null, allPlayerActions[Type.enumIndex(action)], Type.enumParameters(action));
+	}
+	
+	private function fillTable(table:Array<Array<Dynamic>>):Void {
+		for (ike in 0...table.length) {
+			var originalLength:Int = table[ike].length;
+			var jen:Int = originalLength;
+			while (jen < 4) {
+				table[ike].push(table[ike][jen % originalLength]);
+				jen++;
+			}
+		}
+	}
+	
+	private function forfeit():Bool {
+		colorGrid[currentPlayer.headIndex] = 0;
+		resetFreshness();
+		killCheck();
+		currentPlayer.alive = false;
+		numAlivePlayers--;
+		return endTurn();
+	}
+	
+	private function makePiece(?swap:Bool = false):Void {
+		if (!swap) Hat.fill(pieceHat);
+		currentPiece = Hat.pickMapped(pieceHat, false, Pieces.PIECES[currentPiece]);
+		updateLegalMoveGrids();
+	}
+	
+	private function updateLegalMoveGrids():Void {
+		var pieceData:Array<Array<Int>> = Pieces.PIECES[currentPiece];
+		var neighborData:Array<Array<Int>> = Pieces.NEIGHBORS[currentPiece];
+		
+		for (ike in 0...pieceData.length) {
+			var currentBlocks:Array<Int> = pieceData[ike];
+			var currentNeighbors:Array<Int> = neighborData[ike];
+			if (legalMoveGrids[ike] == null) legalMoveGrids[ike] = [];
+			var legalMoveGridForAngle:Array<Bool> = legalMoveGrids[ike];
+			for (jen in 0...Common.BOARD_NUM_CELLS) legalMoveGridForAngle[jen] = testMoveLegality(jen, currentBlocks, currentNeighbors);
+		}
+	}
+	
+	private function testMoveLegality(index:Int, blocks:Array<Int>, neighbors:Array<Int>):Bool {
+		var spotX:Int, spotY:Int;
+		var w:Int = Common.BOARD_SIZE;
+		var ike:Int;
+		var yCoord:Int = Std.int(index / w);
+		var xCoord:Int = index - (yCoord * w);
+		
+		// easy tests for failure
+		ike = 0;
+		while (ike < blocks.length) {
+			spotX = xCoord + blocks[ike]; spotY = yCoord + blocks[ike + 1];
+			if (spotX < 0 || spotX >= w) return false; // off the grid
+			if (spotY < 0 || spotY >= w) return false; // off the grid
+			if (colorGrid[spotY * w + spotX] != 0) return false; // spot taken
+			ike += 2;
+		}
+		
+		// neighbor test
+		ike = 0;
+		while (ike < neighbors.length) {
+			spotX = xCoord + neighbors[ike]; spotY = yCoord + neighbors[ike + 1];
+			if (colorGrid[spotY * w + spotX] == currentPlayer.uid) return true; // neighbor exists
+			ike += 2;
+		}
+		
 		return false;
 	}
-
-	public function evaluatePosition(x:Int, y:Int):Bool {
-		var key:String = Std.string(x) + "|" + Std.string(y);
-
-		// Maybe this position is cached.
-		// if (validPositionCache.exists(key)) return validPositionCache.get(key);
-
-		var currentBlocks:Array<Int> = getPiece();
-		var spotX:Int, spotY:Int, hasNeighbor:Bool;
-		var ike:Int = 0;
-		var m:Int = Common.BOARD_SIZE;
-
-		// At first we assume that the position is invalid.
-		// validPositionCache.set(key, false);
-
-		// easy tests for failure
-		while (ike < currentBlocks.length) {
-			spotX = x + currentBlocks[ike];
-			spotY = y + currentBlocks[ike + 1];
-			if (spotX < 0 || spotX >= m) return false; // off the grid
-			if (spotY < 0 || spotY >= m) return false; // off the grid
-			if (colorGrid[spotY * m + spotX] != DEAD) return false; // spot taken
-			ike += 2;
-		}
-
-		// uglier fail tests
-		hasNeighbor = false;
-		ike = 0;
-		while (ike < currentBlocks.length) {
-			spotX = x + currentBlocks[ike];
-			spotY = y + currentBlocks[ike + 1];
-			hasNeighbor = hasNeighbor || (spotX - 1 >= 0 && colorGrid[(spotY + 0) * m + spotX - 1] == currentPlayer.uid);
-			hasNeighbor = hasNeighbor || (spotY - 1 >= 0 && colorGrid[(spotY - 1) * m + spotX + 0] == currentPlayer.uid);
-			hasNeighbor = hasNeighbor || (spotX + 1 <  m && colorGrid[(spotY + 0) * m + spotX + 1] == currentPlayer.uid);
-			hasNeighbor = hasNeighbor || (spotY + 1 <  m && colorGrid[(spotY + 1) * m + spotX + 0] == currentPlayer.uid);
-			ike += 2;
-		}
-		if (!hasNeighbor) return false; // not connected
-
-		// The piece survived! This position is valid.
-		// validPositionCache.set(key, true);
+	
+	private function swapPiece():Bool {
+		if (numPlayers != 1 && currentPlayer.swaps <= 0) return false;
+		currentPlayer.swaps--;
+		makePiece(true);
 		return true;
 	}
 	
-	private function startBite(xCoord:Int, yCoord:Int):Bool {
-		var m:Int = Common.BOARD_SIZE;
-		var index:Int = yCoord * m + xCoord;
-		if (!biteGrid[index] || currentPlayer.bites == 0) return false;
-
-		// find the cardinal limits of the bite
-		biteLimits = [0, 0, 0, 0];
-		validBiteEnds.splice(0, validBiteEnds.length);
-		var lim:Int = currentPlayer.biteSize + 1;
-
-		var topDone:Bool = false;
-		var rightDone:Bool = false;
-		var bottomDone:Bool = false;
-		var leftDone:Bool = false;
-		var newIndex:Int;
-
-		for (ike in 1...lim) {
-			
-			if (!topDone) {
-				newIndex = index - ike * m;
-				if (yCoord - ike    >= 0 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
-					biteLimits[0]--;
-					validBiteEnds.push(index - ike * m);
-				} else {
-					topDone = true;
-				}
-			}
-			
-			if (!rightDone) {
-				newIndex = index + ike;
-				if (xCoord + ike < m && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
-					biteLimits[1]++;
-					validBiteEnds.push(index + ike);
-				} else {
-					rightDone = true;
-				}
-			}
-			
-			if (!bottomDone) {
-				newIndex = index + ike * m;
-				if (yCoord + ike < m && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
-					biteLimits[2]++;
-					validBiteEnds.push(index + ike * m);
-				} else {
-					bottomDone = true;
-				}
-			}
-			
-			if (!leftDone) {
-				newIndex = index - ike;
-				if (xCoord - ike    >= 0 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
-					biteLimits[3]--;
-					validBiteEnds.push(index - ike);
-				} else {
-					leftDone = true;
-				}
-			}
-			
-			biteX = xCoord;
-			biteY = yCoord;
-				
-		}
-		return true;
-	}
-
-	private function endBite(xCoord:Int, yCoord:Int):Bool {
-		if (biteX == -1 || biteY == -1) return false;
-
-		var biteIndex:Int = biteY * Common.BOARD_SIZE + biteX;
-		var index:Int = yCoord * Common.BOARD_SIZE + xCoord;
-
-		// validate the bite
-		var valid:Bool = false;
-		for (ike in 0...validBiteEnds.length) {
-			if (validBiteEnds[ike] == index) {
-				valid = true;
-				break;
-			}
-		}
-		if (!valid) return false;
+	private function takeBite(startXCoord:Int, startYCoord:Int, endXCoord:Int, endYCoord:Int):Bool {
+		if ((endXCoord != startXCoord) == (endYCoord != startYCoord)) return false;
+		
+		var startIndex:Int = startYCoord * Common.BOARD_SIZE + startXCoord;
+		var endIndex  :Int = endYCoord   * Common.BOARD_SIZE + endXCoord;
+		
+		var biteLimits:Array<Int> = legalBiteGrid[startIndex];
+		if (biteLimits == null) return false;
+		
+		var differences:Array<Int> = [endXCoord - startXCoord, endYCoord - startYCoord];
+		var vertical:Int = (endXCoord == startXCoord) ? 1 : 0;
+		if (differences[vertical] < biteLimits[vertical] || differences[vertical] > biteLimits[2 + vertical]) return false;
 		
 		resetFreshness();
 		
-		var step:Int = (xCoord == biteX) ? Common.BOARD_SIZE : 1;
-
+		// clear the bite region
+		
+		var step:Int = (startXCoord == endXCoord) ? Common.BOARD_SIZE : 1;
+		var index:Int = endIndex;
 		do {
-			colorGrid[index] = DEAD;
+			colorGrid[index] = 0;
 			freshGrid[index] = freshness;
-			if (index < biteIndex) {
+			if (index < startIndex) {
 				index += step;
 			} else {
 				index -= step;
 			}
-		} while (index != biteIndex);
+		} while (index != startIndex);
+		
+		
 		killCheck();
-		biteX = biteY = -1;
-		updateBiteGrid();
 		currentPlayer.bites--;
+		updateLegalBiteGrid();
+		updateLegalMoveGrids();
 		return true;
 	}
 
-	private function placePiece(x:Int, y:Int):Bool {
-		if (!evaluatePosition(x, y)) return false;
-		var currentBlocks:Array<Int> = getPiece();
+	private function placePiece(x:Int, y:Int, angle:Int):Bool {
+		
+		if (!testPosition(x, y, angle)) return false;
+		
+		resetFreshness();
+		
+		var currentBlocks:Array<Int> = getPiece()[angle];
 		var spotX:Int, spotY:Int;
 		var index:Int;
 		var ike:Int = 0;
@@ -329,19 +258,6 @@ class Game {
 			newElements.push(index);
 			ike += 2;
 		}
-		resetFreshness();
-		eatAlgorithm();
-		killCheck();
-		nextTurn();
-		return true;
-	}
-	
-	private function resetFreshness():Void {
-		freshness = 1;
-		for (ike in 0...Common.BOARD_NUM_CELLS) freshGrid[ike] = 0;
-	}
-	
-	private function eatAlgorithm():Void {	
 		
 		processChangesIntoSlices(-1);
 
@@ -356,8 +272,8 @@ class Game {
 		var ike:Int, jen:Int, ken:Int;
 
 		while (hStack.length + vStack.length + uStack.length + dStack.length > 0) {
-			for (ike in 0...stacks.length) {
-				stack = stacks[ike];
+			for (ike in 0...eatStacks.length) {
+				stack = eatStacks[ike];
 				changeIncrement = changeIncrements[ike];
 				while (stack.length > 0) { // stack loop
 					tail = stack.pop();
@@ -390,6 +306,15 @@ class Game {
 				}
 			}
 		}
+		
+		killCheck();
+		endTurn();
+		return true;
+	}
+	
+	private function resetFreshness():Void {
+		freshness = 1;
+		for (ike in 0...Common.BOARD_NUM_CELLS) freshGrid[ike] = 0;
 	}
 	
 	private function processChangesIntoSlices(lastSliceKind:Int):Void {
@@ -398,13 +323,13 @@ class Game {
 		var cell:GridCell;
 		var heads:Array<Int>;
 		var tails:Array<Int>;
-		var stack:Array<Int>;
+		var eatStack:Array<Int>;
 		
 		for (ike in 0...newElements.length) {
 
 			index = newElements[ike];
 
-			if (colorGrid[index] > 0) playerPool[colorGrid[index] - 1].size--;
+			if (colorGrid[index] > 0) allUniquePlayers[colorGrid[index] - 1].size--;
 			currentPlayer.size++;
 
 			colorGrid[index] = currentPlayer.uid;
@@ -415,10 +340,10 @@ class Game {
 			tails = cell.tails;
 
 			for (jen in 0...4) {
-				stack = stacks[jen];
-				if (lastSliceKind != jen && !inside(stack, heads[jen], 2)) {
-					stack.push(heads[jen]);
-					stack.push(tails[jen]);
+				eatStack = eatStacks[jen];
+				if (lastSliceKind != jen && !inside(eatStack, heads[jen], 2)) {
+					eatStack.push(heads[jen]);
+					eatStack.push(tails[jen]);
 				}
 			}
 		}
@@ -447,7 +372,7 @@ class Game {
 		// start with the living heads
 		for (ike in 0...players.length) {
 			var player:Player = players[ike];
-			if (player.alive) player.alive = colorGrid[player.headIndex] != DEAD;
+			if (player.alive) player.alive = colorGrid[player.headIndex] != 0;
 			if (player.alive) {
 				newElements.push(player.headIndex);
 				aliveGrid[player.headIndex] = true;
@@ -499,9 +424,9 @@ class Game {
 		
 		// delete the cells that aren't flagged
 		for (ike in 0...aliveGrid.length) {
-			if (colorGrid[ike] == DEAD || aliveGrid[ike]) continue;
-			playerPool[colorGrid[ike] - 1].size--;
-			colorGrid[ike] = DEAD;
+			if (colorGrid[ike] == 0 || aliveGrid[ike]) continue;
+			allUniquePlayers[colorGrid[ike] - 1].size--;
+			colorGrid[ike] = 0;
 			freshGrid[ike] = freshness;
 		}
 		
@@ -522,13 +447,20 @@ class Game {
 		newElements.splice(0, newElements.length);
 	}
 
-	private function nextTurn():Void {
+	private function endTurn():Bool {
 		// give some players some powerups if this is a deluxe game
 		
-		if (currentPlayer.bites < Common.MAX_BITES && currentPlayer.biteHat.pick() <= 1) {
-			currentPlayer.bites++;
-		} else if (currentPlayer.swaps < Common.MAX_SWAPS && currentPlayer.swapHat.pick() <= 1) {
-			currentPlayer.swaps++;
+		turnItr++;
+		if (turnItr == numAlivePlayers) {
+			turnItr = 0;
+			turnCount++;
+			var anotherBite:Bool = turnCount % 4 == 0;
+			var anotherSwap:Bool = turnCount % 6 == 0;
+			for (ike in 0...players.length) {
+				if (!players[ike].alive) continue;
+				if (anotherBite) players[ike].bites++;
+				if (anotherSwap) players[ike].swaps++;
+			}
 		}
 		
 		var lastPlayer:Player = currentPlayer;
@@ -539,81 +471,89 @@ class Game {
 		} while (!currentPlayer.alive);
 		
 		makePiece();
-		updateBiteGrid();
+		updateLegalBiteGrid();
+		return true;
 	}
 
-	public function begin(?numPlayers:Int = 1, ?gameType:GameType):Void {
-		_numPlayers = (numPlayers < 0) ? 1 : ((numPlayers > 4) ? 4 : numPlayers);
-		if (gameType == null) gameType = GameType.CLASSIC;
-		switch (gameType) {
-			case CLASSIC:
-			case DELUXE(firstSwaps, firstBites, timeLimit):
-			case MAYHEM:
-		}
-		
-		// Prime the grid
-		if (defaultGrid == null) {
-			for (ike in 0...Common.BOARD_NUM_CELLS) colorGrid[ike] = DEAD;
-		}
-		
-		var currentHeads:Array<Int> = Common.HEAD_POSITIONS[_numPlayers - 1];
-		players.splice(0, players.length);
-
-		// Populate the player list
-		for (ike in 0..._numPlayers) {
-			var player:Player = playerPool[ike];
-			players.push(player);
-			player.bites = 2;
-			player.swaps = 10;
-			player.size = 1;
-			player.biteSize = 1;
-			player.headX = currentHeads[ike * 2];
-			player.headY = currentHeads[ike * 2 + 1];
-			player.headIndex = player.headY * Common.BOARD_SIZE + player.headX;
-			player.alive = true;
-			player.swapHat.fill();
-			player.biteHat.fill();
-			colorGrid[player.headIndex] = player.uid;
-		}
-		
-		// Prime the grid
-		if (defaultGrid != null) {
-			for (ike in 0..._numPlayers) playerPool[ike].size = 0;
+	private function updateLegalBiteGrid():Void {
+		legalBiteGrid.splice(0, Common.BOARD_NUM_CELLS);
+		if (currentPlayer.bites > 0) {
+			var w:Int = Common.BOARD_SIZE;
 			for (ike in 0...Common.BOARD_NUM_CELLS) {
-				colorGrid[ike] = Std.int(defaultGrid[ike]);
-				if (colorGrid[ike] > 0) playerPool[colorGrid[ike] - 1].size++;
-			}
-		}
-		
-		resetFreshness();
-		killCheck();
-		
-		// It's player 1's turn
-		currentPlayerIndex = 0;
-		currentPlayer = players[currentPlayerIndex];
-		makePiece();
-		updateBiteGrid();
-	}
+				if (colorGrid[ike] == currentPlayer.uid) {
+					var x:Int = ike % w;
+					var y:Int = Std.int((ike - x) / w);
+					if ((x > 0 && colorGrid[ike - 1] != 0 && colorGrid[ike - 1] != currentPlayer.uid) ||
+						(x < w - 1 && colorGrid[ike + 1] != 0 && colorGrid[ike + 1] != currentPlayer.uid) ||
+						(y > 0 && colorGrid[ike - w] != 0 && colorGrid[ike - w] != currentPlayer.uid) ||
+						(y < w - 1 && colorGrid[ike + w] != 0 && colorGrid[ike + w] != currentPlayer.uid)) {
 
-	private function updateBiteGrid():Void {
-		biteGrid.splice(0, biteGrid.length);
-		var w:Int = Common.BOARD_SIZE;
-		for (ike in 0...Common.BOARD_NUM_CELLS) {
-			if (colorGrid[ike] == currentPlayer.uid) {
-				var valid:Bool = false;
-				var x:Int = ike % w;
-				var y:Int = Std.int((ike - x) / w);
-				if ((x > 0 && colorGrid[ike - 1] != 0 && colorGrid[ike - 1] != currentPlayer.uid) ||
-					(x < w - 1 && colorGrid[ike + 1] != 0 && colorGrid[ike + 1] != currentPlayer.uid) ||
-					(y > 0 && colorGrid[ike - w] != 0 && colorGrid[ike - w] != currentPlayer.uid) ||
-					(y < w - 1 && colorGrid[ike + w] != 0 && colorGrid[ike + w] != currentPlayer.uid)) {
-
-					biteGrid[ike] = true;	
+						legalBiteGrid[ike] = getLegalBiteLimits(x, y);
+					} else {
+						legalBiteGrid[ike] = null;
+					}
 				}
 			}
 		}
 	}
+	
+	private function getLegalBiteLimits(xCoord:Int, yCoord:Int):Array<Int> {
+		
+		var biteLimits:Array<Int> = [0, 0, 0, 0];
+		var index:Int = yCoord * Common.BOARD_SIZE + xCoord;
+		
+		// find the cardinal limits of the bite
+		var w:Int = Common.BOARD_SIZE;
+		var lim:Int = currentPlayer.biteSize + 1;
+		var topDone:Bool = false;
+		var rightDone:Bool = false;
+		var bottomDone:Bool = false;
+		var leftDone:Bool = false;
+		var newIndex:Int;
 
+		for (ike in 1...lim) {
+			
+			if (!leftDone) {
+				newIndex = index - ike;
+				if (xCoord - ike >= 0 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
+					biteLimits[0]--;
+				} else {
+					leftDone = true;
+				}
+			}
+			
+			if (!topDone) {
+				newIndex = index - ike * w;
+				if (yCoord - ike >= 0 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
+					biteLimits[1]--;
+				} else {
+					topDone = true;
+				}
+			}
+			
+			if (!rightDone) {
+				newIndex = index + ike;
+				if (xCoord + ike <  w && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
+					biteLimits[2]++;
+				} else {
+					rightDone = true;
+				}
+			}
+			
+			if (!bottomDone) {
+				newIndex = index + ike * w;
+				if (yCoord + ike <  w && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
+					biteLimits[3]++;
+				} else {
+					bottomDone = true;
+				}
+			}
+			
+		}
+		
+		return biteLimits;
+	}
+	
 	private static function inside<T>(array:Array<T>, element:T, ?skip:Int):Bool {
 		if (skip < 1) skip = 1;
 		var ike:Int = 0;

@@ -23,7 +23,8 @@ class PlayerStat extends Sprite {
 	private var biteIcon3:Sprite;
 	private var biteIcons:Sprite;
 	private var txtName:TextField;
-	private var txtData:TextField;
+	private var txtBites:TextField;
+	private var txtSwaps:TextField;
 	private var tint:ColorTransform;
 	
 	private var tintJob:KTJob;
@@ -50,15 +51,19 @@ class PlayerStat extends Sprite {
 		biteIcons.width = biteIcons.height = hgt * 0.6;
 		biteIcons.x = biteIcons.y = hgt * 0.2;
 		txtName = GUIFactory.makeTextBox(210 - 3 * Layout.BAR_MARGIN - biteIcons.width, hgt * 0.4, GUIFactory.MISO, 28, 0xFFFFFF);
-		txtData = GUIFactory.makeTextBox(210 - 2 * Layout.BAR_MARGIN, hgt * 0.3, GUIFactory.MISO, 18, 0xFFFFFF);
+		txtBites = GUIFactory.makeTextBox((txtName.width - 20) * 0.5, hgt * 0.3, GUIFactory.MISO, 18, 0xFFFFFF);
+		txtSwaps = GUIFactory.makeTextBox((txtName.width + 20) * 0.5, hgt * 0.3, GUIFactory.MISO, 18, 0xFFFFFF);
 		
 		txtName.x = biteIcons.x + biteIcons.width + 6;
 		txtName.y = biteIcons.y - 7;
 		
-		txtData.x = txtName.x;
-		txtData.y = txtName.y + txtName.height + 4;
+		txtBites.x = txtName.x;
+		txtBites.y = txtName.y + txtName.height + 4;
 		
-		GUIFactory.fillSprite(this, [background, biteIcons, txtName, txtData]);
+		txtSwaps.y = txtBites.y;
+		txtSwaps.x = txtName.x + txtName.width - txtSwaps.width;
+		
+		GUIFactory.fillSprite(this, [background, biteIcons, txtName, txtBites, txtSwaps]);
 	}
 	
 	public function update(index:Int, data:Player, ct:ColorTransform):Void {
@@ -72,7 +77,8 @@ class PlayerStat extends Sprite {
 		biteIcon.visible = true;
 		
 		txtName.text = data.name;
-		txtData.text = "BITES: " + Std.string(data.bites) + "   SWAPS: " + Std.string(data.swaps);
+		txtBites.text = "BITES: " + Std.string(data.bites);
+		txtSwaps.text = "SWAPS: " + Std.string(data.swaps);
 		shiftTo(height * index);
 	}
 	

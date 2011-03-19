@@ -26,6 +26,7 @@ class Well extends Sprite {
 	public var swapPiece:Void->Void;
 	
 	public var pieceHandle:Sprite;
+	public var stoicPieceHandle:Sprite;
 	
 	private var background:Shape;
 	private var rotateRightButton:SimpleButton;
@@ -85,10 +86,13 @@ class Well extends Sprite {
 		GUIFactory.fillSprite(biteIndicators, [smallBiteIndicator, bigBiteIndicator, superBiteIndicator]);
 		
 		pieceHandle = new Sprite();
+		stoicPieceHandle = new Sprite();
+		stoicPieceHandle.visible = false;
 		
 		GUIFactory.fillSprite(this, [
 			background, 
 			pieceHandle,
+			stoicPieceHandle, 
 			biteIndicators, 
 			rotateRightButton, 
 			rotateLeftButton, 
@@ -134,7 +138,6 @@ class Well extends Sprite {
 	public function bringPieceHandleBackward():Void { addChildAt(pieceHandle, 1); }
 	
 	public function updateCounters(swaps:Int, bites:Int):Void {
-		
 		if (swapCounterJob != null) swapCounterJob.complete();
 		if (biteCounterJob != null) biteCounterJob.complete();
 		swapCounter.alpha = swapButton.alpha = (swapButton.mouseEnabled = swaps > 0) ? 1 : 0.5;

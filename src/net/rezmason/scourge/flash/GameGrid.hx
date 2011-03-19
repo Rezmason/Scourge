@@ -35,8 +35,7 @@ class GameGrid extends Sprite {
 	
 	private static var COMPLETE_EVENT:Event = new Event(Event.COMPLETE);
 	
-	public var firstBiteCheck:Int->Int->Array<Int>;
-	public var endBiteCheck:Int->Int->Void;
+	public var bite:Int->Int->Int->Int->Void;
 	public var space:Shape;
 	
 	private var background:Shape;
@@ -67,6 +66,12 @@ class GameGrid extends Sprite {
 	private var gridTeethJob:KTJob;
 	private var draggingBite:Bool;
 	private var biteLimits:Array<Int>;
+	private var biteLimitGrid:Array<Array<Int>>;
+	
+	private var bSX:Int;
+	private var bSY:Int;
+	private var bEX:Int;
+	private var bEY:Int;
 	
 	public function new():Void {
 		
@@ -283,7 +288,7 @@ class GameGrid extends Sprite {
 		playerHeads[playerIndex].visible = true;
 	}
 	
-	public function updateTeeth(br:Array<Bool>, index:Int, headX:Int, headY:Int, ct:ColorTransform):Void {
+	public function updateTeeth(br:Array<Array<Int>>, index:Int, headX:Int, headY:Int, ct:ColorTransform):Void {
 		
 		if (br == null) br = [];
 		
@@ -295,7 +300,7 @@ class GameGrid extends Sprite {
 		
 		var arr:Array<Int> = [];
 		for (ike in 0...br.length) {
-			if (!br[ike]) continue;
+			if (br[ike] == null) continue;
 			by = Std.int(ike / Common.BOARD_SIZE);
 			bx = ike - by * Common.BOARD_SIZE;
 			if (bx == headX && by == headY) head.visible = false;
@@ -315,6 +320,7 @@ class GameGrid extends Sprite {
 			toothItr++;
 		}
 		for (ike in toothItr...toothPool.length) toothPool[ike].visible = false;
+		biteLimitGrid = br;
 	}
 	
 	public function isDraggingBite():Bool { return draggingBite; }
@@ -432,9 +438,9 @@ class GameGrid extends Sprite {
 	private function firstBite(?event:Event):Void {
 		if (draggingBite) return;
 		draggingBite = true;
-		var bX:Int = Std.int(teeth.mouseX / Layout.UNIT_SIZE);
-		var bY:Int = Std.int(teeth.mouseY / Layout.UNIT_SIZE);
-		biteLimits = firstBiteCheck(bX, bY);
+		bSX = Std.int(teeth.mouseX / Layout.UNIT_SIZE);
+		bSY = Std.int(teeth.mouseY / Layout.UNIT_SIZE);
+		biteLimits = biteLimitGrid[bSY * Common.BOARD_SIZE + bSX];
 	}
 	
 	private function dragBite():Void {
@@ -455,8 +461,8 @@ class GameGrid extends Sprite {
 			horiz = Math.abs(dX) > Math.abs(dY);
 		}
 		
-		var min:Int = horiz ? biteLimits[3] : biteLimits[0];
-		var max:Int = horiz ? biteLimits[1] : biteLimits[2];
+		var min:Int = horiz ? biteLimits[0] : biteLimits[1];
+		var max:Int = horiz ? biteLimits[2] : biteLimits[3];
 		var val:Int = horiz ? dX : dY;
 		
 		biteTooth.stretchTo(Std.int(Math.max(min, Math.min(val, max))), horiz);
@@ -467,12 +473,12 @@ class GameGrid extends Sprite {
 		draggingBite = false;
 		if (biteToothJob != null) biteToothJob.complete();
 		var pt:Point = space.globalToLocal(biteTooth.localToGlobal(new Point()));
-		var bX:Int = Std.int(pt.x / Layout.UNIT_SIZE) + biteTooth.endX;
-		var bY:Int = Std.int(pt.y / Layout.UNIT_SIZE) + biteTooth.endY;
-		if (biteTooth.endX != 0 || biteTooth.endY != 0 || !biteTooth.hitTestPoint(biteTooth.mouseX, biteTooth.mouseY)) {
+		bEX = Std.int(pt.x / Layout.UNIT_SIZE) + biteTooth.endX;
+		bEY = Std.int(pt.y / Layout.UNIT_SIZE) + biteTooth.endY;
+		if (biteTooth.endX != 0 || biteTooth.endY != 0 || !biteTooth.hitTestPoint(stage.mouseX, stage.mouseY)) {
 			biteToothJob = KTween.to(biteTooth, Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
 		}
-		endBiteCheck(bX, bY);
+		bite(bSX, bSY, bEX, bEY);
 	}
 	
 	private function updateBiteTooth(event:Event):Void {
