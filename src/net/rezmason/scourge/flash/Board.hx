@@ -307,6 +307,7 @@ class Board {
 				showPiece();
 			}
 			well.updateCounters(currentPlayer.swaps, currentPlayer.bites);
+			well.updatePies(game.getSwapPhase(), game.getBitePhase());
 			
 			
 			// Order the players by their turn and by whether they are alive

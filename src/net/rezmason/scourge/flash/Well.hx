@@ -12,6 +12,8 @@ import flash.text.TextField;
 
 import net.rezmason.scourge.Layout;
 
+import net.rezmason.flash.display.Pie;
+
 import net.kawa.tween.KTween;
 import net.kawa.tween.KTJob;
 import net.kawa.tween.easing.Quad;
@@ -44,6 +46,9 @@ class Well extends Sprite {
 	private var biteIndicators:Sprite;
 	private var currentBiteIndicator:MovieClip;
 	
+	private var bitePie:Pie;
+	private var swapPie:Pie;
+	
 	public function new():Void {
 		
 		super();
@@ -65,6 +70,8 @@ class Well extends Sprite {
 		biteButton.y = Layout.WELL_WIDTH - Layout.WELL_BORDER;
 		swapCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO, 28);
 		biteCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO, 28, 0xFFFFFF, true);
+		bitePie = new Pie(8, 0xAAAAAA, 0x222222);
+		swapPie = new Pie(8, 0xAAAAAA, 0x222222);
 		
 		biteIndicators = new Sprite();
 		
@@ -99,7 +106,9 @@ class Well extends Sprite {
 			swapButton, 
 			biteButton,
 			swapCounter, 
-			biteCounter
+			biteCounter,
+			swapPie,
+			bitePie,
 		]);
 		biteCounter.text = "888";
 		swapCounter.text = "888";
@@ -118,6 +127,14 @@ class Well extends Sprite {
 		biteCounter.visible = false;
 		swapCounter.visible = false;
 		
+		swapPie.x = swapButtonRect.left + swapPie.radius;
+		swapPie.y = (swapButtonRect.bottom + 10 + swapPie.radius);
+		swapPie.rotation = -90;
+		
+		bitePie.x = biteButtonRect.right - bitePie.radius;
+		bitePie.y = (biteButtonRect.top - 10 - bitePie.radius);
+		bitePie.rotation = -90;
+		
 		GUIFactory.wireUp(rotateRightButton, hint, hint, click);
 		GUIFactory.wireUp(rotateLeftButton, hint, hint, click);
 		GUIFactory.wireUp(biteButton, hint, hint, click);
@@ -132,6 +149,8 @@ class Well extends Sprite {
 		biteButton.upState.transform.colorTransform = ct;
 		biteCounter.transform.colorTransform = ct;
 		swapCounter.transform.colorTransform = ct;
+		bitePie.transform.colorTransform = ct;
+		swapPie.transform.colorTransform = ct;
 	}
 	
 	public function bringPieceHandleForward():Void { addChild(pieceHandle); }
@@ -144,6 +163,13 @@ class Well extends Sprite {
 		biteCounter.alpha = biteButton.alpha = (biteButton.mouseEnabled = bites > 0) ? 1 : 0.5;
 		swapCounter.text = Std.string(swaps);
 		biteCounter.text = Std.string(bites);
+	}
+	
+	public function updatePies(swapFraction:Float, biteFraction:Float):Void {
+		swapPie.fraction = swapFraction;
+		swapPie.redraw();
+		bitePie.fraction = biteFraction;
+		bitePie.redraw();
 	}
 	
 	public function showBiteIndicator(index:Int, ct:ColorTransform):Void {
@@ -174,6 +200,7 @@ class Well extends Sprite {
 		swapCounter.alpha = show ? 0 : 1;
 		swapCounterJob = KTween.to(swapCounter, (slowly ? 3 : 3 * Layout.QUICK), {alpha:(show ? 1 : 0), visible:show}, (slowly ? Quad.easeOut : Layout.POUNCE));
 	}
+	
 	private function hint(event:MouseEvent):Void {
 		var over:Bool = event.type == MouseEvent.ROLL_OVER;
 		switch (event.currentTarget) {

@@ -1,8 +1,10 @@
-package net.rezmason.display;
+package net.rezmason.flash.display;
 
 import flash.display.Shape;
 
 class Pie extends Shape {
+	
+	private inline static var DEGREES_TO_RADIANS:Float = Math.PI / 180;
 	
 	public var foregroundColor:Int;
 	public var backgroundColor:Int;
@@ -22,10 +24,11 @@ class Pie extends Shape {
 		graphics.drawCircle(0, 0, radius);
 		graphics.endFill();
 		
-		var points:Array<Float> = getArc(0, 0, radius, fraction * 360, 0, true);
+		var points:Array<Array<Float>> = getArc(0, 0, radius + 0.5, fraction * 360, 0, true);
 		
 		graphics.beginFill(foregroundColor);
-		graphics.moveTo(points[0][0], points[0][1]);
+		graphics.moveTo(0, 0);
+		graphics.lineTo(points[0][0], points[0][1]);
 		var ike:Int = 1;
 		while (ike < points.length) {
 			graphics.curveTo(points[ike][0], points[ike++][1], points[ike][0], points[ike++][1]);
@@ -34,21 +37,30 @@ class Pie extends Shape {
 		
 	}
 	
-	private function getArc(centerX:Float, centerY:Float, rad:Float, arc:Float, startAngle:Float, stayOnCircle:Boolean = false):Array<Float> {
+	private function getArc(centerX:Float, centerY:Float, rad:Float, arc:Float, startAngle:Float, stayOnCircle:Bool = false):Array<Array<Float>> {
 		
 		// Mad props to Ric Ewing: formequalsfunction.com
 		
 		// var declaration is expensive
 		
-		var returnValue:Array = [];
-		var segs:int, segAngle:Float;
-		var theta:Float, angle:Float, angleMid:Float;
-		var ax:Float, ay:Float, bx:Float, by:Float, cx:Float, cy:Float;
-		var xOffset:Float = centerX, yOffset:Float = centerY;
+		var returnValue:Array<Array<Float>> = [];
+		var segs:Int;
+		var segAngle:Float;
+		var theta:Float;
+		var angle:Float;
+		var angleMid:Float;
+		var ax:Float;
+		var ay:Float;
+		var bx:Float;
+		var by:Float;
+		var cx:Float;
+		var cy:Float;
+		var xOffset:Float = centerX;
+		var yOffset:Float = centerY;
 	
 		if (arc < 0) arc = 0;
 		
-		segs = arc * 0.02222 + 1;
+		segs = Std.int(arc * 0.02222 + 1);
 		segAngle = arc / segs;
 	
 		theta = -segAngle * DEGREES_TO_RADIANS;
@@ -65,14 +77,15 @@ class Pie extends Shape {
 			returnValue.push([xOffset, yOffset]);
 		}
 	
-		while (segs--) {
+		while (segs-- != 0) {
 			angle += theta;
 			angleMid = angle - (theta * 0.5);
 			bx = ax + Math.cos(angle) * rad;
 			by = ay + Math.sin(angle) * rad;
 			cx = ax + Math.cos(angleMid) * (rad / Math.cos(theta / 2));
 			cy = ay + Math.sin(angleMid) * (rad / Math.cos(theta / 2));
-			returnValue.push([cx + xOffset, cy + yOffset], [bx + xOffset, by + yOffset]);
+			returnValue.push([cx + xOffset, cy + yOffset]);
+			returnValue.push([bx + xOffset, by + yOffset]);
 		}
 	
 		return returnValue;

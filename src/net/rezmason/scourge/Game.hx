@@ -126,6 +126,8 @@ class Game {
 	public function getNumPlayers():Int { return numPlayers; }
 	public function getPlayers():Array<Player> { return players.copy(); }
 	public function testPosition(xCoord:Int, yCoord:Int, angle:Int):Bool { return legalMoveGrids[angle][yCoord * Common.BOARD_SIZE + xCoord]; }
+	public function getBitePhase():Float { return (turnCount % Common.BITE_FREQUENCY) / (Common.BITE_FREQUENCY - 1); }
+	public function getSwapPhase():Float { return (turnCount % Common.SWAP_FREQUENCY) / (Common.SWAP_FREQUENCY - 1); }
 	
 	public function act(action:PlayerAction):Bool {
 		return Reflect.callMethod(null, allPlayerActions[Type.enumIndex(action)], Type.enumParameters(action));
@@ -454,12 +456,12 @@ class Game {
 		if (turnItr == numAlivePlayers) {
 			turnItr = 0;
 			turnCount++;
-			var anotherBite:Bool = turnCount % 4 == 0;
-			var anotherSwap:Bool = turnCount % 6 == 0;
+			var anotherBite:Bool = turnCount % Common.BITE_FREQUENCY == 0;
+			var anotherSwap:Bool = turnCount % Common.SWAP_FREQUENCY == 0;
 			for (ike in 0...players.length) {
 				if (!players[ike].alive) continue;
-				if (anotherBite) players[ike].bites++;
-				if (anotherSwap) players[ike].swaps++;
+				if (anotherBite && players[ike].bites < Common.MAX_BITES) players[ike].bites++;
+				if (anotherSwap && players[ike].swaps < Common.MAX_SWAPS) players[ike].swaps++;
 			}
 		}
 		
