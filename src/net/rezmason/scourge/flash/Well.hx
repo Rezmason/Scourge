@@ -10,8 +10,6 @@ import flash.geom.ColorTransform;
 import flash.geom.Rectangle;
 import flash.text.TextField;
 
-import net.rezmason.scourge.Layout;
-
 import net.rezmason.flash.display.Pie;
 
 import net.kawa.tween.KTween;
@@ -53,7 +51,7 @@ class Well extends Sprite {
 		
 		super();
 		
-		background = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 0, 0, Layout.WELL_WIDTH, Layout.WELL_WIDTH, Layout.BAR_CORNER_RADIUS);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x606060, 1, 0, 0, Layout.WELL_WIDTH, Layout.WELL_WIDTH, Layout.BAR_CORNER_RADIUS);
 		background.cacheAsBitmap = true;
 		rotateRightButton = GUIFactory.makeButton(ScourgeLib_RotateSymbol, ScourgeLib_WellButtonHitState, 1.5, 180, true);
 		rotateLeftButton = GUIFactory.makeButton(ScourgeLib_RotateSymbol, ScourgeLib_WellButtonHitState, 1.5, 270);
@@ -70,8 +68,8 @@ class Well extends Sprite {
 		biteButton.y = Layout.WELL_WIDTH - Layout.WELL_BORDER;
 		swapCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO, 28);
 		biteCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO, 28, 0xFFFFFF, true);
-		bitePie = new Pie(8, 0xAAAAAA, 0x222222);
-		swapPie = new Pie(8, 0xAAAAAA, 0x222222);
+		bitePie = new Pie(8, 0xCCCCCC, 0x808080);
+		swapPie = new Pie(8, 0xCCCCCC, 0x808080);
 		
 		biteIndicators = new Sprite();
 		

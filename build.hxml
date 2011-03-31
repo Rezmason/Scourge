@@ -13,9 +13,9 @@
 --macro patchTypes('types.patch')
 --macro patchTypes('flextypes.patch')
 
---next
+#--next
 
--cp src
--cp lib/easeljs-externs
--js deploy-js/js/scourge.js
--main ScourgeJSProject
+#-cp src
+#-cp lib/easeljs-externs
+#-js deploy-js/js/scourge.js
+#-main ScourgeJSProject

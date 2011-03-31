@@ -7,10 +7,6 @@ import flash.display.Sprite;
 import flash.filters.GlowFilter;
 import flash.geom.ColorTransform;
 
-import net.rezmason.scourge.Layout;
-
-import flash.Lib;
-
 class BiteTooth extends Sprite {
 	
 	private static var TOOTH_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 7, 7, 1);
@@ -29,9 +25,9 @@ class BiteTooth extends Sprite {
 		
 		endX = endY = 0;
 		
-		startTooth = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.2);
+		startTooth = GUIFactory.makeTooth(Layout.UNIT_REZ * 1.2);
 		toothMiddle = new Shape();
-		endTooth = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.2);
+		endTooth = GUIFactory.makeTooth(Layout.UNIT_REZ * 1.2);
 		
 		GUIFactory.fillSprite(this, [startTooth, toothMiddle, endTooth]);
 		
@@ -43,10 +39,10 @@ class BiteTooth extends Sprite {
 	
 	public function stretchTo(val:Int, horiz:Bool):Void {
 		if (horiz) {
-			endTooth.x = val * Layout.UNIT_SIZE;
+			endTooth.x = val * Layout.UNIT_REZ;
 			endX = val;
 		} else {
-			endTooth.y = val * Layout.UNIT_SIZE;
+			endTooth.y = val * Layout.UNIT_REZ;
 			endY = val;
 		}
 		toothMiddle.graphics.clear();

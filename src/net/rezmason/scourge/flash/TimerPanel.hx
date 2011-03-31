@@ -6,10 +6,7 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.geom.ColorTransform;
 import flash.geom.Rectangle;
-
 import flash.text.TextField;
-
-import net.rezmason.scourge.Layout;
 
 class TimerPanel extends Sprite {
 	
@@ -23,7 +20,7 @@ class TimerPanel extends Sprite {
 		
 		super();
 		
-		background = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 0, 0, Layout.WELL_WIDTH, Layout.TIMER_HEIGHT, Layout.BAR_CORNER_RADIUS);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x606060, 1, 0, 0, Layout.WELL_WIDTH, Layout.TIMER_HEIGHT, Layout.BAR_CORNER_RADIUS);
 		
 		counter = GUIFactory.makeTextBox(100, 30, GUIFactory.MISO, 28);
 		counter.text = "0:00";

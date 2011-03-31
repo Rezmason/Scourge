@@ -63,7 +63,6 @@ class Board {
 		background = GUIFactory.drawSolidRect(new Shape(), 0x0, 1, 0, 0, 800, 600);
 		
 		grid = new GameGrid();
-		//for (ike in 0...Common.MAX_PLAYERS) grid.makePlayerHeadAndBody(Common.TEAM_COLORS[ike]);
 		well = new Well();
 		timerPanel = new TimerPanel();
 		statPanel = new StatPanel(Layout.STAT_PANEL_HEIGHT);
@@ -81,9 +80,6 @@ class Board {
 
 		timerPanel.skipFunc = skipTurn;
 		
-		//box = new Rectangle(0, 0, Common.BOARD_SIZE * Layout.UNIT_SIZE, Common.BOARD_SIZE * Layout.UNIT_SIZE);
-		//box.inflate(Layout.UNIT_SIZE * 1.5, Layout.UNIT_SIZE * 1.5);
-
 		// position things
 		well.x = well.y = Layout.BAR_MARGIN;
 		timerPanel.x = Layout.BAR_MARGIN;
@@ -116,8 +112,8 @@ class Board {
 		bar.x = 0;
 		bar.y = 0;
 		var barWidth:Float = Layout.BAR_WIDTH * bar.scaleX;
-		grid.scaleY = grid.scaleX = (((sw - barWidth < sh) ? sw - barWidth : sh) - Layout.GRID_MARGIN * 2) / (Common.BOARD_SIZE * Layout.UNIT_SIZE + 20);
-		var gridWidth:Float = (Common.BOARD_SIZE * Layout.UNIT_SIZE + 20) * grid.scaleX;
+		grid.scaleY = grid.scaleX = (((sw - barWidth < sh) ? sw - barWidth : sh) - Layout.BAR_MARGIN * 2) / (Common.BOARD_SIZE * Layout.UNIT_REZ + 20);
+		var gridWidth:Float = (Common.BOARD_SIZE * Layout.UNIT_REZ + 20) * grid.scaleX;
 		grid.x = barWidth + (sw - barWidth - gridWidth) * 0.5;
 		grid.y = (sh - gridWidth) * 0.5;
 		

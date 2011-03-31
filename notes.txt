@@ -203,7 +203,11 @@ findPlayerEdges
 
 evaluatePiece
 
-
+Ideas for powerups
+	Toxic - kills all adjacent cells
+	Hearty - when eaten, only the outer cells will actually change
+	Venom - a bite paralyzes part of an enemy, so that they can't bite or place a piece there.
+	Stomp - player can place pieces on top of other players
 
 
 JavaScript, non-EaselJS ideas

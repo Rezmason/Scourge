@@ -58,10 +58,10 @@ class GameGrid extends Container {
 		
 		super();
 		
-		var bmpSize:Int = Common.BOARD_SIZE * Layout.UNIT_SIZE;
+		var bmpSize:Int = Std.int(Common.BOARD_SIZE * Layout.UNIT_REZ);
 		
-		background = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 0, 0, bmpSize + 20, bmpSize + 20, 6);
-		GUIFactory.drawSolidRect(background, 0x101010, 1, 4, 4, bmpSize + 12, bmpSize + 12, 4);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x111111, 1, 0, 0, bmpSize + 20, bmpSize + 20, 6);
+		GUIFactory.drawSolidRect(background, 0x111111, 1, 4, 4, bmpSize + 12, bmpSize + 12, 4);
 		GUIFactory.fillContainer(this, [background]);
 	}
 }

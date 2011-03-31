@@ -24,9 +24,9 @@ class BiteTooth extends Container {
 		
 		endX = endY = 0;
 		
-		startTooth = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.2);
+		startTooth = GUIFactory.makeTooth(Layout.UNIT_REZ * 1.2);
 		toothMiddle = new Shape();
-		endTooth = GUIFactory.makeTooth(Layout.UNIT_SIZE * 1.2);
+		endTooth = GUIFactory.makeTooth(Layout.UNIT_REZ * 1.2);
 		
 		GUIFactory.fillContainer(this, [startTooth, toothMiddle, endTooth]);
 		
@@ -38,14 +38,14 @@ class BiteTooth extends Container {
 	
 	public function stretchTo(val:Int, horiz:Bool):Void {
 		if (horiz) {
-			endTooth.x = val * Layout.UNIT_SIZE;
+			endTooth.x = val * Layout.UNIT_REZ;
 			endX = val;
 		} else {
-			endTooth.y = val * Layout.UNIT_SIZE;
+			endTooth.y = val * Layout.UNIT_REZ;
 			endY = val;
 		}
 		
-		toothMiddle.graphics.clear().setStrokeStyle(Layout.UNIT_SIZE * 1.2).beginStroke(GUIFactory.colorString(0xFFFFFF)).lineTo(endTooth.x, endTooth.y).endFill();
+		toothMiddle.graphics.clear().setStrokeStyle(Layout.UNIT_REZ * 1.2).beginStroke(GUIFactory.colorString(0xFFFFFF)).lineTo(endTooth.x, endTooth.y).endFill();
 	}
 	
 	public function reset():Void {

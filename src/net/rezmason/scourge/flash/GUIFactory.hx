@@ -11,12 +11,10 @@ import flash.events.IEventDispatcher;
 import flash.events.MouseEvent;
 import flash.geom.ColorTransform;
 import flash.geom.Matrix;
-import flash.geom.Rectangle;
 import flash.text.Font;
 import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
-import flash.Lib;
 
 class GUIFactory {
 	
@@ -47,7 +45,7 @@ class GUIFactory {
 		if (onClick) target.addEventListener(MouseEvent.CLICK, onClick);
 	}
 	
-	public static function makeHead(size:Float, ?ct:ColorTransform):Shape {
+	public static function makeHead(size:Float):Shape {
 		var shp:Shape = new Shape();
 		var gMat:Matrix = new Matrix();
 		gMat.createGradientBox(size * 2, size * 2, 0, -size, -size);
@@ -55,12 +53,11 @@ class GUIFactory {
 		shp.graphics.drawCircle(0, 0, size);
 		shp.graphics.endFill();
 		shp.graphics.beginFill(0x111111);
-		shp.graphics.drawCircle(0, 0, size * 0.425);
+		shp.graphics.drawCircle(0, 0, size * 0.375);
 		shp.graphics.endFill();
 		shp.visible = false;
 		shp.blendMode = BlendMode.ADD;
 		shp.cacheAsBitmap = true;
-		if (ct != null) shp.transform.colorTransform = ct;
 		return shp;
 	}
 	
@@ -91,14 +88,12 @@ class GUIFactory {
 		return targ;
 	}
 	
-	public static function makeBitmapShape(bitmap:BitmapData, ?scale:Float = 1, ?smooth:Bool = true, ?ct:ColorTransform):Shape {
-		var shp:Shape = new Shape();
+	public static function drawBitmapToShape(shp:Shape, bitmap:BitmapData, ?scale:Float = 1, ?smooth:Bool = true):Shape {
 		var mat:Matrix = new Matrix();
 		mat.scale(scale, scale);
 		shp.graphics.beginBitmapFill(bitmap, mat, false, smooth);
 		shp.graphics.drawRect(0, 0, bitmap.width * scale, bitmap.height * scale);
 		shp.graphics.endFill();
-		if (ct != null) shp.transform.colorTransform = ct;
 		return shp;
 	}
 	

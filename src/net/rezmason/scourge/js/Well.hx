@@ -18,7 +18,7 @@ class Well extends Container {
 		
 		super();
 		
-		background = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 0, 0, Layout.WELL_WIDTH, Layout.WELL_WIDTH, Layout.BAR_CORNER_RADIUS);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x111111, 1, 0, 0, Layout.WELL_WIDTH, Layout.WELL_WIDTH, Layout.BAR_CORNER_RADIUS);
 		GUIFactory.fillContainer(this, [background]);
 	}
 	

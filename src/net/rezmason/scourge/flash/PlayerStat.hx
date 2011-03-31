@@ -10,12 +10,9 @@ import net.kawa.tween.KTJob;
 import net.kawa.tween.KTween;
 import net.kawa.tween.easing.Quad;
 
-import net.rezmason.scourge.Layout;
-import net.rezmason.scourge.Player;
-
 class PlayerStat extends Sprite {
 	
-	private static var DEAD_CT:ColorTransform = new ColorTransform(0.5, 0.5, 0.5);
+	private static var DEAD_CT:ColorTransform = new ColorTransform(0.2, 0.2, 0.2);
 	
 	private var background:Shape;
 	private var biteIcon1:Sprite;
@@ -23,8 +20,7 @@ class PlayerStat extends Sprite {
 	private var biteIcon3:Sprite;
 	private var biteIcons:Sprite;
 	private var txtName:TextField;
-	private var txtBites:TextField;
-	private var txtSwaps:TextField;
+	private var txtData:TextField;
 	private var tint:ColorTransform;
 	
 	private var tintJob:KTJob;
@@ -42,7 +38,7 @@ class PlayerStat extends Sprite {
 		tint = new ColorTransform();
 		
 		uid = _uid;
-		background = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 0, 0, 210, hgt);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x606060, 1, 0, 0, Layout.WELL_WIDTH, hgt);
 		biteIcon1 = new ScourgeLib_BiteIcon1(); biteIcon1.visible = false;
 		biteIcon2 = new ScourgeLib_BiteIcon2(); biteIcon2.visible = false;
 		biteIcon3 = new ScourgeLib_BiteIcon3(); biteIcon3.visible = false;
@@ -50,35 +46,33 @@ class PlayerStat extends Sprite {
 		biteIcons.cacheAsBitmap = true;
 		biteIcons.width = biteIcons.height = hgt * 0.6;
 		biteIcons.x = biteIcons.y = hgt * 0.2;
-		txtName = GUIFactory.makeTextBox(210 - 3 * Layout.BAR_MARGIN - biteIcons.width, hgt * 0.4, GUIFactory.MISO, 28, 0xFFFFFF);
-		txtBites = GUIFactory.makeTextBox((txtName.width - 20) * 0.5, hgt * 0.3, GUIFactory.MISO, 18, 0xFFFFFF);
-		txtSwaps = GUIFactory.makeTextBox((txtName.width + 20) * 0.5, hgt * 0.3, GUIFactory.MISO, 18, 0xFFFFFF);
+		
+		var w:Float = Layout.WELL_WIDTH - 3 * Layout.BAR_MARGIN - biteIcons.width;
+		
+		txtName = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO, 0.275 * w, 0xFFFFFF);
+		txtData = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO, 0.135 * w, 0xFFFFFF);
 		
 		txtName.x = biteIcons.x + biteIcons.width + 6;
-		txtName.y = biteIcons.y - 7;
+		txtName.y = biteIcons.y;
 		
-		txtBites.x = txtName.x;
-		txtBites.y = txtName.y + txtName.height + 4;
+		txtData.x = txtName.x;
+		txtData.y = txtName.y + txtName.height + 4;
 		
-		txtSwaps.y = txtBites.y;
-		txtSwaps.x = txtName.x + txtName.width - txtSwaps.width;
-		
-		GUIFactory.fillSprite(this, [background, biteIcons, txtName, txtBites, txtSwaps]);
+		GUIFactory.fillSprite(this, [background, biteIcons, txtName, txtData]);
 	}
 	
-	public function update(index:Int, data:Player, ct:ColorTransform):Void {
-		if (data.alive != alive) {
-			tintTo(data.alive ? ct : DEAD_CT);
-			alive = data.alive;
+	public function update(index:Int, player:Player, ct:ColorTransform):Void {
+		if (player.alive != alive) {
+			tintTo(player.alive ? ct : DEAD_CT);
+			alive = player.alive;
 		}
 		
 		if (biteIcon != null) biteIcon.visible = false;
-		biteIcon = biteIcons.getChildAt(data.biteSize - 1);
+		biteIcon = biteIcons.getChildAt(player.biteSize - 1);
 		biteIcon.visible = true;
 		
-		txtName.text = data.name;
-		txtBites.text = "BITES: " + Std.string(data.bites);
-		txtSwaps.text = "SWAPS: " + Std.string(data.swaps);
+		txtName.text = player.name;
+		txtData.text = "BITES: " + Std.string(player.bites) + "     " + "SWAPS: " + Std.string(player.swaps);
 		shiftTo(height * index);
 	}
 	

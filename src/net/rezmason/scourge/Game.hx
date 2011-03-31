@@ -4,26 +4,11 @@ class Game {
 	
 	private var defaultGrid:Array<Dynamic>;
 	
-	private var g:GameState;
-	private var allUniquePlayers:Array<Player>;
+	private var _state:GameState;
+	private var history:Array<GameState>;
+	private var histIndex:Int;
+	private var pHat:Hat;
 	private var allPlayerActions:Array<Dynamic>;
-	
-	// the game state
-	private var currentPiece:Int;
-	private var pieceHat:Hat;
-	private var numPlayers:Int;
-	private var numAlivePlayers:Int;
-	private var colorGrid:Array<Int>;
-	private var freshGrid:Array<Int>;
-	private var legalMoveGrids:Array<Array<Bool>>;
-	private var legalBiteGrid:Array<Array<Int>>;
-	private var aliveGrid:Array<Bool>;
-	private var players:Array<Player>;
-	private var currentPlayerIndex:Int;
-	private var currentPlayer:Player;
-	private var freshness:Int;
-	private var turnItr:Int;
-	private var turnCount:Int;
 	
 	// specific to the eat algorithm
 	private var eatStacks:Array<Array<Int>>;
@@ -31,38 +16,36 @@ class Game {
 	private var vStack:Array<Int>;
 	private var uStack:Array<Int>;
 	private var dStack:Array<Int>;
-	private var changeIncrements:Array<Int>;
 	private var newElements:Array<Int>;
 
-	public function new(?_defaultGrid:Array<Dynamic>) {
+	public function new(?_defaultGrid:Array<Dynamic>):Void {
+		
 		defaultGrid = (_defaultGrid[0] == -1) ? null : _defaultGrid;
 		// Set up data structure
-		pieceHat = new Hat(Pieces.PIECES.length, Pieces.PIECES);
-		colorGrid = [];
-		freshGrid = [];
-		legalBiteGrid = [];
-		aliveGrid = [];
-		allUniquePlayers = [];
-		legalMoveGrids = [];
-		players = [];
 		newElements = [];
 		hStack = [];
 		vStack = [];
 		uStack = [];
 		dStack = [];
+		history = [];
 		eatStacks = [hStack, vStack, uStack, dStack]; // H, V, U, D
-		changeIncrements = [1, Common.BOARD_SIZE, Common.BOARD_SIZE + 1, Common.BOARD_SIZE - 1];
-		for (ike in 0...Common.MAX_PLAYERS) allUniquePlayers[ike] = new Player(ike + 1);
 		fillTable(Pieces.PIECES);
 		fillTable(Pieces.CENTERS);
 		fillTable(Pieces.NEIGHBORS);
 		allPlayerActions = [forfeit, endTurn, swapPiece, takeBite, placePiece];
+		pHat = new Hat(Pieces.PIECES.length, Pieces.PIECES);
 	}
 	
 	
 	public function begin(?_numPlayers:Int = 1, ?gameType:GameType):Void {
-		numPlayers = (_numPlayers < 0) ? 1 : ((_numPlayers > 4) ? 4 : _numPlayers);
-		numAlivePlayers = numPlayers;
+		
+		history.splice(0, history.length);
+		histIndex = 0;
+		
+		_state = new GameState();
+		
+		_state.numPlayers = (_numPlayers < 0) ? 1 : ((_numPlayers > Common.MAX_PLAYERS) ? Common.MAX_PLAYERS : _numPlayers);
+		_state.numAlivePlayers = _state.numPlayers;
 		
 		if (gameType == null) gameType = GameType.CLASSIC;
 		
@@ -72,65 +55,150 @@ class Game {
 			case MAYHEM:
 		}
 		
-		// Prime the grid
-		if (defaultGrid == null) for (ike in 0...Common.BOARD_NUM_CELLS) colorGrid[ike] = 0;
+		var startAngle:Float = 0.75;
+		var playerAngle:Float = 2 / _state.numPlayers;
+		var bR:Float = (_state.numPlayers == 1) ? 0 : Common.PLAYER_DISTANCE / (2 * Math.sin(Math.PI * playerAngle * 0.5));
 		
-		var currentHeads:Array<Int> = Common.HEAD_POSITIONS[numPlayers - 1];
-		players.splice(0, players.length);
-
-		// Populate the player list
-		for (ike in 0...numPlayers) {
-			var player:Player = allUniquePlayers[ike];
+		var minHeadX:Float = bR * 2 + 1;
+		var maxHeadX:Float = -1;
+		var minHeadY:Float = bR * 2 + 1;
+		var maxHeadY:Float = -1;
+		
+		// Prime the grid
+		if (defaultGrid == null) for (ike in 0..._state.boardNumCells) _state.bodyGrid[ike] = 0;
+		
+		var colorHat:Hat = new Hat(Common.MAX_PLAYERS);
+		var orderHat:Hat = new Hat(_state.numPlayers);
+		
+		_state.players.splice(0, _state.players.length);
+		
+		var players:Array<Player> = [];
+		var positions:Array<{x:Float, y:Float}> = [];
+		
+		// Populate the player list. Propose the first set of coordinates
+		for (ike in 0..._state.numPlayers) {
+			var player:Player = new Player(ike + 1);
 			players.push(player);
 			player.bites = 2;
 			player.swaps = 10;
 			player.size = 1;
 			player.biteSize = 1;
-			player.headX = currentHeads[ike * 2];
-			player.headY = currentHeads[ike * 2 + 1];
-			player.headIndex = player.headY * Common.BOARD_SIZE + player.headX;
 			player.alive = true;
-			colorGrid[player.headIndex] = player.uid;
+			
+			player.name = "Player " + player.uid; // for now
+			player.color = Hat.pick(colorHat); // for now
+			player.order = Hat.pick(orderHat) + 1; // for now
+			
+			var angle:Float = Math.PI * ((player.order - 1) * playerAngle + startAngle);
+			var pos:{x:Float, y:Float} = {x:Math.cos(angle) * bR, y:Math.sin(angle) * bR};
+			positions[ike] = pos;
+			
+			minHeadX = Math.min(minHeadX, pos.x);
+			minHeadY = Math.min(minHeadY, pos.y);
+			maxHeadX = Math.max(maxHeadX, pos.x + 1);
+			maxHeadY = Math.max(maxHeadY, pos.y + 1);
 		}
+		
+		var scaleX:Float = (maxHeadX - minHeadX) / (2 * bR);
+		var scaleY:Float = (maxHeadY - minHeadY) / (2 * bR);
+		
+		minHeadX = bR * 2 + 1;
+		maxHeadX = -1;
+		minHeadY = bR * 2 + 1;
+		maxHeadY = -1;
+		
+		for (ike in 0..._state.numPlayers) {
+			var player:Player = players[ike];
+			
+			var angle:Float = Math.PI * ((player.order - 1) * playerAngle + startAngle);
+			player.headX = Math.floor(Math.cos(angle) * bR / scaleX);
+			player.headY = Math.floor(Math.sin(angle) * bR / scaleY);
+			
+			minHeadX = Math.min(minHeadX, player.headX);
+			minHeadY = Math.min(minHeadY, player.headY);
+			maxHeadX = Math.max(maxHeadX, player.headX + 1);
+			maxHeadY = Math.max(maxHeadY, player.headY + 1);
+		}
+		
+		_state.boardSize = Std.int(maxHeadX - minHeadX + 2 * Common.BOARD_PADDING);
+		_state.boardNumCells = _state.boardSize * _state.boardSize;
+		_state.changeIncrements = [1, _state.boardSize, _state.boardSize + 1, _state.boardSize - 1];
+		_state.gridCellMap = new GridCellMap(_state.boardSize);
+		
+		for (ike in 0..._state.numPlayers) {
+			var player:Player = players[ike];
+			player.headX += Std.int(Common.BOARD_PADDING - minHeadX);
+			player.headY += Std.int(Common.BOARD_PADDING - minHeadY);
+			player.headIndex = player.headY * _state.boardSize + player.headX;
+			_state.bodyGrid[player.headIndex] = player.order;
+		}
+		
+		_state.players = players.copy();
+		_state.players.sort(Player.orderSort);
+		
 		
 		// Prime the grid
 		if (defaultGrid != null) {
-			for (ike in 0...numPlayers) allUniquePlayers[ike].size = 0;
-			for (ike in 0...Common.BOARD_NUM_CELLS) {
-				colorGrid[ike] = Std.int(defaultGrid[ike]);
-				if (colorGrid[ike] > 0) allUniquePlayers[colorGrid[ike] - 1].size++;
+			for (ike in 0..._state.numPlayers) _state.players[ike].size = 0;
+			for (ike in 0..._state.boardNumCells) {
+				_state.bodyGrid[ike] = Std.int(defaultGrid[ike]);
+				if (_state.bodyGrid[ike] > 0) _state.players[_state.bodyGrid[ike] - 1].size++;
 			}
 		}
 		
-		resetFreshness();
-		killCheck();
+		resetFreshness(_state);
+		killCheck(_state);
+		history.push(_state);
 		
 		// It's player 1's turn
-		currentPlayerIndex = 0;
-		turnItr = 0;
-		turnCount = 0;
-		currentPlayer = players[currentPlayerIndex];
-		currentPiece = -1;
-		makePiece();
-		updateLegalBiteGrid();
+		_state.currentPlayerIndex = 0;
+		_state.turnItr = 0;
+		_state.turnCount = 0;
+		_state.currentPlayer = _state.players[_state.currentPlayerIndex];
+		_state.currentPiece = -1;
+		
+		makePiece(_state);
+		updateLegalBiteGrid(_state);
 	}
 	
-	public function getPiece():Array<Array<Int>> { return Pieces.PIECES[currentPiece]; }
-	public function getPieceCenter():Array<Array<Float>> { return Pieces.CENTERS[currentPiece]; }
-	public function getLegalBiteGrid():Array<Array<Int>> { return legalBiteGrid; }
-	public function getColorGrid():Array<Int> { return colorGrid.copy(); }
-	public function getFreshGrid():Array<Int> { return freshGrid.copy(); }
-	public function getMaxFreshness():Int { return freshness; }
-	public function getCurrentPlayer():Player { return currentPlayer; }
-	public function getCurrentPlayerIndex():Int { return currentPlayerIndex; }
-	public function getNumPlayers():Int { return numPlayers; }
-	public function getPlayers():Array<Player> { return players.copy(); }
-	public function testPosition(xCoord:Int, yCoord:Int, angle:Int):Bool { return legalMoveGrids[angle][yCoord * Common.BOARD_SIZE + xCoord]; }
-	public function getBitePhase():Float { return (turnCount % Common.BITE_FREQUENCY) / (Common.BITE_FREQUENCY - 1); }
-	public function getSwapPhase():Float { return (turnCount % Common.SWAP_FREQUENCY) / (Common.SWAP_FREQUENCY - 1); }
+	public function getBoardSize():Int { return _state.boardSize; }
+	public function getBoardNumCells():Int { return _state.boardNumCells; }
+	public function getPiece(?copy:Bool):Array<Array<Int>> { return copy ? Pieces.PIECES[_state.currentPiece].copy() : Pieces.PIECES[_state.currentPiece]; }
+	public function getPieceCenter(?copy:Bool):Array<Array<Float>> { return copy ? Pieces.CENTERS[_state.currentPiece].copy() : Pieces.CENTERS[_state.currentPiece]; }
+	public function getLegalBiteGrid(?copy:Bool):Array<Array<Int>> { return copy ? _state.legalBiteGrid.copy() : _state.legalBiteGrid; }
+	public function getBodyGrid(?copy:Bool):Array<Int> { return copy ? _state.bodyGrid.copy() : _state.bodyGrid; }
+	public function getFreshGrid(?copy:Bool):Array<Int> { return copy ? _state.freshGrid.copy() : _state.freshGrid; }
+	public function getMaxFreshness():Int { return _state.freshness; }
+	public function getCurrentPlayer(?copy:Bool):Player { return copy ? Player.copy(_state.currentPlayer) : _state.currentPlayer; }
+	public function getCurrentPlayerIndex():Int { return _state.currentPlayerIndex; }
+	public function getNumPlayers():Int { return _state.numPlayers; }
+	public function getPlayers(?copy:Bool):Array<Player> { return copy ? _state.players.copy() : _state.players; }
+	public function testPosition(xCoord:Int, yCoord:Int, angle:Int):Bool { return _state.legalMoveGrids[angle][yCoord * _state.boardSize + xCoord]; }
+	public function getBitePhase():Float { return (_state.turnCount % Common.BITE_FREQUENCY) / (Common.BITE_FREQUENCY - 1); }
+	public function getSwapPhase():Float { return (_state.turnCount % Common.SWAP_FREQUENCY) / (Common.SWAP_FREQUENCY - 1); }
 	
-	public function act(action:PlayerAction):Bool {
-		return Reflect.callMethod(null, allPlayerActions[Type.enumIndex(action)], Type.enumParameters(action));
+	public function act(action:PlayerAction):Void {
+		var params:Array<Dynamic> = Type.enumParameters(action);
+		_state = GameState.copy(_state);
+		histIndex++;
+		history.splice(histIndex, history.length - histIndex);
+		history.push(_state);
+		params.unshift(_state);
+		Reflect.callMethod(null, allPlayerActions[Type.enumIndex(action)], params);
+	}
+	
+	public function undoAction():Bool {
+		if (histIndex == 0) return false;
+		histIndex--;
+		_state = history[histIndex];
+		return true;
+	}
+	
+	public function redoAction():Bool {
+		if (histIndex == history.length - 1) return false;
+		histIndex++;
+		_state = history[histIndex];
+		return true;
 	}
 	
 	private function fillTable(table:Array<Array<Dynamic>>):Void {
@@ -144,91 +212,40 @@ class Game {
 		}
 	}
 	
-	private function forfeit():Bool {
-		colorGrid[currentPlayer.headIndex] = 0;
-		resetFreshness();
-		killCheck();
-		currentPlayer.alive = false;
-		numAlivePlayers--;
-		return endTurn();
+	private function makePiece(state:GameState, ?swap:Bool = false):Void {
+		if (!swap) Hat.fill(pHat);
+		state.currentPiece = Hat.pickMapped(pHat, false, Pieces.PIECES[state.currentPiece]);
+		updateLegalMoveGrids(state);
 	}
 	
-	private function makePiece(?swap:Bool = false):Void {
-		if (!swap) Hat.fill(pieceHat);
-		currentPiece = Hat.pickMapped(pieceHat, false, Pieces.PIECES[currentPiece]);
-		updateLegalMoveGrids();
+	private function swapPiece(state:GameState):Void {
+		if (state.numPlayers != 1 && state.currentPlayer.swaps <= 0) return;
+		state.currentPlayer.swaps--;
+		makePiece(state, true);
 	}
 	
-	private function updateLegalMoveGrids():Void {
-		var pieceData:Array<Array<Int>> = Pieces.PIECES[currentPiece];
-		var neighborData:Array<Array<Int>> = Pieces.NEIGHBORS[currentPiece];
+	private function takeBite(state:GameState, startXCoord:Int, startYCoord:Int, endXCoord:Int, endYCoord:Int):Void {
+		if ((endXCoord != startXCoord) == (endYCoord != startYCoord)) return;
 		
-		for (ike in 0...pieceData.length) {
-			var currentBlocks:Array<Int> = pieceData[ike];
-			var currentNeighbors:Array<Int> = neighborData[ike];
-			if (legalMoveGrids[ike] == null) legalMoveGrids[ike] = [];
-			var legalMoveGridForAngle:Array<Bool> = legalMoveGrids[ike];
-			for (jen in 0...Common.BOARD_NUM_CELLS) legalMoveGridForAngle[jen] = testMoveLegality(jen, currentBlocks, currentNeighbors);
-		}
-	}
-	
-	private function testMoveLegality(index:Int, blocks:Array<Int>, neighbors:Array<Int>):Bool {
-		var spotX:Int, spotY:Int;
-		var w:Int = Common.BOARD_SIZE;
-		var ike:Int;
-		var yCoord:Int = Std.int(index / w);
-		var xCoord:Int = index - (yCoord * w);
+		var startIndex:Int = startYCoord * state.boardSize + startXCoord;
+		var endIndex  :Int = endYCoord   * state.boardSize + endXCoord;
 		
-		// easy tests for failure
-		ike = 0;
-		while (ike < blocks.length) {
-			spotX = xCoord + blocks[ike]; spotY = yCoord + blocks[ike + 1];
-			if (spotX < 0 || spotX >= w) return false; // off the grid
-			if (spotY < 0 || spotY >= w) return false; // off the grid
-			if (colorGrid[spotY * w + spotX] != 0) return false; // spot taken
-			ike += 2;
-		}
-		
-		// neighbor test
-		ike = 0;
-		while (ike < neighbors.length) {
-			spotX = xCoord + neighbors[ike]; spotY = yCoord + neighbors[ike + 1];
-			if (colorGrid[spotY * w + spotX] == currentPlayer.uid) return true; // neighbor exists
-			ike += 2;
-		}
-		
-		return false;
-	}
-	
-	private function swapPiece():Bool {
-		if (numPlayers != 1 && currentPlayer.swaps <= 0) return false;
-		currentPlayer.swaps--;
-		makePiece(true);
-		return true;
-	}
-	
-	private function takeBite(startXCoord:Int, startYCoord:Int, endXCoord:Int, endYCoord:Int):Bool {
-		if ((endXCoord != startXCoord) == (endYCoord != startYCoord)) return false;
-		
-		var startIndex:Int = startYCoord * Common.BOARD_SIZE + startXCoord;
-		var endIndex  :Int = endYCoord   * Common.BOARD_SIZE + endXCoord;
-		
-		var biteLimits:Array<Int> = legalBiteGrid[startIndex];
-		if (biteLimits == null) return false;
+		var biteLimits:Array<Int> = state.legalBiteGrid[startIndex];
+		if (biteLimits == null) return;
 		
 		var differences:Array<Int> = [endXCoord - startXCoord, endYCoord - startYCoord];
 		var vertical:Int = (endXCoord == startXCoord) ? 1 : 0;
-		if (differences[vertical] < biteLimits[vertical] || differences[vertical] > biteLimits[2 + vertical]) return false;
+		if (differences[vertical] < biteLimits[vertical] || differences[vertical] > biteLimits[2 + vertical]) return;
 		
-		resetFreshness();
+		resetFreshness(state);
 		
 		// clear the bite region
 		
-		var step:Int = (startXCoord == endXCoord) ? Common.BOARD_SIZE : 1;
+		var step:Int = (startXCoord == endXCoord) ? state.boardSize : 1;
 		var index:Int = endIndex;
 		do {
-			colorGrid[index] = 0;
-			freshGrid[index] = freshness;
+			state.bodyGrid[index] = 0;
+			state.freshGrid[index] = state.freshness;
 			if (index < startIndex) {
 				index += step;
 			} else {
@@ -237,31 +254,31 @@ class Game {
 		} while (index != startIndex);
 		
 		
-		killCheck();
-		currentPlayer.bites--;
-		updateLegalBiteGrid();
-		updateLegalMoveGrids();
-		return true;
+		killCheck(state);
+		state.currentPlayer.bites--;
+		updateLegalBiteGrid(state);
+		updateLegalMoveGrids(state);
+		return;
 	}
 
-	private function placePiece(x:Int, y:Int, angle:Int):Bool {
+	private function placePiece(state:GameState, x:Int, y:Int, angle:Int):Void {
 		
-		if (!testPosition(x, y, angle)) return false;
+		if (!testPosition(x, y, angle)) return;
 		
-		resetFreshness();
+		resetFreshness(state);
 		
 		var currentBlocks:Array<Int> = getPiece()[angle];
 		var spotX:Int, spotY:Int;
 		var index:Int;
 		var ike:Int = 0;
 		while (ike < currentBlocks.length) {
-			index = (y + currentBlocks[ike + 1]) * Common.BOARD_SIZE + x + currentBlocks[ike];
+			index = (y + currentBlocks[ike + 1]) * state.boardSize + x + currentBlocks[ike];
 			// change current player's size
 			newElements.push(index);
 			ike += 2;
 		}
 		
-		processChangesIntoSlices(-1);
+		processChangesIntoSlices(state, -1);
 
 		var colorSlice:Array<Int> = [];
 		var freshSlice:Array<Int> = [];
@@ -276,7 +293,7 @@ class Game {
 		while (hStack.length + vStack.length + uStack.length + dStack.length > 0) {
 			for (ike in 0...eatStacks.length) {
 				stack = eatStacks[ike];
-				changeIncrement = changeIncrements[ike];
+				changeIncrement = state.changeIncrements[ike];
 				while (stack.length > 0) { // stack loop
 					tail = stack.pop();
 					head = stack.pop();
@@ -288,41 +305,196 @@ class Game {
 					flatElements.splice(0, flatElements.length);
 
 					while (jen != tail) {
-						colorSlice[ken] = colorGrid[jen];
-						freshSlice[ken] = freshGrid[jen];
+						colorSlice[ken] = state.bodyGrid[jen];
+						freshSlice[ken] = state.freshGrid[jen];
 						jen += changeIncrement;
 						ken++;
 					}
 
-					linearEatAlgorithm(colorSlice, freshSlice, flatElements);
+					linearEatAlgorithm(state, colorSlice, freshSlice, flatElements);
 					for (jen in 0...flatElements.length) newElements.push(head + flatElements[jen] * changeIncrement);
-					for (jen in 0...players.length) {
-						player = players[jen];
+					for (jen in 0...state.players.length) {
+						player = state.players[jen];
 						if (player.alive && inside(newElements, player.headIndex)) {
 							player.alive = false;
-							for (ken in 0...Common.BOARD_NUM_CELLS) if (colorGrid[ken] == player.uid) newElements.push(ken);
+							for (ken in 0...state.boardNumCells) if (state.bodyGrid[ken] == player.order) newElements.push(ken);
 						}
 					}
 
-					if (newElements.length > 0) processChangesIntoSlices(ike);
+					if (newElements.length > 0) processChangesIntoSlices(state, ike);
 				}
 			}
 		}
 		
-		killCheck();
-		endTurn();
-		return true;
+		killCheck(state);
+		endTurn(state);
 	}
 	
-	private function resetFreshness():Void {
-		freshness = 1;
-		for (ike in 0...Common.BOARD_NUM_CELLS) freshGrid[ike] = 0;
+	private function forfeit(state:GameState):Void {
+		state.bodyGrid[state.currentPlayer.headIndex] = 0;
+		resetFreshness(state);
+		killCheck(state);
+		state.currentPlayer.alive = false;
+		state.numAlivePlayers--;
+		endTurn(state);
 	}
 	
-	private function processChangesIntoSlices(lastSliceKind:Int):Void {
+	private function endTurn(state:GameState):Void {
+		// give some players some powerups if this is a deluxe game
+		
+		state.turnItr++;
+		if (state.turnItr == state.numAlivePlayers) {
+			state.turnItr = 0;
+			state.turnCount++;
+			var anotherBite:Bool = state.turnCount % Common.BITE_FREQUENCY == 0;
+			var anotherSwap:Bool = state.turnCount % Common.SWAP_FREQUENCY == 0;
+			for (ike in 0...state.players.length) {
+				if (!state.players[ike].alive) continue;
+				if (anotherBite && state.players[ike].bites < Common.MAX_BITES) state.players[ike].bites++;
+				if (anotherSwap && state.players[ike].swaps < Common.MAX_SWAPS) state.players[ike].swaps++;
+			}
+		}
+		
+		var lastPlayer:Player = state.currentPlayer;
+		
+		do {
+			state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.players.length;
+			state.currentPlayer = state.players[state.currentPlayerIndex];
+		} while (!state.currentPlayer.alive);
+		
+		makePiece(state);
+		updateLegalBiteGrid(state);
+	}
+	
+	private function updateLegalMoveGrids(state:GameState):Void {
+		var pieceData:Array<Array<Int>> = Pieces.PIECES[state.currentPiece];
+		var neighborData:Array<Array<Int>> = Pieces.NEIGHBORS[state.currentPiece];
+		
+		for (ike in 0...pieceData.length) {
+			var currentBlocks:Array<Int> = pieceData[ike];
+			var currentNeighbors:Array<Int> = neighborData[ike];
+			if (state.legalMoveGrids[ike] == null) state.legalMoveGrids[ike] = [];
+			var legalMoveGridForAngle:Array<Bool> = state.legalMoveGrids[ike];
+			for (jen in 0...state.boardNumCells) legalMoveGridForAngle[jen] = testMoveLegality(state, jen, currentBlocks, currentNeighbors);
+		}
+	}
+	
+	private function testMoveLegality(state:GameState, index:Int, blocks:Array<Int>, neighbors:Array<Int>):Bool {
+		var spotX:Int, spotY:Int;
+		var w:Int = state.boardSize;
+		var ike:Int;
+		var yCoord:Int = Std.int(index / w);
+		var xCoord:Int = index - (yCoord * w);
+		
+		// easy tests for failure
+		ike = 0;
+		while (ike < blocks.length) {
+			spotX = xCoord + blocks[ike]; spotY = yCoord + blocks[ike + 1];
+			if (spotX < 0 || spotX >= w) return false; // off the grid
+			if (spotY < 0 || spotY >= w) return false; // off the grid
+			if (state.bodyGrid[spotY * w + spotX] != 0) return false; // spot taken
+			ike += 2;
+		}
+		
+		// neighbor test
+		ike = 0;
+		while (ike < neighbors.length) {
+			spotX = xCoord + neighbors[ike]; spotY = yCoord + neighbors[ike + 1];
+			if (state.bodyGrid[spotY * w + spotX] == state.currentPlayer.order) return true; // neighbor exists
+			ike += 2;
+		}
+		
+		return false;
+	}
+
+	private function updateLegalBiteGrid(state:GameState):Void {
+		state.legalBiteGrid.splice(0, state.boardNumCells);
+		if (state.currentPlayer.bites > 0) {
+			var w:Int = state.boardSize;
+			for (ike in 0...state.boardNumCells) {
+				if (state.bodyGrid[ike] == state.currentPlayer.order) {
+					var x:Int = ike % w;
+					var y:Int = Std.int((ike - x) / w);
+					if ((x > 0 && state.bodyGrid[ike - 1] != 0 && state.bodyGrid[ike - 1] != state.currentPlayer.order) ||
+						(x < w - 1 && state.bodyGrid[ike + 1] != 0 && state.bodyGrid[ike + 1] != state.currentPlayer.order) ||
+						(y > 0 && state.bodyGrid[ike - w] != 0 && state.bodyGrid[ike - w] != state.currentPlayer.order) ||
+						(y < w - 1 && state.bodyGrid[ike + w] != 0 && state.bodyGrid[ike + w] != state.currentPlayer.order)) {
+
+						state.legalBiteGrid[ike] = getLegalBiteLimits(state, x, y);
+					} else {
+						state.legalBiteGrid[ike] = null;
+					}
+				}
+			}
+		}
+	}
+	
+	private function getLegalBiteLimits(state:GameState, xCoord:Int, yCoord:Int):Array<Int> {
+		
+		var biteLimits:Array<Int> = [0, 0, 0, 0];
+		var index:Int = yCoord * state.boardSize + xCoord;
+		
+		// find the cardinal limits of the bite
+		var w:Int = state.boardSize;
+		var lim:Int = state.currentPlayer.biteSize + 1;
+		var topDone:Bool = false;
+		var rightDone:Bool = false;
+		var bottomDone:Bool = false;
+		var leftDone:Bool = false;
+		var newIndex:Int;
+
+		for (ike in 1...lim) {
+			
+			if (!leftDone) {
+				newIndex = index - ike;
+				if (xCoord - ike >= 0 && state.bodyGrid[newIndex] != 0 && state.bodyGrid[newIndex] != state.currentPlayer.order) {
+					biteLimits[0]--;
+				} else {
+					leftDone = true;
+				}
+			}
+			
+			if (!topDone) {
+				newIndex = index - ike * w;
+				if (yCoord - ike >= 0 && state.bodyGrid[newIndex] != 0 && state.bodyGrid[newIndex] != state.currentPlayer.order) {
+					biteLimits[1]--;
+				} else {
+					topDone = true;
+				}
+			}
+			
+			if (!rightDone) {
+				newIndex = index + ike;
+				if (xCoord + ike <  w && state.bodyGrid[newIndex] != 0 && state.bodyGrid[newIndex] != state.currentPlayer.order) {
+					biteLimits[2]++;
+				} else {
+					rightDone = true;
+				}
+			}
+			
+			if (!bottomDone) {
+				newIndex = index + ike * w;
+				if (yCoord + ike <  w && state.bodyGrid[newIndex] != 0 && state.bodyGrid[newIndex] != state.currentPlayer.order) {
+					biteLimits[3]++;
+				} else {
+					bottomDone = true;
+				}
+			}
+			
+		}
+		
+		return biteLimits;
+	}
+	
+	private function resetFreshness(state:GameState):Void {
+		state.freshness = 1;
+		for (ike in 0...state.boardNumCells) state.freshGrid[ike] = 0;
+	}
+	
+	private function processChangesIntoSlices(state:GameState, lastSliceKind:Int):Void {
 
 		var index:Int;
-		var cell:GridCell;
+		var cell:{x:Int, y:Int, index:Int, heads:Array<Int>, tails:Array<Int>};
 		var heads:Array<Int>;
 		var tails:Array<Int>;
 		var eatStack:Array<Int>;
@@ -331,13 +503,13 @@ class Game {
 
 			index = newElements[ike];
 
-			if (colorGrid[index] > 0) allUniquePlayers[colorGrid[index] - 1].size--;
-			currentPlayer.size++;
+			if (state.bodyGrid[index] > 0) _state.players[state.bodyGrid[index] - 1].size--;
+			state.currentPlayer.size++;
 
-			colorGrid[index] = currentPlayer.uid;
-			freshGrid[index] = freshness;
+			state.bodyGrid[index] = state.currentPlayer.order;
+			state.freshGrid[index] = state.freshness;
 
-			cell = GridCell.get(index);
+			cell = state.gridCellMap.get(index);
 			heads = cell.heads;
 			tails = cell.tails;
 
@@ -351,13 +523,13 @@ class Game {
 		}
 
 		newElements.splice(0, newElements.length);
-		freshness++;
+		state.freshness++;
 	}
 
-	private function linearEatAlgorithm(cSlice:Array<Int>, fSlice:Array<Int>, elementList:Array<Int>):Void {
+	private function linearEatAlgorithm(state:GameState, cSlice:Array<Int>, fSlice:Array<Int>, elementList:Array<Int>):Void {
 		var first:Int = -2;
 		for (ike in 0...cSlice.length) {
-			if (cSlice[ike] == currentPlayer.uid) {
+			if (cSlice[ike] == state.currentPlayer.order) {
 				if (first != -2 && (fSlice[first] + fSlice[ike] > 0)) for (jen in first + 1...ike) elementList.push(jen);
 				first = ike;
 			} else if (cSlice[ike] == 0) {
@@ -366,22 +538,22 @@ class Game {
 		}
 	}
 
-	private function killCheck():Void {
+	private function killCheck(state:GameState):Void {
 		
-		aliveGrid.splice(0, aliveGrid.length);
-		aliveGrid[Common.BOARD_NUM_CELLS - 1] = false;
+		state.aliveGrid.splice(0, state.aliveGrid.length);
+		state.aliveGrid[state.boardNumCells - 1] = false;
 		
 		// start with the living heads
-		for (ike in 0...players.length) {
-			var player:Player = players[ike];
-			if (player.alive) player.alive = colorGrid[player.headIndex] != 0;
+		for (ike in 0...state.players.length) {
+			var player:Player = state.players[ike];
+			if (player.alive) player.alive = state.bodyGrid[player.headIndex] != 0;
 			if (player.alive) {
 				newElements.push(player.headIndex);
-				aliveGrid[player.headIndex] = true;
+				state.aliveGrid[player.headIndex] = true;
 			}
 		}
 		
-		var w:Int = Common.BOARD_SIZE;
+		var w:Int = state.boardSize;
 		var ike:Int = 0;
 		var num:Int = newElements.length;
 		
@@ -390,33 +562,33 @@ class Game {
 			var index:Int = newElements[ike];
 			var yCoord:Int = Std.int(index / w);
 			var xCoord:Int = index - (yCoord * w);
-			var color:Int = colorGrid[index];
+			var color:Int = state.bodyGrid[index];
 			var amt:Int;
 			
 			amt = index - 1;
-			if (xCoord > 0     && !aliveGrid[amt] && color == colorGrid[amt]) {
-				aliveGrid[amt] = true;
+			if (xCoord > 0     && !state.aliveGrid[amt] && color == state.bodyGrid[amt]) {
+				state.aliveGrid[amt] = true;
 				newElements.push(amt);
 				num++;
 			}
 			
 			amt = index + 1;
-			if (xCoord < w - 1 && !aliveGrid[amt] && color == colorGrid[amt]) {
-				aliveGrid[amt] = true;
+			if (xCoord < w - 1 && !state.aliveGrid[amt] && color == state.bodyGrid[amt]) {
+				state.aliveGrid[amt] = true;
 				newElements.push(amt);
 				num++;
 			}
 			
 			amt = index - w;
-			if (yCoord > 0     && !aliveGrid[amt] && color == colorGrid[amt]) {
-				aliveGrid[amt] = true;
+			if (yCoord > 0     && !state.aliveGrid[amt] && color == state.bodyGrid[amt]) {
+				state.aliveGrid[amt] = true;
 				newElements.push(amt);
 				num++;
 			}
 			
 			amt = index + w;
-			if (yCoord < w - 1 && !aliveGrid[amt] && color == colorGrid[amt]) {
-				aliveGrid[amt] = true;
+			if (yCoord < w - 1 && !state.aliveGrid[amt] && color == state.bodyGrid[amt]) {
+				state.aliveGrid[amt] = true;
 				newElements.push(amt);
 				num++;
 			}
@@ -425,20 +597,20 @@ class Game {
 		}
 		
 		// delete the cells that aren't flagged
-		for (ike in 0...aliveGrid.length) {
-			if (colorGrid[ike] == 0 || aliveGrid[ike]) continue;
-			allUniquePlayers[colorGrid[ike] - 1].size--;
-			colorGrid[ike] = 0;
-			freshGrid[ike] = freshness;
+		for (ike in 0...state.aliveGrid.length) {
+			if (state.bodyGrid[ike] == 0 || state.aliveGrid[ike]) continue;
+			_state.players[state.bodyGrid[ike] - 1].size--;
+			state.bodyGrid[ike] = 0;
+			state.freshGrid[ike] = state.freshness;
 		}
 		
-		// resize the players
-		for (ike in 0...players.length) {
-			var player:Player = players[ike];
+		// resize the state.players
+		for (ike in 0...state.players.length) {
+			var player:Player = state.players[ike];
 			if (player.alive) {
-				if (player.size < 0.2 * Common.BOARD_NUM_CELLS) {
+				if (player.size < 0.2 * state.boardNumCells) {
 					player.biteSize = 1;
-				} else if (player.size < 0.4 * Common.BOARD_NUM_CELLS) {
+				} else if (player.size < 0.4 * state.boardNumCells) {
 					player.biteSize = 2;
 				} else {
 					player.biteSize = 3;
@@ -447,113 +619,6 @@ class Game {
 		}
 		
 		newElements.splice(0, newElements.length);
-	}
-
-	private function endTurn():Bool {
-		// give some players some powerups if this is a deluxe game
-		
-		turnItr++;
-		if (turnItr == numAlivePlayers) {
-			turnItr = 0;
-			turnCount++;
-			var anotherBite:Bool = turnCount % Common.BITE_FREQUENCY == 0;
-			var anotherSwap:Bool = turnCount % Common.SWAP_FREQUENCY == 0;
-			for (ike in 0...players.length) {
-				if (!players[ike].alive) continue;
-				if (anotherBite && players[ike].bites < Common.MAX_BITES) players[ike].bites++;
-				if (anotherSwap && players[ike].swaps < Common.MAX_SWAPS) players[ike].swaps++;
-			}
-		}
-		
-		var lastPlayer:Player = currentPlayer;
-		
-		do {
-			currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-			currentPlayer = players[currentPlayerIndex];
-		} while (!currentPlayer.alive);
-		
-		makePiece();
-		updateLegalBiteGrid();
-		return true;
-	}
-
-	private function updateLegalBiteGrid():Void {
-		legalBiteGrid.splice(0, Common.BOARD_NUM_CELLS);
-		if (currentPlayer.bites > 0) {
-			var w:Int = Common.BOARD_SIZE;
-			for (ike in 0...Common.BOARD_NUM_CELLS) {
-				if (colorGrid[ike] == currentPlayer.uid) {
-					var x:Int = ike % w;
-					var y:Int = Std.int((ike - x) / w);
-					if ((x > 0 && colorGrid[ike - 1] != 0 && colorGrid[ike - 1] != currentPlayer.uid) ||
-						(x < w - 1 && colorGrid[ike + 1] != 0 && colorGrid[ike + 1] != currentPlayer.uid) ||
-						(y > 0 && colorGrid[ike - w] != 0 && colorGrid[ike - w] != currentPlayer.uid) ||
-						(y < w - 1 && colorGrid[ike + w] != 0 && colorGrid[ike + w] != currentPlayer.uid)) {
-
-						legalBiteGrid[ike] = getLegalBiteLimits(x, y);
-					} else {
-						legalBiteGrid[ike] = null;
-					}
-				}
-			}
-		}
-	}
-	
-	private function getLegalBiteLimits(xCoord:Int, yCoord:Int):Array<Int> {
-		
-		var biteLimits:Array<Int> = [0, 0, 0, 0];
-		var index:Int = yCoord * Common.BOARD_SIZE + xCoord;
-		
-		// find the cardinal limits of the bite
-		var w:Int = Common.BOARD_SIZE;
-		var lim:Int = currentPlayer.biteSize + 1;
-		var topDone:Bool = false;
-		var rightDone:Bool = false;
-		var bottomDone:Bool = false;
-		var leftDone:Bool = false;
-		var newIndex:Int;
-
-		for (ike in 1...lim) {
-			
-			if (!leftDone) {
-				newIndex = index - ike;
-				if (xCoord - ike >= 0 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
-					biteLimits[0]--;
-				} else {
-					leftDone = true;
-				}
-			}
-			
-			if (!topDone) {
-				newIndex = index - ike * w;
-				if (yCoord - ike >= 0 && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
-					biteLimits[1]--;
-				} else {
-					topDone = true;
-				}
-			}
-			
-			if (!rightDone) {
-				newIndex = index + ike;
-				if (xCoord + ike <  w && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
-					biteLimits[2]++;
-				} else {
-					rightDone = true;
-				}
-			}
-			
-			if (!bottomDone) {
-				newIndex = index + ike * w;
-				if (yCoord + ike <  w && colorGrid[newIndex] != 0 && colorGrid[newIndex] != currentPlayer.uid) {
-					biteLimits[3]++;
-				} else {
-					bottomDone = true;
-				}
-			}
-			
-		}
-		
-		return biteLimits;
 	}
 	
 	private static function inside<T>(array:Array<T>, element:T, ?skip:Int):Bool {

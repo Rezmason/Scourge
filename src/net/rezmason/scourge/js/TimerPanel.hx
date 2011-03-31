@@ -17,7 +17,7 @@ class TimerPanel extends Container {
 		
 		super();
 		
-		background = GUIFactory.drawSolidRect(new Shape(), 0x444444, 1, 0, 0, Layout.WELL_WIDTH, Layout.TIMER_HEIGHT, Layout.BAR_CORNER_RADIUS);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x111111, 1, 0, 0, Layout.WELL_WIDTH, Layout.TIMER_HEIGHT, Layout.BAR_CORNER_RADIUS);
 		/*
 		counter = GUIFactory.makeTextBox(100, 30, GUIFactory.MISO, 28);
 		counter.text = "0:00";

@@ -18,7 +18,7 @@ class Grid extends Sprite {
 	// CONSTRUCTOR
 	//---------------------------------------
 	
-	// Draws a grid of a certain square size. For now its colors are hard coded in.
+	// Draws a grid of a certain square size.
 	
 	public function new(squareSize:Int, ?__width:Float = 0, ?__height:Float = 0, ?color1:UInt = 0xFFFFFFFF, ?color2:UInt = 0xFF000000) {
 		super();

@@ -11,11 +11,12 @@ class Player {
 	public var uid:Int;
 	public var alive:Bool;
 	public var name:String;
+	public var color:Int;
+	public var order:Int;
 	
 	public function new(_uid:Int):Void {
 		
 		uid = _uid;
-		name = "Player " + uid;
 	}
 	
 	public static function copy(player:Player):Player {
@@ -29,6 +30,12 @@ class Player {
 		clone.headY = player.headY;
 		clone.alive = player.alive;
 		clone.name = player.name;
+		clone.color = player.color;
+		clone.order = player.order;
 		return clone;
+	}
+	
+	public static function orderSort(p1:Player, p2:Player):Int {
+		return p1.order - p2.order;
 	}
 }
