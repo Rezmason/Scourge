@@ -88,11 +88,16 @@ class GUIFactory {
 		return targ;
 	}
 	
-	public static function drawBitmapToShape(shp:Shape, bitmap:BitmapData, ?scale:Float = 1, ?smooth:Bool = true):Shape {
+	public static function drawSolidCircle(targ:Dynamic, color:Int, alpha:Float, x:Float, y:Float, radius:Float):Dynamic {
+		drawSolidRect(targ, color, alpha, x, y, radius, radius, radius);
+	}
+	
+	public static function drawBitmapToShape(shp:Shape, bitmap:BitmapData, ?scale:Float = 1, ?smooth:Bool = true, ?cornerRadius:Float = 0):Shape {
 		var mat:Matrix = new Matrix();
 		mat.scale(scale, scale);
 		shp.graphics.beginBitmapFill(bitmap, mat, false, smooth);
-		shp.graphics.drawRect(0, 0, bitmap.width * scale, bitmap.height * scale);
+		if (!(cornerRadius == cornerRadius)) cornerRadius = 0;
+		shp.graphics.drawRoundRect(0, 0, bitmap.width * scale, bitmap.height * scale, cornerRadius, cornerRadius);
 		shp.graphics.endFill();
 		return shp;
 	}

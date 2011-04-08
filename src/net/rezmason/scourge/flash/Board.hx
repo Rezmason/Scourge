@@ -35,6 +35,7 @@ class Board {
 	private static var PLAIN_CT:ColorTransform = GUIFactory.makeCT(0xFFFFFF);
 	private static var ORIGIN:Point = new Point();
 	
+	private var options:Dynamic;
 	private var game:Game;
 	private var scene:Sprite;
 	private var stage:Stage;
@@ -93,10 +94,11 @@ class Board {
 	private var stoicPiece:Shape;
 	private var stoicPieceHandle:Sprite;
 	
-	public function new(__game:Game, __scene:Sprite, __debugNumPlayers:Int) {
+	public function new(__game:Game, __scene:Sprite, __options:Dynamic) {
 		scene = __scene;
 		game = __game;
-		debugNumPlayers = __debugNumPlayers;
+		options = __options;
+		debugNumPlayers = options.debugNumPlayers;
 		scene.mouseEnabled = scene.mouseChildren = false;
 		if (scene.stage != null) connectToStage();
 		else scene.addEventListener(Event.ADDED_TO_STAGE, connectToStage);
@@ -135,7 +137,7 @@ class Board {
 		for (ike in 0...Common.MAX_PLAYERS) grid.makePlayerHeadAndBody();
 		well = new Well();
 		timerPanel = new TimerPanel();
-		statPanel = new StatPanel(debugNumPlayers, Layout.STAT_PANEL_HEIGHT);
+		statPanel = new StatPanel(Common.MAX_PLAYERS, Layout.STAT_PANEL_HEIGHT);
 		barBackground = GUIFactory.drawSolidRect(new Shape(), 0x333333, 1, 0, 0, Layout.BAR_WIDTH * 0.8, Layout.BAR_HEIGHT);
 		barBackground.cacheAsBitmap = true;
 		bar = GUIFactory.makeContainer([barBackground, timerPanel, statPanel, well]);
@@ -204,17 +206,18 @@ class Board {
 		stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseHandler);
 		
 		// kick things off
-		game.begin(debugNumPlayers);
+		game.begin(debugNumPlayers, GameType.CLASSIC, options.circular);
 		boardSize = game.getBoardSize();
 		currentPlayer = game.getCurrentPlayer();
 		currentPlayerIndex = game.getCurrentPlayerIndex();
 		lastGUIColorCycle = -1;
-		grid.setSize(boardSize, game.getBoardNumCells());
+		grid.setSize(boardSize, game.getBoardNumCells(), options.circular);
 		updateBox();
 		grid.init(game.getPlayers(true), playerCTs);
 		update(true, true);
-		grid.updateFadeSourceBitmap();
 		scene.mouseEnabled = scene.mouseChildren = true;
+		
+		//grid.fillBoardRandomly();
 	}
 	
 	private function resize(?event:Event):Void {
@@ -700,6 +703,9 @@ class Board {
 	
 	private function takeBite(bSX:Int, bSY:Int, bEX:Int, bEY:Int):Void {
 		game.act(PlayerAction.BITE(bSX, bSY, bEX, bEY));
+		currentPlayer = game.getCurrentPlayer();
+		currentPlayerIndex = game.getCurrentPlayerIndex();
+		
 		if (shiftBite && currentPlayer.bites > 0) {
 			update(true, true, true, true);
 			grid.updateTeeth(game.getLegalBiteGrid(true), currentPlayerIndex, currentPlayer.headX, currentPlayer.headY, playerCTs[currentPlayer.color]);
@@ -714,6 +720,9 @@ class Board {
 		displayBite(false);
 		swapHinting = false;
 		game.act(PlayerAction.SWAP_PIECE);
+		currentPlayer = game.getCurrentPlayer();
+		currentPlayerIndex = game.getCurrentPlayerIndex();
+		
 		for (ike in 0...pieceBlocks.length) if (pieceBlockJobs[ike] != null) pieceBlockJobs[ike].abort();
 		update(true);
 		if (pieceRecipe == Pieces.O_PIECE) KTween.from(piecePlug, Layout.QUICK, {alpha:0}, Layout.POUNCE);

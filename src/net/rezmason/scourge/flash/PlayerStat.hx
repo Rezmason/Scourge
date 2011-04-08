@@ -20,7 +20,7 @@ class PlayerStat extends Sprite {
 	private var biteIcon3:Sprite;
 	private var biteIcons:Sprite;
 	private var txtName:TextField;
-	private var txtData:TextField;
+	//private var txtData:TextField;
 	private var tint:ColorTransform;
 	
 	private var tintJob:KTJob;
@@ -49,16 +49,16 @@ class PlayerStat extends Sprite {
 		
 		var w:Float = Layout.WELL_WIDTH - 3 * Layout.BAR_MARGIN - biteIcons.width;
 		
-		txtName = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO, 0.275 * w, 0xFFFFFF);
-		txtData = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO, 0.135 * w, 0xFFFFFF);
+		txtName = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO, 0.21 * w, 0xFFFFFF);
+		//txtData = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO, 0.1 * w, 0xFFFFFF);
 		
 		txtName.x = biteIcons.x + biteIcons.width + 6;
-		txtName.y = biteIcons.y;
+		txtName.y = biteIcons.y - 3;
 		
-		txtData.x = txtName.x;
-		txtData.y = txtName.y + txtName.height + 4;
+		//txtData.x = txtName.x;
+		//txtData.y = txtName.y + txtName.height + 9;
 		
-		GUIFactory.fillSprite(this, [background, biteIcons, txtName, txtData]);
+		GUIFactory.fillSprite(this, [background, biteIcons, txtName, /*txtData*/]);
 	}
 	
 	public function update(index:Int, player:Player, ct:ColorTransform):Void {
@@ -72,7 +72,7 @@ class PlayerStat extends Sprite {
 		biteIcon.visible = true;
 		
 		txtName.text = player.name;
-		txtData.text = "BITES: " + Std.string(player.bites) + "     " + "SWAPS: " + Std.string(player.swaps);
+		//txtData.text = "BITES: " + Std.string(player.bites) + "     " + "SWAPS: " + Std.string(player.swaps);
 		shiftTo(height * index);
 	}
 	

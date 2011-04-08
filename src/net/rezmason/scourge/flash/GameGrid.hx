@@ -38,6 +38,7 @@ class GameGrid extends Sprite {
 	public var space:Shape;
 	
 	private var background:Shape;
+	private var content:Sprite;
 	private var pattern:Grid;
 	private var blurredPatternData:BitmapData;
 	private var blurredPattern:Shape;
@@ -66,6 +67,8 @@ class GameGrid extends Sprite {
 	private var fadeJob:KTJob;
 	private var fadeCount:Float;
 	private var fadeMult:Float;
+	private var fadeBitmapRatio:Float;
+	private var fadeMatrix:Matrix;
 	private var gridTeethJob:KTJob;
 	private var draggingBite:Bool;
 	private var biteLimits:Array<Int>;
@@ -87,13 +90,15 @@ class GameGrid extends Sprite {
 		playerHeadTweens = [];
 		playerBodies = [];
 		playerBitmaps = [];
+		fadeSequence = [];
+		
+		fadeMatrix = new Matrix();
 		
 		var u:Float =  Layout.UNIT_REZ;
 		
 		boardSize = 1;
 		boardNumCells = 1;
 		
-		ALPHA_BLUR.blurX = ALPHA_BLUR.blurY = 0.5 * u;
 		SLIME_MAKER.blurX = SLIME_MAKER.blurY = 0.7 * u;
 		BLUR_FILTER.blurX = BLUR_FILTER.blurY = 0.3 * u;
 		GRID_BLUR.blurX = GRID_BLUR.blurY = 0.25 * u;
@@ -104,7 +109,7 @@ class GameGrid extends Sprite {
 		fader = new Shape();
 		
 		bodies = new Sprite();
-		bodies.x = bodies.y = Layout.GRID_BORDER * u;
+		bodies.x = bodies.y = u * -Layout.BODY_PADDING;
 		bodies.transform.colorTransform = new ColorTransform(0.6, 0.6, 0.6, 3);
 		bodies.blendMode = BlendMode.ADD;
 		heads = new Sprite();
@@ -121,6 +126,9 @@ class GameGrid extends Sprite {
 		teeth.x = teeth.y = Layout.GRID_BORDER * u;
 		biteTooth = new BiteTooth();
 		
+		content = new Sprite();
+		content.x = content.y = Layout.GRID_BORDER * u;
+		
 		cacheAsBitmap = true;
 		tabEnabled = !(buttonMode = useHandCursor = true);
 		
@@ -132,7 +140,7 @@ class GameGrid extends Sprite {
 		addEventListener(Event.ADDED_TO_STAGE, connectToStage);
 	}
 	
-	public function setSize(_boardSize:Int, _boardNumCells:Int):Void {
+	public function setSize(_boardSize:Int, _boardNumCells:Int, ?circular:Bool):Void {
 		
 		boardSize = _boardSize;
 		boardNumCells = _boardNumCells;
@@ -150,47 +158,64 @@ class GameGrid extends Sprite {
 		var bmpSize:Int = Std.int(Layout.UNIT_REZ * boardSize);
 		var u:Float = Layout.UNIT_REZ;
 		
-		GUIFactory.drawSolidRect(background, 0x606060, 1, 0, 0, bmpSize + u, bmpSize + u, 0.3 * u);
-		GUIFactory.drawSolidRect(background, 0x333333, 1, 0.2 * u, 0.2 * u, bmpSize + 0.6 * u, bmpSize + 0.6 * u, 0.2 * u);
+		ALPHA_BLUR.blurX = ALPHA_BLUR.blurY = 0.5 * Layout.FADE_BITMAP_REZ / boardSize;
+		
+		if (circular) {
+			GUIFactory.drawSolidCircle(background, 0x606060, 1, 0, 0, bmpSize + u);
+			GUIFactory.drawSolidCircle(background, 0x333333, 1, 0.2 * u, 0.2 * u, bmpSize + 0.6 * u);
+		} else {
+			GUIFactory.drawSolidRect(background, 0x606060, 1, 0, 0, bmpSize + u, bmpSize + u, 0.3 * u);
+			GUIFactory.drawSolidRect(background, 0x333333, 1, 0.2 * u, 0.2 * u, bmpSize + 0.6 * u, bmpSize + 0.6 * u, 0.2 * u);
+		}
+		
 		if (pattern == null) {
-			pattern = new Grid(Std.int(u * 2), bmpSize, bmpSize, 0xFF111111, 0xFF222222);
+			pattern = new Grid(Std.int(u * 2), bmpSize, bmpSize, circular ? bmpSize : u * 0.5, 0xFF111111, 0xFF222222);
 		} else {
 			pattern.setWidth(bmpSize);
 			pattern.setHeight(bmpSize);	
+			pattern.setCornerRadius(circular ? bmpSize : u * 0.5);
 		}
-		pattern.x = pattern.y = Layout.GRID_BORDER * u;
+		
 		blurredPatternData = new BitmapData(bmpSize, bmpSize, true, 0x0);
-		GUIFactory.drawBitmapToShape(blurredPattern, blurredPatternData, 1, true);
-		blurredPattern.x = blurredPattern.y = pattern.x;
+		GUIFactory.drawBitmapToShape(blurredPattern, blurredPatternData, 1, true, circular ? bmpSize : u * 0.5);
 		cloudCover = new BitmapData(bmpSize, bmpSize, false, 0xFF000000);
 		cloudCover.perlinNoise(1.5 * u, 1.5 * u, 3, 100, false, true, 7, true);
 		cloudCover.colorTransform(cloudCover.rect, new ColorTransform(0.7, 0.7, 0.7));
-		GUIFactory.drawBitmapToShape(clouds, cloudCover, 1, true);
-		clouds.x = clouds.y = Layout.GRID_BORDER * u;
+		GUIFactory.drawBitmapToShape(clouds, cloudCover, 1, true, circular ? bmpSize : u * 0.5);
 		clouds.blendMode = BlendMode.OVERLAY;
-		fadeSourceBitmap = new BitmapData(bmpSize, bmpSize, true, 0x0);
+		
+		var paddedBmpSize:Int = Std.int(bmpSize + 2 * u * Layout.BODY_PADDING);
+		var faderBmpSize:Int = Layout.FADE_BITMAP_REZ;
+		fadeBitmapRatio = faderBmpSize / paddedBmpSize;
+		fadeSourceBitmap = new BitmapData(faderBmpSize, faderBmpSize, true, 0x0);
 		fadeBitmap = fadeSourceBitmap.clone();
-		fader = GUIFactory.drawBitmapToShape(fader, fadeBitmap, 1, true);
+		GUIFactory.drawBitmapToShape(fader, fadeBitmap, 1, true);
 		fadeAlphaBitmap = fadeSourceBitmap.clone();
-		fader.x = fader.y = Layout.GRID_BORDER * u;
+		fader.x = fader.y = (Layout.GRID_BORDER - Layout.BODY_PADDING) * u;
+		fader.scaleX = fader.scaleY = 1 / fadeBitmapRatio;
 		biteTooth.x = biteTooth.y = bmpSize / 2;
+		
+		GUIFactory.fillSprite(content, [
+			pattern, 
+			blurredPattern, 
+			bodies,
+			clouds,
+		]);
 		
 		GUIFactory.fillSprite(this, [
 			background, 
 			space,
-			pattern, 
-			blurredPattern, 
-			bodies,
-			clouds, 
+			content,
 			fader,
 			heads, 
 			teeth, 
-			biteTooth 
+			biteTooth,
 		]);
 		
 		// clear out the old bodies
 		for (ike in 0...playerBitmaps.length) {
-			var bmp:BitmapData = new BitmapData(bmpSize, bmpSize, true, 0x0);
+			var paddedBmpSize:Int = Std.int(u * (boardSize + 2 * Layout.BODY_PADDING));
+			var bmp:BitmapData = new BitmapData(paddedBmpSize, paddedBmpSize, true, 0x0);
 			var body:Shape = cast(bodies.getChildAt(ike), Shape);
 			body.graphics.clear();
 			GUIFactory.drawBitmapToShape(body, bmp, 1, true);
@@ -220,11 +245,25 @@ class GameGrid extends Sprite {
 	public function fade(byFreshness:Bool, arr:Array<Int>, max:Int):Void {
 		
 		if (fadeJob != null) fadeJob.complete();
+		var diff:Float;
+		fadeSourceBitmap.lock();
+		fadeSourceBitmap.fillRect(fadeSourceBitmap.rect, 0x0);
+		diff = -(Layout.GRID_BORDER - Layout.BODY_PADDING) * Layout.UNIT_REZ;
+		fadeMatrix.identity();
+		fadeMatrix.translate(diff, diff);
+		fadeMatrix.scale(fadeBitmapRatio, fadeBitmapRatio);
+		fadeSourceBitmap.draw(background, fadeMatrix, background.transform.colorTransform, BlendMode.NORMAL, null, true);
 		
+		diff = Layout.UNIT_REZ * Layout.BODY_PADDING;
+		fadeMatrix.identity();
+		fadeMatrix.translate(diff, diff);
+		fadeMatrix.scale(fadeBitmapRatio, fadeBitmapRatio);
+		fadeSourceBitmap.draw(content, fadeMatrix, null, BlendMode.NORMAL, null, true);
+		fadeSourceBitmap.unlock();
 		// Sequence the changed indices
 		
 		fadeCount = 0;
-		fadeSequence = [];
+		fadeSequence.splice(0, fadeSequence.length);
 		
 		if (byFreshness) {
 			var fadeSequences:Array<Array<Int>> = [];
@@ -236,13 +275,12 @@ class GameGrid extends Sprite {
 					seq.push(ike);
 				}
 			}
-			
 			for (ike in 0...fadeSequences.length) {
 				var seq:Array<Int> = fadeSequences[ike];
+				if (seq == null) continue;
 				seq.sort(randSort);
 				fadeSequence = fadeSequence.concat(seq);
 			}
-
 			fadeJob = KTween.to(this, Math.log(fadeSequence.length) * 0.2, {fadeCount:fadeSequence.length + fadeMult / 2}, Linear.easeOut, fadeComplete);
 		} else {
 			fadeBitmap.copyPixels(fadeSourceBitmap, fadeSourceBitmap.rect, ORIGIN);
@@ -254,26 +292,16 @@ class GameGrid extends Sprite {
 		fader.visible = true;
 	}
 	
-	public function updateFadeSourceBitmap():Void {
-		var biteToothWasVisible:Bool = biteTooth.visible;
-		heads.visible = teeth.visible = biteTooth.visible = fader.visible = false;
-		var mat:Matrix = new Matrix(1, 0, 0, 1, -Layout.GRID_BORDER * Layout.UNIT_REZ, -Layout.GRID_BORDER * Layout.UNIT_REZ);
-		fadeSourceBitmap.fillRect(fadeSourceBitmap.rect, 0x0);
-		fadeSourceBitmap.draw(this, mat);
-		teeth.visible = heads.visible = true;
-		biteTooth.visible = biteToothWasVisible;
-	}
-	
 	public function makePlayerHeadAndBody():Void {
 		
-		var bmpSize:Int = Std.int(Layout.UNIT_REZ * boardSize);
+		var paddedBmpSize:Int = Std.int(Layout.UNIT_REZ * (boardSize + 2 * Layout.BODY_PADDING));
 		
-		var bmp:BitmapData = new BitmapData(bmpSize, bmpSize, true, 0x0);
+		var bmp:BitmapData = new BitmapData(paddedBmpSize, paddedBmpSize, true, 0x0);
 		playerBitmaps.push(bmp);
 		
 		var body:Shape = GUIFactory.drawBitmapToShape(new Shape(), bmp, 1, true);
 		var head:Shape = GUIFactory.makeHead(Layout.UNIT_REZ);
-		head.x = head.y = bmpSize * 0.5;
+		head.x = head.y = paddedBmpSize * 0.5;
 		
 		playerBodies.push(body);
 		bodies.addChild(body);
@@ -282,21 +310,26 @@ class GameGrid extends Sprite {
 	}
 	
 	public function updateBodies(bodyGrid:Array<Int>):Void {
+		
 		var len:Int = boardNumCells;
 		var rect:Rectangle = new Rectangle(0, 0, Layout.UNIT_REZ, Layout.UNIT_REZ);
 		var rx:Int, ry:Int;
 		
 		preparePlayerBitmaps();
 		
+		for (ike in 0...playerBitmaps.length) playerBitmaps[ike].lock();
+		
 		for (ike in 0...len) {
 			if (bodyGrid[ike] > 0) {
 				rx = ike % boardSize;
 				ry = Std.int((ike - rx) / boardSize);
-				rect.x = rx * Layout.UNIT_REZ;
-				rect.y = ry * Layout.UNIT_REZ;
+				rect.x = (rx + Layout.BODY_PADDING) * Layout.UNIT_REZ;
+				rect.y = (ry + Layout.BODY_PADDING) * Layout.UNIT_REZ;
 				playerBitmaps[bodyGrid[ike] - 1].fillRect(rect, 0xFFFFFFFF);
 			}
 		}
+		
+		for (ike in 0...playerBitmaps.length) playerBitmaps[ike].unlock();
 		
 		finishPlayerBitmaps();
 	}
@@ -391,26 +424,30 @@ class GameGrid extends Sprite {
 	}
 	
 	private function fadeUpdate():Void {
-		
 		if (fadeSequence.length > 0) {
+			
+			fadeBitmap.lock();
+			fadeBitmap.fillRect(fadeBitmap.rect, 0x0);
 			fadeAlphaBitmap.fillRect(fadeAlphaBitmap.rect, 0xFFFFFFFF);
 
 			// draw the patches to fadeAlphaBitmap
 
 			var rect:Rectangle = new Rectangle();
 			var totalRect:Rectangle = null;
-			var w:Int = boardSize;
-			var margin:Float = Layout.UNIT_REZ * 0.5;
-			rect.width = rect.height = Layout.UNIT_REZ + 2 * margin;
-			var ike:Int = Std.int(fadeCount);
+			var u:Float = Layout.UNIT_REZ * fadeBitmapRatio;
+			
+			rect.width = rect.height = 2 * u;
+			
+			var ike:Int = Std.int(Math.min(fadeCount, fadeSequence.length - 1));
+			
 			while (ike >= 0) {
 				var val:Float = (fadeMult - Math.min(fadeMult, fadeCount - ike)) / fadeMult;
 				var alpha:Int = Std.int(0xFF * val * val);
 				var index:Int = fadeSequence[ike];
-				var tx:Int = (index % w);
-				var ty:Int = Std.int((index - tx) / w);
-				rect.x = tx * Layout.UNIT_REZ - margin;
-				rect.y = ty * Layout.UNIT_REZ - margin;
+				var tx:Int = (index % boardSize);
+				var ty:Int = Std.int((index - tx) / boardSize);
+				rect.x = (tx + Layout.BODY_PADDING - 0.5) * u;
+				rect.y = (ty + Layout.BODY_PADDING - 0.5) * u;
 				if (totalRect == null) {
 					totalRect = rect.clone();
 				} else {
@@ -420,9 +457,12 @@ class GameGrid extends Sprite {
 				ike--;
 			}
 			
-			fadeAlphaBitmap.applyFilter(fadeAlphaBitmap, totalRect, totalRect.topLeft, ALPHA_BLUR);
+			if (totalRect != null) fadeAlphaBitmap.applyFilter(fadeAlphaBitmap, totalRect, totalRect.topLeft, ALPHA_BLUR);
+			
 			fadeBitmap.copyPixels(fadeSourceBitmap, fadeSourceBitmap.rect, ORIGIN);
 			fadeBitmap.copyChannel(fadeAlphaBitmap, fadeAlphaBitmap.rect, ORIGIN, BitmapDataChannel.BLUE, BitmapDataChannel.ALPHA);
+				
+			fadeBitmap.unlock();
 		} else {
 			fadeBitmap.colorTransform(fadeBitmap.rect, FADE_CT);
 		}
@@ -430,7 +470,6 @@ class GameGrid extends Sprite {
 	
 	private function fadeComplete():Void {
 		fader.visible = false;
-		updateFadeSourceBitmap();
 		dispatchEvent(COMPLETE_EVENT);
 	}
 	
@@ -462,7 +501,6 @@ class GameGrid extends Sprite {
 		for (ike in 0...Common.MAX_PLAYERS) bmp2.draw(playerBitmaps[ike], mat, null, BlendMode.ADD);
 		blurredPatternData.draw(pattern);
 		blurredPatternData.applyFilter(blurredPatternData, blurredPatternData.rect, ORIGIN, GRID_BLUR);
-		//blurredPatternData.fillRect(blurredPatternData.rect, 0xFFFFFFFF);
 		blurredPatternData.copyChannel(bmp2, bmp2.rect, ORIGIN, BitmapDataChannel.RED, BitmapDataChannel.ALPHA);
 		bmp2.dispose();
 	}
@@ -490,9 +528,9 @@ class GameGrid extends Sprite {
 						whatev[ry][rx] = true;
 						break;
 					}
-				}	
-				rect.x = rx + Layout.GRID_BORDER;
-				rect.y = ry + Layout.GRID_BORDER;
+				}
+				rect.x = rx + Layout.BODY_PADDING * Layout.UNIT_REZ;
+				rect.y = ry + Layout.BODY_PADDING * Layout.UNIT_REZ;
 				rect.width = rect.height = Layout.UNIT_REZ;
 				bmp.fillRect(rect, 0xFFFFFFFF);
 			}

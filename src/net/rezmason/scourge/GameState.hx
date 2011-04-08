@@ -6,6 +6,7 @@ class GameState {
 	public var numPlayers:Int;
 	public var numAlivePlayers:Int;
 	public var bodyGrid:Array<Int>;
+	public var maskGrid:Array<Int>;
 	public var freshGrid:Array<Int>;
 	public var legalMoveGrids:Array<Array<Bool>>;
 	public var legalBiteGrid:Array<Array<Int>>;
@@ -19,10 +20,12 @@ class GameState {
 	
 	public var boardSize:Int;
 	public var boardNumCells:Int;
+	public var boardNumMaskedCells:Int;
 	public var changeIncrements:Array<Int>;
 	public var gridCellMap:GridCellMap;
 
 	public function new():Void {
+		//maskGrid = [];
 		bodyGrid = [];
 		freshGrid = [];
 		legalBiteGrid = [];
@@ -38,6 +41,7 @@ class GameState {
 		clone.numPlayers = gameState.numPlayers;
 		clone.numAlivePlayers = gameState.numAlivePlayers;
 		clone.bodyGrid = gameState.bodyGrid.copy();
+		if (gameState.maskGrid != null) clone.maskGrid = gameState.maskGrid.copy();
 		clone.freshGrid = gameState.freshGrid.copy();
 		clone.legalMoveGrids = [];
 		for (ike in 0...gameState.legalMoveGrids.length) {
@@ -59,6 +63,7 @@ class GameState {
 		// these don't change
 		clone.boardSize = gameState.boardSize;
 		clone.boardNumCells = gameState.boardNumCells;
+		clone.boardNumMaskedCells = gameState.boardNumMaskedCells;
 		clone.changeIncrements = gameState.changeIncrements;
 		clone.gridCellMap = gameState.gridCellMap;
 

@@ -37,7 +37,7 @@ class Game {
 	}
 	
 	
-	public function begin(?_numPlayers:Int = 1, ?gameType:GameType):Void {
+	public function begin(?_numPlayers:Int = 1, ?gameType:GameType, ?circular:Bool):Void {
 		
 		history.splice(0, history.length);
 		histIndex = 0;
@@ -63,9 +63,6 @@ class Game {
 		var maxHeadX:Float = -1;
 		var minHeadY:Float = bR * 2 + 1;
 		var maxHeadY:Float = -1;
-		
-		// Prime the grid
-		if (defaultGrid == null) for (ike in 0..._state.boardNumCells) _state.bodyGrid[ike] = 0;
 		
 		var colorHat:Hat = new Hat(Common.MAX_PLAYERS);
 		var orderHat:Hat = new Hat(_state.numPlayers);
@@ -121,7 +118,7 @@ class Game {
 		}
 		
 		_state.boardSize = Std.int(maxHeadX - minHeadX + 2 * Common.BOARD_PADDING);
-		_state.boardNumCells = _state.boardSize * _state.boardSize;
+		_state.boardNumMaskedCells = _state.boardNumCells = _state.boardSize * _state.boardSize;
 		_state.changeIncrements = [1, _state.boardSize, _state.boardSize + 1, _state.boardSize - 1];
 		_state.gridCellMap = new GridCellMap(_state.boardSize);
 		
@@ -136,6 +133,26 @@ class Game {
 		_state.players = players.copy();
 		_state.players.sort(Player.orderSort);
 		
+		
+		if (circular) {
+			_state.maskGrid = [];
+			var w:Int = _state.boardSize;
+			var count:Int = 0;
+			for (ike in 0..._state.boardNumCells) {
+				var x:Int = ike % w;
+				var y:Int = Std.int((ike - x) / w);
+				var fx:Float = x - 0.5 * w + 0.5;
+				var fy:Float = y - 0.5 * w + 0.5;
+				
+				if (Math.abs(Math.sqrt(fx * fx + fy * fy)) < w * 0.5) {
+					_state.maskGrid[ike] = 1;
+					count++;
+				} else {
+					_state.maskGrid[ike] = 0;
+				}
+			}
+			_state.boardNumMaskedCells = count;
+		}
 		
 		// Prime the grid
 		if (defaultGrid != null) {
@@ -392,6 +409,7 @@ class Game {
 			spotX = xCoord + blocks[ike]; spotY = yCoord + blocks[ike + 1];
 			if (spotX < 0 || spotX >= w) return false; // off the grid
 			if (spotY < 0 || spotY >= w) return false; // off the grid
+			if (state.maskGrid != null && state.maskGrid[spotY * w + spotX] == 0) return false; // spot masked out
 			if (state.bodyGrid[spotY * w + spotX] != 0) return false; // spot taken
 			ike += 2;
 		}
@@ -608,9 +626,9 @@ class Game {
 		for (ike in 0...state.players.length) {
 			var player:Player = state.players[ike];
 			if (player.alive) {
-				if (player.size < 0.2 * state.boardNumCells) {
+				if (player.size < 0.2 * state.boardNumMaskedCells) {
 					player.biteSize = 1;
-				} else if (player.size < 0.4 * state.boardNumCells) {
+				} else if (player.size < 0.4 * state.boardNumMaskedCells) {
 					player.biteSize = 2;
 				} else {
 					player.biteSize = 3;

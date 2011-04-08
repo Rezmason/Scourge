@@ -25,4 +25,7 @@ class Layout {
 	public static var POUNCE:Float -> Float = Quad.easeOut;
 	public static var SLIDE:Float -> Float = Quad.easeInOut;
 	public static var ZIGZAG:Float -> Float = Elastic.easeOut;
+	
+	public static var FADE_BITMAP_REZ:Int = Std.int(40 * UNIT_REZ);
+	public static var BODY_PADDING:Float = 0.3;
 }
