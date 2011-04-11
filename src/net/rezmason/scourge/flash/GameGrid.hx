@@ -160,12 +160,14 @@ class GameGrid extends Sprite {
 		
 		ALPHA_BLUR.blurX = ALPHA_BLUR.blurY = 0.5 * Layout.FADE_BITMAP_REZ / boardSize;
 		
+		var bdr:Float = u * Layout.GRID_BORDER;
+		
 		if (circular) {
-			GUIFactory.drawSolidCircle(background, 0x606060, 1, 0, 0, bmpSize + u);
-			GUIFactory.drawSolidCircle(background, 0x333333, 1, 0.2 * u, 0.2 * u, bmpSize + 0.6 * u);
+			GUIFactory.drawSolidCircle(background, 0x606060, 1, 0, 0, bmpSize + 2 * bdr);
+			GUIFactory.drawSolidCircle(background, 0x333333, 1, 0.2 * (2 * bdr), 0.2 * (2 * bdr), bmpSize + 0.6 * (2 * bdr));
 		} else {
-			GUIFactory.drawSolidRect(background, 0x606060, 1, 0, 0, bmpSize + u, bmpSize + u, 0.3 * u);
-			GUIFactory.drawSolidRect(background, 0x333333, 1, 0.2 * u, 0.2 * u, bmpSize + 0.6 * u, bmpSize + 0.6 * u, 0.2 * u);
+			GUIFactory.drawSolidRect(background, 0x606060, 1, 0, 0, bmpSize + (2 * bdr), bmpSize + (2 * bdr), 0.3 * (2 * bdr));
+			GUIFactory.drawSolidRect(background, 0x333333, 1, 0.2 * (2 * bdr), 0.2 * (2 * bdr), bmpSize + 0.6 * 2 * bdr, bmpSize + 0.6 * 2 * bdr, 0.2 * (2 * bdr));
 		}
 		
 		if (pattern == null) {
