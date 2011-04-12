@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml-stylesheet href="../assets/miso/style.css" type="text/css"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/SVG/DTD/svg10.dtd"> 
+<svg width="100%" height="100%" zoomAndPan="disable"
+xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" onload="init();" > 
+	<script>
+	<![CDATA[
+	
+	var SVGNS = "http://www.w3.org/2000/svg";
+	var docRoot = document.rootElement;
+	
+	var teamColors = ["#FF0040", "#FF8800", "#00FF00", "#0088FF"];
+	var player = -1;
+	
+	function createSVG(markup, target) {
+		var nodes = markup.childNodes;
+		for (var i = 0; i < nodes.length; i++) {
+			var n = nodes[i];
+			if (!n.tagName) continue;
+			var atts = n.attributes;
+			var obj = document.createElementNS(SVGNS, n.tagName);
+			for (var j = 0; j < atts.length; j++) {
+				obj.setAttributeNS(null, atts[j].name, atts[j].value);	
+			}
+			target.appendChild(obj);
+			if (n.childNodes.length) {
+				createSVG(n, obj);
+			}
+		}
+	}
+	
+	function loadAsset(url, dest) {
+		var loader = new XMLHttpRequest();
+		var target = document.getElementById(dest);
+		loader.open("GET", url, true);
+		loader.onreadystatechange = function() {
+			if (loader.readyState != 4) return;
+			var markup = loader.responseXML.getElementsByTagName("svg")[0];
+			createSVG(markup, target);
+		}
+		loader.send(null);
+	}
+	
+	function init() {
+		loadAsset("../assets/swap.svg", "well_swapButton");
+		loadAsset("../assets/rotate.svg", "well_rotateLeftButton");
+		loadAsset("../assets/rotate.svg", "well_rotateRightButton");
+		loadAsset("../assets/bite.svg", "well_biteButton");
+		loadAsset("../assets/skip.svg", "timerPanel_skipButton");
+		
+		
+		loadAsset("../assets/biteicon1.svg", "playerStat_biteIcon1");
+		loadAsset("../assets/biteicon2.svg", "playerStat_biteIcon2");
+		loadAsset("../assets/biteicon3.svg", "playerStat_biteIcon3");
+		
+		loadAsset("../assets/omnomnom.svg", "pieceBite");
+		
+		window.onresize = resize;
+		resize();
+		recolor();
+	}
+	
+	function colorize() {
+		var cR = ((currentColor >> 16) & 0xFF) / 0xFF;
+		var cG = ((currentColor >>  8) & 0xFF) / 0xFF;
+		var cB = ((currentColor >>  0) & 0xFF) / 0xFF;
+		
+		var targets = [
+			
+		];
+		
+		for (var i = 0; i < targets.length; i++) {
+			var target = document.getElementById(targets[i]);
+			if (target.sourceFill == undefined) {
+				target.sourceFill = target.getAttributeNS(null, "fill");
+			}
+			
+			var source = parseInt(target.sourceFill.substr(1), 16);
+			
+			var r = (source >> 16) & 0xFF;
+			var g = (source >>  8) & 0xFF;
+			var b = (source >>  0) & 0xFF;
+			
+			target.calcFill = "#" + (((r * cR) << 16) | ((g * cG) << 8) | ((b * cB) << 0)).toString(16);
+			target.setAttributeNS(null, "fill", target.calcFill);
+		}
+	}
+	
+	function resize() {
+		var suspension = docRoot.suspendRedraw(1000);
+		var w = window.innerWidth;
+		var h = window.innerHeight;
+		var bar = document.getElementById("bar");
+		var scale = h / 600;
+		bar.setAttributeNS(null, "transform", "scale(" + scale + "," + scale + ")");
+		var barWidth = 230 * scale;
+		var grid = document.getElementById("grid");
+		if (w - barWidth < h) {
+			scale = (w - barWidth - 40) / 420;
+		} else {
+			scale = (h - 40) / 420;
+		}
+		var moveX = barWidth + (w - barWidth - 420 * scale) * 0.5;
+		var moveY = (h - 420 * scale) * 0.5;
+		grid.setAttributeNS(null, "transform", "translate(" + moveX + ", " + moveY + ") scale(" + scale + "," + scale + ")");
+		docRoot.unsuspendRedraw(suspension);
+	}
+	
+	function recolor() {
+		player = (player + 1) % teamColors.length;
+		
+		currentColor = parseInt(teamColors[player].substr(1), 16);
+		var cR = ((currentColor >> 16) & 0xFF) / 0xFF;
+		var cG = ((currentColor >>  8) & 0xFF) / 0xFF;
+		var cB = ((currentColor >>  0) & 0xFF) / 0xFF;
+		
+		var mat = document.getElementById("currentColorMat");
+		var values = "r 0 0 0 0 " + "0 g 0 0 0 " + "0 0 b 0 0 " + "0 0 0 1 0";
+		values = values.replace("r", cR).replace("g", cG).replace("b", cB);
+		mat.setAttributeNS(null, "values", values);
+	}
+	
+	]]>
+	</script>
+	<defs>
+		<rect id='piece_block' width="45" height="45" fill="#222222" rx="10" ry="10"/>
+		<circle filter="url(#glow)" id='head' r="10" stroke-width="4" fill="none"/>
+		<g id='playerStat'>
+			<rect class='playerStat_background' width="210" height="77.5" fill="#444444"/>
+			<g class='playerStat_biteIcons' transform="scale(0.48, 0.48) translate(32, 32)" >
+				<g id='playerStat_biteIcon1' visibility="visible"/>
+				<g id='playerStat_biteIcon2' visibility="hidden"/>
+				<g id='playerStat_biteIcon3' visibility="hidden"/>
+			</g>
+			<text font-family='Miso' x="70" y="35" fill="white" id='playerStat_txtName' font-size="28"
+			>Player 1</text>
+			<text xml:space="preserve" font-family="Miso" x="70" y="62" fill="white" id='playerStat_txtData' font-size="17.5"
+			>BITES: 2    SWAPS: 10</text>
+		</g>
+		<filter id='currentColorFilter'>
+			<feColorMatrix id="currentColorMat" type="matrix" />
+		</filter>
+		<filter id='pinkFilter'>
+			<feColorMatrix type="matrix"
+			values="1 0 0 0   0
+			0 0 0 0   0 
+			0 0 0.3 0   0 
+			0 0 0 1   0"
+			/>
+		</filter>
+		<filter id='goldFilter'>
+			<feColorMatrix type="matrix"
+			values="1 0 0 0   0
+			0 0.6 0 0   0 
+			0 0 0 0   0 
+			0 0 0 1   0"
+			/>
+		</filter>
+		<filter id='greenFilter'>
+			<feColorMatrix type="matrix"
+			values="0 0 0 0   0
+			0 1 0 0   0 
+			0 0 0 0   0 
+			0 0 0 1   0"
+			/>
+		</filter>
+		<filter id='blueFilter'>
+			<feColorMatrix type="matrix"
+			values="0 0 0 0   0
+			0 0.6 0 0   0 
+			0 0 1 0   0 
+			0 0 0 1   0"
+			/>
+		</filter>
+		
+		<filter id='glow' x="-80%" y="-80%" width="260%" height="260%" filterRes="100">
+			<feColorMatrix type="matrix"
+			values="1 0 0 0   0
+			0 1 0 0   0 
+			0 0 1 0   0 
+			0 0 0 20   0"
+			result="glowing"
+			/>
+			<feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+			<feMerge>
+				<feMergeNode in="coloredBlur"/>
+				<feMergeNode in="SourceGraphic"/>
+			</feMerge>
+		</filter>
+		
+		<filter id="innerGlow"  x="-200%" y="-200%" width="400%" height="400%" filterRes="500">
+			<feGaussianBlur stdDeviation="2.5" /> 
+			<feComposite operator="arithmetic" in2="SourceAlpha" k2="-1" k3="1" />
+			<feColorMatrix type="matrix"
+			values="0 0 0 10   0
+			0 0 0 10   0 
+			0 0 0 10   0 
+			0 0 0 100   0"
+			result="glowing"
+			/>
+			<feMerge>
+				<feMergeNode in="SourceGraphic"/>
+				<feMergeNode in="glowing"/>
+			</feMerge>
+		</filter>
+		<mask id='statPanel_containerMask' width="210" height="310" maskUnits="objectBoundingBox">
+			<rect width="210" height="310" fill="white" rx="20" ry="20"/>
+		</mask>
+		<mask id='pieceBiteMask' width='45' height='45' maskUnits="objectBoundingBox">
+			<rect width="45" height="45" fill="#FFFFFF"/>
+			<g id='pieceBite' transform="translate(45, 45) scale(1.6, 1.6) rotate(180)"/>
+			<circle cx="45" cy="45" r="25" fill="black" />
+		</mask>
+	</defs>
+	<rect id='background' width="100%" height="100%" fill="#000000"/>
+	<g id='grid'>
+		<rect id='grid_background' width="420" height="420" rx="4" ry="4" fill="#444444"/>
+		<rect id='grid_background_2' x="4" y="4" width="412" height="412" rx="3" ry="3" fill="#101010"/>
+		<rect id='grid_pattern' transform="translate(10, 10)" width="400" height="400" stroke="red" fill="none" visibility="hidden"/>
+		<rect id='grid_blurredPattern' x="10" y="10" width="400" height="400" stroke="green" fill="none" visibility="hidden"/>
+		<g id='grid_bodies' transform="translate(10, 10)" >
+			<rect id='grid_body1' width="400" height="400" stroke="blue" fill="none" visibility="hidden"/>
+			<!-- * -->
+		</g>
+		<g id='grid_heads' transform="translate(10, 10)">
+			<use xlink:href="#head" id='grid_head1' transform="translate(110, 290)" fill="#AA0030" stroke="{teamColors[0]}"/>
+			<use xlink:href="#head" id='grid_head2' transform="translate(110, 110)" fill="#AA8800" stroke="{teamColors[1]}"/>
+			<use xlink:href="#head" id='grid_head3' transform="translate(290, 110)" fill="#30AA00" stroke="{teamColors[2]}"/>
+			<use xlink:href="#head" id='grid_head4' transform="translate(290, 290)" fill="#0080AA" stroke="{teamColors[3]}"/>
+		</g>
+		<rect id='grid_clouds' x="10" y="10" width="400" height="400" stroke="yellow" fill="none" visibility="hidden"/>
+		<rect id='grid_fader' width="420" height="420" stroke="orange" fill="none" visibility="hidden"/>
+		<g id='grid_teeth' transform="translate(10, 10)"/>
+		<g id='biteTooth'>
+			<g id='startTooth'/>
+			<g id='toothMiddle'/>
+			<g id='endTooth'/>
+		</g>
+	</g>
+	
+	<g id='bar'>
+		<rect filter="url(#currentColorFilter)" id='bar_background' width="138" height="600" fill="#888888"/>
+		<g filter="url(#currentColorFilter)" id='well' transform="translate(10, 10)">
+			<rect id='well_background' width="210" height="210" fill="#222222" rx="20" ry="20"/>
+			<g id='pieceHandle' >
+				<g id='piece' filter="url(#innerGlow)">
+					<rect id='piecePlug' x="84" y="84" width="45" height="45" fill="#222222" visibility="hidden"/>
+					<use xlink:href="#piece_block" transform="translate(62, 62)"/>
+					<use xlink:href="#piece_block" transform="translate(62, 105)"/>
+					<use xlink:href="#piece_block" transform="translate(105, 105)" mask="url(#pieceBiteMask)"/>
+				</g>
+			</g>
+
+			<g id='well_smallTeethIndicator' used-to-be='SmallTeeth'/><!-- conains animation -->
+			<g id='well_bigTeethIndicator' used-to-be='BigTeeth'/><!-- conains svg animation -->
+			<g id='well_superTeethIndicator' used-to-be='SuperTeeth'/><!-- conains svg animation -->
+			<g id='well_rotateLeftButton' used-to-be='SimpleButton' transform="translate(10, 200) scale(1.5, 1.5) rotate(-90)"/>
+			<g id='well_rotateRightButton' used-to-be='SimpleButton' transform="translate(200, 10) scale(-1.5, 1.5)"/>
+			<text font-family='Miso' transform="translate(52, 35)" fill="white" id='well_swapCounter' font-size="28">10</text>
+			<text font-family='Miso' transform="translate(150, 195)" fill="white" id='well_biteCounter' font-size="28">2</text>
+			<g id='well_swapButton' used-to-be='SimpleButton' transform="translate(10, 10) scale(1.5, 1.5)"/>
+			<g id='well_biteButton' used-to-be='SimpleButton' transform="translate(200, 200) scale(-1.5, -1.5)"/>
+		</g>
+		<g filter="url(#currentColorFilter)" id='timerPanel' transform="translate(10, 230)">
+			<rect id='timerPanel_background' width="210" height="40" fill="#222222" rx="20" ry="20"/>
+			<text font-family='Miso' x="12" y="30" fill="white" id='timerPanel_counter' font-size="28">---</text>
+			<g id='timerPanel_skipButton' used-to-be='SimpleButton' onclick="recolor();" transform="translate(173, 8) scale(1.25, 1.25)"/><!-- svg for out, up, down and hit states -->
+
+		</g>
+		<g id='statPanel' transform="translate(10, 280)">
+			<rect filter="url(#currentColorFilter)" id='statPanel_background' width="210" height="310" fill="#222222" rx="20" ry="20"/>
+			<g id='statPanel_container' mask="url(#statPanel_containerMask)">
+				<use filter="url(#pinkFilter)" xlink:href="#playerStat" transform="translate(0, 0)"/>
+				<use filter="url(#goldFilter)" xlink:href="#playerStat" transform="translate(0, 77.5)"/>
+				<use filter="url(#greenFilter)" xlink:href="#playerStat" transform="translate(0, 155)"/>
+				<use filter="url(#blueFilter)" xlink:href="#playerStat" transform="translate(0, 232.5)"/>
+			</g>
+		</g>
+	</g>
+</svg>
