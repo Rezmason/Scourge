@@ -15,8 +15,7 @@ class Layout {
 	public static var BAR_CORNER_RADIUS:Float = 40;
 	
 	public static var GRID_BORDER:Float = 0.6;
-	public static var TIMER_HEIGHT:Float = 40;
-	public static var STAT_PANEL_HEIGHT:Float = Layout.BAR_HEIGHT - 4 * Layout.BAR_MARGIN - Layout.WELL_WIDTH - Layout.TIMER_HEIGHT;
+	public static var STAT_PANEL_HEIGHT:Float = Layout.BAR_HEIGHT - 3 * Layout.BAR_MARGIN - Layout.WELL_WIDTH;
 	public static var PIECE_SCALE:Float = WELL_WIDTH * 0.18 / UNIT_REZ;
 	public static var PIECE_BLOCK_BORDER:Float = 0.05;
 	

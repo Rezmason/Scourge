@@ -1,3 +1,5 @@
+/* defunct
+
 package net.rezmason.scourge.flash;
 
 import flash.display.Shape;
@@ -50,3 +52,5 @@ class TimerPanel extends Sprite {
 		skipButton.upState.transform.colorTransform = ct;
 	}
 }
+
+*/

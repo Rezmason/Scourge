@@ -45,7 +45,6 @@ class Board {
 	private var bar:Sprite;
 	private var barBackground:Shape;
 	private var well:Well;
-	private var timerPanel:TimerPanel;
 	private var statPanel:StatPanel;
 	
 	private var biting:Bool;
@@ -136,11 +135,10 @@ class Board {
 		grid = new GameGrid();
 		for (ike in 0...Common.MAX_PLAYERS) grid.makePlayerHeadAndBody();
 		well = new Well();
-		timerPanel = new TimerPanel();
 		statPanel = new StatPanel(Common.MAX_PLAYERS, Layout.STAT_PANEL_HEIGHT);
 		barBackground = GUIFactory.drawSolidRect(new Shape(), 0x333333, 1, 0, 0, Layout.BAR_WIDTH * 0.8, Layout.BAR_HEIGHT);
 		barBackground.cacheAsBitmap = true;
-		bar = GUIFactory.makeContainer([barBackground, timerPanel, statPanel, well]);
+		bar = GUIFactory.makeContainer([barBackground, statPanel, well]);
 		
 		well.rotateHint = rotateHint;
 		well.rotatePiece = rotatePiece;
@@ -148,15 +146,13 @@ class Board {
 		well.toggleBite = toggleBite;
 		well.swapHint = swapHint;
 		well.swapPiece = swapPiece;
-		
-		timerPanel.skipFunc = skipTurn;
+		well.skipFunc = skipTurn;
+		well.forfeitFunc = forfeit;
 		
 		// position things
 		well.x = well.y = Layout.BAR_MARGIN;
-		timerPanel.x = Layout.BAR_MARGIN;
-		timerPanel.y = well.y + Layout.WELL_WIDTH + Layout.BAR_MARGIN;
 		statPanel.x = Layout.BAR_MARGIN;
-		statPanel.y = timerPanel.y + Layout.TIMER_HEIGHT + Layout.BAR_MARGIN;
+		statPanel.y = well.y + Layout.WELL_WIDTH + Layout.BAR_MARGIN;
 		
 		GUIFactory.fillSprite(scene, [background, grid, bar]);
 		
@@ -272,6 +268,7 @@ class Board {
 					}
 				case Keyboard.TAB: if (down) swapPiece();
 				case Keyboard.ESCAPE: if (down) skipTurn();
+				case Keyboard.ENTER: if (down) forfeit();
 				case Keyboard.F1: untyped __global__["flash.profiler.showRedrawRegions"](down);
 				case Keyboard.F2:
 					if (down) {
@@ -362,7 +359,6 @@ class Board {
 		well.tint(guiColorTransform);
 		grid.tint(guiColorTransform);
 		statPanel.tint(guiColorTransform);
-		timerPanel.tint(guiColorTransform);
 		barBackground.transform.colorTransform = guiColorTransform;
 	}
 	
@@ -737,6 +733,16 @@ class Board {
 		currentPlayer = game.getCurrentPlayer();
 		currentPlayerIndex = game.getCurrentPlayerIndex();
 		update(true, true);
+	}
+	
+	private function forfeit():Void {
+		if (draggingPiece || grid.isDraggingBite()) return;
+		displayBite(false);
+		well.displaySwapCounter(false);
+		game.act(PlayerAction.FORFEIT);
+		currentPlayer = game.getCurrentPlayer();
+		currentPlayerIndex = game.getCurrentPlayerIndex();
+		update(true, true, true, true);
 	}
 	
 	private function undoTurn(?event:Event):Void {

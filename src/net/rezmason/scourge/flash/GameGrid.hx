@@ -24,7 +24,7 @@ class GameGrid extends Sprite {
 	
 	private static var BITE_GLOW:GlowFilter = new GlowFilter(0xFFFFFF, 1, 9, 9, 20, 1, true);
 	private static var ORIGIN:Point = new Point();
-	private static var ALPHA_BLUR:BlurFilter = new BlurFilter(10, 10, 3);
+	private static var ALPHA_BLUR:BlurFilter = new BlurFilter(10, 10, 2);
 	
 	private static var SLIME_MAKER:GlowFilter = new GlowFilter(0x0, 1, 14, 14, 2.5, 1, true);
 	private static var BLUR_FILTER:BlurFilter = new BlurFilter(6, 6, 2);
@@ -82,8 +82,6 @@ class GameGrid extends Sprite {
 	public function new():Void {
 		
 		super();
-		
-		fadeMult = 10;
 		draggingBite = false;
 		
 		playerHeads = [];
@@ -283,6 +281,9 @@ class GameGrid extends Sprite {
 				seq.sort(randSort);
 				fadeSequence = fadeSequence.concat(seq);
 			}
+			
+			fadeMult = 10 + fadeSequence.length / boardNumCells * 90;
+			
 			fadeJob = KTween.to(this, Math.log(fadeSequence.length) * 0.2, {fadeCount:fadeSequence.length + fadeMult / 2}, Linear.easeOut, fadeComplete);
 		} else {
 			fadeBitmap.copyPixels(fadeSourceBitmap, fadeSourceBitmap.rect, ORIGIN);
@@ -459,11 +460,14 @@ class GameGrid extends Sprite {
 				ike--;
 			}
 			
-			if (totalRect != null) fadeAlphaBitmap.applyFilter(fadeAlphaBitmap, totalRect, totalRect.topLeft, ALPHA_BLUR);
+			if (totalRect != null) {
+				if (totalRect.containsRect(fadeAlphaBitmap.rect)) totalRect = fadeAlphaBitmap.rect;
+				fadeAlphaBitmap.applyFilter(fadeAlphaBitmap, totalRect, totalRect.topLeft, ALPHA_BLUR);
+			}
 			
 			fadeBitmap.copyPixels(fadeSourceBitmap, fadeSourceBitmap.rect, ORIGIN);
 			fadeBitmap.copyChannel(fadeAlphaBitmap, fadeAlphaBitmap.rect, ORIGIN, BitmapDataChannel.BLUE, BitmapDataChannel.ALPHA);
-				
+			
 			fadeBitmap.unlock();
 		} else {
 			fadeBitmap.colorTransform(fadeBitmap.rect, FADE_CT);

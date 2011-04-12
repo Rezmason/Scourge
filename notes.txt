@@ -230,3 +230,6 @@ JavaScript, non-EaselJS ideas
 	}
 	
 	<foreignobject /> tag in SVG lets you stick canvases inside
+	
+Multitouch ideas
+	Middle finger across board to drag and drop; pointer and ring fingers rotate while dragging

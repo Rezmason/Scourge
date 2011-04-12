@@ -24,6 +24,8 @@ class Well extends Sprite {
 	public var toggleBite:Void->Void;
 	public var swapHint:Bool->Void;
 	public var swapPiece:Void->Void;
+	public var skipFunc:Void->Void;
+	public var forfeitFunc:Void->Void;
 	
 	public var pieceHandle:Sprite;
 	public var stoicPieceHandle:Sprite;

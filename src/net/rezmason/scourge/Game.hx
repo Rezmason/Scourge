@@ -83,8 +83,8 @@ class Game {
 			player.alive = true;
 			
 			player.name = "Player " + player.uid; // for now
-			player.color = Hat.pick(colorHat); // for now
-			player.order = Hat.pick(orderHat) + 1; // for now
+			player.color = ike; //Hat.pick(colorHat); // for now
+			player.order = ike + 1; //Hat.pick(orderHat) + 1; // for now
 			
 			var angle:Float = Math.PI * ((player.order - 1) * playerAngle + startAngle);
 			var pos:{x:Float, y:Float} = {x:Math.cos(angle) * bR, y:Math.sin(angle) * bR};
@@ -348,6 +348,7 @@ class Game {
 	}
 	
 	private function forfeit(state:GameState):Void {
+		if (state.numAlivePlayers == 1) return;
 		state.bodyGrid[state.currentPlayer.headIndex] = 0;
 		resetFreshness(state);
 		killCheck(state);
