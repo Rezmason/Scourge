@@ -10,8 +10,8 @@
 -swf-lib assets/ScourgeLib.swf
 # For now, these animations are Flash authored. I need to figure out how to make this platform independent
 -swf-lib assets/ScourgeBiteSymbols.swf
---macro patchTypes('types.patch')
---macro patchTypes('flextypes.patch')
+--macro patchTypes('patch/types.patch')
+--macro patchTypes('patch/flextypes.patch')
 
 #--next
 
