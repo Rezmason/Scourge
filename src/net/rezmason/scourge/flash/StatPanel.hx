@@ -10,17 +10,17 @@ class StatPanel extends Sprite {
 	private var container:Sprite;
 	private var playerStatPool:Array<PlayerStat>;
 	
-	public function new(numPlayers:Int, hgt:Float):Void {
+	public function new():Void {
 		super();
 		
 		playerStatPool = [];
 		
-		background = GUIFactory.drawSolidRect(new Shape(), 0x606060, 1, 0, 0, Layout.WELL_WIDTH, hgt, Layout.BAR_CORNER_RADIUS);
+		background = GUIFactory.drawSolidRect(new Shape(), 0x606060, 1, 0, 0, Layout.WELL_WIDTH, Layout.STAT_PANEL_HEIGHT, Layout.BAR_CORNER_RADIUS);
 		container = new Sprite();
-		container.mask = GUIFactory.drawSolidRect(new Shape(), 0x0, 1, 0, 0, Layout.WELL_WIDTH, hgt, Layout.BAR_CORNER_RADIUS);
+		container.mask = GUIFactory.drawSolidRect(new Shape(), 0x0, 1, 0, 0, Layout.WELL_WIDTH, Layout.STAT_PANEL_HEIGHT, Layout.BAR_CORNER_RADIUS);
 		GUIFactory.fillSprite(this, [background, container, container.mask]);
 		
-		for (ike in 0...numPlayers) playerStatPool.push(new PlayerStat(ike + 1, hgt / numPlayers));
+		for (ike in 0...Common.MAX_PLAYERS) playerStatPool.push(new PlayerStat(ike + 1, Layout.STAT_PANEL_HEIGHT / Common.MAX_PLAYERS));
 	}
 	
 	public function update(playerData:Array<Player>, cts:Array<ColorTransform>):Void {

@@ -4,6 +4,7 @@ import flash.display.BlendMode;
 import flash.display.Shape;
 import flash.display.Sprite;
 import flash.display.Stage;
+import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
@@ -45,6 +46,7 @@ class Board {
 	private var bar:Sprite;
 	private var barBackground:Shape;
 	private var well:Well;
+	private var timerPanel:TimerPanel;
 	private var statPanel:StatPanel;
 	
 	private var biting:Bool;
@@ -107,6 +109,7 @@ class Board {
 		scene.removeEventListener(Event.ADDED_TO_STAGE, connectToStage);
 		stage = scene.stage;
 		stage.focus = stage;
+		stage.scaleMode = StageScaleMode.NO_SCALE;
 		initialize();
 	}
 	
@@ -135,10 +138,12 @@ class Board {
 		grid = new GameGrid();
 		for (ike in 0...Common.MAX_PLAYERS) grid.makePlayerHeadAndBody();
 		well = new Well();
-		statPanel = new StatPanel(Common.MAX_PLAYERS, Layout.STAT_PANEL_HEIGHT);
+		timerPanel = new TimerPanel();
+		statPanel = new StatPanel();
 		barBackground = GUIFactory.drawSolidRect(new Shape(), 0x333333, 1, 0, 0, Layout.BAR_WIDTH * 0.8, Layout.BAR_HEIGHT);
 		barBackground.cacheAsBitmap = true;
-		bar = GUIFactory.makeContainer([barBackground, statPanel, well]);
+		barBackground.visible = false;
+		bar = GUIFactory.makeContainer([barBackground, timerPanel, statPanel, well]);
 		
 		well.rotateHint = rotateHint;
 		well.rotatePiece = rotatePiece;
@@ -146,13 +151,15 @@ class Board {
 		well.toggleBite = toggleBite;
 		well.swapHint = swapHint;
 		well.swapPiece = swapPiece;
-		well.skipFunc = skipTurn;
-		well.forfeitFunc = forfeit;
+		timerPanel.skipFunc = skipTurn;
+		timerPanel.forfeitFunc = forfeit;
 		
 		// position things
 		well.x = well.y = Layout.BAR_MARGIN;
+		timerPanel.x = Layout.BAR_MARGIN;
+		timerPanel.y = well.y + Layout.WELL_WIDTH + Layout.BAR_MARGIN;
 		statPanel.x = Layout.BAR_MARGIN;
-		statPanel.y = well.y + Layout.WELL_WIDTH + Layout.BAR_MARGIN;
+		statPanel.y = timerPanel.y + Layout.TIMER_PANEL_HEIGHT + Layout.BAR_MARGIN;
 		
 		GUIFactory.fillSprite(scene, [background, grid, bar]);
 		
@@ -359,6 +366,7 @@ class Board {
 		well.tint(guiColorTransform);
 		grid.tint(guiColorTransform);
 		statPanel.tint(guiColorTransform);
+		timerPanel.tint(guiColorTransform);
 		barBackground.transform.colorTransform = guiColorTransform;
 	}
 	

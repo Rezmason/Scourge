@@ -24,8 +24,6 @@ class Well extends Sprite {
 	public var toggleBite:Void->Void;
 	public var swapHint:Bool->Void;
 	public var swapPiece:Void->Void;
-	public var skipFunc:Void->Void;
-	public var forfeitFunc:Void->Void;
 	
 	public var pieceHandle:Sprite;
 	public var stoicPieceHandle:Sprite;
@@ -53,7 +51,12 @@ class Well extends Sprite {
 		
 		super();
 		
+		var w:Float = Layout.WELL_WIDTH;
+		var rad:Float = w / Math.sqrt(3);
+		
 		background = GUIFactory.drawSolidRect(new Shape(), 0x606060, 1, 0, 0, Layout.WELL_WIDTH, Layout.WELL_WIDTH, Layout.BAR_CORNER_RADIUS);
+		//background = GUIFactory.drawSolidPoly(new Shape(), 0x606060, 1, 6, w / 2, rad / 2, rad, 30, Layout.BAR_CORNER_RADIUS);
+		
 		background.cacheAsBitmap = true;
 		rotateRightButton = GUIFactory.makeButton(ScourgeLib_RotateSymbol, ScourgeLib_WellButtonHitState, 1.5, 180, true);
 		rotateLeftButton = GUIFactory.makeButton(ScourgeLib_RotateSymbol, ScourgeLib_WellButtonHitState, 1.5, 270);

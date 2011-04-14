@@ -18,6 +18,8 @@ import flash.text.TextFormatAlign;
 
 class GUIFactory {
 	
+	private inline static var DEGREES_TO_RADIANS:Float = Math.PI / 180;
+	
 	// QUESTION FOR THE LIST: How do I determine whether an instance extends a class?
 	// QUESTION FOR THE LIST: How might I merge types? var n:Dynamic<Class1, Class2>
 	
@@ -61,8 +63,7 @@ class GUIFactory {
 		return shp;
 	}
 	
-	public static function makeTooth(?size:Null<Float>):Sprite {
-		if (size == null) size = 15;
+	public static function makeTooth(size:Float):Sprite {
 		var tooth:Sprite = new Sprite();
 		tooth.graphics.beginFill(0x888888);
 		tooth.graphics.moveTo(0, -size / 2);
@@ -85,6 +86,33 @@ class GUIFactory {
 		targ.graphics.beginFill(color, alpha);
 		targ.graphics.drawRoundRect(x, y, width, height, cornerRadius, cornerRadius);
 		targ.graphics.endFill();
+		return targ;
+	}
+	
+	public static function drawSolidPoly(targ:Dynamic, color:Int, alpha:Float, sides:Int, centerX:Float, centerY:Float, radius:Float, ?angle:Float = 0, ?cornerRadius:Float = 0):Dynamic {
+		var points:Array<Float> = []; // x, y, angle
+		var corners:Array<Float> = []; // x, y, angle
+		angle = angle * DEGREES_TO_RADIANS;
+		
+		// get all the corners
+		for (ike in 0...sides) {
+			var a:Float = angle + Math.PI * 2 * ike / sides;
+			corners.push(radius * Math.cos(a));
+			corners.push(radius * Math.sin(a));
+			corners.push(a);
+		}
+		
+		var ike:Int = 0;
+		
+		targ.graphics.beginFill(color, alpha);
+		targ.graphics.moveTo(corners[ike] + centerX, corners[ike + 1] + centerY);
+		ike += 3;
+		while (ike < corners.length) {
+			targ.graphics.lineTo(corners[ike] + centerX, corners[ike + 1] + centerY);
+			ike += 3;
+		}
+		targ.graphics.endFill();
+		
 		return targ;
 	}
 	
@@ -146,5 +174,60 @@ class GUIFactory {
 		textBox.blendMode = BlendMode.LAYER;
 		
 		return textBox;
+	}
+	
+	
+	private static function getArc(centerX:Float, centerY:Float, rad:Float, arc:Float, startAngle:Float, stayOnCircle:Bool = false):Array<Array<Float>> {
+		
+		// Mad props to Ric Ewing: formequalsfunction.com
+		
+		// var declaration is expensive
+		
+		var returnValue:Array<Array<Float>> = [];
+		var segs:Int;
+		var segAngle:Float;
+		var theta:Float;
+		var angle:Float;
+		var angleMid:Float;
+		var ax:Float;
+		var ay:Float;
+		var bx:Float;
+		var by:Float;
+		var cx:Float;
+		var cy:Float;
+		var xOffset:Float = centerX;
+		var yOffset:Float = centerY;
+	
+		if (arc < 0) arc = 0;
+		
+		segs = Std.int(arc * 0.02222 + 1);
+		segAngle = arc / segs;
+	
+		theta = -segAngle * DEGREES_TO_RADIANS;
+		angle = -startAngle * DEGREES_TO_RADIANS;
+	
+		ax = -Math.cos(angle) * rad;
+		ay = -Math.sin(angle) * rad;
+	
+		if (stayOnCircle) {
+			returnValue.push([centerX - ax, centerY - ay]);
+			ax = 0;
+			ay = 0;
+		} else {
+			returnValue.push([xOffset, yOffset]);
+		}
+	
+		while (segs-- != 0) {
+			angle += theta;
+			angleMid = angle - (theta * 0.5);
+			bx = ax + Math.cos(angle) * rad;
+			by = ay + Math.sin(angle) * rad;
+			cx = ax + Math.cos(angleMid) * (rad / Math.cos(theta / 2));
+			cy = ay + Math.sin(angleMid) * (rad / Math.cos(theta / 2));
+			returnValue.push([cx + xOffset, cy + yOffset]);
+			returnValue.push([bx + xOffset, by + yOffset]);
+		}
+	
+		return returnValue;
 	}
 }
