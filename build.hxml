@@ -1,17 +1,16 @@
-#build file
---times
-
-
--cp src
--main ScourgeFlashProject
 -swf9 deploy-flash/scourge.swf
+-main ScourgeFlashProject
 -swf-version 10.1
+-cp src
 --flash-strict
 -swf-lib assets/ScourgeLib.swf
-# For now, these animations are Flash authored. I need to figure out how to make this platform independent
 -swf-lib assets/ScourgeBiteSymbols.swf
 --macro patchTypes('patch/types.patch')
 --macro patchTypes('patch/flextypes.patch')
+#build file
+
+
+# For now, these animations are Flash authored. I need to figure out how to make this platform independent
 
 #--next
 
