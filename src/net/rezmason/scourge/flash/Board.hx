@@ -57,7 +57,6 @@ class Board {
 	private var waitingForGrid:Bool;
 	private var overBiteButton:Bool;
 	private var overSwapButton:Bool;
-	private var debugNumPlayers:Int;
 	private var playerCTs:Array<ColorTransform>;
 	private var currentPlayerIndex:Int;
 	private var currentPlayer:Player;
@@ -99,7 +98,6 @@ class Board {
 		scene = __scene;
 		game = __game;
 		options = __options;
-		debugNumPlayers = options.debugNumPlayers;
 		scene.mouseEnabled = scene.mouseChildren = false;
 		if (scene.stage != null) connectToStage();
 		else scene.addEventListener(Event.ADDED_TO_STAGE, connectToStage);
@@ -209,7 +207,8 @@ class Board {
 		stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseHandler);
 		
 		// kick things off
-		game.begin(debugNumPlayers, GameType.CLASSIC, options.circular);
+		game.begin(options.numPlayers, GameType.CLASSIC, options.circular);
+		timerPanel.setDuration(options.duration);
 		boardSize = game.getBoardSize();
 		currentPlayer = game.getCurrentPlayer();
 		currentPlayerIndex = game.getCurrentPlayerIndex();
@@ -312,6 +311,7 @@ class Board {
 			}
 			grid.updateBodies(game.getBodyGrid(true));
 			grid.updateHeads(game.getPlayers(true));
+			timerPanel.reset();
 			if (fade) return;
 		}
 		
@@ -746,7 +746,6 @@ class Board {
 	private function forfeit():Void {
 		if (draggingPiece || grid.isDraggingBite()) return;
 		displayBite(false);
-		well.displaySwapCounter(false);
 		game.act(PlayerAction.FORFEIT);
 		currentPlayer = game.getCurrentPlayer();
 		currentPlayerIndex = game.getCurrentPlayerIndex();

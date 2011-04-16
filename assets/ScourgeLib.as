@@ -28,6 +28,7 @@ package {
 		public static const SkipSymbol:Class;
 		[Embed(source='skip_button_base.svg')]
 		public static const SkipButtonHitState:Class;
+		
 		[Embed(source='forfeit.svg')]
 		public static const ForfeitSymbol:Class;
 		[Embed(source='forfeit_button_base.svg')]
