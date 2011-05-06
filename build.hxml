@@ -18,3 +18,12 @@
 #-cp lib/easeljs-externs
 #-js deploy-js/js/scourge.js
 #-main ScourgeJSProject
+
+#--next
+
+#--remap flash:jeash
+#-js deploy-js/js/app.js
+#-main App
+#-js deploy-js/js/scourge_jeash.js
+#-main ScourgeFlashProject
+#-cp src

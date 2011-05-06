@@ -617,10 +617,11 @@ class Game {
 		
 		// delete the cells that aren't flagged
 		for (ike in 0...state.aliveGrid.length) {
-			if (state.bodyGrid[ike] == 0 || state.aliveGrid[ike]) continue;
-			_state.players[state.bodyGrid[ike] - 1].size--;
-			state.bodyGrid[ike] = 0;
-			state.freshGrid[ike] = state.freshness;
+			if (state.bodyGrid[ike] > 0 && !state.aliveGrid[ike]) {
+				_state.players[state.bodyGrid[ike] - 1].size--;
+				state.bodyGrid[ike] = 0;
+				state.freshGrid[ike] = state.freshness;
+			}
 		}
 		
 		// resize the state.players

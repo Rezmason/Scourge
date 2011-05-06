@@ -177,8 +177,8 @@ class Board {
 		pieceBite.visible = false;
 		pieceBite.width = pieceBite.height = Layout.UNIT_REZ * 0.7;
 		pieceBite.blendMode = BlendMode.ERASE;
-		piece.blendMode = BlendMode.LAYER;
 		piece.addChild(pieceBite);
+		piece.blendMode = BlendMode.LAYER;
 		pieceHandle = well.pieceHandle;
 		pieceHandle.addChild(piece);
 		pieceHandle.tabEnabled = !(pieceHandle.buttonMode = pieceHandle.useHandCursor = true);
@@ -218,7 +218,6 @@ class Board {
 		grid.init(game.getPlayers(true), playerCTs);
 		update(true, true);
 		scene.mouseEnabled = scene.mouseChildren = true;
-		
 		//grid.fillBoardRandomly();
 	}
 	
@@ -299,6 +298,7 @@ class Board {
 	}
 	
 	private function update(?thePiece:Bool, ?thePlay:Bool, ?fade:Bool, ?fadeByFreshness:Bool):Void {
+		
 		if (thePlay) {
 			if (fade) {
 				grid.fade(fadeByFreshness, game.getFreshGrid(true), game.getMaxFreshness());
@@ -323,7 +323,6 @@ class Board {
 			}
 			well.updateCounters(currentPlayer.swaps, currentPlayer.bites);
 			well.updatePies(game.getSwapPhase(), game.getBitePhase());
-			
 			
 			// Order the players by their turn and by whether they are alive
 			var rollCall:Array<Player> = [];
