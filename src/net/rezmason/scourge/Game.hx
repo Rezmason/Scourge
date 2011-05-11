@@ -513,7 +513,7 @@ class Game {
 	private function processChangesIntoSlices(state:GameState, lastSliceKind:Int):Void {
 
 		var index:Int;
-		var cell:{x:Int, y:Int, index:Int, heads:Array<Int>, tails:Array<Int>};
+		var cell:GridCellMap.GridCell;
 		var heads:Array<Int>;
 		var tails:Array<Int>;
 		var eatStack:Array<Int>;

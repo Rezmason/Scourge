@@ -1,8 +1,9 @@
-package net.rezmason.scourge.flash;
+package net.rezmason.scourge;
 
 import flash.display.BitmapData;
 import flash.display.BlendMode;
 import flash.display.DisplayObject;
+import flash.display.Graphics;
 import flash.display.GradientType;
 import flash.display.Shape;
 import flash.display.SimpleButton;
@@ -16,12 +17,11 @@ import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 
+using Reflect;
+
 class GUIFactory {
 	
 	private inline static var DEGREES_TO_RADIANS:Float = Math.PI / 180;
-	
-	// QUESTION FOR THE LIST: How do I determine whether an instance extends a class?
-	// QUESTION FOR THE LIST: How might I merge types? var n:Dynamic<Class1, Class2>
 	
 	public static var MISO:String = "miso";
 	private static var __miso:Font = null;
@@ -29,6 +29,7 @@ class GUIFactory {
 	private static var numTeeth:Int = 0;
 	
 	public static function makeButton(clazz:Class<DisplayObject>, hitClazz:Class<DisplayObject>, ?scale:Float = 1, ?angle:Float = 0, ?flip:Bool = false):SimpleButton {
+		
 		var returnVal:SimpleButton = new SimpleButton();
 		returnVal.upState = returnVal.downState = Type.createEmptyInstance(clazz);
 		returnVal.overState = Type.createEmptyInstance(clazz);
@@ -83,6 +84,7 @@ class GUIFactory {
 	}
 	
 	public static function drawSolidRect(targ:Dynamic, color:Int, alpha:Float, x:Float, y:Float, width:Float, height:Float, ?cornerRadius:Float = 0):Dynamic {
+		if (targ.field("graphics") == null) return targ;
 		targ.graphics.beginFill(color, alpha);
 		targ.graphics.drawRoundRect(x, y, width, height, cornerRadius, cornerRadius);
 		targ.graphics.endFill();
@@ -90,6 +92,8 @@ class GUIFactory {
 	}
 	
 	public static function drawSolidPoly(targ:Dynamic, color:Int, alpha:Float, sides:Int, centerX:Float, centerY:Float, radius:Float, ?angle:Float = 0, ?cornerRadius:Float = 0):Dynamic {
+		if (targ.field("graphics") == null) return targ;
+		
 		var points:Array<Float> = []; // x, y, angle
 		var corners:Array<Float> = []; // x, y, angle
 		angle = angle * DEGREES_TO_RADIANS;

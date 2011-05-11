@@ -1,12 +1,20 @@
 package net.rezmason.scourge;
 
+typedef GridCell = {
+	x:Int,
+	y:Int,
+	index:Int,
+	heads:Array<Int>,
+	tails:Array<Int>
+}
+
 class GridCellMap {
 	
-	private var cells:Array<{x:Int, y:Int, index:Int, heads:Array<Int>, tails:Array<Int>}>;
+	private var cells:Array<GridCell>;
 	private var boardSize:Int;
 	
-	public function get(index:Int):{x:Int, y:Int, index:Int, heads:Array<Int>, tails:Array<Int>} {
-		var returnVal:{x:Int, y:Int, index:Int, heads:Array<Int>, tails:Array<Int>} = cells[index];
+	public function get(index:Int):GridCell {
+		var returnVal:GridCell = cells[index];
 		if (returnVal == null) {
 			var x:Int = index % boardSize;
 			var y:Int = Std.int(index / boardSize);

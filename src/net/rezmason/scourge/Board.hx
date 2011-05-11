@@ -1,4 +1,4 @@
-package net.rezmason.scourge.flash;
+package net.rezmason.scourge;
 
 import flash.display.BlendMode;
 import flash.display.Shape;
@@ -21,6 +21,8 @@ import net.kawa.tween.KTJob;
 import net.kawa.tween.easing.Linear;
 
 import flash.Lib;
+
+using Reflect;
 
 class Board {
 	
