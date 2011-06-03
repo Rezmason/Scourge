@@ -16,7 +16,7 @@ using Reflect;
 
 class YUIDoc2haXeExtern {
 	
-	public static inline var argKeys = ["-source", "-dest", "-footer", "-verbose"];
+	public static inline var argKeys = ["source", "dest", "footer", "verbose"];
 	
 	private var loader:Http;
 	private var source:String; // target JSON
@@ -30,7 +30,6 @@ class YUIDoc2haXeExtern {
 	private var yuiProjects:Array<YUIProject>;
 	private var yuiClasses:Array<YUIClass>;
 	
-	
 	public static function main():Void {
 		new YUIDoc2haXeExtern();
 	}
@@ -38,10 +37,8 @@ class YUIDoc2haXeExtern {
 	public function new():Void {
 		
 		var args:Array<String> = Sys.args();
-		var ike:Int = 0;
-		while (ike < args.length) {
-			if (argKeys.has(args[ike])) setField(args[ike].substr(1), args[ike + 1]);
-			ike += 2;
+		for (ike in new EvenItr(0, args.length)) {
+			if (argKeys.has("-" + args[ike])) setField(args[ike], args[ike + 1]);
 		}
 		
 		isVerbose = (verbose == "true" || verbose == "1");
@@ -114,4 +111,28 @@ class YUIDoc2haXeExtern {
 	private function processError(message:String):Void {
 		Lib.println("Could not load the JSON file: " + message);
 	}
+}
+
+
+class EvenItr {
+
+	var min : Int;
+	var tmp : Int;
+	var max : Int;
+	
+	public function new( min : Int, max : Int ) {
+		this.min = min;
+		this.max = max;
+	}
+	
+	public function hasNext() {
+		return min < max;
+	}
+	
+	public function next() {
+		tmp = min;
+		min += 2;
+		return tmp;
+	}
+
 }

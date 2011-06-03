@@ -23,7 +23,7 @@ class GUIFactory {
 	
 	private inline static var DEGREES_TO_RADIANS:Float = Math.PI / 180;
 	
-	public static var MISO:String = "miso";
+	public static var MISO_FONT:String = "miso";
 	private static var __miso:Font = null;
 	
 	private static var numTeeth:Int = 0;
@@ -83,17 +83,14 @@ class GUIFactory {
 		return new ScourgeLib_MousePointer();
 	}
 	
-	public static function drawSolidRect(targ:Dynamic, color:Int, alpha:Float, x:Float, y:Float, width:Float, height:Float, ?cornerRadius:Float = 0):Dynamic {
-		if (targ.field("graphics") == null) return targ;
-		targ.graphics.beginFill(color, alpha);
-		targ.graphics.drawRoundRect(x, y, width, height, cornerRadius, cornerRadius);
-		targ.graphics.endFill();
-		return targ;
+	public static function drawSolidRect(shp:Shape, color:Int, alpha:Float, x:Float, y:Float, width:Float, height:Float, ?cornerRadius:Float = 0):Shape {
+		shp.graphics.beginFill(color, alpha);
+		shp.graphics.drawRoundRect(x, y, width, height, cornerRadius, cornerRadius);
+		shp.graphics.endFill();
+		return shp;
 	}
 	
-	public static function drawSolidPoly(targ:Dynamic, color:Int, alpha:Float, sides:Int, centerX:Float, centerY:Float, radius:Float, ?angle:Float = 0, ?cornerRadius:Float = 0):Dynamic {
-		if (targ.field("graphics") == null) return targ;
-		
+	public static function drawSolidPoly(shp:Shape, color:Int, alpha:Float, sides:Int, centerX:Float, centerY:Float, radius:Float, ?angle:Float = 0, ?cornerRadius:Float = 0):Shape {
 		var points:Array<Float> = []; // x, y, angle
 		var corners:Array<Float> = []; // x, y, angle
 		angle = angle * DEGREES_TO_RADIANS;
@@ -108,20 +105,20 @@ class GUIFactory {
 		
 		var ike:Int = 0;
 		
-		targ.graphics.beginFill(color, alpha);
-		targ.graphics.moveTo(corners[ike] + centerX, corners[ike + 1] + centerY);
+		shp.graphics.beginFill(color, alpha);
+		shp.graphics.moveTo(corners[ike] + centerX, corners[ike + 1] + centerY);
 		ike += 3;
 		while (ike < corners.length) {
-			targ.graphics.lineTo(corners[ike] + centerX, corners[ike + 1] + centerY);
+			shp.graphics.lineTo(corners[ike] + centerX, corners[ike + 1] + centerY);
 			ike += 3;
 		}
-		targ.graphics.endFill();
+		shp.graphics.endFill();
 		
-		return targ;
+		return shp;
 	}
 	
-	public static function drawSolidCircle(targ:Dynamic, color:Int, alpha:Float, x:Float, y:Float, radius:Float):Dynamic {
-		drawSolidRect(targ, color, alpha, x, y, radius, radius, radius);
+	public static function drawSolidCircle(shp:Shape, color:Int, alpha:Float, x:Float, y:Float, radius:Float):Shape {
+		return drawSolidRect(shp, color, alpha, x, y, radius, radius, radius);
 	}
 	
 	public static function drawBitmapToShape(shp:Shape, bitmap:BitmapData, ?scale:Float = 1, ?smooth:Bool = true, ?cornerRadius:Float = 0):Shape {
@@ -158,7 +155,7 @@ class GUIFactory {
 		var textBox:TextField = new TextField();
 		//textBox.border = true; textBox.borderColor = 0xFFFFFF;
 		
-		if (fontName == MISO) {
+		if (fontName == MISO_FONT) {
 			if (__miso == null) {
 				Font.registerFont(ScourgeLib_MISO);
 				__miso = new ScourgeLib_MISO();

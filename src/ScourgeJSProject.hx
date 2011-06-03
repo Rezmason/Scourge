@@ -1,4 +1,4 @@
-import net.rezmason.scourge.js.Board;
+import net.rezmason.scourge.Board;
 import net.rezmason.scourge.Game;
 import js.Dom;
 import js.Lib;

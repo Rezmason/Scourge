@@ -49,8 +49,8 @@ class PlayerStat extends Sprite {
 		
 		var w:Float = Layout.WELL_WIDTH - 3 * Layout.BAR_MARGIN - biteIcons.width;
 		
-		txtName = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO, 0.21 * w, 0xFFFFFF);
-		//txtData = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO, 0.1 * w, 0xFFFFFF);
+		txtName = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO_FONT, 0.21 * w, 0xFFFFFF);
+		//txtData = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO_FONT, 0.1 * w, 0xFFFFFF);
 		
 		txtName.x = biteIcons.x + biteIcons.width + 6;
 		txtName.y = biteIcons.y - 3;

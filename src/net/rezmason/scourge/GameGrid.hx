@@ -275,8 +275,7 @@ class GameGrid extends Sprite {
 					seq.push(ike);
 				}
 			}
-			for (ike in 0...fadeSequences.length) {
-				var seq:Array<Int> = fadeSequences[ike];
+			for (seq in fadeSequences) {
 				if (seq == null) continue;
 				seq.sort(randSort);
 				fadeSequence = fadeSequence.concat(seq);
@@ -320,7 +319,7 @@ class GameGrid extends Sprite {
 		
 		preparePlayerBitmaps();
 		
-		for (ike in 0...playerBitmaps.length) playerBitmaps[ike].lock();
+		for (bmp in playerBitmaps) bmp.lock();
 		
 		for (ike in 0...len) {
 			if (bodyGrid[ike] > 0) {
@@ -332,7 +331,7 @@ class GameGrid extends Sprite {
 			}
 		}
 		
-		for (ike in 0...playerBitmaps.length) playerBitmaps[ike].unlock();
+		for (bmp in playerBitmaps) bmp.unlock();
 		
 		finishPlayerBitmaps();
 	}
@@ -519,17 +518,14 @@ class GameGrid extends Sprite {
 		
 		preparePlayerBitmaps();
 		
-		for (ike in 0...Common.MAX_PLAYERS) {
-			bmp = playerBitmaps[ike];
-			for (jen in 0...total) {
+		for (bmp in playerBitmaps) {
+			for (ike in 0...total) {
 				var rx:Int = 0;
 				var ry:Int = 0;
 				while (true) {
 					rx = Std.int(Math.random() * boardSize) * Std.int(Layout.UNIT_REZ);
 					ry = Std.int(Math.random() * boardSize) * Std.int(Layout.UNIT_REZ);
-					if (whatev[ry] == null) {
-						whatev[ry] = [];
-					}
+					if (whatev[ry] == null) whatev[ry] = [];
 					if (whatev[ry][rx] == null) {
 						whatev[ry][rx] = true;
 						break;

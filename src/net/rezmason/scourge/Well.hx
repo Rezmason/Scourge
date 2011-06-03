@@ -71,8 +71,8 @@ class Well extends Sprite {
 		swapButton.y = Layout.WELL_BORDER;
 		biteButton.x = Layout.WELL_WIDTH - Layout.WELL_BORDER;
 		biteButton.y = Layout.WELL_WIDTH - Layout.WELL_BORDER;
-		swapCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO, 28);
-		biteCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO, 28, 0xFFFFFF, true);
+		swapCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO_FONT, 28);
+		biteCounter = GUIFactory.makeTextBox(50, 30, GUIFactory.MISO_FONT, 28, 0xFFFFFF, true);
 		bitePie = new Pie(8, 0xCCCCCC, 0x808080);
 		swapPie = new Pie(8, 0xCCCCCC, 0x808080);
 		

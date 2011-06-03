@@ -6,6 +6,7 @@
 -cp src
 --flash-strict
 -swf-lib assets/ScourgeLib.swf
+#-swf-lib assets/ScourgeLib_milled.swf
 # For now, these animations are Flash authored. I need to figure out how to make this platform independent
 -swf-lib assets/ScourgeBiteSymbols.swf
 --macro patchTypes('patch/types.patch')

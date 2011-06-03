@@ -1,5 +1,7 @@
 package net.rezmason.scourge;
 
+import net.rezmason.scourge.GridCellMap;
+
 class Game {
 	
 	private var defaultGrid:Array<Dynamic>;
@@ -219,12 +221,12 @@ class Game {
 	}
 	
 	private function fillTable(table:Array<Array<Dynamic>>):Void {
-		for (ike in 0...table.length) {
-			var originalLength:Int = table[ike].length;
-			var jen:Int = originalLength;
-			while (jen < 4) {
-				table[ike].push(table[ike][jen % originalLength]);
-				jen++;
+		for (row in table) {
+			var originalLength:Int = row.length;
+			if (originalLength < 4) {
+				for (ike in originalLength...4) {
+					row.push(row[ike % originalLength]);
+				}
 			}
 		}
 	}
@@ -303,7 +305,6 @@ class Game {
 
 		var stack:Array<Int>;
 		var tail:Int, head:Int, changeIncrement:Int;
-		var player:Player;
 
 		var ike:Int, jen:Int, ken:Int;
 
@@ -320,7 +321,7 @@ class Game {
 					colorSlice.splice(0, colorSlice.length);
 					freshSlice.splice(0, freshSlice.length);
 					flatElements.splice(0, flatElements.length);
-
+					
 					while (jen != tail) {
 						colorSlice[ken] = state.bodyGrid[jen];
 						freshSlice[ken] = state.freshGrid[jen];
@@ -329,9 +330,8 @@ class Game {
 					}
 
 					linearEatAlgorithm(state, colorSlice, freshSlice, flatElements);
-					for (jen in 0...flatElements.length) newElements.push(head + flatElements[jen] * changeIncrement);
-					for (jen in 0...state.players.length) {
-						player = state.players[jen];
+					for (elem in flatElements) newElements.push(head + elem * changeIncrement);
+					for (player in state.players) {
 						if (player.alive && inside(newElements, player.headIndex)) {
 							player.alive = false;
 							for (ken in 0...state.boardNumCells) if (state.bodyGrid[ken] == player.order) newElements.push(ken);
@@ -366,10 +366,10 @@ class Game {
 			state.turnCount++;
 			var anotherBite:Bool = state.turnCount % Common.BITE_FREQUENCY == 0;
 			var anotherSwap:Bool = state.turnCount % Common.SWAP_FREQUENCY == 0;
-			for (ike in 0...state.players.length) {
-				if (!state.players[ike].alive) continue;
-				if (anotherBite && state.players[ike].bites < Common.MAX_BITES) state.players[ike].bites++;
-				if (anotherSwap && state.players[ike].swaps < Common.MAX_SWAPS) state.players[ike].swaps++;
+			for (player in state.players) {
+				if (!player.alive) continue;
+				if (anotherBite && player.bites < Common.MAX_BITES) player.bites++;
+				if (anotherSwap && player.swaps < Common.MAX_SWAPS) player.swaps++;
 			}
 		}
 		
@@ -513,15 +513,13 @@ class Game {
 	private function processChangesIntoSlices(state:GameState, lastSliceKind:Int):Void {
 
 		var index:Int;
-		var cell:GridCellMap.GridCell;
+		var cell:GridCell;
 		var heads:Array<Int>;
 		var tails:Array<Int>;
 		var eatStack:Array<Int>;
 		
-		for (ike in 0...newElements.length) {
-
-			index = newElements[ike];
-
+		for (index in newElements) {
+			
 			if (state.bodyGrid[index] > 0) _state.players[state.bodyGrid[index] - 1].size--;
 			state.currentPlayer.size++;
 
@@ -532,11 +530,11 @@ class Game {
 			heads = cell.heads;
 			tails = cell.tails;
 
-			for (jen in 0...4) {
-				eatStack = eatStacks[jen];
-				if (lastSliceKind != jen && !inside(eatStack, heads[jen], 2)) {
-					eatStack.push(heads[jen]);
-					eatStack.push(tails[jen]);
+			for (ike in 0...4) {
+				eatStack = eatStacks[ike];
+				if (lastSliceKind != ike && !inside(eatStack, heads[ike], 2)) {
+					eatStack.push(heads[ike]);
+					eatStack.push(tails[ike]);
 				}
 			}
 		}
@@ -563,8 +561,7 @@ class Game {
 		state.aliveGrid[state.boardNumCells - 1] = false;
 		
 		// start with the living heads
-		for (ike in 0...state.players.length) {
-			var player:Player = state.players[ike];
+		for (player in state.players) {
 			if (player.alive) player.alive = state.bodyGrid[player.headIndex] != 0;
 			if (player.alive) {
 				newElements.push(player.headIndex);
@@ -625,8 +622,7 @@ class Game {
 		}
 		
 		// resize the state.players
-		for (ike in 0...state.players.length) {
-			var player:Player = state.players[ike];
+		for (player in state.players) {
 			if (player.alive) {
 				if (player.size < 0.2 * state.boardNumMaskedCells) {
 					player.biteSize = 1;

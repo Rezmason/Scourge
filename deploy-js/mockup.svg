@@ -251,9 +251,9 @@ xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xm
 				</g>
 			</g>
 
-			<g id='well_smallTeethIndicator' used-to-be='SmallTeeth'/><!-- conains animation -->
-			<g id='well_bigTeethIndicator' used-to-be='BigTeeth'/><!-- conains svg animation -->
-			<g id='well_superTeethIndicator' used-to-be='SuperTeeth'/><!-- conains svg animation -->
+			<g id='well_smallTeethIndicator' used-to-be='SmallTeeth'/><!-- contains animation -->
+			<g id='well_bigTeethIndicator' used-to-be='BigTeeth'/><!-- contains svg animation -->
+			<g id='well_superTeethIndicator' used-to-be='SuperTeeth'/><!-- contains svg animation -->
 			<g id='well_rotateLeftButton' used-to-be='SimpleButton' transform="translate(10, 200) scale(1.5, 1.5) rotate(-90)"/>
 			<g id='well_rotateRightButton' used-to-be='SimpleButton' transform="translate(200, 10) scale(-1.5, 1.5)"/>
 			<text font-family='Miso' transform="translate(52, 35)" fill="white" id='well_swapCounter' font-size="28">10</text>

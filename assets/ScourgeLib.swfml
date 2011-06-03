@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<movie as3="1" version="10">
+<frame>
+<library>
+	<!--
+	
+	<sound id="audio_01" class="audio_01" import="sound/bgm.mp3"/>
+	<clip id="clip_01" class="clip_01" import="swfs/library.swf"/>
+	<clip id="clip_02" class="clip_02" import="image/background.png"/>
+	<bitmap id="image_01" class="image_01" import="image/arrow.png"/>
+	<font id="font_01" class="font_01" import="library/vera.ttf" />
+	<import file="library/library.swf" url="http://foo.com/library.swf"/>
+	
+	-->
+	
+	<!--
+	
+	swfmill -v -n simple ScourgeLib.swfml  ScourgeLib_milled.swf
+	xsltproc  -o ../src/ScourgeLib.hx library.xslt ScourgeLib.swfml
+	
+	-->
+	
+	<clip id="WellButtonHitState_Old" class="WellButtonHitState_Old" import="well_button_base.svg"/>
+	<clip id="WellButtonHitState" class="WellButtonHitState" import="swap_button_base.svg"/>
+	<clip id="RotateSymbol" class="RotateSymbol" import="rotate.svg"/>
+	<clip id="BiteSymbol" class="BiteSymbol" import="bite.svg"/>
+	<clip id="SwapSymbol" class="SwapSymbol" import="swap.svg"/>
+	
+	<clip id="BiteIcon1" class="BiteIcon1" import="biteicon1.svg"/>
+	<clip id="BiteIcon2" class="BiteIcon2" import="biteicon2.svg"/>
+	<clip id="BiteIcon3" class="BiteIcon3" import="biteicon3.svg"/>
+	
+	<clip id="SkipSymbol" class="SkipSymbol" import="skip.svg"/>
+	<clip id="SkipButtonHitState" class="SkipButtonHitState" import="skip_button_base.svg"/>
+	
+	<clip id="ForfeitSymbol" class="ForfeitSymbol" import="forfeit.svg"/>
+	<clip id="ForfeitButtonHitState" class="ForfeitButtonHitState" import="forfeit_button_base.svg"/>
+	<clip id="MousePointer" class="MousePointer" import="mousepointer.svg"/>
+	<clip id="BiteMask" class="BiteMask" import="omnomnom.svg"/>
+	<font name="MISO" import="miso/miso-bold.ttf" />
+</library>
+</frame>
+</movie>

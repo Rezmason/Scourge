@@ -45,8 +45,8 @@ class Hat {
 	
 	public function outcomes(hat:Hat, ?preventVal:Dynamic = null):Array<Hat> {
 		var clones:Array<Hat> = [];
-		for (ike in 0...hat.contents.length) {
-			if (hat._mappedContents[hat.contents[ike]] != preventVal) {
+		for (chance in hat.contents) {
+			if (hat._mappedContents[chance] != preventVal) {
 				var clone:Hat = copy(hat);
 				var outcome:Int = clone.contents.splice(Std.int(Math.random() * clone.contents.length), 1)[0];
 				if (clone._mappedContents != null) clone._lastVal = clone._mappedContents[outcome];
