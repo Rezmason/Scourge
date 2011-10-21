@@ -1,5 +1,7 @@
 package net.kawa.tween;
 
+using Reflect;
+
 /**
  * Tween frontend class for ease of use
  * @author Yusuke Kawasaki
@@ -85,14 +87,8 @@ class KTween {
 	 * @throws ArgumentError A Function instance is not allowed for the .from or .to property.
 	 **/
 	static public function queue(job : KTJob, ?delay : Float) : Void {
-		if (Reflect.isFunction(job.from)) {
-			//throw new ArgumentError('Function is not allowed for the .from property.');
-			return;
-		}
-		if (Reflect.isFunction(job.to)) {
-			//throw new ArgumentError('Function is not allowed for the .to property.');
-			return;
-		}
+		if (job.from.isFunction()) throw 'Function is not allowed for the .from property.';
+		if (job.to.isFunction()) throw 'Function is not allowed for the .to property.';
 		manager.queue(job, delay);
 	}
 
@@ -100,39 +96,29 @@ class KTween {
 	 * Terminates all tween jobs immediately
 	 * @see net.kawa.tween.KTJob#abort()
 	 */
-	static public function abort():Void {
-		manager.abort();
-	}
+	static public function abort():Void { manager.abort(); }
 
 	/**
 	 * Stops and rollbacks to the first (beginning) status of all tween jobs.
 	 * @see net.kawa.tween.KTJob#cancel()
 	 */
-	static public function cancel():Void {
-		manager.cancel();
-	}
+	static public function cancel():Void { manager.cancel(); }
 
 	/**
 	 * Forces to finish all tween jobs.
 	 * @see net.kawa.tween.KTJob#complete()
 	 */
-	static public function complete():Void {
-		manager.complete();
-	}		
+	static public function complete():Void { manager.complete(); }		
 
 	/**
 	 * Pauses all tween jobs.
 	 * @see net.kawa.tween.KTJob#pause()
 	 */
-	static public function pause():Void {
-		manager.pause();
-	}		
+	static public function pause():Void { manager.pause(); }		
 
 	/**
 	 * Proceeds with all tween jobs paused.
 	 * @see net.kawa.tween.KTJob#resume()
 	 */
-	static public function resume():Void {
-		manager.resume();
-	}
+	static public function resume():Void { manager.resume(); }
 }

@@ -4,6 +4,8 @@ import haxe.Timer;
 
 import net.kawa.tween.easing.Quad;
 
+using Reflect;
+
 /**
  * KTJob
  * Tween job calss for the KTween
@@ -118,7 +120,7 @@ class KTJob {
 	 *
 	 * @param target 	The object whose properties will be tweened.
 	 **/
-	public function new(target:Dynamic):Void {
+	public function new(_target:Dynamic):Void {
 		
 		duration = 1.0;
 		ease = Quad.easeOut;
@@ -131,7 +133,7 @@ class KTJob {
 		canceled = false;
 		pausing = false;
 		
-		this.target = target;
+		target = _target;
 	}
 
 	/**
@@ -155,7 +157,7 @@ class KTJob {
 		initialized = true;
 		
 		// activated
-		if (Reflect.isFunction(onInit)) {
+		if (onInit.isFunction()) {
 			onInit.apply(onInit, onInitParams);
 		}
 	}
@@ -163,14 +165,14 @@ class KTJob {
 	private function setupValues():Void {
 		var first:Dynamic = (from != null) ? from : target;
 		var last:Dynamic = (to != null) ? to : target;
-		var keys:Array<String> = Reflect.fields((to != null) ? to : from);
+		var keys:Array<String> = (to != null ? to : from).fields();
 		if (keys == null || keys.length == 0) return;
 
 		var p:_KTProperty;
 		var lastProp:_KTProperty = null;
 		for (key in keys) {
-			var firstVal:Dynamic = Reflect.field(first, key);
-			var lastVal:Dynamic = Reflect.field(last, key);
+			var firstVal:Dynamic = first.field(key);
+			var lastVal:Dynamic = last.field(key);
 			if (firstVal == lastVal) continue; // skip this
 			p = new _KTProperty(key, firstVal, lastVal);
 			if (firstProp == null) {
@@ -188,10 +190,10 @@ class KTJob {
 	private function applyFirstValues():Void {
 		var p:_KTProperty = firstProp;
 		while (p != null) {
-			Reflect.setField(target, p.key, p.from);
+			target.setField(p.key, p.from);
 			p = p.next;
 		}
-		if (Reflect.isFunction(onChange)) {
+		if (onChange.isFunction()) {
 			onChange.apply(onChange, onChangeParams);
 		}
 	}
@@ -199,10 +201,10 @@ class KTJob {
 	private function applyFinalValues():Void {
 		var p:_KTProperty = firstProp;
 		while (p != null) {
-			Reflect.setField(target, p.key, p.to);
+			target.setField(p.key, p.to);
 			p = p.next;
 		}
-		if (Reflect.isFunction(onChange)) {
+		if (onChange.isFunction()) {
 			onChange.apply(onChange, onChangeParams);
 		}
 	}
@@ -252,7 +254,7 @@ class KTJob {
 		if (reverse) {
 			pos = 1 - pos;
 		}
-		if (Reflect.isFunction(ease)) {
+		if (ease.isFunction()) {
 			pos = ease(pos);
 		}
 		
@@ -260,16 +262,16 @@ class KTJob {
 		var p:_KTProperty = firstProp;
 		if (round) {
 			while (p != null) {
-				Reflect.setField(target, p.key, Math.round(p.from + p.diff * pos));
+				target.setField(p.key, Math.round(p.from + p.diff * pos));
 				p = p.next;
 			}
 		} else {
 			while (p != null) {
-				Reflect.setField(target, p.key, p.from + p.diff * pos);
+				target.setField(p.key, p.from + p.diff * pos);
 				p = p.next;
 			}
 		}
-		if (Reflect.isFunction(onChange)) {
+		if (onChange.isFunction()) {
 			onChange.apply(onChange, onChangeParams);
 		}
 	}
@@ -287,7 +289,7 @@ class KTJob {
 		applyFinalValues();
 
 		finished = true;
-		if (Reflect.isFunction(onComplete)) {
+		if (onComplete.isFunction()) {
 			onComplete.apply(onComplete, onCompleteParams);
 		}
 	}
@@ -305,7 +307,7 @@ class KTJob {
 		
 		finished = true;
 		canceled = true;
-		if (Reflect.isFunction(onCancel)) {
+		if (onCancel.isFunction()) {
 			onCancel.apply(onCancel, onCancelParams);
 		}
 	}
@@ -318,7 +320,7 @@ class KTJob {
 		if (canceled) return;
 		
 		finished = true;
-		if (Reflect.isFunction(onClose)) {
+		if (onClose.isFunction()) {
 			onClose.apply(onClose, onCloseParams);
 		}
 		clearnup();
@@ -379,11 +381,11 @@ class _KTProperty {
 	public var diff:Float;
 	public var next:_KTProperty;
 
-	public function new(key:String, from:Float, to:Float, next:_KTProperty = null):Void {
-		this.key = key;
-		this.from = from;
-		this.to = to;
-		this.diff = to - from;
-		this.next = next;
+	public function new(_key:String, _from:Float, _to:Float, ?_next:_KTProperty):Void {
+		key = _key;
+		from = _from;
+		to = _to;
+		diff = _to - _from;
+		next = _next;
 	}
 }
