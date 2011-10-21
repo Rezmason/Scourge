@@ -18,3 +18,5 @@
 #-cp lib/easeljs-externs
 #-js deploy-js/js/scourge.js
 #-main ScourgeJSProject
+
+#test
