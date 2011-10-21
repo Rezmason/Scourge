@@ -1,22 +1,13 @@
-#build file
-
 -swf9 deploy-flash/scourge.swf
--main ScourgeFlashProject
--swf-version 10.1
--cp src
+-main Scourge
+-debug
 --flash-strict
+-swf-version 10.3
+-swf-header 800:600:30:FFFFFF
+-cp src
+
 -swf-lib assets/ScourgeLib.swf
-#-swf-lib assets/ScourgeLib_milled.swf
-# For now, these animations are Flash authored. I need to figure out how to make this platform independent
 -swf-lib assets/ScourgeBiteSymbols.swf
+
 --macro patchTypes('patch/types.patch')
 --macro patchTypes('patch/flextypes.patch')
-
-#--next
-
-#-cp src
-#-cp lib/easeljs-externs
-#-js deploy-js/js/scourge.js
-#-main ScourgeJSProject
-
-#test

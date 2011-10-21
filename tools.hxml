@@ -1,6 +1,0 @@
--cp src
--cp lib
--main yuiparse.YUIDoc2haXeExtern
--neko ./tools/YUIDoc2haXeExtern.n
-
-#	nekotools boot YUIDoc2haXeExtern.n

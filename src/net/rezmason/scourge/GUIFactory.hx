@@ -18,6 +18,7 @@ import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 
 using Reflect;
+using Type;
 
 class GUIFactory {
 	
@@ -28,13 +29,13 @@ class GUIFactory {
 	
 	private static var numTeeth:Int = 0;
 	
-	public static function makeButton(clazz:Class<DisplayObject>, hitClazz:Class<DisplayObject>, ?scale:Float = 1, ?angle:Float = 0, ?flip:Bool = false):SimpleButton {
+	public inline static function makeButton(clazz:Class<DisplayObject>, hitClazz:Class<DisplayObject>, ?scale:Float = 1, ?angle:Float = 0, ?flip:Bool = false):SimpleButton {
 		
 		var returnVal:SimpleButton = new SimpleButton();
-		returnVal.upState = returnVal.downState = Type.createEmptyInstance(clazz);
-		returnVal.overState = Type.createEmptyInstance(clazz);
+		returnVal.upState = returnVal.downState = clazz.createEmptyInstance();
+		returnVal.overState = clazz.createEmptyInstance();
 		returnVal.upState.alpha = 0.5;
-		returnVal.hitTestState = Type.createEmptyInstance(hitClazz);
+		returnVal.hitTestState = hitClazz.createEmptyInstance();
 		returnVal.tabEnabled = false;
 		returnVal.rotation = angle;
 		returnVal.scaleX = returnVal.scaleY = scale;
@@ -42,13 +43,13 @@ class GUIFactory {
 		return returnVal;
 	}
 	
-	public static function wireUp(target:IEventDispatcher, ?onRollOver:Dynamic, ?onRollOut:Dynamic, ?onClick:Dynamic):Void {
+	public inline static function wireUp(target:IEventDispatcher, ?onRollOver:Dynamic, ?onRollOut:Dynamic, ?onClick:Dynamic):Void {
 		if (onRollOver) target.addEventListener(MouseEvent.ROLL_OVER, onRollOver);
 		if (onRollOut) target.addEventListener(MouseEvent.ROLL_OUT, onRollOut);
 		if (onClick) target.addEventListener(MouseEvent.CLICK, onClick);
 	}
 	
-	public static function makeHead(size:Float):Shape {
+	public inline static function makeHead(size:Float):Shape {
 		var shp:Shape = new Shape();
 		var gMat:Matrix = new Matrix();
 		gMat.createGradientBox(size * 2, size * 2, 0, -size, -size);
@@ -64,7 +65,7 @@ class GUIFactory {
 		return shp;
 	}
 	
-	public static function makeTooth(size:Float):Sprite {
+	public inline static function makeTooth(size:Float):Sprite {
 		var tooth:Sprite = new Sprite();
 		tooth.graphics.beginFill(0x888888);
 		tooth.graphics.moveTo(0, -size / 2);
@@ -79,18 +80,18 @@ class GUIFactory {
 		return tooth;
 	}
 	
-	public static function makePointer():Sprite {
+	public inline static function makePointer():Sprite {
 		return new ScourgeLib_MousePointer();
 	}
 	
-	public static function drawSolidRect(shp:Shape, color:Int, alpha:Float, x:Float, y:Float, width:Float, height:Float, ?cornerRadius:Float = 0):Shape {
+	public inline static function drawSolidRect(shp:Shape, color:Int, alpha:Float, x:Float, y:Float, width:Float, height:Float, ?cornerRadius:Float = 0):Shape {
 		shp.graphics.beginFill(color, alpha);
 		shp.graphics.drawRoundRect(x, y, width, height, cornerRadius, cornerRadius);
 		shp.graphics.endFill();
 		return shp;
 	}
 	
-	public static function drawSolidPoly(shp:Shape, color:Int, alpha:Float, sides:Int, centerX:Float, centerY:Float, radius:Float, ?angle:Float = 0, ?cornerRadius:Float = 0):Shape {
+	public inline static function drawSolidPoly(shp:Shape, color:Int, alpha:Float, sides:Int, centerX:Float, centerY:Float, radius:Float, ?angle:Float = 0, ?cornerRadius:Float = 0):Shape {
 		var points:Array<Float> = []; // x, y, angle
 		var corners:Array<Float> = []; // x, y, angle
 		angle = angle * DEGREES_TO_RADIANS;
@@ -117,11 +118,11 @@ class GUIFactory {
 		return shp;
 	}
 	
-	public static function drawSolidCircle(shp:Shape, color:Int, alpha:Float, x:Float, y:Float, radius:Float):Shape {
+	public inline static function drawSolidCircle(shp:Shape, color:Int, alpha:Float, x:Float, y:Float, radius:Float):Shape {
 		return drawSolidRect(shp, color, alpha, x, y, radius, radius, radius);
 	}
 	
-	public static function drawBitmapToShape(shp:Shape, bitmap:BitmapData, ?scale:Float = 1, ?smooth:Bool = true, ?cornerRadius:Float = 0):Shape {
+	public inline static function drawBitmapToShape(shp:Shape, bitmap:BitmapData, ?scale:Float = 1, ?smooth:Bool = true, ?cornerRadius:Float = 0):Shape {
 		var mat:Matrix = new Matrix();
 		mat.scale(scale, scale);
 		shp.graphics.beginBitmapFill(bitmap, mat, false, smooth);
@@ -131,17 +132,17 @@ class GUIFactory {
 		return shp;
 	}
 	
-	public static function makeContainer(children:Array<Dynamic>):Sprite {
+	public inline static function makeContainer(children:Array<Dynamic>):Sprite {
 		return fillSprite(new Sprite(), children);
 	}
 	
-	public static function fillSprite(sprite:Sprite, children:Array<Dynamic>):Sprite {
+	public inline static function fillSprite(sprite:Sprite, children:Array<Dynamic>):Sprite {
 		children = children.copy();
 		while (children.length > 0) sprite.addChildAt(children.pop(), 0);
 		return sprite;
 	}
 	
-	public static function makeCT(color:Int, ?alpha:Float = 1.0):ColorTransform {
+	public inline static function makeCT(color:Int, ?alpha:Float = 1.0):ColorTransform {
 		var ct:ColorTransform = new ColorTransform();
 		ct.redMultiplier = ((color >> 16) & 0xFF) / 0xFF;
 		ct.greenMultiplier = ((color >>  8) & 0xFF) / 0xFF;
@@ -150,7 +151,7 @@ class GUIFactory {
 		return ct;
 	}
 	
-	public static function makeTextBox(?w:Float = 0, ?h:Float = 0, ?fontName:String = "_sans", 
+	public inline static function makeTextBox(?w:Float = 0, ?h:Float = 0, ?fontName:String = "_sans", 
 			?fontSize:Float = 12, ?color:Int = 0xFFFFFF, ?rightAlign:Bool = false, ?multiline:Bool = false):TextField {
 		var textBox:TextField = new TextField();
 		//textBox.border = true; textBox.borderColor = 0xFFFFFF;
@@ -178,7 +179,7 @@ class GUIFactory {
 	}
 	
 	
-	private static function getArc(centerX:Float, centerY:Float, rad:Float, arc:Float, startAngle:Float, stayOnCircle:Bool = false):Array<Array<Float>> {
+	private inline static function getArc(centerX:Float, centerY:Float, rad:Float, arc:Float, startAngle:Float, stayOnCircle:Bool = false):Array<Array<Float>> {
 		
 		// Mad props to Ric Ewing: formequalsfunction.com
 		

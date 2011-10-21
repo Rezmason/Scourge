@@ -16,13 +16,12 @@ import flash.ui.Keyboard;
 
 import haxe.Timer;
 
-import net.kawa.tween.KTween;
 import net.kawa.tween.KTJob;
 import net.kawa.tween.easing.Linear;
 
-import flash.Lib;
+using net.kawa.tween.KTween;
 
-using Reflect;
+import flash.Lib;
 
 class Board {
 	
@@ -220,12 +219,13 @@ class Board {
 		grid.init(game.getPlayers(true), playerCTs);
 		update(true, true);
 		scene.mouseEnabled = scene.mouseChildren = true;
+		resize();
 		//grid.fillBoardRandomly();
 	}
 	
 	private function resize(?event:Event):Void {
 		
-		if (event.type == Event.ADDED && event.target != scene) return;
+		if (event != null && event.type == Event.ADDED && event.target != scene) return;
 		
 		var sw:Float = stage.stageWidth;
 		var sh:Float = stage.stageHeight;
@@ -279,8 +279,15 @@ class Board {
 				case Keyboard.F1: untyped __global__["flash.profiler.showRedrawRegions"](down);
 				case Keyboard.F2:
 					if (down) {
-						var gridString:String = game.getBodyGrid().toString() + ",";
-						for (ike in 0...boardSize) Lib.trace(gridString.substr(ike * boardSize * 2, boardSize * 2));
+						var gridArr:Array<Int> = game.getBodyGrid();
+						for (i in 0...gridArr.length) {
+							if (gridArr[i] > 0) {
+								
+							} else {
+								gridArr[i] = 0;
+							}
+						}
+						Lib.trace(gridArr);
 					}
 				case 88: if (down) redoTurn();
 				case 90: if (down) undoTurn();
@@ -359,7 +366,7 @@ class Board {
 		tween.greenMultiplier = ct.greenMultiplier;
 		tween.blueMultiplier = ct.blueMultiplier;
 		if (guiColorJob != null) guiColorJob.complete();
-		guiColorJob = KTween.to(guiColorTransform, Layout.QUICK * 3, tween, Layout.SLIDE);
+		guiColorJob = guiColorTransform.to(Layout.QUICK * 3, tween, Layout.SLIDE);
 		guiColorJob.onChange = tweenGUIColors;
 	}
 	
@@ -502,9 +509,9 @@ class Board {
 			stoicPiece.y -= goodPt.y;
 			piece.x -= well.mouseX;
 			piece.y -= well.mouseY;
-			pieceJob = KTween.to(piece, 3 * Layout.QUICK, {x:stoicPiece.x, y:stoicPiece.y}, Layout.POUNCE);
+			pieceJob = piece.to(3 * Layout.QUICK, {x:stoicPiece.x, y:stoicPiece.y}, Layout.POUNCE);
 			stoicPieceHandle.scaleX = stoicPieceHandle.scaleY = 1.2;
-			pieceHandleJob = KTween.to(pieceHandle, Layout.QUICK, {scaleX:1.2, scaleY:1.2}, Linear.easeOut);
+			pieceHandleJob = pieceHandle.to(Layout.QUICK, {scaleX:1.2, scaleY:1.2}, Linear.easeOut);
 		}
 		
 		dragPiece(__softSnap, true);
@@ -526,7 +533,7 @@ class Board {
 			if (pieceHandleJob != null) pieceHandleJob.complete();
 			scale = pieceOverGrid ? pieceBoardScale : 1.2;
 			stoicPieceHandle.scaleX = stoicPieceHandle.scaleY = scale;
-			pieceHandleJob = KTween.to(pieceHandle, 2 * Layout.QUICK, {scaleX:scale, scaleY:scale}, Linear.easeOut);
+			pieceHandleJob = pieceHandle.to(2 * Layout.QUICK, {scaleX:scale, scaleY:scale}, Linear.easeOut);
 		}
 		
 		stoicPieceHandle.x = well.mouseX;
@@ -626,8 +633,8 @@ class Board {
 			stoicPieceHandle.scaleX = stoicPieceHandle.scaleY = 1;
 			stoicPiece.x = pieceHomeX;
 			stoicPiece.y = pieceHomeY;
-			pieceHandleJob = KTween.to(pieceHandle, 2 * Layout.QUICK, {x:pieceHandleHome, y:pieceHandleHome, scaleX:1, scaleY:1}, Layout.POUNCE, enableDrag);
-			pieceJob = KTween.to(piece, 2 * Layout.QUICK, {x:pieceHomeX, y:pieceHomeY}, Layout.POUNCE);
+			pieceHandleJob = pieceHandle.to(2 * Layout.QUICK, {x:pieceHandleHome, y:pieceHandleHome, scaleX:1, scaleY:1}, Layout.POUNCE, enableDrag);
+			pieceJob = piece.to(2 * Layout.QUICK, {x:pieceHomeX, y:pieceHomeY}, Layout.POUNCE);
 		}
 	}
 	
@@ -645,7 +652,7 @@ class Board {
 		if (pieceHandleSpinJob != null) pieceHandleSpinJob.complete();
 		well.bringPieceHandleBackward();
 		stoicPieceHandle.scaleX = stoicPieceHandle.scaleY = 1;
-		pieceHandleJob = KTween.to(pieceHandle, 3 * Layout.QUICK, {alpha:1, scaleX:1, scaleY:1}, Layout.SLIDE, enableDrag);
+		pieceHandleJob = pieceHandle.to(3 * Layout.QUICK, {alpha:1, scaleX:1, scaleY:1}, Layout.SLIDE, enableDrag);
 	}
 	
 	private function rotatePiece(?cc:Bool):Void {
@@ -660,12 +667,12 @@ class Board {
 		var turnAngle:Int = cc ? -90 : 90;
 		updatePiece(turnAngle);
 		
-		pieceHandleSpinJob = KTween.from(pieceHandle, 2 * Layout.QUICK, {rotation:-turnAngle}, Layout.POUNCE, enableDrag);
+		pieceHandleSpinJob = pieceHandle.from(2 * Layout.QUICK, {rotation:-turnAngle}, Layout.POUNCE, enableDrag);
 		
 		if (!draggingPiece) {
 			stoicPiece.x = pieceHomeX;
 			stoicPiece.y = pieceHomeY;
-			pieceJob = KTween.to(piece, 2 * Layout.QUICK, {x:pieceHomeX, y:pieceHomeY}, Layout.POUNCE);
+			pieceJob = piece.to(2 * Layout.QUICK, {x:pieceHomeX, y:pieceHomeY}, Layout.POUNCE);
 		}
 		pieceHandle.mouseEnabled = pieceHandle.mouseChildren = false;
 		if (pieceLocX != -1) legalPiecePosition = game.testPosition(pieceLocX, pieceLocY, pieceAngle);
@@ -730,7 +737,7 @@ class Board {
 		
 		for (ike in 0...pieceBlocks.length) if (pieceBlockJobs[ike] != null) pieceBlockJobs[ike].abort();
 		update(true);
-		if (pieceRecipe == Pieces.O_PIECE) KTween.from(piecePlug, Layout.QUICK, {alpha:0}, Layout.POUNCE);
+		if (pieceRecipe == Pieces.O_PIECE) piecePlug.from(Layout.QUICK, {alpha:0}, Layout.POUNCE);
 		if (!overSwapButton) well.displaySwapCounter(false, true);
 	}
 	
@@ -773,7 +780,7 @@ class Board {
 		if (draggingPiece || biting) return;
 		if (pieceHandleSpinJob != null) pieceHandleSpinJob.complete();
 		var angle:Float = over ? (cc ? -10 : 10) : 0;
-		pieceHandleSpinJob = KTween.to(pieceHandle, Layout.QUICK, {rotation:angle}, Layout.POUNCE);
+		pieceHandleSpinJob = pieceHandle.to(Layout.QUICK, {rotation:angle}, Layout.POUNCE);
 	}
 	
 	private function biteHint(over:Bool):Void {
@@ -786,11 +793,11 @@ class Board {
 			pieceBite.alpha = 1;
 			var wham:Float = Layout.WELL_WIDTH * 0.05;
 			//pieceHandle.rotation = 30;
-			pieceHandleJob = KTween.from(pieceHandle, 3 * Layout.QUICK, {x:pieceHandle.x + wham, y:pieceHandle.y + wham/*, rotation:0*/}, Layout.ZIGZAG);
+			pieceHandleJob = pieceHandle.from(3 * Layout.QUICK, {x:pieceHandle.x + wham, y:pieceHandle.y + wham/*, rotation:0*/}, Layout.ZIGZAG);
 		} else {
 			pieceBite.alpha = 0.05;
-			pieceBiteJob = KTween.to(pieceBite, 3 * Layout.QUICK, {alpha:0, visible:false}, Layout.POUNCE);
-			//pieceHandleJob = KTween.to(pieceHandle, 3 * Layout.QUICK, {rotation:0}, Layout.POUNCE);
+			pieceBiteJob = pieceBite.to(3 * Layout.QUICK, {alpha:0, visible:false}, Layout.POUNCE);
+			//pieceHandleJob = pieceHandle, 3 * Layout.QUICK, {rotation:0}.to(Layout.POUNCE);
 		}
 		well.displayBiteCounter(overBiteButton);
 	}
@@ -818,8 +825,8 @@ class Board {
 				if (pieceBlockJobs[ike] != null) pieceBlockJobs[ike].abort();
 			}
 			updatePiece();
-			KTween.from(piece, Layout.QUICK, {x:oldPieceX, y:oldPieceY}, Layout.POUNCE);
-			for (ike in 0...pieceBlocks.length) pieceBlockJobs[ike] = KTween.from(pieceBlocks[ike], Layout.QUICK, {x:oldXs[ike], y:oldYs[ike]}, Layout.SLIDE);
+			piece.from(Layout.QUICK, {x:oldPieceX, y:oldPieceY}, Layout.POUNCE);
+			for (ike in 0...pieceBlocks.length) pieceBlockJobs[ike] = pieceBlocks[ike].from(Layout.QUICK, {x:oldXs[ike], y:oldYs[ike]}, Layout.SLIDE);
 			pieceHandle.filters = [];
 			piece.filters = [PIECE_GLOW];
 		}
@@ -845,7 +852,7 @@ class Board {
 		}
 		
 		if (pieceBlockJobs[currentBlockForSwapHint] != null) pieceBlockJobs[currentBlockForSwapHint].close();
-		pieceBlockJobs[currentBlockForSwapHint] = KTween.to(block, Layout.QUICK * 0.7, {x:spotX, y:spotY}, Linear.easeOut, pushCurrentSwapBlock);
+		pieceBlockJobs[currentBlockForSwapHint] = block.to(Layout.QUICK * 0.7, {x:spotX, y:spotY}, Linear.easeOut, pushCurrentSwapBlock);
 		
 		currentBlockForSwapHint = (currentBlockForSwapHint + 1) % pieceBlocks.length;
 	}

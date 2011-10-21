@@ -16,9 +16,10 @@ import flash.geom.Rectangle;
 
 import net.rezmason.flash.display.Grid;
 
-import net.kawa.tween.KTween;
 import net.kawa.tween.KTJob;
 import net.kawa.tween.easing.Linear;
+
+using net.kawa.tween.KTween;
 
 class GameGrid extends Sprite {
 	
@@ -283,10 +284,10 @@ class GameGrid extends Sprite {
 			
 			fadeMult = 10 + fadeSequence.length / boardNumCells * 90;
 			
-			fadeJob = KTween.to(this, Math.log(fadeSequence.length) * 0.2, {fadeCount:fadeSequence.length + fadeMult / 2}, Linear.easeOut, fadeComplete);
+			fadeJob = this.to(Math.log(fadeSequence.length) * 0.2, {fadeCount:fadeSequence.length + fadeMult / 2}, Linear.easeOut, fadeComplete);
 		} else {
 			fadeBitmap.copyPixels(fadeSourceBitmap, fadeSourceBitmap.rect, ORIGIN);
-			fadeJob = KTween.to(this, Layout.QUICK * 3, {fadeCount:1}, Linear.easeOut, fadeComplete);
+			fadeJob = this.to(Layout.QUICK * 3, {fadeCount:1}, Linear.easeOut, fadeComplete);
 		}
 		
 		fadeJob.onChange = fadeUpdate;
@@ -343,9 +344,9 @@ class GameGrid extends Sprite {
 			playerHeadTweens[ike] = null;
 			if (players[ike].alive && head.alpha < 1) {
 				head.visible = true;
-				playerHeadTweens[ike] = KTween.to(head, Layout.QUICK * 5, {scaleX:1, scaleY:1, alpha:1}, Linear.easeOut);
+				playerHeadTweens[ike] = head.to(Layout.QUICK * 5, {scaleX:1, scaleY:1, alpha:1}, Linear.easeOut);
 			} else if (!players[ike].alive && head.alpha > 0) {
-				playerHeadTweens[ike] = KTween.to(head, Layout.QUICK * 5, {scaleX:1, scaleY:1, alpha:0, visible:false}, Linear.easeOut);
+				playerHeadTweens[ike] = head.to(Layout.QUICK * 5, {scaleX:1, scaleY:1, alpha:0, visible:false}, Linear.easeOut);
 			}
 		}
 	}
@@ -371,7 +372,7 @@ class GameGrid extends Sprite {
 		if (biteToothJob != null) biteToothJob.close();
 		teeth.visible = true;
 		teeth.mouseEnabled = teeth.mouseChildren = true;
-		gridTeethJob = KTween.to(teeth, Layout.QUICK * 2, {alpha:1}, Layout.POUNCE);
+		gridTeethJob = teeth.to(Layout.QUICK * 2, {alpha:1}, Layout.POUNCE);
 	}
 	
 	public function hideTeeth(playerIndex:Int):Void {
@@ -379,8 +380,8 @@ class GameGrid extends Sprite {
 		if (biteToothJob != null) biteToothJob.close();
 		draggingBite = false;
 		teeth.mouseEnabled = teeth.mouseChildren = false;
-		gridTeethJob = KTween.to(teeth, Layout.QUICK * 2, {alpha:0, visible:false}, Layout.POUNCE);
-		biteToothJob = KTween.to(biteTooth, Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
+		gridTeethJob = teeth.to(Layout.QUICK * 2, {alpha:0, visible:false}, Layout.POUNCE);
+		biteToothJob = biteTooth.to(Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
 		playerHeads[playerIndex].visible = true;
 	}
 	
@@ -582,7 +583,7 @@ class GameGrid extends Sprite {
 		bEX = Std.int(pt.x / Layout.UNIT_REZ) + biteTooth.endX;
 		bEY = Std.int(pt.y / Layout.UNIT_REZ) + biteTooth.endY;
 		if (biteTooth.endX != 0 || biteTooth.endY != 0 || !biteTooth.hitTestPoint(stage.mouseX, stage.mouseY)) {
-			biteToothJob = KTween.to(biteTooth, Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
+			biteToothJob = biteTooth.to(Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
 		}
 		bite(bSX, bSY, bEX, bEY);
 	}
@@ -593,11 +594,11 @@ class GameGrid extends Sprite {
 		if (event.type == MouseEvent.MOUSE_OVER) {
 			var tooth:Sprite = untyped __as__(event.target, Sprite);
 			biteTooth.visible = true;
-			biteToothJob = KTween.to(biteTooth, Layout.QUICK, {scaleX:1, scaleY:1, alpha:1}, Layout.POUNCE);
+			biteToothJob = biteTooth.to(Layout.QUICK, {scaleX:1, scaleY:1, alpha:1}, Layout.POUNCE);
 			biteTooth.x = tooth.x + Layout.GRID_BORDER * Layout.UNIT_REZ;
 			biteTooth.y = tooth.y + Layout.GRID_BORDER * Layout.UNIT_REZ;
 		} else {
-			biteToothJob = KTween.to(biteTooth, Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
+			biteToothJob = biteTooth.to(Layout.QUICK, {scaleX:0.5, scaleY:0.5, alpha:0, visible:false}, Layout.POUNCE, biteTooth.reset);
 		}
 	}
 }

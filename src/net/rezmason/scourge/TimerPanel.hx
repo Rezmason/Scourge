@@ -11,9 +11,10 @@ import flash.geom.Rectangle;
 import flash.text.TextField;
 
 import net.kawa.tween.KTJob;
-import net.kawa.tween.KTween;
 import net.kawa.tween.easing.Linear;
 import net.kawa.tween.easing.Quad;
+
+using net.kawa.tween.KTween;
 
 class TimerPanel extends Sprite {
 	
@@ -81,11 +82,11 @@ class TimerPanel extends Sprite {
 		var sX:Float = progressBar.scaleX;
 		if (progressBarJob != null) progressBarJob.cancel();
 		progressBar.scaleX = sX;
-		progressBarJob = KTween.to(progressBar, 0.2, {scaleX:1}, Quad.easeInOut, begin);
+		progressBarJob = progressBar.to(0.2, {scaleX:1}, Quad.easeInOut, begin);
 	}
 	
 	private function begin():Void {
 		if (!progressBar.visible) return;
-		progressBarJob = KTween.to(progressBar, duration, {width:1}, Linear.easeIn, skip);
+		progressBarJob = progressBar.to(duration, {width:1}, Linear.easeIn, skip);
 	}
 }

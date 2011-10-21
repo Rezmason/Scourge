@@ -12,9 +12,10 @@ import flash.text.TextField;
 
 import net.rezmason.flash.display.Pie;
 
-import net.kawa.tween.KTween;
 import net.kawa.tween.KTJob;
 import net.kawa.tween.easing.Quad;
+
+using net.kawa.tween.KTween;
 
 class Well extends Sprite {
 	
@@ -194,14 +195,14 @@ class Well extends Sprite {
 		if (biteCounterJob != null) biteCounterJob.complete();
 		biteCounter.visible = true;
 		biteCounter.alpha = show ? 0 : 1;
-		biteCounterJob = KTween.to(biteCounter, 3 * Layout.QUICK, {alpha:(show ? 1 : 0), visible:show}, Layout.POUNCE);
+		biteCounterJob = biteCounter.to(3 * Layout.QUICK, {alpha:(show ? 1 : 0), visible:show}, Layout.POUNCE);
 	}
 
 	public function displaySwapCounter(show:Bool, ?slowly:Bool):Void {
 		if (swapCounterJob != null) swapCounterJob.complete();
 		swapCounter.visible = true;
 		swapCounter.alpha = show ? 0 : 1;
-		swapCounterJob = KTween.to(swapCounter, (slowly ? 3 : 3 * Layout.QUICK), {alpha:(show ? 1 : 0), visible:show}, (slowly ? Quad.easeOut : Layout.POUNCE));
+		swapCounterJob = swapCounter.to((slowly ? 3 : 3 * Layout.QUICK), {alpha:(show ? 1 : 0), visible:show}, (slowly ? Quad.easeOut : Layout.POUNCE));
 	}
 	
 	private function hint(event:MouseEvent):Void {

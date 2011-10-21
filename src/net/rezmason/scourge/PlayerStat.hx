@@ -7,8 +7,9 @@ import flash.geom.ColorTransform;
 import flash.text.TextField;
 
 import net.kawa.tween.KTJob;
-import net.kawa.tween.KTween;
 import net.kawa.tween.easing.Quad;
+
+using net.kawa.tween.KTween;
 
 class PlayerStat extends Sprite {
 	
@@ -20,7 +21,8 @@ class PlayerStat extends Sprite {
 	private var biteIcon3:Sprite;
 	private var biteIcons:Sprite;
 	private var txtName:TextField;
-	//private var txtData:TextField;
+	private var txtBites:TextField;
+	private var txtSwaps:TextField;
 	private var tint:ColorTransform;
 	
 	private var tintJob:KTJob;
@@ -49,16 +51,20 @@ class PlayerStat extends Sprite {
 		
 		var w:Float = Layout.WELL_WIDTH - 3 * Layout.BAR_MARGIN - biteIcons.width;
 		
-		txtName = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO_FONT, 0.21 * w, 0xFFFFFF);
-		//txtData = GUIFactory.makeTextBox(w, hgt * 0.3, GUIFactory.MISO_FONT, 0.1 * w, 0xFFFFFF);
+		txtName = GUIFactory.makeTextBox(w * 0.6, hgt * 0.3, GUIFactory.MISO_FONT, 0.21 * w, 0xFFFFFF);
+		txtBites = GUIFactory.makeTextBox(w * 0.4, hgt * 0.1, GUIFactory.MISO_FONT, 0.1 * w, 0xFFFFFF);
+		txtSwaps = GUIFactory.makeTextBox(w * 0.4, hgt * 0.1, GUIFactory.MISO_FONT, 0.1 * w, 0xFFFFFF);
 		
 		txtName.x = biteIcons.x + biteIcons.width + 6;
 		txtName.y = biteIcons.y - 3;
 		
-		//txtData.x = txtName.x;
-		//txtData.y = txtName.y + txtName.height + 9;
+		txtBites.x = txtName.x + txtName.width;
+		txtBites.y = txtName.y;
 		
-		GUIFactory.fillSprite(this, [background, biteIcons, txtName, /*txtData*/]);
+		txtSwaps.x = txtBites.x;
+		txtSwaps.y = txtName.y + txtName.height;
+		
+		GUIFactory.fillSprite(this, [background, biteIcons, txtName, txtBites, txtSwaps]);
 	}
 	
 	public function update(index:Int, player:Player, ct:ColorTransform):Void {
@@ -72,7 +78,8 @@ class PlayerStat extends Sprite {
 		biteIcon.visible = true;
 		
 		txtName.text = player.name;
-		//txtData.text = "BITES: " + Std.string(player.bites) + "     " + "SWAPS: " + Std.string(player.swaps);
+		txtBites.text = "BITES: " + Std.string(player.bites);
+		txtSwaps.text = "SWAPS: " + Std.string(player.swaps);
 		shiftTo(height * index);
 	}
 	
@@ -82,7 +89,7 @@ class PlayerStat extends Sprite {
 		tween.redMultiplier = ct.redMultiplier;
 		tween.greenMultiplier = ct.greenMultiplier;
 		tween.blueMultiplier = ct.blueMultiplier;
-		tintJob = KTween.to(tint, 0.5, tween, Quad.easeInOut);
+		tintJob = tint.to(0.5, tween, Quad.easeInOut);
 		tintJob.onChange = updateTint;
 	}
 	
@@ -93,6 +100,6 @@ class PlayerStat extends Sprite {
 	private function shiftTo(newY:Float):Void {
 		// tween to this new position
 		if (shiftJob != null) shiftJob.close();
-		shiftJob = KTween.to(this, 0.2, {y:newY}, Quad.easeInOut);
+		shiftJob = this.to(0.2, {y:newY}, Quad.easeInOut);
 	}
 }

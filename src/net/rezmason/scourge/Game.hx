@@ -2,6 +2,9 @@ package net.rezmason.scourge;
 
 import net.rezmason.scourge.GridCellMap;
 
+using Reflect;
+using Type;
+
 class Game {
 	
 	private var defaultGrid:Array<Dynamic>;
@@ -197,13 +200,13 @@ class Game {
 	public function getSwapPhase():Float { return (_state.turnCount % Common.SWAP_FREQUENCY) / (Common.SWAP_FREQUENCY - 1); }
 	
 	public function act(action:PlayerAction):Void {
-		var params:Array<Dynamic> = Type.enumParameters(action);
+		var params:Array<Dynamic> = action.enumParameters();
 		_state = GameState.copy(_state);
 		histIndex++;
 		history.splice(histIndex, history.length - histIndex);
 		history.push(_state);
 		params.unshift(_state);
-		Reflect.callMethod(null, allPlayerActions[Type.enumIndex(action)], params);
+		callMethod(allPlayerActions[action.enumIndex()], params);
 	}
 	
 	public function undoAction():Bool {
