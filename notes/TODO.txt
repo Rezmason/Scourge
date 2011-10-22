@@ -1,0 +1,17 @@
+NME
+
+New UI
+
+Texture synthesis
+	Dots
+	Stripes
+
+Computer opponents
+	Create pruning functions
+
+Game starts as a primer
+	History of game states and commands allows player to
+
+Remove getBounds and getCharBoundaries dependencies?
+
+Contact Jason Whong?

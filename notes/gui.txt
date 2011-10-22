@@ -1,0 +1,147 @@
+UI Goals
+	1. To allow the user to easily call actions and place a piece on the board in a 5 second time period
+	2. To allow the user to easily view the entire board
+	3. To allow the user to easily perceive recent changes to the board
+	4. Some kind of hint system
+	5. Some kind of comm system for multiplayer?
+		Audio chat might be cool
+
+UI 1.0
+	The piece is large in the game bar, where you rotate it
+		Smooth, fast rotation tween
+		Replace the piece with its rotated equivalent when the tween is finished
+	You pick it up (grip) and drop it to place it
+		The piece shrinks when you carry it to the board
+			Shrinks under mouse; it's pinned by the grip
+				This will require scaling a grip parent whose origin is at the mouse position
+		The piece turns white and glows when it's in a valid position
+		If you drop the piece in an invalid place, it snaps back to the game bar
+		A placed piece 
+	
+	Alerts indicate major weaknesses and recent changes
+		Mobile: arrows and alerts in a margin
+	Freshness gradient- More recent changes on the board have a brighter intensity
+	Contextual opponent stats
+		Progress bars (including size) form wedges
+		Wedge changes from circle two semicircle to quadrant
+		Clicking a player's head allows you to send a message directly to him
+		By default,
+	Mobile: Gestural support
+		NO ZOOMING
+		Piece rotation, accelerated one-finger swipe
+		Maybe a bite gesture?
+	Corner confirmation button for actions
+	Context menu
+		Bite, skip turn, change piece, etc
+	
+	Tutorial level
+	Some sort of indicator for newbs for where to place pieces
+		Valid-position regions
+	
+		
+	Bite system
+		Teeth appear on the current player
+			Mousing over a tooth causes it to light up
+			Drag a tooth across another player to bite
+
+	Bite replenishment
+		Based on number of turns that you survive without getting bitten
+		Opponents skipping will speed up replenishment rate
+	Swap replenishment
+		Based on... something
+		Opponents skipping will speed up replenishment rate
+		
+	Other players' board actions should be tweened
+	
+	Bite animations
+		Single: Sharp glinting shark tooth
+		Double: Fat snapping mandibles
+		Triple: roaring lamprey maw
+		
+		All flat, white, graphical, with a gradient
+
+
+
+UI 2.0
+	Pressable board in default UI state
+		Tap [hover over] a player to get data about them on the left
+	Large buttons on left
+		Drop
+			Shape, powerup
+		Chop
+			Icon (size indicator), number
+		Swap
+			Icon, number
+		Skip
+	Drag them all the way to the right [or click them]
+		Background shifts left as you go right
+		Button snaps back if you don't drag it the whole way
+		Button's track reveals name as you drag across
+	Chop transition zooms the board in [not on PC]
+	Chop press [hover] shows bite areas
+	Action-specific button sets on right
+		Back button on bottom (buttons 
+		
+		Drop
+			Back
+			rotate left
+			rotate right
+			OK
+			(powerup indicator)
+			board interaction: snapped piece pan
+		Chop
+			Back
+			Bite
+			(bite count indicator)
+			board interaction: pan, bite swipe
+		Swap
+			Back
+			Swap
+			maybe a more complex representation of the swapping system
+				A tetris-like look-ahead?
+				Should all players use the same hat?
+		Skip
+			Back
+			Skip
+			Forfeit
+	
+	AI and remote user board interactions are animated
+	AI and remote user interactions of all kinds emanate the same sounds as the player
+	Buttons are dark grey when they are disabled
+	
+	Locally,
+		The GUI color is the color of the player for the current turn
+		AIs use the existing user interface to play
+	On a network game,
+		The GUI is always your color
+		AI and remote player non-board interactions are indicated, but not shown
+	Every GUI
+		
+	Landscape orientation with option for vertical orientation
+	
+Animated heads ?
+	White faces on color backgrounds swivel to look at last mouse position
+	Expressions for each bite size:
+		Plain
+		Increase in bite size
+		Decrease in bite size
+		Bitten wince (sharp pain)
+		Bitten; minor loss (irritated)
+		Bitten; major loss (sad)
+		Eating wince (agony)
+		Eaten; minor loss
+		Eaten; major loss
+		Biting; wicked grin
+		Eating; hungry
+		Death by eating: loser's head, shudders screams silently, and gets absorbed by winning color, then shrinks down to nothing
+		Death by biting: dead losing head is yanked off center, struggles, and suddenly snaps off. The head goes gray and slowly fades
+		Starving; pale, gasping
+		Starved to death; head goes gray and slowly fades
+
+
+Ad placement
+	sponsorship
+		If a player wears a logo and wins, he gets a promo code from the sponsor
+	last words
+		Before a player dies, he gets to say whatever he wants. OR he can force everyone to watch an ad for 15 seconds.
+	

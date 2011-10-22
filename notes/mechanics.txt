@@ -1,0 +1,27 @@
+Game varieties
+	Classic
+		Heads
+		Bites and swaps
+		Bites are objects that you can gain by eating
+	Genetic powerups
+		A looping timeline of powerups received during gameplay
+			Small by default; can be made larger
+			Indicates current position 
+			Customized by the player before the game begins
+			Visible to other players once game starts
+	
+		Genes expressed by unique powers, related to new block:
+			Poisonous pieces (kills adjacent enemy blocks for full round)
+			Bitey pieces (Free bite originating from piece at end of turn)
+			Tough pieces (Can't be bit for full round; can die or be eaten, though)
+			Head piece (Makes another head)
+		Tradeoffs
+			Non-pieces
+			Slower bite/swap rate
+			Smaller pieces?
+			
+MULTIPLAYER
+	Same machine (PC)
+	LAN (PC)
+	Server (PC, mobile)
+	P2P / Game Thing (mobile)
