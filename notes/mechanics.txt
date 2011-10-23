@@ -11,14 +11,15 @@ Game varieties
 			Visible to other players once game starts
 	
 		Genes expressed by unique powers, related to new block:
-			Poisonous pieces (kills adjacent enemy blocks for full round)
+			Poisonous pieces (kills adjacent enemy blocks for full round) (emergent property: can't be eaten)
 			Bitey pieces (Free bite originating from piece at end of turn)
 			Tough pieces (Can't be bit for full round; can die or be eaten, though)
 			Head piece (Makes another head)
 		Tradeoffs
 			Non-pieces
-			Slower bite/swap rate
-			Smaller pieces?
+			Slower bite replenishment rate
+			Slower swap replenishment rate
+			More small pieces in swap stream?
 			
 MULTIPLAYER
 	Same machine (PC)

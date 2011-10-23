@@ -1,0 +1,13 @@
+-swf9 deploy-flash/scourge.swf
+-main Scourge
+-debug
+--flash-strict
+-swf-version 10.3
+-swf-header 800:600:30:FFFFFF
+-cp src
+
+-swf-lib assets/ScourgeLib.swf
+-swf-lib assets/ScourgeBiteSymbols.swf
+
+--macro patchTypes('patch/types.patch')
+--macro patchTypes('patch/flextypes.patch')
