@@ -11,3 +11,14 @@ class Common {
 	public static var SWAP_FREQUENCY:Int = 4;
 	public static var TEAM_COLORS:Array<Int> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ];
 }
+
+typedef GameOptions = {
+	var numPlayers(default, null):Int;
+	var circular(default, null):Bool;
+	var duration(default, null):Float;
+}
+
+enum GameType {
+	CLASSIC;
+	GENETIC;
+}

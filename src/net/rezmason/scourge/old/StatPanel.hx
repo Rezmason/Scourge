@@ -1,4 +1,4 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.old;
 
 import flash.display.Shape;
 import flash.display.Sprite;

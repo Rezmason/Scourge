@@ -1,4 +1,4 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.old;
 
 import flash.display.BlendMode;
 import flash.display.Shape;
@@ -13,6 +13,9 @@ import flash.geom.ColorTransform;
 import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.ui.Keyboard;
+
+import net.rezmason.scourge.model.Game;
+import net.rezmason.scourge.Common;
 
 import haxe.Timer;
 
@@ -95,7 +98,7 @@ class Board {
 	private var stoicPiece:Shape;
 	private var stoicPieceHandle:Sprite;
 	
-	public function new(__game:Game, __scene:Sprite, __options:Dynamic) {
+	public function new(__game:Game, __scene:Sprite, __options:GameOptions) {
 		scene = __scene;
 		game = __game;
 		options = __options;

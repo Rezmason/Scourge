@@ -1,4 +1,4 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.model;
 
 typedef GridCell = {
 	x:Int,

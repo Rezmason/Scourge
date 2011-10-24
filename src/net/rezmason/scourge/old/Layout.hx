@@ -1,4 +1,4 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.old;
 
 import net.kawa.tween.easing.Elastic;
 import net.kawa.tween.easing.Quad;

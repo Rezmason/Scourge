@@ -2,8 +2,9 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.Lib;
 
-import net.rezmason.scourge.Board;
-import net.rezmason.scourge.Game;
+import net.rezmason.scourge.old.Board;
+import net.rezmason.scourge.model.Game;
+import net.rezmason.scourge.Common;
 
 class Scourge {
 
@@ -12,19 +13,29 @@ class Scourge {
 	}
 
 	public static function init(?event:Event):Void {
-		var params:Dynamic;
-
 		Lib.current.loaderInfo.removeEventListener("init", init);
-		params = Lib.current.loaderInfo.parameters;
-
+		
+		var params:Dynamic = Lib.current.loaderInfo.parameters;
+		
 		var defaultGrid:String = params.defaultGrid;
 		var numPlayers:Int = Std.parseInt(params.numPlayers);
 		var circular:Bool = (params.circular == "true" || params.circular == "1");
 		var duration:Float = params.duration;
+		
 		if (defaultGrid == null) defaultGrid = "-1";
 		if (numPlayers == 0) numPlayers = 4;
 		if (Math.isNaN(duration)) duration = 0;
-		var board:Board = new Board(new Game(defaultGrid.split(",")), Lib.current, {numPlayers:numPlayers, circular:circular, duration:duration});
+		
+		var options:GameOptions = {
+			numPlayers:numPlayers,
+			circular:circular,
+			duration:duration,
+		};
+		
+		var game:Game = new Game(defaultGrid.split(","));
+		var board:Board = new Board(game, Lib.current, options);
+		//var view:SwipeView = new SwipeView(game, Lib.current, options);
+		
 		var splash:Array<String> = [
 			" %%%%    %%%      %%%    %   %    %%%%      %%%%    %%% ",
 			"%       %   %    %   %   %   %    %   %    %   %   %   %",
