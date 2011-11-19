@@ -10,14 +10,14 @@ class GameState {
 	public var freshGrid:Array<Int>;
 	public var legalMoveGrids:Array<Array<Bool>>;
 	public var legalBiteGrid:Array<Array<Int>>;
-	public var aliveGrid:Array<Bool>;
+	public var lifeGrid:Array<Int>;
 	public var players:Array<Player>;
 	public var currentPlayerIndex:Int;
 	public var currentPlayer:Player;
 	public var freshness:Int;
 	public var turnItr:Int;
 	public var turnCount:Int;
-	
+
 	public var boardSize:Int;
 	public var boardNumCells:Int;
 	public var boardNumMaskedCells:Int;
@@ -29,7 +29,7 @@ class GameState {
 		bodyGrid = [];
 		freshGrid = [];
 		legalBiteGrid = [];
-		aliveGrid = [];
+		lifeGrid = [];
 		legalMoveGrids = [];
 		players = [];
 	}
@@ -51,7 +51,7 @@ class GameState {
 		for (ike in 0...gameState.legalBiteGrid.length) {
 			if (gameState.legalBiteGrid[ike] != null) clone.legalBiteGrid[ike] = gameState.legalBiteGrid[ike].copy();
 		}
-		clone.aliveGrid = gameState.aliveGrid.copy();
+		clone.lifeGrid = gameState.lifeGrid.copy();
 		clone.players = [];
 		for (ike in 0...gameState.players.length) clone.players[ike] = Player.copy(gameState.players[ike]);
 		clone.currentPlayerIndex = gameState.currentPlayerIndex;
@@ -59,7 +59,7 @@ class GameState {
 		clone.freshness = gameState.freshness;
 		clone.turnItr = gameState.turnItr;
 		clone.turnCount = gameState.turnCount;
-		
+
 		// these don't change
 		clone.boardSize = gameState.boardSize;
 		clone.boardNumCells = gameState.boardNumCells;
