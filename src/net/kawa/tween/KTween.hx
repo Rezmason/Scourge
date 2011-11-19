@@ -1,5 +1,7 @@
 package net.kawa.tween;
 
+import net.kawa.tween.KTJob;
+
 using Reflect;
 
 /**
@@ -18,7 +20,7 @@ class KTween {
 	/**
 	 * Starts a new KTween job specifying the first (beginning) status.
 	 * The last (ending) status will be back the current status.
-	 * 
+	 *
 	 * @param target   	The target object to be tweened.
 	 * @param duration 	The length of the tween in seconds.
 	 * @param from 	 	The object which contains the first (beginning) status in each property.
@@ -26,7 +28,7 @@ class KTween {
 	 * @param callback	The callback function invoked after the tween completed as onClose.
 	 * @return			The KTween job instance.
 	 */
-	static public function from(target : Dynamic, duration : Float, from : Dynamic, ?ease : Dynamic, ?_callback : Dynamic) : KTJob {
+	static public function from(target : Dynamic, duration : Float, from : Dynamic, ?ease : Ease, ?_callback : Dynamic) : KTJob {
 		var job:KTJob = new KTJob(target);
 		job.from = from;
 		job.duration = duration;
@@ -39,7 +41,7 @@ class KTween {
 	/**
 	 * Starts a new KTween job specifying the last (ending) status.
 	 * The current status is used as the first (beginning) status.
-	 * 
+	 *
 	 * @param target   	The target object to be tweened.
 	 * @param duration 	The length of the tween in seconds.
 	 * @param to 	 	The object which contains the last (ending) status in each property.
@@ -47,7 +49,7 @@ class KTween {
 	 * @param callback	The callback function invoked after the tween completed as onClose.
 	 * @return			The KTween job instance.
 	 */
-	static public function to(target : Dynamic, duration : Float, to : Dynamic, ?ease : Dynamic, ?_callback : Dynamic) : KTJob {
+	static public function to(target : Dynamic, duration : Float, to : Dynamic, ?ease : Ease, ?_callback : Dynamic) : KTJob {
 		var job:KTJob = new KTJob(target);
 		job.to = to;
 		job.duration = duration;
@@ -59,7 +61,7 @@ class KTween {
 
 	/**
 	 * Starts a new KTween job.
-	 * 
+	 *
 	 * @param target   	The target object to be tweened.
 	 * @param duration 	The length of the tween in seconds.
 	 * @param from 	 	The object which contains the first (beginning) status in each property.
@@ -68,7 +70,7 @@ class KTween {
 	 * @param callback	The callback function invoked after the tween completed as onClose.
 	 * @return			The KTween job instance.
 	 */
-	static public function fromTo(target : Dynamic, duration : Float, from : Dynamic, to : Dynamic, ?ease : Dynamic, ?_callback : Dynamic) : KTJob {
+	static public function fromTo(target : Dynamic, duration : Float, from : Dynamic, to : Dynamic, ?ease : Ease, ?_callback : Dynamic) : KTJob {
 		var job:KTJob = new KTJob(target);
 		job.from = from;
 		job.to = to;
@@ -108,13 +110,13 @@ class KTween {
 	 * Forces to finish all tween jobs.
 	 * @see net.kawa.tween.KTJob#complete()
 	 */
-	static public function complete():Void { manager.complete(); }		
+	static public function complete():Void { manager.complete(); }
 
 	/**
 	 * Pauses all tween jobs.
 	 * @see net.kawa.tween.KTJob#pause()
 	 */
-	static public function pause():Void { manager.pause(); }		
+	static public function pause():Void { manager.pause(); }
 
 	/**
 	 * Proceeds with all tween jobs paused.

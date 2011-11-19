@@ -6,6 +6,8 @@ import net.kawa.tween.easing.Quad;
 
 using Reflect;
 
+typedef Ease = Float->Float;
+
 /**
  * KTJob
  * Tween job calss for the KTween
@@ -58,7 +60,7 @@ class KTJob {
 	public var yoyo:Bool;
 	/**
 	 * The callback function invoked when the tween job has just started.<br/>
-	 * Note this would not work with KTween's static methods, 
+	 * Note this would not work with KTween's static methods,
 	 * ex. <code>KTween.fromTo()</code>,
 	 * as these methods start a job at the same time.
 	 */
@@ -69,7 +71,7 @@ class KTJob {
 	public var onChange:Dynamic;
 	/**
 	 * The callback function invoked when the tween job has just completed.<br/>
-	 * Note this would be invoked before the Flash Player renders the object 
+	 * Note this would be invoked before the Flash Player renders the object
 	 * at the final position.
 	 */
 	public var onComplete:Dynamic;
@@ -121,7 +123,7 @@ class KTJob {
 	 * @param target 	The object whose properties will be tweened.
 	 **/
 	public function new(_target:Dynamic):Void {
-		
+
 		duration = 1.0;
 		ease = Quad.easeOut;
 		finished = false;
@@ -132,7 +134,7 @@ class KTJob {
 		initialized = false;
 		canceled = false;
 		pausing = false;
-		
+
 		target = _target;
 	}
 
@@ -155,7 +157,7 @@ class KTJob {
 
 		setupValues();
 		initialized = true;
-		
+
 		// activated
 		if (onInit.isFunction()) {
 			onInit.apply(onInit, onInitParams);
@@ -218,12 +220,12 @@ class KTJob {
 		if (finished) return;
 		if (canceled) return;
 		if (pausing) return;
-		
+
 		// get current time
 		if (curTime < 0) {
 			curTime = Timer.stamp();
 		}
-		
+
 		// not started yet
 		if (!initialized) {
 			init(curTime);
@@ -233,7 +235,7 @@ class KTJob {
 		// check invoked in the same time
 		if (lastTime == curTime) return;
 		lastTime = curTime;
-		
+
 		// check finished
 		var secs:Float = (curTime - startTime);
 		if (secs >= duration) {
@@ -257,7 +259,7 @@ class KTJob {
 		if (ease.isFunction()) {
 			pos = ease(pos);
 		}
-		
+
 		// update
 		var p:_KTProperty = firstProp;
 		if (round) {
@@ -285,7 +287,7 @@ class KTJob {
 		if (canceled) return;
 		// if (!to) return;
 		if (!target) return;
-		
+
 		applyFinalValues();
 
 		finished = true;
@@ -302,9 +304,9 @@ class KTJob {
 		if (canceled) return;
 		// if (!from) return;
 		if (!target) return;
-		
+
 		applyFirstValues();
-		
+
 		finished = true;
 		canceled = true;
 		if (onCancel.isFunction()) {
@@ -318,7 +320,7 @@ class KTJob {
 	public function close():Void {
 		if (!initialized) return;
 		if (canceled) return;
-		
+
 		finished = true;
 		if (onClose.isFunction()) {
 			onClose.apply(onClose, onCloseParams);
