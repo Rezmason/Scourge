@@ -2,8 +2,8 @@
 -main Scourge
 -debug
 --flash-strict
--swf-version 10.3
--swf-header 800:600:30:FFFFFF
+-swf-version 11
+-swf-header 800:495:30:FF00FF
 -cp src
 
 -swf-lib assets/ScourgeLib.swf
@@ -11,3 +11,12 @@
 
 --macro patchTypes('patch/types.patch')
 --macro patchTypes('patch/flextypes.patch')
+
+
+--next
+
+-swf9 deploy-flash/metaballtest.swf
+-main metaball.Main
+-swf-version 11
+-swf-header 600:600:120:000000
+-cp src

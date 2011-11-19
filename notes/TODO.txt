@@ -1,6 +1,27 @@
-NME
-
 New UI
+	Game board
+
+		Slime
+			Hoo boy
+
+		Piece
+			Piece Panning
+		Bites
+			Bite panning
+		Bite tracks
+
+		Player info
+			hover for mouse
+			Press for touch
+
+	Touch mode
+		Swipe gesture instead of click for auto expand
+		Press instead of hover for hint
+	Mouse mode
+		Board doesn't zoom for chop
+		No swiping at all?
+
+NME
 
 Texture synthesis
 	Dots

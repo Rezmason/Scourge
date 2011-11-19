@@ -1,3 +1,12 @@
+Gameplay types
+	Multiplayer
+		Local
+		Network
+		"By mail" (FB)
+	Single player
+		Story mode
+
+
 Game varieties
 	Classic
 		Heads
@@ -6,10 +15,10 @@ Game varieties
 	Genetic powerups
 		A looping timeline of powerups received during gameplay
 			Small by default; can be made larger
-			Indicates current position 
+			Indicates current position
 			Customized by the player before the game begins
 			Visible to other players once game starts
-	
+
 		Genes expressed by unique powers, related to new block:
 			Poisonous pieces (kills adjacent enemy blocks for full round) (emergent property: can't be eaten)
 			Bitey pieces (Free bite originating from piece at end of turn)
@@ -20,7 +29,7 @@ Game varieties
 			Slower bite replenishment rate
 			Slower swap replenishment rate
 			More small pieces in swap stream?
-			
+
 MULTIPLAYER
 	Same machine (PC)
 	LAN (PC)

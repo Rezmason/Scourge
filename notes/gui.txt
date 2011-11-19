@@ -16,8 +16,8 @@ UI 1.0
 				This will require scaling a grip parent whose origin is at the mouse position
 		The piece turns white and glows when it's in a valid position
 		If you drop the piece in an invalid place, it snaps back to the game bar
-		A placed piece 
-	
+		A placed piece
+
 	Alerts indicate major weaknesses and recent changes
 		Mobile: arrows and alerts in a margin
 	Freshness gradient- More recent changes on the board have a brighter intensity
@@ -33,12 +33,12 @@ UI 1.0
 	Corner confirmation button for actions
 	Context menu
 		Bite, skip turn, change piece, etc
-	
+
 	Tutorial level
 	Some sort of indicator for newbs for where to place pieces
 		Valid-position regions
-	
-		
+
+
 	Bite system
 		Teeth appear on the current player
 			Mousing over a tooth causes it to light up
@@ -50,14 +50,14 @@ UI 1.0
 	Swap replenishment
 		Based on... something
 		Opponents skipping will speed up replenishment rate
-		
+
 	Other players' board actions should be tweened
-	
+
 	Bite animations
 		Single: Sharp glinting shark tooth
 		Double: Fat snapping mandibles
 		Triple: roaring lamprey maw
-		
+
 		All flat, white, graphical, with a gradient
 
 
@@ -73,15 +73,15 @@ UI 2.0
 		Swap
 			Icon, number
 		Skip
-	Drag them all the way to the right [or click them]
+	Drag them all the way to the right or swipe them to the right [or click them]
 		Background shifts left as you go right
 		Button snaps back if you don't drag it the whole way
 		Button's track reveals name as you drag across
 	Chop transition zooms the board in [not on PC]
 	Chop press [hover] shows bite areas
 	Action-specific button sets on right
-		Back button on bottom (buttons 
-		
+		Back button on bottom
+
 		Drop
 			Back
 			rotate left
@@ -100,15 +100,15 @@ UI 2.0
 			maybe a more complex representation of the swapping system
 				A tetris-like look-ahead?
 				Should all players use the same hat?
-		Skip
+		Flop
 			Back
 			Skip
 			Forfeit
-	
+
 	AI and remote user board interactions are animated
 	AI and remote user interactions of all kinds emanate the same sounds as the player
 	Buttons are dark grey when they are disabled
-	
+
 	Locally,
 		The GUI color is the color of the player for the current turn
 		AIs use the existing user interface to play
@@ -116,9 +116,9 @@ UI 2.0
 		The GUI is always your color
 		AI and remote player non-board interactions are indicated, but not shown
 	Every GUI
-		
+
 	Landscape orientation with option for vertical orientation
-	
+
 Animated heads ?
 	White faces on color backgrounds swivel to look at last mouse position
 	Expressions for each bite size:
@@ -144,4 +144,4 @@ Ad placement
 		If a player wears a logo and wins, he gets a promo code from the sponsor
 	last words
 		Before a player dies, he gets to say whatever he wants. OR he can force everyone to watch an ad for 15 seconds.
-	
+
