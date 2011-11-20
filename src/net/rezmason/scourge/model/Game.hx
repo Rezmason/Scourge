@@ -192,6 +192,7 @@ class Game {
 	public function getLegalBiteGrid(?copy:Bool):Array<Array<Int>> { return copy ? _state.legalBiteGrid.copy() : _state.legalBiteGrid; }
 	public function getBodyGrid(?copy:Bool):Array<Int> { return copy ? _state.bodyGrid.copy() : _state.bodyGrid; }
 	public function getFreshGrid(?copy:Bool):Array<Int> { return copy ? _state.freshGrid.copy() : _state.freshGrid; }
+	public function getLifeGrid(?copy:Bool):Array<Int> { return copy ? _state.lifeGrid.copy() : _state.lifeGrid; }
 	public function getMaxFreshness():Int { return _state.freshness; }
 	public function getCurrentPlayer(?copy:Bool):Player { return copy ? Player.copy(_state.currentPlayer) : _state.currentPlayer; }
 	public function getCurrentPlayerIndex():Int { return _state.currentPlayerIndex; }
