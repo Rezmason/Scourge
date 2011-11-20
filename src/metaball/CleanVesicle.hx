@@ -27,8 +27,6 @@ typedef Metaball = {
 
 class CleanVesicle extends Shape {
 
-	//private var rects:Array<Rectangle>;
-
 	private var texWid:Int;
 	private var frameWid:Int;
 	private var activeWid:Int;
@@ -46,15 +44,7 @@ class CleanVesicle extends Shape {
 	public var frameBuffer(default, null):Buffer;
 	public var output(default, null):BitmapData;
 
-	public function new(
-		_ballBuffers:Array<Buffer>,
-		_texWid:Int,
-		_frameWid:Int,
-		_lookupTable:Buffer,
-		_base:BitmapData,
-		?_state:Array<Metaball>,
-		?_frames:Int = 30
-	):Void {
+	public function new(_ballBuffers:Array<Buffer>, _texWid:Int, _frameWid:Int, _lookupTable:Buffer, _base:BitmapData, ?_state:Array<Metaball>, ?_frames:Int = 30):Void {
 
 		super();
 
