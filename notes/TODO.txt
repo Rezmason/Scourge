@@ -30,9 +30,9 @@ Texture synthesis
 Computer opponents
 	Create pruning functions
 
-Game starts as a primer
-	History of game states and commands allows player to
+http://code.google.com/p/hxgk/
 
-Remove getBounds and getCharBoundaries dependencies?
+Game starts as a primer
+	History of game states and commands allows player to better understand how games progress
 
 Contact Jason Whong?
