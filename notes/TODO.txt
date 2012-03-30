@@ -1,3 +1,4 @@
+Prevent overlapping interaction
 
 The game needs to be separated from the rules
 	Computer opponents use the rules to simulate the game
@@ -6,6 +7,13 @@ The rules need to be testable
 	Test framework creates states, performs actions on those states and compares the outcomes
 
 New UI
+
+	Switch back to MISO font
+	Data indicators
+
+	Icons
+	Color Transform
+
 	Game board
 
 		Slime

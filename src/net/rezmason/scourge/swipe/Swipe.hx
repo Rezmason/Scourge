@@ -18,15 +18,26 @@ import net.rezmason.scourge.swipe.SwipeButton;
 using net.kawa.tween.KTween;
 using net.rezmason.flash.display.FastDraw;
 
+typedef GrabCallback = Swipe->Void;
+typedef DropCallback = Swipe->Void;
 typedef DragCallback = Swipe->Float->Void;
 typedef HintCallback = Swipe->Bool->Void;
 
+typedef SwipeInitObject = {
+	var grab:GrabCallback;
+	var drop:DropCallback;
+	var drag:DragCallback;
+	var hint:HintCallback;
+}
+
 class Swipe extends SwipeBox {
 
-	private static var SWIPE_CAPTION_FORMAT:TextFormat = new TextFormat("_sans", 40, 0x444444, true);
+	private static var SWIPE_CAPTION_FORMAT:TextFormat = new TextFormat("_sans", 40, 0xFFFFFF, true);
 
 	private var caption:String;
 	public var relatedObject(default, null):Dynamic;
+	public var grabCallback:GrabCallback;
+	public var dropCallback:DropCallback;
 	public var dragCallback:DragCallback;
 	public var hintCallback:HintCallback;
 	public var percent(default, null):Float;
@@ -34,6 +45,8 @@ class Swipe extends SwipeBox {
 	private var thumbWidth:Float;
 	private var trackWidth:Float;
 	private var _height:Float;
+
+	private var lastPercent:Float;
 
 	// composition
 
@@ -46,11 +59,12 @@ class Swipe extends SwipeBox {
 
 	private var dragX:Float;
 	private var dragged:Bool;
+
 	private var startX:Float;
 
 	private var captionRect:Rectangle;
 
-	public function new(__caption:String, __content:ContentType, __relatedObject:Dynamic, __dragCallback:DragCallback, __hintCallback:HintCallback):Void {
+	public function new(__caption:String, __content:ContentType, __relatedObject:Dynamic, initObject:SwipeInitObject):Void {
 
 		super();
 
@@ -63,6 +77,7 @@ class Swipe extends SwipeBox {
 		captionRect = new Rectangle();
 
 		percent = 0.0;
+		lastPercent = 0.0;
 		thumbWidth = 0;
 		trackWidth = 0;
 		_height = 0;
@@ -77,8 +92,10 @@ class Swipe extends SwipeBox {
 
 		caption = __caption;
 		relatedObject = __relatedObject;
-		dragCallback = __dragCallback;
-		hintCallback = __hintCallback;
+		grabCallback = initObject.grab;
+		dropCallback = initObject.drop;
+		dragCallback = initObject.drag;
+		hintCallback = initObject.hint;
 	}
 
 	public override function resize(__thumbWidth:Float, __height:Float):Void {
@@ -89,7 +106,7 @@ class Swipe extends SwipeBox {
 
 	public function resizeTrack(__trackWidth:Float):Void {
 		trackWidth = __trackWidth;
-		updatePosition();
+		updatePosition(false);
 	}
 
 	public function hide():Void {
@@ -191,13 +208,20 @@ class Swipe extends SwipeBox {
 		dragThumb.resize(thumbWidth, _height);
 		dragTrack.height = _height;
 
-		updatePosition();
+		updatePosition(false);
+
 	}
 
-	private function updatePosition():Void {
+	private function updatePosition(?report:Bool = true):Void {
 		// update x position of thumb
 		dragTrack.width = dragThumb.x = percent * (trackWidth - thumbWidth);
 
-		if (dragCallback != null) dragCallback(this, percent);
+		captionText.y = (_height - captionText.height) * 0.5;
+		captionText.x = dragThumb.x - captionText.width - captionText.height;
+
+		if (report) {
+			if ((percent == 0 || lastPercent != percent) && dragCallback != null) dragCallback(this, percent);
+			lastPercent == percent;
+		}
 	}
 }

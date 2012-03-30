@@ -14,6 +14,7 @@ import flash.geom.Point;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.Common;
 import net.rezmason.scourge.swipe.ContentType;
+import net.rezmason.scourge.swipe.Swipe;
 
 import haxe.Timer;
 
@@ -64,6 +65,7 @@ class SwipeView {
 	private var swapSwipe:Swipe;
 	private var flopSwipe:Swipe;
 	private var activeSwipe:Swipe;
+	private var openSwipe:Swipe;
 
 	private var actionBar:Bar;
 
@@ -138,6 +140,9 @@ class SwipeView {
 		stage.addEventListener(Event.RESIZE, resize);
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, keyHandler);
 		stage.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
+		scene.addEventListener(MouseEvent.ROLL_OVER, interruptMouseEvent, true);
+		scene.addEventListener(MouseEvent.ROLL_OUT, interruptMouseEvent, true);
+		scene.addEventListener(MouseEvent.CLICK, interruptMouseEvent, true);
 
 		// kick things off
 		game.begin(options.numPlayers, GameType.CLASSIC, options.circular);
@@ -168,26 +173,27 @@ class SwipeView {
 		forfeitButton = new SwipeButton(CAPTION("DIE"), forfeit);
 
 		dropUI = cast [
-			//rotateSwitch,
+			new SwipeSpacer(1),		// not sure
+			new SwipeSpacer(1),		//rotateSwitch
 			dropButton,
 			backButton,
 		];
 
 		chopUI = cast [
+			new SwipeSpacer(2),		// bite indicator
 			biteButton,
-			//bite count indicator
-			//bite size indicator
 			backButton,
 		];
 
 		swapUI = cast [
+			new SwipeSpacer(1), 	// piece indicator
+			new SwipeSpacer(1), 	// swap count indicator
 			swapButton,
-			//swap count indicator
-			//piece indicator
 			backButton,
 		];
 
 		flopUI = cast [
+			new SwipeSpacer(1),		// not sure
 			skipButton,
 			forfeitButton,
 			backButton,
@@ -195,12 +201,19 @@ class SwipeView {
 
 		// TODO: icons for buttons
 
-		dropSwipe = new Swipe("DROP", CAPTION("PLACE\nPIECE"), dropUI, handleSwipeDrag, handleSwipeHint);
-		chopSwipe = new Swipe("CHOP", CAPTION("BITE"), chopUI, handleSwipeDrag, handleSwipeHint);
-		swapSwipe = new Swipe("SWAP", CAPTION("SWAP\nPIECE"), swapUI, handleSwipeDrag, handleSwipeHint);
-		flopSwipe = new Swipe("FLOP", CAPTION("SKIP"), flopUI, handleSwipeDrag, handleSwipeHint);
+		var swipeHandlers:SwipeInitObject = {
+			grab:handleSwipeGrab,
+			drop:handleSwipeDrop,
+			drag:handleSwipeDrag,
+			hint:handleSwipeHint,
+		};
 
-		swipeBar.pack([dropSwipe, chopSwipe, swapSwipe, flopSwipe]);
+		dropSwipe = new Swipe("DROP", CAPTION("PLACE\nPIECE"), dropUI, swipeHandlers);
+		chopSwipe = new Swipe("BITE", CAPTION("TAKE\nBITE"), chopUI, swipeHandlers);
+		swapSwipe = new Swipe("SWAP", CAPTION("SWAP\nPIECE"), swapUI, swipeHandlers);
+		flopSwipe = new Swipe("SKIP", CAPTION("SKIP\nTURN"), flopUI, swipeHandlers);
+
+		swipeBar.contents = cast [dropSwipe, chopSwipe, swapSwipe, flopSwipe];
 	}
 
 	private function resize(?event:Event):Void {
@@ -250,6 +263,12 @@ class SwipeView {
 		updateBoard();
 	}
 
+	private function interruptMouseEvent(event:MouseEvent):Void {
+		if (activeSwipe != null && activeSwipe != event.target && !activeSwipe.contains(event.target)) {
+			event.stopImmediatePropagation();
+		}
+	}
+
 	private function keyHandler(event:KeyboardEvent):Void {
 		var down:Bool = event.type == KeyboardEvent.KEY_DOWN;
 		var wasDown:Bool = keyList[event.keyCode];
@@ -262,20 +281,26 @@ class SwipeView {
 		keyList[event.keyCode] = (event.type == KeyboardEvent.KEY_DOWN);
 	}
 
+	private function handleSwipeGrab(swipe:Swipe):Void {
+		if (activeSwipe == null) activeSwipe = swipe;
+	}
+
+	private function handleSwipeDrop(swipe:Swipe):Void {
+		if (activeSwipe == swipe) activeSwipe = null;
+	}
+
 	private function handleSwipeDrag(swipe:Swipe, percent:Float):Void {
 
-		if (activeSwipe != null) {
-			if (swipe != activeSwipe) return;
-			if (percent <= 0) activeSwipe = null;
-		}
+		if (swipe != activeSwipe) return;
 
 		scene.x = percent * -barWidth;
 
 		if (percent >= 1) {
-			activeSwipe = swipe;
-			actionBar.expandFromSwipe(activeSwipe);
+			openSwipe = activeSwipe;
+			actionBar.expandFromSwipe(openSwipe);
 		}
 
+		// Special treatment for swipes whose actions involve unique board interaction
 		if (swipe == chopSwipe) {
 			boardZoom = percent;
 			updateBoard();
@@ -307,9 +332,10 @@ class SwipeView {
 	}
 
 	private function goBack():Void {
-		if (activeSwipe != null) {
-			activeSwipe.show(true);
-			actionBar.collapseToSwipe(activeSwipe);
+		if (openSwipe != null) {
+			openSwipe.show(true);
+			actionBar.collapseToSwipe(openSwipe);
+			openSwipe = null;
 		}
 	}
 

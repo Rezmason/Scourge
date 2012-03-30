@@ -6,10 +6,10 @@ import net.rezmason.scourge.Common;
 
 import net.rezmason.scourge.Pieces;
 
-typedef PieceHat = Hat<PieceDef>;
-
 using Reflect;
 using Type;
+
+typedef PieceHat = Hat<PieceDef>;
 
 class Game {
 

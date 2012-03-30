@@ -32,21 +32,25 @@ class FastDraw {
 	}
 
 	public static inline function drawBox(dad:GraphicsDad, color:Int, alpha:Float, x:Float, y:Float, width:Float, height:Float):GraphicsDad {
-		var graphics:Graphics = dad.graphics;
-		graphics.beginFill(color, alpha);
-		graphics.drawRect(x, y, width, height);
-		graphics.endFill();
+		if (width * height != 0 && !Math.isNaN(width * height)) {
+			var graphics:Graphics = dad.graphics;
+			graphics.beginFill(color, alpha);
+			graphics.drawRect(x, y, width, height);
+			graphics.endFill();
+		}
 		return dad;
 	}
 
 	public static inline function drawGradientBox(dad:GraphicsDad, colors:Array<UInt>, alphas:Array<Float>, ratios:Array<Int>,
 			angle:Float, x:Float, y:Float, width:Float, height:Float):GraphicsDad {
-		var graphics:Graphics = dad.graphics;
-		var mat:Matrix = new Matrix();
-		mat.createGradientBox(width, height, angle * DEGREES_TO_RADIANS);
-		graphics.beginGradientFill(GradientType.LINEAR, colors, alphas, ratios, mat);
-		graphics.drawRect(x, y, width, height);
-		graphics.endFill();
+		if (width * height != 0 && !Math.isNaN(width * height)) {
+			var graphics:Graphics = dad.graphics;
+			var mat:Matrix = new Matrix();
+			mat.createGradientBox(width, height, angle * DEGREES_TO_RADIANS);
+			graphics.beginGradientFill(GradientType.LINEAR, colors, alphas, ratios, mat);
+			graphics.drawRect(x, y, width, height);
+			graphics.endFill();
+		}
 		return dad;
 	}
 
@@ -60,14 +64,15 @@ class FastDraw {
 		return container;
 	}
 
-	public static inline function arrangeY(container:Container, ?overlap:Float = 0):Container {
+	public static inline function arrangeY(container:Container, objects:Array<DisplayObject>, ?overlap:Float = 0):Container {
 		var y:Float = 0;
-		for (i in 0...container.numChildren) {
-			var child:DisplayObject = container.getChildAt(i);
-			child.y = 0;
-			var bounds:Rectangle = child.getBounds(container);
-			child.y = y - bounds.y;
-			y += bounds.bottom - overlap;
+		for (object in objects) {
+			object.y = 0;
+			var bounds:Rectangle = object.getBounds(container);
+			if (bounds.height != 0) {
+				object.y = y - bounds.y;
+				y += bounds.bottom - overlap;
+			}
 		}
 		return container;
 	}

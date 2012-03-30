@@ -21,6 +21,8 @@ class Bar extends SwipeBox {
 	private var tweenJob:KTJob;
 	private var swipe:Swipe;
 	public var autoLiftChildren(default, setAutoLiftChildren):Bool;
+	public var contents(getContents, setContents):Array<SwipeBox>;
+	private var _contents:Array<SwipeBox>;
 
 	public function new():Void {
 		super();
@@ -39,49 +41,58 @@ class Bar extends SwipeBox {
 	public override function resize(__width:Float, __height:Float):Void {
 		_width = __width;
 		_height = __height;
-		var swipeHeight:Float = (_height - Layout.SWIPE_OVERLAP) / numChildren + Layout.SWIPE_OVERLAP;
-		clear().drawBox(0x222222, 1, 0, 0, _width, _height);
-		for (i in 0...numChildren) {
-			var child:SwipeBox = cast getChildAt(i);
-			if (child != null) child.resize(_width, swipeHeight);
+		if (_contents != null) {
+			var numContents:Int = _contents.length;
+			var numUnits:Float = 0;
+			for (child in _contents) numUnits += child.unitHeight;
+			var swipeHeight:Float = (_height - Layout.SWIPE_OVERLAP) / numUnits;
+			for (child in _contents) child.resize(_width, swipeHeight * child.unitHeight + Layout.SWIPE_OVERLAP);
+			arrangeY(cast _contents, Layout.SWIPE_OVERLAP);
 		}
-		arrangeY(Layout.SWIPE_OVERLAP);
+		clear().drawBox(0x222222, 1, 0, 0, _width, _height);
 	}
 
 	public function expandFromSwipe(_swipe:Swipe):Void {
 		if (tweenJob != null) tweenJob.complete();
 		swipe = _swipe;
-		pack(cast swipe.relatedObject);
-		resize(_width, _height);
-		generateOriginalRects();
-		tweenJob = tween.fromTo(0.2, {value:0}, {value:1}, Quart.easeOut, endExpand);
-		tweenJob.onChange = updateTween;
-		updateTween();
+		contents = cast swipe.relatedObject;
+		if (_contents != null) {
+			generateOriginalRects();
+			tweenJob = tween.fromTo(0.2, {value:0}, {value:1}, Quart.easeOut, endExpand);
+			tweenJob.onChange = updateTween;
+			updateTween();
+		}
 	}
 
 	public function collapseToSwipe(_swipe:Swipe):Void {
 		if (tweenJob != null) tweenJob.complete();
 		swipe = _swipe;
-		generateOriginalRects();
-		tweenJob = tween.fromTo(0.2, {value:1}, {value:0}, Quart.easeOut, endCollapse);
-		tweenJob.onChange = updateTween;
-		updateTween();
+		if (_contents != null) {
+			generateOriginalRects();
+			tweenJob = tween.fromTo(0.2, {value:1}, {value:0}, Quart.easeOut, endCollapse);
+			tweenJob.onChange = updateTween;
+			updateTween();
+		}
 	}
 
 	private function updateTween():Void {
-		for (i in 0...numChildren) {
-			var child:SwipeBox = cast getChildAt(i);
-			var originalRect:Rectangle = originalRects[i];
-			var rect:Rectangle = child.box;
+		if (_contents != null) {
+			for (i in 0..._contents.length) {
+				var originalRect:Rectangle = originalRects[i];
+				var child:SwipeBox = _contents[i];
+				var rect:Rectangle = child.box;
 
-			var val:Float = tween.value;
-			var inv:Float = 1 - tween.value;
+				var val:Float = tween.value;
+				var inv:Float = 1 - tween.value;
 
-			rect.y      = originalRect.y      * val + swipe.y      * inv;
-			rect.height = originalRect.height * val + swipe.height * inv;
+				if (rect != null && originalRect != null) {
+					rect.y      = originalRect.y      * val + swipe.y      * inv;
+					rect.height = originalRect.height * val + swipe.height * inv;
+					child.box = rect;
+				}
 
-			child.box = rect;
-			child.alpha = val;
+				child.alpha = val;
+			}
 		}
 	}
 
@@ -91,20 +102,19 @@ class Bar extends SwipeBox {
 
 	private function endCollapse():Void {
 		swipe = null;
-		for (i in 0...numChildren) {
-			var child:SwipeBox = cast getChildAt(i);
-			child.box = originalRects[i];
-			child.alpha = 1;
+		if (_contents != null) {
+			for (i in 0..._contents.length) {
+				var child:SwipeBox = _contents[i];
+				child.box = originalRects[i];
+				child.alpha = 1;
+			}
 		}
-		empty();
+		contents = null;
 	}
 
 	private function generateOriginalRects():Void {
 		originalRects = [];
-		for (i in 0...numChildren) {
-			var child:SwipeBox = cast getChildAt(i);
-			originalRects.push(child.box);
-		}
+		for (child in _contents) originalRects.push(child.box);
 	}
 
 	private function setAutoLiftChildren(value:Bool):Bool {
@@ -128,4 +138,15 @@ class Bar extends SwipeBox {
 		liftChild(cast target);
 	}
 
+	private function getContents():Array<SwipeBox> { return _contents == null ? null : _contents.copy(); }
+
+	private function setContents(value:Array<SwipeBox>):Array<SwipeBox> {
+		if (value != _contents) {
+			if (_contents != null) for (child in _contents) removeChild(child);
+			_contents = value;
+			if (_contents != null) for (child in _contents) addChild(child);
+		}
+		resize(_width, _height);
+		return _contents;
+	}
 }
