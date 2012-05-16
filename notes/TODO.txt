@@ -1,3 +1,26 @@
+New architecture
+	Game
+		State: just a Grid<ICell>, a List<IStat>, and a pointer to the IStat of the current IPlayer
+			Also the time limit
+		IStateFactory: creates states of different sorts
+			(does NOT create players of different sorts)
+			InitialStateFactory
+			LevelStateFactory
+			TestStateFactory
+		IPlayer: an object that picks an optimal State from a set of States
+			The initial state is also provided
+			??? How to evaluate for an optimal state if the rules aren't in stone?
+			??? How does the View portray the set of states?
+				For the View's sake, the set of states must be organized by cause
+			MachinePlayer
+			HumanPlayer
+			NetworkPlayer
+			TestPlayer
+		IRule: a generator whose input and output are a State and a set of States that can be reached from that State
+
+
+
+
 Prevent overlapping interaction
 
 The game needs to be separated from the rules
