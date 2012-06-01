@@ -2,12 +2,13 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.Lib;
 
-#if oldview
-import net.rezmason.scourge.old.Board;
+#if proto
+	import net.rezmason.scourge.proto.view.Board;
+	import net.rezmason.scourge.proto.model.Game;
+	import net.rezmason.scourge.proto.swipe.SwipeView;
 #else
-import net.rezmason.scourge.swipe.SwipeView;
+
 #end
-import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.Common;
 
 class Scourge {
@@ -36,11 +37,12 @@ class Scourge {
 			duration:duration,
 		};
 
-		var game:Game = new Game(defaultGrid.split(","));
-		#if oldview
-		var board:Board = new Board(game, Lib.current, options);
+		#if proto
+			var game:Game = new Game(defaultGrid.split(","));
+			var board:Board = new Board(game, Lib.current, options);
+			//var view:SwipeView = new SwipeView(game, Lib.current, options);
 		#else
-		var view:SwipeView = new SwipeView(game, Lib.current, options);
+
 		#end
 
 		var splash:Array<String> = [
