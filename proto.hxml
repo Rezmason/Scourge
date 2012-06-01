@@ -1,5 +1,5 @@
 -swf9 deploy-flash/scourge.swf
--main Scourge
+-main Proto
 -debug
 --flash-strict
 -swf-version 11
