@@ -29,6 +29,9 @@ Game varieties
 			Slower bite replenishment rate
 			Slower swap replenishment rate
 			More small pieces in swap stream?
+	Story mode
+		Locomotion is going to be necessary
+			Move (pick up a chunk of yourself (including your head) and place it somewhere else on your body)
 
 MULTIPLAYER
 	Same machine (PC)

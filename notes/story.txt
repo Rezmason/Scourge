@@ -25,7 +25,7 @@ You must eat.
 
 Chapters:
 	emergy - in which the specimen is activated, and develops its abilities
-		Tutorial levels and the beginnings of narrative. The main character learns of his nature as a synthetic organism trained to kill.
+		"Tutorial levels" and the beginnings of narrative. The main character learns of his nature as a synthetic organism trained to kill.
 	ipseity - in which the specimen distinguishes itself from the others through its cunning and ferocity
 		The specimen becomes more horrified and weary of its development procedure. It finds a way to break containment unobserved.
 	hegemony - in which the species gains ecological dominance under the specimen's leadership
@@ -42,16 +42,20 @@ Chapters:
 			Completely peaceful but lacking self awareness
 			The specimen faces the irony of a return to bondage on behalf of the natural behaviors it yearned for
 		The specimen defiantly remains to seek the cosmic origin.
+			Staves off his craving to consume by eating his own tail
+				Ananta
+				Scans the sky as he goes around
+				Also an indeterminate progress indicator
 
 Events:
-	Synthesis - the creation of artificial life. The specimen grows disgusted with synthesis, which it sees as a deeply rooted kind of tyrannical control
+	Synthesis - the creation of artificial life from non-living material. The specimen grows disgusted with synthesis, which it sees as a deeply rooted kind of tyrannical control
 		This is in contrast to the natural, instinctive behaviors that the specimen observes in its species and sees as more truthful
 	The breakout - the specimen's successful escape from the test system
 	END DUNN - a mission to terminate high-ranking personnel in the company responsible for the escapees' synthesis and for their species' conditioning.
 		[ Unintentionally similar in name to John Tyler Bonner, a very clever man who experiments with slime molds in interesting ways ]
 	Debut - the first time people are killed as a result of the species' weaponizaiton
 		Originally a term used by the company, it was adopted by the escapees when they took control of the research facility and its countryside
-	Premise - the name of the synthetic planet on which the story unfolds.
+	????? - the name of the synthetic planet on which the story unfolds.
 		Divided into six square regions, each subdivided into nine square regions = 54 levels
 
 	* - unnamed event where the player can have a live chat with the author at the end of the game, if the player waits long enough
