@@ -1,38 +1,25 @@
-Gap eating
-	An inner gap is an empty cell whose neareset non-empty neighbors
-			in all cardinal directions have the same allegiance.
-		(Zuser: count these regions when determining area)
-	Updated during the eat algorithm
+Tests I want to write
+	PieceGen macro BOOYAH
+	Rules - assert output state of each ply
+		PlayRule
+			init: sets "playing" to true
+			always valid
+			ends ply and begins next "playing" player's ply
+			optional "forfeit" param sets "playing" to false
+	Game
+		RequisitionPieceRule
 
-Coarse evaluation
-	Obvious`
-		Area
-		Attribute count (bites and swaps) times attribute range
-	Maybe
-		Outer perimeter (based on largest attribute range)
-		Porosity
-		Connectedness
-
-
-A.I. thoughts
-	Shannon Type B
-		Identify and prune the moves that are just fucking stupid
-			Sort by coarse evaluation
-			Only consider the top N possibilities
-	Alpha-Beta pruning
-		Is this even possible?
-	Fretting
-		aka "Permanent brain"
-		Players technically aren't limited to their turn in order to evaluate the board
-
+		Four test players, an initial test state
+		skip-requisitionpiece
+	Signals and commands?
 
 New architecture
 
-	State: just a Grid<ICell>, a List<IStat>, and a pointer to the IStat of the current IPlayer
-	IStateFactory: creates states of different sorts
-		InitialStateFactory
-		MissionStateFactory
-		TestStateFactory
+	State: just an Array<ICell>, a List<IStat>, and a pointer to the IStat of the current IPlayer
+	State factory: creates states of different sorts
+		BoardStateFactory
+		WorldStateFactory
+		TestStateFactory extends BoardStateFactory - for testing visual effects
 	IRule: a generator whose input and output are a State and a set of States that can be reached from that State
 		Organized hierarchically based on the parameters of the action associated with the IRule
 			Each param must be easily converted to String
@@ -103,6 +90,33 @@ New architecture
 			Including tutorials
 		Uses MissionStateFactory
 
+Gap eating
+	An inner gap is an empty cell whose neareset non-empty neighbors
+			in all cardinal directions have the same allegiance.
+		(Zuser: count these regions when determining area)
+	Updated during the eat algorithm
+
+Coarse evaluation
+	Obvious
+		Area
+		Attribute count (bites and swaps) times attribute range
+	Maybe
+		Outer perimeter (based on largest attribute range)
+		Porosity
+		Connectedness
+
+
+A.I. thoughts
+	Shannon Type B
+		Identify and prune the moves that are just fucking stupid
+			Sort by coarse evaluation
+			Only consider the top N possibilities
+	Alpha-Beta pruning
+		Is this even possible?
+	Fretting
+		aka "Permanent brain"
+		Players technically aren't limited to their turn in order to evaluate the board
+
 
 New UI
 
@@ -133,8 +147,6 @@ New UI
 	Mouse mode
 		Board doesn't zoom for chop
 		No swiping at all?
-
-NME
 
 Texture synthesis
 	Dots
