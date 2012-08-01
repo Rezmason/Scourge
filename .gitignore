@@ -1,3 +1,4 @@
 deploy-flash/*.swf
 build
 report
+TestSuite.hx
