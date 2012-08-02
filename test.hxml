@@ -34,6 +34,7 @@
 -lib munit
 -lib hamcrest
 -cp src
+#-D VISUAL_TEST
 
 -cp test
 -neko build/neko_test.n

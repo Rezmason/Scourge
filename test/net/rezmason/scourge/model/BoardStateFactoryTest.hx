@@ -11,6 +11,47 @@ typedef BoardNode = GridNode<Cell>;
 
 class BoardStateFactoryTest {
 
+    private static var board1:String = "\n" +
+        "• • • • • • • • • • • • • • • • • • • • • • • • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•           1                     2           • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•           0                     3           • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "•                                             • \n" +
+        "• • • • • • • • • • • • • • • • • • • • • • • • ";
+
+    private static var board2:String = "\n" +
+        "• • • • • • • • • • • • • \n" +
+        "• • • •           • • • • \n" +
+        "• • •               • • • \n" +
+        "• •                   • • \n" +
+        "•                       • \n" +
+        "•                       • \n" +
+        "•           0           • \n" +
+        "•                       • \n" +
+        "•                       • \n" +
+        "• •                   • • \n" +
+        "• • •               • • • \n" +
+        "• • • •           • • • • \n" +
+        "• • • • • • • • • • • • • ";
+
     @Before
     public function setup():Void {
 
@@ -45,8 +86,12 @@ class BoardStateFactoryTest {
 
         var playerHead:BoardNode = state.players[0].head;
 
-        trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
-        trace(spitGrid(playerHead));
+        #if VISUAL_TEST
+            trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
+            trace(spitGrid(playerHead));
+        #else
+            Assert.areEqual(board1, spitGrid(playerHead));
+        #end
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);
@@ -72,8 +117,12 @@ class BoardStateFactoryTest {
         cfg.circular = true;
         var state:State = factory.makeState(cfg);
 
-        trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
-        trace(spitGrid(state.players[0].head));
+        #if VISUAL_TEST
+            trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
+            trace(spitGrid(state.players[0].head));
+        #else
+            Assert.areEqual(board2, spitGrid(state.players[0].head));
+        #end
     }
 
     private function spitGrid(head:BoardNode):String {
