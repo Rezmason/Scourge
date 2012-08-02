@@ -1,17 +1,26 @@
-Tests I want to write
-	PieceGen macro BOOYAH
-	Rules - assert output state of each ply
-		PlayRule
-			init: sets "playing" to true
-			always valid
-			ends ply and begins next "playing" player's ply
-			optional "forfeit" param sets "playing" to false
-	Game
-		RequisitionPieceRule
+PieceGen macro BOOYAH
+	XY = <x:Int, y:Int>
+	Orientation = {coords:Array<XY>, adjacentCoords:Array<XY>}
+	Piece = Array<Orientation>;
 
-		Four test players, an initial test state
-		skip-requisitionpiece
-	Signals and commands?
+PlacePieceRule
+	1: for each orientation,
+		2: for each edge node of the player,
+			3: for each neighbor coord in the orientation,
+				Look up the node at the origin
+				If that node has not already been visited as an origin,
+					Flag that node
+					4: for each coord in the orientation,
+						Get the node at the coord (relative to the origin node)
+						If the node is filled,
+							break loop 3
+					add the origin node to the list
+	unflag all flagged nodes
+
+FindEdgeNodesRule
+	Updates the edges for the current player
+	Stores the list in the aspect
+
 
 New architecture
 

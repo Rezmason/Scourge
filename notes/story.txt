@@ -59,3 +59,7 @@ Events:
 		Divided into six square regions, each subdivided into nine square regions = 54 levels
 
 	* - unnamed event where the player can have a live chat with the author at the end of the game, if the player waits long enough
+
+Funny:
+	http://mathworld.wolfram.com/LatticeAnimal.html
+	"LATTICE ANIMALS"! Ahahahaha!
