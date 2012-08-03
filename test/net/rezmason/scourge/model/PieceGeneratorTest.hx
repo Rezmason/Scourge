@@ -21,22 +21,23 @@ class PieceGeneratorTest {
 
         // PieceGenerator should create all one-sided polyominoes with no duplicates
 
-        var pieces:Array<Piece>;
-
+        // http://mathworld.wolfram.com/Polyomino.html
         var expectedCounts:Array<Array<Int>> = [
-            [1, 1, 2,  5, 12,  35],
-            [1, 1, 2,  7, 18,  60],
             [1, 2, 6, 19, 63, 216],
+            [1, 1, 2,  7, 18,  60],
+            [1, 1, 2,  5, 12,  35],
         ];
 
-        for (type in 0...expectedCounts.length) {
-            for (size in expectedCounts[type]) {
-                pieces = PieceGenerator.generate(size, type);
+        for (pieceType in 0...expectedCounts.length) {
+            var counts:Array<Int> = expectedCounts[pieceType];
+            for (size in 0...expectedCounts[pieceType].length) {
+                var count:Int = counts[size];
+                var pieces:Array<Piece> = PieceGenerator.generate(size + 1, pieceType);
                 Assert.isNotNull(pieces);
-                Assert.areEqual(expectedCounts[type][size], pieces.length);
+                Assert.areEqual(count, pieces.length);
                 for (piece in pieces) {
                     Assert.isNotNull(piece);
-                    Assert.areEqual(piece.length, size);
+                    Assert.areEqual(size + 1, piece.length);
                 }
             }
         }
