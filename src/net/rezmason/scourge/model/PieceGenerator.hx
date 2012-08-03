@@ -69,10 +69,10 @@ class PieceGenerator {
 
                 // remove duplicates
 
-                for (i in 0...patterns.length) {
-                    if (patterns[i] == null) continue;
-                    for (j in i + 1...patterns.length) {
-                        if (patterns[j] != null && arePatternsEqual(patterns[i], patterns[j])) patterns[j] = null;
+                for (ike in 0...patterns.length) {
+                    if (patterns[ike] == null) continue;
+                    for (jen in ike + 1...patterns.length) {
+                        if (patterns[jen] != null && arePatternsEqual(patterns[ike], patterns[jen])) patterns[jen] = null;
                     }
                 }
             }
@@ -91,17 +91,17 @@ class PieceGenerator {
 
             // remove duplicates
 
-            for (i in 0...patterns.length) {
-                if (patterns[i] == null) continue;
-                var  r90Pattern:Pattern = rotatePattern(patterns[i]);
+            for (ike in 0...patterns.length) {
+                if (patterns[ike] == null) continue;
+                var  r90Pattern:Pattern = rotatePattern(patterns[ike]);
                 var r180Pattern:Pattern = rotatePattern(r90Pattern);
                 var r270Pattern:Pattern = rotatePattern(r180Pattern);
-                for (j in i + 1...patterns.length) {
-                    if (patterns[j] != null) {
-                        if (arePatternsEqual( r90Pattern, patterns[j]) ||
-                            arePatternsEqual(r180Pattern, patterns[j]) ||
-                            arePatternsEqual(r270Pattern, patterns[j])) {
-                            patterns[j] = null;
+                for (jen in ike + 1...patterns.length) {
+                    if (patterns[jen] != null) {
+                        if (arePatternsEqual( r90Pattern, patterns[jen]) ||
+                            arePatternsEqual(r180Pattern, patterns[jen]) ||
+                            arePatternsEqual(r270Pattern, patterns[jen])) {
+                            patterns[jen] = null;
                         }
                     }
                 }
@@ -121,20 +121,20 @@ class PieceGenerator {
 
             // remove duplicates
 
-            for (i in 0...patterns.length) {
-                if (patterns[i] == null) continue;
-                var flipPattern:Pattern = hFlipPattern(patterns[i]);
+            for (ike in 0...patterns.length) {
+                if (patterns[ike] == null) continue;
+                var flipPattern:Pattern = vFlipPattern(patterns[ike]);
                 var  r90Pattern:Pattern = rotatePattern(flipPattern);
                 var r180Pattern:Pattern = rotatePattern(r90Pattern);
                 var r270Pattern:Pattern = rotatePattern(r180Pattern);
 
-                for (j in i + 1...patterns.length) {
-                    if (patterns[j] != null) {
-                        if (arePatternsEqual(flipPattern, patterns[j]) ||
-                            arePatternsEqual( r90Pattern, patterns[j]) ||
-                            arePatternsEqual(r180Pattern, patterns[j]) ||
-                            arePatternsEqual(r270Pattern, patterns[j])) {
-                            patterns[j] = null;
+                for (jen in ike + 1...patterns.length) {
+                    if (patterns[jen] != null) {
+                        if (arePatternsEqual(flipPattern, patterns[jen]) ||
+                            arePatternsEqual( r90Pattern, patterns[jen]) ||
+                            arePatternsEqual(r180Pattern, patterns[jen]) ||
+                            arePatternsEqual(r270Pattern, patterns[jen])) {
+                            patterns[jen] = null;
                         }
                     }
                 }
@@ -156,25 +156,25 @@ class PieceGenerator {
 
     private static function rotatePattern(pattern:Pattern):Pattern {
         var rotatedPattern:Pattern = [];
-        for (i in 0...pattern.length) {
+        for (row in 0...pattern.length) {
             rotatedPattern.push([]);
-            for (j in 0...pattern.length) {
-                rotatedPattern[i][j] = pattern[j][i] == true;
+            for (col in 0...pattern.length) {
+                rotatedPattern[row][col] = pattern[col][row] == true;
             }
-            rotatedPattern[i].reverse();
+            rotatedPattern[row].reverse();
         }
         return rotatedPattern;
     }
 
     private static function hFlipPattern(pattern:Pattern):Pattern {
         pattern = copyPattern(pattern);
-        for (i in 0...pattern.length) {
-            var row:Array<Bool> = pattern[i];
+        for (ike in 0...pattern.length) {
+            var row:Array<Bool> = pattern[ike];
             var newRow:Array<Bool> = [];
-            for (i in 0...pattern.length) {
-                newRow[i] = row[pattern.length - 1 - i];
+            for (jen in 0...pattern.length) {
+                newRow[jen] = row[pattern.length - 1 - jen];
             }
-            pattern[i] = newRow;
+            pattern[ike] = newRow;
         }
         return pattern;
     }
@@ -229,32 +229,32 @@ class PieceGenerator {
 
         // find the closest corner of pattern1
 
-        for (i in 0...pattern1.length) {
-            var index:Int = pattern1[i].indexOf(true);
-            if (index != -1) {
-                if (minX1 > index) minX1 = index;
-                if (minY1 > i) minY1 = i;
+        for (row in 0...pattern1.length) {
+            var col:Int = pattern1[row].indexOf(true);
+            if (col != -1) {
+                if (minX1 > col) minX1 = col;
+                if (minY1 > row) minY1 = row;
             }
         }
 
         // find the closest corner of pattern2
 
-        for (i in 0...pattern2.length) {
-            var index:Int = pattern2[i].indexOf(true);
-            if (index != -1) {
-                if (minX2 > index) minX2 = index;
-                if (minY2 > i) minY2 = i;
+        for (row in 0...pattern2.length) {
+            var col:Int = pattern2[row].indexOf(true);
+            if (col != -1) {
+                if (minX2 > col) minX2 = col;
+                if (minY2 > row) minY2 = row;
             }
         }
 
-        for (i in 0...pattern1.length) {
-            var row1:Array<Bool> = pattern1[i + minY1];
-            var row2:Array<Bool> = pattern2[i + minY2];
+        for (row in 0...pattern1.length) {
+            var slice1:Array<Bool> = pattern1[row + minY1];
+            var slice2:Array<Bool> = pattern2[row + minY2];
 
-            if (row1 == null || row2 == null) return true;
+            if (slice1 == null || slice2 == null) return true;
 
-            for (j in 0...row1.length) {
-                if ((row1[j + minX1] == true) != (row2[j + minX2] == true)) return false;
+            for (col in 0...slice1.length) {
+                if ((slice1[col + minX1] == true) != (slice2[col + minX2] == true)) return false;
             }
         }
         return true;
