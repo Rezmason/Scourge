@@ -1,5 +1,4 @@
-PieceGen macro BOOYAH
-	Make sure the class doesn't end up in the binary
+PieceGen parser BOOYAH
 
 PlacePieceRule
 	1: for each orientation,

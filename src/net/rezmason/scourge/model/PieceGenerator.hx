@@ -10,11 +10,7 @@ using Lambda;
 
 class PieceGenerator {
 
-    private static var MONOMINO:Pattern = [
-        [false, false, false],
-        [false,  true, false],
-        [false, false, false],
-    ];
+    private static var MONOMINO:Pattern = [[true]];
 
     private static var fixedPatternsBySize:Array<Array<Pattern>> = [];
     private static var oneSidedPatternsBySize:Array<Array<Pattern>> = [];
@@ -47,6 +43,8 @@ class PieceGenerator {
     }
 
     private static function makeFixedPatterns(size:Int):Array<Pattern> {
+        //trace("FS " + size);
+
         var patterns:Array<Pattern> = [];
 
         if (size == 1) {
@@ -60,7 +58,7 @@ class PieceGenerator {
 
                 // create modifications of the predecessor
 
-                for (pattern in getProgeny(inflatePattern(predecessor))) {
+                for (pattern in getProgeny(predecessor)) {
                     patterns.push(pattern);
                 }
             }
@@ -84,6 +82,8 @@ class PieceGenerator {
     }
 
     private static function makeOneSidedPatterns(size:Int):Array<Pattern> {
+        //trace("OS " + size);
+
         if (fixedPatternsBySize[size] == null) fixedPatternsBySize[size] = makeFixedPatterns(size);
         var patterns:Array<Pattern> = fixedPatternsBySize[size].copy();
 
@@ -96,6 +96,7 @@ class PieceGenerator {
                 var  r90Pattern:Pattern = rotatePattern(patterns[ike]);
                 var r180Pattern:Pattern = rotatePattern(r90Pattern);
                 var r270Pattern:Pattern = rotatePattern(r180Pattern);
+
                 for (jen in ike + 1...patterns.length) {
                     if (patterns[jen] != null) {
                         if (arePatternsEqual( r90Pattern, patterns[jen]) ||
@@ -114,6 +115,8 @@ class PieceGenerator {
     }
 
     private static function makeFreePatterns(size:Int):Array<Pattern> {
+        //trace("FR " + size);
+
         if (oneSidedPatternsBySize[size] == null) oneSidedPatternsBySize[size] = makeOneSidedPatterns(size);
         var patterns:Array<Pattern> = oneSidedPatternsBySize[size].copy();
 
@@ -146,14 +149,6 @@ class PieceGenerator {
         return patterns;
     }
 
-    private static function inflatePattern(pattern:Pattern):Pattern {
-        pattern = copyPattern(pattern);
-        for (row in pattern) row.unshift(false);
-        pattern.push([]);
-        pattern.unshift([]);
-        return pattern;
-    }
-
     private static function rotatePattern(pattern:Pattern):Pattern {
         var rotatedPattern:Pattern = [];
         for (row in 0...pattern.length) {
@@ -163,6 +158,8 @@ class PieceGenerator {
             }
             rotatedPattern[row].reverse();
         }
+
+        cleanPattern(rotatedPattern);
         return rotatedPattern;
     }
 
@@ -176,12 +173,15 @@ class PieceGenerator {
             }
             pattern[ike] = newRow;
         }
+
+        cleanPattern(pattern);
         return pattern;
     }
 
     private static function vFlipPattern(pattern:Pattern):Pattern {
         pattern = copyPattern(pattern);
         pattern.reverse();
+        cleanPattern(pattern);
         return pattern;
     }
 
@@ -193,6 +193,11 @@ class PieceGenerator {
 
     private static function getProgeny(pattern:Pattern):Array<Pattern> {
         var progeny:Array<Pattern> = [];
+
+        pattern = copyPattern(pattern); // !!
+        for (row in pattern) row.unshift(false); // !!
+        pattern.push([]); // !!
+        pattern.unshift([]); // !!
 
         for (y in 0...pattern.length) {
             for (x in 0...pattern.length) {
@@ -211,6 +216,8 @@ class PieceGenerator {
                     if (valid) {
                         var child:Pattern = copyPattern(pattern);
                         child[y][x] = true;
+                        cleanPattern(child); // !!
+                        child.pop(); // !!
                         progeny.push(child);
                     }
                 }
@@ -221,62 +228,33 @@ class PieceGenerator {
     }
 
     private static function arePatternsEqual(pattern1:Pattern, pattern2:Pattern):Bool {
-
-        var minX1:Int = Std.int(pattern1.length / 2);
-        var minY1:Int = Std.int(pattern1.length / 2);
-        var minX2:Int = Std.int(pattern1.length / 2);
-        var minY2:Int = Std.int(pattern1.length / 2);
-
-        // find the closest corner of pattern1
-
         for (row in 0...pattern1.length) {
-            var col:Int = pattern1[row].indexOf(true);
-            if (col != -1) {
-                if (minX1 > col) minX1 = col;
-                if (minY1 > row) minY1 = row;
-            }
-        }
-
-        // find the closest corner of pattern2
-
-        for (row in 0...pattern2.length) {
-            var col:Int = pattern2[row].indexOf(true);
-            if (col != -1) {
-                if (minX2 > col) minX2 = col;
-                if (minY2 > row) minY2 = row;
-            }
-        }
-
-        for (row in 0...pattern1.length) {
-            var slice1:Array<Bool> = pattern1[row + minY1];
-            var slice2:Array<Bool> = pattern2[row + minY2];
-
-            if (slice1 == null || slice2 == null) return true;
-
-            for (col in 0...slice1.length) {
-                if ((slice1[col + minX1] == true) != (slice2[col + minX2] == true)) return false;
-            }
+            var slice1:Array<Bool> = pattern1[row];
+            var slice2:Array<Bool> = pattern2[row];
+            for (col in 0...slice1.length) if ((slice1[col] == true) != (slice2[col] == true)) return false;
         }
         return true;
+    }
+
+    private static function cleanPattern(pattern:Pattern):Void {
+
+        var old:String = spitPattern(pattern);
+
+        var minX:Int = pattern.length;
+
+        for (slice in pattern) {
+            var col:Int = slice.indexOf(true);
+            if (col != -1 && minX > col) minX = col;
+        }
+
+        if (minX < pattern.length) for (slice in pattern) slice.splice(0, minX);
+
+        while (!pattern[0].has(true)) pattern.push(pattern.shift());
     }
 
     private static function patternToPiece(pattern:Pattern):Piece {
         var piece:Piece = [];
         for (y in 0...pattern.length) for (x in 0...pattern[y].length) if (pattern[y][x]) piece.push({x:x, y:y});
-
-        var minX:Int = Std.int(pattern.length / 2);
-        var minY:Int = Std.int(pattern.length / 2);
-
-        for (coord in piece) {
-            if (minX > coord.x) minX = coord.x;
-            if (minY > coord.y) minY = coord.y;
-        }
-
-        for (coord in piece) {
-            coord.x -= minX;
-            coord.y -= minY;
-        }
-
         return piece;
     }
 
