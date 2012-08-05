@@ -10,8 +10,6 @@ using Lambda;
 
 class PieceGenerator {
 
-    private static var MONOMINO:Pattern = [[true]];
-
     private static var fixedPatternsBySize:Array<Array<Pattern>> = [];
     private static var oneSidedPatternsBySize:Array<Array<Pattern>> = [];
     private static var freePatternsBySize:Array<Array<Pattern>> = [];
@@ -48,25 +46,13 @@ class PieceGenerator {
         var patterns:Array<Pattern> = [];
 
         if (size == 1) {
-            patterns.push(MONOMINO);
+            patterns.push([[true]]);
         } else {
 
             if (fixedPatternsBySize[size - 1] == null) fixedPatternsBySize[size - 1] = makeFixedPatterns(size - 1);
-            var predecessors:Array<Pattern> = fixedPatternsBySize[size - 1];
-
-            for (predecessor in predecessors) {
-
-                // create modifications of the predecessor
-
-                for (pattern in getProgeny(predecessor)) {
-                    patterns.push(pattern);
-                }
-            }
+            for (predecessor in fixedPatternsBySize[size - 1]) for (pattern in getProgeny(predecessor)) patterns.push(pattern);
 
             if (patterns.length > 1) {
-
-                // remove duplicates
-
                 for (ike in 0...patterns.length) {
                     if (patterns[ike] == null) continue;
                     for (jen in ike + 1...patterns.length) {
@@ -74,9 +60,9 @@ class PieceGenerator {
                     }
                 }
             }
-
-            while (patterns.has(null)) patterns.remove(null);
         }
+
+        while (patterns.has(null)) patterns.remove(null);
 
         return patterns;
     }
@@ -88,22 +74,19 @@ class PieceGenerator {
         var patterns:Array<Pattern> = fixedPatternsBySize[size].copy();
 
         if (patterns.length > 1) {
-
-            // remove duplicates
-
             for (ike in 0...patterns.length) {
                 if (patterns[ike] == null) continue;
+
                 var  r90Pattern:Pattern = rotatePattern(patterns[ike]);
                 var r180Pattern:Pattern = rotatePattern(r90Pattern);
                 var r270Pattern:Pattern = rotatePattern(r180Pattern);
 
                 for (jen in ike + 1...patterns.length) {
-                    if (patterns[jen] != null) {
-                        if (arePatternsEqual( r90Pattern, patterns[jen]) ||
-                            arePatternsEqual(r180Pattern, patterns[jen]) ||
-                            arePatternsEqual(r270Pattern, patterns[jen])) {
-                            patterns[jen] = null;
-                        }
+                    var pattern2:Pattern = patterns[jen];
+                    if (pattern2 != null) {
+                             if (arePatternsEqual( r90Pattern, pattern2)) patterns[jen] = null;
+                        else if (arePatternsEqual(r180Pattern, pattern2)) patterns[jen] = null;
+                        else if (arePatternsEqual(r270Pattern, pattern2)) patterns[jen] = null;
                     }
                 }
             }
@@ -121,24 +104,21 @@ class PieceGenerator {
         var patterns:Array<Pattern> = oneSidedPatternsBySize[size].copy();
 
         if (patterns.length > 1) {
-
-            // remove duplicates
-
             for (ike in 0...patterns.length) {
                 if (patterns[ike] == null) continue;
+
                 var flipPattern:Pattern = vFlipPattern(patterns[ike]);
                 var  r90Pattern:Pattern = rotatePattern(flipPattern);
                 var r180Pattern:Pattern = rotatePattern(r90Pattern);
                 var r270Pattern:Pattern = rotatePattern(r180Pattern);
 
                 for (jen in ike + 1...patterns.length) {
-                    if (patterns[jen] != null) {
-                        if (arePatternsEqual(flipPattern, patterns[jen]) ||
-                            arePatternsEqual( r90Pattern, patterns[jen]) ||
-                            arePatternsEqual(r180Pattern, patterns[jen]) ||
-                            arePatternsEqual(r270Pattern, patterns[jen])) {
-                            patterns[jen] = null;
-                        }
+                    var pattern2:Pattern = patterns[jen];
+                    if (pattern2 != null) {
+                             if (arePatternsEqual(flipPattern, pattern2)) patterns[jen] = null;
+                        else if (arePatternsEqual( r90Pattern, pattern2)) patterns[jen] = null;
+                        else if (arePatternsEqual(r180Pattern, pattern2)) patterns[jen] = null;
+                        else if (arePatternsEqual(r270Pattern, pattern2)) patterns[jen] = null;
                     }
                 }
             }
@@ -153,29 +133,12 @@ class PieceGenerator {
         var rotatedPattern:Pattern = [];
         for (row in 0...pattern.length) {
             rotatedPattern.push([]);
-            for (col in 0...pattern.length) {
-                rotatedPattern[row][col] = pattern[col][row] == true;
-            }
+            for (col in 0...pattern.length) rotatedPattern[row][col] = pattern[col][row] == true;
             rotatedPattern[row].reverse();
         }
 
         cleanPattern(rotatedPattern);
         return rotatedPattern;
-    }
-
-    private static function hFlipPattern(pattern:Pattern):Pattern {
-        pattern = copyPattern(pattern);
-        for (ike in 0...pattern.length) {
-            var row:Array<Bool> = pattern[ike];
-            var newRow:Array<Bool> = [];
-            for (jen in 0...pattern.length) {
-                newRow[jen] = row[pattern.length - 1 - jen];
-            }
-            pattern[ike] = newRow;
-        }
-
-        cleanPattern(pattern);
-        return pattern;
     }
 
     private static function vFlipPattern(pattern:Pattern):Pattern {
@@ -262,11 +225,11 @@ class PieceGenerator {
         var str:String = "\n";
         var size:Int = pattern.length;
         for (row in pattern) {
-            str += "| ";
+            str += "";
             for (column in 0...size) {
-                str += row[column] ? "H " : ". ";
+                str += row[column] ? "•" : " ";
             }
-            str += "| \n";
+            str += "\n______";
         }
         return str;
     }
