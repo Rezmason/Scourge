@@ -1,4 +1,4 @@
-package net.rezmason.scourge.model;
+package net.rezmason.scourge.tools;
 
 typedef IntCoord = {x:Int, y:Int};
 typedef Piece = Array<IntCoord>;

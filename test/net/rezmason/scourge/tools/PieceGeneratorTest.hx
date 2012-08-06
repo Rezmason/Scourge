@@ -1,8 +1,8 @@
-package net.rezmason.scourge.model;
+package net.rezmason.scourge.tools;
 
 import massive.munit.Assert;
 
-import net.rezmason.scourge.model.PieceGenerator;
+import net.rezmason.scourge.tools.PieceGenerator;
 
 class PieceGeneratorTest {
 
