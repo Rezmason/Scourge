@@ -11,46 +11,74 @@ typedef BoardNode = GridNode<Cell>;
 
 class BoardStateFactoryTest {
 
+    private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
+
     private static var board1:String = "\n" +
-        "• • • • • • • • • • • • • • • • • • • • • • • • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•           1                     2           • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•           0                     3           • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "•                                             • \n" +
-        "• • • • • • • • • • • • • • • • • • • • • • • • ";
+        "@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@           1                     2           @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@           0                     3           @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@                                             @ \n" +
+        "@ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ ";
 
     private static var board2:String = "\n" +
-        "• • • • • • • • • • • • • \n" +
-        "• • • •           • • • • \n" +
-        "• • •               • • • \n" +
-        "• •                   • • \n" +
-        "•                       • \n" +
-        "•                       • \n" +
-        "•           0           • \n" +
-        "•                       • \n" +
-        "•                       • \n" +
-        "• •                   • • \n" +
-        "• • •               • • • \n" +
-        "• • • •           • • • • \n" +
-        "• • • • • • • • • • • • • ";
+        "@ @ @ @ @ @ @ @ @ @ @ @ @ \n" +
+        "@ @ @ @           @ @ @ @ \n" +
+        "@ @ @               @ @ @ \n" +
+        "@ @                   @ @ \n" +
+        "@                       @ \n" +
+        "@                       @ \n" +
+        "@           0           @ \n" +
+        "@                       @ \n" +
+        "@                       @ \n" +
+        "@ @                   @ @ \n" +
+        "@ @ @               @ @ @ \n" +
+        "@ @ @ @           @ @ @ @ \n" +
+        "@ @ @ @ @ @ @ @ @ @ @ @ @ ";
+
+    private static var board3:String = "\n" +
+        "@@@@@@@@@@@@@@@@@@@@@@@@\n" +
+        "@1111112222222222222222@\n" +
+        "@1111112222222222222222@\n" +
+        "@1111112222222222222222@\n" +
+        "@1111111111111111222222@\n" +
+        "@1111111111111111222222@\n" +
+        "@1111111111111111222222@\n" +
+        "@111000          222333@\n" +
+        "@111000 11111111 222333@\n" +
+        "@111000 00000001 222333@\n" +
+        "@111000 01111101 222333@\n" +
+        "@111000 01000101 222333@\n" +
+        "@111000 01010101 222333@\n" +
+        "@111000 01011101 222333@\n" +
+        "@111000 01000001 222333@\n" +
+        "@111000 01111111 222333@\n" +
+        "@111000          222333@\n" +
+        "@0000003333333333333333@\n" +
+        "@0000003333333333333333@\n" +
+        "@0000003333333333333333@\n" +
+        "@0000000000000000333333@\n" +
+        "@0000000000000000333333@\n" +
+        "@0000000000000000333333@\n" +
+        "@@@@@@@@@@@@@@@@@@@@@@@@";
 
     @Before
     public function setup():Void {
@@ -125,7 +153,20 @@ class BoardStateFactoryTest {
         #end
     }
 
-    private function spitGrid(head:BoardNode):String {
+    @Test
+    public function configTest3():Void {
+        var factory:BoardStateFactory = new BoardStateFactory();
+        var cfg:BoardStateConfig = new BoardStateConfig();
+        for (gene in ["a", "b", "c", "d"]) cfg.playerGenes.push(gene);
+        cfg.initGrid = board3;
+        var state:State = factory.makeState(cfg);
+
+        trace(spitGrid(state.players[0].head));
+
+        Assert.areEqual(board3, spitGrid(state.players[0].head, false));
+    }
+
+    private function spitGrid(head:BoardNode, addSpaces:Bool = true):String {
         var str:String = "";
 
         var grid:BoardNode = head.run(Gr.nw).run(Gr.w).run(Gr.n);
@@ -134,16 +175,17 @@ class BoardStateFactoryTest {
             str += "\n";
             for (column in row.walk(Gr.e)) {
                 str += cellToString(column.value);
-                str += " ";
             }
         }
+
+        if (addSpaces) str = ADD_SPACES.replace(str, "$1 ");
 
         return str;
     }
 
     private function cellToString(cell:Cell):String {
         if (cell.occupier > -1) return Std.string(cell.occupier);
-        if (cell.isFilled) return "•";
+        if (cell.isFilled) return "@";
 
         return " ";
     }

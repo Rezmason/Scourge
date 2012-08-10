@@ -1,4 +1,17 @@
-PieceGen parser BOOYAH
+Provide history for all rule aspects
+Create a history manager
+
+KillDisconnectedCellsRule
+	TEST
+		Create a state with a debugGrid
+		Pass the State to the Rule for Option generation
+			returns one Option, which is the expected Option
+		Pass State, Evaluator and Option to Rule
+			returns an expected value
+		Pass the State and Option to the Rule
+		Compare the State with the expected result
+
+		Do this for several cases
 
 PlacePieceRule
 	1: for each orientation,
@@ -18,6 +31,8 @@ FindEdgeNodesRule
 	Updates the edges for the current player
 	Stores the list in the aspect
 
+Level Editing
+	Just a bunch of rules, aha
 
 New architecture
 

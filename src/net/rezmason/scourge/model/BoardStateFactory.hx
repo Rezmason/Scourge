@@ -20,6 +20,9 @@ class BoardStateFactory {
     private inline static var PADDING:Int = 5;
     private inline static var RIM:Int = 1;
 
+    private static var INIT_GRID_CLEANER:EReg = ~/(\n\t)/g;
+    private static var NUMERIC_CHAR:EReg = ~/(\d)/g;
+
     public function new():Void {
 
     }
@@ -38,16 +41,16 @@ class BoardStateFactory {
             state.aspects.set(rule.id, list);
         }
 
-        makeBoard(state.players, cfg.circular, rules);
+        makeBoard(state.players, cfg.circular, cfg.initGrid, rules);
 
         return state;
     }
 
-    function makeBoard(players:Array<PlayerState>, circular:Bool, rules:Array<Rule>):Void {
+    function makeBoard(players:Array<PlayerState>, circular:Bool, initGrid:String, rules:Array<Rule>):Void {
         var numPlayers:Int = players.length;
 
         // build the level out of nodes
-        var data:BoardData = getHeadPoints(players.length, PLAYER_DIST, PADDING + RIM);
+        var data:BoardData = getHeadPoints(numPlayers, PLAYER_DIST, PADDING + RIM);
 
         // Make a connected grid of nodes with default values
         var node:GridNode<Cell> = makeNode();
@@ -75,13 +78,37 @@ class BoardStateFactory {
         for (node in grid.run(Gr.e).walk(Gr.s)) node.value.isFilled = true;
 
         // Identify and change the occupier of each head
-        for (ike in 0...players.length) {
+        for (ike in 0...numPlayers) {
             var player:PlayerState = players[ike];
             var coord:XY = data.heads[ike];
             player.head = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
             var cell:Cell = player.head.value;
             cell.isFilled = true;
             cell.occupier = ike;
+        }
+
+        if (initGrid != null && initGrid.length > 0) {
+
+            var initGridWidth:Int = data.boardWidth + 1;
+
+            initGrid = INIT_GRID_CLEANER.replace(initGrid, "");
+
+            var y:Int = 0;
+            for (row in grid.walk(Gr.s)) {
+                var x:Int = 0;
+                for (column in row.walk(Gr.e)) {
+                    if (!column.value.isFilled) {
+                        var char:String = initGrid.charAt(y * initGridWidth + x + 1);
+                        if (char != " ") {
+                            column.value.isFilled = true;
+                            if (!NUMERIC_CHAR.match(char)) column.value.occupier = -1;
+                            else column.value.occupier = Std.int(Math.min(Std.parseInt(char), numPlayers));
+                        }
+                    }
+                    x++;
+                }
+                y++;
+            }
         }
 
         if (circular) {
