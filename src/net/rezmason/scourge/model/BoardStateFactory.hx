@@ -87,6 +87,24 @@ class BoardStateFactory {
             cell.occupier = ike;
         }
 
+        if (circular) {
+            var radius:Float = (data.boardWidth - RIM * 2) * 0.5;
+            var y:Int = 0;
+            for (row in grid.walk(Gr.s)) {
+                var x:Int = 0;
+                for (column in row.walk(Gr.e)) {
+                    if (!column.value.isFilled) {
+                        var fx:Float = x - radius + 0.5 - RIM;
+                        var fy:Float = y - radius + 0.5 - RIM;
+                        var insideCircle:Bool = Math.sqrt(fx * fx + fy * fy) < radius;
+                        if (!insideCircle) column.value.isFilled = true;
+                    }
+                    x++;
+                }
+                y++;
+            }
+        }
+
         if (initGrid != null && initGrid.length > 0) {
 
             var initGridWidth:Int = data.boardWidth + 1;
@@ -104,24 +122,6 @@ class BoardStateFactory {
                             if (!NUMERIC_CHAR.match(char)) column.value.occupier = -1;
                             else column.value.occupier = Std.int(Math.min(Std.parseInt(char), numPlayers));
                         }
-                    }
-                    x++;
-                }
-                y++;
-            }
-        }
-
-        if (circular) {
-            var radius:Float = (data.boardWidth - RIM * 2) * 0.5;
-            var y:Int = 0;
-            for (row in grid.walk(Gr.s)) {
-                var x:Int = 0;
-                for (column in row.walk(Gr.e)) {
-                    if (!column.value.isFilled) {
-                        var fx:Float = x - radius + 0.5 - RIM;
-                        var fy:Float = y - radius + 0.5 - RIM;
-                        var insideCircle:Bool = Math.sqrt(fx * fx + fy * fy) < radius;
-                        if (!insideCircle) column.value.isFilled = true;
                     }
                     x++;
                 }
