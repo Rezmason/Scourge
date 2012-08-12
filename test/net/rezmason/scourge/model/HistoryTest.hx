@@ -21,6 +21,8 @@ class HistoryTest
 		var recordB:Record<Int> = new Record<Int>();
 		var recordC:Record<Int> = new Record<Int>();
 
+		recordA.value = 0;
+
 		history.add(recordA);
 		history.add(recordB);
 
@@ -56,7 +58,7 @@ class HistoryTest
 		// first state
 		history.revert(0);
 		Assert.areEqual(0, recordA.value);
-		Assert.areEqual(0, recordB.value);
+		Assert.areEqual(null, recordB.value);
 		Assert.areEqual(3, recordC.value);
 
 		// middle state
@@ -70,14 +72,16 @@ class HistoryTest
 		recordB.value = 5;
 		recordC.value = 6;
 
-		// Attempt to revert with pending changes
-		threwError = false;
-		try {
-			history.revert(history.latestRev);
-		} catch (error:Dynamic) {
-			threwError = true;
-		}
-		Assert.isTrue(threwError);
+		#if SAFE_HISTORY
+			// Attempt to revert with pending changes
+			threwError = false;
+			try {
+				history.revert(history.latestRev);
+			} catch (error:Dynamic) {
+				threwError = true;
+			}
+			Assert.isTrue(threwError);
+		#end
 
 		// reset undoes pending changes
 		history.reset();

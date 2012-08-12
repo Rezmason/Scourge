@@ -2,6 +2,8 @@ package net.rezmason.scourge.model;
 
 typedef Changeset<T> = IntHash<Change<T>>;
 
+using Lambda;
+
 class History<T> {
 
     private var changesets:Array<Changeset<T>>;
@@ -31,6 +33,7 @@ class History<T> {
     }
 
     public function revert(goalRev:Int):Void {
+
         if (goalRev == currentRev) return;
 
         if (goalRev < 0 || goalRev > latestRev) {
@@ -38,7 +41,7 @@ class History<T> {
         }
 
         #if SAFE_HISTORY
-            if (recordsHaveChanged()) throw "Uncommitted changes"
+            if (recordsHaveChanged()) throw "Uncommitted changes";
         #end
 
         var backwards:Bool = goalRev < currentRev;
@@ -65,6 +68,8 @@ class History<T> {
             change.record.value = value;
             change.record.oldValue = value;
         }
+
+        currentRev = goalRev;
     }
 
     public function cut():Void {
@@ -79,14 +84,17 @@ class History<T> {
             // Not sure what to do
         }
 
-        currentRev++; // Not sure
-        latestRev++;
-
         var changedRecords:Array<Record<T>> = findChangedRecords();
 
         if (changedRecords.length > 0) {
+            currentRev++; // Not sure
+            latestRev++;
+
             var changeset:Changeset<T> = new Changeset<T>();
-            for (record in changedRecords) changeset.set(record.id, new Change<T>(record));
+            for (record in changedRecords) {
+                changeset.set(record.id, new Change<T>(record));
+                record.oldValue = record.value;
+            }
             changesets[latestRev] = changeset;
         }
 
@@ -94,8 +102,11 @@ class History<T> {
     }
 
     public function add(record:Record<T>):Void {
+        if (records.has(record)) return;
+        record.oldValue = record.value;
         var firstChangeset:Changeset<T> = changesets[0];
         firstChangeset.set(record.id, new Change<T>(record));
+        records.push(record);
     }
 
     #if SAFE_HISTORY
