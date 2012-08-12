@@ -14,7 +14,7 @@ class HistoryTest
 
 		var history:History<Int> = new History<Int>();
 
-		Assert.areEqual(0, history.currentRev);
+		Assert.areEqual(0, history.revision);
 		Assert.areEqual(0, history.commit()); // Commit with no subscribers
 
 		var recordA:Record<Int> = new Record<Int>();
@@ -55,17 +55,13 @@ class HistoryTest
 		}
 		Assert.isTrue(threwError);
 
-		// first state
-		history.revert(0);
-		Assert.areEqual(0, recordA.value);
-		Assert.areEqual(null, recordB.value);
-		Assert.areEqual(3, recordC.value);
-
-		// middle state
+		// revert to early state
 		history.revert(2);
 		Assert.areEqual(1, recordA.value);
 		Assert.areEqual(2, recordB.value);
 		Assert.areEqual(3, recordC.value);
+
+		Assert.areEqual(2, history.revision);
 
 		// Pending changes
 		recordA.value = 4;
@@ -76,7 +72,7 @@ class HistoryTest
 			// Attempt to revert with pending changes
 			threwError = false;
 			try {
-				history.revert(history.latestRev);
+				history.revert(1);
 			} catch (error:Dynamic) {
 				threwError = true;
 			}
@@ -89,17 +85,22 @@ class HistoryTest
 		Assert.areEqual(2, recordB.value);
 		Assert.areEqual(3, recordC.value);
 
-		// invalid revert after cut
-		history.cut();
-		threwError = false;
-		try {
-			history.revert(3);
-		} catch (error:Dynamic) {
-			threwError = true;
-		}
-		Assert.isTrue(threwError);
+		// revert to first state
+		history.revert(0);
+		Assert.areEqual(0, recordA.value);
+		Assert.areEqual(null, recordB.value);
+		Assert.areEqual(3, recordC.value);
+
+		Assert.areEqual(0, history.revision);
+
+		recordA.value = 1;
+		recordB.value = 2;
+		recordC.value = 3;
+		Assert.areEqual(1, history.commit()); // Commit
 
 		history.wipe();
+		Assert.areEqual(0, history.revision);
+
 		var recordD:Record<Int> = new Record<Int>();
 		recordD.value = 1;	// subscriber after wipe
 		history.add(recordD);

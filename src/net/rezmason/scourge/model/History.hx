@@ -7,116 +7,99 @@ using Lambda;
 class History<T> {
 
     private var changesets:Array<Changeset<T>>;
+    private var firstChangeset:Changeset<T>;
     private var records:Array<Record<T>>;
+    private var oldValues:IntHash<T>;
 
-    public var currentRev(default, null):Int;
-    public var latestRev(default, null):Int;
+    public var revision(default, null):Int;
 
     public function new():Void {
-        changesets = [new Changeset<T>()]; // there's always the first one
+        changesets = []; // there's always the first one
         records = [];
-        latestRev = 0;
+        revision = 0;
         wipe();
     }
 
     public function wipe():Void {
-        currentRev = 0;
-        cut();
-        changesets[0] = new Changeset<T>();
+        changesets.splice(0, revision + 1);
+        firstChangeset = new Changeset<T>();
+        changesets[0] = firstChangeset;
+
+        revision = 0;
+
         records.splice(0, records.length);
+        oldValues = new IntHash<T>();
     }
 
     public function reset():Void {
-        var currentChangeset:Changeset<T> = changesets[currentRev];
-        var changedRecords:Array<Record<T>> = findChangedRecords();
-        for (record in changedRecords) record.value = record.oldValue;
+        for (record in findChangedRecords()) record.value = oldValues.get(record.id);
     }
 
     public function revert(goalRev:Int):Void {
 
-        if (goalRev == currentRev) return;
+        if (goalRev == revision) return;
 
-        if (goalRev < 0 || goalRev > latestRev) {
-            throw "Invalid revision " + goalRev + " falls out of range 0-" + latestRev;
+        if (goalRev < 0 || goalRev > revision) {
+            throw "Invalid revision " + goalRev + " falls out of range 0-" + revision;
         }
 
         #if SAFE_HISTORY
-            if (recordsHaveChanged()) throw "Uncommitted changes";
+            if (findChangedRecords().length > 0) throw "Uncommitted changes";
         #end
-
-        var backwards:Bool = goalRev < currentRev;
-
-        var earliestRev:Int = backwards ? goalRev : currentRev;
-        var latestRev:Int = backwards ? currentRev : goalRev;
 
         var combinedChanges:Changeset<T> = new Changeset<T>();
         var combinedChangeRevs:IntHash<Int> = new IntHash<Int>();
-        for (rev in earliestRev...latestRev + 1) {
-            var changeset:Changeset<T> = changesets[rev];
+        while (revision >= goalRev) {
+            var changeset:Changeset<T> = changesets[revision];
             for (change in changeset) {
                 var id:Int = change.record.id;
-                if (backwards && combinedChanges.exists(id)) continue;
                 combinedChanges.set(id, change);
-                combinedChangeRevs.set(id, rev);
+                combinedChangeRevs.set(id, revision);
             }
+            revision--;
         }
 
         for (id in combinedChanges.keys()) {
             var change:Change<T> = combinedChanges.get(id);
-            var lateChange:Bool = (backwards && combinedChangeRevs.get(id) != goalRev);
+            var lateChange:Bool = combinedChangeRevs.get(id) != goalRev;
             var value:T = lateChange ? change.oldValue : change.newValue;
             change.record.value = value;
-            change.record.oldValue = value;
+            oldValues.set(id, value);
         }
 
-        currentRev = goalRev;
-    }
-
-    public function cut():Void {
-        if (currentRev == latestRev) return;
-        changesets.splice(currentRev + 1, latestRev - currentRev);
-        latestRev = currentRev;
+        revision = goalRev;
     }
 
     public function commit():Int {
 
-        if (currentRev < latestRev) {
-            // Not sure what to do
-        }
-
         var changedRecords:Array<Record<T>> = findChangedRecords();
 
         if (changedRecords.length > 0) {
-            currentRev++; // Not sure
-            latestRev++;
+            revision++;
 
             var changeset:Changeset<T> = new Changeset<T>();
             for (record in changedRecords) {
-                changeset.set(record.id, new Change<T>(record));
-                record.oldValue = record.value;
+                var id:Int = record.id;
+                changeset.set(id, new Change<T>(record, oldValues.get(id)));
+                oldValues.set(id, record.value);
             }
-            changesets[latestRev] = changeset;
+            changesets[revision] = changeset;
         }
 
-        return latestRev;
+        return revision;
     }
 
     public function add(record:Record<T>):Void {
         if (records.has(record)) return;
-        record.oldValue = record.value;
-        var firstChangeset:Changeset<T> = changesets[0];
-        firstChangeset.set(record.id, new Change<T>(record));
+        oldValues.set(record.id, record.value);
+        firstChangeset.set(record.id, new Change<T>(record, record.value));
         records.push(record);
     }
 
-    #if SAFE_HISTORY
-    private function recordsHaveChanged():Bool { return findChangedRecords().length > 0; }
-    #end
-
     private function findChangedRecords():Array<Record<T>> {
-        var currentChangeset:Changeset<T> = changesets[currentRev];
+        var currentChangeset:Changeset<T> = changesets[revision];
         var changedRecords:Array<Record<T>> = [];
-        for (record in records) if (record.oldValue != record.value) changedRecords.push(record);
+        for (record in records) if (oldValues.get(record.id) != record.value) changedRecords.push(record);
         return changedRecords;
     }
 }
@@ -126,9 +109,9 @@ class Change<T> {
     public var oldValue:T;
     public var newValue:T;
 
-    public function new(record:Record<T>):Void {
+    public function new(record:Record<T>, oldValue:T):Void {
         this.record = record;
-        oldValue = record.oldValue;
+        this.oldValue = oldValue;
         newValue = record.value;
     }
 }
