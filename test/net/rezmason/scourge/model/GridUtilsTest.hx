@@ -46,7 +46,7 @@ class GridUtilsTest {
 
     function makeNode():GridNode<Int> {
         var node:GridNode<Int> = new GridNode<Int>();
-        node.add(nodeItr++);
+        node.value = nodeItr++;
         return node;
     }
 }

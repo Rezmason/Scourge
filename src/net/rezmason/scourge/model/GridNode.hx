@@ -1,13 +1,8 @@
 package net.rezmason.scourge.model;
 
-import haxe.FastList;
-
-class GridNode<T> extends FastList<T> {
-    public var value(getValue, null):T;
+class GridNode<T> extends Record<T> {
     public var neighbors(default, null):Array<GridNode<T>>;
     public function new():Void { super(); neighbors = []; }
-    public function cut():Void { head.next = null; }
-    inline function getValue():T { return first(); }
 }
 
 typedef Gr = GridDirection;

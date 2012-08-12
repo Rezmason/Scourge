@@ -1,5 +1,35 @@
-Provide history for all rule aspects
 Create a history manager
+	commit function
+		Iterates over all subscribed records
+		Creates list of changed records, their previous values and their new values
+			aka a "changeset"
+		returns the revision number
+			Revisions are never skipped
+	reset function
+		Iterates over all subscribed records
+		Sets the value of all changed records to those in the latest changeset
+	revert function
+		Accepts and validates a revision number
+		Iterates through the changesets between the current revision and the new revision
+		Creates list of records that are in any of the changesets
+			Prevent duplicates - keep the change that is closest to the new revision
+		Iterate through the change list
+			If a change's revision number is equal to the new revision, assign the associated record the changed-to value
+			Otherwise, assign the associated record the old value
+	cut function
+		Removes all changesets after the currently active revision
+	subscribe function
+		Accepts a record; assumes its current state to be its first state
+		If it is already subscribed, return
+		Adds it to the list of subscribed records
+		Adds its value to the changeset for revision 0
+	reset function
+		Undoes all changes since latest commit
+	wipe function
+		Removes all subscribed records
+		Empties and jettisons the list of changesets
+
+
 
 KillDisconnectedCellsRule
 	TEST

@@ -35,11 +35,7 @@ class BoardStateFactory {
         var rules:Array<Rule> = cfg.rules;
         while (rules.has(null)) rules.remove(null);
         for (genome in cfg.playerGenes) state.players.push(makePlayer(genome, rules));
-        for (rule in rules) {
-            var list:FastList<RuleAspect> = new FastList<RuleAspect>();
-            list.add(rule.createGameAspect());
-            state.aspects.set(rule.id, list);
-        }
+        for (rule in rules) state.aspects.set(rule.id, rule.createGameAspect());
 
         makeBoard(state.players, cfg.circular, cfg.initGrid, rules);
 
@@ -135,7 +131,7 @@ class BoardStateFactory {
         var cell:Cell = new Cell();
         cell.occupier = -1;
         cell.isFilled = false;
-        node.add(cell);
+        node.value = cell;
         return node;
     }
 
@@ -200,11 +196,7 @@ class BoardStateFactory {
     function makePlayer(genome:String, rules:Array<Rule>):PlayerState {
         var playerState:PlayerState = new PlayerState();
         playerState.genome = genome;
-        for (rule in rules) {
-            var list:FastList<RuleAspect> = new FastList<RuleAspect>();
-            list.add(rule.createPlayerAspect());
-            playerState.aspects.set(rule.id, list);
-        }
+        for (rule in rules) playerState.aspects.set(rule.id, rule.createPlayerAspect());
         return playerState;
     }
 }

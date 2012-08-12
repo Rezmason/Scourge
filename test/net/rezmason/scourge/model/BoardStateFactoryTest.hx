@@ -161,7 +161,7 @@ class BoardStateFactoryTest {
         cfg.initGrid = board3;
         var state:State = factory.makeState(cfg);
 
-        trace(spitGrid(state.players[0].head));
+        // trace(spitGrid(state.players[0].head));
 
         Assert.areEqual(board3, spitGrid(state.players[0].head, false));
     }
