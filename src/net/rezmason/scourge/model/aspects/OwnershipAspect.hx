@@ -1,8 +1,8 @@
-package net.rezmason.scourge.model.rules;
+package net.rezmason.scourge.model.aspects;
 
-class OwnershipRuleAspect extends RuleAspect {
+class OwnershipAspect extends Aspect {
 
-    public static var id(default, null):Int = RuleAspect.ids++;
+    public static var id(default, null):Int = Aspect.ids++;
 
     public var isFilled(default, null):Pointer<Int>;
     public var occupier(default, null):Pointer<Int>;

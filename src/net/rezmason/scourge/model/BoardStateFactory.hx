@@ -3,7 +3,8 @@ package net.rezmason.scourge.model;
 import haxe.FastList;
 
 import net.rezmason.scourge.model.GridNode;
-import net.rezmason.scourge.model.rules.OwnershipRuleAspect;
+import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.aspects.Aspect;
 
 using Lambda;
 using Std;
@@ -17,7 +18,7 @@ class BoardStateFactory {
     // Creates boards for "skirmish games"
     // I suspect that this is actually a rule. Might refactor in the future
 
-    private static var OWNERSHIP:Int = OwnershipRuleAspect.id;
+    private static var OWNERSHIP:Int = OwnershipAspect.id;
     private inline static var PLAYER_DIST:Int = 9;
     private inline static var PADDING:Int = 5;
     private inline static var RIM:Int = 1;
@@ -51,13 +52,13 @@ class BoardStateFactory {
         var data:BoardData = getHeadPoints(numPlayers, PLAYER_DIST, PADDING + RIM);
 
         // Make a connected grid of nodes with default values
-        var node:GridNode<IntHash<RuleAspect>> = makeNode(rules);
+        var node:GridNode<IntHash<Aspect>> = makeNode(rules);
         for (ike in 1...data.boardWidth) node = node.attach(makeNode(rules), Gr.e);
 
-        var row:GridNode<IntHash<RuleAspect>> = node.run(Gr.w);
+        var row:GridNode<IntHash<Aspect>> = node.run(Gr.w);
         for (ike in 1...data.boardWidth) {
             for (column in row.walk(Gr.e)) {
-                var next:GridNode<IntHash<RuleAspect>> = makeNode(rules);
+                var next:GridNode<IntHash<Aspect>> = makeNode(rules);
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);
@@ -67,7 +68,7 @@ class BoardStateFactory {
         }
 
         // run to the northwest
-        var grid:GridNode<IntHash<RuleAspect>> = node.run(Gr.nw).run(Gr.n).run(Gr.w);
+        var grid:GridNode<IntHash<Aspect>> = node.run(Gr.nw).run(Gr.n).run(Gr.w);
 
         // obstruct the RIM
         for (node in grid.walk(Gr.e)) getOwner(node).isFilled.value = 1;
@@ -80,7 +81,7 @@ class BoardStateFactory {
             var player:PlayerState = players[ike];
             var coord:XY = data.heads[ike];
             player.head = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
-            var ownerAspect:OwnershipRuleAspect = getOwner(player.head);
+            var ownerAspect:OwnershipAspect = getOwner(player.head);
             ownerAspect.isFilled.value = 1;
             ownerAspect.occupier.value = ike;
         }
@@ -91,7 +92,7 @@ class BoardStateFactory {
             for (row in grid.walk(Gr.s)) {
                 var x:Int = 0;
                 for (column in row.walk(Gr.e)) {
-                    var ownerAspect:OwnershipRuleAspect = getOwner(column);
+                    var ownerAspect:OwnershipAspect = getOwner(column);
                     if (ownerAspect.isFilled.value == 0) {
                         var fx:Float = x - radius + 0.5 - RIM;
                         var fy:Float = y - radius + 0.5 - RIM;
@@ -114,7 +115,7 @@ class BoardStateFactory {
             for (row in grid.walk(Gr.s)) {
                 var x:Int = 0;
                 for (column in row.walk(Gr.e)) {
-                    var ownerAspect:OwnershipRuleAspect = getOwner(column);
+                    var ownerAspect:OwnershipAspect = getOwner(column);
                     if (ownerAspect.isFilled.value == 0) {
                         var char:String = initGrid.charAt(y * initGridWidth + x + 1);
                         if (char != " ") {
@@ -130,17 +131,16 @@ class BoardStateFactory {
         }
     }
 
-    function makeNode(rules:Array<Rule>):GridNode<IntHash<RuleAspect>> {
-        var node:GridNode<IntHash<RuleAspect>> = new GridNode<IntHash<RuleAspect>>();
-        var cell:IntHash<RuleAspect> = new IntHash<RuleAspect>();
-        var ownerAspect:OwnershipRuleAspect = new OwnershipRuleAspect();
-        cell.set(OWNERSHIP, ownerAspect);
+    function makeNode(rules:Array<Rule>):GridNode<IntHash<Aspect>> {
+        var node:GridNode<IntHash<Aspect>> = new GridNode<IntHash<Aspect>>();
+        var cell:IntHash<Aspect> = new IntHash<Aspect>();
+        cell.set(OWNERSHIP, new OwnershipAspect());
         for (rule in rules) rule.addCellAspects(cell);
         node.value = cell;
         return node;
     }
 
-    inline function getOwner(node:GridNode<IntHash<RuleAspect>>):OwnershipRuleAspect {
+    inline function getOwner(node:GridNode<IntHash<Aspect>>):OwnershipAspect {
         return cast node.value.get(OWNERSHIP);
     }
 

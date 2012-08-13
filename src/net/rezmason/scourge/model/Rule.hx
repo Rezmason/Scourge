@@ -1,5 +1,7 @@
 package net.rezmason.scourge.model;
 
+import net.rezmason.scourge.model.aspects.Aspect;
+
 class Rule {
 
     /*
@@ -16,17 +18,17 @@ class Rule {
     Command validation
     */
 
-    public function addPlayerAspects(hash:IntHash<RuleAspect>):Void {
+    public function addPlayerAspects(hash:IntHash<Aspect>):Void {
         // determine whether the required player aspects are present in the hash
         // if one is absent, add it
     }
 
-    public function addGameAspects(hash:IntHash<RuleAspect>):Void {
+    public function addGameAspects(hash:IntHash<Aspect>):Void {
         // determine whether the required game aspects are present in the hash
         // if one is absent, add it
     }
 
-    public function addCellAspects(hash:IntHash<RuleAspect>):Void {
+    public function addCellAspects(hash:IntHash<Aspect>):Void {
         // determine whether the required cell aspects are present in the hash
         // if one is absent, add it
     }

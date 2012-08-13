@@ -3,12 +3,14 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 
 import net.rezmason.scourge.model.GridNode;
-import net.rezmason.scourge.model.rules.OwnershipRuleAspect;
+
+import net.rezmason.scourge.model.aspects.Aspect;
+import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Reflect;
 using net.rezmason.scourge.model.GridUtils;
 
-typedef BoardNode = GridNode<IntHash<RuleAspect>>;
+typedef BoardNode = GridNode<IntHash<Aspect>>;
 
 class BoardStateFactoryTest {
 
@@ -185,14 +187,14 @@ class BoardStateFactoryTest {
     }
 
     private function nodeToString(node:BoardNode):String {
-        var ownerAspect:OwnershipRuleAspect = getOwner(node);
+        var ownerAspect:OwnershipAspect = getOwner(node);
         if (ownerAspect.occupier.value > -1) return Std.string(ownerAspect.occupier.value);
         if (ownerAspect.isFilled.value == 1) return "X";
 
         return " ";
     }
 
-    private function getOwner(node:BoardNode):OwnershipRuleAspect {
-        return cast node.value.get(OwnershipRuleAspect.id);
+    private function getOwner(node:BoardNode):OwnershipAspect {
+        return cast node.value.get(OwnershipAspect.id);
     }
 }
