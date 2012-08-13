@@ -8,14 +8,14 @@ class History<T> {
 
     private var diffs:Array<Diff<T>>;
     private var firstDiff:Diff<T>;
-    private var records:Array<Pointer<T>>;
+    private var pointers:Array<Pointer<T>>;
     private var oldValues:IntHash<T>;
 
     public var revision(default, null):Int;
 
     public function new():Void {
         diffs = []; // there's always the first one
-        records = [];
+        pointers = [];
         revision = 0;
         wipe();
     }
@@ -27,12 +27,12 @@ class History<T> {
 
         revision = 0;
 
-        records.splice(0, records.length);
+        pointers.splice(0, pointers.length);
         oldValues = new IntHash<T>();
     }
 
     public function reset():Void {
-        for (record in findChangedPointers()) record.value = oldValues.get(record.id);
+        for (pointer in findChangedPointers()) pointer.value = oldValues.get(pointer.id);
     }
 
     public function revert(goalRev:Int):Void {
@@ -52,7 +52,7 @@ class History<T> {
         while (revision > goalRev) {
             var diff:Diff<T> = diffs[revision];
             for (change in diff) {
-                var id:Int = change.record.id;
+                var id:Int = change.pointer.id;
                 combinedChanges.set(id, change);
                 combinedChangeRevs.set(id, revision);
             }
@@ -64,7 +64,7 @@ class History<T> {
             var change:Change<T> = combinedChanges.get(id);
             var lateChange:Bool = combinedChangeRevs.get(id) != goalRev;
             var value:T = lateChange ? change.oldValue : change.newValue;
-            change.record.value = value;
+            change.pointer.value = value;
             oldValues.set(id, value);
         }
 
@@ -79,10 +79,10 @@ class History<T> {
             revision++;
 
             var diff:Diff<T> = new Diff<T>();
-            for (record in changedPointers) {
-                var id:Int = record.id;
-                diff.set(id, new Change<T>(record, oldValues.get(id)));
-                oldValues.set(id, record.value);
+            for (pointer in changedPointers) {
+                var id:Int = pointer.id;
+                diff.set(id, new Change<T>(pointer, oldValues.get(id)));
+                oldValues.set(id, pointer.value);
             }
             diffs[revision] = diff;
         }
@@ -90,29 +90,29 @@ class History<T> {
         return revision;
     }
 
-    public function add(record:Pointer<T>):Void {
-        if (records.has(record)) return;
-        oldValues.set(record.id, record.value);
-        firstDiff.set(record.id, new Change<T>(record, record.value));
-        records.push(record);
+    public function add(pointer:Pointer<T>):Void {
+        if (pointers.has(pointer)) return;
+        oldValues.set(pointer.id, pointer.value);
+        firstDiff.set(pointer.id, new Change<T>(pointer, pointer.value));
+        pointers.push(pointer);
     }
 
     private function findChangedPointers():Array<Pointer<T>> {
         var currentDiff:Diff<T> = diffs[revision];
         var changedPointers:Array<Pointer<T>> = [];
-        for (record in records) if (oldValues.get(record.id) != record.value) changedPointers.push(record);
+        for (pointer in pointers) if (oldValues.get(pointer.id) != pointer.value) changedPointers.push(pointer);
         return changedPointers;
     }
 }
 
 class Change<T> {
-    public var record:Pointer<T>;
+    public var pointer:Pointer<T>;
     public var oldValue:T;
     public var newValue:T;
 
-    public function new(record:Pointer<T>, oldValue:T):Void {
-        this.record = record;
+    public function new(pointer:Pointer<T>, oldValue:T):Void {
+        this.pointer = pointer;
         this.oldValue = oldValue;
-        newValue = record.value;
+        newValue = pointer.value;
     }
 }
