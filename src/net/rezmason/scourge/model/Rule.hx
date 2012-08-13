@@ -16,18 +16,19 @@ class Rule {
     Command validation
     */
 
-    public var id(default, null):String;
-
-    public function createPlayerAspect():RuleAspect {
-        // The object used by this rule to represent the state of a player
-        return null;
+    public function addPlayerAspects(hash:IntHash<RuleAspect>):Void {
+        // determine whether the required player aspects are present in the hash
+        // if one is absent, add it
     }
 
-    public function createGameAspect():RuleAspect {
-        // The object used by this rule to represent the state of a game
-        return null;
+    public function addGameAspects(hash:IntHash<RuleAspect>):Void {
+        // determine whether the required game aspects are present in the hash
+        // if one is absent, add it
     }
 
-    // Handy tip: Reflect has a copy() function for anonymous objects
+    public function addCellAspects(hash:IntHash<RuleAspect>):Void {
+        // determine whether the required cell aspects are present in the hash
+        // if one is absent, add it
+    }
 }
 

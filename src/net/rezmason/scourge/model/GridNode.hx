@@ -1,8 +1,9 @@
 package net.rezmason.scourge.model;
 
-class GridNode<T> extends Record<T> {
+class GridNode<T> {
+    public var value:T;
     public var neighbors(default, null):Array<GridNode<T>>;
-    public function new():Void { super(); neighbors = []; }
+    public function new():Void { neighbors = []; }
 }
 
 typedef Gr = GridDirection;

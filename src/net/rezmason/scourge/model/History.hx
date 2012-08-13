@@ -1,29 +1,29 @@
 package net.rezmason.scourge.model;
 
-typedef Changeset<T> = IntHash<Change<T>>;
+typedef Diff<T> = IntHash<Change<T>>;
 
 using Lambda;
 
 class History<T> {
 
-    private var changesets:Array<Changeset<T>>;
-    private var firstChangeset:Changeset<T>;
-    private var records:Array<Record<T>>;
+    private var diffs:Array<Diff<T>>;
+    private var firstDiff:Diff<T>;
+    private var records:Array<Pointer<T>>;
     private var oldValues:IntHash<T>;
 
     public var revision(default, null):Int;
 
     public function new():Void {
-        changesets = []; // there's always the first one
+        diffs = []; // there's always the first one
         records = [];
         revision = 0;
         wipe();
     }
 
     public function wipe():Void {
-        changesets.splice(0, revision + 1);
-        firstChangeset = new Changeset<T>();
-        changesets[0] = firstChangeset;
+        diffs.splice(0, revision + 1);
+        firstDiff = new Diff<T>();
+        diffs[0] = firstDiff;
 
         revision = 0;
 
@@ -32,7 +32,7 @@ class History<T> {
     }
 
     public function reset():Void {
-        for (record in findChangedRecords()) record.value = oldValues.get(record.id);
+        for (record in findChangedPointers()) record.value = oldValues.get(record.id);
     }
 
     public function revert(goalRev:Int):Void {
@@ -44,18 +44,19 @@ class History<T> {
         }
 
         #if SAFE_HISTORY
-            if (findChangedRecords().length > 0) throw "Uncommitted changes";
+            if (findChangedPointers().length > 0) throw "Uncommitted changes";
         #end
 
-        var combinedChanges:Changeset<T> = new Changeset<T>();
+        var combinedChanges:Diff<T> = new Diff<T>();
         var combinedChangeRevs:IntHash<Int> = new IntHash<Int>();
-        while (revision >= goalRev) {
-            var changeset:Changeset<T> = changesets[revision];
-            for (change in changeset) {
+        while (revision > goalRev) {
+            var diff:Diff<T> = diffs[revision];
+            for (change in diff) {
                 var id:Int = change.record.id;
                 combinedChanges.set(id, change);
                 combinedChangeRevs.set(id, revision);
             }
+            diffs[revision] = null;
             revision--;
         }
 
@@ -72,44 +73,44 @@ class History<T> {
 
     public function commit():Int {
 
-        var changedRecords:Array<Record<T>> = findChangedRecords();
+        var changedPointers:Array<Pointer<T>> = findChangedPointers();
 
-        if (changedRecords.length > 0) {
+        if (changedPointers.length > 0) {
             revision++;
 
-            var changeset:Changeset<T> = new Changeset<T>();
-            for (record in changedRecords) {
+            var diff:Diff<T> = new Diff<T>();
+            for (record in changedPointers) {
                 var id:Int = record.id;
-                changeset.set(id, new Change<T>(record, oldValues.get(id)));
+                diff.set(id, new Change<T>(record, oldValues.get(id)));
                 oldValues.set(id, record.value);
             }
-            changesets[revision] = changeset;
+            diffs[revision] = diff;
         }
 
         return revision;
     }
 
-    public function add(record:Record<T>):Void {
+    public function add(record:Pointer<T>):Void {
         if (records.has(record)) return;
         oldValues.set(record.id, record.value);
-        firstChangeset.set(record.id, new Change<T>(record, record.value));
+        firstDiff.set(record.id, new Change<T>(record, record.value));
         records.push(record);
     }
 
-    private function findChangedRecords():Array<Record<T>> {
-        var currentChangeset:Changeset<T> = changesets[revision];
-        var changedRecords:Array<Record<T>> = [];
-        for (record in records) if (oldValues.get(record.id) != record.value) changedRecords.push(record);
-        return changedRecords;
+    private function findChangedPointers():Array<Pointer<T>> {
+        var currentDiff:Diff<T> = diffs[revision];
+        var changedPointers:Array<Pointer<T>> = [];
+        for (record in records) if (oldValues.get(record.id) != record.value) changedPointers.push(record);
+        return changedPointers;
     }
 }
 
 class Change<T> {
-    public var record:Record<T>;
+    public var record:Pointer<T>;
     public var oldValue:T;
     public var newValue:T;
 
-    public function new(record:Record<T>, oldValue:T):Void {
+    public function new(record:Pointer<T>, oldValue:T):Void {
         this.record = record;
         this.oldValue = oldValue;
         newValue = record.value;

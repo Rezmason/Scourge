@@ -3,11 +3,12 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 
 import net.rezmason.scourge.model.GridNode;
+import net.rezmason.scourge.model.rules.OwnershipRuleAspect;
 
 using Reflect;
 using net.rezmason.scourge.model.GridUtils;
 
-typedef BoardNode = GridNode<Cell>;
+typedef BoardNode = GridNode<IntHash<RuleAspect>>;
 
 class BoardStateFactoryTest {
 
@@ -123,18 +124,18 @@ class BoardStateFactoryTest {
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);
-            Assert.areEqual(-1, neighbor.value.occupier);
-            neighbor.value.occupier = 0;
+            Assert.areEqual(-1, getOwner(neighbor).occupier.value);
+            getOwner(neighbor).occupier.value = 0;
         }
 
-        Assert.areEqual(0, playerHead.nw().value.occupier);
-        Assert.areEqual(0, playerHead.n().value.occupier);
-        Assert.areEqual(0, playerHead.ne().value.occupier);
-        Assert.areEqual(0, playerHead.e().value.occupier);
-        Assert.areEqual(0, playerHead.se().value.occupier);
-        Assert.areEqual(0, playerHead.s().value.occupier);
-        Assert.areEqual(0, playerHead.sw().value.occupier);
-        Assert.areEqual(0, playerHead.w().value.occupier);
+        Assert.areEqual(0, getOwner(playerHead.nw()).occupier.value);
+        Assert.areEqual(0, getOwner(playerHead.n()).occupier.value);
+        Assert.areEqual(0, getOwner(playerHead.ne()).occupier.value);
+        Assert.areEqual(0, getOwner(playerHead.e()).occupier.value);
+        Assert.areEqual(0, getOwner(playerHead.se()).occupier.value);
+        Assert.areEqual(0, getOwner(playerHead.s()).occupier.value);
+        Assert.areEqual(0, getOwner(playerHead.sw()).occupier.value);
+        Assert.areEqual(0, getOwner(playerHead.w()).occupier.value);
     }
 
     @Test
@@ -174,7 +175,7 @@ class BoardStateFactoryTest {
         for (row in grid.walk(Gr.s)) {
             str += "\n";
             for (column in row.walk(Gr.e)) {
-                str += cellToString(column.value);
+                str += nodeToString(column);
             }
         }
 
@@ -183,10 +184,15 @@ class BoardStateFactoryTest {
         return str;
     }
 
-    private function cellToString(cell:Cell):String {
-        if (cell.occupier > -1) return Std.string(cell.occupier);
-        if (cell.isFilled) return "X";
+    private function nodeToString(node:BoardNode):String {
+        var ownerAspect:OwnershipRuleAspect = getOwner(node);
+        if (ownerAspect.occupier.value > -1) return Std.string(ownerAspect.occupier.value);
+        if (ownerAspect.isFilled.value == 1) return "X";
 
         return " ";
+    }
+
+    private function getOwner(node:BoardNode):OwnershipRuleAspect {
+        return cast node.value.get(OwnershipRuleAspect.id);
     }
 }

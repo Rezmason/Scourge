@@ -3,7 +3,7 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 
 import net.rezmason.scourge.model.History;
-import net.rezmason.scourge.model.Record;
+import net.rezmason.scourge.model.Pointer;
 
 class HistoryTest
 {
@@ -17,9 +17,9 @@ class HistoryTest
 		Assert.areEqual(0, history.revision);
 		Assert.areEqual(0, history.commit()); // Commit with no subscribers
 
-		var recordA:Record<Int> = new Record<Int>();
-		var recordB:Record<Int> = new Record<Int>();
-		var recordC:Record<Int> = new Record<Int>();
+		var recordA:Pointer<Int> = new Pointer<Int>();
+		var recordB:Pointer<Int> = new Pointer<Int>();
+		var recordC:Pointer<Int> = new Pointer<Int>();
 
 		recordA.value = 0;
 
@@ -101,7 +101,7 @@ class HistoryTest
 		history.wipe();
 		Assert.areEqual(0, history.revision);
 
-		var recordD:Record<Int> = new Record<Int>();
+		var recordD:Pointer<Int> = new Pointer<Int>();
 		recordD.value = 1;	// subscriber after wipe
 		history.add(recordD);
 		recordA.value = -1;

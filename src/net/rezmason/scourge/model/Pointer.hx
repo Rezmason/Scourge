@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model;
 
-class Record<T> {
+class Pointer<T> {
 
     private static var ids:Int = 0;
 
@@ -10,4 +10,6 @@ class Record<T> {
     public function new():Void {
         id = ids++;
     }
+
+    public function toString():String { return "*" + Std.string(value); }
 }
