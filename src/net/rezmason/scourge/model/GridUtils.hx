@@ -2,6 +2,8 @@ package net.rezmason.scourge.model;
 
 import net.rezmason.scourge.model.GridNode;
 
+using Lambda;
+
 class GridUtils {
 
     // Creates an iterator for walking along a grid in one direction
@@ -25,6 +27,24 @@ class GridUtils {
         if (node1 != null) node1.neighbors[direction] = node2;
         if (node2 != null) node2.neighbors[(direction + 4) % 8] = node1;
         return node2;
+    }
+
+    public inline static function getGraph<T>(node:GridNode<T>):Array<GridNode<T>> {
+        var nodes:Array<GridNode<T>> = [];
+        var newNodes:Array<GridNode<T>> = [];
+
+        while (node != null) {
+            for (direction in allDirections()) {
+                var neighbor:GridNode<T> = node.neighbors[direction];
+                if (neighbor != null && !nodes.has(neighbor)) {
+                    nodes.push(neighbor);
+                    newNodes.push(neighbor);
+                }
+            }
+            node = newNodes.pop();
+        }
+
+        return nodes;
     }
 
     // Shortcuts

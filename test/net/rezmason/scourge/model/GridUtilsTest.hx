@@ -42,6 +42,8 @@ class GridUtilsTest {
         ike = 0;
         for (n in first.walk(Gr.e)) ike++;
         Assert.areEqual(10, ike);
+
+        Assert.areEqual(10, first.getGraph().length);
     }
 
     function makeNode():GridNode<Int> {
