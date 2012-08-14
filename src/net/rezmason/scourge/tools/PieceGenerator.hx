@@ -10,6 +10,9 @@ using Lambda;
 
 class PieceGenerator {
 
+    // Generates fixed polyominoes, and then sifts through them to find one-sided and free polyominoes
+    // Used at compile time to generate the polyomino tables that go into the game.
+
     private static var fixedPatternsBySize:Array<Array<Pattern>> = [];
     private static var oneSidedPatternsBySize:Array<Array<Pattern>> = [];
     private static var freePatternsBySize:Array<Array<Pattern>> = [];
@@ -24,6 +27,9 @@ class PieceGenerator {
 
     private static var patternFunctions:Array<PatternFunction> = [makeFixedPatterns, makeOneSidedPatterns, makeFreePatterns];
 
+    // The only public method, and therefore the entry point. PieceGenerator's work is recursive,
+    // so it's structured to repurpose its previous solutions.
+
     public static function generate(size:Int, type:Int):Array<Piece> {
         if (size < 0 || type < 0 || type > PieceType.FREE) throw "Invalid generator input";
 
@@ -31,6 +37,8 @@ class PieceGenerator {
         if (pieceSet[size] == null) pieceSet[size] = makePieces(size, type);
         return pieceSet[size];
     }
+
+    // Pieces are more compact and user-friendly representations of polyominoes than the internal Pattern objects
 
     private static function makePieces(size:Int, type:Int):Array<Piece> {
         var patternSet:Array<Array<Pattern>> = patterns[type];
@@ -46,13 +54,19 @@ class PieceGenerator {
         var patterns:Array<Pattern> = [];
 
         if (size == 1) {
+            // There's obviously only one polyomino of any sort that is of size one
             patterns.push([[true]]);
         } else {
 
+            // Grab the previously found fixed patterns that are one size smaller
             if (fixedPatternsBySize[size - 1] == null) fixedPatternsBySize[size - 1] = makeFixedPatterns(size - 1);
+
+            // Generate new polyomino varieties from each earlier polyomino by appending a cell somewhere
             for (predecessor in fixedPatternsBySize[size - 1]) for (pattern in getProgeny(predecessor)) patterns.push(pattern);
 
             if (patterns.length > 1) {
+
+                // Find the duplicates and null them
                 for (ike in 0...patterns.length) {
                     if (patterns[ike] == null) continue;
                     for (jen in ike + 1...patterns.length) {
@@ -62,7 +76,8 @@ class PieceGenerator {
             }
         }
 
-        while (patterns.has(null)) patterns.remove(null);
+        // remove all null patterns
+        while (patterns.remove(null)) {}
 
         return patterns;
     }
@@ -70,10 +85,13 @@ class PieceGenerator {
     private static function makeOneSidedPatterns(size:Int):Array<Pattern> {
         //trace("OS " + size);
 
+        // Grab the previously found fixed patterns
         if (fixedPatternsBySize[size] == null) fixedPatternsBySize[size] = makeFixedPatterns(size);
         var patterns:Array<Pattern> = fixedPatternsBySize[size].copy();
 
         if (patterns.length > 1) {
+
+            // Create rotations of the pattern, find the duplicates and null them
             for (ike in 0...patterns.length) {
                 if (patterns[ike] == null) continue;
 
@@ -92,7 +110,8 @@ class PieceGenerator {
             }
         }
 
-        while (patterns.has(null)) patterns.remove(null);
+        // remove all null patterns
+        while (patterns.remove(null)) {}
 
         return patterns;
     }
@@ -100,10 +119,13 @@ class PieceGenerator {
     private static function makeFreePatterns(size:Int):Array<Pattern> {
         //trace("FR " + size);
 
+        // Grab the previously found one-sided patterns
         if (oneSidedPatternsBySize[size] == null) oneSidedPatternsBySize[size] = makeOneSidedPatterns(size);
         var patterns:Array<Pattern> = oneSidedPatternsBySize[size].copy();
 
         if (patterns.length > 1) {
+
+            // Create flipped rotations of the pattern, find the duplicates and null them
             for (ike in 0...patterns.length) {
                 if (patterns[ike] == null) continue;
 
@@ -124,12 +146,16 @@ class PieceGenerator {
             }
         }
 
-        while (patterns.has(null)) patterns.remove(null);
+        // remove all null patterns
+        while (patterns.remove(null)) {}
 
         return patterns;
     }
 
     private static function rotatePattern(pattern:Pattern):Pattern {
+
+        // I find it easier to flip the x and y coordinates of a pattern, and then flip the y axis
+
         var rotatedPattern:Pattern = [];
         for (row in 0...pattern.length) {
             rotatedPattern.push([]);
@@ -142,6 +168,9 @@ class PieceGenerator {
     }
 
     private static function vFlipPattern(pattern:Pattern):Pattern {
+
+        // Reversing a pattern reflects it along the y axis
+
         pattern = copyPattern(pattern);
         pattern.reverse();
         cleanPattern(pattern);
@@ -149,6 +178,7 @@ class PieceGenerator {
     }
 
     private static function copyPattern(pattern:Pattern):Pattern {
+        // We're dealing with integers here, so it's not too hard to do a deep copy of a pattern
         var copy:Pattern = [];
         for (row in pattern) copy.push(row.copy());
         return copy;
@@ -157,10 +187,14 @@ class PieceGenerator {
     private static function getProgeny(pattern:Pattern):Array<Pattern> {
         var progeny:Array<Pattern> = [];
 
+        // We copy the pattern and then give it growing room.
+
         pattern = copyPattern(pattern); // !!
         for (row in pattern) row.unshift(false); // !!
         pattern.push([]); // !!
         pattern.unshift([]); // !!
+
+        // For each empty cell adjacent to the filled cells in the pattern,
 
         for (y in 0...pattern.length) {
             for (x in 0...pattern.length) {
@@ -177,6 +211,9 @@ class PieceGenerator {
                     }
 
                     if (valid) {
+
+                        // We copy the pattern and fill the cell in that copy, and then clean the pattern
+
                         var child:Pattern = copyPattern(pattern);
                         child[y][x] = true;
                         cleanPattern(child); // !!
@@ -191,6 +228,7 @@ class PieceGenerator {
     }
 
     private static function arePatternsEqual(pattern1:Pattern, pattern2:Pattern):Bool {
+        // Because Array<Int> is really Array<Null<Int>>, we test whether all cells' equivalence to true are equal
         for (row in 0...pattern1.length) {
             var slice1:Array<Bool> = pattern1[row];
             var slice2:Array<Bool> = pattern2[row];
@@ -201,7 +239,7 @@ class PieceGenerator {
 
     private static function cleanPattern(pattern:Pattern):Void {
 
-        var old:String = spitPattern(pattern);
+        // Patterns are cropped before they are tested for equivalence
 
         var minX:Int = pattern.length;
 
@@ -222,6 +260,9 @@ class PieceGenerator {
     }
 
     private static function spitPattern(pattern:Pattern):String {
+
+        // Handy.
+
         var str:String = "\n";
         var size:Int = pattern.length;
         for (row in pattern) {

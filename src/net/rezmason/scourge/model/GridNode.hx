@@ -3,7 +3,10 @@ package net.rezmason.scourge.model;
 class GridNode<T> {
     public var value:T;
     public var neighbors(default, null):Array<GridNode<T>>;
-    public function new():Void { neighbors = []; }
+    public function new(value:T):Void {
+        this.value = value;
+        neighbors = [];
+    }
 }
 
 typedef Gr = GridDirection;

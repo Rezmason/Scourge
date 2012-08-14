@@ -1,4 +1,4 @@
-package net.rezmason.scourge.model;
+package net.rezmason.scourge.unused;
 
 class Grid<T> {
 

@@ -1,4 +1,4 @@
-package net.rezmason.scourge.model;
+package net.rezmason.scourge.unused;
 
 import massive.munit.Assert;
 
@@ -17,7 +17,7 @@ class GridTest {
 
     }
 
-    @Test
+    //@Test
     public function spitTest():Void {
         grid = new Grid<TestCell>(4, 3, gen);
 
@@ -38,7 +38,7 @@ class GridTest {
         grid = null;
     }
 
-    @Test
+    //@Test
     public function iteratorTest():Void {
         grid = new Grid<TestCell>(5, 3, gen);
 
@@ -101,7 +101,7 @@ class GridTest {
         grid = null;
     }
 
-    @Test
+    //@Test
     public function iteratorTest2():Void {
         grid = new Grid<TestCell>(20, 20, gen);
 

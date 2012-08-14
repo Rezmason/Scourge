@@ -2,6 +2,8 @@ package net.rezmason.scourge.model;
 
 import net.rezmason.scourge.model.aspects.Aspect;
 
+typedef AspectList = IntHash<Class<Aspect>>;
+
 class Rule {
 
     /*
@@ -18,19 +20,8 @@ class Rule {
     Command validation
     */
 
-    public function addPlayerAspects(hash:IntHash<Aspect>):Void {
-        // determine whether the required player aspects are present in the hash
-        // if one is absent, add it
-    }
-
-    public function addGameAspects(hash:IntHash<Aspect>):Void {
-        // determine whether the required game aspects are present in the hash
-        // if one is absent, add it
-    }
-
-    public function addCellAspects(hash:IntHash<Aspect>):Void {
-        // determine whether the required cell aspects are present in the hash
-        // if one is absent, add it
-    }
+    public function listStateAspects():AspectList { return null; }
+    public function listPlayerAspects():AspectList { return null; }
+    public function listBoardAspects():AspectList { return null; }
 }
 

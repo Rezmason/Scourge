@@ -9,16 +9,17 @@ import net.rezmason.scourge.model.aspects.Aspect;
 using Lambda;
 using Std;
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.utils.IntHashUtils;
 
 typedef XY = {x:Float, y:Float};
 typedef BoardData = {boardWidth:Int, heads:Array<XY>};
+typedef AspectRequirements = IntHash<Class<Aspect>>;
 
 class BoardStateFactory {
 
     // Creates boards for "skirmish games"
     // I suspect that this is actually a rule. Might refactor in the future
 
-    private static var OWNERSHIP:Int = OwnershipAspect.id;
     private inline static var PLAYER_DIST:Int = 9;
     private inline static var PADDING:Int = 5;
     private inline static var RIM:Int = 1;
@@ -37,28 +38,42 @@ class BoardStateFactory {
 
         var rules:Array<Rule> = cfg.rules;
         while (rules.has(null)) rules.remove(null);
-        for (genome in cfg.playerGenes) state.players.push(makePlayer(genome, rules));
-        for (rule in rules) rule.addGameAspects(state.aspects);
 
-        makeBoard(state.players, cfg.circular, cfg.initGrid, rules);
+        // Create and populate the aspect requirement lists
+        var stateRequirements:AspectRequirements = new AspectRequirements();
+        var playerRequirements:AspectRequirements = new AspectRequirements();
+        var boardRequirements:AspectRequirements = new AspectRequirements();
+
+        boardRequirements.set(OwnershipAspect.id, OwnershipAspect);
+
+        for (rule in rules) {
+            stateRequirements.absorb(rule.listStateAspects());
+            playerRequirements.absorb(rule.listPlayerAspects());
+            boardRequirements.absorb(rule.listBoardAspects());
+        }
+
+        // Populate the game state with aspects, players and nodes
+        createAspects(stateRequirements, state.aspects);
+        for (genome in cfg.playerGenes) state.players.push(makePlayer(genome, playerRequirements));
+        makeBoard(state.players, cfg.circular, cfg.initGrid, boardRequirements);
 
         return state;
     }
 
-    function makeBoard(players:Array<PlayerState>, circular:Bool, initGrid:String, rules:Array<Rule>):Void {
+    function makeBoard(players:Array<PlayerState>, circular:Bool, initGrid:String, requirements:AspectRequirements):Void {
         var numPlayers:Int = players.length;
 
-        // build the level out of nodes
-        var data:BoardData = getHeadPoints(numPlayers, PLAYER_DIST, PADDING + RIM);
+        // Derive the size of the board and the positions of the players' heads
+        var data:BoardData = designBoard(numPlayers, PLAYER_DIST, PADDING + RIM);
 
         // Make a connected grid of nodes with default values
-        var node:GridNode<IntHash<Aspect>> = makeNode(rules);
-        for (ike in 1...data.boardWidth) node = node.attach(makeNode(rules), Gr.e);
+        var node:GridNode<IntHash<Aspect>> = makeNode(requirements);
+        for (ike in 1...data.boardWidth) node = node.attach(makeNode(requirements), Gr.e);
 
         var row:GridNode<IntHash<Aspect>> = node.run(Gr.w);
         for (ike in 1...data.boardWidth) {
             for (column in row.walk(Gr.e)) {
-                var next:GridNode<IntHash<Aspect>> = makeNode(rules);
+                var next:GridNode<IntHash<Aspect>> = makeNode(requirements);
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);
@@ -70,21 +85,24 @@ class BoardStateFactory {
         // run to the northwest
         var grid:GridNode<IntHash<Aspect>> = node.run(Gr.nw).run(Gr.n).run(Gr.w);
 
-        // obstruct the RIM
-        for (node in grid.walk(Gr.e)) getOwner(node).isFilled.value = 1;
-        for (node in grid.walk(Gr.s)) getOwner(node).isFilled.value = 1;
-        for (node in grid.run(Gr.s).walk(Gr.e)) getOwner(node).isFilled.value = 1;
-        for (node in grid.run(Gr.e).walk(Gr.s)) getOwner(node).isFilled.value = 1;
+        // obstruct the rim
+        for (node in grid.walk(Gr.e)) nodeOwner(node).isFilled = 1;
+        for (node in grid.walk(Gr.s)) nodeOwner(node).isFilled = 1;
+        for (node in grid.run(Gr.s).walk(Gr.e)) nodeOwner(node).isFilled = 1;
+        for (node in grid.run(Gr.e).walk(Gr.s)) nodeOwner(node).isFilled = 1;
 
-        // Identify and change the occupier of each head
+        // Identify and change the occupier of each head node
         for (ike in 0...numPlayers) {
             var player:PlayerState = players[ike];
             var coord:XY = data.heads[ike];
             player.head = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
-            var ownerAspect:OwnershipAspect = getOwner(player.head);
-            ownerAspect.isFilled.value = 1;
-            ownerAspect.occupier.value = ike;
+            var ownerAspect:OwnershipAspect = nodeOwner(player.head);
+            ownerAspect.isFilled = 1;
+            ownerAspect.occupier = ike;
         }
+
+        // Circular levels' cells are obstructed if they're too far from the board's center
+        // Note: This creates lots of nodes whose states never change...
 
         if (circular) {
             var radius:Float = (data.boardWidth - RIM * 2) * 0.5;
@@ -92,18 +110,20 @@ class BoardStateFactory {
             for (row in grid.walk(Gr.s)) {
                 var x:Int = 0;
                 for (column in row.walk(Gr.e)) {
-                    var ownerAspect:OwnershipAspect = getOwner(column);
-                    if (ownerAspect.isFilled.value == 0) {
+                    var ownerAspect:OwnershipAspect = nodeOwner(column);
+                    if (ownerAspect.isFilled == 0) {
                         var fx:Float = x - radius + 0.5 - RIM;
                         var fy:Float = y - radius + 0.5 - RIM;
                         var insideCircle:Bool = Math.sqrt(fx * fx + fy * fy) < radius;
-                        if (!insideCircle) ownerAspect.isFilled.value = 1;
+                        if (!insideCircle) ownerAspect.isFilled = 1;
                     }
                     x++;
                 }
                 y++;
             }
         }
+
+        // Refer to the initGrid to assign initial values to nodes
 
         if (initGrid != null && initGrid.length > 0) {
 
@@ -115,13 +135,13 @@ class BoardStateFactory {
             for (row in grid.walk(Gr.s)) {
                 var x:Int = 0;
                 for (column in row.walk(Gr.e)) {
-                    var ownerAspect:OwnershipAspect = getOwner(column);
-                    if (ownerAspect.isFilled.value == 0) {
+                    var ownerAspect:OwnershipAspect = nodeOwner(column);
+                    if (ownerAspect.isFilled == 0) {
                         var char:String = initGrid.charAt(y * initGridWidth + x + 1);
                         if (char != " ") {
-                            ownerAspect.isFilled.value = 1;
-                            if (!NUMERIC_CHAR.match(char)) ownerAspect.occupier.value = -1;
-                            else ownerAspect.occupier.value = Std.int(Math.min(Std.parseInt(char), numPlayers));
+                            ownerAspect.isFilled = 1;
+                            if (!NUMERIC_CHAR.match(char)) ownerAspect.occupier = -1;
+                            else ownerAspect.occupier = Std.int(Math.min(Std.parseInt(char), numPlayers));
                         }
                     }
                     x++;
@@ -131,20 +151,31 @@ class BoardStateFactory {
         }
     }
 
-    function makeNode(rules:Array<Rule>):GridNode<IntHash<Aspect>> {
-        var node:GridNode<IntHash<Aspect>> = new GridNode<IntHash<Aspect>>();
-        var cell:IntHash<Aspect> = new IntHash<Aspect>();
-        cell.set(OWNERSHIP, new OwnershipAspect());
-        for (rule in rules) rule.addCellAspects(cell);
-        node.value = cell;
-        return node;
+    inline function makePlayer(genome:String, requirements:AspectRequirements):PlayerState {
+        var playerState:PlayerState = new PlayerState();
+        playerState.genome = genome;
+        createAspects(requirements, playerState.aspects);
+        return playerState;
     }
 
-    inline function getOwner(node:GridNode<IntHash<Aspect>>):OwnershipAspect {
-        return cast node.value.get(OWNERSHIP);
+    inline function makeNode(aspects:AspectRequirements):GridNode<IntHash<Aspect>> {
+        return new GridNode<IntHash<Aspect>>(createAspects(aspects));
     }
 
-    function getHeadPoints(numHeads:Int, playerDistance:Float, padding:Float):BoardData {
+    inline function nodeOwner(node:GridNode<IntHash<Aspect>>):OwnershipAspect {
+        return cast node.value.get(OwnershipAspect.id);
+    }
+
+    inline function createAspects(requirements:AspectRequirements, hash:IntHash<Aspect> = null):IntHash<Aspect> {
+        if (hash == null) hash = new IntHash<Aspect>();
+        for (key in requirements.keys()) hash.set(key, Type.createInstance(requirements.get(key), []));
+        return hash;
+    }
+
+    function designBoard(numHeads:Int, playerDistance:Float, padding:Float):BoardData {
+
+        // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
+        // Player 1's head is at a 45 degree angle
 
         var startAngle:Float = 0.75;
         var headAngle:Float = 2 / numHeads;
@@ -178,6 +209,10 @@ class BoardStateFactory {
         minHeadY = boardRadius * 2 + 1;
         maxHeadY = -1;
 
+        // For some values of numHeads, the heads will be relatively evenly spaced
+        // but relatively unevenly positioned away from the edges of the board.
+        // So we scale their positions to fit within a square.
+
         for (ike in 0...numHeads) {
             var coord:XY = {x:0., y:0.};
             coords.push(coord);
@@ -192,6 +227,8 @@ class BoardStateFactory {
             maxHeadY = Math.max(maxHeadY, coord.y + 1);
         }
 
+        // The square's width and the positions of each head are returned.
+
         var boardWidth:Int = Std.int(maxHeadX - minHeadX + 2 * padding);
 
         for (coord in coords) {
@@ -200,12 +237,5 @@ class BoardStateFactory {
         }
 
         return {boardWidth:boardWidth, heads:coords};
-    }
-
-    function makePlayer(genome:String, rules:Array<Rule>):PlayerState {
-        var playerState:PlayerState = new PlayerState();
-        playerState.genome = genome;
-        for (rule in rules) rule.addPlayerAspects(playerState.aspects);
-        return playerState;
     }
 }

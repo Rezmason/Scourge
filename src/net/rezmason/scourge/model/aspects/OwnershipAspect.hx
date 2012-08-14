@@ -4,14 +4,11 @@ class OwnershipAspect extends Aspect {
 
     public static var id(default, null):Int = Aspect.ids++;
 
-    public var isFilled(default, null):Pointer<Int>;
-    public var occupier(default, null):Pointer<Int>;
+    public var isFilled:Int;
+    public var occupier:Int;
 
     public function new():Void {
-        isFilled = new Pointer<Int>();
-        occupier = new Pointer<Int>();
-
-        isFilled.value = 0;
-        occupier.value = -1;
+        isFilled = 0;
+        occupier = -1;
     }
 }

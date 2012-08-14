@@ -65,16 +65,16 @@ class BoardStateFactoryTest {
         "X1111111111111111222222X\n" +
         "X1111111111111111222222X\n" +
         "X1111111111111111222222X\n" +
-        "X111000          222333X\n" +
+        "X111000   XXXX   222333X\n" +
         "X111000 11111111 222333X\n" +
         "X111000 00000001 222333X\n" +
-        "X111000 01111101 222333X\n" +
-        "X111000 01000101 222333X\n" +
-        "X111000 01010101 222333X\n" +
-        "X111000 01011101 222333X\n" +
+        "X111000X01111101X222333X\n" +
+        "X111000X01000101X222333X\n" +
+        "X111000X01010101X222333X\n" +
+        "X111000X01011101X222333X\n" +
         "X111000 01000001 222333X\n" +
         "X111000 01111111 222333X\n" +
-        "X111000          222333X\n" +
+        "X111000   XXXX   222333X\n" +
         "X0000003333333333333333X\n" +
         "X0000003333333333333333X\n" +
         "X0000003333333333333333X\n" +
@@ -126,18 +126,18 @@ class BoardStateFactoryTest {
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);
-            Assert.areEqual(-1, getOwner(neighbor).occupier.value);
-            getOwner(neighbor).occupier.value = 0;
+            Assert.areEqual(-1, getOwner(neighbor).occupier);
+            getOwner(neighbor).occupier = 0;
         }
 
-        Assert.areEqual(0, getOwner(playerHead.nw()).occupier.value);
-        Assert.areEqual(0, getOwner(playerHead.n()).occupier.value);
-        Assert.areEqual(0, getOwner(playerHead.ne()).occupier.value);
-        Assert.areEqual(0, getOwner(playerHead.e()).occupier.value);
-        Assert.areEqual(0, getOwner(playerHead.se()).occupier.value);
-        Assert.areEqual(0, getOwner(playerHead.s()).occupier.value);
-        Assert.areEqual(0, getOwner(playerHead.sw()).occupier.value);
-        Assert.areEqual(0, getOwner(playerHead.w()).occupier.value);
+        Assert.areEqual(0, getOwner(playerHead.nw()).occupier);
+        Assert.areEqual(0, getOwner(playerHead.n()).occupier);
+        Assert.areEqual(0, getOwner(playerHead.ne()).occupier);
+        Assert.areEqual(0, getOwner(playerHead.e()).occupier);
+        Assert.areEqual(0, getOwner(playerHead.se()).occupier);
+        Assert.areEqual(0, getOwner(playerHead.s()).occupier);
+        Assert.areEqual(0, getOwner(playerHead.sw()).occupier);
+        Assert.areEqual(0, getOwner(playerHead.w()).occupier);
     }
 
     @Test
@@ -188,8 +188,8 @@ class BoardStateFactoryTest {
 
     private function nodeToString(node:BoardNode):String {
         var ownerAspect:OwnershipAspect = getOwner(node);
-        if (ownerAspect.occupier.value > -1) return Std.string(ownerAspect.occupier.value);
-        if (ownerAspect.isFilled.value == 1) return "X";
+        if (ownerAspect.occupier > -1) return Std.string(ownerAspect.occupier);
+        if (ownerAspect.isFilled == 1) return "X";
 
         return " ";
     }

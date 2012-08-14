@@ -1,4 +1,4 @@
-package net.rezmason.scourge.model;
+package net.rezmason.scourge.unused;
 
 typedef Diff<T> = IntHash<Change<T>>;
 

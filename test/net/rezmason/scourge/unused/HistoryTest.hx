@@ -1,13 +1,13 @@
-package net.rezmason.scourge.model;
+package net.rezmason.scourge.unused;
 
 import massive.munit.Assert;
 
-import net.rezmason.scourge.model.History;
-import net.rezmason.scourge.model.Pointer;
+import net.rezmason.scourge.unused.History;
+import net.rezmason.scourge.unused.Pointer;
 
 class HistoryTest
 {
-	@Test
+	//@Test
 	public function historyTest1():Void
 	{
 		var threwError:Bool;
