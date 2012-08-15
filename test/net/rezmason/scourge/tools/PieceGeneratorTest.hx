@@ -28,7 +28,7 @@ class PieceGeneratorTest {
             [ 1, 1, 2,  5, 12,  35, 108,  369, 1285,  4655, ],
         ];
 
-        var max:Int = 6;
+        var max:Int = 4;
 
         for (pieceType in 0...expectedCounts.length) {
             var counts:Array<Int> = expectedCounts[pieceType];

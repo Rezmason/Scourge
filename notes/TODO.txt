@@ -1,5 +1,5 @@
-Separate BoardFactory from StateFactory
-
+BoardFactory is ugly
+StateFactoryTest needs a TestRule which requires a TestAspect on everything
 
 New history, again
 	All values are stored in an array
@@ -20,7 +20,8 @@ New history, again
 		state[node.stateIndex]
 		state[aspect.isFilledIndex]
 
-
+StateFactoryTest needs to wire up all aspects with the history
+	Aspects tie into its alloc
 
 KillDisconnectedCellsRule
 	TEST

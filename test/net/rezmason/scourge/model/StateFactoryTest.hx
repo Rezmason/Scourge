@@ -2,86 +2,16 @@ package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
 
+import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.GridNode;
-
 import net.rezmason.scourge.model.aspects.Aspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
-using Reflect;
 using net.rezmason.scourge.model.GridUtils;
 
-//typedef BoardNode = GridNode<IntHash<Aspect>>;
-
 class StateFactoryTest {
-/*
+
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
-
-    private static var board1:String = "\n" +
-        "X X X X X X X X X X X X X X X X X X X X X X X X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X           1                     2           X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X           0                     3           X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X X X X X X X X X X X X X X X X X X X X X X X X ";
-
-    private static var board2:String = "\n" +
-        "X X X X X X X X X X X X X \n" +
-        "X X X X           X X X X \n" +
-        "X X X               X X X \n" +
-        "X X                   X X \n" +
-        "X                       X \n" +
-        "X                       X \n" +
-        "X           0           X \n" +
-        "X                       X \n" +
-        "X                       X \n" +
-        "X X                   X X \n" +
-        "X X X               X X X \n" +
-        "X X X X           X X X X \n" +
-        "X X X X X X X X X X X X X ";
-
-    private static var board3:String = "\n" +
-        "XXXXXXXXXXXXXXXXXXXXXXXX\n" +
-        "X1111112222222222222222X\n" +
-        "X1111112222222222222222X\n" +
-        "X1111112222222222222222X\n" +
-        "X1111111111111111222222X\n" +
-        "X1111111111111111222222X\n" +
-        "X1111111111111111222222X\n" +
-        "X111000   XXXX   222333X\n" +
-        "X111000 11111111 222333X\n" +
-        "X111000 00000001 222333X\n" +
-        "X111000X01111101X222333X\n" +
-        "X111000X01000101X222333X\n" +
-        "X111000X01010101X222333X\n" +
-        "X111000X01011101X222333X\n" +
-        "X111000 01000001 222333X\n" +
-        "X111000 01111111 222333X\n" +
-        "X111000   XXXX   222333X\n" +
-        "X0000003333333333333333X\n" +
-        "X0000003333333333333333X\n" +
-        "X0000003333333333333333X\n" +
-        "X0000000000000000333333X\n" +
-        "X0000000000000000333333X\n" +
-        "X0000000000000000333333X\n" +
-        "XXXXXXXXXXXXXXXXXXXXXXXX";
 
     @Before
     public function setup():Void {
@@ -95,78 +25,51 @@ class StateFactoryTest {
 
     @Test
     public function configTest1():Void {
-        var factory:BoardFactory = new BoardFactory();
-        var cfg:BoardConfig = new BoardConfig();
-        for (gene in ["a", "b", "c", "d"]) cfg.playerGenes.push(gene);
-        cfg.rules.push(null);
-        cfg.circular = false;
-        var state:State = factory.makeState(cfg);
 
-        Assert.areEqual(cfg.playerGenes.length, state.players.length);
+        var genes:Array<String> = ["a", "b"];
 
-        for (player in state.players) {
-            Assert.isNotNull(player.head);
+        // make board config and generate board
+        var boardCfg:BoardConfig = new BoardConfig();
+        boardCfg.numPlayers = genes.length;
+        boardCfg.circular = false;
+        var boardFactory:BoardFactory = new BoardFactory();
+        var heads:Array<BoardNode> = boardFactory.makeBoard(boardCfg);
+
+        var boardBefore:String = spitGrid(heads[0], false);
+
+        // make state config and generate state
+        var factory:StateFactory = new StateFactory();
+        var stateCfg:StateConfig = new StateConfig();
+        for (head in heads) stateCfg.playerHeads.push(head);
+        for (gene in genes) stateCfg.playerGenes.push(gene);
+        stateCfg.rules.push(null); // TODO: Add rules
+        var state:State = factory.makeState(stateCfg);
+
+        Assert.areEqual(stateCfg.playerGenes.length, state.players.length);
+
+        // Make sure there's the right aspects on the state
+        for (aspect in state.aspects) {
+            // TODO: Check that rule aspect requirements appear
+        }
+
+        // Make sure there's the right aspects on each players
+        for (ike in 0...state.players.length) {
+            var player:PlayerState = state.players[ike];
+            Assert.areEqual(player.genome, genes[ike]);
+            Assert.areEqual(player.head, heads[ike]);
             for (aspect in player.aspects) {
-                // TODO: Assert aspects?
+                // TODO: Check that rule aspect requirements appear
             }
         }
 
-        for (aspect in state.aspects) {
-            // TODO: Assert aspects?
+        for (node in state.players[0].head.getGraph()) {
+            for (aspect in node.value) {
+                // TODO: Check that rule aspect requirements appear
+            }
         }
 
-        var playerHead:BoardNode = state.players[0].head;
-
-        #if VISUAL_TEST
-            trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
-            trace(spitGrid(playerHead));
-        #else
-            Assert.areEqual(board1, spitGrid(playerHead));
-        #end
-
-        for (neighbor in playerHead.neighbors) {
-            Assert.isNotNull(neighbor);
-            Assert.areEqual(-1, getOwner(neighbor).occupier);
-            getOwner(neighbor).occupier = 0;
-        }
-
-        Assert.areEqual(0, getOwner(playerHead.nw()).occupier);
-        Assert.areEqual(0, getOwner(playerHead.n()).occupier);
-        Assert.areEqual(0, getOwner(playerHead.ne()).occupier);
-        Assert.areEqual(0, getOwner(playerHead.e()).occupier);
-        Assert.areEqual(0, getOwner(playerHead.se()).occupier);
-        Assert.areEqual(0, getOwner(playerHead.s()).occupier);
-        Assert.areEqual(0, getOwner(playerHead.sw()).occupier);
-        Assert.areEqual(0, getOwner(playerHead.w()).occupier);
-    }
-
-    @Test
-    public function configTest2():Void {
-        var factory:BoardFactory = new BoardFactory();
-        var cfg:BoardConfig = new BoardConfig();
-        for (gene in ["a"]) cfg.playerGenes.push(gene);
-        cfg.circular = true;
-        var state:State = factory.makeState(cfg);
-
-        #if VISUAL_TEST
-            trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
-            trace(spitGrid(state.players[0].head));
-        #else
-            Assert.areEqual(board2, spitGrid(state.players[0].head));
-        #end
-    }
-
-    @Test
-    public function configTest3():Void {
-        var factory:BoardFactory = new BoardFactory();
-        var cfg:BoardConfig = new BoardConfig();
-        for (gene in ["a", "b", "c", "d"]) cfg.playerGenes.push(gene);
-        cfg.initGrid = board3;
-        var state:State = factory.makeState(cfg);
-
-        // trace(spitGrid(state.players[0].head));
-
-        Assert.areEqual(board3, spitGrid(state.players[0].head, false));
+        // Make sure the board renders the same way
+        Assert.areEqual(boardBefore, spitGrid(state.players[0].head, false));
     }
 
     private function spitGrid(head:BoardNode, addSpaces:Bool = true):String {
@@ -197,5 +100,4 @@ class StateFactoryTest {
     private function getOwner(node:BoardNode):OwnershipAspect {
         return cast node.value.get(OwnershipAspect.id);
     }
-*/
 }

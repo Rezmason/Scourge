@@ -1,8 +1,7 @@
 package net.rezmason.scourge.model;
 
+import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.Aspect;
-
-typedef AspectList = IntHash<Class<Aspect>>;
 
 class Rule {
 
@@ -20,8 +19,8 @@ class Rule {
     Command validation
     */
 
-    public function listStateAspects():AspectList { return null; }
-    public function listPlayerAspects():AspectList { return null; }
-    public function listBoardAspects():AspectList { return null; }
+    public function listStateAspectRequirements():AspectRequirements { return null; }
+    public function listPlayerAspectRequirements():AspectRequirements { return null; }
+    public function listBoardAspectRequirements():AspectRequirements { return null; }
 }
 
