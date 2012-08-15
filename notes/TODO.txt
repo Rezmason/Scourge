@@ -1,3 +1,6 @@
+Separate BoardFactory from StateFactory
+
+
 New history, again
 	All values are stored in an array
 	Oldvalues are stored the same way

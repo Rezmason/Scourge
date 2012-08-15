@@ -15,7 +15,7 @@ typedef XY = {x:Float, y:Float};
 typedef BoardData = {boardWidth:Int, heads:Array<XY>};
 typedef AspectRequirements = IntHash<Class<Aspect>>;
 
-class BoardStateFactory {
+class BoardFactory {
 
     // Creates boards for "skirmish games"
     // I suspect that this is actually a rule. Might refactor in the future
@@ -31,7 +31,7 @@ class BoardStateFactory {
 
     }
 
-    public function makeState(cfg:BoardStateConfig):State {
+    public function makeState(cfg:BoardConfig):State {
         if (cfg == null) return null;
 
         var state:State = new State();

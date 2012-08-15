@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model;
 
-class BoardStateConfig {
+class BoardConfig {
 
     public var playerGenes(default, null):Array<String>;
     public var circular:Bool;

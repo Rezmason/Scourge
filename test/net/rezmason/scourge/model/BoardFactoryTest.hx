@@ -12,7 +12,7 @@ using net.rezmason.scourge.model.GridUtils;
 
 typedef BoardNode = GridNode<IntHash<Aspect>>;
 
-class BoardStateFactoryTest {
+class BoardFactoryTest {
 
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
@@ -95,8 +95,8 @@ class BoardStateFactoryTest {
 
     @Test
     public function configTest1():Void {
-        var factory:BoardStateFactory = new BoardStateFactory();
-        var cfg:BoardStateConfig = new BoardStateConfig();
+        var factory:BoardFactory = new BoardFactory();
+        var cfg:BoardConfig = new BoardConfig();
         for (gene in ["a", "b", "c", "d"]) cfg.playerGenes.push(gene);
         cfg.rules.push(null);
         cfg.circular = false;
@@ -142,8 +142,8 @@ class BoardStateFactoryTest {
 
     @Test
     public function configTest2():Void {
-        var factory:BoardStateFactory = new BoardStateFactory();
-        var cfg:BoardStateConfig = new BoardStateConfig();
+        var factory:BoardFactory = new BoardFactory();
+        var cfg:BoardConfig = new BoardConfig();
         for (gene in ["a"]) cfg.playerGenes.push(gene);
         cfg.circular = true;
         var state:State = factory.makeState(cfg);
@@ -158,8 +158,8 @@ class BoardStateFactoryTest {
 
     @Test
     public function configTest3():Void {
-        var factory:BoardStateFactory = new BoardStateFactory();
-        var cfg:BoardStateConfig = new BoardStateConfig();
+        var factory:BoardFactory = new BoardFactory();
+        var cfg:BoardConfig = new BoardConfig();
         for (gene in ["a", "b", "c", "d"]) cfg.playerGenes.push(gene);
         cfg.initGrid = board3;
         var state:State = factory.makeState(cfg);
