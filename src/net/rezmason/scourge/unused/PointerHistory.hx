@@ -4,7 +4,7 @@ typedef Diff<T> = IntHash<Change<T>>;
 
 using Lambda;
 
-class History<T> {
+class PointerHistory<T> {
 
     private var diffs:Array<Diff<T>>;
     private var firstDiff:Diff<T>;

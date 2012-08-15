@@ -5,7 +5,6 @@
 -cp src
 -debug
 #-D VISUAL_TEST
--D SAFE_HISTORY
 
 -cp test
 -swf-version 9
@@ -13,18 +12,17 @@
 --next
 
 #Flash 8
--main TestMain
--lib munit
--lib hamcrest
--cp src
--debug
-#-D VISUAL_TEST
--D SAFE_HISTORY
-
--cp test
--swf-version 8
--swf build/as2_test.swf
---next
+#-main TestMain
+#-lib munit
+#-lib hamcrest
+#-cp src
+#-debug
+##-D VISUAL_TEST
+#
+#-cp test
+#-swf-version 8
+#-swf build/as2_test.swf
+#--next
 
 # JavaScript
 -main TestMain
@@ -33,7 +31,6 @@
 -cp src
 -debug
 #-D VISUAL_TEST
--D SAFE_HISTORY
 
 -cp test
 -js build/js_test.js
@@ -47,7 +44,6 @@
 -cp src
 -debug
 #-D VISUAL_TEST
--D SAFE_HISTORY
 
 -cp test
 -neko build/neko_test.n

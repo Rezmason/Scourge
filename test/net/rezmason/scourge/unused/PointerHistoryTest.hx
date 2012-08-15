@@ -2,49 +2,49 @@ package net.rezmason.scourge.unused;
 
 import massive.munit.Assert;
 
-import net.rezmason.scourge.unused.History;
+import net.rezmason.scourge.unused.PointerHistory;
 import net.rezmason.scourge.unused.Pointer;
 
-class HistoryTest
+class PointerHistoryTest
 {
 	//@Test
 	public function historyTest1():Void
 	{
 		var threwError:Bool;
 
-		var history:History<Int> = new History<Int>();
+		var history:PointerHistory<Int> = new PointerHistory<Int>();
 
 		Assert.areEqual(0, history.revision);
 		Assert.areEqual(0, history.commit()); // Commit with no subscribers
 
-		var recordA:Pointer<Int> = new Pointer<Int>();
-		var recordB:Pointer<Int> = new Pointer<Int>();
-		var recordC:Pointer<Int> = new Pointer<Int>();
+		var propA:Pointer<Int> = new Pointer<Int>();
+		var propB:Pointer<Int> = new Pointer<Int>();
+		var propC:Pointer<Int> = new Pointer<Int>();
 
-		recordA.value = 0;
+		propA.value = 0;
 
-		history.add(recordA);
-		history.add(recordB);
+		history.add(propA);
+		history.add(propB);
 
 		Assert.areEqual(0, history.commit()); // Commit with subscribers with no changes
 
-		recordA.value = 1;
+		propA.value = 1;
 		Assert.areEqual(1, history.commit()); // Commit
-		recordB.value = 2;
+		propB.value = 2;
 		Assert.areEqual(2, history.commit()); // Commit
 
-		recordA.value = 3;
-		recordB.value = 3;
-		recordC.value = 3;
+		propA.value = 3;
+		propB.value = 3;
+		propC.value = 3;
 
-		history.add(recordC); // Late subscription
+		history.add(propC); // Late subscription
 
 		Assert.areEqual(3, history.commit()); // Commit
 
 		// current state
-		Assert.areEqual(3, recordA.value);
-		Assert.areEqual(3, recordB.value);
-		Assert.areEqual(3, recordC.value);
+		Assert.areEqual(3, propA.value);
+		Assert.areEqual(3, propB.value);
+		Assert.areEqual(3, propC.value);
 
 		// invalid revert
 		threwError = false;
@@ -57,16 +57,16 @@ class HistoryTest
 
 		// revert to early state
 		history.revert(2);
-		Assert.areEqual(1, recordA.value);
-		Assert.areEqual(2, recordB.value);
-		Assert.areEqual(3, recordC.value);
+		Assert.areEqual(1, propA.value);
+		Assert.areEqual(2, propB.value);
+		Assert.areEqual(3, propC.value);
 
 		Assert.areEqual(2, history.revision);
 
 		// Pending changes
-		recordA.value = 4;
-		recordB.value = 5;
-		recordC.value = 6;
+		propA.value = 4;
+		propB.value = 5;
+		propC.value = 6;
 
 		#if SAFE_HISTORY
 			// Attempt to revert with pending changes
@@ -81,32 +81,32 @@ class HistoryTest
 
 		// reset undoes pending changes
 		history.reset();
-		Assert.areEqual(1, recordA.value);
-		Assert.areEqual(2, recordB.value);
-		Assert.areEqual(3, recordC.value);
+		Assert.areEqual(1, propA.value);
+		Assert.areEqual(2, propB.value);
+		Assert.areEqual(3, propC.value);
 
 		// revert to first state
 		history.revert(0);
-		Assert.areEqual(0, recordA.value);
-		Assert.areEqual(null, recordB.value);
-		Assert.areEqual(3, recordC.value);
+		Assert.areEqual(0, propA.value);
+		Assert.areEqual(null, propB.value);
+		Assert.areEqual(3, propC.value);
 
 		Assert.areEqual(0, history.revision);
 
-		recordA.value = 1;
-		recordB.value = 2;
-		recordC.value = 3;
+		propA.value = 1;
+		propB.value = 2;
+		propC.value = 3;
 		Assert.areEqual(1, history.commit()); // Commit
 
 		history.wipe();
 		Assert.areEqual(0, history.revision);
 
-		var recordD:Pointer<Int> = new Pointer<Int>();
-		recordD.value = 1;	// subscriber after wipe
-		history.add(recordD);
-		recordA.value = -1;
-		recordB.value = -1;
-		recordC.value = -1;
+		var propD:Pointer<Int> = new Pointer<Int>();
+		propD.value = 1;	// subscriber after wipe
+		history.add(propD);
+		propA.value = -1;
+		propB.value = -1;
+		propC.value = -1;
 
 		Assert.areEqual(0, history.commit()); // Commit after wipe
 
