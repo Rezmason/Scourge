@@ -114,9 +114,9 @@ class BoardFactory {
     }
 
     inline function makeNode():BoardNode {
-        var hash:IntHash<Aspect> = new IntHash<Aspect>();
-        hash.set(OwnershipAspect.id, new OwnershipAspect());
-        return new BoardNode(hash);
+        var aspects:Aspects = new Aspects();
+        aspects.set(OwnershipAspect.id, new OwnershipAspect());
+        return new BoardNode(aspects);
     }
 
     inline function nodeOwner(node:BoardNode):OwnershipAspect {

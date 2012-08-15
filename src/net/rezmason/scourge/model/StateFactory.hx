@@ -57,9 +57,9 @@ class StateFactory {
         return playerState;
     }
 
-    inline function createAspects(requirements:AspectRequirements, hash:IntHash<Aspect> = null):IntHash<Aspect> {
-        if (hash == null) hash = new IntHash<Aspect>();
-        for (key in requirements.keys()) if (!hash.exists(key)) hash.set(key, Type.createInstance(requirements.get(key), []));
-        return hash;
+    inline function createAspects(requirements:AspectRequirements, aspects:Aspects = null):Aspects {
+        if (aspects == null) aspects = new Aspects();
+        for (key in requirements.keys()) if (!aspects.exists(key)) aspects.set(key, Type.createInstance(requirements.get(key), []));
+        return aspects;
     }
 }
