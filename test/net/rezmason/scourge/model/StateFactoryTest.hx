@@ -5,7 +5,9 @@ import massive.munit.Assert;
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.aspects.Aspect;
+import net.rezmason.scourge.model.aspects.TestAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.rules.TestRule;
 
 using net.rezmason.scourge.model.GridUtils;
 
@@ -42,30 +44,31 @@ class StateFactoryTest {
         var stateCfg:StateConfig = new StateConfig();
         for (head in heads) stateCfg.playerHeads.push(head);
         for (gene in genes) stateCfg.playerGenes.push(gene);
-        stateCfg.rules.push(null); // TODO: Add rules
+        stateCfg.rules.push(null);
+        stateCfg.rules.push(new TestRule());
         var state:State = factory.makeState(stateCfg);
 
         Assert.areEqual(stateCfg.playerGenes.length, state.players.length);
 
         // Make sure there's the right aspects on the state
-        for (aspect in state.aspects) {
-            // TODO: Check that rule aspect requirements appear
-        }
+        Assert.isNotNull(state.aspects.get(TestAspect.id));
+        Assert.isTrue(Std.is(state.aspects.get(TestAspect.id), TestAspect));
 
         // Make sure there's the right aspects on each players
         for (ike in 0...state.players.length) {
             var player:PlayerState = state.players[ike];
             Assert.areEqual(player.genome, genes[ike]);
             Assert.areEqual(player.head, heads[ike]);
-            for (aspect in player.aspects) {
-                // TODO: Check that rule aspect requirements appear
-            }
+            Assert.isNotNull(player.aspects.get(TestAspect.id));
+            Assert.isTrue(Std.is(player.aspects.get(TestAspect.id), TestAspect));
         }
 
         for (node in state.players[0].head.getGraph()) {
-            for (aspect in node.value) {
-                // TODO: Check that rule aspect requirements appear
-            }
+            Assert.isNotNull(node.value.get(TestAspect.id));
+            Assert.isTrue(Std.is(node.value.get(TestAspect.id), TestAspect));
+
+            Assert.isNotNull(node.value.get(OwnershipAspect.id));
+            Assert.isTrue(Std.is(node.value.get(OwnershipAspect.id), OwnershipAspect));
         }
 
         // Make sure the board renders the same way

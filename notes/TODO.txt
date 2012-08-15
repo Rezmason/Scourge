@@ -1,6 +1,3 @@
-BoardFactory is ugly
-StateFactoryTest needs a TestRule which requires a TestAspect on everything
-
 New history, again
 	All values are stored in an array
 	Oldvalues are stored the same way

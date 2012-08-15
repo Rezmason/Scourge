@@ -1,7 +1,6 @@
 package net.rezmason.scourge.model;
 
 import net.rezmason.scourge.model.ModelTypes;
-import net.rezmason.scourge.model.aspects.Aspect;
 
 class Rule {
 
