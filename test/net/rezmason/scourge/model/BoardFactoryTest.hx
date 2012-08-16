@@ -110,9 +110,9 @@ class BoardFactoryTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
-            trace(spitGrid(playerHead, historyArray));
+            trace(BoardUtils.spitGrid(playerHead, historyArray));
         #else
-            Assert.areEqual(board1, spitGrid(playerHead, historyArray));
+            Assert.areEqual(board1, BoardUtils.spitGrid(playerHead, historyArray));
         #end
 
         for (neighbor in playerHead.neighbors) {
@@ -155,9 +155,9 @@ class BoardFactoryTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
-            trace(spitGrid(board[0], historyArray));
+            trace(BoardUtils.spitGrid(board[0], historyArray));
         #else
-            Assert.areEqual(board2, spitGrid(board[0], historyArray));
+            Assert.areEqual(board2, BoardUtils.spitGrid(board[0], historyArray));
         #end
     }
 
@@ -171,34 +171,9 @@ class BoardFactoryTest {
         cfg.initGrid = board3;
         var board:Array<BoardNode> = factory.makeBoard(cfg, history);
 
-        // trace(spitGrid(state.players[0].head, historyArray));
+        // trace(BoardUtils.spitGrid(state.players[0].head, historyArray));
 
-        Assert.areEqual(board3, spitGrid(board[0], historyArray, false));
-    }
-
-    private function spitGrid(head:BoardNode, historyArray:Array<Int>, addSpaces:Bool = true):String {
-        var str:String = "";
-
-        var grid:BoardNode = head.run(Gr.nw).run(Gr.w).run(Gr.n);
-
-        for (row in grid.walk(Gr.s)) {
-            str += "\n";
-            for (column in row.walk(Gr.e)) {
-                str += nodeToString(column, historyArray);
-            }
-        }
-
-        if (addSpaces) str = ADD_SPACES.replace(str, "$1 ");
-
-        return str;
-    }
-
-    private function nodeToString(node:BoardNode, historyArray:Array<Int>):String {
-        var ownerAspect:OwnershipAspect = getOwner(node);
-        if (historyArray[ownerAspect.occupier] > -1) return Std.string(historyArray[ownerAspect.occupier]);
-        if (historyArray[ownerAspect.isFilled] == 1) return "X";
-
-        return " ";
+        Assert.areEqual(board3, BoardUtils.spitGrid(board[0], historyArray, false));
     }
 
     private function getOwner(node:BoardNode):OwnershipAspect {

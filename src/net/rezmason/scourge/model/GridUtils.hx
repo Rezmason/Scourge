@@ -34,8 +34,7 @@ class GridUtils {
         var newNodes:Array<GridNode<T>> = [];
 
         while (node != null) {
-            for (direction in allDirections()) {
-                var neighbor:GridNode<T> = node.neighbors[direction];
+            for (neighbor in node.neighbors) {
                 if (neighbor != null && !nodes.has(neighbor)) {
                     nodes.push(neighbor);
                     newNodes.push(neighbor);

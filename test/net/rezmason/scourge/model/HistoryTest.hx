@@ -86,6 +86,7 @@ class HistoryTest
 
         history.wipe();
         Assert.areEqual(0, history.revision);
+        for (ike in historyArray) Assert.isNull(ike);
 
         var propD:Int = history.alloc(1);
 

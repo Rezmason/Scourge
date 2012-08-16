@@ -1,3 +1,7 @@
+Often a rule will need more information than what is in the game state
+	How to deal?
+		Give each cell an id, and list the cells that have changed?
+
 KillDisconnectedCellsRule
 	TEST
 		Create a state with a debugGrid
@@ -29,24 +33,7 @@ FindEdgeNodesRule
 Level Editing
 	Just a bunch of rules, aha
 
-New architecture
-
-	State: just an Array<ICell>, a List<IStat>, and a pointer to the IStat of the current IPlayer
-	State factory: creates states of different sorts
-		BoardStateFactory
-		WorldStateFactory
-		TestStateFactory extends BoardStateFactory - for testing visual effects
-	IRule: a generator whose input and output are a State and a set of States that can be reached from that State
-		Organized hierarchically based on the parameters of the action associated with the IRule
-			Each param must be easily converted to String
-				Commands are URLs, basically
-		Rules can be chained
-			BiteDecayRule
-			SwapSkipRule
-			SkipForfeitRule
-			DropEatDecaySkipRule
-		TestRule
-		Command validation
+New architecture - what's left
 	IPlayer: an object that picks an optimal State from a set of States
 		The initial state is also provided
 		Evaluator: Turns a State into a number based on averaging values from IGoals
