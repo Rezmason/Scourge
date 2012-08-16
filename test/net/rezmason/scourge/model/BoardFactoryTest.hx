@@ -11,75 +11,6 @@ using net.rezmason.scourge.model.GridUtils;
 
 class BoardFactoryTest {
 
-    private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
-
-    private static var board1:String = "\n" +
-        "X X X X X X X X X X X X X X X X X X X X X X X X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X           1                     2           X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X           0                     3           X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X X X X X X X X X X X X X X X X X X X X X X X X ";
-
-    private static var board2:String = "\n" +
-        "X X X X X X X X X X X X X \n" +
-        "X X X X           X X X X \n" +
-        "X X X               X X X \n" +
-        "X X                   X X \n" +
-        "X                       X \n" +
-        "X                       X \n" +
-        "X           0           X \n" +
-        "X                       X \n" +
-        "X                       X \n" +
-        "X X                   X X \n" +
-        "X X X               X X X \n" +
-        "X X X X           X X X X \n" +
-        "X X X X X X X X X X X X X ";
-
-    private static var board3:String = "\n" +
-        "XXXXXXXXXXXXXXXXXXXXXXXX\n" +
-        "X1111112222222222222222X\n" +
-        "X1111112222222222222222X\n" +
-        "X1111112222222222222222X\n" +
-        "X1111111111111111222222X\n" +
-        "X1111111111111111222222X\n" +
-        "X1111111111111111222222X\n" +
-        "X111000   XXXX   222333X\n" +
-        "X111000 11111111 222333X\n" +
-        "X111000 00000001 222333X\n" +
-        "X111000X01111101X222333X\n" +
-        "X111000X01000101X222333X\n" +
-        "X111000X01010101X222333X\n" +
-        "X111000X01011101X222333X\n" +
-        "X111000 01000001 222333X\n" +
-        "X111000 01111111 222333X\n" +
-        "X111000   XXXX   222333X\n" +
-        "X0000003333333333333333X\n" +
-        "X0000003333333333333333X\n" +
-        "X0000003333333333333333X\n" +
-        "X0000000000000000333333X\n" +
-        "X0000000000000000333333X\n" +
-        "X0000000000000000333333X\n" +
-        "XXXXXXXXXXXXXXXXXXXXXXXX";
-
     @Before
     public function setup():Void {
 
@@ -112,7 +43,7 @@ class BoardFactoryTest {
             trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
             trace(BoardUtils.spitGrid(playerHead, historyArray));
         #else
-            Assert.areEqual(board1, BoardUtils.spitGrid(playerHead, historyArray));
+            Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, BoardUtils.spitGrid(playerHead, historyArray));
         #end
 
         for (neighbor in playerHead.neighbors) {
@@ -157,7 +88,7 @@ class BoardFactoryTest {
             trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
             trace(BoardUtils.spitGrid(board[0], historyArray));
         #else
-            Assert.areEqual(board2, BoardUtils.spitGrid(board[0], historyArray));
+            Assert.areEqual(TestBoards.emptyPetri, BoardUtils.spitGrid(board[0], historyArray));
         #end
     }
 
@@ -168,12 +99,12 @@ class BoardFactoryTest {
         var factory:BoardFactory = new BoardFactory();
         var cfg:BoardConfig = new BoardConfig();
         cfg.numPlayers = 4;
-        cfg.initGrid = board3;
+        cfg.initGrid = TestBoards.spiral;
         var board:Array<BoardNode> = factory.makeBoard(cfg, history);
 
         // trace(BoardUtils.spitGrid(state.players[0].head, historyArray));
 
-        Assert.areEqual(board3, BoardUtils.spitGrid(board[0], historyArray, false));
+        Assert.areEqual(TestBoards.spiral, BoardUtils.spitGrid(board[0], historyArray, false));
     }
 
     private function getOwner(node:BoardNode):OwnershipAspect {

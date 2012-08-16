@@ -29,13 +29,13 @@ class GridUtils {
         return node2;
     }
 
-    public inline static function getGraph<T>(node:GridNode<T>):Array<GridNode<T>> {
+    public inline static function getGraph<T>(node:GridNode<T>, spreadFilter:T->Bool = null):Array<GridNode<T>> {
         var nodes:Array<GridNode<T>> = [];
         var newNodes:Array<GridNode<T>> = [];
 
         while (node != null) {
             for (neighbor in node.neighbors) {
-                if (neighbor != null && !nodes.has(neighbor)) {
+                if (neighbor != null && !nodes.has(neighbor) && (spreadFilter == null || spreadFilter(neighbor.value))) {
                     nodes.push(neighbor);
                     newNodes.push(neighbor);
                 }
