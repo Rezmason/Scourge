@@ -43,7 +43,7 @@ class BoardFactoryTest {
             trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
             trace(BoardUtils.spitGrid(playerHead, historyArray));
         #else
-            Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, BoardUtils.spitGrid(playerHead, historyArray));
+            Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, BoardUtils.spitGrid(playerHead, historyArray, false));
         #end
 
         for (neighbor in playerHead.neighbors) {
@@ -88,7 +88,7 @@ class BoardFactoryTest {
             trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
             trace(BoardUtils.spitGrid(board[0], historyArray));
         #else
-            Assert.areEqual(TestBoards.emptyPetri, BoardUtils.spitGrid(board[0], historyArray));
+            Assert.areEqual(TestBoards.emptyPetri, BoardUtils.spitGrid(board[0], historyArray, false));
         #end
     }
 

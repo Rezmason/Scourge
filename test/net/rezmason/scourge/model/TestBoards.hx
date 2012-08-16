@@ -1,70 +1,123 @@
 package net.rezmason.scourge.model;
 
 class TestBoards {
+
     public static var emptySquareFourPlayerSkirmish:String = "\n" +
-        "X X X X X X X X X X X X X X X X X X X X X X X X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X           1                     2           X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X           0                     3           X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X                                             X \n" +
-        "X X X X X X X X X X X X X X X X X X X X X X X X ";
+        "XXXXXXXXXXXXXXXXXXXXXXXX\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X     1          2     X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X     0          3     X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "XXXXXXXXXXXXXXXXXXXXXXXX";
 
     public static var emptyPetri:String = "\n" +
-        "X X X X X X X X X X X X X \n" +
-        "X X X X           X X X X \n" +
-        "X X X               X X X \n" +
-        "X X                   X X \n" +
-        "X                       X \n" +
-        "X                       X \n" +
-        "X           0           X \n" +
-        "X                       X \n" +
-        "X                       X \n" +
-        "X X                   X X \n" +
-        "X X X               X X X \n" +
-        "X X X X           X X X X \n" +
-        "X X X X X X X X X X X X X ";
+        "XXXXXXXXXXXXX\n" +
+        "XXXX     XXXX\n" +
+        "XXX       XXX\n" +
+        "XX         XX\n" +
+        "X           X\n" +
+        "X           X\n" +
+        "X     0     X\n" +
+        "X           X\n" +
+        "X           X\n" +
+        "XX         XX\n" +
+        "XXX       XXX\n" +
+        "XXXX     XXXX\n" +
+        "XXXXXXXXXXXXX";
+
+   public static var fourSquares:String = "\n" +
+        "XXXXXXXXXXXXXXXXXXXXXXXX\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X     111111222222     X\n" +
+        "X     111111222222     X\n" +
+        "X     111111222222     X\n" +
+        "X     111111222222     X\n" +
+        "X     111111222222     X\n" +
+        "X     111111222222     X\n" +
+        "X     000000333333     X\n" +
+        "X     000000333333     X\n" +
+        "X     000000333333     X\n" +
+        "X     000000333333     X\n" +
+        "X     000000333333     X\n" +
+        "X     000000333333     X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "XXXXXXXXXXXXXXXXXXXXXXXX";
 
     public static var spiral:String = "\n" +
         "XXXXXXXXXXXXXXXXXXXXXXXX\n" +
-        "X1111112222222222222222X\n" +
-        "X1111112222222222222222X\n" +
-        "X1111112222222222222222X\n" +
-        "X1111111111111111222222X\n" +
-        "X1111111111111111222222X\n" +
-        "X1111111111111111222222X\n" +
-        "X111000011XXXX   222333X\n" +
-        "X111000011111111 222333X\n" +
-        "X111000000000001 222333X\n" +
-        "X111000X01111101X222333X\n" +
-        "X111000X01000101X222333X\n" +
-        "X111000X01010101X222333X\n" +
-        "X111000X01011101X222333X\n" +
-        "X111000 01000001 222333X\n" +
-        "X111000 01111111 222333X\n" +
-        "X111000   XXXX   222333X\n" +
-        "X0000003333333333333333X\n" +
-        "X0000003333333333333333X\n" +
-        "X0000003333333333333333X\n" +
-        "X0000000000000000333333X\n" +
-        "X0000000000000000333333X\n" +
-        "X0000000000000000333333X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X     1          2     X\n" +
+        "X     112222222222     X\n" +
+        "X      2200000000      X\n" +
+        "X      2002222220      X\n" +
+        "X      2022000020      X\n" +
+        "X      2020022020      X\n" +
+        "X      2020022020      X\n" +
+        "X      2022220020      X\n" +
+        "X      2000000220      X\n" +
+        "X      2222222200      X\n" +
+        "X     000000000033     X\n" +
+        "X     0          3     X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "X                      X\n" +
+        "XXXXXXXXXXXXXXXXXXXXXXXX";
+
+    public static var oaf:String = "\n" +
+        "XXXXXXXXXXXXXXXXXXXXXXXX\n" +
+        "X0000000000000000000000X\n" +
+        "X0000000000000000000000X\n" +
+        "X0000000000000000000000X\n" +
+        "X0000000000000000000000X\n" +
+        "X0000000000000000000000X\n" +
+        "X0000011111122222200000X\n" +
+        "X0000011111122222200000X\n" +
+        "X0000011111122222200000X\n" +
+        "X0000011111122222200000X\n" +
+        "X0000011111122222200000X\n" +
+        "X0000011111122222200000X\n" +
+        "X0000000000033333300000X\n" +
+        "X0000000000033333300000X\n" +
+        "X0000000000033333300000X\n" +
+        "X0000000000033333300000X\n" +
+        "X0000000000033333300000X\n" +
+        "X0000003333333333300000X\n" +
+        "X0000000000000000000000X\n" +
+        "X0000000000000000000000X\n" +
+        "X0000000000000000000000X\n" +
+        "X0000000000000000000000X\n" +
+        "X0000000000000000000000X\n" +
         "XXXXXXXXXXXXXXXXXXXXXXXX";
 }
