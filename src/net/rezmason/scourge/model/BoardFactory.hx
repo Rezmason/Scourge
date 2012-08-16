@@ -32,8 +32,10 @@ class BoardFactory {
 
     }
 
-    public function makeBoard(cfg:BoardConfig):Array<BoardNode> {
+    public function makeBoard(cfg:BoardConfig, history:History<Int>):Array<BoardNode> {
         if (cfg == null) return null;
+
+        var historyArray:Array<Int> = history.array;
 
         var heads:Array<BoardNode> = [];
 
@@ -83,11 +85,11 @@ class BoardFactory {
 
 
 
-        var grid:BoardNode = makeSquareGraph(boardWidth);
-        obstructGraphRim(grid);
-        populateGraphHeads(grid, headCoords, heads);
-        if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM);
-        if (cfg.initGrid != null && cfg.initGrid.length > 0) initGraph(grid, cfg.initGrid, boardWidth);
+        var grid:BoardNode = makeSquareGraph(boardWidth, history);
+        obstructGraphRim(grid, historyArray);
+        populateGraphHeads(grid, headCoords, heads, historyArray);
+        if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM, historyArray);
+        if (cfg.initGrid != null && cfg.initGrid.length > 0) initGraph(grid, cfg.initGrid, boardWidth, historyArray);
 
         return heads;
     }
@@ -113,9 +115,9 @@ class BoardFactory {
         return {x:maxX, y:maxY};
     }
 
-    inline function makeNode():BoardNode {
+    inline function makeNode(history:History<Int>):BoardNode {
         var aspects:Aspects = new Aspects();
-        aspects.set(OwnershipAspect.id, new OwnershipAspect());
+        aspects.set(OwnershipAspect.id, new OwnershipAspect(history));
         return new BoardNode(aspects);
     }
 
@@ -123,16 +125,16 @@ class BoardFactory {
         return cast node.value.get(OwnershipAspect.id);
     }
 
-    inline function makeSquareGraph(width:Int):BoardNode {
+    inline function makeSquareGraph(width:Int, history:History<Int>):BoardNode {
 
         // Make a connected grid of nodes with default values
-        var node:BoardNode = makeNode();
-        for (ike in 1...width) node = node.attach(makeNode(), Gr.e);
+        var node:BoardNode = makeNode(history);
+        for (ike in 1...width) node = node.attach(makeNode(history), Gr.e);
 
         var row:BoardNode = node.run(Gr.w);
         for (ike in 1...width) {
             for (column in row.walk(Gr.e)) {
-                var next:BoardNode = makeNode();
+                var next:BoardNode = makeNode(history);
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);
@@ -145,26 +147,26 @@ class BoardFactory {
         return node.run(Gr.nw).run(Gr.n).run(Gr.w);
     }
 
-    inline function obstructGraphRim(grid:BoardNode):Void {
-        for (node in grid.walk(Gr.e)) nodeOwner(node).isFilled = 1;
-        for (node in grid.walk(Gr.s)) nodeOwner(node).isFilled = 1;
-        for (node in grid.run(Gr.s).walk(Gr.e)) nodeOwner(node).isFilled = 1;
-        for (node in grid.run(Gr.e).walk(Gr.s)) nodeOwner(node).isFilled = 1;
+    inline function obstructGraphRim(grid:BoardNode, historyArray:Array<Int>):Void {
+        for (node in grid.walk(Gr.e)) historyArray[nodeOwner(node).isFilled] = 1;
+        for (node in grid.walk(Gr.s)) historyArray[nodeOwner(node).isFilled] = 1;
+        for (node in grid.run(Gr.s).walk(Gr.e)) historyArray[nodeOwner(node).isFilled] = 1;
+        for (node in grid.run(Gr.e).walk(Gr.s)) historyArray[nodeOwner(node).isFilled] = 1;
     }
 
-    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>, heads:Array<BoardNode>):Void {
+    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>, heads:Array<BoardNode>, historyArray:Array<Int>):Void {
         // Identify and change the occupier of each head node
 
         for (ike in 0...headCoords.length) {
             var coord:XY = headCoords[ike];
             heads[ike] = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
             var ownerAspect:OwnershipAspect = nodeOwner(heads[ike]);
-            ownerAspect.isFilled = 1;
-            ownerAspect.occupier = ike;
+            historyArray[ownerAspect.isFilled] = 1;
+            historyArray[ownerAspect.occupier] = ike;
         }
     }
 
-    inline function encircleGraph(grid:BoardNode, radius:Float):Void {
+    inline function encircleGraph(grid:BoardNode, radius:Float, historyArray:Array<Int>):Void {
         // Circular levels' cells are obstructed if they're too far from the board's center
 
         var y:Int = 0;
@@ -172,11 +174,11 @@ class BoardFactory {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
                 var ownerAspect:OwnershipAspect = nodeOwner(column);
-                if (ownerAspect.isFilled == 0) {
+                if (historyArray[ownerAspect.isFilled] == 0) {
                     var fx:Float = x - radius + 0.5 - RIM;
                     var fy:Float = y - radius + 0.5 - RIM;
                     var insideCircle:Bool = Math.sqrt(fx * fx + fy * fy) < radius;
-                    if (!insideCircle) ownerAspect.isFilled = 1;
+                    if (!insideCircle) historyArray[ownerAspect.isFilled] = 1;
                 }
                 x++;
             }
@@ -184,7 +186,7 @@ class BoardFactory {
         }
     }
 
-    inline function initGraph(grid:BoardNode, initGrid:String, boardWidth:Int):Void {
+    inline function initGraph(grid:BoardNode, initGrid:String, boardWidth:Int, historyArray:Array<Int>):Void {
 
         // Refer to the initGrid to assign initial values to nodes
 
@@ -197,12 +199,12 @@ class BoardFactory {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
                 var ownerAspect:OwnershipAspect = nodeOwner(column);
-                if (ownerAspect.isFilled == 0) {
+                if (historyArray[ownerAspect.isFilled] == 0) {
                     var char:String = initGrid.charAt(y * initGridWidth + x + 1);
                     if (char != " ") {
-                        ownerAspect.isFilled = 1;
-                        if (!NUMERIC_CHAR.match(char)) ownerAspect.occupier = -1;
-                        else ownerAspect.occupier = Std.parseInt(char);
+                        historyArray[ownerAspect.isFilled] = 1;
+                        if (!NUMERIC_CHAR.match(char)) historyArray[ownerAspect.occupier] = -1;
+                        else historyArray[ownerAspect.occupier] = Std.parseInt(char);
                     }
                 }
                 x++;

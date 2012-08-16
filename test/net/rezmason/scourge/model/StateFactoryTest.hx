@@ -28,6 +28,9 @@ class StateFactoryTest {
     @Test
     public function configTest1():Void {
 
+        var history:History<Int> = new History<Int>();
+        var historyArray:Array<Int> = history.array;
+
         var genes:Array<String> = ["a", "b"];
 
         // make board config and generate board
@@ -35,9 +38,9 @@ class StateFactoryTest {
         boardCfg.numPlayers = genes.length;
         boardCfg.circular = false;
         var boardFactory:BoardFactory = new BoardFactory();
-        var heads:Array<BoardNode> = boardFactory.makeBoard(boardCfg);
+        var heads:Array<BoardNode> = boardFactory.makeBoard(boardCfg, history);
 
-        var boardBefore:String = spitGrid(heads[0], false);
+        var boardBefore:String = spitGrid(heads[0], historyArray, false);
 
         // make state config and generate state
         var factory:StateFactory = new StateFactory();
@@ -46,7 +49,7 @@ class StateFactoryTest {
         for (gene in genes) stateCfg.playerGenes.push(gene);
         stateCfg.rules.push(null);
         stateCfg.rules.push(new TestRule());
-        var state:State = factory.makeState(stateCfg);
+        var state:State = factory.makeState(stateCfg, history);
 
         Assert.areEqual(stateCfg.playerGenes.length, state.players.length);
 
@@ -72,10 +75,14 @@ class StateFactoryTest {
         }
 
         // Make sure the board renders the same way
-        Assert.areEqual(boardBefore, spitGrid(state.players[0].head, false));
+        Assert.areEqual(boardBefore, spitGrid(state.players[0].head, historyArray, false));
+
+        history.wipe();
+
+        for (ike in historyArray) Assert.isNull(ike);
     }
 
-    private function spitGrid(head:BoardNode, addSpaces:Bool = true):String {
+    private function spitGrid(head:BoardNode, historyArray:Array<Int>, addSpaces:Bool = true):String {
         var str:String = "";
 
         var grid:BoardNode = head.run(Gr.nw).run(Gr.w).run(Gr.n);
@@ -83,7 +90,7 @@ class StateFactoryTest {
         for (row in grid.walk(Gr.s)) {
             str += "\n";
             for (column in row.walk(Gr.e)) {
-                str += nodeToString(column);
+                str += nodeToString(column, historyArray);
             }
         }
 
@@ -92,10 +99,10 @@ class StateFactoryTest {
         return str;
     }
 
-    private function nodeToString(node:BoardNode):String {
+    private function nodeToString(node:BoardNode, historyArray:Array<Int>):String {
         var ownerAspect:OwnershipAspect = getOwner(node);
-        if (ownerAspect.occupier > -1) return Std.string(ownerAspect.occupier);
-        if (ownerAspect.isFilled == 1) return "X";
+        if (historyArray[ownerAspect.occupier] > -1) return Std.string(historyArray[ownerAspect.occupier]);
+        if (historyArray[ownerAspect.isFilled] == 1) return "X";
 
         return " ";
     }

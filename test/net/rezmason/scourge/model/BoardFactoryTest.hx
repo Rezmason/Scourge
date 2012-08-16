@@ -92,11 +92,15 @@ class BoardFactoryTest {
 
     @Test
     public function configTest1():Void {
+
+        var history:History<Int> = new History<Int>();
+        var historyArray:Array<Int> = history.array;
+
         var factory:BoardFactory = new BoardFactory();
         var cfg:BoardConfig = new BoardConfig();
         cfg.numPlayers = 4;
         cfg.circular = false;
-        var board:Array<BoardNode> = factory.makeBoard(cfg);
+        var board:Array<BoardNode> = factory.makeBoard(cfg, history);
 
         Assert.areEqual(cfg.numPlayers, board.length);
 
@@ -106,14 +110,14 @@ class BoardFactoryTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
-            trace(spitGrid(playerHead));
+            trace(spitGrid(playerHead, historyArray));
         #else
-            Assert.areEqual(board1, spitGrid(playerHead));
+            Assert.areEqual(board1, spitGrid(playerHead, historyArray));
         #end
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);
-            Assert.areEqual(-1, getOwner(neighbor).occupier);
+            Assert.areEqual(-1, historyArray[getOwner(neighbor).occupier]);
             getOwner(neighbor).occupier = 0;
         }
 
@@ -125,38 +129,54 @@ class BoardFactoryTest {
         Assert.areEqual(0, getOwner(playerHead.s()).occupier);
         Assert.areEqual(0, getOwner(playerHead.sw()).occupier);
         Assert.areEqual(0, getOwner(playerHead.w()).occupier);
+
+        history.wipe();
+
+        var historyArray:Array<Int> = history.array;
+
+        for (ike in historyArray) Assert.isNull(ike);
+
+        for (node in board[0].getGraph()) {
+            var ownerAspect:OwnershipAspect = getOwner(node);
+            Assert.isNull(historyArray[ownerAspect.isFilled]);
+            Assert.isNull(historyArray[ownerAspect.occupier]);
+        }
     }
 
     @Test
     public function configTest2():Void {
+        var history:History<Int> = new History<Int>();
+        var historyArray:Array<Int> = history.array;
         var factory:BoardFactory = new BoardFactory();
         var cfg:BoardConfig = new BoardConfig();
         cfg.numPlayers = 1;
         cfg.circular = true;
-        var board:Array<BoardNode> = factory.makeBoard(cfg);
+        var board:Array<BoardNode> = factory.makeBoard(cfg, history);
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
-            trace(spitGrid(board[0]));
+            trace(spitGrid(board[0], historyArray));
         #else
-            Assert.areEqual(board2, spitGrid(board[0]));
+            Assert.areEqual(board2, spitGrid(board[0], historyArray));
         #end
     }
 
     @Test
     public function configTest3():Void {
+        var history:History<Int> = new History<Int>();
+        var historyArray:Array<Int> = history.array;
         var factory:BoardFactory = new BoardFactory();
         var cfg:BoardConfig = new BoardConfig();
         cfg.numPlayers = 4;
         cfg.initGrid = board3;
-        var board:Array<BoardNode> = factory.makeBoard(cfg);
+        var board:Array<BoardNode> = factory.makeBoard(cfg, history);
 
-        // trace(spitGrid(state.players[0].head));
+        // trace(spitGrid(state.players[0].head, historyArray));
 
-        Assert.areEqual(board3, spitGrid(board[0], false));
+        Assert.areEqual(board3, spitGrid(board[0], historyArray, false));
     }
 
-    private function spitGrid(head:BoardNode, addSpaces:Bool = true):String {
+    private function spitGrid(head:BoardNode, historyArray:Array<Int>, addSpaces:Bool = true):String {
         var str:String = "";
 
         var grid:BoardNode = head.run(Gr.nw).run(Gr.w).run(Gr.n);
@@ -164,7 +184,7 @@ class BoardFactoryTest {
         for (row in grid.walk(Gr.s)) {
             str += "\n";
             for (column in row.walk(Gr.e)) {
-                str += nodeToString(column);
+                str += nodeToString(column, historyArray);
             }
         }
 
@@ -173,10 +193,10 @@ class BoardFactoryTest {
         return str;
     }
 
-    private function nodeToString(node:BoardNode):String {
+    private function nodeToString(node:BoardNode, historyArray:Array<Int>):String {
         var ownerAspect:OwnershipAspect = getOwner(node);
-        if (ownerAspect.occupier > -1) return Std.string(ownerAspect.occupier);
-        if (ownerAspect.isFilled == 1) return "X";
+        if (historyArray[ownerAspect.occupier] > -1) return Std.string(historyArray[ownerAspect.occupier]);
+        if (historyArray[ownerAspect.isFilled] == 1) return "X";
 
         return " ";
     }

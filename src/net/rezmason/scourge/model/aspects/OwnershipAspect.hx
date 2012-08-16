@@ -7,8 +7,8 @@ class OwnershipAspect extends Aspect {
     public var isFilled:Int;
     public var occupier:Int;
 
-    public function new():Void {
-        isFilled = 0;
-        occupier = -1;
+    public function new(history:History<Int>):Void {
+        isFilled = history.alloc(0);
+        occupier = history.alloc(-1);
     }
 }

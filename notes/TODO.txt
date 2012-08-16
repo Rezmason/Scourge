@@ -1,25 +1,3 @@
-New history, again
-	All values are stored in an array
-	Oldvalues are stored the same way
-	Stack of changesets
-		AbsoluteChangeset
-			Array with indices and values
-		IncrementalChangeset
-			IntHash with keys and values
-		Commit is easy
-			Diff oldValues and values
-			Create some kind of changeset
-				Depends on the number of differences since the last changeset
-		Revert is easy
-			Start at latest absolute changeset before target revision and increment
-
-	Using the history isn't so bad either
-		state[node.stateIndex]
-		state[aspect.isFilledIndex]
-
-StateFactoryTest needs to wire up all aspects with the history
-	Aspects tie into its alloc
-
 KillDisconnectedCellsRule
 	TEST
 		Create a state with a debugGrid
