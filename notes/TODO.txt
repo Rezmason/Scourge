@@ -1,35 +1,3 @@
-Often a rule will need more information than what is in the game state
-	How to deal?
-		Give each cell an id, and list the cells that have changed?
-
-KillDisconnectedCellsRule
-	TEST
-		Create a state with a debugGrid
-		Pass the State to the Rule for Option generation
-			returns one Option, which is the expected Option
-		Pass State, Evaluator and Option to Rule
-			returns an expected value
-		Pass the State and Option to the Rule
-		Compare the State with the expected result
-
-PlacePieceRule
-	1: for each orientation,
-		2: for each edge node of the player,
-			3: for each neighbor coord in the orientation,
-				Look up the node at the origin
-				If that node has not already been visited as an origin,
-					Flag that node
-					4: for each coord in the orientation,
-						Get the node at the coord (relative to the origin node)
-						If the node is filled,
-							break loop 3
-					add the origin node to the list
-	unflag all flagged nodes
-
-FindEdgeNodesRule
-	Updates the edges for the current player
-	Stores the list in the aspect
-
 Level Editing
 	Just a bunch of rules, aha
 

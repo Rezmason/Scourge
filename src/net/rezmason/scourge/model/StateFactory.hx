@@ -18,6 +18,9 @@ class StateFactory {
 
     public function makeState(cfg:StateConfig, history:History<Int>):State {
         if (cfg == null) return null;
+        if (cfg.playerGenes == null) return null;
+        if (cfg.playerHeads == null) return null;
+        if (cfg.rules == null) return null;
 
         var state:State = new State();
 
