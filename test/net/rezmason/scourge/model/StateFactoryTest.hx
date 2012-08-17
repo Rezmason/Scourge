@@ -45,7 +45,7 @@ class StateFactoryTest {
         var stateCfg:StateConfig = new StateConfig();
         stateCfg.playerHeads = heads;
         stateCfg.playerGenes = genes;
-        stateCfg.rules = [null, new TestRule()];
+        stateCfg.rules = [null, new TestRule(historyArray)];
         var state:State = factory.makeState(stateCfg, history);
 
         Assert.areEqual(stateCfg.playerGenes.length, state.players.length);

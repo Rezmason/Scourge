@@ -26,6 +26,16 @@ class History<T> {
         array.splice(0, length);
         oldArray.splice(0, length);
         length = 0;
+        changeCount = 0;
+    }
+
+    public function forget():Void {
+        incrementalChanges.splice(0, revision + 1);
+        fullChanges.splice(0, revision + 1);
+        for (ike in 0...length) oldArray[ike] = array[ike];
+        fullChanges[0] = array.copy();
+        revision = 0;
+        changeCount = 0;
     }
 
     public function reset():Void {

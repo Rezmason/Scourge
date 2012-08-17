@@ -18,6 +18,10 @@ class Rule {
     Command validation
     */
 
+    private var historyArray:Array<Int>;
+
+    public function new(historyArray:Array<Int>) { this.historyArray = historyArray; }
+
     public function listStateAspectRequirements():AspectRequirements { return null; }
     public function listPlayerAspectRequirements():AspectRequirements { return null; }
     public function listBoardAspectRequirements():AspectRequirements { return null; }

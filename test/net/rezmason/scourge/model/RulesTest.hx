@@ -4,7 +4,10 @@ import massive.munit.Assert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.Rule;
+import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.rules.KillDisconnectedCellsRule;
+
+using net.rezmason.scourge.model.GridUtils;
 
 class RulesTest
 {
@@ -22,7 +25,7 @@ class RulesTest
 	public function beforeClass():Void {
 		history = new History<Int>();
         historyArray = history.array;
-        genes = ["a", "b"];
+        genes = ["a", "b", "c", "d"];
 	}
 
 	@AfterClass

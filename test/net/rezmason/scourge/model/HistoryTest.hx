@@ -4,6 +4,8 @@ import massive.munit.Assert;
 
 import net.rezmason.scourge.model.History;
 
+using Lambda;
+
 class HistoryTest
 {
     @Test
@@ -91,6 +93,17 @@ class HistoryTest
         var propD:Int = history.alloc(1);
 
         Assert.areEqual(1, history.commit()); // Commit after wipe
+
+        for (ike in 0...100) history.alloc(1);
+
+        history.forget();
+
+        Assert.isTrue(historyArray.has(1));
+        Assert.areEqual(0, history.revision);
+
+        history.wipe();
+
+        Assert.isFalse(historyArray.has(1));
 
     }
 }

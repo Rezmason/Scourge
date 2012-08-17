@@ -102,7 +102,10 @@ class BoardFactoryTest {
         cfg.initGrid = TestBoards.spiral;
         var board:Array<BoardNode> = factory.makeBoard(cfg, history);
 
-        // trace(BoardUtils.spitGrid(state.players[0].head, historyArray));
+        #if VISUAL_TEST
+            trace("VISUAL ASSERTION: Should appear to be a four-player board with a spiral interior");
+            trace(BoardUtils.spitGrid(board[0], historyArray));
+        #end
 
         Assert.areEqual(TestBoards.spiral, BoardUtils.spitGrid(board[0], historyArray, false));
     }
