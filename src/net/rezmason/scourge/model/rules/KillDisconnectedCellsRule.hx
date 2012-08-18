@@ -1,6 +1,5 @@
 package net.rezmason.scourge.model.rules;
 
-class KillDisconnectedCellsRule extends Rule
-{
+class KillDisconnectedCellsRule extends Rule {
 
 }

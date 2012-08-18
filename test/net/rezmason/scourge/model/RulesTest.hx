@@ -6,6 +6,7 @@ import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.Rule;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.rules.KillDisconnectedCellsRule;
+import net.rezmason.scourge.model.evaluators.TestEvaluator;
 
 using net.rezmason.scourge.model.GridUtils;
 
@@ -13,6 +14,7 @@ class RulesTest
 {
 	var history:History<Int>;
     var historyArray:Array<Int>;
+    var allocator:HistoryAllocator;
     var genes:Array<String>;
 
     var state:State;
@@ -25,6 +27,7 @@ class RulesTest
 	public function beforeClass():Void {
 		history = new History<Int>();
         historyArray = history.array;
+        allocator = history.alloc;
         genes = ["a", "b", "c", "d"];
 	}
 
@@ -44,11 +47,16 @@ class RulesTest
 
 	@Test
 	public function killDisconnectedCellsRuleTest():Void {
-		/*
+
 		var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule(historyArray);
 		state = makeState(TestBoards.spiral, cast [killRule]);
 
 		var playerIndex:Int = 0;
+
+        var numCells:Int = ~/([^0])/g.replace(TestBoards.spiral, "").length;
+
+        var testEvaluator:Evaluator = new TestEvaluator(historyArray);
+        Assert.areEqual(numCells, testEvaluator.evaluate(playerIndex, state)); // only one cell for player 0
 
 		var playerHead:BoardNode = state.players[playerIndex].head;
 		var playerNeck:BoardNode = playerHead.n();
@@ -61,22 +69,20 @@ class RulesTest
 
 		//Pass the State to the Rule for Option generation
 
-		var testEvaluator:TestEvaluator = new TestEvaluator(historyArray);
+		var options:Array<Option> = killRule.getOptions(state);
 
-		var options:Array<Option> = rule.getOptions(state);
-
+        Assert.isNotNull(options);
 		Assert.areEqual(1, options.length);
 
 		var reviz:Int = history.revision;
 
-		trace(BoardUtils.spitGrid(playerHead));
+		trace(BoardUtils.spitGrid(playerHead, historyArray));
 
 		killRule.chooseOption(state, options[0]);
 
-		trace(BoardUtils.spitGrid(playerHead));
+		trace(BoardUtils.spitGrid(playerHead, historyArray));
 
 		Assert.areEqual(1, testEvaluator.evaluate(playerIndex, state)); // only one cell for player 0
-		*/
 	}
 
 	//@Test

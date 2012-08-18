@@ -25,5 +25,8 @@ class Rule {
     public function listStateAspectRequirements():AspectRequirements { return null; }
     public function listPlayerAspectRequirements():AspectRequirements { return null; }
     public function listBoardAspectRequirements():AspectRequirements { return null; }
+
+    public function getOptions(state:State):Array<Option> { return null; }
+    public function chooseOption(state:State, option:Option):Void { }
 }
 
