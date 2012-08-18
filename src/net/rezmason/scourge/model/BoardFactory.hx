@@ -36,6 +36,7 @@ class BoardFactory {
         if (cfg == null) return null;
 
         var historyArray:Array<Int> = history.array;
+        var allocator:HistoryAllocator = history.alloc;
 
         var heads:Array<BoardNode> = [];
 
@@ -85,7 +86,7 @@ class BoardFactory {
 
 
 
-        var grid:BoardNode = makeSquareGraph(boardWidth, history);
+        var grid:BoardNode = makeSquareGraph(boardWidth, allocator);
         obstructGraphRim(grid, historyArray);
         populateGraphHeads(grid, headCoords, heads, historyArray);
         if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM, historyArray);
@@ -115,9 +116,9 @@ class BoardFactory {
         return {x:maxX, y:maxY};
     }
 
-    inline function makeNode(history:History<Int>):BoardNode {
+    inline function makeNode(allocator:HistoryAllocator):BoardNode {
         var aspects:Aspects = new Aspects();
-        aspects.set(OwnershipAspect.id, new OwnershipAspect(history));
+        aspects.set(OwnershipAspect.id, new OwnershipAspect(allocator));
         return new BoardNode(aspects);
     }
 
@@ -125,16 +126,16 @@ class BoardFactory {
         return cast node.value.get(OwnershipAspect.id);
     }
 
-    inline function makeSquareGraph(width:Int, history:History<Int>):BoardNode {
+    inline function makeSquareGraph(width:Int, allocator:HistoryAllocator):BoardNode {
 
         // Make a connected grid of nodes with default values
-        var node:BoardNode = makeNode(history);
-        for (ike in 1...width) node = node.attach(makeNode(history), Gr.e);
+        var node:BoardNode = makeNode(allocator);
+        for (ike in 1...width) node = node.attach(makeNode(allocator), Gr.e);
 
         var row:BoardNode = node.run(Gr.w);
         for (ike in 1...width) {
             for (column in row.walk(Gr.e)) {
-                var next:BoardNode = makeNode(history);
+                var next:BoardNode = makeNode(allocator);
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);

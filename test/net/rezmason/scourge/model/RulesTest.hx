@@ -44,17 +44,42 @@ class RulesTest
 
 	@Test
 	public function killDisconnectedCellsRuleTest():Void {
-		state = makeState(TestBoards.spiral, cast [new KillDisconnectedCellsRule()]);
+		/*
+		var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule(historyArray);
+		state = makeState(TestBoards.spiral, cast [killRule]);
+
+		var playerIndex:Int = 0;
+
+		var playerHead:BoardNode = state.players[playerIndex].head;
+		var playerNeck:BoardNode = playerHead.n();
+		var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
+
+		// Cut the neck
+
+		historyArray[neckOwner.isFilled] = 0;
+		historyArray[neckOwner.occupier] = -1;
 
 		//Pass the State to the Rule for Option generation
-			//returns one Option, which is the expected Option
-		//Pass State, Evaluator and Option to Rule
-			//returns an expected value
-		//Pass the State and Option to the Rule
-		//Compare the State with the expected result
+
+		var testEvaluator:TestEvaluator = new TestEvaluator(historyArray);
+
+		var options:Array<Option> = rule.getOptions(state);
+
+		Assert.areEqual(1, options.length);
+
+		var reviz:Int = history.revision;
+
+		trace(BoardUtils.spitGrid(playerHead));
+
+		killRule.chooseOption(state, options[0]);
+
+		trace(BoardUtils.spitGrid(playerHead));
+
+		Assert.areEqual(1, testEvaluator.evaluate(playerIndex, state)); // only one cell for player 0
+		*/
 	}
 
-	@Test
+	//@Test
 	public function placePieceRuleTest():Void {
 		state = makeState(TestBoards.fourSquares, cast []);
 		/*

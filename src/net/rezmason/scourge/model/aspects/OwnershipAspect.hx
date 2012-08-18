@@ -1,5 +1,7 @@
 package net.rezmason.scourge.model.aspects;
 
+import net.rezmason.scourge.model.ModelTypes;
+
 class OwnershipAspect extends Aspect {
 
     public static var id(default, null):Int = Aspect.ids++;
@@ -7,8 +9,8 @@ class OwnershipAspect extends Aspect {
     public var isFilled:Int;
     public var occupier:Int;
 
-    public function new(history:History<Int>):Void {
-        isFilled = history.alloc(0);
-        occupier = history.alloc(-1);
+    public function new(allocator:HistoryAllocator):Void {
+        isFilled = allocator(0);
+        occupier = allocator(-1);
     }
 }
