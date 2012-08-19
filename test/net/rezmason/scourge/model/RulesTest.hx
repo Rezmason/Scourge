@@ -50,7 +50,7 @@ class RulesTest
 	public function killDisconnectedCellsRuleTest():Void {
 
 		var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule();
-		state = makeState(TestBoards.spiral, cast [killRule]);
+		state = makeState(TestBoards.spiral, 4, cast [killRule]);
 
 		var numCells:Int = ~/([^0])/g.replace(TestBoards.spiral, "").length;
 
@@ -65,6 +65,7 @@ class RulesTest
 
 		historyArray[neckOwner.isFilled] = 0;
 		historyArray[neckOwner.occupier] = -1;
+        // TODO: Freshness
 
         Assert.areEqual(1, testEvaluator.evaluate()); // only one cell for player 0
 
@@ -87,9 +88,35 @@ class RulesTest
 		Assert.areEqual(1, numCells); // only one cell for player 0
 	}
 
+    @Test
+    public function killDisconnectedCellsRuleTest2():Void {
+        var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule();
+        state = makeState(TestBoards.spiralPetri, 1, cast [killRule]);
+        var numCells:Int = ~/([^0])/g.replace(TestBoards.spiralPetri, "").length;
+        var testEvaluator:Evaluator = new TestEvaluator(state);
+
+        Assert.areEqual(numCells, testEvaluator.evaluate()); // 51 cells for player 0
+
+        var playerHead:BoardNode = state.players[state.currentPlayer].head;
+        var playerNeck:BoardNode = playerHead.s();
+        var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
+
+        // Cut the neck
+
+        historyArray[neckOwner.isFilled] = 0;
+        historyArray[neckOwner.occupier] = -1;
+
+        trace(BoardUtils.spitGrid(playerHead, historyArray));
+        killRule.chooseOption(killRule.getOptions()[0]);
+        trace(BoardUtils.spitGrid(playerHead, historyArray));
+
+        numCells = ~/([^0])/g.replace(BoardUtils.spitGrid(playerHead, historyArray), "").length;
+        Assert.areEqual(1, numCells); // only one cell for player 0
+    }
+
 	//@Test
 	public function placePieceRuleTest():Void {
-		state = makeState(TestBoards.fourSquares, cast []);
+		state = makeState(TestBoards.fourSquares, 4, cast []);
 		/*
 		1: for each orientation,
 		2: for each edge node of the player,
@@ -106,13 +133,16 @@ class RulesTest
 		*/
 	}
 
-	private function makeState(initGrid:String, rules:Array<Rule>):State {
+	private function makeState(initGrid:String, numPlayers:Int, rules:Array<Rule>):State {
 
 		history.wipe();
 
+        var genes:Array<String> = [];
+        for (ike in 0...numPlayers) genes.push("DNA" + ike);
+
 		// make board config and generate board
         var boardCfg:BoardConfig = new BoardConfig();
-        boardCfg.numPlayers = genes.length;
+        boardCfg.numPlayers = numPlayers;
         boardCfg.circular = false;
         boardCfg.initGrid = initGrid;
         var boardFactory:BoardFactory = new BoardFactory();

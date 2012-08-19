@@ -43,6 +43,21 @@ class TestBoards {
         "XXXX     XXXX\n" +
         "XXXXXXXXXXXXX";
 
+    public static var spiralPetri:String = "\n" +
+        "XXXXXXXXXXXXX\n" +
+        "XXXX     XXXX\n" +
+        "XXX       XXX\n" +
+        "XX         XX\n" +
+        "X   00000   X\n" +
+        "X   0   0   X\n" +
+        "X   0 0 0   X\n" +
+        "X   0 0 0   X\n" +
+        "X   0 000   X\n" +
+        "XX         XX\n" +
+        "XXX       XXX\n" +
+        "XXXX     XXXX\n" +
+        "XXXXXXXXXXXXX";
+
    public static var fourSquares:String = "\n" +
         "XXXXXXXXXXXXXXXXXXXXXXXX\n" +
         "X                      X\n" +
