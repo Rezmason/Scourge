@@ -2,6 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.aspects.FreshnessAspect;
 
 using Lambda;
 
@@ -19,6 +20,7 @@ class KillDisconnectedCellsRule extends Rule {
         {
             nodeReqs = new AspectRequirements();
             nodeReqs.set(OwnershipAspect.id, OwnershipAspect);
+            nodeReqs.set(FreshnessAspect.id, FreshnessAspect);
         }
     }
 
@@ -48,10 +50,11 @@ class KillDisconnectedCellsRule extends Rule {
 
     function isCandidate(cell:Aspects, connection:Aspects):Bool {
         var owner:OwnershipAspect = cast cell.get(OwnershipAspect.id);
+        var fresh:FreshnessAspect = cast cell.get(FreshnessAspect.id);
 
         if (hist[owner.isFilled] > 0 && hist[owner.occupier] > -1) {
             return true;
-        } else if (false) { // TODO: Freshness
+        } else if (hist[fresh.freshness] > 0) {
             return true;
         }
 
@@ -66,7 +69,8 @@ class KillDisconnectedCellsRule extends Rule {
 
     function killCell(cell:Aspects):Void {
         var owner:OwnershipAspect = cast cell.get(OwnershipAspect.id);
-        // TODO: Freshness
+        var fresh:FreshnessAspect = cast cell.get(FreshnessAspect.id);
+        hist[fresh.freshness] = 0;
         hist[owner.isFilled] = 0;
         hist[owner.occupier] = -1;
     }

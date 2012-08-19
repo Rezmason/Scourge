@@ -5,6 +5,7 @@ import massive.munit.Assert;
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.Rule;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.rules.KillDisconnectedCellsRule;
 import net.rezmason.scourge.model.evaluators.TestEvaluator;
 //import net.rezmason.scourge.model.GridNode;
@@ -60,12 +61,13 @@ class RulesTest
 		var playerHead:BoardNode = state.players[state.currentPlayer].head;
 		var playerNeck:BoardNode = playerHead.n();
 		var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
+        var neckFresh:FreshnessAspect = cast playerNeck.value.get(FreshnessAspect.id);
 
         // Cut the neck
 
 		historyArray[neckOwner.isFilled] = 0;
 		historyArray[neckOwner.occupier] = -1;
-        // TODO: Freshness
+        historyArray[neckFresh.freshness] = 1;
 
         Assert.areEqual(1, testEvaluator.evaluate()); // only one cell for player 0
 
@@ -100,11 +102,13 @@ class RulesTest
         var playerHead:BoardNode = state.players[state.currentPlayer].head;
         var playerNeck:BoardNode = playerHead.s();
         var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
+        var neckFresh:FreshnessAspect = cast playerNeck.value.get(FreshnessAspect.id);
 
         // Cut the neck
 
         historyArray[neckOwner.isFilled] = 0;
         historyArray[neckOwner.occupier] = -1;
+        historyArray[neckFresh.freshness] = 1;
 
         trace(BoardUtils.spitGrid(playerHead, historyArray));
         killRule.chooseOption(killRule.getOptions()[0]);
