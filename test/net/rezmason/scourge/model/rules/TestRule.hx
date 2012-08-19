@@ -5,12 +5,16 @@ import net.rezmason.scourge.model.aspects.TestAspect;
 
 class TestRule extends Rule {
 
-    var reqs:AspectRequirements;
+    static var reqs:AspectRequirements;
 
-    public function new(historyArray:Array<Int>):Void {
-        super(historyArray);
-        reqs = new AspectRequirements();
-        reqs.set(TestAspect.id, TestAspect);
+    public function new():Void {
+        super();
+
+        if (reqs == null)
+        {
+            reqs = new AspectRequirements();
+            reqs.set(TestAspect.id, TestAspect);
+        }
     }
 
     override public function listStateAspectRequirements():AspectRequirements { return reqs; }

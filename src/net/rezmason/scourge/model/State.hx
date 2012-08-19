@@ -7,10 +7,12 @@ class State {
     public var players:Array<PlayerState>;
     public var aspects:Aspects;
     public var currentPlayer:Int;
+    public var historyArray:Array<Int>;
 
-    public function new():Void {
+    public function new(historyArray:Array<Int>):Void {
         players = [];
         currentPlayer = 0;
         aspects = new Aspects();
+        this.historyArray = historyArray;
     }
 }

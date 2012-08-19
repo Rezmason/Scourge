@@ -4,6 +4,8 @@ import net.rezmason.scourge.model.GridNode;
 
 using Lambda;
 
+typedef SpreadFilter<T> = T->T->Bool;
+
 class GridUtils {
 
     // Creates an iterator for walking along a grid in one direction
@@ -29,16 +31,27 @@ class GridUtils {
         return node2;
     }
 
-    public inline static function getGraph<T>(node:GridNode<T>, spreadFilter:T->Bool = null):Array<GridNode<T>> {
-        var nodes:Array<GridNode<T>> = [];
-        var newNodes:Array<GridNode<T>> = [];
+    public inline static function getGraph<T>(source:GridNode<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridNode<T>> {
+        return expandGraph([source], orthoOnly, spreadFilter);
+    }
 
+    public inline static function expandGraph<T>(sources:Array<GridNode<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridNode<T>> {
+        var nodes:Array<GridNode<T>> = sources.copy();
+        var newNodes:Array<GridNode<T>> = sources.copy();
+
+        var step:Int = orthoOnly ? 2 : 1;
+
+        var node:GridNode<T> = newNodes.pop();
         while (node != null) {
-            for (neighbor in node.neighbors) {
-                if (neighbor != null && !nodes.has(neighbor) && (spreadFilter == null || spreadFilter(neighbor.value))) {
+            var direction:Int = 0;
+            while (direction < 8) {
+                var neighbor:GridNode<T> = node.neighbors[direction];
+                if (neighbor != null && !nodes.has(neighbor) &&
+                        (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
                     nodes.push(neighbor);
                     newNodes.push(neighbor);
                 }
+                direction += step;
             }
             node = newNodes.pop();
         }

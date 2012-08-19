@@ -1,3 +1,14 @@
+Damn it, heads can change
+	Forgot about that
+	Okay, each node gets an ID
+	Players get a BodyAspect with a head property
+	Also, Players get a GenomeAspect with a genome property and an index property
+	And the currentPlayer value should be on a PlyAspect
+
+DAMN IT, OPTIONS WERE NEVER SPECCED
+	How will these even work with the view or with heuristics
+	This will need to be figured out before rules that have multiple options get written
+
 Level Editing
 	Just a bunch of rules, aha
 

@@ -3,7 +3,11 @@ package net.rezmason.scourge.model;
 class Evaluator {
 
     private var historyArray:Array<Int>;
+    private var state:State;
 
-    public function new(historyArray:Array<Int>) { this.historyArray = historyArray; }
-    public function evaluate(playerIndex:Int, state:State):Int { return 0; }
+    public function new(state:State) {
+        this.state = state;
+        historyArray = state.historyArray;
+    }
+    public function evaluate():Int { return 0; }
 }

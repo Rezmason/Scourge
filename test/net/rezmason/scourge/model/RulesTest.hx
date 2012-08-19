@@ -7,6 +7,7 @@ import net.rezmason.scourge.model.Rule;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.rules.KillDisconnectedCellsRule;
 import net.rezmason.scourge.model.evaluators.TestEvaluator;
+//import net.rezmason.scourge.model.GridNode;
 
 using net.rezmason.scourge.model.GridUtils;
 
@@ -48,28 +49,28 @@ class RulesTest
 	@Test
 	public function killDisconnectedCellsRuleTest():Void {
 
-		var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule(historyArray);
+		var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule();
 		state = makeState(TestBoards.spiral, cast [killRule]);
 
-		var playerIndex:Int = 0;
+		var numCells:Int = ~/([^0])/g.replace(TestBoards.spiral, "").length;
 
-        var numCells:Int = ~/([^0])/g.replace(TestBoards.spiral, "").length;
+        var testEvaluator:Evaluator = new TestEvaluator(state);
+        Assert.areEqual(numCells, testEvaluator.evaluate()); // 51 cells for player 0
 
-        var testEvaluator:Evaluator = new TestEvaluator(historyArray);
-        Assert.areEqual(numCells, testEvaluator.evaluate(playerIndex, state)); // only one cell for player 0
-
-		var playerHead:BoardNode = state.players[playerIndex].head;
+		var playerHead:BoardNode = state.players[state.currentPlayer].head;
 		var playerNeck:BoardNode = playerHead.n();
 		var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
 
-		// Cut the neck
+        // Cut the neck
 
 		historyArray[neckOwner.isFilled] = 0;
 		historyArray[neckOwner.occupier] = -1;
 
+        Assert.areEqual(1, testEvaluator.evaluate()); // only one cell for player 0
+
 		//Pass the State to the Rule for Option generation
 
-		var options:Array<Option> = killRule.getOptions(state);
+		var options:Array<Option> = killRule.getOptions();
 
         Assert.isNotNull(options);
 		Assert.areEqual(1, options.length);
@@ -78,11 +79,12 @@ class RulesTest
 
 		trace(BoardUtils.spitGrid(playerHead, historyArray));
 
-		killRule.chooseOption(state, options[0]);
+		killRule.chooseOption(options[0]);
 
 		trace(BoardUtils.spitGrid(playerHead, historyArray));
 
-		Assert.areEqual(1, testEvaluator.evaluate(playerIndex, state)); // only one cell for player 0
+        numCells = ~/([^0])/g.replace(BoardUtils.spitGrid(playerHead, historyArray), "").length;
+		Assert.areEqual(1, numCells); // only one cell for player 0
 	}
 
 	//@Test

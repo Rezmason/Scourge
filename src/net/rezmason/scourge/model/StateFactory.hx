@@ -24,7 +24,7 @@ class StateFactory {
 
         var allocator:HistoryAllocator = history.alloc;
 
-        var state:State = new State();
+        var state:State = new State(history.array);
 
         var rules:Array<Rule> = cfg.rules;
         while (rules.has(null)) rules.remove(null);
@@ -50,6 +50,8 @@ class StateFactory {
 
         // Populate each node in the graph with aspects
         for (node in cfg.playerHeads[0].getGraph()) createAspects(boardRequirements, allocator, node.value);
+
+        for (rule in rules) rule.init(state);
 
         return state;
     }

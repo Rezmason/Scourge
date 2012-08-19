@@ -18,15 +18,21 @@ class Rule {
     Command validation
     */
 
-    private var historyArray:Array<Int>;
+    private var hist:Array<Int>;
+    private var state:State;
 
-    public function new(historyArray:Array<Int>) { this.historyArray = historyArray; }
+    public function new():Void { }
+
+    public function init(state:State) {
+        this.state = state;
+        hist = state.historyArray;
+    }
 
     public function listStateAspectRequirements():AspectRequirements { return null; }
     public function listPlayerAspectRequirements():AspectRequirements { return null; }
     public function listBoardAspectRequirements():AspectRequirements { return null; }
 
-    public function getOptions(state:State):Array<Option> { return null; }
-    public function chooseOption(state:State, option:Option):Void { }
+    public function getOptions():Array<Option> { return null; }
+    public function chooseOption(option:Option):Void { }
 }
 

@@ -48,7 +48,7 @@ class GridUtilsTest {
         Assert.areEqual(5, first.getGraph(underFiveOnly).length);
     }
 
-    function underFiveOnly(val:Int):Bool { return val < 5; }
+    function underFiveOnly(val:Int, connection:Int):Bool { return val < 5; }
 
     function makeNode():GridNode<Int> {
         var node:GridNode<Int> = new GridNode<Int>(nodeItr++);
