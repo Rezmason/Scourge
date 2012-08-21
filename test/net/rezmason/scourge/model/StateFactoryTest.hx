@@ -4,7 +4,7 @@ import massive.munit.Assert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.GridNode;
-import net.rezmason.scourge.model.aspects.Aspect;
+import net.rezmason.scourge.model.Aspect;
 import net.rezmason.scourge.model.aspects.TestAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.rules.TestRule;
@@ -29,26 +29,29 @@ class StateFactoryTest {
         var history:History<Int> = new History<Int>();
         var historyArray:Array<Int> = history.array;
 
-        var genes:Array<String> = ["a", "b"];
-
         // make board config and generate board
         var boardCfg:BoardConfig = new BoardConfig();
-        boardCfg.numPlayers = genes.length;
+        boardCfg.numPlayers = 2;
         boardCfg.circular = false;
         var boardFactory:BoardFactory = new BoardFactory();
-        var heads:Array<BoardNode> = boardFactory.makeBoard(boardCfg, history);
+        var boardData:BoardData = boardFactory.makeBoard(boardCfg, history);
 
-        var boardBefore:String = BoardUtils.spitGrid(heads[0], historyArray, false);
+        // Ugly. Change.
+        var heads:Array<Int> = boardData.heads;
+        var nodes:Array<BoardNode> = boardData.nodes;
+
+        var boardBefore:String = BoardUtils.spitGrid(nodes[0], historyArray, false);
 
         // make state config and generate state
         var factory:StateFactory = new StateFactory();
         var stateCfg:StateConfig = new StateConfig();
         stateCfg.playerHeads = heads;
-        stateCfg.playerGenes = genes;
+        stateCfg.numPlayers = 2;
+        stateCfg.nodes = nodes;
         stateCfg.rules = [null, new TestRule()];
         var state:State = factory.makeState(stateCfg, history);
 
-        Assert.areEqual(stateCfg.playerGenes.length, state.players.length);
+        Assert.areEqual(stateCfg.numPlayers, state.players.length);
 
         // Make sure there's the right aspects on the state
         var testAspect:Aspect = state.aspects.get(TestAspect.id);
@@ -59,7 +62,6 @@ class StateFactoryTest {
         // Make sure there's the right aspects on each player
         for (ike in 0...state.players.length) {
             var player:PlayerState = state.players[ike];
-            Assert.areEqual(player.genome, genes[ike]);
             Assert.areEqual(player.head, heads[ike]);
             testAspect = player.aspects.get(TestAspect.id);
             Assert.isNotNull(testAspect);
@@ -67,7 +69,7 @@ class StateFactoryTest {
             Assert.isNotNull(historyArray[cast(testAspect, TestAspect).value]);
         }
 
-        for (node in state.players[0].head.getGraph()) {
+        for (node in state.nodes) {
             testAspect = node.value.get(TestAspect.id);
             Assert.isNotNull(testAspect);
             Assert.isTrue(Std.is(testAspect, TestAspect));
@@ -78,7 +80,7 @@ class StateFactoryTest {
         }
 
         // Make sure the board renders the same way
-        Assert.areEqual(boardBefore, BoardUtils.spitGrid(state.players[0].head, historyArray, false));
+        Assert.areEqual(boardBefore, BoardUtils.spitGrid(state.nodes[0], historyArray, false));
 
         history.wipe();
 
@@ -92,7 +94,7 @@ class StateFactoryTest {
         }
 
         // Make sure the aspects were nulled on each node
-        for (node in state.players[0].head.getGraph()) {
+        for (node in state.nodes) {
             Assert.isNull(historyArray[cast(node.value.get(TestAspect.id), TestAspect).value]);
         }
     }

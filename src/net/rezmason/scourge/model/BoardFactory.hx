@@ -1,11 +1,9 @@
 package net.rezmason.scourge.model;
 
-import haxe.FastList;
-
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.aspects.Aspect;
+import net.rezmason.scourge.model.Aspect;
 
 using Lambda;
 using Std;
@@ -13,7 +11,6 @@ using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.IntHashUtils;
 
 typedef XY = {x:Float, y:Float};
-typedef BoardData = {boardWidth:Int, headCoords:Array<XY>};
 
 class BoardFactory {
 
@@ -32,13 +29,14 @@ class BoardFactory {
 
     }
 
-    public function makeBoard(cfg:BoardConfig, history:History<Int>):Array<BoardNode> {
+    public function makeBoard(cfg:BoardConfig, history:History<Int>):BoardData {
         if (cfg == null) return null;
 
         var historyArray:Array<Int> = history.array;
         var allocator:HistoryAllocator = history.alloc;
 
-        var heads:Array<BoardNode> = [];
+        var nodes:Array<BoardNode> = [];
+        var heads:Array<Int> = [];
 
         // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
         // Player 1's head is at a 45 degree angle
@@ -86,13 +84,13 @@ class BoardFactory {
 
 
 
-        var grid:BoardNode = makeSquareGraph(boardWidth, allocator);
+        var grid:BoardNode = makeSquareGraph(boardWidth, allocator, nodes);
         obstructGraphRim(grid, historyArray);
-        populateGraphHeads(grid, headCoords, heads, historyArray);
+        populateGraphHeads(grid, headCoords, heads, nodes, historyArray);
         if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM, historyArray);
         if (cfg.initGrid != null && cfg.initGrid.length > 0) initGraph(grid, cfg.initGrid, boardWidth, historyArray);
 
-        return heads;
+        return {heads:heads, nodes:nodes};
     }
 
     inline function findMinCoord(coords:Array<XY>):XY {
@@ -116,26 +114,28 @@ class BoardFactory {
         return {x:maxX, y:maxY};
     }
 
-    inline function makeNode(allocator:HistoryAllocator):BoardNode {
+    inline function makeNode(allocator:HistoryAllocator, nodes:Array<BoardNode>):BoardNode {
         var aspects:Aspects = new Aspects();
         aspects.set(OwnershipAspect.id, new OwnershipAspect(allocator));
-        return new BoardNode(aspects);
+        var node:BoardNode = new BoardNode(aspects);
+        nodes.push(node);
+        return node;
     }
 
     inline function nodeOwner(node:BoardNode):OwnershipAspect {
         return cast node.value.get(OwnershipAspect.id);
     }
 
-    inline function makeSquareGraph(width:Int, allocator:HistoryAllocator):BoardNode {
+    inline function makeSquareGraph(width:Int, allocator:HistoryAllocator, nodes:Array<BoardNode>):BoardNode {
 
         // Make a connected grid of nodes with default values
-        var node:BoardNode = makeNode(allocator);
-        for (ike in 1...width) node = node.attach(makeNode(allocator), Gr.e);
+        var node:BoardNode = makeNode(allocator, nodes);
+        for (ike in 1...width) node = node.attach(makeNode(allocator, nodes), Gr.e);
 
         var row:BoardNode = node.run(Gr.w);
         for (ike in 1...width) {
             for (column in row.walk(Gr.e)) {
-                var next:BoardNode = makeNode(allocator);
+                var next:BoardNode = makeNode(allocator, nodes);
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);
@@ -155,13 +155,14 @@ class BoardFactory {
         for (node in grid.run(Gr.e).walk(Gr.s)) historyArray[nodeOwner(node).isFilled] = 1;
     }
 
-    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>, heads:Array<BoardNode>, historyArray:Array<Int>):Void {
+    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>, heads:Array<Int>, nodes:Array<BoardNode>, historyArray:Array<Int>):Void {
         // Identify and change the occupier of each head node
 
         for (ike in 0...headCoords.length) {
             var coord:XY = headCoords[ike];
-            heads[ike] = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
-            var ownerAspect:OwnershipAspect = nodeOwner(heads[ike]);
+            var head:BoardNode = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
+            heads[ike] = nodes.indexOf(head);
+            var ownerAspect:OwnershipAspect = nodeOwner(head);
             historyArray[ownerAspect.isFilled] = 1;
             historyArray[ownerAspect.occupier] = ike;
         }

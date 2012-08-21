@@ -5,6 +5,7 @@ import massive.munit.Assert;
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.Rule;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.rules.KillDisconnectedCellsRule;
 import net.rezmason.scourge.model.evaluators.TestEvaluator;
@@ -17,7 +18,6 @@ class RulesTest
 	var history:History<Int>;
     var historyArray:Array<Int>;
     var allocator:HistoryAllocator;
-    var genes:Array<String>;
 
     var state:State;
 
@@ -30,7 +30,6 @@ class RulesTest
 		history = new History<Int>();
         historyArray = history.array;
         allocator = history.alloc;
-        genes = ["a", "b", "c", "d"];
 	}
 
 	@AfterClass
@@ -58,7 +57,9 @@ class RulesTest
         var testEvaluator:Evaluator = new TestEvaluator(state);
         Assert.areEqual(numCells, testEvaluator.evaluate()); // 51 cells for player 0
 
-		var playerHead:BoardNode = state.players[state.currentPlayer].head;
+        var ply:PlyAspect = cast state.aspects.get(PlyAspect.id);
+
+		var playerHead:BoardNode = state.nodes[state.players[historyArray[ply.currentPlayer]].head];
 		var playerNeck:BoardNode = playerHead.n();
 		var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
         var neckFresh:FreshnessAspect = cast playerNeck.value.get(FreshnessAspect.id);
@@ -80,11 +81,11 @@ class RulesTest
 
 		var reviz:Int = history.revision;
 
-		trace(BoardUtils.spitGrid(playerHead, historyArray));
+		//trace(BoardUtils.spitGrid(playerHead, historyArray));
 
 		killRule.chooseOption(options[0]);
 
-		trace(BoardUtils.spitGrid(playerHead, historyArray));
+		//trace(BoardUtils.spitGrid(playerHead, historyArray));
 
         numCells = ~/([^0])/g.replace(BoardUtils.spitGrid(playerHead, historyArray), "").length;
 		Assert.areEqual(1, numCells); // only one cell for player 0
@@ -99,7 +100,9 @@ class RulesTest
 
         Assert.areEqual(numCells, testEvaluator.evaluate()); // 51 cells for player 0
 
-        var playerHead:BoardNode = state.players[state.currentPlayer].head;
+        var ply:PlyAspect = cast state.aspects.get(PlyAspect.id);
+
+        var playerHead:BoardNode = state.nodes[state.players[historyArray[ply.currentPlayer]].head];
         var playerNeck:BoardNode = playerHead.s();
         var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
         var neckFresh:FreshnessAspect = cast playerNeck.value.get(FreshnessAspect.id);
@@ -110,9 +113,9 @@ class RulesTest
         historyArray[neckOwner.occupier] = -1;
         historyArray[neckFresh.freshness] = 1;
 
-        trace(BoardUtils.spitGrid(playerHead, historyArray));
+        //trace(BoardUtils.spitGrid(playerHead, historyArray));
         killRule.chooseOption(killRule.getOptions()[0]);
-        trace(BoardUtils.spitGrid(playerHead, historyArray));
+        //trace(BoardUtils.spitGrid(playerHead, historyArray));
 
         numCells = ~/([^0])/g.replace(BoardUtils.spitGrid(playerHead, historyArray), "").length;
         Assert.areEqual(1, numCells); // only one cell for player 0
@@ -141,23 +144,21 @@ class RulesTest
 
 		history.wipe();
 
-        var genes:Array<String> = [];
-        for (ike in 0...numPlayers) genes.push("DNA" + ike);
-
-		// make board config and generate board
+        // make board config and generate board
         var boardCfg:BoardConfig = new BoardConfig();
         boardCfg.numPlayers = numPlayers;
         boardCfg.circular = false;
         boardCfg.initGrid = initGrid;
         var boardFactory:BoardFactory = new BoardFactory();
-        var heads:Array<BoardNode> = boardFactory.makeBoard(boardCfg, history);
+        var boardData:BoardData = boardFactory.makeBoard(boardCfg, history);
 
-		// make state config and generate state
+        // make state config and generate state
         var factory:StateFactory = new StateFactory();
         var stateCfg:StateConfig = new StateConfig();
-        stateCfg.playerHeads = heads;
-        stateCfg.playerGenes = genes;
+        stateCfg.playerHeads = boardData.heads;
+        stateCfg.numPlayers = numPlayers;
         stateCfg.rules = rules;
+        stateCfg.nodes = boardData.nodes;
 
         return factory.makeState(stateCfg, history);
 	}

@@ -37,7 +37,7 @@ class KillDisconnectedCellsRule extends Rule {
             var nodesInPlay:Array<BoardNode> = [];
 
             var heads:Array<BoardNode> = [];
-            for (player in state.players) heads.push(player.head);
+            for (player in state.players) heads.push(state.nodes[player.head]);
 
             var candidates:Array<BoardNode> = heads.expandGraph(true, isCandidate);
             var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(true, isLivingBodyNeighbor);

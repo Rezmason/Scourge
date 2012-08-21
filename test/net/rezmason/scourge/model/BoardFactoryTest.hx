@@ -4,7 +4,7 @@ import massive.munit.Assert;
 
 import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.ModelTypes;
-import net.rezmason.scourge.model.aspects.Aspect;
+import net.rezmason.scourge.model.Aspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using net.rezmason.scourge.model.GridUtils;
@@ -31,13 +31,16 @@ class BoardFactoryTest {
         var cfg:BoardConfig = new BoardConfig();
         cfg.numPlayers = 4;
         cfg.circular = false;
-        var board:Array<BoardNode> = factory.makeBoard(cfg, history);
+        var boardData:BoardData = factory.makeBoard(cfg, history);
 
-        Assert.areEqual(cfg.numPlayers, board.length);
+        var heads:Array<Int> = boardData.heads;
+        var nodes:Array<BoardNode> = boardData.nodes;
 
-        for (ike in 0...board.length) Assert.isNotNull(board[ike]);
+        Assert.areEqual(cfg.numPlayers, heads.length);
 
-        var playerHead:BoardNode = board[0];
+        for (ike in 0...heads.length) Assert.isNotNull(heads[ike]);
+
+        var playerHead:BoardNode = nodes[heads[0]];
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
@@ -67,7 +70,7 @@ class BoardFactoryTest {
 
         for (ike in historyArray) Assert.isNull(ike);
 
-        for (node in board[0].getGraph()) {
+        for (node in nodes) {
             var ownerAspect:OwnershipAspect = getOwner(node);
             Assert.isNull(historyArray[ownerAspect.isFilled]);
             Assert.isNull(historyArray[ownerAspect.occupier]);
@@ -82,13 +85,17 @@ class BoardFactoryTest {
         var cfg:BoardConfig = new BoardConfig();
         cfg.numPlayers = 1;
         cfg.circular = true;
-        var board:Array<BoardNode> = factory.makeBoard(cfg, history);
+
+        var boardData:BoardData = factory.makeBoard(cfg, history);
+
+        var heads:Array<Int> = boardData.heads;
+        var nodes:Array<BoardNode> = boardData.nodes;
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
             trace(BoardUtils.spitGrid(board[0], historyArray));
         #else
-            Assert.areEqual(TestBoards.emptyPetri, BoardUtils.spitGrid(board[0], historyArray, false));
+            Assert.areEqual(TestBoards.emptyPetri, BoardUtils.spitGrid(nodes[0], historyArray, false));
         #end
     }
 
@@ -100,14 +107,17 @@ class BoardFactoryTest {
         var cfg:BoardConfig = new BoardConfig();
         cfg.numPlayers = 4;
         cfg.initGrid = TestBoards.spiral;
-        var board:Array<BoardNode> = factory.makeBoard(cfg, history);
+        var boardData:BoardData = factory.makeBoard(cfg, history);
+
+        var heads:Array<Int> = boardData.heads;
+        var nodes:Array<BoardNode> = boardData.nodes;
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be a four-player board with a spiral interior");
             trace(BoardUtils.spitGrid(board[0], historyArray));
         #end
 
-        Assert.areEqual(TestBoards.spiral, BoardUtils.spitGrid(board[0], historyArray, false));
+        Assert.areEqual(TestBoards.spiral, BoardUtils.spitGrid(nodes[0], historyArray, false));
     }
 
     private function getOwner(node:BoardNode):OwnershipAspect {

@@ -1,13 +1,19 @@
-Damn it, heads can change
-	Forgot about that
-	Okay, each node gets an ID
-	Players get a BodyAspect with a head property
-	Also, Players get a GenomeAspect with a genome property and an index property
-	And the currentPlayer value should be on a PlyAspect
+Aw damn- the BoardFactory is a rule after all
+	Accepts a config in its constructor
+	It requires OwnershipAspect and BodyAspect
+	It generates the board when it initializes
+
+Dissolving aspect classes
+	Dissolve Aspect classes into inline static {id:Int, defaultVal:Int}s that increment Aspect.ids
+	StateFactory generates an IntHash<Int> of indices for state, player and node aspects
+		Rules store these indices and use them to access data on nodes, players and the state
 
 DAMN IT, OPTIONS WERE NEVER SPECCED
 	How will these even work with the view or with heuristics
 	This will need to be figured out before rules that have multiple options get written
+
+
+
 
 Level Editing
 	Just a bunch of rules, aha

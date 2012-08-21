@@ -1,4 +1,4 @@
-package net.rezmason.scourge.model.aspects;
+package net.rezmason.scourge.model;
 
 class Aspect {
     private static var ids:Int = 0;
