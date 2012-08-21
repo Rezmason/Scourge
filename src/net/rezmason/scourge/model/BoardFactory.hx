@@ -32,9 +32,6 @@ class BoardFactory {
     public function makeBoard(cfg:BoardConfig, history:History<Int>):BoardData {
         if (cfg == null) return null;
 
-        var historyArray:Array<Int> = history.array;
-        var allocator:HistoryAllocator = history.alloc;
-
         var nodes:Array<BoardNode> = [];
         var heads:Array<Int> = [];
 
@@ -84,11 +81,11 @@ class BoardFactory {
 
 
 
-        var grid:BoardNode = makeSquareGraph(boardWidth, allocator, nodes);
-        obstructGraphRim(grid, historyArray);
-        populateGraphHeads(grid, headCoords, heads, nodes, historyArray);
-        if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM, historyArray);
-        if (cfg.initGrid != null && cfg.initGrid.length > 0) initGraph(grid, cfg.initGrid, boardWidth, historyArray);
+        var grid:BoardNode = makeSquareGraph(boardWidth, history, nodes);
+        obstructGraphRim(grid, history);
+        populateGraphHeads(grid, headCoords, heads, nodes, history);
+        if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM, history);
+        if (cfg.initGrid != null && cfg.initGrid.length > 0) initGraph(grid, cfg.initGrid, boardWidth, history);
 
         return {heads:heads, nodes:nodes};
     }
@@ -114,9 +111,9 @@ class BoardFactory {
         return {x:maxX, y:maxY};
     }
 
-    inline function makeNode(allocator:HistoryAllocator, nodes:Array<BoardNode>):BoardNode {
+    inline function makeNode(history:History<Int>, nodes:Array<BoardNode>):BoardNode {
         var aspects:Aspects = new Aspects();
-        aspects.set(OwnershipAspect.id, new OwnershipAspect(allocator));
+        aspects.set(OwnershipAspect.id, new OwnershipAspect(history));
         var node:BoardNode = new BoardNode(aspects);
         nodes.push(node);
         return node;
@@ -126,16 +123,16 @@ class BoardFactory {
         return cast node.value.get(OwnershipAspect.id);
     }
 
-    inline function makeSquareGraph(width:Int, allocator:HistoryAllocator, nodes:Array<BoardNode>):BoardNode {
+    inline function makeSquareGraph(width:Int, history:History<Int>, nodes:Array<BoardNode>):BoardNode {
 
         // Make a connected grid of nodes with default values
-        var node:BoardNode = makeNode(allocator, nodes);
-        for (ike in 1...width) node = node.attach(makeNode(allocator, nodes), Gr.e);
+        var node:BoardNode = makeNode(history, nodes);
+        for (ike in 1...width) node = node.attach(makeNode(history, nodes), Gr.e);
 
         var row:BoardNode = node.run(Gr.w);
         for (ike in 1...width) {
             for (column in row.walk(Gr.e)) {
-                var next:BoardNode = makeNode(allocator, nodes);
+                var next:BoardNode = makeNode(history, nodes);
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);
@@ -148,14 +145,14 @@ class BoardFactory {
         return node.run(Gr.nw).run(Gr.n).run(Gr.w);
     }
 
-    inline function obstructGraphRim(grid:BoardNode, historyArray:Array<Int>):Void {
-        for (node in grid.walk(Gr.e)) historyArray[nodeOwner(node).isFilled] = 1;
-        for (node in grid.walk(Gr.s)) historyArray[nodeOwner(node).isFilled] = 1;
-        for (node in grid.run(Gr.s).walk(Gr.e)) historyArray[nodeOwner(node).isFilled] = 1;
-        for (node in grid.run(Gr.e).walk(Gr.s)) historyArray[nodeOwner(node).isFilled] = 1;
+    inline function obstructGraphRim(grid:BoardNode, history:History<Int>):Void {
+        for (node in grid.walk(Gr.e)) history.set(nodeOwner(node).isFilled, 1);
+        for (node in grid.walk(Gr.s)) history.set(nodeOwner(node).isFilled, 1);
+        for (node in grid.run(Gr.s).walk(Gr.e)) history.set(nodeOwner(node).isFilled, 1);
+        for (node in grid.run(Gr.e).walk(Gr.s)) history.set(nodeOwner(node).isFilled, 1);
     }
 
-    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>, heads:Array<Int>, nodes:Array<BoardNode>, historyArray:Array<Int>):Void {
+    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>, heads:Array<Int>, nodes:Array<BoardNode>, history:History<Int>):Void {
         // Identify and change the occupier of each head node
 
         for (ike in 0...headCoords.length) {
@@ -163,12 +160,12 @@ class BoardFactory {
             var head:BoardNode = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
             heads[ike] = nodes.indexOf(head);
             var ownerAspect:OwnershipAspect = nodeOwner(head);
-            historyArray[ownerAspect.isFilled] = 1;
-            historyArray[ownerAspect.occupier] = ike;
+            history.set(ownerAspect.isFilled, 1);
+            history.set(ownerAspect.occupier, ike);
         }
     }
 
-    inline function encircleGraph(grid:BoardNode, radius:Float, historyArray:Array<Int>):Void {
+    inline function encircleGraph(grid:BoardNode, radius:Float, history:History<Int>):Void {
         // Circular levels' cells are obstructed if they're too far from the board's center
 
         var y:Int = 0;
@@ -176,11 +173,11 @@ class BoardFactory {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
                 var ownerAspect:OwnershipAspect = nodeOwner(column);
-                if (historyArray[ownerAspect.isFilled] == 0) {
+                if (history.get(ownerAspect.isFilled) == 0) {
                     var fx:Float = x - radius + 0.5 - RIM;
                     var fy:Float = y - radius + 0.5 - RIM;
                     var insideCircle:Bool = Math.sqrt(fx * fx + fy * fy) < radius;
-                    if (!insideCircle) historyArray[ownerAspect.isFilled] = 1;
+                    if (!insideCircle) history.set(ownerAspect.isFilled, 1);
                 }
                 x++;
             }
@@ -188,7 +185,7 @@ class BoardFactory {
         }
     }
 
-    inline function initGraph(grid:BoardNode, initGrid:String, boardWidth:Int, historyArray:Array<Int>):Void {
+    inline function initGraph(grid:BoardNode, initGrid:String, boardWidth:Int, history:History<Int>):Void {
 
         // Refer to the initGrid to assign initial values to nodes
 
@@ -201,12 +198,12 @@ class BoardFactory {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
                 var ownerAspect:OwnershipAspect = nodeOwner(column);
-                if (historyArray[ownerAspect.isFilled] == 0) {
+                if (history.get(ownerAspect.isFilled) == 0) {
                     var char:String = initGrid.charAt(y * initGridWidth + x + 1);
                     if (char != " ") {
-                        historyArray[ownerAspect.isFilled] = 1;
-                        if (!NUMERIC_CHAR.match(char)) historyArray[ownerAspect.occupier] = -1;
-                        else historyArray[ownerAspect.occupier] = Std.parseInt(char);
+                        history.set(ownerAspect.isFilled, 1);
+                        if (!NUMERIC_CHAR.match(char)) history.set(ownerAspect.occupier, -1);
+                        else history.set(ownerAspect.occupier, Std.parseInt(char));
                     }
                 }
                 x++;

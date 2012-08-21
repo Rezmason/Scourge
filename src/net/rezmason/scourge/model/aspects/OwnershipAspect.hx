@@ -9,8 +9,8 @@ class OwnershipAspect extends Aspect {
     public var isFilled:Int;
     public var occupier:Int;
 
-    public function new(allocator:HistoryAllocator):Void {
-        isFilled = allocator(0);
-        occupier = allocator(-1);
+    public function new(history:History<Int>):Void {
+        isFilled = history.alloc(0);
+        occupier = history.alloc(-1);
     }
 }

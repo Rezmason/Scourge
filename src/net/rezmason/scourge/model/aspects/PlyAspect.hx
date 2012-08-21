@@ -8,7 +8,7 @@ class PlyAspect extends Aspect {
 
     public var currentPlayer:Int;
 
-    public function new(allocator:HistoryAllocator):Void {
-        currentPlayer = allocator(0);
+    public function new(history:History<Int>):Void {
+        currentPlayer = history.alloc(0);
     }
 }

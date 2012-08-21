@@ -8,7 +8,7 @@ class FreshnessAspect extends Aspect {
 
     public var freshness:Int;
 
-    public function new(allocator:HistoryAllocator):Void {
-        freshness = allocator(0);
+    public function new(history:History<Int>):Void {
+        freshness = history.alloc(0);
     }
 }

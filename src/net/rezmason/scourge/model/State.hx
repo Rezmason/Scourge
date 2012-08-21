@@ -7,11 +7,11 @@ class State {
     public var players:Array<PlayerState>;
     public var nodes:Array<BoardNode>;
     public var aspects:Aspects;
-    public var historyArray:Array<Int>;
+    public var history:History<Int>;
 
-    public function new(historyArray:Array<Int>):Void {
+    public function new(history:History<Int>):Void {
         players = [];
         aspects = new Aspects();
-        this.historyArray = historyArray;
+        this.history = history;
     }
 }

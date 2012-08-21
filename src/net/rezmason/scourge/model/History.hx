@@ -4,8 +4,8 @@ class History<T> {
 
     public var length(default, null):Int;
     public var revision(default, null):Int;
-    public var array(default, null):Array<T>;
 
+    private var array:Array<T>;
     private var oldArray:Array<T>;
     private var changeCount:Int;
     private var fullChanges:Array<Array<T>>;
@@ -94,8 +94,38 @@ class History<T> {
         return revision;
     }
 
-    public function alloc(val:T):Int {
+    public inline function alloc(val:T):Int {
         array[length] = val;
         return length++;
+    }
+
+    public inline function get(index:Int):T {
+
+        if (length == 0)
+        {
+            throw "Invalid get : no data allocated";
+        }
+
+        if (index < 0 || index > length - 1) {
+            throw "Invalid get " + index + " falls out of range 0-" + (length - 1);
+        }
+
+        return array[index];
+    }
+
+    public inline function set(index:Int, val:T):T {
+
+        if (length == 0)
+        {
+            throw "Invalid set : no data allocated";
+        }
+
+        if (index < 0 || index > length - 1) {
+            throw "Invalid set " + index + " falls out of range 0-" + (length - 1);
+        }
+
+        array[index] = val;
+
+        return val;
     }
 }

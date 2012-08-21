@@ -27,7 +27,6 @@ class StateFactoryTest {
     public function configTest1():Void {
 
         var history:History<Int> = new History<Int>();
-        var historyArray:Array<Int> = history.array;
 
         // make board config and generate board
         var boardCfg:BoardConfig = new BoardConfig();
@@ -40,7 +39,7 @@ class StateFactoryTest {
         var heads:Array<Int> = boardData.heads;
         var nodes:Array<BoardNode> = boardData.nodes;
 
-        var boardBefore:String = BoardUtils.spitGrid(nodes[0], historyArray, false);
+        var boardBefore:String = BoardUtils.spitGrid(nodes[0], history, false);
 
         // make state config and generate state
         var factory:StateFactory = new StateFactory();
@@ -57,7 +56,7 @@ class StateFactoryTest {
         var testAspect:Aspect = state.aspects.get(TestAspect.id);
         Assert.isNotNull(testAspect);
         Assert.isTrue(Std.is(testAspect, TestAspect));
-        Assert.isNotNull(historyArray[cast(testAspect, TestAspect).value]);
+        Assert.isNotNull(history.get(cast(testAspect, TestAspect).value));
 
         // Make sure there's the right aspects on each player
         for (ike in 0...state.players.length) {
@@ -66,36 +65,20 @@ class StateFactoryTest {
             testAspect = player.aspects.get(TestAspect.id);
             Assert.isNotNull(testAspect);
             Assert.isTrue(Std.is(testAspect, TestAspect));
-            Assert.isNotNull(historyArray[cast(testAspect, TestAspect).value]);
+            Assert.isNotNull(history.get(cast(testAspect, TestAspect).value));
         }
 
         for (node in state.nodes) {
             testAspect = node.value.get(TestAspect.id);
             Assert.isNotNull(testAspect);
             Assert.isTrue(Std.is(testAspect, TestAspect));
-            Assert.isNotNull(historyArray[cast(testAspect, TestAspect).value]);
+            Assert.isNotNull(history.get(cast(testAspect, TestAspect).value));
 
             Assert.isNotNull(node.value.get(OwnershipAspect.id));
             Assert.isTrue(Std.is(node.value.get(OwnershipAspect.id), OwnershipAspect));
         }
 
         // Make sure the board renders the same way
-        Assert.areEqual(boardBefore, BoardUtils.spitGrid(state.nodes[0], historyArray, false));
-
-        history.wipe();
-
-        // Make sure the aspects were nulled on the state
-        Assert.isNull(historyArray[cast(state.aspects.get(TestAspect.id), TestAspect).value]);
-
-        // Make sure the aspects were nulled on each player
-        for (ike in 0...state.players.length) {
-            var player:PlayerState = state.players[ike];
-            Assert.isNull(historyArray[cast(player.aspects.get(TestAspect.id), TestAspect).value]);
-        }
-
-        // Make sure the aspects were nulled on each node
-        for (node in state.nodes) {
-            Assert.isNull(historyArray[cast(node.value.get(TestAspect.id), TestAspect).value]);
-        }
+        Assert.areEqual(boardBefore, BoardUtils.spitGrid(state.nodes[0], history, false));
     }
 }

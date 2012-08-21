@@ -52,9 +52,9 @@ class KillDisconnectedCellsRule extends Rule {
         var owner:OwnershipAspect = cast cell.get(OwnershipAspect.id);
         var fresh:FreshnessAspect = cast cell.get(FreshnessAspect.id);
 
-        if (hist[owner.isFilled] > 0 && hist[owner.occupier] > -1) {
+        if (history.get(owner.isFilled) > 0 && history.get(owner.occupier) > -1) {
             return true;
-        } else if (hist[fresh.freshness] > 0) {
+        } else if (history.get(fresh.freshness) > 0) {
             return true;
         }
 
@@ -64,15 +64,15 @@ class KillDisconnectedCellsRule extends Rule {
     function isLivingBodyNeighbor(cell:Aspects, connection:Aspects):Bool {
         var owner1:OwnershipAspect = cast cell.get(OwnershipAspect.id);
         var owner2:OwnershipAspect = cast connection.get(OwnershipAspect.id);
-        return hist[owner1.isFilled] > 0 && hist[owner1.occupier] == hist[owner2.occupier];
+        return history.get(owner1.isFilled) > 0 && history.get(owner1.occupier) == history.get(owner2.occupier);
     }
 
     function killCell(cell:Aspects):Void {
         var owner:OwnershipAspect = cast cell.get(OwnershipAspect.id);
         var fresh:FreshnessAspect = cast cell.get(FreshnessAspect.id);
-        hist[fresh.freshness] = 0;
-        hist[owner.isFilled] = 0;
-        hist[owner.occupier] = -1;
+        history.set(fresh.freshness, 0);
+        history.set(owner.isFilled, 0);
+        history.set(owner.occupier, -1);
     }
 }
 

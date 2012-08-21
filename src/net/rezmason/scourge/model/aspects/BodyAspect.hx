@@ -8,7 +8,7 @@ class BodyAspect extends Aspect {
 
     public var head:Int;
 
-    public function new(allocator:HistoryAllocator):Void {
-        head = allocator(-1);
+    public function new(history:History):Void {
+        head = history.alloc(-1);
     }
 }

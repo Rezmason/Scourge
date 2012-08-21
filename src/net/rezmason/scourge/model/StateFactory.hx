@@ -22,9 +22,7 @@ class StateFactory {
         if (cfg.nodes == null) return null;
         if (cfg.rules == null) return null;
 
-        var allocator:HistoryAllocator = history.alloc;
-
-        var state:State = new State(history.array);
+        var state:State = new State(history);
 
         var rules:Array<Rule> = cfg.rules;
         while (rules.has(null)) rules.remove(null);
@@ -44,13 +42,13 @@ class StateFactory {
         if (!stateRequirements.exists(PlyAspect.id)) stateRequirements.set(PlyAspect.id, PlyAspect);
 
         // Populate the game state with aspects, players and nodes
-        createAspects(stateRequirements, allocator, state.aspects);
+        createAspects(stateRequirements, history, state.aspects);
         for (ike in 0...cfg.numPlayers) {
-            state.players.push(makePlayer(cfg.playerHeads[ike], playerRequirements, allocator));
+            state.players.push(makePlayer(cfg.playerHeads[ike], playerRequirements, history));
         }
 
         // Populate each node in the graph with aspects
-        for (node in cfg.nodes) createAspects(boardRequirements, allocator, node.value);
+        for (node in cfg.nodes) createAspects(boardRequirements, history, node.value);
         state.nodes = cfg.nodes.copy();
 
         for (rule in rules) rule.init(state);
@@ -58,16 +56,16 @@ class StateFactory {
         return state;
     }
 
-    inline function makePlayer(head:Int, requirements:AspectRequirements, allocator:HistoryAllocator):PlayerState {
+    inline function makePlayer(head:Int, requirements:AspectRequirements, history:History<Int>):PlayerState {
         var playerState:PlayerState = new PlayerState();
         playerState.head = head;
-        createAspects(requirements, allocator, playerState.aspects);
+        createAspects(requirements, history, playerState.aspects);
         return playerState;
     }
 
-    inline function createAspects(requirements:AspectRequirements, allocator:HistoryAllocator, aspects:Aspects = null):Aspects {
+    inline function createAspects(requirements:AspectRequirements, history:History<Int>, aspects:Aspects = null):Aspects {
         if (aspects == null) aspects = new Aspects();
-        for (key in requirements.keys()) if (!aspects.exists(key)) aspects.set(key, Type.createInstance(requirements.get(key), [allocator]));
+        for (key in requirements.keys()) if (!aspects.exists(key)) aspects.set(key, Type.createInstance(requirements.get(key), [history]));
         return aspects;
     }
 }

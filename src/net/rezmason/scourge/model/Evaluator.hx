@@ -2,12 +2,12 @@ package net.rezmason.scourge.model;
 
 class Evaluator {
 
-    private var historyArray:Array<Int>;
+    private var history:History<Int>;
     private var state:State;
 
     public function new(state:State) {
         this.state = state;
-        historyArray = state.historyArray;
+        history = state.history;
     }
     public function evaluate():Int { return 0; }
 }

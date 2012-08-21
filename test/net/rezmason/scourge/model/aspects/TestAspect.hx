@@ -8,7 +8,7 @@ class TestAspect extends Aspect {
 
     public var value:Int;
 
-    public function new(allocator:HistoryAllocator):Void {
-        value = allocator(1);
+    public function new(history:History<Int>):Void {
+        value = history.alloc(1);
     }
 }

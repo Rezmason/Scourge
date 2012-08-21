@@ -9,15 +9,15 @@ class TestEvaluator extends Evaluator {
 
     override public function evaluate():Int {
         var ply:PlyAspect = cast state.aspects.get(PlyAspect.id);
-        var currentPlayer:Int = historyArray[ply.currentPlayer];
+        var currentPlayer:Int = history.get(ply.currentPlayer);
         return state.nodes[state.players[currentPlayer].head].getGraph(true, myContiguous).length;
     }
 
     function myContiguous(aspects:Aspects, connection:Aspects):Bool {
         var ply:PlyAspect = cast state.aspects.get(PlyAspect.id);
         var aspect:OwnershipAspect = cast aspects.get(OwnershipAspect.id);
-        return historyArray[aspect.occupier] == historyArray[ply.currentPlayer] &&
-                historyArray[aspect.isFilled] == 1;
+        return history.get(aspect.occupier) == history.get(ply.currentPlayer) &&
+                history.get(aspect.isFilled) == 1;
     }
 
 }

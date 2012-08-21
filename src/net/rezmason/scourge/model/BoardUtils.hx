@@ -10,7 +10,7 @@ class BoardUtils {
 
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
-    public static function spitGrid(head:BoardNode, historyArray:Array<Int>, addSpaces:Bool = true):String {
+    public static function spitGrid(head:BoardNode, history:History<Int>, addSpaces:Bool = true):String {
         var str:String = "";
 
         var grid:BoardNode = head.run(Gr.nw).run(Gr.w).run(Gr.n);
@@ -20,8 +20,8 @@ class BoardUtils {
             for (column in row.walk(Gr.e)) {
                 var ownerAspect:OwnershipAspect = cast column.value.get(OwnershipAspect.id);
                 str += switch (true) {
-                    case (historyArray[ownerAspect.occupier] > -1): "" + historyArray[ownerAspect.occupier];
-                    case (historyArray[ownerAspect.isFilled] == 1): "X";
+                    case (history.get(ownerAspect.occupier) > -1): "" + history.get(ownerAspect.occupier);
+                    case (history.get(ownerAspect.isFilled) == 1): "X";
                     default: " ";
                 }
             }

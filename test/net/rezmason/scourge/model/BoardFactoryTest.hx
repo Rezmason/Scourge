@@ -25,7 +25,6 @@ class BoardFactoryTest {
     public function configTest1():Void {
 
         var history:History<Int> = new History<Int>();
-        var historyArray:Array<Int> = history.array;
 
         var factory:BoardFactory = new BoardFactory();
         var cfg:BoardConfig = new BoardConfig();
@@ -44,14 +43,14 @@ class BoardFactoryTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
-            trace(BoardUtils.spitGrid(playerHead, historyArray));
+            trace(BoardUtils.spitGrid(playerHead, history));
         #else
-            Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, BoardUtils.spitGrid(playerHead, historyArray, false));
+            Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, BoardUtils.spitGrid(playerHead, history, false));
         #end
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);
-            Assert.areEqual(-1, historyArray[getOwner(neighbor).occupier]);
+            Assert.areEqual(-1, history.get(getOwner(neighbor).occupier));
             getOwner(neighbor).occupier = 0;
         }
 
@@ -65,22 +64,11 @@ class BoardFactoryTest {
         Assert.areEqual(0, getOwner(playerHead.w()).occupier);
 
         history.wipe();
-
-        var historyArray:Array<Int> = history.array;
-
-        for (ike in historyArray) Assert.isNull(ike);
-
-        for (node in nodes) {
-            var ownerAspect:OwnershipAspect = getOwner(node);
-            Assert.isNull(historyArray[ownerAspect.isFilled]);
-            Assert.isNull(historyArray[ownerAspect.occupier]);
-        }
     }
 
     @Test
     public function configTest2():Void {
         var history:History<Int> = new History<Int>();
-        var historyArray:Array<Int> = history.array;
         var factory:BoardFactory = new BoardFactory();
         var cfg:BoardConfig = new BoardConfig();
         cfg.numPlayers = 1;
@@ -93,16 +81,15 @@ class BoardFactoryTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
-            trace(BoardUtils.spitGrid(board[0], historyArray));
+            trace(BoardUtils.spitGrid(board[0], history));
         #else
-            Assert.areEqual(TestBoards.emptyPetri, BoardUtils.spitGrid(nodes[0], historyArray, false));
+            Assert.areEqual(TestBoards.emptyPetri, BoardUtils.spitGrid(nodes[0], history, false));
         #end
     }
 
     @Test
     public function configTest3():Void {
         var history:History<Int> = new History<Int>();
-        var historyArray:Array<Int> = history.array;
         var factory:BoardFactory = new BoardFactory();
         var cfg:BoardConfig = new BoardConfig();
         cfg.numPlayers = 4;
@@ -114,10 +101,10 @@ class BoardFactoryTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be a four-player board with a spiral interior");
-            trace(BoardUtils.spitGrid(board[0], historyArray));
+            trace(BoardUtils.spitGrid(board[0], history));
         #end
 
-        Assert.areEqual(TestBoards.spiral, BoardUtils.spitGrid(nodes[0], historyArray, false));
+        Assert.areEqual(TestBoards.spiral, BoardUtils.spitGrid(nodes[0], history, false));
     }
 
     private function getOwner(node:BoardNode):OwnershipAspect {

@@ -18,14 +18,14 @@ class Rule {
     Command validation
     */
 
-    private var hist:Array<Int>;
+    private var history:History<Int>;
     private var state:State;
 
     public function new():Void { }
 
     public function init(state:State) {
         this.state = state;
-        hist = state.historyArray;
+        history = state.history;
     }
 
     public function listStateAspectRequirements():AspectRequirements { return null; }
