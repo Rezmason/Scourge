@@ -5,9 +5,6 @@ class Evaluator {
     private var history:History<Int>;
     private var state:State;
 
-    public function new(state:State) {
-        this.state = state;
-        history = state.history;
-    }
-    public function evaluate():Int { return 0; }
+    public function new() { }
+    public function evaluate(state:State):Int { return 0; }
 }

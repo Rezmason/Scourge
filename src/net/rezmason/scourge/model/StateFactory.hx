@@ -18,11 +18,11 @@ class StateFactory {
     public function makeState(cfg:StateConfig, history:History<Int>):State {
         if (cfg == null) return null;
         if (cfg.numPlayers < 1) return null;
-        if (cfg.playerHeads == null) return null;
-        if (cfg.nodes == null) return null;
         if (cfg.rules == null) return null;
 
-        var state:State = new State(history);
+        var state:State = new State();
+        state.history = history;
+
 
         var rules:Array<Rule> = cfg.rules;
         while (rules.has(null)) rules.remove(null);
@@ -42,25 +42,19 @@ class StateFactory {
         if (!stateRequirements.exists(PlyAspect.id)) stateRequirements.set(PlyAspect.id, PlyAspect);
 
         // Populate the game state with aspects, players and nodes
-        createAspects(stateRequirements, history, state.aspects);
-        for (ike in 0...cfg.numPlayers) {
-            state.players.push(makePlayer(cfg.playerHeads[ike], playerRequirements, history));
-        }
+        state.aspects = createAspects(stateRequirements, history);
 
-        // Populate each node in the graph with aspects
-        for (node in cfg.nodes) createAspects(boardRequirements, history, node.value);
-        state.nodes = cfg.nodes.copy();
+        state.players = [];
+        for (ike in 0...cfg.numPlayers) state.players.push(createAspects(playerRequirements, history));
+
+        // TODO: Populate state with aspect templates
+        state.stateAspectTemplate = [];
+        state.playerAspectTemplate = [];
+        state.nodeAspectTemplate = [];
 
         for (rule in rules) rule.init(state);
 
         return state;
-    }
-
-    inline function makePlayer(head:Int, requirements:AspectRequirements, history:History<Int>):PlayerState {
-        var playerState:PlayerState = new PlayerState();
-        playerState.head = head;
-        createAspects(requirements, history, playerState.aspects);
-        return playerState;
     }
 
     inline function createAspects(requirements:AspectRequirements, history:History<Int>, aspects:Aspects = null):Aspects {

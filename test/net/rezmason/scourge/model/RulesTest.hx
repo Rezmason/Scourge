@@ -4,6 +4,7 @@ import massive.munit.Assert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.Rule;
+import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
@@ -50,12 +51,13 @@ class RulesTest
 
 		var numCells:Int = ~/([^0])/g.replace(TestBoards.spiral, "").length;
 
-        var testEvaluator:Evaluator = new TestEvaluator(state);
-        Assert.areEqual(numCells, testEvaluator.evaluate()); // 51 cells for player 0
+        var testEvaluator:Evaluator = new TestEvaluator();
+        Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
 
         var ply:PlyAspect = cast state.aspects.get(PlyAspect.id);
 
-		var playerHead:BoardNode = state.nodes[state.players[history.get(ply.currentPlayer)].head];
+        var body:BodyAspect = cast state.players[history.get(ply.currentPlayer)].get(BodyAspect.id);
+		var playerHead:BoardNode = state.nodes[history.get(body.head)];
 		var playerNeck:BoardNode = playerHead.n();
 		var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
         var neckFresh:FreshnessAspect = cast playerNeck.value.get(FreshnessAspect.id);
@@ -66,11 +68,11 @@ class RulesTest
 		history.set(neckOwner.occupier, -1);
         history.set(neckFresh.freshness, 1);
 
-        Assert.areEqual(1, testEvaluator.evaluate()); // only one cell for player 0
+        Assert.areEqual(1, testEvaluator.evaluate(state)); // only one cell for player 0
 
 		//Pass the State to the Rule for Option generation
 
-		var options:Array<Option> = killRule.getOptions();
+		var options:Array<Option> = killRule.getOptions(state);
 
         Assert.isNotNull(options);
 		Assert.areEqual(1, options.length);
@@ -79,7 +81,7 @@ class RulesTest
 
 		//trace(BoardUtils.spitGrid(playerHead, history));
 
-		killRule.chooseOption(options[0]);
+		killRule.chooseOption(state, options[0]);
 
 		//trace(BoardUtils.spitGrid(playerHead, history));
 
@@ -92,13 +94,14 @@ class RulesTest
         var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule();
         state = makeState(TestBoards.spiralPetri, 1, cast [killRule]);
         var numCells:Int = ~/([^0])/g.replace(TestBoards.spiralPetri, "").length;
-        var testEvaluator:Evaluator = new TestEvaluator(state);
+        var testEvaluator:Evaluator = new TestEvaluator();
 
-        Assert.areEqual(numCells, testEvaluator.evaluate()); // 51 cells for player 0
+        Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
 
         var ply:PlyAspect = cast state.aspects.get(PlyAspect.id);
 
-        var playerHead:BoardNode = state.nodes[state.players[history.get(ply.currentPlayer)].head];
+        var body:BodyAspect = cast state.players[history.get(ply.currentPlayer)].get(BodyAspect.id);
+        var playerHead:BoardNode = state.nodes[history.get(body.head)];
         var playerNeck:BoardNode = playerHead.s();
         var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
         var neckFresh:FreshnessAspect = cast playerNeck.value.get(FreshnessAspect.id);
@@ -110,7 +113,7 @@ class RulesTest
         history.set(neckFresh.freshness, 1);
 
         //trace(BoardUtils.spitGrid(playerHead, history));
-        killRule.chooseOption(killRule.getOptions()[0]);
+        killRule.chooseOption(state, killRule.getOptions(state)[0]);
         //trace(BoardUtils.spitGrid(playerHead, history));
 
         numCells = ~/([^0])/g.replace(BoardUtils.spitGrid(playerHead, history), "").length;
@@ -140,6 +143,7 @@ class RulesTest
 
 		history.wipe();
 
+        /*
         // make board config and generate board
         var boardCfg:BoardConfig = new BoardConfig();
         boardCfg.numPlayers = numPlayers;
@@ -147,14 +151,15 @@ class RulesTest
         boardCfg.initGrid = initGrid;
         var boardFactory:BoardFactory = new BoardFactory();
         var boardData:BoardData = boardFactory.makeBoard(boardCfg, history);
+        */
 
         // make state config and generate state
         var factory:StateFactory = new StateFactory();
         var stateCfg:StateConfig = new StateConfig();
-        stateCfg.playerHeads = boardData.heads;
+        //stateCfg.playerHeads = boardData.heads;
         stateCfg.numPlayers = numPlayers;
         stateCfg.rules = rules;
-        stateCfg.nodes = boardData.nodes;
+        //stateCfg.nodes = boardData.nodes;
 
         return factory.makeState(stateCfg, history);
 	}

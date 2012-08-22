@@ -81,7 +81,7 @@ class BoardFactoryTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
-            trace(BoardUtils.spitGrid(board[0], history));
+            trace(BoardUtils.spitGrid(nodes[0], history));
         #else
             Assert.areEqual(TestBoards.emptyPetri, BoardUtils.spitGrid(nodes[0], history, false));
         #end
@@ -101,7 +101,7 @@ class BoardFactoryTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be a four-player board with a spiral interior");
-            trace(BoardUtils.spitGrid(board[0], history));
+            trace(BoardUtils.spitGrid(nodes[0], history));
         #end
 
         Assert.areEqual(TestBoards.spiral, BoardUtils.spitGrid(nodes[0], history, false));
