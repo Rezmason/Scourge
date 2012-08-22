@@ -38,22 +38,23 @@ class StateFactoryTest {
         Assert.areEqual(stateCfg.numPlayers, state.players.length);
 
         // Make sure there's the right aspects on the state
-        var testAspect:Aspect = state.aspects.get(TestAspect.id);
-        Assert.isNotNull(testAspect);
-        Assert.isTrue(Std.is(testAspect, TestAspect));
-        Assert.isNotNull(history.get(cast(testAspect, TestAspect).value));
+
+        var stateTestValue_:Int = state.stateAspectLookup[TestAspect.VALUE.id];
+        Assert.areNotEqual(-1, stateTestValue_);
+        Assert.isNotNull(history.get(state.aspects[stateTestValue_]));
 
         // Make sure there's the right aspects on each player
+        var playerTestValue_:Int = state.playerAspectLookup[TestAspect.VALUE.id];
+        Assert.areNotEqual(-1, playerTestValue_);
         for (ike in 0...state.players.length) {
-            var player:Aspects = state.players[ike];
-            testAspect = player.get(TestAspect.id);
-            Assert.isNotNull(testAspect);
-            Assert.isTrue(Std.is(testAspect, TestAspect));
-            Assert.isNotNull(history.get(cast(testAspect, TestAspect).value));
+            Assert.isNotNull(history.get(state.players[ike][playerTestValue_]));
         }
 
-        // There's no nodes yet
-
-        // TODO: Test aspect template for state, player and node
+        // Make sure there's the right aspects on each node
+        var nodeTestValue_:Int = state.nodeAspectLookup[TestAspect.VALUE.id];
+        Assert.areNotEqual(-1, nodeTestValue_);
+        for (ike in 0...state.nodes.length) {
+            Assert.isNotNull(history.get(state.nodes[ike].value[nodeTestValue_]));
+        }
     }
 }

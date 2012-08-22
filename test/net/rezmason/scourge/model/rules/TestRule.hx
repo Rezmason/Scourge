@@ -10,11 +10,9 @@ class TestRule extends Rule {
     public function new():Void {
         super();
 
-        if (reqs == null)
-        {
-            reqs = new AspectRequirements();
-            reqs.set(TestAspect.id, TestAspect);
-        }
+        if (reqs == null) reqs = [
+            TestAspect.VALUE,
+        ];
     }
 
     override public function listStateAspectRequirements():AspectRequirements { return reqs; }

@@ -1,9 +1,9 @@
-package net.rezmason.scourge.model;
+package net.rezmason.scourge.model.rules;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.GridNode;
+import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.Aspect;
 
 using Lambda;
 using Std;
@@ -12,33 +12,65 @@ using net.rezmason.utils.IntHashUtils;
 
 typedef XY = {x:Float, y:Float};
 
-class BoardFactory {
+class BuildBoardRule extends Rule {
 
     // Creates boards for "skirmish games"
-    // I suspect that this is actually a rule. Might refactor in the future
 
-    private inline static var PLAYER_DIST:Int = 9;
-    private inline static var RIM:Int = 1;
-    private inline static var PADDING:Int = 5 + RIM;
-    private inline static var START_ANGLE:Float = 0.75;
+    static var nodeReqs:AspectRequirements;
+    static var playerReqs:AspectRequirements;
+
+    private /*inline*/ static var PLAYER_DIST:Int = 9;
+    private /*inline*/ static var RIM:Int = 1;
+    private /*inline*/ static var PADDING:Int = 5 + RIM;
+    private /*inline*/ static var START_ANGLE:Float = 0.75;
 
     private static var INIT_GRID_CLEANER:EReg = ~/(\n\t)/g;
     private static var NUMERIC_CHAR:EReg = ~/(\d)/g;
 
-    public function new():Void {
+    private var cfg:BoardConfig;
 
+    var occupier_:Int;
+    var isFilled_:Int;
+    var head_:Int;
+
+    public function new(cfg:BoardConfig):Void {
+        super();
+
+        this.cfg = cfg;
+        if (cfg == null) throw "Missing board config.";
+
+        if (nodeReqs == null)  nodeReqs = [
+            OwnershipAspect.IS_FILLED,
+            OwnershipAspect.OCCUPIER,
+        ];
+
+        if (playerReqs == null) playerReqs = [
+            BodyAspect.HEAD,
+        ];
     }
 
-    public function makeBoard(cfg:BoardConfig, history:History<Int>):BoardData {
-        if (cfg == null) return null;
+    override public function init(state:State):Void {
 
-        var nodes:Array<BoardNode> = [];
-        var heads:Array<Int> = [];
+        super.init(state);
+
+        occupier_ = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
+
+        makeBoard();
+    }
+
+    override public function listPlayerAspectRequirements():AspectRequirements { return playerReqs; }
+    override public function listBoardAspectRequirements():AspectRequirements { return nodeReqs; }
+
+    function makeBoard():Void {
+
+        state.nodes = [];
 
         // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
         // Player 1's head is at a 45 degree angle
 
-        var numPlayers:Int = cfg.numPlayers;
+        var numPlayers:Int = state.players.length;
         var headAngle:Float = 2 / numPlayers;
         var boardRadius:Float = (numPlayers == 1) ? 0 : PLAYER_DIST / (2 * Math.sin(Math.PI * headAngle * 0.5));
 
@@ -79,18 +111,14 @@ class BoardFactory {
             coord.y = Std.int(coord.y + PADDING - minCoord.y);
         }
 
-
-
-        var grid:BoardNode = makeSquareGraph(boardWidth, history, nodes);
-        obstructGraphRim(grid, history);
-        populateGraphHeads(grid, headCoords, heads, nodes, history);
-        if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM, history);
-        if (cfg.initGrid != null && cfg.initGrid.length > 0) initGraph(grid, cfg.initGrid, boardWidth, history);
-
-        return {heads:heads, nodes:nodes};
+        var grid:BoardNode = makeSquareGraph(boardWidth);
+        obstructGraphRim(grid);
+        populateGraphHeads(grid, headCoords);
+        if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM);
+        if (cfg.initGrid != null && cfg.initGrid.length > 0) initGraph(grid, cfg.initGrid, boardWidth);
     }
 
-    inline function findMinCoord(coords:Array<XY>):XY {
+    /*inline*/ function findMinCoord(coords:Array<XY>):XY {
         var minX:Float = Math.POSITIVE_INFINITY;
         var minY:Float = Math.POSITIVE_INFINITY;
         for (coord in coords) {
@@ -100,7 +128,7 @@ class BoardFactory {
         return {x:minX, y:minY};
     }
 
-    inline function findMaxCoord(coords:Array<XY>):XY {
+    /*inline*/ function findMaxCoord(coords:Array<XY>):XY {
         var maxX:Float = Math.NEGATIVE_INFINITY;
         var maxY:Float = Math.NEGATIVE_INFINITY;
 
@@ -111,28 +139,25 @@ class BoardFactory {
         return {x:maxX, y:maxY};
     }
 
-    inline function makeNode(history:History<Int>, nodes:Array<BoardNode>):BoardNode {
+    /*inline*/ function makeNode():BoardNode {
         var aspects:Aspects = new Aspects();
-        aspects.set(OwnershipAspect.id, new OwnershipAspect(history));
+        var template:AspectTemplate = state.nodeAspectTemplate;
+        for (val in template) aspects.push(history.alloc(template[val]));
         var node:BoardNode = new BoardNode(aspects);
-        nodes.push(node);
+        state.nodes.push(node);
         return node;
     }
 
-    inline function nodeOwner(node:BoardNode):OwnershipAspect {
-        return cast node.value.get(OwnershipAspect.id);
-    }
-
-    inline function makeSquareGraph(width:Int, history:History<Int>, nodes:Array<BoardNode>):BoardNode {
+    /*inline*/ function makeSquareGraph(width:Int):BoardNode {
 
         // Make a connected grid of nodes with default values
-        var node:BoardNode = makeNode(history, nodes);
-        for (ike in 1...width) node = node.attach(makeNode(history, nodes), Gr.e);
+        var node:BoardNode = makeNode();
+        for (ike in 1...width) node = node.attach(makeNode(), Gr.e);
 
         var row:BoardNode = node.run(Gr.w);
         for (ike in 1...width) {
             for (column in row.walk(Gr.e)) {
-                var next:BoardNode = makeNode(history, nodes);
+                var next:BoardNode = makeNode();
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);
@@ -145,39 +170,38 @@ class BoardFactory {
         return node.run(Gr.nw).run(Gr.n).run(Gr.w);
     }
 
-    inline function obstructGraphRim(grid:BoardNode, history:History<Int>):Void {
-        for (node in grid.walk(Gr.e)) history.set(nodeOwner(node).isFilled, 1);
-        for (node in grid.walk(Gr.s)) history.set(nodeOwner(node).isFilled, 1);
-        for (node in grid.run(Gr.s).walk(Gr.e)) history.set(nodeOwner(node).isFilled, 1);
-        for (node in grid.run(Gr.e).walk(Gr.s)) history.set(nodeOwner(node).isFilled, 1);
+    /*inline*/ function obstructGraphRim(grid:BoardNode):Void {
+        for (node in grid.walk(Gr.e)) history.set(node.value[isFilled_], 1);
+        for (node in grid.walk(Gr.s)) history.set(node.value[isFilled_], 1);
+        for (node in grid.run(Gr.s).walk(Gr.e)) history.set(node.value[isFilled_], 1);
+        for (node in grid.run(Gr.e).walk(Gr.s)) history.set(node.value[isFilled_], 1);
     }
 
-    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>, heads:Array<Int>, nodes:Array<BoardNode>, history:History<Int>):Void {
+    /*inline*/ function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>):Void {
         // Identify and change the occupier of each head node
 
         for (ike in 0...headCoords.length) {
             var coord:XY = headCoords[ike];
             var head:BoardNode = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
-            heads[ike] = nodes.indexOf(head);
-            var ownerAspect:OwnershipAspect = nodeOwner(head);
-            history.set(ownerAspect.isFilled, 1);
-            history.set(ownerAspect.occupier, ike);
+            history.set(state.players[ike][head_], state.nodes.indexOf(head));
+            history.set(head.value[isFilled_], 1);
+            history.set(head.value[occupier_], ike);
         }
     }
 
-    inline function encircleGraph(grid:BoardNode, radius:Float, history:History<Int>):Void {
+    /*inline*/ function encircleGraph(grid:BoardNode, radius:Float):Void {
         // Circular levels' cells are obstructed if they're too far from the board's center
 
         var y:Int = 0;
         for (row in grid.walk(Gr.s)) {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
-                var ownerAspect:OwnershipAspect = nodeOwner(column);
-                if (history.get(ownerAspect.isFilled) == 0) {
+                var isFilled:Int = column.value[isFilled_];
+                if (history.get(isFilled) == 0) {
                     var fx:Float = x - radius + 0.5 - RIM;
                     var fy:Float = y - radius + 0.5 - RIM;
                     var insideCircle:Bool = Math.sqrt(fx * fx + fy * fy) < radius;
-                    if (!insideCircle) history.set(ownerAspect.isFilled, 1);
+                    if (!insideCircle) history.set(isFilled, 1);
                 }
                 x++;
             }
@@ -185,7 +209,7 @@ class BoardFactory {
         }
     }
 
-    inline function initGraph(grid:BoardNode, initGrid:String, boardWidth:Int, history:History<Int>):Void {
+    /*inline*/ function initGraph(grid:BoardNode, initGrid:String, boardWidth:Int):Void {
 
         // Refer to the initGrid to assign initial values to nodes
 
@@ -197,13 +221,12 @@ class BoardFactory {
         for (row in grid.walk(Gr.s)) {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
-                var ownerAspect:OwnershipAspect = nodeOwner(column);
-                if (history.get(ownerAspect.isFilled) == 0) {
+                if (history.get(column.value[isFilled_]) == 0) {
                     var char:String = initGrid.charAt(y * initGridWidth + x + 1);
                     if (char != " ") {
-                        history.set(ownerAspect.isFilled, 1);
-                        if (!NUMERIC_CHAR.match(char)) history.set(ownerAspect.occupier, -1);
-                        else history.set(ownerAspect.occupier, Std.parseInt(char));
+                        history.set(column.value[isFilled_], 1);
+                        if (!NUMERIC_CHAR.match(char)) history.set(column.value[occupier_], -1);
+                        else history.set(column.value[occupier_], Std.parseInt(char));
                     }
                 }
                 x++;

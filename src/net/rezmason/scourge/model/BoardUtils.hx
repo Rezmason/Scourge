@@ -10,18 +10,26 @@ class BoardUtils {
 
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
-    public static function spitGrid(head:BoardNode, history:History<Int>, addSpaces:Bool = true):String {
+    public static function spitBoard(state:State, addSpaces:Bool = true):String {
+
+        if (state.nodes.length == 0) return "empty grid";
+
         var str:String = "";
 
-        var grid:BoardNode = head.run(Gr.nw).run(Gr.w).run(Gr.n);
+        var grid:BoardNode = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n);
+
+        var occupier_:Int = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:Int = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
 
         for (row in grid.walk(Gr.s)) {
             str += "\n";
             for (column in row.walk(Gr.e)) {
-                var ownerAspect:OwnershipAspect = cast column.value.get(OwnershipAspect.id);
+                var occupier:Int = state.history.get(column.value[occupier_]);
+                var isFilled:Int = state.history.get(column.value[isFilled_]);
+
                 str += switch (true) {
-                    case (history.get(ownerAspect.occupier) > -1): "" + history.get(ownerAspect.occupier);
-                    case (history.get(ownerAspect.isFilled) == 1): "X";
+                    case (occupier > -1): "" + occupier;
+                    case (isFilled == 1): "X";
                     default: " ";
                 }
             }

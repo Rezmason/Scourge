@@ -8,6 +8,10 @@ Transform BoardFactory into a Rule
 	It requires OwnershipAspect and BodyAspect
 	It generates the board when it initializes
 
+"PlayerFactory" idea is a rule too
+	Take Player instantiation out of the picture
+	Makes the ply too
+
 DAMN IT, OPTIONS WERE NEVER SPECCED
 	How will these even work with the view or with heuristics
 	This will need to be figured out before rules that have multiple options get written

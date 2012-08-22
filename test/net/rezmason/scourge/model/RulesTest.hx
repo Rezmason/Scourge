@@ -3,7 +3,6 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 
 import net.rezmason.scourge.model.ModelTypes;
-import net.rezmason.scourge.model.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
@@ -29,9 +28,11 @@ class RulesTest
 		history = new History<Int>();
 	}
 
-	@AfterClass
-	public function afterClass():Void {
-	}
+    @AfterClass
+    public function afterClass():Void {
+        history.wipe();
+        history = null;
+    }
 
 	@Before
 	public function setup():Void {
@@ -49,74 +50,85 @@ class RulesTest
 		var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule();
 		state = makeState(TestBoards.spiral, 4, cast [killRule]);
 
+        var occupier_:Int = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:Int = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var freshness_:Int = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var head_:Int = state.playerAspectLookup[BodyAspect.HEAD.id];
+        var currentPlayer_:Int = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+
+
 		var numCells:Int = ~/([^0])/g.replace(TestBoards.spiral, "").length;
 
         var testEvaluator:Evaluator = new TestEvaluator();
         Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
 
-        var ply:PlyAspect = cast state.aspects.get(PlyAspect.id);
+        var currentPlayer:Int = state.aspects[currentPlayer_];
 
-        var body:BodyAspect = cast state.players[history.get(ply.currentPlayer)].get(BodyAspect.id);
-		var playerHead:BoardNode = state.nodes[history.get(body.head)];
+        var head:Int = history.get(state.players[currentPlayer][BodyAspect.HEAD.id]);
+        var playerHead:BoardNode = state.nodes[head];
 		var playerNeck:BoardNode = playerHead.n();
-		var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
-        var neckFresh:FreshnessAspect = cast playerNeck.value.get(FreshnessAspect.id);
 
         // Cut the neck
 
-		history.set(neckOwner.isFilled, 0);
-		history.set(neckOwner.occupier, -1);
-        history.set(neckFresh.freshness, 1);
+		history.set(playerNeck.value[isFilled_], 0);
+		history.set(playerNeck.value[occupier_], -1);
+        history.set(playerNeck.value[freshness_], 1);
 
         Assert.areEqual(1, testEvaluator.evaluate(state)); // only one cell for player 0
 
 		//Pass the State to the Rule for Option generation
 
-		var options:Array<Option> = killRule.getOptions(state);
+		var options:Array<Option> = killRule.getOptions();
 
         Assert.isNotNull(options);
 		Assert.areEqual(1, options.length);
 
 		var reviz:Int = history.revision;
 
-		//trace(BoardUtils.spitGrid(playerHead, history));
+		//trace(BoardUtils.spitBoard(state));
 
-		killRule.chooseOption(state, options[0]);
+		killRule.chooseOption(options[0]);
 
-		//trace(BoardUtils.spitGrid(playerHead, history));
+		//trace(BoardUtils.spitBoard(state));
 
-        numCells = ~/([^0])/g.replace(BoardUtils.spitGrid(playerHead, history), "").length;
+        numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
 		Assert.areEqual(1, numCells); // only one cell for player 0
 	}
 
     @Test
     public function killDisconnectedCellsRuleTest2():Void {
+
         var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule();
         state = makeState(TestBoards.spiralPetri, 1, cast [killRule]);
+
+        var occupier_:Int = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:Int = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var freshness_:Int = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var head_:Int = state.playerAspectLookup[BodyAspect.HEAD.id];
+        var currentPlayer_:Int = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+
         var numCells:Int = ~/([^0])/g.replace(TestBoards.spiralPetri, "").length;
         var testEvaluator:Evaluator = new TestEvaluator();
 
         Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
 
-        var ply:PlyAspect = cast state.aspects.get(PlyAspect.id);
+        var currentPlayer:Int = state.aspects[currentPlayer_];
 
-        var body:BodyAspect = cast state.players[history.get(ply.currentPlayer)].get(BodyAspect.id);
-        var playerHead:BoardNode = state.nodes[history.get(body.head)];
-        var playerNeck:BoardNode = playerHead.s();
-        var neckOwner:OwnershipAspect = cast playerNeck.value.get(OwnershipAspect.id);
-        var neckFresh:FreshnessAspect = cast playerNeck.value.get(FreshnessAspect.id);
+        var head:Int = history.get(state.players[currentPlayer][BodyAspect.HEAD.id]);
+        var playerHead:BoardNode = state.nodes[head];
+        var playerNeck:BoardNode = playerHead.n();
 
         // Cut the neck
 
-        history.set(neckOwner.isFilled, 0);
-        history.set(neckOwner.occupier, -1);
-        history.set(neckFresh.freshness, 1);
+        history.set(playerNeck.value[isFilled_], 0);
+        history.set(playerNeck.value[occupier_], -1);
+        history.set(playerNeck.value[freshness_], 1);
 
-        //trace(BoardUtils.spitGrid(playerHead, history));
-        killRule.chooseOption(state, killRule.getOptions(state)[0]);
-        //trace(BoardUtils.spitGrid(playerHead, history));
+        //trace(BoardUtils.spitBoard(state));
+        killRule.chooseOption(killRule.getOptions()[0]);
+        //trace(BoardUtils.spitBoard(state));
 
-        numCells = ~/([^0])/g.replace(BoardUtils.spitGrid(playerHead, history), "").length;
+        numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
         Assert.areEqual(1, numCells); // only one cell for player 0
     }
 

@@ -1,4 +1,4 @@
- Flash 9+
+#Flash 9+
 -main TestMain
 -lib munit
 -lib hamcrest
