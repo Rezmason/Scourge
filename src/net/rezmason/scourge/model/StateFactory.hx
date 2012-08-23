@@ -58,7 +58,11 @@ class StateFactory {
         state.aspects = createAspects(state.stateAspectTemplate, history);
 
         state.players = [];
+
         for (ike in 0...cfg.numPlayers) state.players.push(createAspects(state.playerAspectTemplate, history));
+
+        state.nodes = [];
+
 
         for (rule in rules) rule.init(state);
 
@@ -75,7 +79,7 @@ class StateFactory {
 
     inline function createAspects(template:AspectTemplate, history:History<Int>):Aspects {
         var aspects:Aspects = new Aspects();
-        for (val in template) aspects.push(history.alloc(template[val]));
+        for (val in template) aspects.push(history.alloc(val));
         return aspects;
     }
 }

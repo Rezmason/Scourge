@@ -11,7 +11,7 @@ import net.rezmason.scourge.model.rules.BuildBoardRule;
 
 using net.rezmason.scourge.model.GridUtils;
 
-class BoardFactoryTest {
+class BoardRuleTest {
 
     var history:History<Int>;
 
@@ -45,10 +45,21 @@ class BoardFactoryTest {
         var buildBoardRule = new BuildBoardRule(cfg);
         var state:State = makeState(4, [buildBoardRule]);
 
-        var occupier_:Int = state.nodeAspectTemplate[OwnershipAspect.OCCUPIER.id];
-        var head_:Int = state.nodeAspectTemplate[BodyAspect.HEAD.id];
+        var occupier_:Int = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var head_:Int = state.playerAspectLookup[BodyAspect.HEAD.id];
 
-        for (player in state.players) Assert.areNotEqual(-1, player[head_]);
+        Assert.isNotNull(occupier_);
+        Assert.isNotNull(head_);
+
+        for (player in state.players) {
+            Assert.isNotNull(player[head_]);
+            Assert.areNotEqual(-1, player[head_]);
+        }
+
+        for (node in state.nodes) {
+            Assert.isNotNull(node);
+            Assert.isNotNull(history.get(node.value[occupier_]));
+        }
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
@@ -65,14 +76,14 @@ class BoardFactoryTest {
             history.set(neighbor.value[occupier_], 0);
         }
 
-        Assert.areEqual(0, playerHead.nw().value[occupier_]);
-        Assert.areEqual(0, playerHead.n().value[occupier_]);
-        Assert.areEqual(0, playerHead.ne().value[occupier_]);
-        Assert.areEqual(0, playerHead.e().value[occupier_]);
-        Assert.areEqual(0, playerHead.se().value[occupier_]);
-        Assert.areEqual(0, playerHead.s().value[occupier_]);
-        Assert.areEqual(0, playerHead.sw().value[occupier_]);
-        Assert.areEqual(0, playerHead.w().value[occupier_]);
+        Assert.areEqual(0, history.get(playerHead.nw().value[occupier_]));
+        Assert.areEqual(0, history.get(playerHead.n().value[occupier_]));
+        Assert.areEqual(0, history.get(playerHead.ne().value[occupier_]));
+        Assert.areEqual(0, history.get(playerHead.e().value[occupier_]));
+        Assert.areEqual(0, history.get(playerHead.se().value[occupier_]));
+        Assert.areEqual(0, history.get(playerHead.s().value[occupier_]));
+        Assert.areEqual(0, history.get(playerHead.sw().value[occupier_]));
+        Assert.areEqual(0, history.get(playerHead.w().value[occupier_]));
     }
 
     @Test
@@ -109,6 +120,8 @@ class BoardFactoryTest {
         #end
 
         Assert.areEqual(TestBoards.spiral, BoardUtils.spitBoard(state, false));
+
+        //trace(history.dump());
     }
 
     private function makeState(numPlayers:Int, rules:Array<Rule>):State {

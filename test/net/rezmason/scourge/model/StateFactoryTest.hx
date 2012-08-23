@@ -53,8 +53,9 @@ class StateFactoryTest {
         // Make sure there's the right aspects on each node
         var nodeTestValue_:Int = state.nodeAspectLookup[TestAspect.VALUE.id];
         Assert.areNotEqual(-1, nodeTestValue_);
-        for (ike in 0...state.nodes.length) {
-            Assert.isNotNull(history.get(state.nodes[ike].value[nodeTestValue_]));
+
+        for (node in state.nodes) {
+            Assert.isNotNull(history.get(node.value[nodeTestValue_]));
         }
     }
 }

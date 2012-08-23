@@ -65,8 +65,6 @@ class BuildBoardRule extends Rule {
 
     function makeBoard():Void {
 
-        state.nodes = [];
-
         // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
         // Player 1's head is at a 45 degree angle
 
@@ -142,7 +140,7 @@ class BuildBoardRule extends Rule {
     /*inline*/ function makeNode():BoardNode {
         var aspects:Aspects = new Aspects();
         var template:AspectTemplate = state.nodeAspectTemplate;
-        for (val in template) aspects.push(history.alloc(template[val]));
+        for (val in template) aspects.push(history.alloc(val));
         var node:BoardNode = new BoardNode(aspects);
         state.nodes.push(node);
         return node;

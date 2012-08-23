@@ -60,6 +60,7 @@ class RulesTest
 		var numCells:Int = ~/([^0])/g.replace(TestBoards.spiral, "").length;
 
         var testEvaluator:Evaluator = new TestEvaluator();
+
         Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
 
         var currentPlayer:Int = state.aspects[currentPlayer_];
