@@ -19,10 +19,10 @@ class BuildBoardRule extends Rule {
     static var nodeReqs:AspectRequirements;
     static var playerReqs:AspectRequirements;
 
-    private /*inline*/ static var PLAYER_DIST:Int = 9;
-    private /*inline*/ static var RIM:Int = 1;
-    private /*inline*/ static var PADDING:Int = 5 + RIM;
-    private /*inline*/ static var START_ANGLE:Float = 0.75;
+    private inline static var PLAYER_DIST:Int = 9;
+    private inline static var RIM:Int = 1;
+    private inline static var PADDING:Int = 5 + RIM;
+    private inline static var START_ANGLE:Float = 0.75;
 
     private static var INIT_GRID_CLEANER:EReg = ~/(\n\t)/g;
     private static var NUMERIC_CHAR:EReg = ~/(\d)/g;
@@ -116,7 +116,7 @@ class BuildBoardRule extends Rule {
         if (cfg.initGrid != null && cfg.initGrid.length > 0) initGraph(grid, cfg.initGrid, boardWidth);
     }
 
-    /*inline*/ function findMinCoord(coords:Array<XY>):XY {
+    inline function findMinCoord(coords:Array<XY>):XY {
         var minX:Float = Math.POSITIVE_INFINITY;
         var minY:Float = Math.POSITIVE_INFINITY;
         for (coord in coords) {
@@ -126,7 +126,7 @@ class BuildBoardRule extends Rule {
         return {x:minX, y:minY};
     }
 
-    /*inline*/ function findMaxCoord(coords:Array<XY>):XY {
+    inline function findMaxCoord(coords:Array<XY>):XY {
         var maxX:Float = Math.NEGATIVE_INFINITY;
         var maxY:Float = Math.NEGATIVE_INFINITY;
 
@@ -137,7 +137,7 @@ class BuildBoardRule extends Rule {
         return {x:maxX, y:maxY};
     }
 
-    /*inline*/ function makeNode():BoardNode {
+    inline function makeNode():BoardNode {
         var aspects:Aspects = new Aspects();
         var template:AspectTemplate = state.nodeAspectTemplate;
         for (val in template) aspects.push(history.alloc(val));
@@ -146,7 +146,7 @@ class BuildBoardRule extends Rule {
         return node;
     }
 
-    /*inline*/ function makeSquareGraph(width:Int):BoardNode {
+    inline function makeSquareGraph(width:Int):BoardNode {
 
         // Make a connected grid of nodes with default values
         var node:BoardNode = makeNode();
@@ -168,14 +168,14 @@ class BuildBoardRule extends Rule {
         return node.run(Gr.nw).run(Gr.n).run(Gr.w);
     }
 
-    /*inline*/ function obstructGraphRim(grid:BoardNode):Void {
+    inline function obstructGraphRim(grid:BoardNode):Void {
         for (node in grid.walk(Gr.e)) history.set(node.value[isFilled_], 1);
         for (node in grid.walk(Gr.s)) history.set(node.value[isFilled_], 1);
         for (node in grid.run(Gr.s).walk(Gr.e)) history.set(node.value[isFilled_], 1);
         for (node in grid.run(Gr.e).walk(Gr.s)) history.set(node.value[isFilled_], 1);
     }
 
-    /*inline*/ function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>):Void {
+    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>):Void {
         // Identify and change the occupier of each head node
 
         for (ike in 0...headCoords.length) {
@@ -187,7 +187,7 @@ class BuildBoardRule extends Rule {
         }
     }
 
-    /*inline*/ function encircleGraph(grid:BoardNode, radius:Float):Void {
+    inline function encircleGraph(grid:BoardNode, radius:Float):Void {
         // Circular levels' cells are obstructed if they're too far from the board's center
 
         var y:Int = 0;
@@ -207,7 +207,7 @@ class BuildBoardRule extends Rule {
         }
     }
 
-    /*inline*/ function initGraph(grid:BoardNode, initGrid:String, boardWidth:Int):Void {
+    inline function initGraph(grid:BoardNode, initGrid:String, boardWidth:Int):Void {
 
         // Refer to the initGrid to assign initial values to nodes
 

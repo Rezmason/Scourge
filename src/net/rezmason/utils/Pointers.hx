@@ -1,13 +1,8 @@
 package net.rezmason.utils;
 
-typedef Pointer<T> = #if USE_POINTERS { var addr(default, null):Int; } #else Int #end ;
+typedef Pointer<T> = #if USE_POINTERS {>Int,} #else Int #end ;
 
 class Pointers {
-    public inline static function d<T>(pointer:Pointer<T>, array:Array<T>):T {
-        return array[#if USE_POINTERS pointer.addr #else pointer #end];
-    }
-
-    public inline static function addr<T>(array:Array<T>, index:Int):Pointer<T> {
-        return #if USE_POINTERS {addr:index} #else index #end;
-    }
+    public inline static function d<T>(p:Pointer<T>, a:Array<T>):T { return a[untyped p]; }
+    public inline static function ptr<T>(a:Array<T>, i:Int):Pointer<T> { return untyped i; }
 }
