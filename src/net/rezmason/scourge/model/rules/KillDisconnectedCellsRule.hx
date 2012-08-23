@@ -26,6 +26,7 @@ class KillDisconnectedCellsRule extends Rule {
         if (nodeReqs == null)  nodeReqs = [
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
+            FreshnessAspect.FRESHNESS,
         ];
 
         if (playerReqs == null) playerReqs = [
@@ -54,27 +55,29 @@ class KillDisconnectedCellsRule extends Rule {
             var nodesInPlay:Array<BoardNode> = [];
 
             var heads:Array<BoardNode> = [];
-            for (player in state.players) heads.push(state.nodes[history.get(player[head_])]);
+            for (ike in 0...state.players.length) {
+                var head:Int = history.get(state.players[ike][head_]);
+                heads.push(state.nodes[head]);
+            }
 
             var candidates:Array<BoardNode> = heads.expandGraph(true, isCandidate);
             var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(true, isLivingBodyNeighbor);
 
-            for (candidate in candidates) {
-                if (!livingBodyNeighbors.has(candidate)) killCell(candidate.value);
-            }
+            for (candidate in candidates) if (!livingBodyNeighbors.has(candidate)) killCell(candidate.value);
         }
     }
 
     function isCandidate(me:Aspects, you:Aspects):Bool {
         var occupier:Int = history.get(me[occupier_]);
+        var isFilled:Int = history.get(me[isFilled_]);
         var freshness:Int = history.get(me[freshness_]);
-        if (occupier > 0 && occupier > -1) return true;
+        if (isFilled > 0 && occupier > -1) return true;
         else if (freshness > 0) return true;
         return false;
     }
 
     function isLivingBodyNeighbor(me:Aspects, you:Aspects):Bool {
-        if (history.get(me[isFilled_]) > 0) return true;
+        if (history.get(me[isFilled_]) == 0) return false;
         return history.get(me[occupier_]) == history.get(you[occupier_]);
     }
 

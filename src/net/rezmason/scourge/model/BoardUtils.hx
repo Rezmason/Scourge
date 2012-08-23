@@ -2,6 +2,7 @@ package net.rezmason.scourge.model;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.GridNode;
+import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using net.rezmason.scourge.model.GridUtils;
@@ -20,14 +21,19 @@ class BoardUtils {
 
         var occupier_:Int = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         var isFilled_:Int = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var freshness_:Int = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
 
         for (row in grid.walk(Gr.s)) {
             str += "\n";
             for (column in row.walk(Gr.e)) {
+
+                var freshness:Int = (freshness_ == null) ? 0 : state.history.get(column.value[freshness_]);
+
                 var occupier:Int = state.history.get(column.value[occupier_]);
                 var isFilled:Int = state.history.get(column.value[isFilled_]);
 
                 str += switch (true) {
+                    case (freshness > 0): "F";
                     case (occupier > -1): "" + occupier;
                     case (isFilled == 1): "X";
                     default: " ";
