@@ -44,6 +44,7 @@
 -cp src
 -debug
 #-D VISUAL_TEST
+-D USE_POINTERS
 
 -cp test
 -neko build/neko_test.n
