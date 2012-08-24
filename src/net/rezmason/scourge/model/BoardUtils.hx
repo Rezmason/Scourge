@@ -18,8 +18,8 @@ class BoardUtils {
 
         var grid:BoardNode = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n);
 
-        var occupier_:Int = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:Int = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
 
         for (row in grid.walk(Gr.s)) {
             str += "\n";

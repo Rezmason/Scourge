@@ -15,10 +15,10 @@ class KillDisconnectedCellsRule extends Rule {
     static var playerReqs:AspectRequirements;
     static var option:Option = new Option();
 
-    var occupier_:Int;
-    var isFilled_:Int;
-    var freshness_:Int;
-    var head_:Int;
+    var occupier_:AspectPtr;
+    var isFilled_:AspectPtr;
+    var freshness_:AspectPtr;
+    var head_:AspectPtr;
 
     public function new():Void {
         super();
@@ -67,7 +67,7 @@ class KillDisconnectedCellsRule extends Rule {
         }
     }
 
-    function isCandidate(me:Aspects, you:Aspects):Bool {
+    function isCandidate(me:AspectSet, you:AspectSet):Bool {
         var occupier:Int = history.get(me[occupier_]);
         var isFilled:Int = history.get(me[isFilled_]);
         var freshness:Int = history.get(me[freshness_]);
@@ -76,12 +76,12 @@ class KillDisconnectedCellsRule extends Rule {
         return false;
     }
 
-    function isLivingBodyNeighbor(me:Aspects, you:Aspects):Bool {
+    function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
         if (history.get(me[isFilled_]) == 0) return false;
         return history.get(me[occupier_]) == history.get(you[occupier_]);
     }
 
-    function killCell(me:Aspects):Void {
+    function killCell(me:AspectSet):Void {
         history.set(me[occupier_], -1);
         history.set(me[isFilled_], 0);
         history.set(me[freshness_], 0);

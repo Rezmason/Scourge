@@ -29,9 +29,9 @@ class BuildBoardRule extends Rule {
 
     private var cfg:BoardConfig;
 
-    var occupier_:Int;
-    var isFilled_:Int;
-    var head_:Int;
+    var occupier_:AspectPtr;
+    var isFilled_:AspectPtr;
+    var head_:AspectPtr;
 
     public function new(cfg:BoardConfig):Void {
         super();
@@ -138,7 +138,7 @@ class BuildBoardRule extends Rule {
     }
 
     inline function makeNode():BoardNode {
-        var aspects:Aspects = new Aspects();
+        var aspects:AspectSet = new AspectSet();
         var template:AspectTemplate = state.nodeAspectTemplate;
         for (val in template) aspects.push(history.alloc(val));
         var node:BoardNode = new BoardNode(aspects);
@@ -194,7 +194,7 @@ class BuildBoardRule extends Rule {
         for (row in grid.walk(Gr.s)) {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
-                var isFilled:Int = column.value[isFilled_];
+                var isFilled:HistPtr = column.value[isFilled_];
                 if (history.get(isFilled) == 0) {
                     var fx:Float = x - radius + 0.5 - RIM;
                     var fy:Float = y - radius + 0.5 - RIM;

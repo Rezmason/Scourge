@@ -45,8 +45,8 @@ class BoardRuleTest {
         var buildBoardRule = new BuildBoardRule(cfg);
         var state:State = makeState(4, [buildBoardRule]);
 
-        var occupier_:Int = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var head_:Int = state.playerAspectLookup[BodyAspect.HEAD.id];
+        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
 
         Assert.isNotNull(occupier_);
         Assert.isNotNull(head_);

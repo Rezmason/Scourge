@@ -6,8 +6,8 @@ class State {
 
     public var history:StateHistory;
 
-    public var aspects:Aspects;
-    public var players:Array<Aspects>;
+    public var aspects:AspectSet;
+    public var players:Array<AspectSet>;
     public var nodes:Array<BoardNode>;
 
     public var stateAspectTemplate:AspectTemplate;

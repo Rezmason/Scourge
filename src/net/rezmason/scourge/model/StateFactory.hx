@@ -50,16 +50,16 @@ class StateFactory {
         state.playerAspectTemplate = [];
         state.nodeAspectTemplate = [];
 
-        bakeAspects(stateRequirements, state.stateAspectLookup, state.stateAspectTemplate);
-        bakeAspects(playerRequirements, state.playerAspectLookup, state.playerAspectTemplate);
-        bakeAspects(nodeRequirements, state.nodeAspectLookup, state.nodeAspectTemplate);
+        bakeAspectSet(stateRequirements, state.stateAspectLookup, state.stateAspectTemplate);
+        bakeAspectSet(playerRequirements, state.playerAspectLookup, state.playerAspectTemplate);
+        bakeAspectSet(nodeRequirements, state.nodeAspectLookup, state.nodeAspectTemplate);
 
         // Populate the game state with aspects, players and nodes
-        state.aspects = createAspects(state.stateAspectTemplate, history);
+        state.aspects = createAspectSet(state.stateAspectTemplate, history);
 
         state.players = [];
 
-        for (ike in 0...cfg.numPlayers) state.players.push(createAspects(state.playerAspectTemplate, history));
+        for (ike in 0...cfg.numPlayers) state.players.push(createAspectSet(state.playerAspectTemplate, history));
 
         state.nodes = [];
 
@@ -69,16 +69,16 @@ class StateFactory {
         return state;
     }
 
-    function bakeAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectTemplate):Void {
+    function bakeAspectSet(requirements:AspectRequirements, lookup:AspectLookup, template:AspectTemplate):Void {
         for (ike in 0...requirements.length) {
             var prop:AspectProperty = requirements[ike];
-            lookup[prop.id] = ike;
+            lookup[prop.id] = untyped ike; // Pointer arithmetic
             template[ike] = prop.initialValue;
         }
     }
 
-    inline function createAspects(template:AspectTemplate, history:StateHistory):Aspects {
-        var aspects:Aspects = new Aspects();
+    inline function createAspectSet(template:AspectTemplate, history:StateHistory):AspectSet {
+        var aspects:AspectSet = new AspectSet();
         for (val in template) aspects.push(history.alloc(val));
         return aspects;
     }

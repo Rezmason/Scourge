@@ -51,11 +51,11 @@ class RulesTest
 		var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule();
 		state = makeState(TestBoards.spiral, 4, cast [killRule]);
 
-        var occupier_:Int = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:Int = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        var freshness_:Int = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var head_:Int = state.playerAspectLookup[BodyAspect.HEAD.id];
-        var currentPlayer_:Int = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
+        var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
 
 
 		var numCells:Int = ~/([^0])/g.replace(TestBoards.spiral, "").length;
@@ -103,11 +103,11 @@ class RulesTest
         var killRule:KillDisconnectedCellsRule = new KillDisconnectedCellsRule();
         state = makeState(TestBoards.spiralPetri, 1, cast [killRule]);
 
-        var occupier_:Int = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:Int = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        var freshness_:Int = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var head_:Int = state.playerAspectLookup[BodyAspect.HEAD.id];
-        var currentPlayer_:Int = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
+        var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
 
         var numCells:Int = ~/([^0])/g.replace(TestBoards.spiralPetri, "").length;
         var testEvaluator:Evaluator = new TestEvaluator();

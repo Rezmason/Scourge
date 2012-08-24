@@ -39,19 +39,19 @@ class StateFactoryTest {
 
         // Make sure there's the right aspects on the state
 
-        var stateTestValue_:Int = state.stateAspectLookup[TestAspect.VALUE.id];
+        var stateTestValue_:AspectPtr = state.stateAspectLookup[TestAspect.VALUE.id];
         Assert.areNotEqual(-1, stateTestValue_);
         Assert.isNotNull(history.get(state.aspects[stateTestValue_]));
 
         // Make sure there's the right aspects on each player
-        var playerTestValue_:Int = state.playerAspectLookup[TestAspect.VALUE.id];
+        var playerTestValue_:AspectPtr = state.playerAspectLookup[TestAspect.VALUE.id];
         Assert.areNotEqual(-1, playerTestValue_);
         for (ike in 0...state.players.length) {
             Assert.isNotNull(history.get(state.players[ike][playerTestValue_]));
         }
 
         // Make sure there's the right aspects on each node
-        var nodeTestValue_:Int = state.nodeAspectLookup[TestAspect.VALUE.id];
+        var nodeTestValue_:AspectPtr = state.nodeAspectLookup[TestAspect.VALUE.id];
         Assert.areNotEqual(-1, nodeTestValue_);
 
         for (node in state.nodes) {

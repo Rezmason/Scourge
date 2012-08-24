@@ -6,6 +6,8 @@ import net.rezmason.scourge.model.History;
 
 using Lambda;
 
+using net.rezmason.utils.Pointers;
+
 class HistoryTest
 {
     @Test
@@ -18,9 +20,8 @@ class HistoryTest
         Assert.areEqual(0, history.revision);
         Assert.areEqual(1, history.commit()); // Commit with no subscribers
 
-        var propA:Int = history.alloc(0);
-        var propB:Int = history.alloc(0);
-        var propC:Int = -1;
+        var propA:Ptr<Int> = history.alloc(0);
+        var propB:Ptr<Int> = history.alloc(0);
 
         history.set(propA, 0);
 
@@ -34,7 +35,7 @@ class HistoryTest
         history.set(propA, 3);
         history.set(propB, 3);
 
-        propC = history.alloc(3); // Late subscription
+        var propC:Ptr<Int> = history.alloc(3); // Late subscription
 
         Assert.areEqual(5, history.commit()); // Commit
 
@@ -87,24 +88,37 @@ class HistoryTest
 
         history.wipe();
         Assert.areEqual(0, history.revision);
-        for (ike in 0...history.length) Assert.isNull(history.get(ike));
+        threwError = false;
+        try {
+            history.get(propA);
+        } catch (error:Dynamic) {
+            threwError = true;
+        }
 
-        var propD:Int = history.alloc(1);
+        Assert.isTrue(threwError);
+
+
+        var propD:Ptr<Int> = history.alloc(1);
 
         Assert.areEqual(1, history.commit()); // Commit after wipe
 
-        for (ike in 0...100) history.alloc(1);
+        var pointers:Array<Ptr<Int>> = [];
+
+        for (ike in 0...100) pointers[ike] = history.alloc(1);
 
         history.forget();
 
-        for (ike in 0...100) Assert.areEqual(1, history.get(ike));
+        for (ike in 0...100) Assert.areEqual(1, history.get(pointers[ike]));
         Assert.areEqual(0, history.revision);
 
         history.wipe();
 
+        var propE:Ptr<Int> = history.alloc(0);
+        history.wipe();
+
         threwError = false;
         try {
-            history.get(0);
+            history.get(propE);
         } catch (error:Dynamic) {
             threwError = true;
         }

@@ -2,15 +2,19 @@ package net.rezmason.scourge.model;
 
 import net.rezmason.scourge.model.Aspect;
 
-typedef AspectProperty = {id:Int, initialValue:Int};
+using net.rezmason.utils.Pointers;
 
-typedef Aspects = Array<Int>;
-typedef AspectTemplate = Array<Int>;
-typedef AspectLookup = Array<Int>;
+private typedef Atom = Null<Int>; // Our low-level value type
+
+typedef AspectProperty = {id:Int, initialValue:Atom}; // The distinct possible properties of our state
 typedef AspectRequirements = Array<AspectProperty>;
 
-typedef StateHistory = History<Null<Int>>;
+typedef HistPtr = Ptr<Int>;
+typedef AspectPtr = Ptr<HistPtr>;
 
-typedef BoardNode = GridNode<Aspects>;
+typedef AspectTemplate = Array<Atom>; // The default values required when creating a new AspectSet
+typedef AspectSet = Array<HistPtr>; // The properties of an element of the state
+typedef AspectLookup = Array<AspectPtr>; // The indices of property types in the AspectSet of an element
 
-typedef BoardData = {heads:Array<Int>, nodes:Array<BoardNode>};
+typedef StateHistory = History<Atom>;
+typedef BoardNode = GridNode<AspectSet>;

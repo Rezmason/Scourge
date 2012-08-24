@@ -1,7 +1,3 @@
-Switch to using Pointers, like, everywhere
-	Use it in the History
-	Then retype the ModelTypes
-
 "PlayerFactory" idea is a rule too
 	Take Player instantiation out of the picture
 	Makes the ply too
