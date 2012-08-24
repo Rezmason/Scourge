@@ -9,6 +9,7 @@ using Lambda;
 using Std;
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.ArrayUtils;
+using net.rezmason.utils.Pointers;
 
 class StateFactory {
     public function new():Void {
@@ -72,7 +73,7 @@ class StateFactory {
     function bakeAspectSet(requirements:AspectRequirements, lookup:AspectLookup, template:AspectTemplate):Void {
         for (ike in 0...requirements.length) {
             var prop:AspectProperty = requirements[ike];
-            lookup[prop.id] = untyped ike; // Pointer arithmetic
+            lookup[prop.id] = ike.pointerArithmetic();
             template[ike] = prop.initialValue;
         }
     }
