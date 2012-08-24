@@ -8,6 +8,7 @@ import net.rezmason.scourge.model.Aspect;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
+import net.rezmason.scourge.model.rules.DraftPlayersRule;
 
 using net.rezmason.scourge.model.GridUtils;
 
@@ -39,11 +40,15 @@ class BoardRuleTest {
     @Test
     public function configTest1():Void {
 
-        var cfg:BoardConfig = new BoardConfig();
-        cfg.circular = false;
+        var boardCfg:BoardConfig = new BoardConfig();
+        boardCfg.circular = false;
+        var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
-        var buildBoardRule = new BuildBoardRule(cfg);
-        var state:State = makeState(4, [buildBoardRule]);
+        var playerCfg:PlayerConfig = new PlayerConfig();
+        playerCfg.numPlayers = 4;
+        var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
+
+        var state:State = makeState([draftPlayersRule, buildBoardRule]);
 
         var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
@@ -89,12 +94,15 @@ class BoardRuleTest {
     @Test
     public function configTest2():Void {
 
-        var cfg:BoardConfig = new BoardConfig();
-        cfg.circular = true;
+        var boardCfg:BoardConfig = new BoardConfig();
+        boardCfg.circular = true;
+        var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
-        var buildBoardRule = new BuildBoardRule(cfg);
+        var playerCfg:PlayerConfig = new PlayerConfig();
+        playerCfg.numPlayers = 1;
+        var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
 
-        var state:State = makeState(1, [buildBoardRule]);
+        var state:State = makeState([draftPlayersRule, buildBoardRule]);
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
@@ -107,12 +115,17 @@ class BoardRuleTest {
     @Test
     public function configTest3():Void {
 
-        var cfg:BoardConfig = new BoardConfig();
-        cfg.initGrid = TestBoards.spiral;
+        var boardCfg:BoardConfig = new BoardConfig();
+        boardCfg.circular = false;
+        boardCfg.initGrid = TestBoards.spiral;
+        var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
-        var buildBoardRule = new BuildBoardRule(cfg);
+        var playerCfg:PlayerConfig = new PlayerConfig();
 
-        var state:State = makeState(4, [buildBoardRule]);
+        playerCfg.numPlayers = 4;
+        var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
+
+        var state:State = makeState([draftPlayersRule, buildBoardRule]);
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be a four-player board with a spiral interior");
@@ -124,11 +137,10 @@ class BoardRuleTest {
         //trace(history.dump());
     }
 
-    private function makeState(numPlayers:Int, rules:Array<Rule>):State {
+    private function makeState(rules:Array<Rule>):State {
         history.wipe();
         var factory:StateFactory = new StateFactory();
         var stateCfg:StateConfig = new StateConfig();
-        stateCfg.numPlayers = numPlayers;
         stateCfg.rules = rules;
         return factory.makeState(stateCfg, history);
     }

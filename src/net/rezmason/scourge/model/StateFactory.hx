@@ -18,12 +18,10 @@ class StateFactory {
 
     public function makeState(cfg:StateConfig, history:StateHistory):State {
         if (cfg == null) return null;
-        if (cfg.numPlayers < 1) return null;
         if (cfg.rules == null) return null;
 
         var state:State = new State();
         state.history = history;
-
 
         var rules:Array<Rule> = cfg.rules;
         while (rules.has(null)) rules.remove(null);
@@ -59,11 +57,7 @@ class StateFactory {
         state.aspects = createAspectSet(state.stateAspectTemplate, history);
 
         state.players = [];
-
-        for (ike in 0...cfg.numPlayers) state.players.push(createAspectSet(state.playerAspectTemplate, history));
-
         state.nodes = [];
-
 
         for (rule in rules) rule.init(state);
 

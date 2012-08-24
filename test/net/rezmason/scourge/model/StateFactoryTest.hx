@@ -31,11 +31,8 @@ class StateFactoryTest {
         // make state config and generate state
         var factory:StateFactory = new StateFactory();
         var stateCfg:StateConfig = new StateConfig();
-        stateCfg.numPlayers = 2;
         stateCfg.rules = [null, new TestRule()];
         var state:State = factory.makeState(stateCfg, history);
-
-        Assert.areEqual(stateCfg.numPlayers, state.players.length);
 
         // Make sure there's the right aspects on the state
 

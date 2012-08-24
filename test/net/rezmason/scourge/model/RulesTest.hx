@@ -9,6 +9,7 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.rules.KillDisconnectedCellsRule;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
+import net.rezmason.scourge.model.rules.DraftPlayersRule;
 import net.rezmason.scourge.model.evaluators.TestEvaluator;
 //import net.rezmason.scourge.model.GridNode;
 
@@ -153,24 +154,29 @@ class RulesTest
 		*/
 	}
 
-	private function makeState(initGrid:String, numPlayers:Int, otherRules:Array<Rule>):State {
+    private function makeState(initGrid:String, numPlayers:Int, rules:Array<Rule>):State {
 
 		history.wipe();
 
+        // make player config and generate players
+        var playerCfg:PlayerConfig = new PlayerConfig();
+        playerCfg.numPlayers = numPlayers;
+
+        var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
+
         // make board config and generate board
         var boardCfg:BoardConfig = new BoardConfig();
-        boardCfg.circular = false;
         boardCfg.initGrid = initGrid;
 
-        otherRules.unshift(new BuildBoardRule(boardCfg));
+        var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
+
+        rules.unshift(buildBoardRule);
+        rules.unshift(draftPlayersRule);
 
         // make state config and generate state
         var factory:StateFactory = new StateFactory();
         var stateCfg:StateConfig = new StateConfig();
-        //stateCfg.playerHeads = boardData.heads;
-        stateCfg.numPlayers = numPlayers;
-        stateCfg.rules = otherRules;
-        //stateCfg.nodes = boardData.nodes;
+        stateCfg.rules = rules;
 
         return factory.makeState(stateCfg, history);
 	}
