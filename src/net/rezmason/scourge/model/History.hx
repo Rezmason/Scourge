@@ -94,12 +94,12 @@ class History<T> {
         return revision;
     }
 
-    public inline function alloc(val:T):Int {
+    public inline function alloc(val:Null<T>):Int {
         array[length] = val;
         return length++;
     }
 
-    public inline function get(index:Int):T {
+    public inline function get(index:Int):Null<T> {
 
         if (length == 0)
         {
@@ -113,7 +113,7 @@ class History<T> {
         return array[index];
     }
 
-    public inline function set(index:Int, val:T):T {
+    public inline function set(index:Int, val:Null<T>):Null<T> {
 
         if (length == 0)
         {

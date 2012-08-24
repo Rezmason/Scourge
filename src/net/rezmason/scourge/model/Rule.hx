@@ -19,7 +19,7 @@ class Rule {
     */
 
     var state:State;
-    var history:History<Int>;
+    var history:StateHistory;
 
     public function new():Void { }
 

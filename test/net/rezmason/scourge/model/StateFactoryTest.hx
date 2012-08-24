@@ -26,7 +26,7 @@ class StateFactoryTest {
     @Test
     public function configTest1():Void {
 
-        var history:History<Int> = new History<Int>();
+        var history:StateHistory = new StateHistory();
 
         // make state config and generate state
         var factory:StateFactory = new StateFactory();

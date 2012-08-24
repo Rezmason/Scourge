@@ -4,7 +4,7 @@ import net.rezmason.scourge.model.ModelTypes;
 
 class State {
 
-    public var history:History<Int>;
+    public var history:StateHistory;
 
     public var aspects:Aspects;
     public var players:Array<Aspects>;

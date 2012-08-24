@@ -10,7 +10,7 @@ class TestEvaluator extends Evaluator {
 
     override public function evaluate(state:State):Int {
 
-        var history:History<Int> = state.history;
+        var history:StateHistory = state.history;
 
         var currentPlayer_:Int = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
         var currentPlayer:Int = history.get(state.aspects[currentPlayer_]);

@@ -13,11 +13,11 @@ using net.rezmason.scourge.model.GridUtils;
 
 class BoardRuleTest {
 
-    var history:History<Int>;
+    var history:StateHistory;
 
     @BeforeClass
     public function beforeClass():Void {
-        history = new History<Int>();
+        history = new StateHistory();
     }
 
     @AfterClass

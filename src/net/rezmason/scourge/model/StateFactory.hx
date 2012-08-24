@@ -15,7 +15,7 @@ class StateFactory {
 
     }
 
-    public function makeState(cfg:StateConfig, history:History<Int>):State {
+    public function makeState(cfg:StateConfig, history:StateHistory):State {
         if (cfg == null) return null;
         if (cfg.numPlayers < 1) return null;
         if (cfg.rules == null) return null;
@@ -77,7 +77,7 @@ class StateFactory {
         }
     }
 
-    inline function createAspects(template:AspectTemplate, history:History<Int>):Aspects {
+    inline function createAspects(template:AspectTemplate, history:StateHistory):Aspects {
         var aspects:Aspects = new Aspects();
         for (val in template) aspects.push(history.alloc(val));
         return aspects;

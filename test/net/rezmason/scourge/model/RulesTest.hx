@@ -16,7 +16,7 @@ using net.rezmason.scourge.model.GridUtils;
 
 class RulesTest
 {
-	var history:History<Int>;
+	var history:StateHistory;
 
     var state:State;
 
@@ -26,7 +26,7 @@ class RulesTest
 
 	@BeforeClass
 	public function beforeClass():Void {
-		history = new History<Int>();
+		history = new StateHistory();
 	}
 
     @AfterClass

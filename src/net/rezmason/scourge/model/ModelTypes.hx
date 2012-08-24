@@ -9,6 +9,8 @@ typedef AspectTemplate = Array<Int>;
 typedef AspectLookup = Array<Int>;
 typedef AspectRequirements = Array<AspectProperty>;
 
+typedef StateHistory = History<Null<Int>>;
+
 typedef BoardNode = GridNode<Aspects>;
 
 typedef BoardData = {heads:Array<Int>, nodes:Array<BoardNode>};

@@ -13,7 +13,7 @@ class HistoryTest
     {
         var threwError:Bool;
 
-        var history:History<Int> = new History<Int>();
+        var history:History<Null<Int>> = new History<Null<Int>>();
 
         Assert.areEqual(0, history.revision);
         Assert.areEqual(1, history.commit()); // Commit with no subscribers
@@ -53,6 +53,7 @@ class HistoryTest
         Assert.isTrue(threwError);
 
         // revert to early state
+
         history.revert(4);
         Assert.areEqual(1, history.get(propA));
         Assert.areEqual(2, history.get(propB));
