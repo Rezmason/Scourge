@@ -23,6 +23,7 @@ class RulesTest
 
 	public function new() {
 
+
 	}
 
 	@BeforeClass
