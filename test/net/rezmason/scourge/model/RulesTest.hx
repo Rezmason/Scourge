@@ -135,9 +135,30 @@ class RulesTest
         Assert.areEqual(1, numCells); // only one cell for player 0
     }
 
+    //@Test
+    public function eatRuleTest():Void {
+        /*
+        var eatConfig:EatConfig = new EatConfig();
+        eatConfig.recursive = false;
+        var eatRule:EatRule = new EatRule(eatConfig);
+        state = makeState(TestBoards.fourSquares, 4, cast [eatRule]);
+        */
+        // straight up eating
+    }
+
+    //@Test
+    public function eatRecursivelyRuleTest():Void {
+        /*
+        var eatConfig:EatConfig = new EatConfig();
+        eatConfig.recursive = true;
+        var eatRule:EatRule = new EatRule(eatConfig);
+        state = makeState(TestBoards.fourSquares, 4, cast [eatRule]);
+        */
+        // recursive eating
+    }
+
 	//@Test
 	public function placePieceRuleTest():Void {
-		state = makeState(TestBoards.fourSquares, 4, cast []);
 		/*
 		1: for each orientation,
 		2: for each edge node of the player,

@@ -1,18 +1,23 @@
-"PlayerFactory" idea is a rule too
-	Take Player instantiation out of the picture
-	Makes the ply too
+Eating rule
 
-DAMN IT, OPTIONS WERE NEVER SPECCED
-	How will these even work with the view or with heuristics
-	This will need to be figured out before rules that have multiple options get written
+Piece placement - hoo boy
+	PieceGenerator should provide arrays of pieces
 
+	How will I store a set of available pieces?
+		Bitfield <--> Array<Int>
+		101010 <--> [1, 3, 5]
 
-
+	Create test piece
 
 Level Editing
 	Just a bunch of rules, aha
 
 New architecture - what's left
+	Options
+		IDs that should be the same every time the same situation is run
+			This allows options to be inexpensively sent to opponents on other machines
+		Other parameters, such as relevantNodes:Array<Int>
+			The View will *have* to type options
 	IPlayer: an object that picks an optimal State from a set of States
 		The initial state is also provided
 		Evaluator: Turns a State into a number based on averaging values from IGoals
@@ -133,6 +138,8 @@ New UI
 Texture synthesis
 	Dots
 	Stripes
+	Put them on an environmental map
+	Use a shader to map the texture onto a blob! :-)
 
 http://code.google.com/p/hxgk/
 
