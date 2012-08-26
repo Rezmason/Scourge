@@ -3,7 +3,6 @@ package net.rezmason.scourge.model;
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.aspects.FreshnessAspect;
 
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.Pointers;
@@ -12,9 +11,13 @@ class BoardUtils {
 
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
-    public static function spitBoard(state:State, addSpaces:Bool = true):String {
+    public static function spitBoard(state:State, addSpaces:Bool = true, otherNodeAspects:IntHash<String> = null):String {
 
         if (state.nodes.length == 0) return "empty grid";
+
+        if (otherNodeAspects == null) otherNodeAspects = new IntHash<String>();
+        var otherAspectPtrs:Array<AspectPtr> = [];
+        for (id in otherNodeAspects.keys()) otherAspectPtrs[id] = state.nodeAspectLookup[id];
 
         var str:String = "";
 
@@ -22,23 +25,32 @@ class BoardUtils {
 
         var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
 
         for (row in grid.walk(Gr.s)) {
             str += "\n";
             for (column in row.walk(Gr.e)) {
 
-                var occupier:Int = state.history.get(occupier_.dref(column.value));
-                var isFilled:Int = state.history.get(isFilled_.dref(column.value));
-                var freshness:Int = 0;
+                var otherAspectFound:Bool = false;
 
-                if (!freshness_.isNull()) freshness = state.history.get(freshness_.dref(column.value));
+                for (id in 0...otherAspectPtrs.length) {
+                    var ptr:AspectPtr = otherAspectPtrs[id];
+                    if (ptr == null) continue;
+                    if (state.history.get(column.value.at(ptr)) > 0) {
+                        otherAspectFound = true;
+                        str += otherNodeAspects.get(id);
+                        break;
+                    }
+                }
 
-                str += switch (true) {
-                    case (freshness > 0): "F";
-                    case (occupier > -1): "" + occupier;
-                    case (isFilled == 1): "X";
-                    default: " ";
+                if (!otherAspectFound) {
+                    var occupier:Int = state.history.get(column.value.at(occupier_));
+                    var isFilled:Int = state.history.get(column.value.at(isFilled_));
+
+                    str += switch (true) {
+                        case (occupier > -1): "" + occupier;
+                        case (isFilled == 1): "X";
+                        default: " ";
+                    }
                 }
             }
         }

@@ -103,11 +103,11 @@ class History<T> {
 
     public inline function get(ptr:Ptr<T>):Null<T> {
         if (length == 0) throw "Invalid get : no data allocated";
-        return ptr.dref(array);
+        return array.at(ptr);
     }
 
     public inline function set(ptr:Ptr<T>, val:Null<T>):Null<T> {
         if (length == 0) throw "Invalid set : no data allocated";
-        return ptr.mod(array, val);
+        return array.mod(ptr, val);
     }
 }

@@ -169,10 +169,10 @@ class BuildBoardRule extends Rule {
     }
 
     inline function obstructGraphRim(grid:BoardNode):Void {
-        for (node in grid.walk(Gr.e)) history.set(isFilled_.dref(node.value), 1);
-        for (node in grid.walk(Gr.s)) history.set(isFilled_.dref(node.value), 1);
-        for (node in grid.run(Gr.s).walk(Gr.e)) history.set(isFilled_.dref(node.value), 1);
-        for (node in grid.run(Gr.e).walk(Gr.s)) history.set(isFilled_.dref(node.value), 1);
+        for (node in grid.walk(Gr.e)) history.set(node.value.at(isFilled_), 1);
+        for (node in grid.walk(Gr.s)) history.set(node.value.at(isFilled_), 1);
+        for (node in grid.run(Gr.s).walk(Gr.e)) history.set(node.value.at(isFilled_), 1);
+        for (node in grid.run(Gr.e).walk(Gr.s)) history.set(node.value.at(isFilled_), 1);
     }
 
     inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>):Void {
@@ -181,9 +181,9 @@ class BuildBoardRule extends Rule {
         for (ike in 0...headCoords.length) {
             var coord:XY = headCoords[ike];
             var head:BoardNode = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
-            history.set(head_.dref(state.players[ike]), state.nodes.indexOf(head));
-            history.set(isFilled_.dref(head.value), 1);
-            history.set(occupier_.dref(head.value), ike);
+            history.set(state.players[ike].at(head_), state.nodes.indexOf(head));
+            history.set(head.value.at(isFilled_), 1);
+            history.set(head.value.at(occupier_), ike);
         }
     }
 
@@ -194,7 +194,7 @@ class BuildBoardRule extends Rule {
         for (row in grid.walk(Gr.s)) {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
-                var isFilled:HistPtr = isFilled_.dref(column.value);
+                var isFilled:HistPtr = column.value.at(isFilled_);
                 if (history.get(isFilled) == 0) {
                     var fx:Float = x - radius + 0.5 - RIM;
                     var fy:Float = y - radius + 0.5 - RIM;
@@ -219,12 +219,12 @@ class BuildBoardRule extends Rule {
         for (row in grid.walk(Gr.s)) {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
-                if (history.get(isFilled_.dref(column.value)) == 0) {
+                if (history.get(column.value.at(isFilled_)) == 0) {
                     var char:String = initGrid.charAt(y * initGridWidth + x + 1);
                     if (char != " ") {
-                        history.set(isFilled_.dref(column.value), 1);
-                        if (!NUMERIC_CHAR.match(char)) history.set(occupier_.dref(column.value), -1);
-                        else history.set(occupier_.dref(column.value), Std.parseInt(char));
+                        history.set(column.value.at(isFilled_), 1);
+                        if (!NUMERIC_CHAR.match(char)) history.set(column.value.at(occupier_), -1);
+                        else history.set(column.value.at(occupier_), Std.parseInt(char));
                     }
                 }
                 x++;

@@ -56,13 +56,13 @@ class BoardRuleTest {
         var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
 
         for (player in state.players) {
-            Assert.isNotNull(head_.dref(player));
-            Assert.areNotEqual(-1, head_.dref(player));
+            Assert.isNotNull(player.at(head_));
+            Assert.areNotEqual(-1, player.at(head_));
         }
 
         for (node in state.nodes) {
             Assert.isNotNull(node);
-            Assert.isNotNull(history.get(occupier_.dref(node.value)));
+            Assert.isNotNull(history.get(node.value.at(occupier_)));
         }
 
         #if VISUAL_TEST
@@ -73,24 +73,24 @@ class BoardRuleTest {
         #end
 
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var currentPlayer:Int = history.get(currentPlayer_.dref(state.aspects));
+        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
 
-        var playerHead:BoardNode = state.nodes[history.get(head_.dref(state.players[currentPlayer]))];
+        var playerHead:BoardNode = state.nodes[history.get(state.players[currentPlayer].at(head_))];
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);
-            Assert.areEqual(-1, history.get(occupier_.dref(neighbor.value)));
-            history.set(occupier_.dref(neighbor.value), 0);
+            Assert.areEqual(-1, history.get(neighbor.value.at(occupier_)));
+            history.set(neighbor.value.at(occupier_), 0);
         }
 
-        Assert.areEqual(0, history.get(occupier_.dref(playerHead.nw().value)));
-        Assert.areEqual(0, history.get(occupier_.dref(playerHead.n().value)));
-        Assert.areEqual(0, history.get(occupier_.dref(playerHead.ne().value)));
-        Assert.areEqual(0, history.get(occupier_.dref(playerHead.e().value)));
-        Assert.areEqual(0, history.get(occupier_.dref(playerHead.se().value)));
-        Assert.areEqual(0, history.get(occupier_.dref(playerHead.s().value)));
-        Assert.areEqual(0, history.get(occupier_.dref(playerHead.sw().value)));
-        Assert.areEqual(0, history.get(occupier_.dref(playerHead.w().value)));
+        Assert.areEqual(0, history.get(playerHead.nw().value.at(occupier_)));
+        Assert.areEqual(0, history.get(playerHead.n( ).value.at(occupier_)));
+        Assert.areEqual(0, history.get(playerHead.ne().value.at(occupier_)));
+        Assert.areEqual(0, history.get(playerHead.e( ).value.at(occupier_)));
+        Assert.areEqual(0, history.get(playerHead.se().value.at(occupier_)));
+        Assert.areEqual(0, history.get(playerHead.s( ).value.at(occupier_)));
+        Assert.areEqual(0, history.get(playerHead.sw().value.at(occupier_)));
+        Assert.areEqual(0, history.get(playerHead.w( ).value.at(occupier_)));
     }
 
     @Test

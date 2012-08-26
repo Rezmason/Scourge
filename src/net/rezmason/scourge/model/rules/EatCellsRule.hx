@@ -4,21 +4,25 @@ import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
+import net.rezmason.scourge.model.aspects.PlyAspect;
 
 using Lambda;
-
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.utils.Pointers;
 
 class EatCellsRule extends Rule {
 
     static var nodeReqs:AspectRequirements;
     static var playerReqs:AspectRequirements;
+    static var stateReqs:AspectRequirements;
     static var option:Option = new Option();
 
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var freshness_:AspectPtr;
     var head_:AspectPtr;
+
+    var recursive:Bool;
 
     private var cfg:EatCellsConfig;
 
@@ -35,6 +39,10 @@ class EatCellsRule extends Rule {
         if (playerReqs == null) playerReqs = [
             BodyAspect.HEAD,
         ];
+
+        if (stateReqs == null) stateReqs = [
+            PlyAspect.CURRENT_PLAYER,
+        ];
     }
 
     override public function init(state:State):Void {
@@ -43,9 +51,11 @@ class EatCellsRule extends Rule {
         isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         freshness_ = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
+
+        recursive = cfg.recursive;
     }
 
-    //override public function listStateAspectRequirements():AspectRequirements { return reqs; }
+    override public function listStateAspectRequirements():AspectRequirements { return stateReqs; }
     override public function listPlayerAspectRequirements():AspectRequirements { return playerReqs; }
     override public function listBoardAspectRequirements():AspectRequirements { return nodeReqs; }
     override public function getOptions():Array<Option> { return [option]; }
@@ -55,46 +65,63 @@ class EatCellsRule extends Rule {
 
             // perform eat operation on state
 
-            // Get all fresh nodes from FRESH_NEXT
+            // Find all fresh nodes
+            // hint: they're body nodes
 
-            // for every node in the fresh nodes list,
-                // for every direction,
-                    // walk in that direction:
-                        // if the current node is eatable,
-                            // add it to the pending list
-                        // else if the current node is owned by you,
-                            // for each pending node,
-                                // convert to fresh node owned by you
-                                // if recursive,
-                                    // add node to fresh nodes list
-                            // break
-                        // else
-                            // break
+            var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+            var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+
+            var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
+            var head:Int = history.get(state.players[currentPlayer].at(head_));
+
+            var playerHead:BoardNode = state.nodes[head];
+
+            var nodes:Array<BoardNode> = playerHead.getGraph(true, isLivingBodyNeighbor);
+            nodes = nodes.filter(isFresh).array();
+
+            var newNodes:Array<BoardNode> = nodes.copy();
+
+            var node:BoardNode = newNodes.pop();
+            while (node != null) {
+                for (direction in GridUtils.allDirections()) {
+                    var pendingNodes:Array<BoardNode> = [];
+                    for (scout in node.walk(direction)) {
+                        if (scout == node) continue;
+                        if (history.get(scout.value.at(isFilled_)) > 0) {
+                            if (history.get(scout.value.at(occupier_)) == currentPlayer) {
+                                for (pendingNode in pendingNodes) {
+                                    eatCell(pendingNode.value, currentPlayer);
+                                    if (recursive) newNodes.push(pendingNode);
+                                    nodes.push(pendingNode);
+                                }
+                                break;
+                            } else {
+                                pendingNodes.push(scout);
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                node = newNodes.pop();
+            }
 
 
         }
     }
 
-    /*
-    function isCandidate(me:AspectSet, you:AspectSet):Bool {
-        var occupier:Int = history.get(me[occupier_]);
-        var isFilled:Int = history.get(me[isFilled_]);
-        var freshness:Int = history.get(me[freshness_]);
-        if (isFilled > 0 && occupier > -1) return true;
-        else if (freshness > 0) return true;
-        return false;
-    }
-
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
-        if (history.get(me[isFilled_]) == 0) return false;
-        return history.get(me[occupier_]) == history.get(you[occupier_]);
+        if (history.get(me.at(isFilled_)) == 0) return false;
+        return history.get(me.at(occupier_)) == history.get(you.at(occupier_));
     }
 
-    function killCell(me:AspectSet):Void {
-        history.set(me[occupier_], -1);
-        history.set(me[isFilled_], 0);
-        history.set(me[freshness_], 0);
+    function isFresh(node:BoardNode):Bool {
+        return history.get(node.value.at(freshness_)) > 0;
     }
-    */
+
+    function eatCell(me:AspectSet, currentPlayer:Int):Void {
+        history.set(me.at(occupier_), currentPlayer);
+        history.set(me.at(freshness_), 1);
+    }
 }
 

@@ -12,7 +12,7 @@ import net.rezmason.scourge.model.rules.EatCellsRule;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.DraftPlayersRule;
 import net.rezmason.scourge.model.evaluators.TestEvaluator;
-//import net.rezmason.scourge.model.GridNode;
+import net.rezmason.scourge.model.GridNode;
 
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.Pointers;
@@ -67,7 +67,7 @@ class RulesTest
 
         Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
 
-        var currentPlayer:Int = history.get(currentPlayer_.dref(state.aspects));
+        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
 
         var head:Int = history.get(state.players[currentPlayer][BodyAspect.HEAD.id]);
         var playerHead:BoardNode = state.nodes[head];
@@ -75,9 +75,9 @@ class RulesTest
 
         // Cut the neck
 
-		history.set(isFilled_.dref(playerNeck.value), 0);
-		history.set(occupier_.dref(playerNeck.value), -1);
-        history.set(freshness_.dref(playerNeck.value), 1);
+		history.set(playerNeck.value.at(isFilled_), 0);
+		history.set(playerNeck.value.at(occupier_), -1);
+        history.set(playerNeck.value.at(freshness_), 1);
 
         Assert.areEqual(1, testEvaluator.evaluate(state)); // only one cell for player 0
 
@@ -91,9 +91,7 @@ class RulesTest
 		var reviz:Int = history.revision;
 
 		//trace(BoardUtils.spitBoard(state));
-
 		killRule.chooseOption(options[0]);
-
 		//trace(BoardUtils.spitBoard(state));
 
         numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
@@ -117,17 +115,17 @@ class RulesTest
 
         Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
 
-        var currentPlayer:Int = history.get(currentPlayer_.dref(state.aspects));
+        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
 
-        var head:Int = history.get(head_.dref(state.players[currentPlayer]));
+        var head:Int = history.get(state.players[currentPlayer].at(head_));
         var playerHead:BoardNode = state.nodes[head];
         var playerNeck:BoardNode = playerHead.s();
 
         // Cut the neck
 
-        history.set(isFilled_.dref(playerNeck.value), 0);
-        history.set(occupier_.dref(playerNeck.value), -1);
-        history.set(freshness_.dref(playerNeck.value), 1);
+        history.set(playerNeck.value.at(isFilled_), 0);
+        history.set(playerNeck.value.at(occupier_), -1);
+        history.set(playerNeck.value.at(freshness_), 1);
 
         //trace(BoardUtils.spitBoard(state));
         killRule.chooseOption(killRule.getOptions()[0]);
@@ -142,9 +140,43 @@ class RulesTest
         var eatConfig:EatCellsConfig = new EatCellsConfig();
         eatConfig.recursive = false;
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        state = makeState(TestBoards.fourSquares, 4, cast [eatRule]);
+        state = makeState(TestBoards.oaf, 4, cast [eatRule]);
+
+        // set up the board for the test
+
+        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
+        var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var playerHead:BoardNode = state.nodes[head];
+
+        var spitAspectProperties:IntHash<String> = new IntHash<String>();
+        spitAspectProperties.set(FreshnessAspect.FRESHNESS.id, "F");
+
+        var cursor:BoardNode = playerHead;
+        cursor = cursor.run(Gr.n, 12).run(Gr.e, 6);
+
+        history.set(cursor.value.at(freshness_), 1);
+
+        cursor = cursor.run(Gr.s, 2).run(Gr.e, 2);
+
+        history.set(cursor.value.at(isFilled_), 0);
+        history.set(cursor.value.at(occupier_), -1);
+
+        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        Assert.areEqual(371, numCells);
 
         // straight up eating
+
+        //trace(BoardUtils.spitBoard(state, true, spitAspectProperties));
+        eatRule.chooseOption(eatRule.getOptions()[0]);
+        //trace(BoardUtils.spitBoard(state, true, spitAspectProperties));
+
+        numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        Assert.areEqual(389, numCells);
     }
 
     @Test
@@ -152,9 +184,43 @@ class RulesTest
         var eatConfig:EatCellsConfig = new EatCellsConfig();
         eatConfig.recursive = true;
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        state = makeState(TestBoards.fourSquares, 4, cast [eatRule]);
+        state = makeState(TestBoards.oaf, 4, cast [eatRule]);
+
+        // set up the board for the test
+
+        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
+        var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var playerHead:BoardNode = state.nodes[head];
+
+        var spitAspectProperties:IntHash<String> = new IntHash<String>();
+        spitAspectProperties.set(FreshnessAspect.FRESHNESS.id, "F");
+
+        var cursor:BoardNode = playerHead;
+        cursor = cursor.run(Gr.n, 12).run(Gr.e, 6);
+
+        history.set(cursor.value.at(freshness_), 1);
+
+        cursor = cursor.run(Gr.s, 2).run(Gr.e, 2);
+
+        history.set(cursor.value.at(isFilled_), 0);
+        history.set(cursor.value.at(occupier_), -1);
+
+        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        Assert.areEqual(371, numCells);
 
         // recursive eating
+
+        //trace(BoardUtils.spitBoard(state, true, spitAspectProperties));
+        eatRule.chooseOption(eatRule.getOptions()[0]);
+        //trace(BoardUtils.spitBoard(state, true, spitAspectProperties));
+
+        numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        Assert.areEqual(483, numCells);
     }
 
 	//@Test
