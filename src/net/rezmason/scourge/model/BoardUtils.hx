@@ -16,8 +16,8 @@ class BoardUtils {
         if (state.nodes.length == 0) return "empty grid";
 
         if (otherNodeAspects == null) otherNodeAspects = new IntHash<String>();
-        var otherAspectPtrs:Array<AspectPtr> = [];
-        for (id in otherNodeAspects.keys()) otherAspectPtrs[id] = state.nodeAspectLookup[id];
+        var otherAspectPtrs:IntHash<AspectPtr> = new IntHash<AspectPtr>();
+        for (id in otherNodeAspects.keys()) otherAspectPtrs.set(id, state.nodeAspectLookup[id]);
 
         var str:String = "";
 
@@ -32,9 +32,8 @@ class BoardUtils {
 
                 var otherAspectFound:Bool = false;
 
-                for (id in 0...otherAspectPtrs.length) {
-                    var ptr:AspectPtr = otherAspectPtrs[id];
-                    if (ptr == null) continue;
+                for (id in otherAspectPtrs.keys()) {
+                    var ptr:AspectPtr = otherAspectPtrs.get(id);
                     if (state.history.get(column.value.at(ptr)) > 0) {
                         otherAspectFound = true;
                         str += otherNodeAspects.get(id);
