@@ -7,6 +7,9 @@ Piece placement - hoo boy
 		Bitfield <--> Array<Int>
 		101010 <--> [1, 3, 5]
 
+	How will I store a set of nodes?
+		HeadCountAspect.NEXT_HEAD.id
+
 	Create test piece
 
 Level Editing

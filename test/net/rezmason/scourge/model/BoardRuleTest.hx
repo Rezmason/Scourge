@@ -7,10 +7,12 @@ import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.Aspect;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.DraftPlayersRule;
 
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.utils.Pointers;
 
 class BoardRuleTest {
 
@@ -53,17 +55,14 @@ class BoardRuleTest {
         var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
 
-        Assert.isNotNull(occupier_);
-        Assert.isNotNull(head_);
-
         for (player in state.players) {
-            Assert.isNotNull(player[head_]);
-            Assert.areNotEqual(-1, player[head_]);
+            Assert.isNotNull(head_.dref(player));
+            Assert.areNotEqual(-1, head_.dref(player));
         }
 
         for (node in state.nodes) {
             Assert.isNotNull(node);
-            Assert.isNotNull(history.get(node.value[occupier_]));
+            Assert.isNotNull(history.get(occupier_.dref(node.value)));
         }
 
         #if VISUAL_TEST
@@ -73,22 +72,25 @@ class BoardRuleTest {
             Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, BoardUtils.spitBoard(state, false));
         #end
 
-        var playerHead:BoardNode = state.nodes[history.get(state.players[0][head_])];
+        var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var currentPlayer:Int = history.get(currentPlayer_.dref(state.aspects));
+
+        var playerHead:BoardNode = state.nodes[history.get(head_.dref(state.players[currentPlayer]))];
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);
-            Assert.areEqual(-1, history.get(neighbor.value[occupier_]));
-            history.set(neighbor.value[occupier_], 0);
+            Assert.areEqual(-1, history.get(occupier_.dref(neighbor.value)));
+            history.set(occupier_.dref(neighbor.value), 0);
         }
 
-        Assert.areEqual(0, history.get(playerHead.nw().value[occupier_]));
-        Assert.areEqual(0, history.get(playerHead.n().value[occupier_]));
-        Assert.areEqual(0, history.get(playerHead.ne().value[occupier_]));
-        Assert.areEqual(0, history.get(playerHead.e().value[occupier_]));
-        Assert.areEqual(0, history.get(playerHead.se().value[occupier_]));
-        Assert.areEqual(0, history.get(playerHead.s().value[occupier_]));
-        Assert.areEqual(0, history.get(playerHead.sw().value[occupier_]));
-        Assert.areEqual(0, history.get(playerHead.w().value[occupier_]));
+        Assert.areEqual(0, history.get(occupier_.dref(playerHead.nw().value)));
+        Assert.areEqual(0, history.get(occupier_.dref(playerHead.n().value)));
+        Assert.areEqual(0, history.get(occupier_.dref(playerHead.ne().value)));
+        Assert.areEqual(0, history.get(occupier_.dref(playerHead.e().value)));
+        Assert.areEqual(0, history.get(occupier_.dref(playerHead.se().value)));
+        Assert.areEqual(0, history.get(occupier_.dref(playerHead.s().value)));
+        Assert.areEqual(0, history.get(occupier_.dref(playerHead.sw().value)));
+        Assert.areEqual(0, history.get(occupier_.dref(playerHead.w().value)));
     }
 
     @Test

@@ -10,6 +10,7 @@ import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.rules.TestRule;
 
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.utils.Pointers;
 
 class StateFactoryTest {
 
@@ -37,22 +38,19 @@ class StateFactoryTest {
         // Make sure there's the right aspects on the state
 
         var stateTestValue_:AspectPtr = state.stateAspectLookup[TestAspect.VALUE.id];
-        Assert.areNotEqual(-1, stateTestValue_);
-        Assert.isNotNull(history.get(state.aspects[stateTestValue_]));
+        Assert.isNotNull(history.get(stateTestValue_.dref(state.aspects)));
 
         // Make sure there's the right aspects on each player
         var playerTestValue_:AspectPtr = state.playerAspectLookup[TestAspect.VALUE.id];
-        Assert.areNotEqual(-1, playerTestValue_);
         for (ike in 0...state.players.length) {
-            Assert.isNotNull(history.get(state.players[ike][playerTestValue_]));
+            Assert.isNotNull(history.get(playerTestValue_.dref(state.players[ike])));
         }
 
         // Make sure there's the right aspects on each node
         var nodeTestValue_:AspectPtr = state.nodeAspectLookup[TestAspect.VALUE.id];
-        Assert.areNotEqual(-1, nodeTestValue_);
 
         for (node in state.nodes) {
-            Assert.isNotNull(history.get(node.value[nodeTestValue_]));
+            Assert.isNotNull(history.get(nodeTestValue_.dref(node.value)));
         }
     }
 }

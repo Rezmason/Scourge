@@ -8,9 +8,8 @@ import net.rezmason.scourge.model.aspects.FreshnessAspect;
 using Lambda;
 
 using net.rezmason.scourge.model.GridUtils;
-using net.rezmason.utils.Pointers;
 
-class KillDisconnectedCellsRule extends Rule {
+class EatCellsRule extends Rule {
 
     static var nodeReqs:AspectRequirements;
     static var playerReqs:AspectRequirements;
@@ -21,8 +20,11 @@ class KillDisconnectedCellsRule extends Rule {
     var freshness_:AspectPtr;
     var head_:AspectPtr;
 
-    public function new():Void {
+    private var cfg:EatCellsConfig;
+
+    public function new(cfg:EatCellsConfig):Void {
         super();
+        this.cfg = cfg;
 
         if (nodeReqs == null)  nodeReqs = [
             OwnershipAspect.IS_FILLED,
@@ -51,41 +53,48 @@ class KillDisconnectedCellsRule extends Rule {
     override public function chooseOption(choice:Option):Void {
         if (choice == option) {
 
-            // perform kill operation on state
+            // perform eat operation on state
 
-            var nodesInPlay:Array<BoardNode> = [];
+            // Get all fresh nodes from FRESH_NEXT
 
-            var heads:Array<BoardNode> = [];
-            for (ike in 0...state.players.length) {
-                var head:Int = history.get(head_.dref(state.players[ike]));
-                heads.push(state.nodes[head]);
-            }
+            // for every node in the fresh nodes list,
+                // for every direction,
+                    // walk in that direction:
+                        // if the current node is eatable,
+                            // add it to the pending list
+                        // else if the current node is owned by you,
+                            // for each pending node,
+                                // convert to fresh node owned by you
+                                // if recursive,
+                                    // add node to fresh nodes list
+                            // break
+                        // else
+                            // break
 
-            var candidates:Array<BoardNode> = heads.expandGraph(true, isCandidate);
-            var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(true, isLivingBodyNeighbor);
 
-            for (candidate in candidates) if (!livingBodyNeighbors.has(candidate)) killCell(candidate.value);
         }
     }
 
+    /*
     function isCandidate(me:AspectSet, you:AspectSet):Bool {
-        var occupier:Int = history.get(occupier_.dref(me));
-        var isFilled:Int = history.get(isFilled_.dref(me));
-        var freshness:Int = history.get(freshness_.dref(me));
+        var occupier:Int = history.get(me[occupier_]);
+        var isFilled:Int = history.get(me[isFilled_]);
+        var freshness:Int = history.get(me[freshness_]);
         if (isFilled > 0 && occupier > -1) return true;
         else if (freshness > 0) return true;
         return false;
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
-        if (history.get(isFilled_.dref(me)) == 0) return false;
-        return history.get(occupier_.dref(me)) == history.get(occupier_.dref(you));
+        if (history.get(me[isFilled_]) == 0) return false;
+        return history.get(me[occupier_]) == history.get(you[occupier_]);
     }
 
     function killCell(me:AspectSet):Void {
-        history.set(occupier_.dref(me), -1);
-        history.set(isFilled_.dref(me), 0);
-        history.set(freshness_.dref(me), 0);
+        history.set(me[occupier_], -1);
+        history.set(me[isFilled_], 0);
+        history.set(me[freshness_], 0);
     }
+    */
 }
 

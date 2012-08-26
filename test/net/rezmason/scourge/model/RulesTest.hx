@@ -8,12 +8,14 @@ import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.rules.KillDisconnectedCellsRule;
+import net.rezmason.scourge.model.rules.EatCellsRule;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.DraftPlayersRule;
 import net.rezmason.scourge.model.evaluators.TestEvaluator;
 //import net.rezmason.scourge.model.GridNode;
 
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.utils.Pointers;
 
 class RulesTest
 {
@@ -22,7 +24,6 @@ class RulesTest
     var state:State;
 
 	public function new() {
-
 
 	}
 
@@ -66,7 +67,7 @@ class RulesTest
 
         Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
 
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = history.get(currentPlayer_.dref(state.aspects));
 
         var head:Int = history.get(state.players[currentPlayer][BodyAspect.HEAD.id]);
         var playerHead:BoardNode = state.nodes[head];
@@ -74,9 +75,9 @@ class RulesTest
 
         // Cut the neck
 
-		history.set(playerNeck.value[isFilled_], 0);
-		history.set(playerNeck.value[occupier_], -1);
-        history.set(playerNeck.value[freshness_], 1);
+		history.set(isFilled_.dref(playerNeck.value), 0);
+		history.set(occupier_.dref(playerNeck.value), -1);
+        history.set(freshness_.dref(playerNeck.value), 1);
 
         Assert.areEqual(1, testEvaluator.evaluate(state)); // only one cell for player 0
 
@@ -116,17 +117,17 @@ class RulesTest
 
         Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
 
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = history.get(currentPlayer_.dref(state.aspects));
 
-        var head:Int = history.get(state.players[currentPlayer][BodyAspect.HEAD.id]);
+        var head:Int = history.get(head_.dref(state.players[currentPlayer]));
         var playerHead:BoardNode = state.nodes[head];
         var playerNeck:BoardNode = playerHead.s();
 
         // Cut the neck
 
-        history.set(playerNeck.value[isFilled_], 0);
-        history.set(playerNeck.value[occupier_], -1);
-        history.set(playerNeck.value[freshness_], 1);
+        history.set(isFilled_.dref(playerNeck.value), 0);
+        history.set(occupier_.dref(playerNeck.value), -1);
+        history.set(freshness_.dref(playerNeck.value), 1);
 
         //trace(BoardUtils.spitBoard(state));
         killRule.chooseOption(killRule.getOptions()[0]);
@@ -136,25 +137,23 @@ class RulesTest
         Assert.areEqual(1, numCells); // only one cell for player 0
     }
 
-    //@Test
+    @Test
     public function eatRuleTest():Void {
-        /*
-        var eatConfig:EatConfig = new EatConfig();
+        var eatConfig:EatCellsConfig = new EatCellsConfig();
         eatConfig.recursive = false;
-        var eatRule:EatRule = new EatRule(eatConfig);
+        var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         state = makeState(TestBoards.fourSquares, 4, cast [eatRule]);
-        */
+
         // straight up eating
     }
 
-    //@Test
+    @Test
     public function eatRecursivelyRuleTest():Void {
-        /*
-        var eatConfig:EatConfig = new EatConfig();
+        var eatConfig:EatCellsConfig = new EatCellsConfig();
         eatConfig.recursive = true;
-        var eatRule:EatRule = new EatRule(eatConfig);
+        var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         state = makeState(TestBoards.fourSquares, 4, cast [eatRule]);
-        */
+
         // recursive eating
     }
 
