@@ -9,19 +9,23 @@ using net.rezmason.scourge.model.GridUtils;
 class GridUtilsTest {
 
     var nodeItr:Int;
+    var time:Float;
 
     @Before
     public function setup():Void {
-        nodeItr = 0;
+        time = massive.munit.util.Timer.stamp();
     }
 
     @After
     public function tearDown():Void {
-
+        time = massive.munit.util.Timer.stamp() - time;
+        trace(time);
     }
 
     @Test
     public function rowTest():Void {
+        nodeItr = 0;
+
         var node:GridNode<Int> = makeNode();
         var first:GridNode<Int> = node;
         Assert.areEqual(0, node.value);

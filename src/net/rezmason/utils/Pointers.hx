@@ -1,6 +1,13 @@
 package net.rezmason.utils;
 
-typedef Ptr<T> = #if USE_POINTERS {_:Null<Int>, t:Null<T>} #else Int #end ;
+#if USE_POINTERS
+    typedef Ptr<T> = {
+        var _(default, null):Null<Int>;
+        var t(default, null):Null<T>;
+    }
+#else
+    typedef Ptr<T> = Int;
+#end
 
 class Pointers {
 

@@ -1,16 +1,38 @@
-Eating rule
-
 Piece placement - hoo boy
-	PieceGenerator should provide arrays of pieces
+	PieceGenerator should provide associations of pieces
 
-	How will I store a set of available pieces?
-		Bitfield <--> Array<Int>
-		101010 <--> [1, 3, 5]
+	Random pieces - easy to implement
+	Hat pieces - just as easy, though the configuration might be strange
+	Piece genes - easy
+	Choosing ANY piece - easy
+	Choosing from a SET of pieces - hard
+		So we just won't offer that
+		Still, this is silly
+
+	Config options
+		overlapping - allows a piece to overlap with existing cells; just won't modify them
+		flipping - allows a piece to be flipped
+		rotating - allows a piece to be rotated
 
 	How will I store a set of nodes?
 		HeadCountAspect.NEXT_HEAD.id
 
 	Create test piece
+
+Eating a head
+Biting
+	Refilling
+	Genetic
+	Biting a head
+Swapping
+	Refilling
+	Genetic
+Skipping
+Forfeiting
+
+And then SPEED EVERYTHING UP
+	Use timing output to find the bottlenecks
+		Pretty damn sure the kill-disconnected-cells rule is a lot slower than it could be
 
 Level Editing
 	Just a bunch of rules, aha

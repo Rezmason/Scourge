@@ -10,11 +10,22 @@ using net.rezmason.utils.Pointers;
 
 class HistoryTest
 {
+    var time:Float;
+
+    @Before
+    public function setup():Void {
+        time = massive.munit.util.Timer.stamp();
+    }
+
+    @After
+    public function tearDown():Void {
+        time = massive.munit.util.Timer.stamp() - time;
+        trace(time);
+    }
+
     @Test
     public function historyTest1():Void
     {
-        var threwError:Bool;
-
         var history:History<Null<Int>> = new History<Null<Int>>();
 
         Assert.areEqual(0, history.revision);
@@ -45,13 +56,10 @@ class HistoryTest
         Assert.areEqual(3, history.get(propC));
 
         // invalid revert
-        threwError = false;
         try {
             history.revert(6);
-        } catch (error:Dynamic) {
-            threwError = true;
-        }
-        Assert.isTrue(threwError);
+            Assert.fail("Invalid revert failed to throw error");
+        } catch (error:Dynamic) {}
 
         // revert to early state
 
@@ -88,15 +96,11 @@ class HistoryTest
 
         history.wipe();
         Assert.areEqual(0, history.revision);
-        threwError = false;
+
         try {
             history.get(propA);
-        } catch (error:Dynamic) {
-            threwError = true;
-        }
-
-        Assert.isTrue(threwError);
-
+            Assert.fail("Bad get failed to throw error");
+        } catch (error:Dynamic) {}
 
         var propD:Ptr<Int> = history.alloc(1);
 
@@ -116,14 +120,10 @@ class HistoryTest
         var propE:Ptr<Int> = history.alloc(0);
         history.wipe();
 
-        threwError = false;
         try {
             history.get(propE);
-        } catch (error:Dynamic) {
-            threwError = true;
-        }
-
-        Assert.isTrue(threwError);
+            Assert.fail("Bad get failed to throw error");
+        } catch (error:Dynamic) {}
 
     }
 }

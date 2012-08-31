@@ -5,13 +5,24 @@ import massive.munit.Assert;
 import net.rezmason.scourge.unused.PointerHistory;
 import net.rezmason.scourge.unused.Pointer;
 
-class PointerHistoryTest
-{
+class PointerHistoryTest {
+
+    var time:Float;
+
+	@Before
+    public function setup():Void {
+        time = massive.munit.util.Timer.stamp();
+    }
+
+    @After
+    public function tearDown():Void {
+        time = massive.munit.util.Timer.stamp() - time;
+        trace(time);
+    }
+
 	//@Test
 	public function historyTest1():Void
 	{
-		var threwError:Bool;
-
 		var history:PointerHistory<Int> = new PointerHistory<Int>();
 
 		Assert.areEqual(0, history.revision);
@@ -47,13 +58,10 @@ class PointerHistoryTest
 		Assert.areEqual(3, propC.value);
 
 		// invalid revert
-		threwError = false;
 		try {
-			history.revert(4);
-		} catch (error:Dynamic) {
-			threwError = true;
-		}
-		Assert.isTrue(threwError);
+            history.revert(4);
+            Assert.fail("Invalid revert failed to throw error");
+        } catch (error:Dynamic) {}
 
 		// revert to early state
 		history.revert(2);
@@ -70,13 +78,10 @@ class PointerHistoryTest
 
 		#if SAFE_HISTORY
 			// Attempt to revert with pending changes
-			threwError = false;
 			try {
-				history.revert(1);
-			} catch (error:Dynamic) {
-				threwError = true;
-			}
-			Assert.isTrue(threwError);
+            	history.revert(1);
+            	Assert.fail("Invalid revert failed to throw error");
+        	} catch (error:Dynamic) {}
 		#end
 
 		// reset undoes pending changes

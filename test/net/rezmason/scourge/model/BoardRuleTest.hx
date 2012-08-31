@@ -17,6 +17,7 @@ using net.rezmason.utils.Pointers;
 class BoardRuleTest {
 
     var history:StateHistory;
+    var time:Float;
 
     @BeforeClass
     public function beforeClass():Void {
@@ -31,12 +32,13 @@ class BoardRuleTest {
 
     @Before
     public function setup():Void {
-
+        time = massive.munit.util.Timer.stamp();
     }
 
     @After
     public function tearDown():Void {
-
+        time = massive.munit.util.Timer.stamp() - time;
+        trace(time);
     }
 
     @Test

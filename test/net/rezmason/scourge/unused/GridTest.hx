@@ -5,16 +5,19 @@ import massive.munit.Assert;
 typedef TestCell = {str:String, symbol:String};
 
 class GridTest {
+
     private var grid:Grid<TestCell>;
+    var time:Float;
 
     @Before
     public function setup():Void {
-
+        time = massive.munit.util.Timer.stamp();
     }
 
     @After
     public function tearDown():Void {
-
+        time = massive.munit.util.Timer.stamp() - time;
+        trace(time);
     }
 
     //@Test

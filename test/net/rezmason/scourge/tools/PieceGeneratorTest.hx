@@ -6,14 +6,17 @@ import net.rezmason.scourge.tools.PieceGenerator;
 
 class PieceGeneratorTest {
 
+    var time:Float;
+
     @Before
     public function setup():Void {
-
+        time = massive.munit.util.Timer.stamp();
     }
 
     @After
     public function tearDown():Void {
-
+        time = massive.munit.util.Timer.stamp() - time;
+        trace(time);
     }
 
     @Test                             // slowing me down
