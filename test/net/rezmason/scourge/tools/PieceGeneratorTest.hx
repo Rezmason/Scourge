@@ -19,7 +19,7 @@ class PieceGeneratorTest {
         trace(time);
     }
 
-    @Test                             // slowing me down
+    @Test
     public function genTest1():Void {
 
         // PieceGenerator should create all one-sided polyominoes with no duplicates
@@ -46,5 +46,48 @@ class PieceGeneratorTest {
                 }
             }
         }
+
+        var count:Int = 5;
+        var pieceGroups:Array<PieceGroup> = PieceGenerator.generateGroups(4);
+        Assert.isNotNull(pieceGroups);
+        Assert.areEqual(count, pieceGroups.length);
+
+        for (group in pieceGroups) {
+            var left:Array<Piece> = group[0];
+            var right:Array<Piece> = group[1];
+
+            if (right != null) Assert.areEqual(left.length, right.length);
+
+            for (ike in 0...left.length) {
+                //trace(spitPiece(left[ike]));
+                if (right != null) {
+                    Assert.areNotEqual(Std.string(left[ike]), Std.string(right[ike]));
+                    //trace(spitPiece(right[ike]));
+                }
+                //trace(" ");
+            }
+            //trace("____");
+        }
+    }
+
+    private function spitPiece(piece:Piece):String {
+        var max:Int = piece.length;
+
+        var str:String = "";
+        for (ike in 0...max * max) {
+            str += " ";
+        }
+
+        for (coord in piece) {
+            var index:Int = max * coord.y + coord.x;
+            str = str.substr(0, index) + "." + str.substr(index + 1);
+        }
+
+        for (ike in 0...max) {
+            var index:Int = ike * max + ike;
+            str = str.substr(0, index) + "\n" + str.substr(index);
+        }
+
+        return str;
     }
 }

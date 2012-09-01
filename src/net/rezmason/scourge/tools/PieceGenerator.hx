@@ -2,9 +2,10 @@ package net.rezmason.scourge.tools;
 
 typedef IntCoord = {x:Int, y:Int};
 typedef Piece = Array<IntCoord>;
+typedef PieceGroup = Array<Array<Piece>>;
 typedef Pattern = Array<Array<Bool>>;
 
-typedef PatternFunction = Int->Array<Pattern>;
+typedef PatternFunction = Int->Void;
 
 using Lambda;
 
@@ -17,6 +18,9 @@ class PieceGenerator {
     private static var oneSidedPatternsBySize:Array<Array<Pattern>> = [];
     private static var freePatternsBySize:Array<Array<Pattern>> = [];
 
+    private static var oneSidedGroupsBySize:Array<Array<Array<Pattern>>> = [];
+    private static var freeGroupsBySize:Array<Array<Array<Array<Pattern>>>> = [];
+
     private static var patterns:Array<Array<Array<Pattern>>> = [fixedPatternsBySize, oneSidedPatternsBySize, freePatternsBySize];
 
     private static var fixedPiecesBySize:Array<Array<Piece>> = [];
@@ -24,31 +28,47 @@ class PieceGenerator {
     private static var freePiecesBySize:Array<Array<Piece>> = [];
 
     private static var pieces:Array<Array<Array<Piece>>> = [fixedPiecesBySize, oneSidedPiecesBySize, freePiecesBySize];
+    private static var pieceGroups:Array<Array<PieceGroup>> = [];
 
     private static var patternFunctions:Array<PatternFunction> = [makeFixedPatterns, makeOneSidedPatterns, makeFreePatterns];
 
-    // The only public method, and therefore the entry point. PieceGenerator's work is recursive,
+    // Returns pieces as arrays of coordinates. PieceGenerator's work is recursive,
     // so it's structured to repurpose its previous solutions.
 
     public static function generate(size:Int, type:Int):Array<Piece> {
         if (size < 0 || type < 0 || type > PieceType.FREE) throw "Invalid generator input";
+        if (pieces[type][size] == null) makePieces(size, type);
+        return pieces[type][size];
+    }
 
-        var pieceSet:Array<Array<Piece>> = pieces[type];
-        if (pieceSet[size] == null) pieceSet[size] = makePieces(size, type);
-        return pieceSet[size];
+    // Returns pieces arranged in a matrix, representing their rotations and reflections
+
+    public static function generateGroups(size:Int):Array<PieceGroup> {
+        if (size < 0) throw "Invalid generator input";
+        if (pieceGroups[size] == null) makePieceGroups(size);
+        return pieceGroups[size];
     }
 
     // Pieces are more compact and user-friendly representations of polyominoes than the internal Pattern objects
 
-    private static function makePieces(size:Int, type:Int):Array<Piece> {
+    private static function makePieces(size:Int, type:Int):Void {
         var patternSet:Array<Array<Pattern>> = patterns[type];
-        if (patternSet[size] == null) patternSet[size] = patternFunctions[type](size);
-        var pieces:Array<Piece> = [];
-        for (pattern in patternSet[size]) pieces.push(patternToPiece(pattern));
-        return pieces;
+        if (patternSet[size] == null) patternFunctions[type](size);
+        var pcs:Array<Piece> = [];
+        for (pattern in patternSet[size]) pcs.push(patternToPiece(pattern));
+        pieces[type][size] = pcs;
     }
 
-    private static function makeFixedPatterns(size:Int):Array<Pattern> {
+    // Piece groups represent the relationships between pieces that are transformable into one another
+
+    private static function makePieceGroups(size:Int):Void {
+        if (freeGroupsBySize[size] == null) makeFixedPatterns(size);
+        var pcGroups:Array<PieceGroup> = [];
+        for (freeGroup in freeGroupsBySize[size]) pcGroups.push(groupToPieceGroup(freeGroup));
+        pieceGroups[size] = pcGroups;
+    }
+
+    private static function makeFixedPatterns(size:Int):Void {
         //trace("FS " + size);
 
         var patterns:Array<Pattern> = [];
@@ -59,7 +79,7 @@ class PieceGenerator {
         } else {
 
             // Grab the previously found fixed patterns that are one size smaller
-            if (fixedPatternsBySize[size - 1] == null) fixedPatternsBySize[size - 1] = makeFixedPatterns(size - 1);
+            if (fixedPatternsBySize[size - 1] == null) makeFixedPatterns(size - 1);
 
             // Generate new polyomino varieties from each earlier polyomino by appending a cell somewhere
             for (predecessor in fixedPatternsBySize[size - 1]) for (pattern in getProgeny(predecessor)) patterns.push(pattern);
@@ -79,21 +99,24 @@ class PieceGenerator {
         // remove all null patterns
         while (patterns.remove(null)) {}
 
-        return patterns;
+        fixedPatternsBySize[size] = patterns;
     }
 
-    private static function makeOneSidedPatterns(size:Int):Array<Pattern> {
+    private static function makeOneSidedPatterns(size:Int):Void {
         //trace("OS " + size);
 
         // Grab the previously found fixed patterns
-        if (fixedPatternsBySize[size] == null) fixedPatternsBySize[size] = makeFixedPatterns(size);
+        if (fixedPatternsBySize[size] == null) makeFixedPatterns(size);
         var patterns:Array<Pattern> = fixedPatternsBySize[size].copy();
+        var oneSidedGroups:Array<Array<Pattern>> = [];
 
         if (patterns.length > 1) {
 
             // Create rotations of the pattern, find the duplicates and null them
             for (ike in 0...patterns.length) {
                 if (patterns[ike] == null) continue;
+
+                var oneSidedGroup:Array<Pattern> = [patterns[ike]];
 
                 var  r90Pattern:Pattern = rotatePattern(patterns[ike]);
                 var r180Pattern:Pattern = rotatePattern(r90Pattern);
@@ -102,54 +125,96 @@ class PieceGenerator {
                 for (jen in ike + 1...patterns.length) {
                     var pattern2:Pattern = patterns[jen];
                     if (pattern2 != null) {
-                             if (arePatternsEqual( r90Pattern, pattern2)) patterns[jen] = null;
-                        else if (arePatternsEqual(r180Pattern, pattern2)) patterns[jen] = null;
-                        else if (arePatternsEqual(r270Pattern, pattern2)) patterns[jen] = null;
+                        if (arePatternsEqual( r90Pattern, pattern2)) {
+                            patterns[jen] = null;
+                            oneSidedGroup[1] = pattern2;
+                        } else if (arePatternsEqual(r180Pattern, pattern2)) {
+                            patterns[jen] = null;
+                            oneSidedGroup[2] = pattern2;
+                        } else if (arePatternsEqual(r270Pattern, pattern2)) {
+                            patterns[jen] = null;
+                            oneSidedGroup[3] = pattern2;
+                        }
                     }
                 }
+
+                oneSidedGroups.push(oneSidedGroup);
             }
+        } else {
+            oneSidedGroups.push([patterns[0]]);
         }
 
         // remove all null patterns
         while (patterns.remove(null)) {}
 
-        return patterns;
+        oneSidedGroupsBySize[size] = oneSidedGroups;
+        oneSidedPatternsBySize[size] = patterns;
     }
 
-    private static function makeFreePatterns(size:Int):Array<Pattern> {
+    private static function makeFreePatterns(size:Int):Void {
         //trace("FR " + size);
 
         // Grab the previously found one-sided patterns
-        if (oneSidedPatternsBySize[size] == null) oneSidedPatternsBySize[size] = makeOneSidedPatterns(size);
-        var patterns:Array<Pattern> = oneSidedPatternsBySize[size].copy();
+        if (oneSidedPatternsBySize[size] == null) makeOneSidedPatterns(size);
+        var patterns:Array<Pattern> = [];
+        var oneSidedGroups:Array<Array<Pattern>> = oneSidedGroupsBySize[size].copy();
+        var freeSidedGroups:Array<Array<Array<Pattern>>> = [];
 
-        if (patterns.length > 1) {
+        if (oneSidedGroups.length > 1) {
 
-            // Create flipped rotations of the pattern, find the duplicates and null them
-            for (ike in 0...patterns.length) {
-                if (patterns[ike] == null) continue;
+            // Create flipped rotations of the group's first pattern, find the duplicates and null them
+            for (ike in 0...oneSidedGroups.length) {
 
-                var flipPattern:Pattern = vFlipPattern(patterns[ike]);
+                var oneSidedGroup:Array<Pattern> = oneSidedGroups[ike];
+
+                if (oneSidedGroup == null) continue;
+
+                var freeGroup:Array<Array<Pattern>> = [oneSidedGroup];
+
+                patterns.push(oneSidedGroup[0]);
+
+                var flipPattern:Pattern = vFlipPattern(oneSidedGroup[0]);
                 var  r90Pattern:Pattern = rotatePattern(flipPattern);
                 var r180Pattern:Pattern = rotatePattern(r90Pattern);
                 var r270Pattern:Pattern = rotatePattern(r180Pattern);
 
-                for (jen in ike + 1...patterns.length) {
-                    var pattern2:Pattern = patterns[jen];
-                    if (pattern2 != null) {
-                             if (arePatternsEqual(flipPattern, pattern2)) patterns[jen] = null;
-                        else if (arePatternsEqual( r90Pattern, pattern2)) patterns[jen] = null;
-                        else if (arePatternsEqual(r180Pattern, pattern2)) patterns[jen] = null;
-                        else if (arePatternsEqual(r270Pattern, pattern2)) patterns[jen] = null;
+                for (jen in ike + 1...oneSidedGroups.length) {
+                    var group2:Array<Pattern> = oneSidedGroups[jen];
+                    if (group2 != null) {
+                        var pattern2:Pattern = group2[0];
+
+                        if (pattern2 != null) {
+                            var offset:Int = -1;
+
+                            if (arePatternsEqual(flipPattern, pattern2)) {
+                                offset = 0;
+                            } else if (arePatternsEqual( r90Pattern, pattern2)) {
+                                offset = 1;
+                            } else if (arePatternsEqual(r180Pattern, pattern2)) {
+                                offset = 2;
+                            } else if (arePatternsEqual(r270Pattern, pattern2)) {
+                                offset = 3;
+                            }
+
+                            if (offset != -1) {
+                                while (offset-- > 0) group2.push(group2.shift());
+                                freeGroup.push(group2);
+                                oneSidedGroups[jen] = null;
+                                break;
+                            }
+                        }
                     }
                 }
+
+                freeSidedGroups.push(freeGroup);
             }
+        } else {
+            freeSidedGroups.push([oneSidedGroups[0], oneSidedGroups[0]]);
+            patterns.push(oneSidedGroups[0][0]);
         }
 
-        // remove all null patterns
-        while (patterns.remove(null)) {}
-
-        return patterns;
+        freePatternsBySize[size] = patterns;
+        freeGroupsBySize[size] = freeSidedGroups;
     }
 
     private static function rotatePattern(pattern:Pattern):Pattern {
@@ -259,6 +324,19 @@ class PieceGenerator {
         return piece;
     }
 
+    private static function groupToPieceGroup(group:Array<Array<Pattern>>):PieceGroup {
+        var pieceGroup:PieceGroup = [];
+        for (reflection in group) {
+            var pieceReflection:Array<Piece> = [];
+            pieceGroup.push(pieceReflection);
+            for (pattern in reflection) {
+                pieceReflection.push(patternToPiece(pattern));
+            }
+        }
+
+        return pieceGroup;
+    }
+
     private static function spitPattern(pattern:Pattern):String {
 
         // Handy.
@@ -270,7 +348,7 @@ class PieceGenerator {
             for (column in 0...size) {
                 str += row[column] ? "•" : " ";
             }
-            str += "\n______";
+            str += "\n";
         }
         return str;
     }
