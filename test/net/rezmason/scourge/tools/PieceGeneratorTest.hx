@@ -42,7 +42,7 @@ class PieceGeneratorTest {
                 Assert.areEqual(count, pieces.length);
                 for (piece in pieces) {
                     Assert.isNotNull(piece);
-                    Assert.areEqual(size + 1, piece.length);
+                    Assert.areEqual(size + 1, piece[0].length);
                 }
             }
         }
@@ -52,6 +52,8 @@ class PieceGeneratorTest {
         Assert.isNotNull(pieceGroups);
         Assert.areEqual(count, pieceGroups.length);
 
+        var str:String = "\n";
+
         for (group in pieceGroups) {
             var left:Array<Piece> = group[0];
             var right:Array<Piece> = group[1];
@@ -59,27 +61,34 @@ class PieceGeneratorTest {
             if (right != null) Assert.areEqual(left.length, right.length);
 
             for (ike in 0...left.length) {
-                //trace(spitPiece(left[ike]));
+                str += "\n" + spitPiece(left[ike]);
                 if (right != null) {
                     Assert.areNotEqual(Std.string(left[ike]), Std.string(right[ike]));
-                    //trace(spitPiece(right[ike]));
+                    str += "\n" + spitPiece(right[ike]);
                 }
-                //trace(" ");
+                str += "\n" + " ";
             }
-            //trace("____");
+            str += "\n" + "____";
         }
+
+        //trace(str);
     }
 
     private function spitPiece(piece:Piece):String {
-        var max:Int = piece.length;
+        var max:Int = piece[0].length + 2;
 
         var str:String = "";
         for (ike in 0...max * max) {
-            str += " ";
+            str += "-";
         }
 
-        for (coord in piece) {
-            var index:Int = max * coord.y + coord.x;
+        for (coord in piece[0]) {
+            var index:Int = max * (coord.y + 1) + coord.x + 1;
+            str = str.substr(0, index) + "O" + str.substr(index + 1);
+        }
+
+        for (coord in piece[1]) {
+            var index:Int = max * (coord.y + 1) + coord.x + 1;
             str = str.substr(0, index) + "." + str.substr(index + 1);
         }
 

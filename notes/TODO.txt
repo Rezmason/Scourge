@@ -1,5 +1,4 @@
 Piece placement - hoo boy
-	PieceGenerator should provide associations of pieces
 
 	Random pieces - easy to implement
 	Hat pieces - just as easy, though the configuration might be strange

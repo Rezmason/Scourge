@@ -1,7 +1,7 @@
 package net.rezmason.scourge.tools;
 
 typedef IntCoord = {x:Int, y:Int};
-typedef Piece = Array<IntCoord>;
+typedef Piece = Array<Array<IntCoord>>;
 typedef PieceGroup = Array<Array<Piece>>;
 typedef Pattern = Array<Array<Bool>>;
 
@@ -224,7 +224,7 @@ class PieceGenerator {
         var rotatedPattern:Pattern = [];
         for (row in 0...pattern.length) {
             rotatedPattern.push([]);
-            for (col in 0...pattern.length) rotatedPattern[row][col] = pattern[col][row] == true;
+            for (col in 0...pattern.length) rotatedPattern[row][col] = pattern[col][row] == true ? true : false;
             rotatedPattern[row].reverse();
         }
 
@@ -267,11 +267,11 @@ class PieceGenerator {
 
                     var valid:Bool = false;
 
-                    if (pattern[y][x-1] || pattern[y][x+1]) {
+                    if (pattern[y][x-1] == true || pattern[y][x+1] == true) {
                         valid = true;
-                    } else if (pattern[y-1] != null && pattern[y-1][x]) {
+                    } else if (pattern[y-1] != null && pattern[y-1][x] == true) {
                         valid = true;
-                    } else if (pattern[y+1] != null && pattern[y+1][x]) {
+                    } else if (pattern[y+1] != null && pattern[y+1][x] == true) {
                         valid = true;
                     }
 
@@ -319,9 +319,39 @@ class PieceGenerator {
     }
 
     private static function patternToPiece(pattern:Pattern):Piece {
-        var piece:Piece = [];
-        for (y in 0...pattern.length) for (x in 0...pattern[y].length) if (pattern[y][x]) piece.push({x:x, y:y});
-        return piece;
+
+        var coords:Array<IntCoord> = [];
+        var neighborCoords:Array<IntCoord> = [];
+
+        pattern = copyPattern(pattern); // !!
+        for (row in pattern) row.unshift(false); // !!
+        pattern.push([]); // !!
+        pattern.unshift([]); // !!
+
+        // For each empty cell adjacent to the filled cells in the pattern,
+
+        for (y in 0...pattern.length) {
+            for (x in 0...pattern.length) {
+                if (pattern[y][x] != true) {
+
+                    var valid:Bool = false;
+
+                    if (pattern[y][x-1] == true || pattern[y][x+1] == true) {
+                        valid = true;
+                    } else if (pattern[y-1] != null && pattern[y-1][x] == true) {
+                        valid = true;
+                    } else if (pattern[y+1] != null && pattern[y+1][x] == true) {
+                        valid = true;
+                    }
+
+                    if (valid) neighborCoords.push({x:x-1, y:y-1});
+                }
+            }
+        }
+
+        for (y in 0...pattern.length) for (x in 0...pattern[y].length) if (pattern[y][x] == true) coords.push({x:x-1, y:y-1});
+
+        return [coords, neighborCoords];
     }
 
     private static function groupToPieceGroup(group:Array<Array<Pattern>>):PieceGroup {
@@ -346,7 +376,8 @@ class PieceGenerator {
         for (row in pattern) {
             str += "";
             for (column in 0...size) {
-                str += row[column] ? "•" : " ";
+                if (row[column]) str += "•";
+                else str += " ";
             }
             str += "\n";
         }
