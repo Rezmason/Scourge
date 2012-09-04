@@ -1,10 +1,7 @@
 package net.rezmason.scourge.tools;
 
-typedef IntCoord = {x:Int, y:Int};
-typedef Piece = Array<Array<IntCoord>>;
-typedef PieceGroup = Array<Array<Piece>>;
+import net.rezmason.scourge.model.PieceTypes;
 typedef Pattern = Array<Array<Bool>>;
-
 typedef PatternFunction = Int->Void;
 
 using Lambda;
@@ -62,7 +59,7 @@ class PieceGenerator {
     // Piece groups represent the relationships between pieces that are transformable into one another
 
     private static function makePieceGroups(size:Int):Void {
-        if (freeGroupsBySize[size] == null) makeFixedPatterns(size);
+        if (freeGroupsBySize[size] == null) makeFreePatterns(size);
         var pcGroups:Array<PieceGroup> = [];
         for (freeGroup in freeGroupsBySize[size]) pcGroups.push(groupToPieceGroup(freeGroup));
         pieceGroups[size] = pcGroups;
@@ -209,7 +206,7 @@ class PieceGenerator {
                 freeSidedGroups.push(freeGroup);
             }
         } else {
-            freeSidedGroups.push([oneSidedGroups[0], oneSidedGroups[0]]);
+            freeSidedGroups.push([oneSidedGroups[0]]);
             patterns.push(oneSidedGroups[0][0]);
         }
 
@@ -344,12 +341,12 @@ class PieceGenerator {
                         valid = true;
                     }
 
-                    if (valid) neighborCoords.push({x:x-1, y:y-1});
+                    if (valid) neighborCoords.push([x-1, y-1]);
                 }
             }
         }
 
-        for (y in 0...pattern.length) for (x in 0...pattern[y].length) if (pattern[y][x] == true) coords.push({x:x-1, y:y-1});
+        for (y in 0...pattern.length) for (x in 0...pattern[y].length) if (pattern[y][x] == true) coords.push([x-1, y-1]);
 
         return [coords, neighborCoords];
     }

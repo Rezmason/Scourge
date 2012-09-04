@@ -229,18 +229,21 @@ class RulesTest
 	//@Test
 	public function placePieceRuleTest():Void {
 		/*
-		1: for each orientation,
-		2: for each edge node of the player,
-			3: for each neighbor coord in the orientation,
-				Look up the node at the origin
-				If that node has not already been visited as an origin,
-					Flag that node
-					4: for each coord in the orientation,
-						Get the node at the coord (relative to the origin node)
-						If the node is filled,
-							break loop 3
-					add the origin node to the list
-		unflag all flagged nodes
+		- Find edge nodes of current player
+
+        A: For each available piece,
+            B: For each of the piece's reflections,
+                C: For each of the reflection's angles,
+                    Create coord list
+                    D: For each of the angle's neighbor coords,
+                        E: For each edge node of the current player,
+                            If the node under the first piece coord is not in the coord list,
+                                Add it to the list
+                                For each of the angle's piece coords,
+                                    If the node under the coord is occupied,
+                                        continue C
+                                Create option from angle and first piece coord
+                                    Remember the ID
 		*/
 	}
 

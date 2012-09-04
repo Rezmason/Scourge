@@ -1,0 +1,3 @@
+-x tables/GenerateTables.hx
+-cp src
+-D haxeJSON

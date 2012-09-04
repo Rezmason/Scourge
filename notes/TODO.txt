@@ -1,5 +1,23 @@
 Piece placement - hoo boy
 
+	Options are a piece and the node where its first coordinate should rest
+
+	- Find edge nodes of current player
+
+	A: For each available piece,
+		B: For each of the piece's reflections,
+			C: For each of the reflection's angles,
+				Create coord list
+				D: For each of the angle's neighbor coords,
+					E: For each edge node of the current player,
+						If the node under the first piece coord is not in the coord list,
+							Add it to the list
+							For each of the angle's piece coords,
+								If the node under the coord is occupied,
+									continue C
+							Create option from angle and first piece coord
+								Remember the ID
+
 	Random pieces - easy to implement
 	Hat pieces - just as easy, though the configuration might be strange
 	Piece genes - easy
@@ -32,6 +50,8 @@ Forfeiting
 And then SPEED EVERYTHING UP
 	Use timing output to find the bottlenecks
 		Pretty damn sure the kill-disconnected-cells rule is a lot slower than it could be
+	Store useful information, like edges, distance and connectedness values
+		Rules that take advantage of these values would expand a graph from an affected square
 
 Level Editing
 	Just a bunch of rules, aha

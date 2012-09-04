@@ -2,6 +2,8 @@ package net.rezmason.scourge.tools;
 
 import massive.munit.Assert;
 
+import net.rezmason.scourge.model.PieceTypes;
+import net.rezmason.scourge.model.Pieces;
 import net.rezmason.scourge.tools.PieceGenerator;
 
 class PieceGeneratorTest {
@@ -17,6 +19,32 @@ class PieceGeneratorTest {
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
         trace(time);
+    }
+
+    @Test
+    public function jsonTest():Void {
+        var pieceGroups:Array<PieceGroup> = Pieces.groups;
+
+        var str:String = "\n";
+
+        for (group in pieceGroups) {
+            var left:Array<Piece> = group[0];
+            var right:Array<Piece> = group[1];
+
+            if (right != null) Assert.areEqual(left.length, right.length);
+
+            for (ike in 0...left.length) {
+                str += "\n" + spitPiece(left[ike]);
+                if (right != null) {
+                    Assert.areNotEqual(Std.string(left[ike]), Std.string(right[ike]));
+                    str += "\n" + spitPiece(right[ike]);
+                }
+                str += "\n" + " ";
+            }
+            str += "\n" + "____";
+        }
+
+        //trace(str);
     }
 
     @Test
@@ -47,10 +75,13 @@ class PieceGeneratorTest {
             }
         }
 
-        var count:Int = 5;
-        var pieceGroups:Array<PieceGroup> = PieceGenerator.generateGroups(4);
-        Assert.isNotNull(pieceGroups);
-        Assert.areEqual(count, pieceGroups.length);
+        var pieceGroups:Array<PieceGroup> = [];
+        for (size in 0...4) {
+            var groups:Array<PieceGroup> = PieceGenerator.generateGroups(size + 1);
+            Assert.isNotNull(groups);
+            Assert.areEqual(expectedCounts[2][size], groups.length);
+            pieceGroups = pieceGroups.concat(groups);
+        }
 
         var str:String = "\n";
 
@@ -83,12 +114,12 @@ class PieceGeneratorTest {
         }
 
         for (coord in piece[0]) {
-            var index:Int = max * (coord.y + 1) + coord.x + 1;
+            var index:Int = max * (coord[1] + 1) + coord[0] + 1;
             str = str.substr(0, index) + "O" + str.substr(index + 1);
         }
 
         for (coord in piece[1]) {
-            var index:Int = max * (coord.y + 1) + coord.x + 1;
+            var index:Int = max * (coord[1] + 1) + coord[0] + 1;
             str = str.substr(0, index) + "." + str.substr(index + 1);
         }
 

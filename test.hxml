@@ -4,8 +4,10 @@
 -lib hamcrest
 -cp src
 -debug
+-resource tables/pieces.json@pieces
 #-D VISUAL_TEST
 -D USE_POINTERS
+-D haxeJSON
 
 -cp test
 -swf-version 9
@@ -18,8 +20,10 @@
 -lib hamcrest
 -cp src
 -debug
+-resource tables/pieces.json@pieces
 #-D VISUAL_TEST
 -D USE_POINTERS
+-D haxeJSON
 
 -cp test
 -js build/js_test.js
@@ -27,13 +31,16 @@
 --next
 
 # Neko
+
 -main TestMain
 -lib munit
 -lib hamcrest
 -cp src
 -debug
+-resource tables/pieces.json@pieces
 #-D VISUAL_TEST
 -D USE_POINTERS
+-D haxeJSON
 
 -cp test
 -neko build/neko_test.n
