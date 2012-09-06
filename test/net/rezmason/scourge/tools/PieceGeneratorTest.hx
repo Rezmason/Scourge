@@ -23,28 +23,36 @@ class PieceGeneratorTest {
 
     @Test
     public function jsonTest():Void {
-        var pieceGroups:Array<PieceGroup> = Pieces.groups;
 
         var str:String = "\n";
 
-        for (group in pieceGroups) {
-            var left:Array<Piece> = group[0];
-            var right:Array<Piece> = group[1];
+        for (size in 0...4) {
 
-            if (right != null) Assert.areEqual(left.length, right.length);
+            str += "" + size + "\n__\n";
 
-            for (ike in 0...left.length) {
-                str += "\n" + spitPiece(left[ike]);
-                if (right != null) {
-                    Assert.areNotEqual(Std.string(left[ike]), Std.string(right[ike]));
-                    str += "\n" + spitPiece(right[ike]);
+            var pieceGroups:Array<PieceGroup> = Pieces.getAllPiecesOfSize(size + 1);
+
+            for (group in pieceGroups) {
+                var left:Array<Piece> = group[0];
+                var right:Array<Piece> = group[1];
+
+                if (right != null) Assert.areEqual(left.length, right.length);
+
+                for (ike in 0...left.length) {
+                    Assert.areEqual(size + 1, left[ike][0].length);
+                    str += "\n" + spitPiece(left[ike]);
+                    if (right != null) {
+                        Assert.areNotEqual(Std.string(left[ike]), Std.string(right[ike]));
+                        Assert.areEqual(size + 1, right[ike][0].length);
+                        str += "\n" + spitPiece(right[ike]);
+                    }
+                    str += "\n" + " ";
                 }
-                str += "\n" + " ";
+                str += "\n" + "____";
             }
-            str += "\n" + "____";
-        }
 
         //trace(str);
+        }
     }
 
     @Test

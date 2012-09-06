@@ -44,12 +44,10 @@ class BoardRuleTest {
     @Test
     public function configTest1():Void {
 
-        var boardCfg:BoardConfig = new BoardConfig();
-        boardCfg.circular = false;
+        var boardCfg:BoardConfig = {circular:false, initGrid:null};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
-        var playerCfg:PlayerConfig = new PlayerConfig();
-        playerCfg.numPlayers = 4;
+        var playerCfg:PlayerConfig = {numPlayers:4};
         var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
 
         var state:State = makeState([draftPlayersRule, buildBoardRule]);
@@ -98,12 +96,10 @@ class BoardRuleTest {
     @Test
     public function configTest2():Void {
 
-        var boardCfg:BoardConfig = new BoardConfig();
-        boardCfg.circular = true;
+        var boardCfg:BoardConfig = {circular:true, initGrid:null};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
-        var playerCfg:PlayerConfig = new PlayerConfig();
-        playerCfg.numPlayers = 1;
+        var playerCfg:PlayerConfig = {numPlayers:1};
         var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
 
         var state:State = makeState([draftPlayersRule, buildBoardRule]);
@@ -119,14 +115,10 @@ class BoardRuleTest {
     @Test
     public function configTest3():Void {
 
-        var boardCfg:BoardConfig = new BoardConfig();
-        boardCfg.circular = false;
-        boardCfg.initGrid = TestBoards.spiral;
+        var boardCfg:BoardConfig = {circular:false, initGrid:TestBoards.spiral};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
-        var playerCfg:PlayerConfig = new PlayerConfig();
-
-        playerCfg.numPlayers = 4;
+        var playerCfg:PlayerConfig = {numPlayers:4};
         var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
 
         var state:State = makeState([draftPlayersRule, buildBoardRule]);
@@ -143,9 +135,6 @@ class BoardRuleTest {
 
     private function makeState(rules:Array<Rule>):State {
         history.wipe();
-        var factory:StateFactory = new StateFactory();
-        var stateCfg:StateConfig = new StateConfig();
-        stateCfg.rules = rules;
-        return factory.makeState(stateCfg, history);
+        return new StateFactory().makeState(rules, history);
     }
 }

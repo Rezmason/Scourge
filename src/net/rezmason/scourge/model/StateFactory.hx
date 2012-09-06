@@ -16,14 +16,12 @@ class StateFactory {
 
     }
 
-    public function makeState(cfg:StateConfig, history:StateHistory):State {
-        if (cfg == null) return null;
-        if (cfg.rules == null) return null;
+    public function makeState(rules:Array<Rule>, history:StateHistory):State {
+        if (rules == null) return null;
 
         var state:State = new State();
         state.history = history;
 
-        var rules:Array<Rule> = cfg.rules;
         while (rules.has(null)) rules.remove(null);
 
         // Create and populate the aspect requirement lists

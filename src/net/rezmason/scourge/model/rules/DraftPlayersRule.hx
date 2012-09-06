@@ -3,6 +3,10 @@ package net.rezmason.scourge.model.rules;
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.TestAspect;
 
+typedef PlayerConfig = {
+    public var numPlayers:Int;
+}
+
 class DraftPlayersRule extends Rule {
 
     static var reqs:AspectRequirements;

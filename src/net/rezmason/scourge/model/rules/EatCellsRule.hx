@@ -10,6 +10,10 @@ using Lambda;
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.Pointers;
 
+typedef EatCellsConfig = {
+    public var recursive:Bool;
+}
+
 class EatCellsRule extends Rule {
 
     static var nodeReqs:AspectRequirements;
@@ -21,6 +25,7 @@ class EatCellsRule extends Rule {
     var isFilled_:AspectPtr;
     var freshness_:AspectPtr;
     var head_:AspectPtr;
+    var currentPlayer_:AspectPtr;
 
     var recursive:Bool;
 
@@ -51,6 +56,7 @@ class EatCellsRule extends Rule {
         isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         freshness_ = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
+        currentPlayer_ = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
 
         recursive = cfg.recursive;
     }
@@ -68,12 +74,8 @@ class EatCellsRule extends Rule {
             // Find all fresh nodes
             // hint: they're body nodes
 
-            var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
             var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-
-            var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
             var head:Int = history.get(state.players[currentPlayer].at(head_));
-
             var playerHead:BoardNode = state.nodes[head];
 
             var nodes:Array<BoardNode> = playerHead.getGraph(true, isLivingBodyNeighbor);

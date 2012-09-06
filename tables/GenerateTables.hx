@@ -15,12 +15,11 @@ class GenerateTables {
     }
 
     static function generatePieceTable():Void {
-        var pieceGroups:Array<PieceGroup> = [];
+        var pieceGroupsBySize:Array<Array<PieceGroup>> = [];
         for (size in 0...4) {
-
-            pieceGroups = pieceGroups.concat(PieceGenerator.generateGroups(size + 1));
+            pieceGroupsBySize.push(PieceGenerator.generateGroups(size + 1));
         }
 
-        File.write("./tables/pieces.json", false).writeString(pieceGroups.stringify());
+        File.write("./tables/pieces.json", false).writeString(pieceGroupsBySize.stringify());
     }
 }

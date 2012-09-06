@@ -2,17 +2,20 @@ package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
 
+import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
-import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
-import net.rezmason.scourge.model.rules.KillDisconnectedCellsRule;
-import net.rezmason.scourge.model.rules.EatCellsRule;
+import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.aspects.PieceAspect;
+import net.rezmason.scourge.model.aspects.PlyAspect;
+import net.rezmason.scourge.model.evaluators.TestEvaluator;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.DraftPlayersRule;
-import net.rezmason.scourge.model.evaluators.TestEvaluator;
-import net.rezmason.scourge.model.GridNode;
+import net.rezmason.scourge.model.rules.EatCellsRule;
+import net.rezmason.scourge.model.rules.KillDisconnectedCellsRule;
+import net.rezmason.scourge.model.rules.TestPieceRule;
+import net.rezmason.scourge.model.rules.DropPieceRule;
 
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.Pointers;
@@ -63,7 +66,6 @@ class RulesTest
         var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
 
-
 		var numCells:Int = ~/([^0])/g.replace(TestBoards.spiral, "").length;
 
         var testEvaluator:Evaluator = new TestEvaluator();
@@ -72,7 +74,7 @@ class RulesTest
 
         var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
 
-        var head:Int = history.get(state.players[currentPlayer][BodyAspect.HEAD.id]);
+        var head:Int = history.get(state.players[currentPlayer].at(head_));
         var playerHead:BoardNode = state.nodes[head];
 		var playerNeck:BoardNode = playerHead.n();
 
@@ -140,8 +142,7 @@ class RulesTest
 
     @Test
     public function eatRuleTest():Void {
-        var eatConfig:EatCellsConfig = new EatCellsConfig();
-        eatConfig.recursive = false;
+        var eatConfig:EatCellsConfig = {recursive:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         state = makeState(TestBoards.oaf, 4, cast [eatRule]);
 
@@ -184,8 +185,7 @@ class RulesTest
 
     @Test
     public function eatRecursivelyRuleTest():Void {
-        var eatConfig:EatCellsConfig = new EatCellsConfig();
-        eatConfig.recursive = true;
+        var eatConfig:EatCellsConfig = {recursive:true};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         state = makeState(TestBoards.oaf, 4, cast [eatRule]);
 
@@ -226,25 +226,21 @@ class RulesTest
         Assert.areEqual(483, numCells);
     }
 
-	//@Test
+	@Test
 	public function placePieceRuleTest():Void {
-		/*
-		- Find edge nodes of current player
 
-        A: For each available piece,
-            B: For each of the piece's reflections,
-                C: For each of the reflection's angles,
-                    Create coord list
-                    D: For each of the angle's neighbor coords,
-                        E: For each edge node of the current player,
-                            If the node under the first piece coord is not in the coord list,
-                                Add it to the list
-                                For each of the angle's piece coords,
-                                    If the node under the coord is occupied,
-                                        continue C
-                                Create option from angle and first piece coord
-                                    Remember the ID
-		*/
+        var testPieceCfg:TestPieceConfig = {piece:Pieces.getPieceIdBySizeAndIndex(4, 0)}; // "I-block"
+        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
+
+        var dropConfig:DropPieceConfig = {overlapSelf:false};
+        var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
+        state = makeState(TestBoards.emptyPetri, 1, cast [dropRule]);
+
+        var options:Array<Option> = dropRule.getOptions();
+
+        dropRule.chooseOption(options[0]);
+
+        //trace(BoardUtils.spitBoard(state));
 	}
 
     private function makeState(initGrid:String, numPlayers:Int, rules:Array<Rule>):State {
@@ -252,25 +248,16 @@ class RulesTest
 		history.wipe();
 
         // make player config and generate players
-        var playerCfg:PlayerConfig = new PlayerConfig();
-        playerCfg.numPlayers = numPlayers;
-
+        var playerCfg:PlayerConfig = {numPlayers:numPlayers};
         var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
 
         // make board config and generate board
-        var boardCfg:BoardConfig = new BoardConfig();
-        boardCfg.initGrid = initGrid;
-
+        var boardCfg:BoardConfig = {circular:false, initGrid:initGrid};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
         rules.unshift(buildBoardRule);
         rules.unshift(draftPlayersRule);
 
-        // make state config and generate state
-        var factory:StateFactory = new StateFactory();
-        var stateCfg:StateConfig = new StateConfig();
-        stateCfg.rules = rules;
-
-        return factory.makeState(stateCfg, history);
+        return new StateFactory().makeState(rules, history);
 	}
 }

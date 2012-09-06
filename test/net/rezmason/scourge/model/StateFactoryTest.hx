@@ -34,9 +34,8 @@ class StateFactoryTest {
 
         // make state config and generate state
         var factory:StateFactory = new StateFactory();
-        var stateCfg:StateConfig = new StateConfig();
-        stateCfg.rules = [null, new TestRule()];
-        var state:State = factory.makeState(stateCfg, history);
+        var rules:Array<Rule> = [null, new TestRule()];
+        var state:State = factory.makeState(rules, history);
 
         // Make sure there's the right aspects on the state
 
