@@ -1,21 +1,3 @@
-/*
-- Find edge nodes of current player
-
-A: For each available piece,
-    B: For each of the piece's reflections,
-        C: For each of the reflection's angles,
-            Create coord list
-            D: For each of the angle's neighbor coords,
-                E: For each edge node of the current player,
-                    If the node under the first piece coord is not in the coord list,
-                        Add it to the list
-                        For each of the angle's piece coords,
-                            If the node under the coord is occupied,
-                                continue C
-                        Create option from angle and first piece coord
-                            Remember the ID
-*/
-
 package net.rezmason.scourge.model.rules;
 
 import net.rezmason.scourge.model.ModelTypes;
@@ -30,6 +12,8 @@ using net.rezmason.utils.Pointers;
 
 typedef DropPieceConfig = {
     public var overlapSelf:Bool;
+    public var allowFlipping:Bool;
+    public var allowRotating:Bool;
 }
 
 class DropPieceRule extends Rule {
@@ -43,6 +27,9 @@ class DropPieceRule extends Rule {
     var head_:AspectPtr;
     var currentPlayer_:AspectPtr;
     var pieceID_:AspectPtr;
+
+    var pieceReflection_:AspectPtr;
+    var pieceRotation_:AspectPtr;
 
     var overlapSelf:Bool;
 
@@ -64,6 +51,8 @@ class DropPieceRule extends Rule {
         if (stateReqs == null) stateReqs = [
             PlyAspect.CURRENT_PLAYER,
             PieceAspect.PIECE_ID,
+            PieceAspect.PIECE_REFLECTION,
+            PieceAspect.PIECE_ROTATION,
         ];
     }
 
@@ -75,6 +64,9 @@ class DropPieceRule extends Rule {
         currentPlayer_ = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
         pieceID_ = state.stateAspectLookup[PieceAspect.PIECE_ID.id];
 
+        pieceReflection_ = state.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
+        pieceRotation_ = state.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
+
         overlapSelf = cfg.overlapSelf;
     }
 
@@ -85,6 +77,24 @@ class DropPieceRule extends Rule {
 
     override public function getOptions():Array<Option> {
         return [];
+
+        /*
+        - Find edge nodes of current player
+
+        A: For each available piece,
+            B: For each of the piece's allowed reflections,
+                C: For each of the reflection's allowed angles,
+                    Create coord list
+                    D: For each of the angle's neighbor coords,
+                        E: For each edge node of the current player,
+                            If the node under the first piece coord is not in the coord list,
+                                Add it to the list
+                                For each of the angle's piece coords,
+                                    If the node under the coord is occupied,
+                                        continue C
+                                Create option from angle and first piece coord
+                                    Remember the ID
+        */
     }
 
     override public function chooseOption(choice:Option):Void {

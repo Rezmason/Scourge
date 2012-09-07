@@ -229,14 +229,20 @@ class RulesTest
 	@Test
 	public function placePieceRuleTest():Void {
 
-        var testPieceCfg:TestPieceConfig = {piece:Pieces.getPieceIdBySizeAndIndex(4, 0)}; // "I-block"
+        var testPieceCfg:TestPieceConfig = {
+            piece:Pieces.getPieceIdBySizeAndIndex(4, 0), // "I-block"
+            reflection:0,
+            rotation:0,
+        };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:false};
+        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:true};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         state = makeState(TestBoards.emptyPetri, 1, cast [dropRule]);
 
         var options:Array<Option> = dropRule.getOptions();
+
+        Assert.areNotEqual(0, options.length);
 
         dropRule.chooseOption(options[0]);
 

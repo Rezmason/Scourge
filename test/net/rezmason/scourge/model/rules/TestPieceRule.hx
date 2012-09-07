@@ -7,6 +7,8 @@ using net.rezmason.utils.Pointers;
 
 typedef TestPieceConfig = {
     var piece:Int;
+    var reflection:Int;
+    var rotation:Int;
 }
 
 class TestPieceRule extends Rule {
@@ -22,6 +24,8 @@ class TestPieceRule extends Rule {
 
         if (stateReqs == null) stateReqs = [
             PieceAspect.PIECE_ID,
+            PieceAspect.PIECE_REFLECTION,
+            PieceAspect.PIECE_ROTATION,
         ];
     }
 
@@ -29,6 +33,12 @@ class TestPieceRule extends Rule {
         super.init(state);
         var pieceID_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_ID.id];
         history.set(state.aspects.at(pieceID_), cfg.piece);
+
+        var pieceReflection_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
+        history.set(state.aspects.at(pieceReflection_), cfg.reflection);
+
+        var pieceRotation_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
+        history.set(state.aspects.at(pieceRotation_), cfg.rotation);
     }
 
     override public function listStateAspectRequirements():AspectRequirements { return stateReqs; }
