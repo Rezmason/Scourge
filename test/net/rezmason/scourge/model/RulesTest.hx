@@ -83,7 +83,8 @@ class RulesTest
 
 		//Pass the State to the Rule for Option generation
 
-		var options:Array<Option> = killRule.getOptions();
+        killRule.update();
+		var options:Array<Option> = killRule.options;
 
         Assert.isNotNull(options);
 		Assert.areEqual(1, options.length);
@@ -167,7 +168,8 @@ class RulesTest
         var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
         Assert.areEqual(371, numCells);
 
-        Assert.areEqual(1, eatRule.getOptions().length);
+        eatRule.update();
+        Assert.areEqual(1, eatRule.options.length);
 
         // straight up eating
 
@@ -245,7 +247,8 @@ class RulesTest
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         state = makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
-        var options:Array<DropPieceOption> = cast dropRule.getOptions();
+        dropRule.update();
+        var options:Array<DropPieceOption> = cast dropRule.options;
 
         Assert.areEqual(72, options.length);
 

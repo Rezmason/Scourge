@@ -22,7 +22,7 @@ class TestPieceRule extends Rule {
 
         this.cfg = cfg;
 
-        if (stateReqs == null) stateReqs = [
+        stateAspectRequirements = [
             PieceAspect.PIECE_ID,
             PieceAspect.PIECE_REFLECTION,
             PieceAspect.PIECE_ROTATION,
@@ -40,6 +40,4 @@ class TestPieceRule extends Rule {
         var pieceRotation_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
         history.set(state.aspects.at(pieceRotation_), cfg.rotation);
     }
-
-    override public function listStateAspectRequirements():AspectRequirements { return stateReqs; }
 }

@@ -21,10 +21,6 @@ typedef DropPieceConfig = {
 
 class DropPieceRule extends Rule {
 
-    static var nodeReqs:AspectRequirements;
-    static var playerReqs:AspectRequirements;
-    static var stateReqs:AspectRequirements;
-
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var freshness_:AspectPtr;
@@ -43,21 +39,21 @@ class DropPieceRule extends Rule {
         super();
         this.cfg = cfg;
 
-        if (nodeReqs == null)  nodeReqs = [
-            OwnershipAspect.IS_FILLED,
-            OwnershipAspect.OCCUPIER,
-            FreshnessAspect.FRESHNESS,
-        ];
-
-        if (playerReqs == null) playerReqs = [
-            BodyAspect.HEAD,
-        ];
-
-        if (stateReqs == null) stateReqs = [
+        stateAspectRequirements = [
             PlyAspect.CURRENT_PLAYER,
             PieceAspect.PIECE_ID,
             PieceAspect.PIECE_REFLECTION,
             PieceAspect.PIECE_ROTATION,
+        ];
+
+        playerAspectRequirements = [
+            BodyAspect.HEAD,
+        ];
+
+        nodeAspectRequirements = [
+            OwnershipAspect.IS_FILLED,
+            OwnershipAspect.OCCUPIER,
+            FreshnessAspect.FRESHNESS,
         ];
     }
 
@@ -77,14 +73,9 @@ class DropPieceRule extends Rule {
         overlapSelf = cfg.overlapSelf;
     }
 
-    override public function listStateAspectRequirements():AspectRequirements { return stateReqs; }
-    override public function listPlayerAspectRequirements():AspectRequirements { return playerReqs; }
-    override public function listBoardAspectRequirements():AspectRequirements { return nodeReqs; }
+    override public function update():Void {
 
-
-    override public function getOptions():Array<Option> {
-
-        var options:Array<DropPieceOption> = [];
+        var dropOptions:Array<DropPieceOption> = [];
 
         // get current player head
         var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
@@ -140,12 +131,12 @@ class DropPieceRule extends Rule {
                         }
 
                         if (valid) {
-                            options.push({
+                            dropOptions.push({
                                 targetNode:state.nodes.indexOf(node),
                                 reflection:-1,
                                 pieceID:pieceIndex,
                                 rotation:rotationIndex,
-                                optionID:options.length,
+                                optionID:dropOptions.length,
                             });
                         }
                     }
@@ -153,7 +144,7 @@ class DropPieceRule extends Rule {
             }
         }
 
-        return cast options;
+        options = cast dropOptions;
     }
 
     override public function chooseOption(choice:Int):Void {

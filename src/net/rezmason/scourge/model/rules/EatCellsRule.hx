@@ -16,11 +16,6 @@ typedef EatCellsConfig = {
 
 class EatCellsRule extends Rule {
 
-    static var nodeReqs:AspectRequirements;
-    static var playerReqs:AspectRequirements;
-    static var stateReqs:AspectRequirements;
-    static var option:Option = {optionID:0};
-
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var freshness_:AspectPtr;
@@ -35,19 +30,21 @@ class EatCellsRule extends Rule {
         super();
         this.cfg = cfg;
 
-        if (nodeReqs == null)  nodeReqs = [
+        stateAspectRequirements = [
+            PlyAspect.CURRENT_PLAYER,
+        ];
+
+        playerAspectRequirements = [
+            BodyAspect.HEAD,
+        ];
+
+        nodeAspectRequirements = [
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
             FreshnessAspect.FRESHNESS,
         ];
 
-        if (playerReqs == null) playerReqs = [
-            BodyAspect.HEAD,
-        ];
-
-        if (stateReqs == null) stateReqs = [
-            PlyAspect.CURRENT_PLAYER,
-        ];
+        options.push({optionID:0});
     }
 
     override public function init(state:State):Void {
@@ -60,11 +57,6 @@ class EatCellsRule extends Rule {
 
         recursive = cfg.recursive;
     }
-
-    override public function listStateAspectRequirements():AspectRequirements { return stateReqs; }
-    override public function listPlayerAspectRequirements():AspectRequirements { return playerReqs; }
-    override public function listBoardAspectRequirements():AspectRequirements { return nodeReqs; }
-    override public function getOptions():Array<Option> { return [option]; }
 
     override public function chooseOption(choice:Int):Void {
 

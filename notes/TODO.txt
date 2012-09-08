@@ -1,16 +1,8 @@
 Piece placement
+	Put the piece down
 
-	Options are a piece and the node where its first coordinate should rest
-
-	Config options
-		overlapping - allows a piece to overlap with existing cells; just won't modify them
-		flipping - allows a piece to be flipped
-		rotating - allows a piece to be rotated
-
-	How will I store a set of nodes?
-		HeadCountAspect.NEXT_HEAD.id
-
-	Create test piece
+How will I store a set of nodes?
+	HeadCountAspect.NEXT_HEAD.id
 
 Piece choice
 

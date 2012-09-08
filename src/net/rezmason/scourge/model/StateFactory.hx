@@ -30,9 +30,9 @@ class StateFactory {
         var nodeRequirements:AspectRequirements = new AspectRequirements();
 
         for (rule in rules) {
-            stateRequirements.absorb(rule.listStateAspectRequirements());
-            playerRequirements.absorb(rule.listPlayerAspectRequirements());
-            nodeRequirements.absorb(rule.listBoardAspectRequirements());
+            stateRequirements.absorb(rule.stateAspectRequirements);
+            playerRequirements.absorb(rule.playerAspectRequirements);
+            nodeRequirements.absorb(rule.nodeAspectRequirements);
         }
 
         // TEMPORARY

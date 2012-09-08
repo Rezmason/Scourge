@@ -21,9 +21,6 @@ class BuildBoardRule extends Rule {
 
     // Creates boards for "skirmish games"
 
-    static var nodeReqs:AspectRequirements;
-    static var playerReqs:AspectRequirements;
-
     private inline static var PLAYER_DIST:Int = 9;
     private inline static var RIM:Int = 1;
     private inline static var PADDING:Int = 5 + RIM;
@@ -44,13 +41,13 @@ class BuildBoardRule extends Rule {
         this.cfg = cfg;
         if (cfg == null) throw "Missing board config.";
 
-        if (nodeReqs == null)  nodeReqs = [
-            OwnershipAspect.IS_FILLED,
-            OwnershipAspect.OCCUPIER,
+        playerAspectRequirements = [
+            BodyAspect.HEAD,
         ];
 
-        if (playerReqs == null) playerReqs = [
-            BodyAspect.HEAD,
+        nodeAspectRequirements = [
+            OwnershipAspect.IS_FILLED,
+            OwnershipAspect.OCCUPIER,
         ];
     }
 
@@ -64,9 +61,6 @@ class BuildBoardRule extends Rule {
 
         makeBoard();
     }
-
-    override public function listPlayerAspectRequirements():AspectRequirements { return playerReqs; }
-    override public function listBoardAspectRequirements():AspectRequirements { return nodeReqs; }
 
     function makeBoard():Void {
 

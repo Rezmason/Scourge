@@ -15,18 +15,27 @@ class Rule {
     var state:State;
     var history:StateHistory;
 
-    public function new():Void { }
+    public var options(default, null):Array<Option>;
+    public var stateAspectRequirements(default, null):AspectRequirements;
+    public var playerAspectRequirements(default, null):AspectRequirements;
+    public var nodeAspectRequirements(default, null):AspectRequirements;
 
-    public function init(state:State) {
+    public function new():Void {
+        stateAspectRequirements = [];
+        playerAspectRequirements = [];
+        nodeAspectRequirements = [];
+        options = [];
+    }
+
+    public function init(state:State):Void {
         this.state = state;
         history = state.history;
     }
 
-    public function listStateAspectRequirements():AspectRequirements { return []; }
-    public function listPlayerAspectRequirements():AspectRequirements { return []; }
-    public function listBoardAspectRequirements():AspectRequirements { return []; }
+    public function update():Void {
 
-    public function getOptions():Array<Option> { return []; }
+    }
+
     public function chooseOption(choice:Int):Void { }
 }
 

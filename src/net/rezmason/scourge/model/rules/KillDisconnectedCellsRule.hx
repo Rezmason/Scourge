@@ -12,10 +12,6 @@ using net.rezmason.utils.Pointers;
 
 class KillDisconnectedCellsRule extends Rule {
 
-    static var nodeReqs:AspectRequirements;
-    static var playerReqs:AspectRequirements;
-    static var option:Option = {optionID:0};
-
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var freshness_:AspectPtr;
@@ -24,15 +20,17 @@ class KillDisconnectedCellsRule extends Rule {
     public function new():Void {
         super();
 
-        if (nodeReqs == null)  nodeReqs = [
+        playerAspectRequirements = [
+            BodyAspect.HEAD,
+        ];
+
+        nodeAspectRequirements = [
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
             FreshnessAspect.FRESHNESS,
         ];
 
-        if (playerReqs == null) playerReqs = [
-            BodyAspect.HEAD,
-        ];
+        options.push({optionID:0});
     }
 
     override public function init(state:State):Void {
@@ -42,11 +40,6 @@ class KillDisconnectedCellsRule extends Rule {
         freshness_ = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
     }
-
-    //override public function listStateAspectRequirements():AspectRequirements { return reqs; }
-    override public function listPlayerAspectRequirements():AspectRequirements { return playerReqs; }
-    override public function listBoardAspectRequirements():AspectRequirements { return nodeReqs; }
-    override public function getOptions():Array<Option> { return [option]; }
 
     override public function chooseOption(choice:Int):Void {
         // perform kill operation on state
