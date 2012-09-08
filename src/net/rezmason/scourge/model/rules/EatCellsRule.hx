@@ -19,7 +19,7 @@ class EatCellsRule extends Rule {
     static var nodeReqs:AspectRequirements;
     static var playerReqs:AspectRequirements;
     static var stateReqs:AspectRequirements;
-    static var option:Option = new Option();
+    static var option:Option = {optionID:0};
 
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
@@ -66,49 +66,43 @@ class EatCellsRule extends Rule {
     override public function listBoardAspectRequirements():AspectRequirements { return nodeReqs; }
     override public function getOptions():Array<Option> { return [option]; }
 
-    override public function chooseOption(choice:Option):Void {
-        if (choice == option) {
+    override public function chooseOption(choice:Int):Void {
 
-            // perform eat operation on state
+        // Find all fresh nodes
+        // hint: they're body nodes
 
-            // Find all fresh nodes
-            // hint: they're body nodes
+        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var playerHead:BoardNode = state.nodes[head];
 
-            var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-            var head:Int = history.get(state.players[currentPlayer].at(head_));
-            var playerHead:BoardNode = state.nodes[head];
+        var nodes:Array<BoardNode> = playerHead.getGraph(true, isLivingBodyNeighbor);
+        nodes = nodes.filter(isFresh).array();
 
-            var nodes:Array<BoardNode> = playerHead.getGraph(true, isLivingBodyNeighbor);
-            nodes = nodes.filter(isFresh).array();
+        var newNodes:Array<BoardNode> = nodes.copy();
 
-            var newNodes:Array<BoardNode> = nodes.copy();
-
-            var node:BoardNode = newNodes.pop();
-            while (node != null) {
-                for (direction in GridUtils.allDirections()) {
-                    var pendingNodes:Array<BoardNode> = [];
-                    for (scout in node.walk(direction)) {
-                        if (scout == node) continue;
-                        if (history.get(scout.value.at(isFilled_)) > 0) {
-                            if (history.get(scout.value.at(occupier_)) == currentPlayer) {
-                                for (pendingNode in pendingNodes) {
-                                    eatCell(pendingNode.value, currentPlayer);
-                                    if (recursive) newNodes.push(pendingNode);
-                                    nodes.push(pendingNode);
-                                }
-                                break;
-                            } else {
-                                pendingNodes.push(scout);
+        var node:BoardNode = newNodes.pop();
+        while (node != null) {
+            for (direction in GridUtils.allDirections()) {
+                var pendingNodes:Array<BoardNode> = [];
+                for (scout in node.walk(direction)) {
+                    if (scout == node) continue;
+                    if (history.get(scout.value.at(isFilled_)) > 0) {
+                        if (history.get(scout.value.at(occupier_)) == currentPlayer) {
+                            for (pendingNode in pendingNodes) {
+                                eatCell(pendingNode.value, currentPlayer);
+                                if (recursive) newNodes.push(pendingNode);
+                                nodes.push(pendingNode);
                             }
-                        } else {
                             break;
+                        } else {
+                            pendingNodes.push(scout);
                         }
+                    } else {
+                        break;
                     }
                 }
-                node = newNodes.pop();
             }
-
-
+            node = newNodes.pop();
         }
     }
 

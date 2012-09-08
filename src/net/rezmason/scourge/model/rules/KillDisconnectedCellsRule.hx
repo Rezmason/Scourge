@@ -14,7 +14,7 @@ class KillDisconnectedCellsRule extends Rule {
 
     static var nodeReqs:AspectRequirements;
     static var playerReqs:AspectRequirements;
-    static var option:Option = new Option();
+    static var option:Option = {optionID:0};
 
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
@@ -48,24 +48,21 @@ class KillDisconnectedCellsRule extends Rule {
     override public function listBoardAspectRequirements():AspectRequirements { return nodeReqs; }
     override public function getOptions():Array<Option> { return [option]; }
 
-    override public function chooseOption(choice:Option):Void {
-        if (choice == option) {
+    override public function chooseOption(choice:Int):Void {
+        // perform kill operation on state
 
-            // perform kill operation on state
+        var nodesInPlay:Array<BoardNode> = [];
 
-            var nodesInPlay:Array<BoardNode> = [];
-
-            var heads:Array<BoardNode> = [];
-            for (ike in 0...state.players.length) {
-                var head:Int = history.get(state.players[ike].at(head_));
-                heads.push(state.nodes[head]);
-            }
-
-            var candidates:Array<BoardNode> = heads.expandGraph(true, isCandidate);
-            var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(true, isLivingBodyNeighbor);
-
-            for (candidate in candidates) if (!livingBodyNeighbors.has(candidate)) killCell(candidate.value);
+        var heads:Array<BoardNode> = [];
+        for (ike in 0...state.players.length) {
+            var head:Int = history.get(state.players[ike].at(head_));
+            heads.push(state.nodes[head]);
         }
+
+        var candidates:Array<BoardNode> = heads.expandGraph(true, isCandidate);
+        var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(true, isLivingBodyNeighbor);
+
+        for (candidate in candidates) if (!livingBodyNeighbors.has(candidate)) killCell(candidate.value);
     }
 
     function isCandidate(me:AspectSet, you:AspectSet):Bool {

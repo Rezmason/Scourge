@@ -67,10 +67,7 @@ class RulesTest
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
 
 		var numCells:Int = ~/([^0])/g.replace(TestBoards.spiral, "").length;
-
-        var testEvaluator:Evaluator = new TestEvaluator();
-
-        Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
+        Assert.areEqual(51, numCells); // 51 cells for player 0
 
         var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
 
@@ -84,8 +81,6 @@ class RulesTest
 		history.set(playerNeck.value.at(occupier_), -1);
         history.set(playerNeck.value.at(freshness_), 1);
 
-        Assert.areEqual(1, testEvaluator.evaluate(state)); // only one cell for player 0
-
 		//Pass the State to the Rule for Option generation
 
 		var options:Array<Option> = killRule.getOptions();
@@ -96,7 +91,7 @@ class RulesTest
 		var reviz:Int = history.revision;
 
 		//trace(BoardUtils.spitBoard(state));
-		killRule.chooseOption(options[0]);
+		killRule.chooseOption(0);
 		//trace(BoardUtils.spitBoard(state));
 
         numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
@@ -116,9 +111,8 @@ class RulesTest
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
 
         var numCells:Int = ~/([^0])/g.replace(TestBoards.spiralPetri, "").length;
-        var testEvaluator:Evaluator = new TestEvaluator();
 
-        Assert.areEqual(numCells, testEvaluator.evaluate(state)); // 51 cells for player 0
+        Assert.areEqual(17, numCells); // 51 cells for player 0
 
         var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
 
@@ -133,7 +127,7 @@ class RulesTest
         history.set(playerNeck.value.at(freshness_), 1);
 
         //trace(BoardUtils.spitBoard(state));
-        killRule.chooseOption(killRule.getOptions()[0]);
+        killRule.chooseOption(0);
         //trace(BoardUtils.spitBoard(state));
 
         numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
@@ -173,10 +167,12 @@ class RulesTest
         var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
         Assert.areEqual(371, numCells);
 
+        Assert.areEqual(1, eatRule.getOptions().length);
+
         // straight up eating
 
         //trace(BoardUtils.spitBoard(state, true, spitAspectProperties));
-        eatRule.chooseOption(eatRule.getOptions()[0]);
+        eatRule.chooseOption(0);
         //trace(BoardUtils.spitBoard(state, true, spitAspectProperties));
 
         numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
@@ -219,7 +215,7 @@ class RulesTest
         // recursive eating
 
         //trace(BoardUtils.spitBoard(state, true, spitAspectProperties));
-        eatRule.chooseOption(eatRule.getOptions()[0]);
+        eatRule.chooseOption(0);
         //trace(BoardUtils.spitBoard(state, true, spitAspectProperties));
 
         numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
@@ -227,10 +223,19 @@ class RulesTest
     }
 
 	@Test
-	public function placePieceRuleTest():Void {
+	public function placePieceRuleTest1():Void {
+
+        var pieceSize:Int = 4;
+
+        // An L/J block has nine neighbor cells.
+        // Reflection allowed   rotation allowed    option count
+        // N                    N                   9
+        // Y                    N                   18
+        // N                    Y                   36
+        // Y                    Y                   72
 
         var testPieceCfg:TestPieceConfig = {
-            piece:Pieces.getPieceIdBySizeAndIndex(4, 0), // "I-block"
+            pieceID:Pieces.getPieceIdBySizeAndIndex(pieceSize, 1), // "L/J block"
             reflection:0,
             rotation:0,
         };
@@ -238,15 +243,21 @@ class RulesTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:true};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        state = makeState(TestBoards.emptyPetri, 1, cast [dropRule]);
+        state = makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
-        var options:Array<Option> = dropRule.getOptions();
+        var options:Array<DropPieceOption> = cast dropRule.getOptions();
 
-        Assert.areNotEqual(0, options.length);
+        Assert.areEqual(72, options.length);
 
-        dropRule.chooseOption(options[0]);
+        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(BoardUtils.spitBoard(state));
+        trace(BoardUtils.spitBoard(state));
+        dropRule.chooseOption(0);
+        trace(BoardUtils.spitBoard(state));
+
+        numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        Assert.areEqual(1 + pieceSize, numCells); // 5 cells for player 0
 	}
 
     private function makeState(initGrid:String, numPlayers:Int, rules:Array<Rule>):State {

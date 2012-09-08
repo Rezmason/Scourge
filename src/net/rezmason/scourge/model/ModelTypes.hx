@@ -18,3 +18,5 @@ typedef AspectLookup = Array<AspectPtr>; // The indices of property types in the
 
 typedef StateHistory = History<Atom>;
 typedef BoardNode = GridNode<AspectSet>;
+
+typedef Option = {optionID:Int};

@@ -6,7 +6,7 @@ import net.rezmason.scourge.model.aspects.PieceAspect;
 using net.rezmason.utils.Pointers;
 
 typedef TestPieceConfig = {
-    var piece:Int;
+    var pieceID:Int;
     var reflection:Int;
     var rotation:Int;
 }
@@ -32,7 +32,7 @@ class TestPieceRule extends Rule {
     override public function init(state:State):Void {
         super.init(state);
         var pieceID_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_ID.id];
-        history.set(state.aspects.at(pieceID_), cfg.piece);
+        history.set(state.aspects.at(pieceID_), cfg.pieceID);
 
         var pieceReflection_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
         history.set(state.aspects.at(pieceReflection_), cfg.reflection);

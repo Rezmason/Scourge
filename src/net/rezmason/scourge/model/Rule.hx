@@ -27,6 +27,6 @@ class Rule {
     public function listBoardAspectRequirements():AspectRequirements { return []; }
 
     public function getOptions():Array<Option> { return []; }
-    public function chooseOption(option:Option):Void { }
+    public function chooseOption(choice:Int):Void { }
 }
 
