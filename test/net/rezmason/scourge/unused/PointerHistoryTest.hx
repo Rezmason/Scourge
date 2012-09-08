@@ -17,7 +17,7 @@ class PointerHistoryTest {
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace(time);
+        trace("tick " + time);
     }
 
 	//@Test
