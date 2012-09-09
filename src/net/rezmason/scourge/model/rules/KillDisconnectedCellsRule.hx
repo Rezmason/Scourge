@@ -42,15 +42,13 @@ class KillDisconnectedCellsRule extends Rule {
     }
 
     override public function chooseOption(choice:Int):Void {
+        super.chooseOption(choice);
         // perform kill operation on state
 
         var nodesInPlay:Array<BoardNode> = [];
 
         var heads:Array<BoardNode> = [];
-        for (ike in 0...state.players.length) {
-            var head:Int = history.get(state.players[ike].at(head_));
-            heads.push(state.nodes[head]);
-        }
+        for (player in state.players) heads.push(state.nodes[history.get(player.at(head_))]);
 
         var candidates:Array<BoardNode> = heads.expandGraph(true, isCandidate);
         var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(true, isLivingBodyNeighbor);

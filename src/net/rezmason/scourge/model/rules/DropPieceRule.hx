@@ -132,10 +132,10 @@ class DropPieceRule extends Rule {
 
                         if (valid) {
                             dropOptions.push({
-                                targetNode:state.nodes.indexOf(node),
-                                reflection:-1,
+                                targetNode:node.id,
                                 pieceID:pieceIndex,
                                 rotation:rotationIndex,
+                                reflection:reflectionIndex,
                                 optionID:dropOptions.length,
                             });
                         }
@@ -148,7 +148,17 @@ class DropPieceRule extends Rule {
     }
 
     override public function chooseOption(choice:Int):Void {
+        super.chooseOption(choice);
 
+        var option:DropPieceOption = cast options[choice];
+        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(history.get(state.aspects.at(pieceID_)))];
+        var node:BoardNode = state.nodes[option.targetNode];
+        var coords:Array<IntCoord> = pieceGroups[option.pieceID][option.reflection][option.rotation][0];
+        var homeCoord:IntCoord = coords[0];
+
+        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+
+        for (coord in coords) fillAndOccupyCell(walkNode(node, coord, homeCoord).value, currentPlayer);
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
@@ -193,7 +203,7 @@ class DropPieceRule extends Rule {
 typedef DropPieceOption = {>Option,
     var targetNode:Int;
     var pieceID:Int;
-    var reflection:Int;
     var rotation:Int;
+    var reflection:Int;
 }
 

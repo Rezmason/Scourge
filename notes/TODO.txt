@@ -1,11 +1,4 @@
-Piece placement
-	Put the piece down
-
-How will I store a set of nodes?
-	HeadCountAspect.NEXT_HEAD.id
-
 Piece choice
-
 	allowFlipping and allowRotating must go here too
 		They affect the odds of picking reflections
 
@@ -17,7 +10,6 @@ Piece choice
 		So we just won't offer that
 		Still, this is silly
 
-Eating a head
 Biting
 	Refilling
 	Genetic
@@ -28,11 +20,18 @@ Swapping
 Skipping
 Forfeiting
 
+Group rules together
+
 And then SPEED EVERYTHING UP
 	Use timing output to find the bottlenecks
 		Pretty damn sure the kill-disconnected-cells rule is a lot slower than it could be
 	Store useful information, like edges, distance and connectedness values
 		Rules that take advantage of these values would expand a graph from an affected square
+	Take advantage of linked lists for storing sets of nodes
+		NEXT_WHATEVER on nodes
+			-1 is your null, remember to set the final NEXT_WHATEVER to -1
+		FIRST_WHATEVER on state, or on player
+	Also, haxe.List might be better than Array in some situations
 
 Level Editing
 	Just a bunch of rules, aha

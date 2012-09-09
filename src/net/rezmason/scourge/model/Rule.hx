@@ -36,6 +36,10 @@ class Rule {
 
     }
 
-    public function chooseOption(choice:Int):Void { }
+    public function chooseOption(choice:Int):Void {
+        if (options == null || options.length < choice || options[choice] == null) {
+            throw "Invalid choice index.";
+        }
+    }
 }
 

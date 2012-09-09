@@ -140,7 +140,7 @@ class BuildBoardRule extends Rule {
         var aspects:AspectSet = new AspectSet();
         var template:AspectTemplate = state.nodeAspectTemplate;
         for (val in template) aspects.push(history.alloc(val));
-        var node:BoardNode = new BoardNode(aspects);
+        var node:BoardNode = new BoardNode(aspects, state.nodes.length);
         state.nodes.push(node);
         return node;
     }
@@ -180,7 +180,7 @@ class BuildBoardRule extends Rule {
         for (ike in 0...headCoords.length) {
             var coord:XY = headCoords[ike];
             var head:BoardNode = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
-            history.set(state.players[ike].at(head_), state.nodes.indexOf(head));
+            history.set(state.players[ike].at(head_), head.id);
             history.set(head.value.at(isFilled_), 1);
             history.set(head.value.at(occupier_), ike);
         }
