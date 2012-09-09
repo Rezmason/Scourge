@@ -114,8 +114,13 @@ class DropPieceRule extends Rule {
                     for (node in edgeNodes) {
                         for (neighborCoord in rotation[1]) {
                             var nodeAtCoord:BoardNode = walkNode(node, neighborCoord, homeCoord);
-                            if (!touchedNodes.has(nodeAtCoord)) {
-                                touchedNodes.push(nodeAtCoord);
+                            if (!touchedNodes.has(nodeAtCoord)) touchedNodes.push(nodeAtCoord);
+                        }
+
+                        if (cfg.overlapSelf) {
+                            for (coord in rotation[0]) {
+                                var nodeAtCoord:BoardNode = walkNode(node, coord, homeCoord);
+                                if (!touchedNodes.has(nodeAtCoord)) touchedNodes.push(nodeAtCoord);
                             }
                         }
                     }
@@ -124,7 +129,8 @@ class DropPieceRule extends Rule {
                         var valid:Bool = true;
 
                         for (coord in coords) {
-                            if (history.get(walkNode(node, homeCoord, coord).value.at(occupier_)) > 0) {
+                            var occupier:Int = history.get(walkNode(node, homeCoord, coord).value.at(occupier_));
+                            if (occupier > 0 && !(cfg.overlapSelf && occupier == currentPlayer)) {
                                 valid = false;
                                 break;
                             }

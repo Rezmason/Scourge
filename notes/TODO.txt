@@ -1,8 +1,9 @@
-Skipping
-	Easy!
+Ending turn
+	Go to the next player who is alive (has a head)
 Forfeiting
-	Set head to -1
-	Make sure you didn't break everything
+	Kill and freshen head
+Head death
+	Removes heads that are not occupied by their owner
 
 Ortho Biting
 	Config
@@ -54,6 +55,9 @@ Gap cells
 Moving
 	pick up a chunk of yourself and place it somewhere else on your body
 	Think this one through first
+
+Expand board when placing a piece
+	Tough?
 
 Group rules together!
 
