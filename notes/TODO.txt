@@ -1,3 +1,32 @@
+Skipping
+	Easy!
+Forfeiting
+	Set head to -1
+	Make sure you didn't break everything
+
+Ortho Biting
+	Config
+		maxReach
+		maxSizeReference
+		basedOnThickness
+		biteThroughOccupiedAir
+		biteHeads
+
+	Reach
+		Based on size
+		Based on thickness in opposite direction
+
+	Availability
+		Refilling
+			Per change to currentPlayer
+			Per ply
+		Genetic (later)
+
+	Head biting
+
+Should refilling be its own rule?
+	Perhaps the aspects of replenishible state and player values could be passed in
+
 Piece choice
 	allowFlipping and allowRotating must go here too
 		They affect the odds of picking reflections
@@ -10,23 +39,29 @@ Piece choice
 		So we just won't offer that
 		Still, this is silly
 
-Biting
-	Refilling
-	Genetic
-	Biting a head
 Swapping
 	Refilling
-	Genetic
-Skipping
-Forfeiting
+		Per change to currentPlayer
+		Per ply
 
-Group rules together
+	Genetic
+
+Gap cells
+	Count these regions when determining area (Zuser)
+	Updated during the eat algorithm
+	Biting through these should be an option
+
+Moving
+	pick up a chunk of yourself and place it somewhere else on your body
+	Think this one through first
+
+Group rules together!
 
 And then SPEED EVERYTHING UP
 	Use timing output to find the bottlenecks
-		Pretty damn sure the kill-disconnected-cells rule is a lot slower than it could be
 	Store useful information, like edges, distance and connectedness values
 		Rules that take advantage of these values would expand a graph from an affected square
+		Just make sure to update this information when it changes
 	Take advantage of linked lists for storing sets of nodes
 		NEXT_WHATEVER on nodes
 			-1 is your null, remember to set the final NEXT_WHATEVER to -1
@@ -100,12 +135,6 @@ New architecture - what's left
 		Depicts a single player narrative interspersed with gameplay
 			Including tutorials
 		Uses MissionStateFactory
-
-Gap eating
-	An inner gap is an empty cell whose neareset non-empty neighbors
-			in all cardinal directions have the same allegiance.
-		(Zuser: count these regions when determining area)
-	Updated during the eat algorithm
 
 Coarse evaluation
 	Obvious

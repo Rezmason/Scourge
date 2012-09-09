@@ -10,7 +10,7 @@ using Lambda;
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.Pointers;
 
-class KillDisconnectedCellsRule extends Rule {
+class DecayRule extends Rule {
 
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
