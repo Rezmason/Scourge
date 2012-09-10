@@ -1,8 +1,10 @@
 Gameplay types
 	Multiplayer
-		Local
-		Network
+		Same machine (PC)
+		LAN (PC)
+		Server (PC, mobile)
 		"By mail" (FB)
+		P2P / Game Thing (mobile)
 	Single player
 		Story mode
 
@@ -35,9 +37,3 @@ Game varieties
 	Story mode
 		Locomotion is going to be necessary
 			Move (pick up a chunk of yourself (including your head) and place it somewhere else on your body)
-
-MULTIPLAYER
-	Same machine (PC)
-	LAN (PC)
-	Server (PC, mobile)
-	P2P / Game Thing (mobile)

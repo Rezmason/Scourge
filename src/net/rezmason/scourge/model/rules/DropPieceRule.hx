@@ -181,9 +181,14 @@ class DropPieceRule extends Rule {
     }
 
     function fillAndOccupyCell(me:AspectSet, currentPlayer:Int):Void {
+
+        if (history.get(me.at(occupier_)) != currentPlayer || history.get(me.at(isFilled_)) == 0) {
+            // Only freshen it if it's fresh
+            history.set(me.at(freshness_), 1);
+        }
+
         history.set(me.at(occupier_), currentPlayer);
         history.set(me.at(isFilled_), 1);
-        history.set(me.at(freshness_), 1);
     }
 
     function walkNode(node:BoardNode, fromCoord:IntCoord, toCoord:IntCoord):BoardNode {

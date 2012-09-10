@@ -60,8 +60,6 @@ class DecayRuleTest extends RuleTest
         Assert.isNotNull(options);
         Assert.areEqual(1, options.length);
 
-        var reviz:Int = history.revision;
-
         //trace(BoardUtils.spitBoard(state));
         decayRule.chooseOption(0);
         //trace(BoardUtils.spitBoard(state));

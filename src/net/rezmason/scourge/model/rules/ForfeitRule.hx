@@ -4,21 +4,27 @@ import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
+import net.rezmason.scourge.model.aspects.PlyAspect;
 
 using Lambda;
 
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.Pointers;
 
-class DecayRule extends Rule {
+class ForfeitRule extends Rule {
 
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var freshness_:AspectPtr;
     var head_:AspectPtr;
+    var currentPlayer_:AspectPtr;
 
     public function new():Void {
         super();
+
+        stateAspectRequirements = [
+            PlyAspect.CURRENT_PLAYER,
+        ];
 
         playerAspectRequirements = [
             BodyAspect.HEAD,
@@ -39,30 +45,16 @@ class DecayRule extends Rule {
         isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         freshness_ = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
+        currentPlayer_ = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
     }
 
     override public function chooseOption(choice:Int):Void {
         super.chooseOption(choice);
-        // perform kill operation on state
 
-        var nodesInPlay:Array<BoardNode> = [];
-
-        var heads:Array<BoardNode> = [];
-        for (player in state.players) heads.push(state.nodes[history.get(player.at(head_))]);
-
-        var candidates:Array<BoardNode> = heads.expandGraph(true, isOccupiedOrFresh);
-        var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(true, isLivingBodyNeighbor);
-
-        for (candidate in candidates) if (!livingBodyNeighbors.has(candidate)) killCell(candidate.value);
-    }
-
-    function isOccupiedOrFresh(me:AspectSet, you:AspectSet):Bool {
-        var occupier:Int = history.get(me.at(occupier_));
-        var isFilled:Int = history.get(me.at(isFilled_));
-        var freshness:Int = history.get(me.at(freshness_));
-        if (isFilled > 0 && occupier > -1) return true;
-        else if (freshness > 0) return true;
-        return false;
+        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var playerHead:BoardNode = state.nodes[head];
+        for (node in playerHead.getGraph(true, isLivingBodyNeighbor)) killCell(node.value);
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
@@ -74,12 +66,5 @@ class DecayRule extends Rule {
         history.set(me.at(isFilled_), 0);
         history.set(me.at(occupier_), -1);
     }
-
-    /*
-    function resetCell(me:AspectSet):Void {
-        var template:AspectTemplate = state.nodeAspectTemplate;
-        for (ike in 0...me.length) history.set(me[ike], template[ike]);
-    }
-    */
 }
 
