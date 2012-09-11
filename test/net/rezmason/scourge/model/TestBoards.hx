@@ -28,6 +28,28 @@ class TestBoards {
         "X                      X\n" +
         "XXXXXXXXXXXXXXXXXXXXXXXX";
 
+    public static var twoPlayerHeadGrab:String = "\n" +
+        "XXXXXXXXXXXXXXXXXXXX\n" +
+        "X                  X\n" +
+        "X           111    X\n" +
+        "X           111    X\n" +
+        "X           111    X\n" +
+        "X            1     X\n" +
+        "X           010    X\n" +
+        "X           000    X\n" +
+        "X            0     X\n" +
+        "X            0     X\n" +
+        "X            0     X\n" +
+        "X            0     X\n" +
+        "X            0     X\n" +
+        "X     00000000     X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "XXXXXXXXXXXXXXXXXXXX\n";
+
     public static var emptyPetri:String = "\n" +
         "XXXXXXXXXXXXX\n" +
         "XXXX     XXXX\n" +

@@ -43,8 +43,8 @@ class EatTest extends RuleTest
         var head:Int = history.get(state.players[currentPlayer].at(head_));
         var playerHead:BoardNode = state.nodes[head];
 
-        var spitAspectProperties:IntHash<String> = new IntHash<String>();
-        spitAspectProperties.set(FreshnessAspect.FRESHNESS.id, "F");
+        //var spitAspectProperties:IntHash<String> = new IntHash<String>();
+        //spitAspectProperties.set(FreshnessAspect.FRESHNESS.id, "F");
 
         var cursor:BoardNode = playerHead;
         cursor = cursor.run(Gr.n, 12).run(Gr.e, 6);
@@ -89,8 +89,8 @@ class EatTest extends RuleTest
         var head:Int = history.get(state.players[currentPlayer].at(head_));
         var playerHead:BoardNode = state.nodes[head];
 
-        var spitAspectProperties:IntHash<String> = new IntHash<String>();
-        spitAspectProperties.set(FreshnessAspect.FRESHNESS.id, "F");
+        //var spitAspectProperties:IntHash<String> = new IntHash<String>();
+        //spitAspectProperties.set(FreshnessAspect.FRESHNESS.id, "F");
 
         var cursor:BoardNode = playerHead;
         cursor = cursor.run(Gr.n, 12).run(Gr.e, 6);
@@ -167,5 +167,37 @@ class EatTest extends RuleTest
 
         numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
         Assert.areEqual(0, numCells);
+    }
+
+    @Test
+    public function eatHeadKillBodyTest():Void {
+        var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:false};
+        var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
+        state = makeState(TestBoards.twoPlayerHeadGrab, 2, cast [eatRule]);
+
+        // set up the board for the test
+
+        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
+        var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var playerHead:BoardNode = state.nodes[head];
+
+        var cursor:BoardNode = playerHead;
+        cursor = cursor.run(Gr.n, 7).run(Gr.e, 6);
+        history.set(cursor.value.at(freshness_), 1);
+
+        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        Assert.areEqual(18, numCells);
+
+        eatRule.chooseOption(0);
+
+        //trace(BoardUtils.spitBoard(state, true));
+
+        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        Assert.areEqual(18 + 1, numCells); // Only eat the head
     }
 }

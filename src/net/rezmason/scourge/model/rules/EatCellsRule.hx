@@ -8,6 +8,7 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 
 using Lambda;
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.Pointers;
 
 typedef EatCellsConfig = {
@@ -23,6 +24,8 @@ class EatCellsRule extends Rule {
     var freshness_:AspectPtr;
     var head_:AspectPtr;
     var currentPlayer_:AspectPtr;
+    var bodyFirst_:AspectPtr;
+    var bodyNext_:AspectPtr;
 
     private var cfg:EatCellsConfig;
 
@@ -54,6 +57,9 @@ class EatCellsRule extends Rule {
         freshness_ = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
         currentPlayer_ = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+
+        bodyFirst_ = state.nodeAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
     }
 
     override public function chooseOption(choice:Int):Void {
@@ -74,6 +80,7 @@ class EatCellsRule extends Rule {
 
         var newNodes:Array<BoardNode> = nodes.copy();
         var eatenNodes:Array<BoardNode> = [];
+        var potentiallyDeadNodes:Array<BoardNode> = [];
 
         var node:BoardNode = newNodes.pop();
         while (node != null) {
@@ -85,15 +92,14 @@ class EatCellsRule extends Rule {
                         var scoutOccupier:Int = history.get(scout.value.at(occupier_));
                         if (scoutOccupier == currentPlayer || eatenNodes.has(scout)) {
                             for (pendingNode in pendingNodes) {
-                                if (cfg.takeBodiesFromHeads && headIndices.has(pendingNode.id)) {
-                                    for (enemyBodyNode in pendingNode.getGraph(true, isLivingBodyNeighbor)) {
-                                        if (!pendingNodes.has(enemyBodyNode)) pendingNodes.push(enemyBodyNode);
-                                    }
-                                    eatenNodes.push(pendingNode);
+                                if (headIndices.has(pendingNode.id)) {
+                                    var enemyBody:Array<BoardNode> = pendingNode.getGraph(true, isLivingBodyNeighbor);
+                                    if (cfg.takeBodiesFromHeads) pendingNodes.absorb(enemyBody);
+                                    else potentiallyDeadNodes.absorb(enemyBody);
                                 } else {
-                                    eatenNodes.push(pendingNode);
                                     if (cfg.recursive && !newNodes.has(pendingNode)) newNodes.push(pendingNode);
                                 }
+                                eatenNodes.push(pendingNode);
                             }
                             break;
                         } else if (headIndices[scoutOccupier] == scout.id) {
@@ -111,6 +117,7 @@ class EatCellsRule extends Rule {
         }
 
         for (node in eatenNodes) eatCell(node.value, currentPlayer);
+        for (node in potentiallyDeadNodes) if (history.get(node.value.at(occupier_)) != currentPlayer) killCell(node.value);
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
@@ -125,6 +132,11 @@ class EatCellsRule extends Rule {
     function eatCell(me:AspectSet, currentPlayer:Int):Void {
         history.set(me.at(occupier_), currentPlayer);
         history.set(me.at(freshness_), 1);
+    }
+
+    function killCell(me:AspectSet):Void {
+        history.set(me.at(isFilled_), 0);
+        history.set(me.at(occupier_), -1);
     }
 }
 

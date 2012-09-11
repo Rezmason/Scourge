@@ -16,6 +16,8 @@ class DecayRule extends Rule {
     var isFilled_:AspectPtr;
     var freshness_:AspectPtr;
     var head_:AspectPtr;
+    var bodyFirst_:AspectPtr;
+    var bodyNext_:AspectPtr;
 
     public function new():Void {
         super();
@@ -39,6 +41,9 @@ class DecayRule extends Rule {
         isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         freshness_ = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
+
+        bodyFirst_ = state.nodeAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
     }
 
     override public function chooseOption(choice:Int):Void {

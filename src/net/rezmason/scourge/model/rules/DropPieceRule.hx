@@ -31,7 +31,8 @@ class DropPieceRule extends Rule {
     var pieceReflection_:AspectPtr;
     var pieceRotation_:AspectPtr;
 
-    var overlapSelf:Bool;
+    var bodyFirst_:AspectPtr;
+    var bodyNext_:AspectPtr;
 
     private var cfg:DropPieceConfig;
 
@@ -66,11 +67,11 @@ class DropPieceRule extends Rule {
         isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         currentPlayer_ = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
         pieceID_ = state.stateAspectLookup[PieceAspect.PIECE_ID.id];
-
         pieceReflection_ = state.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
         pieceRotation_ = state.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
 
-        overlapSelf = cfg.overlapSelf;
+        bodyFirst_ = state.nodeAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
     }
 
     override public function update():Void {

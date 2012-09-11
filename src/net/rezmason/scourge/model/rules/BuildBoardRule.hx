@@ -34,6 +34,8 @@ class BuildBoardRule extends Rule {
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var head_:AspectPtr;
+    var bodyFirst_:AspectPtr;
+    var bodyNext_:AspectPtr;
 
     public function new(cfg:BoardConfig):Void {
         super();
@@ -43,11 +45,13 @@ class BuildBoardRule extends Rule {
 
         playerAspectRequirements = [
             BodyAspect.HEAD,
+            BodyAspect.BODY_FIRST,
         ];
 
         nodeAspectRequirements = [
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
+            BodyAspect.BODY_NEXT,
         ];
     }
 
@@ -58,6 +62,9 @@ class BuildBoardRule extends Rule {
         occupier_ = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
+
+        bodyFirst_ = state.nodeAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
 
         makeBoard();
     }

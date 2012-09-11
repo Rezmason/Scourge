@@ -58,4 +58,39 @@ class BoardUtils {
 
         return str;
     }
+
+    public static function iterate(_node:BoardNode, _state:State, _aspectPointer:AspectPtr):BoardNodeIterator {
+        return new BoardNodeIterator(_node, _state, _aspectPointer);
+    }
+
+    public static function boardListToArray(_node:BoardNode, _state:State, _aspectPointer:AspectPtr):Array<BoardNode> {
+        var arr:Array<BoardNode> = [];
+        for (node in iterate(_node, _state, _aspectPointer)) arr.push(node);
+        return arr;
+    }
+}
+
+class BoardNodeIterator {
+
+    private var node:BoardNode;
+    private var state:State;
+    private var aspectPointer:AspectPtr;
+
+    public function new(_node:BoardNode, _state:State, _aspectPointer:AspectPtr):Void {
+        node = _node;
+        state = _state;
+        aspectPointer = _aspectPointer;
+    }
+
+    public function hasNext():Bool {
+        return node != null;
+    }
+
+    public function next():BoardNode {
+        var lastNode:BoardNode = node;
+        var nodeIndex:Int = state.history.get(node.value.at(aspectPointer));
+        if (nodeIndex == -1) node = null;
+        else node = state.nodes[nodeIndex];
+        return lastNode;
+    }
 }

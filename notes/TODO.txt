@@ -1,49 +1,65 @@
-Ortho Biting
+Add body linked lists
+	And iterate over them, dumbass
+	Let's think about where this goes!
+		Board rule
+			init
+				Iterate over ALL nodes
+					If a node is filled and occupied,
+						Add it to the list
+		DecayRule
+			chooseOption
+				Candidates are all cells in the bodies of players
+					Killing a cell requires removing it from its linked list
+						Tricky, since it's not doubly linked
+		DropPieceRule
+			update
+				Edge nodes are nodes within the current player's body
+		EatCellsRule?
+			Not sure yet
+		ForfeitRule
+			Kill all cells in the current player's body
+
+	Freshness is just gauze
+		We're using it to connect reachable nodes to unreachable ones
+		Look into all instances where freshness is used
+			Determine whether they are still necessary (probably not)
+		Freshness needs to become a change indicator for the view
+
+Piece choice
+	Config
+		pieceIDs
+		allowFlipping
+		allowRotating
+		allowAll
+		hatSize
+
+	Swapping is just an option of piece choice, you dope
+
+	Generating possible states from this is complicated
+
+Per-ply replenishing
+	player values
+	state values
+
+Biting
 	Config
 		maxReach
 		maxSizeReference
-		basedOnThickness
+		baseReachOnThickness
+		omnidirectional
 		biteThroughOccupiedAir
 		biteHeads
 
-	Reach
-		Based on size
-		Based on thickness in opposite direction
+	Bitten areas MUST be fresh
+		The decay rule relies on this
 
-	Availability
-		Refilling
-			Per change to currentPlayer
-			Per ply
-		Genetic (later)
+Cavities
+	Cavity linked lists on BodyAspects
 
-	Head biting
-
-Should refilling be its own rule?
-	Perhaps the aspects of replenishible state and player values could be passed in
-
-Piece choice
-	allowFlipping and allowRotating must go here too
-		They affect the odds of picking reflections
-
-	Random pieces, no choice - easy to implement
-	Hat pieces, no choice - just as easy, though the configuration might be strange
-	Piece genes, no choise - easy
-	Choosing ANY piece - easy
-	Choosing from a SET of pieces - hard
-		So we just won't offer that
-		Still, this is silly
-
-Swapping
-	Refilling
-		Per change to currentPlayer
-		Per ply
-
-	Genetic
-
-Gap cells
 	Count these regions when determining area (Zuser)
 	Updated during the eat algorithm
 	Biting through these should be an option
+	Tough?
 
 Moving
 	pick up a chunk of yourself and place it somewhere else on your body
@@ -60,9 +76,7 @@ And then SPEED EVERYTHING UP
 		Rules that take advantage of these values would expand a graph from an affected square
 		Just make sure to update this information when it changes
 	Take advantage of linked lists for storing sets of nodes
-		NEXT_WHATEVER on nodes
-			-1 is your null, remember to set the final NEXT_WHATEVER to -1
-		FIRST_WHATEVER on state, or on player
+		See body linked lists
 	Also, haxe.List might be better than Array in some situations
 
 Level Editing

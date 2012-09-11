@@ -18,6 +18,8 @@ class ForfeitRule extends Rule {
     var freshness_:AspectPtr;
     var head_:AspectPtr;
     var currentPlayer_:AspectPtr;
+    var bodyFirst_:AspectPtr;
+    var bodyNext_:AspectPtr;
 
     public function new():Void {
         super();
@@ -46,6 +48,9 @@ class ForfeitRule extends Rule {
         freshness_ = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
         currentPlayer_ = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+
+        bodyFirst_ = state.nodeAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
     }
 
     override public function chooseOption(choice:Int):Void {
