@@ -1,8 +1,10 @@
 The octopus should hold all the cards
 	GOD DAMN IT!
 	Why am I referencing and dereferencing to the History EVERYWHERE??
-	The State should store values!
-	The StateMap should map the State to the History, SHIT!
+	Split aspects into two objects
+		One stores values
+		The other stores history pointers
+		StateHistorian copies values to and from the history
 
 And then clean up
 	Lots of code is used over and over again, especially in rules

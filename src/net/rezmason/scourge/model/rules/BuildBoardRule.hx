@@ -205,12 +205,11 @@ class BuildBoardRule extends Rule {
         for (row in grid.walk(Gr.s)) {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
-                var isFilled:HistPtr = column.value.at(isFilled_);
-                if (history.get(isFilled) == 0) {
+                if (history.get(column.value.at(isFilled_)) == 0) {
                     var fx:Float = x - radius + 0.5 - RIM;
                     var fy:Float = y - radius + 0.5 - RIM;
                     var insideCircle:Bool = Math.sqrt(fx * fx + fy * fy) < radius;
-                    if (!insideCircle) history.set(isFilled, 1);
+                    if (!insideCircle) history.set(column.value.at(isFilled_), 1);
                 }
                 x++;
             }

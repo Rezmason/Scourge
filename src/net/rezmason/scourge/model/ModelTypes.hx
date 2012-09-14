@@ -9,7 +9,7 @@ private typedef Atom = Null<Int>; // Our low-level value type
 typedef AspectProperty = {id:Int, initialValue:Atom}; // The distinct possible properties of our state
 typedef AspectRequirements = Array<AspectProperty>;
 
-typedef HistPtr = Ptr<Int>;
+typedef HistPtr = Ptr<Atom>;
 typedef AspectPtr = Ptr<HistPtr>;
 
 typedef AspectTemplate = Array<Atom>; // The default values required when creating a new AspectSet
