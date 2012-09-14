@@ -7,6 +7,7 @@ import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.DraftPlayersRule;
 
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
 
 class RuleTest
@@ -47,5 +48,25 @@ class RuleTest
         rules.unshift(draftPlayersRule);
 
         return new StateFactory().makeState(rules, history);
+    }
+
+    private function testListLength(expectedLength:Int, first:BoardNode, next:AspectPtr, prev:AspectPtr):Int {
+        var count:Int = 0;
+        var last:BoardNode = null;
+
+        for (node in first.iterate(state, next)) {
+            count++;
+            last = node;
+            if (count > expectedLength) break;
+        }
+        if (expectedLength != count) return expectedLength - count;
+
+        count = 0;
+        for (node in last.iterate(state, prev)) {
+            count++;
+            if (count > expectedLength) break;
+        }
+
+        return expectedLength - count;
     }
 }

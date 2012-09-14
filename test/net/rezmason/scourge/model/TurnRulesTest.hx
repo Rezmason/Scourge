@@ -9,9 +9,10 @@ import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.rules.EndTurnRule;
 import net.rezmason.scourge.model.rules.ForfeitRule;
-import net.rezmason.scourge.model.rules.KillHeadsRule;
+import net.rezmason.scourge.model.rules.KillHeadlessPlayerRule;
 
 // using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
 
 class TurnRulesTest extends RuleTest
@@ -45,7 +46,7 @@ class TurnRulesTest extends RuleTest
         // Get rid of player 4's head
 
         var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
-        history.set(state.players[3].at(head_), -1);
+        history.set(state.players[3].at(head_), Aspect.NULL);
 
 
         endTurnRule.update();
@@ -84,16 +85,19 @@ class TurnRulesTest extends RuleTest
         Assert.isNotNull(options);
         Assert.areEqual(1, options.length);
 
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
         forfeitRule.chooseOption(0);
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
 
-        Assert.areEqual(-1, history.get(playerHead.value.at(occupier_)));
+        Assert.areEqual(Aspect.NULL, history.get(playerHead.value.at(occupier_)));
         Assert.areEqual(0, history.get(playerHead.value.at(isFilled_)));
 
         // Player 1 should be gone
-        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(0, numCells);
+
+        var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        Assert.areEqual(Aspect.NULL, history.get(state.players[currentPlayer].at(bodyFirst_)));
     }
 
     @Test
@@ -101,8 +105,8 @@ class TurnRulesTest extends RuleTest
 
         // Should remove heads that are not occupied by their owner
 
-        var killHeadsRule:KillHeadsRule = new KillHeadsRule();
-        state = makeState(TestBoards.emptyPetri, 4, cast [killHeadsRule]);
+        var killHeadlessPlayerRule:KillHeadlessPlayerRule = new KillHeadlessPlayerRule();
+        state = makeState(TestBoards.emptyPetri, 4, cast [killHeadlessPlayerRule]);
 
         // Change occupier of current player's head
 
@@ -111,6 +115,7 @@ class TurnRulesTest extends RuleTest
         var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
 
         var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
         var head:Int = history.get(state.players[currentPlayer].at(head_));
@@ -118,14 +123,17 @@ class TurnRulesTest extends RuleTest
 
         history.set(playerHead.value.at(occupier_), 1);
 
-        killHeadsRule.update();
-        var options:Array<Option> = killHeadsRule.options;
+        killHeadlessPlayerRule.update();
+        var options:Array<Option> = killHeadlessPlayerRule.options;
         Assert.isNotNull(options);
         Assert.areEqual(1, options.length);
 
-        killHeadsRule.chooseOption(0);
+        killHeadlessPlayerRule.chooseOption(0);
 
         head = history.get(state.players[currentPlayer].at(head_));
-        Assert.areEqual(-1, head);
+        Assert.areEqual(Aspect.NULL, head);
+
+        var bodyFirst:Int = history.get(state.players[currentPlayer].at(bodyFirst_));
+        Assert.areEqual(Aspect.NULL, bodyFirst);
     }
 }

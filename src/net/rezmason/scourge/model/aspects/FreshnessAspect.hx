@@ -4,4 +4,5 @@ import net.rezmason.scourge.model.ModelTypes;
 
 class FreshnessAspect extends Aspect {
     public static var FRESHNESS:AspectProperty = {id:Aspect.ids++, initialValue:0};
+    public static var MAX_FRESHNESS:AspectProperty = {id:Aspect.ids++, initialValue:0};
 }

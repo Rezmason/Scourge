@@ -3,33 +3,35 @@ package net.rezmason.scourge.model.rules;
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.aspects.FreshnessAspect;
 
 using Lambda;
 
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
 
 class DecayRule extends Rule {
 
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
-    var freshness_:AspectPtr;
     var head_:AspectPtr;
     var bodyFirst_:AspectPtr;
     var bodyNext_:AspectPtr;
+    var bodyPrev_:AspectPtr;
 
     public function new():Void {
         super();
 
         playerAspectRequirements = [
             BodyAspect.HEAD,
+            BodyAspect.BODY_FIRST,
         ];
 
         nodeAspectRequirements = [
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
-            FreshnessAspect.FRESHNESS,
+            BodyAspect.BODY_NEXT,
+            BodyAspect.BODY_PREV,
         ];
 
         options.push({optionID:0});
@@ -39,45 +41,50 @@ class DecayRule extends Rule {
         super.init(state);
         occupier_ = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        freshness_ = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
 
-        bodyFirst_ = state.nodeAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyFirst_ = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        bodyPrev_ = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
     }
 
     override public function chooseOption(choice:Int):Void {
         super.chooseOption(choice);
         // perform kill operation on state
 
-        var nodesInPlay:Array<BoardNode> = [];
-
         var heads:Array<BoardNode> = [];
-        for (player in state.players) heads.push(state.nodes[history.get(player.at(head_))]);
-
-        var candidates:Array<BoardNode> = heads.expandGraph(true, isOccupiedOrFresh);
+        for (player in state.players) {
+            var headIndex:Int = history.get(player.at(head_));
+            if (headIndex != Aspect.NULL) heads.push(state.nodes[headIndex]);
+        }
         var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(true, isLivingBodyNeighbor);
 
-        for (candidate in candidates) if (!livingBodyNeighbors.has(candidate)) killCell(candidate.value);
-    }
+        for (player in state.players) {
 
-    function isOccupiedOrFresh(me:AspectSet, you:AspectSet):Bool {
-        var occupier:Int = history.get(me.at(occupier_));
-        var isFilled:Int = history.get(me.at(isFilled_));
-        var freshness:Int = history.get(me.at(freshness_));
-        if (isFilled > 0 && occupier > -1) return true;
-        else if (freshness > 0) return true;
-        return false;
+            // Removing nodes is not something to do haphazardly - what if you remove the first one?
+
+            var bodyFirst:Int = history.get(player.at(bodyFirst_));
+            if (bodyFirst != Aspect.NULL) {
+                for (node in state.nodes[bodyFirst].iterate(state, bodyNext_)) {
+                    if (!livingBodyNeighbors.has(node)) bodyFirst = killCell(node, bodyFirst);
+                }
+            }
+            history.set(player.at(bodyFirst_), bodyFirst);
+        }
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
-        if (history.get(me.at(isFilled_)) == 0) return false;
+        if (history.get(me.at(isFilled_)) == Aspect.FALSE) return false;
         return history.get(me.at(occupier_)) == history.get(you.at(occupier_));
     }
 
-    function killCell(me:AspectSet):Void {
-        history.set(me.at(isFilled_), 0);
-        history.set(me.at(occupier_), -1);
+    function killCell(node:BoardNode, firstIndex:Int):Int {
+        history.set(node.value.at(isFilled_), Aspect.FALSE);
+        history.set(node.value.at(occupier_), Aspect.NULL);
+
+        var nextNode:BoardNode = node.removeNode(state, bodyNext_, bodyPrev_);
+        if (firstIndex == node.id) firstIndex = nextNode == null ? Aspect.NULL : nextNode.id;
+        return firstIndex;
     }
 
     /*

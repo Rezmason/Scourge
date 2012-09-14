@@ -1,29 +1,13 @@
-Add body linked lists
-	And iterate over them, dumbass
-	Let's think about where this goes!
-		Board rule
-			init
-				Iterate over ALL nodes
-					If a node is filled and occupied,
-						Add it to the list
-		DecayRule
-			chooseOption
-				Candidates are all cells in the bodies of players
-					Killing a cell requires removing it from its linked list
-						Tricky, since it's not doubly linked
-		DropPieceRule
-			update
-				Edge nodes are nodes within the current player's body
-		EatCellsRule?
-			Not sure yet
-		ForfeitRule
-			Kill all cells in the current player's body
+The octopus should hold all the cards
+	GOD DAMN IT!
+	Why am I referencing and dereferencing to the History EVERYWHERE??
+	The State should store values!
+	The StateMap should map the State to the History, SHIT!
 
-	Freshness is just gauze
-		We're using it to connect reachable nodes to unreachable ones
-		Look into all instances where freshness is used
-			Determine whether they are still necessary (probably not)
-		Freshness needs to become a change indicator for the view
+And then clean up
+	Lots of code is used over and over again, especially in rules
+	Are there leftover aspects?
+	Finally, comment the rule code
 
 Piece choice
 	Config
@@ -57,7 +41,7 @@ Cavities
 	Cavity linked lists on BodyAspects
 
 	Count these regions when determining area (Zuser)
-	Updated during the eat algorithm
+	Updated during the decay algorithm
 	Biting through these should be an option
 	Tough?
 
@@ -72,6 +56,8 @@ Group rules together!
 
 And then SPEED EVERYTHING UP
 	Use timing output to find the bottlenecks
+	Graph expansion is expensive, but so is Lambda.has.
+		Switch to using tables of ids
 	Store useful information, like edges, distance and connectedness values
 		Rules that take advantage of these values would expand a graph from an affected square
 		Just make sure to update this information when it changes

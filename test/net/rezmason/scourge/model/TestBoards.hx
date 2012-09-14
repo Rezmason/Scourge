@@ -28,21 +28,21 @@ class TestBoards {
         "X                      X\n" +
         "XXXXXXXXXXXXXXXXXXXXXXXX";
 
-    public static var twoPlayerHeadGrab:String = "\n" +
+    public static var twoPlayerGrab:String = "\n" +
         "XXXXXXXXXXXXXXXXXXXX\n" +
         "X                  X\n" +
-        "X           111    X\n" +
-        "X           111    X\n" +
-        "X           111    X\n" +
-        "X            1     X\n" +
-        "X           010    X\n" +
-        "X           000    X\n" +
-        "X            0     X\n" +
-        "X            0     X\n" +
-        "X            0     X\n" +
-        "X            0     X\n" +
-        "X            0     X\n" +
-        "X     00000000     X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X     000000000    X\n" +
+        "X     0     010    X\n" +
+        "X     0000   1     X\n" +
+        "X     01111  1     X\n" +
+        "X     01 11111     X\n" +
+        "X     01111        X\n" +
+        "X     0000         X\n" +
+        "X     0            X\n" +
+        "X     0            X\n" +
         "X                  X\n" +
         "X                  X\n" +
         "X                  X\n" +
@@ -65,7 +65,7 @@ class TestBoards {
         "XXXX     XXXX\n" +
         "XXXXXXXXXXXXX";
 
-    public static var spiralPetri:String = "\n" +
+    public static var loosePetri:String = "\n" +
         "XXXXXXXXXXXXX\n" +
         "XXXX     XXXX\n" +
         "XXX       XXX\n" +
@@ -73,8 +73,8 @@ class TestBoards {
         "X   00000   X\n" +
         "X   0   0   X\n" +
         "X   0 0 0   X\n" +
-        "X   0 0 0   X\n" +
-        "X   0 000   X\n" +
+        "X   0   0   X\n" +
+        "X   00000   X\n" +
         "XX         XX\n" +
         "XXX       XXX\n" +
         "XXXX     XXXX\n" +

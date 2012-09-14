@@ -11,6 +11,7 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 
 using Lambda;
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
 
 typedef DropPieceConfig = {
@@ -24,7 +25,7 @@ class DropPieceRule extends Rule {
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var freshness_:AspectPtr;
-    var head_:AspectPtr;
+    var maxFreshness_:AspectPtr;
     var currentPlayer_:AspectPtr;
     var pieceID_:AspectPtr;
 
@@ -33,6 +34,7 @@ class DropPieceRule extends Rule {
 
     var bodyFirst_:AspectPtr;
     var bodyNext_:AspectPtr;
+    var bodyPrev_:AspectPtr;
 
     private var cfg:DropPieceConfig;
 
@@ -45,24 +47,28 @@ class DropPieceRule extends Rule {
             PieceAspect.PIECE_ID,
             PieceAspect.PIECE_REFLECTION,
             PieceAspect.PIECE_ROTATION,
+            FreshnessAspect.MAX_FRESHNESS,
         ];
 
         playerAspectRequirements = [
             BodyAspect.HEAD,
+            BodyAspect.BODY_FIRST,
         ];
 
         nodeAspectRequirements = [
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
             FreshnessAspect.FRESHNESS,
+            BodyAspect.BODY_NEXT,
+            BodyAspect.BODY_PREV,
         ];
     }
 
     override public function init(state:State):Void {
         super.init(state);
 
-        head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
         freshness_ = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        maxFreshness_ = state.stateAspectLookup[FreshnessAspect.MAX_FRESHNESS.id];
         occupier_ = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         currentPlayer_ = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
@@ -70,8 +76,9 @@ class DropPieceRule extends Rule {
         pieceReflection_ = state.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
         pieceRotation_ = state.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
 
-        bodyFirst_ = state.nodeAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyFirst_ = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        bodyPrev_ = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
     }
 
     override public function update():Void {
@@ -80,12 +87,10 @@ class DropPieceRule extends Rule {
 
         // get current player head
         var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-        var head:Int = history.get(state.players[currentPlayer].at(head_));
-        var playerHead:BoardNode = state.nodes[head];
+        var bodyNode:BoardNode = state.nodes[history.get(state.players[currentPlayer].at(bodyFirst_))];
 
         // Find edge nodes of current player
-        var edgeNodes:Array<BoardNode> = playerHead.getGraph(true, isLivingBodyNeighbor);
-        edgeNodes = edgeNodes.filter(isFreeEdge).array();
+        var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state, bodyNext_).filter(isFreeEdge).array();
 
         var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(history.get(state.aspects.at(pieceID_)))];
         var pieceReflection:Int = history.get(state.aspects.at(pieceReflection_));
@@ -162,15 +167,15 @@ class DropPieceRule extends Rule {
         var node:BoardNode = state.nodes[option.targetNode];
         var coords:Array<IntCoord> = pieceGroups[option.pieceID][option.reflection][option.rotation][0];
         var homeCoord:IntCoord = coords[0];
+        var maxFreshness:Int = history.get(state.aspects.at(maxFreshness_)) + 1;
 
         var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+        var bodyNode:BoardNode = state.nodes[history.get(state.players[currentPlayer].at(bodyFirst_))];
 
-        for (coord in coords) fillAndOccupyCell(walkNode(node, coord, homeCoord).value, currentPlayer);
-    }
+        for (coord in coords) bodyNode = fillAndOccupyCell(walkNode(node, coord, homeCoord), currentPlayer, maxFreshness, bodyNode);
+        history.set(state.players[currentPlayer].at(bodyFirst_), bodyNode.id);
 
-    function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
-        if (history.get(me.at(isFilled_)) == 0) return false;
-        return history.get(me.at(occupier_)) == history.get(you.at(occupier_));
+        history.set(state.aspects.at(maxFreshness_), maxFreshness);
     }
 
     inline function isFreeEdge(node:BoardNode):Bool {
@@ -178,21 +183,24 @@ class DropPieceRule extends Rule {
     }
 
     inline function isVacant(node:BoardNode):Bool {
-        return history.get(node.value.at(isFilled_)) == 0;
+        return history.get(node.value.at(isFilled_)) == Aspect.FALSE;
     }
 
-    function fillAndOccupyCell(me:AspectSet, currentPlayer:Int):Void {
+    inline function fillAndOccupyCell(node:BoardNode, currentPlayer:Int, maxFreshness, bodyNode:BoardNode):BoardNode {
 
-        if (history.get(me.at(occupier_)) != currentPlayer || history.get(me.at(isFilled_)) == 0) {
-            // Only freshen it if it's fresh
-            history.set(me.at(freshness_), 1);
+        var me:AspectSet = node.value;
+
+        if (history.get(me.at(occupier_)) != currentPlayer || history.get(me.at(isFilled_)) == Aspect.FALSE) {
+            history.set(me.at(freshness_), maxFreshness);
         }
 
         history.set(me.at(occupier_), currentPlayer);
-        history.set(me.at(isFilled_), 1);
+        history.set(me.at(isFilled_), Aspect.TRUE);
+
+        return bodyNode.addNode(node, state, bodyNext_, bodyPrev_);
     }
 
-    function walkNode(node:BoardNode, fromCoord:IntCoord, toCoord:IntCoord):BoardNode {
+    inline function walkNode(node:BoardNode, fromCoord:IntCoord, toCoord:IntCoord):BoardNode {
         var dn:Int = 0;
         var dw:Int = 0;
         var de:Int = toCoord[0] - fromCoord[0];

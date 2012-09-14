@@ -2,8 +2,13 @@ package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
 
+import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.rules.DropPieceRule;
 import net.rezmason.scourge.model.rules.TestPieceRule;
+
+using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.utils.Pointers;
 
 class PieceRulesTest extends RuleTest
 {
@@ -46,15 +51,22 @@ class PieceRulesTest extends RuleTest
 
         Assert.areEqual(72, options.length);
 
-        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
         dropRule.chooseOption(0);
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
 
-        numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
+
+        var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        var bodyNext_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        var bodyPrev_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var bodyNode:BoardNode = state.nodes[history.get(state.players[0].at(bodyFirst_))];
+
+        Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
 	}
 
     @Test
@@ -76,14 +88,14 @@ class PieceRulesTest extends RuleTest
 
         Assert.areEqual(36, options.length);
 
-        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
         dropRule.chooseOption(0);
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
 
-        numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -106,14 +118,14 @@ class PieceRulesTest extends RuleTest
 
         Assert.areEqual(18, options.length);
 
-        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
         dropRule.chooseOption(0);
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
 
-        numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -136,14 +148,14 @@ class PieceRulesTest extends RuleTest
 
         Assert.areEqual(9, options.length);
 
-        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
         dropRule.chooseOption(0);
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
 
-        numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -166,14 +178,14 @@ class PieceRulesTest extends RuleTest
 
         Assert.areEqual(9 + 4, options.length);
 
-        var numCells:Int = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
         dropRule.chooseOption(0);
-        //trace(BoardUtils.spitBoard(state));
+        //trace(state.spitBoard());
 
-        numCells = ~/([^0])/g.replace(BoardUtils.spitBoard(state), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 }

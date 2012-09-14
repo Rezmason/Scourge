@@ -8,6 +8,7 @@ import net.rezmason.scourge.model.aspects.OwnershipAspect;
 using Lambda;
 using Std;
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
 
 typedef XY = {x:Float, y:Float};
@@ -21,7 +22,7 @@ class BuildBoardRule extends Rule {
 
     // Creates boards for "skirmish games"
 
-    private inline static var PLAYER_DIST:Int = 9;
+    private  static var PLAYER_DIST:Int = 9;
     private inline static var RIM:Int = 1;
     private inline static var PADDING:Int = 5 + RIM;
     private inline static var START_ANGLE:Float = 0.75;
@@ -36,6 +37,7 @@ class BuildBoardRule extends Rule {
     var head_:AspectPtr;
     var bodyFirst_:AspectPtr;
     var bodyNext_:AspectPtr;
+    var bodyPrev_:AspectPtr;
 
     public function new(cfg:BoardConfig):Void {
         super();
@@ -52,6 +54,7 @@ class BuildBoardRule extends Rule {
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
             BodyAspect.BODY_NEXT,
+            BodyAspect.BODY_PREV,
         ];
     }
 
@@ -63,8 +66,9 @@ class BuildBoardRule extends Rule {
         isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
 
-        bodyFirst_ = state.nodeAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyFirst_ = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        bodyPrev_ = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
 
         makeBoard();
     }
@@ -120,6 +124,7 @@ class BuildBoardRule extends Rule {
         populateGraphHeads(grid, headCoords);
         if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM);
         if (cfg.initGrid != null && cfg.initGrid.length > 0) initGraph(grid, cfg.initGrid, boardWidth);
+        populateGraphBodies();
     }
 
     inline function findMinCoord(coords:Array<XY>):XY {
@@ -175,10 +180,10 @@ class BuildBoardRule extends Rule {
     }
 
     inline function obstructGraphRim(grid:BoardNode):Void {
-        for (node in grid.walk(Gr.e)) history.set(node.value.at(isFilled_), 1);
-        for (node in grid.walk(Gr.s)) history.set(node.value.at(isFilled_), 1);
-        for (node in grid.run(Gr.s).walk(Gr.e)) history.set(node.value.at(isFilled_), 1);
-        for (node in grid.run(Gr.e).walk(Gr.s)) history.set(node.value.at(isFilled_), 1);
+        for (node in grid.walk(Gr.e)) history.set(node.value.at(isFilled_), Aspect.TRUE);
+        for (node in grid.walk(Gr.s)) history.set(node.value.at(isFilled_), Aspect.TRUE);
+        for (node in grid.run(Gr.s).walk(Gr.e)) history.set(node.value.at(isFilled_), Aspect.TRUE);
+        for (node in grid.run(Gr.e).walk(Gr.s)) history.set(node.value.at(isFilled_), Aspect.TRUE);
     }
 
     inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>):Void {
@@ -188,7 +193,7 @@ class BuildBoardRule extends Rule {
             var coord:XY = headCoords[ike];
             var head:BoardNode = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
             history.set(state.players[ike].at(head_), head.id);
-            history.set(head.value.at(isFilled_), 1);
+            history.set(head.value.at(isFilled_), Aspect.TRUE);
             history.set(head.value.at(occupier_), ike);
         }
     }
@@ -225,17 +230,37 @@ class BuildBoardRule extends Rule {
         for (row in grid.walk(Gr.s)) {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
-                if (history.get(column.value.at(isFilled_)) == 0) {
+                if (history.get(column.value.at(isFilled_)) == Aspect.FALSE) {
                     var char:String = initGrid.charAt(y * initGridWidth + x + 1);
                     if (char != " ") {
-                        history.set(column.value.at(isFilled_), 1);
-                        if (!NUMERIC_CHAR.match(char)) history.set(column.value.at(occupier_), -1);
+                        history.set(column.value.at(isFilled_), Aspect.TRUE);
+                        if (!NUMERIC_CHAR.match(char)) history.set(column.value.at(occupier_), Aspect.NULL);
                         else history.set(column.value.at(occupier_), Std.parseInt(char));
                     }
                 }
                 x++;
             }
             y++;
+        }
+    }
+
+    inline function populateGraphBodies():Void {
+
+        var bodies:Array<Array<BoardNode>> = [];
+        for (ike in 0...state.players.length) bodies.push([]);
+
+        for (node in state.nodes) {
+            if (history.get(node.value.at(isFilled_)) != Aspect.FALSE) {
+                var occupier:Int = history.get(node.value.at(occupier_));
+                if (occupier != Aspect.NULL) bodies[occupier].push(node);
+            }
+        }
+
+        for (ike in 0...state.players.length) {
+            var body:Array<BoardNode> = bodies[ike];
+            var bodyFirstNode:BoardNode = body[0];
+            history.set(state.players[ike].at(bodyFirst_), bodyFirstNode.id);
+            body.chainByAspect(state, bodyNext_, bodyPrev_);
         }
     }
 }

@@ -12,6 +12,7 @@ import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.DraftPlayersRule;
 
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
 
 class BoardRuleTest {
@@ -57,7 +58,7 @@ class BoardRuleTest {
 
         for (player in state.players) {
             Assert.isNotNull(player.at(head_));
-            Assert.areNotEqual(-1, player.at(head_));
+            Assert.areNotEqual(Aspect.NULL, player.at(head_));
         }
 
         for (node in state.nodes) {
@@ -67,9 +68,9 @@ class BoardRuleTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
-            trace(BoardUtils.spitBoard(state));
+            trace(state.spitBoard());
         #else
-            Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, BoardUtils.spitBoard(state, false));
+            Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, state.spitBoard(false));
         #end
 
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
@@ -79,7 +80,7 @@ class BoardRuleTest {
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);
-            Assert.areEqual(-1, history.get(neighbor.value.at(occupier_)));
+            Assert.areEqual(Aspect.NULL, history.get(neighbor.value.at(occupier_)));
             history.set(neighbor.value.at(occupier_), 0);
         }
 
@@ -106,9 +107,9 @@ class BoardRuleTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
-            trace(BoardUtils.spitBoard(state));
+            trace(state.spitBoard());
         #else
-            Assert.areEqual(TestBoards.emptyPetri, BoardUtils.spitBoard(state, false));
+            Assert.areEqual(TestBoards.emptyPetri, state.spitBoard(false));
         #end
     }
 
@@ -125,10 +126,21 @@ class BoardRuleTest {
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be a four-player board with a spiral interior");
-            trace(BoardUtils.spitBoard(state));
+            trace(state.spitBoard());
         #end
 
-        Assert.areEqual(TestBoards.spiral, BoardUtils.spitBoard(state, false));
+        Assert.areEqual(TestBoards.spiral, state.spitBoard(false));
+
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(false), "").length;
+
+        var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        var bodyNext_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        var bodyPrev_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+
+        var bodyFirst:Int = history.get(state.players[0].at(bodyFirst_));
+        Assert.areNotEqual(Aspect.NULL, bodyFirst);
+
+        testListLength(numCells, state, state.nodes[bodyFirst], bodyNext_, bodyPrev_);
 
         //trace(history.dump());
     }
@@ -136,5 +148,22 @@ class BoardRuleTest {
     private function makeState(rules:Array<Rule>):State {
         history.wipe();
         return new StateFactory().makeState(rules, history);
+    }
+
+    private function testListLength(expectedLength:Int, state:State, first:BoardNode, next:AspectPtr, prev:AspectPtr):Void {
+        var count:Int = 0;
+        var last:BoardNode = null;
+
+        for (node in first.iterate(state, next)) {
+            count++;
+            last = node;
+        }
+        Assert.areEqual(expectedLength, count);
+
+        count = 0;
+        for (node in last.iterate(state, prev)) {
+            count++;
+        }
+        Assert.areEqual(expectedLength, count);
     }
 }
