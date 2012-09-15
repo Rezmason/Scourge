@@ -65,7 +65,7 @@ class DecayRule extends Rule {
 
             var bodyFirst:Int = player.at(bodyFirst_);
             if (bodyFirst != Aspect.NULL) {
-                for (node in state.nodes[bodyFirst].iterate(state, bodyNext_)) {
+                for (node in state.nodes[bodyFirst].iterate(state.nodes, bodyNext_)) {
                     if (!livingBodyNeighbors.has(node)) bodyFirst = killCell(node, bodyFirst);
                 }
             }
@@ -82,16 +82,9 @@ class DecayRule extends Rule {
         node.value.mod(isFilled_, Aspect.FALSE);
         node.value.mod(occupier_, Aspect.NULL);
 
-        var nextNode:BoardNode = node.removeNode(state, bodyNext_, bodyPrev_);
+        var nextNode:BoardNode = node.removeNode(state.nodes, bodyNext_, bodyPrev_);
         if (firstIndex == node.id) firstIndex = nextNode == null ? Aspect.NULL : nextNode.id;
         return firstIndex;
     }
-
-    /*
-    function resetCell(me:AspectSet):Void {
-        var template:AspectTemplate = state.nodeAspectTemplate;
-        for (ike in 0...me.length) history.set(me[ike], template[ike]);
-    }
-    */
 }
 

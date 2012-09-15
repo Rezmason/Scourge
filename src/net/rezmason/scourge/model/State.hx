@@ -4,8 +4,6 @@ import net.rezmason.scourge.model.ModelTypes;
 
 class State {
 
-    public var history:StateHistory;
-
     public var aspects:AspectSet;
     public var players:Array<AspectSet>;
     public var nodes:Array<BoardNode>;

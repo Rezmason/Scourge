@@ -85,7 +85,7 @@ class EatCellsRule extends Rule {
         var headIndices:Array<Int> = [];
         for (player in state.players) headIndices.push(player.at(head_));
 
-        var nodes:Array<BoardNode> = bodyNode.boardListToArray(state, bodyNext_);
+        var nodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_);
         nodes = nodes.filter(isFresh).array();
 
         var newNodes:Array<BoardNode> = nodes.copy();
@@ -132,7 +132,7 @@ class EatCellsRule extends Rule {
 
     function getBody(player:Int):Array<BoardNode> {
         var bodyNode:BoardNode = state.nodes[state.players[player].at(bodyFirst_)];
-        return bodyNode.boardListToArray(state, bodyNext_);
+        return bodyNode.boardListToArray(state.nodes, bodyNext_);
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
@@ -147,7 +147,7 @@ class EatCellsRule extends Rule {
     function eatCell(node:BoardNode, currentPlayer:Int, maxFreshness:Int, bodyNode:BoardNode):BoardNode {
         node.value.mod(occupier_, currentPlayer);
         node.value.mod(freshness_, maxFreshness);
-        return bodyNode.addNode(node, state, bodyNext_, bodyPrev_);
+        return bodyNode.addNode(node, state.nodes, bodyNext_, bodyPrev_);
     }
 }
 

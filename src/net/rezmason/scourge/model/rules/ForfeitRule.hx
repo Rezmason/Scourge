@@ -61,7 +61,7 @@ class ForfeitRule extends Rule {
         var player:AspectSet = state.players[currentPlayer];
         var bodyNode:BoardNode = state.nodes[player.at(bodyFirst_)];
 
-        for (node in bodyNode.boardListToArray(state, bodyNext_)) killCell(node);
+        for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node);
         player.mod(bodyFirst_, Aspect.NULL);
         player.mod(head_, Aspect.NULL);
     }
@@ -74,7 +74,7 @@ class ForfeitRule extends Rule {
     function killCell(node:BoardNode):Void {
         node.value.mod(isFilled_, Aspect.FALSE);
         node.value.mod(occupier_, Aspect.NULL);
-        node.removeNode(state, bodyNext_, bodyPrev_);
+        node.removeNode(state.nodes, bodyNext_, bodyPrev_);
     }
 }
 

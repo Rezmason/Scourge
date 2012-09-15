@@ -90,7 +90,7 @@ class DropPieceRule extends Rule {
         var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
 
         // Find edge nodes of current player
-        var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state, bodyNext_).filter(isFreeEdge).array();
+        var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge).array();
 
         var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(state.aspects.at(pieceID_))];
         var pieceReflection:Int = state.aspects.at(pieceReflection_);
@@ -197,7 +197,7 @@ class DropPieceRule extends Rule {
         me.mod(occupier_, currentPlayer);
         me.mod(isFilled_, Aspect.TRUE);
 
-        return bodyNode.addNode(node, state, bodyNext_, bodyPrev_);
+        return bodyNode.addNode(node, state.nodes, bodyNext_, bodyPrev_);
     }
 
     inline function walkNode(node:BoardNode, fromCoord:IntCoord, toCoord:IntCoord):BoardNode {

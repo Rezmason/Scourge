@@ -3,8 +3,6 @@ The octopus should hold all the cards
 		One stores values
 		The other stores history pointers
 		Something else copies values to and from the history
-	Then clean up
-		Get rid of all unneeded state and history params
 
 And then clean up
 	Lots of code is used over and over again, especially in rules

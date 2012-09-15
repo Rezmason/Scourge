@@ -16,6 +16,7 @@ typedef XY = {x:Float, y:Float};
 typedef BoardConfig = {
     public var circular:Bool;
     public var initGrid:String;
+    public var history:StateHistory;
 }
 
 class BuildBoardRule extends Rule {
@@ -152,7 +153,7 @@ class BuildBoardRule extends Rule {
         var aspects:AspectSet = new AspectSet();
         var template:AspectSet = state.nodeAspectTemplate;
         for (val in template) {
-            //aspects.push(history.alloc(val)); // H
+            //aspects.push(cfg.history.alloc(val)); // H
             aspects.push(val);
         }
         var node:BoardNode = new BoardNode(aspects, state.nodes.length);
@@ -262,7 +263,7 @@ class BuildBoardRule extends Rule {
             var body:Array<BoardNode> = bodies[ike];
             var bodyFirstNode:BoardNode = body[0];
             state.players[ike].mod(bodyFirst_, bodyFirstNode.id);
-            body.chainByAspect(state, bodyNext_, bodyPrev_);
+            body.chainByAspect(bodyNext_, bodyPrev_);
         }
     }
 }

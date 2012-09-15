@@ -20,7 +20,6 @@ class StateFactory {
         if (rules == null) return null;
 
         var state:State = new State();
-        state.history = history;
 
         while (rules.has(null)) rules.remove(null);
 

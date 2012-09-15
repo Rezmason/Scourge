@@ -37,11 +37,11 @@ class RuleTest
         history.wipe();
 
         // make player config and generate players
-        var playerCfg:PlayerConfig = {numPlayers:numPlayers};
+        var playerCfg:PlayerConfig = {numPlayers:numPlayers, history:history};
         var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
 
         // make board config and generate board
-        var boardCfg:BoardConfig = {circular:false, initGrid:initGrid};
+        var boardCfg:BoardConfig = {circular:false, initGrid:initGrid, history:history};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
         rules.unshift(buildBoardRule);
@@ -54,7 +54,7 @@ class RuleTest
         var count:Int = 0;
         var last:BoardNode = null;
 
-        for (node in first.iterate(state, next)) {
+        for (node in first.iterate(state.nodes, next)) {
             count++;
             last = node;
             if (count > expectedLength) break;
@@ -62,7 +62,7 @@ class RuleTest
         if (expectedLength != count) return expectedLength - count;
 
         count = 0;
-        for (node in last.iterate(state, prev)) {
+        for (node in last.iterate(state.nodes, prev)) {
             count++;
             if (count > expectedLength) break;
         }

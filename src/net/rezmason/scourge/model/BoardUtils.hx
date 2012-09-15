@@ -67,18 +67,17 @@ class BoardUtils {
         return str;
     }
 
-    public inline static function iterate(_node:BoardNode, _state:State, _aspectPointer:AspectPtr):BoardNodeIterator {
-        return new BoardNodeIterator(_node, _state, _aspectPointer);
+    public inline static function iterate(_node:BoardNode, _nodes:Array<BoardNode>, _aspectPointer:AspectPtr):BoardNodeIterator {
+        return new BoardNodeIterator(_node, _nodes, _aspectPointer);
     }
 
-    public inline static function boardListToArray(_node:BoardNode, _state:State, _aspectPointer:AspectPtr):Array<BoardNode> {
+    public inline static function boardListToArray(_node:BoardNode, _nodes:Array<BoardNode>, _aspectPointer:AspectPtr):Array<BoardNode> {
         var arr:Array<BoardNode> = [];
-        for (node in iterate(_node, _state, _aspectPointer)) arr.push(node);
+        for (node in iterate(_node, _nodes, _aspectPointer)) arr.push(node);
         return arr;
     }
 
-    public inline static function removeNode(node:BoardNode, state:State, next:AspectPtr, prev:AspectPtr):BoardNode {
-        var history:StateHistory = state.history;
+    public inline static function removeNode(node:BoardNode, nodes:Array<BoardNode>, next:AspectPtr, prev:AspectPtr):BoardNode {
         var nextNodeID:Int = node.value.at(next);
         var prevNodeID:Int = node.value.at(prev);
 
@@ -88,13 +87,13 @@ class BoardUtils {
 
         if (nextNodeID != Aspect.NULL) {
             wasConnected = true;
-            nextNode = state.nodes[nextNodeID];
-            state.nodes[nextNodeID].value.mod(prev, prevNodeID);
+            nextNode = nodes[nextNodeID];
+            nodes[nextNodeID].value.mod(prev, prevNodeID);
         }
 
         if (prevNodeID != Aspect.NULL) {
             wasConnected = true;
-            state.nodes[prevNodeID].value.mod(next, nextNodeID);
+            nodes[prevNodeID].value.mod(next, nextNodeID);
         }
 
         if (wasConnected) {
@@ -105,10 +104,8 @@ class BoardUtils {
         return nextNode;
     }
 
-    public inline static function addNode(node:BoardNode, addedNode:BoardNode, state:State, next:AspectPtr, prev:AspectPtr):BoardNode {
-        var history:StateHistory = state.history;
-
-        removeNode(addedNode, state, next, prev);
+    public inline static function addNode(node:BoardNode, addedNode:BoardNode, nodes:Array<BoardNode>, next:AspectPtr, prev:AspectPtr):BoardNode {
+        removeNode(addedNode, nodes, next, prev);
 
         var prevNodeID:Int = node.value.at(prev);
 
@@ -116,16 +113,14 @@ class BoardUtils {
         addedNode.value.mod(prev, prevNodeID);
         node.value.mod(prev, addedNode.id);
         if (prevNodeID != Aspect.NULL) {
-            var prevNode:BoardNode = state.nodes[prevNodeID];
+            var prevNode:BoardNode = nodes[prevNodeID];
             prevNode.value.mod(next, addedNode.id);
         }
 
         return addedNode;
     }
 
-    public inline static function chainByAspect(nodes:Array<BoardNode>, state:State, next:AspectPtr, prev:AspectPtr):Void {
-        var history:StateHistory = state.history;
-
+    public inline static function chainByAspect(nodes:Array<BoardNode>, next:AspectPtr, prev:AspectPtr):Void {
         nodes = nodes.copy();
         while (nodes.remove(null)) {}
 
@@ -147,12 +142,12 @@ class BoardUtils {
 class BoardNodeIterator {
 
     private var node:BoardNode;
-    private var state:State;
+    private var nodes:Array<BoardNode>;
     private var aspectPointer:AspectPtr;
 
-    public function new(_node:BoardNode, _state:State, _aspectPointer:AspectPtr):Void {
+    public function new(_node:BoardNode, _nodes:Array<BoardNode>, _aspectPointer:AspectPtr):Void {
         node = _node;
-        state = _state;
+        nodes = _nodes;
         aspectPointer = _aspectPointer;
     }
 
@@ -164,7 +159,7 @@ class BoardNodeIterator {
         var lastNode:BoardNode = node;
         var nodeIndex:Int = node.value.at(aspectPointer);
         if (nodeIndex == Aspect.NULL) node = null;
-        else node = state.nodes[nodeIndex];
+        else node = nodes[nodeIndex];
         return lastNode;
     }
 }

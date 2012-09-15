@@ -61,7 +61,7 @@ class KillHeadlessPlayerRule extends Rule {
                 var playerHead:BoardNode = state.nodes[head];
                 if (playerHead.value.at(occupier_) != playerIndex || playerHead.value.at(isFilled_) == Aspect.FALSE) {
                     player.mod(head_, Aspect.NULL);
-                    for (node in state.nodes[bodyFirst].iterate(state, bodyNext_)) node.removeNode(state, bodyNext_, bodyPrev_);
+                    for (node in state.nodes[bodyFirst].iterate(state.nodes, bodyNext_)) node.removeNode(state.nodes, bodyNext_, bodyPrev_);
                     player.mod(bodyFirst_, Aspect.NULL);
                 }
             }

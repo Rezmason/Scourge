@@ -45,10 +45,10 @@ class BoardRuleTest {
     @Test
     public function configTest1():Void {
 
-        var boardCfg:BoardConfig = {circular:false, initGrid:null};
+        var boardCfg:BoardConfig = {circular:false, initGrid:null, history:history};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
-        var playerCfg:PlayerConfig = {numPlayers:4};
+        var playerCfg:PlayerConfig = {numPlayers:4, history:history};
         var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
 
         var state:State = makeState([draftPlayersRule, buildBoardRule]);
@@ -97,10 +97,10 @@ class BoardRuleTest {
     @Test
     public function configTest2():Void {
 
-        var boardCfg:BoardConfig = {circular:true, initGrid:null};
+        var boardCfg:BoardConfig = {circular:true, initGrid:null, history:history};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
-        var playerCfg:PlayerConfig = {numPlayers:1};
+        var playerCfg:PlayerConfig = {numPlayers:1, history:history};
         var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
 
         var state:State = makeState([draftPlayersRule, buildBoardRule]);
@@ -116,10 +116,10 @@ class BoardRuleTest {
     @Test
     public function configTest3():Void {
 
-        var boardCfg:BoardConfig = {circular:false, initGrid:TestBoards.spiral};
+        var boardCfg:BoardConfig = {circular:false, initGrid:TestBoards.spiral, history:history};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
-        var playerCfg:PlayerConfig = {numPlayers:4};
+        var playerCfg:PlayerConfig = {numPlayers:4, history:history};
         var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
 
         var state:State = makeState([draftPlayersRule, buildBoardRule]);
@@ -154,14 +154,14 @@ class BoardRuleTest {
         var count:Int = 0;
         var last:BoardNode = null;
 
-        for (node in first.iterate(state, next)) {
+        for (node in first.iterate(state.nodes, next)) {
             count++;
             last = node;
         }
         Assert.areEqual(expectedLength, count);
 
         count = 0;
-        for (node in last.iterate(state, prev)) {
+        for (node in last.iterate(state.nodes, prev)) {
             count++;
         }
         Assert.areEqual(expectedLength, count);
