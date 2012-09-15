@@ -4,22 +4,22 @@ import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.rules.BuildRule;
 
 using Lambda;
 using Std;
-using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.Pointers;
 
 typedef XY = {x:Float, y:Float};
 
-typedef BoardConfig = {
+typedef BuildBoardConfig = {>BuildConfig,
     public var circular:Bool;
     public var initGrid:String;
-    public var history:StateHistory;
 }
 
-class BuildBoardRule extends Rule {
+class BuildBoardRule extends BuildRule {
 
     // Creates boards for "skirmish games"
 
@@ -31,7 +31,7 @@ class BuildBoardRule extends Rule {
     private static var INIT_GRID_CLEANER:EReg = ~/(\n\t)/g;
     private static var NUMERIC_CHAR:EReg = ~/(\d)/g;
 
-    private var cfg:BoardConfig;
+    private var cfg:BuildBoardConfig;
 
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
@@ -40,7 +40,7 @@ class BuildBoardRule extends Rule {
     var bodyNext_:AspectPtr;
     var bodyPrev_:AspectPtr;
 
-    public function new(cfg:BoardConfig):Void {
+    public function new(cfg:BuildBoardConfig):Void {
         super();
 
         this.cfg = cfg;
@@ -63,13 +63,13 @@ class BuildBoardRule extends Rule {
 
         super.init(state, plan);
 
-        occupier_ = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        isFilled_ = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        head_ =   plan.playerAspectLookup[BodyAspect.HEAD.id];
+        occupier_ = nodePtr(OwnershipAspect.OCCUPIER);
+        isFilled_ = nodePtr(OwnershipAspect.IS_FILLED);
+        head_ =   playerPtr(BodyAspect.HEAD);
 
-        bodyFirst_ = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        bodyNext_ = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        bodyPrev_ = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        bodyFirst_ = playerPtr(BodyAspect.BODY_FIRST);
+        bodyNext_ = nodePtr(BodyAspect.BODY_NEXT);
+        bodyPrev_ = nodePtr(BodyAspect.BODY_PREV);
 
         // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
         // Player 1's head is at a 45 degree angle
@@ -115,7 +115,7 @@ class BuildBoardRule extends Rule {
             coord.y = Std.int(coord.y + PADDING - minCoord.y);
         }
 
-        var grid:BoardNode = makeSquareGraph(boardWidth, plan.nodeAspectTemplate);
+        var grid:BoardNode = makeSquareGraph(boardWidth);
         obstructGraphRim(grid);
         populateGraphHeads(grid, headCoords);
         if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM);
@@ -144,22 +144,27 @@ class BuildBoardRule extends Rule {
         return {x:maxX, y:maxY};
     }
 
-    inline function makeNode(template:AspectSet):BoardNode {
-        var node:BoardNode = new BoardNode(createAspectSet(template, cfg.history), state.nodes.length);
+    inline function makeNode():BoardNode {
+        var node:BoardNode = new BoardNode(buildAspectSet(plan.nodeAspectTemplate), state.nodes.length);
         state.nodes.push(node);
+
+        var histAspects:AspectSet = buildHistAspectSet(plan.nodeAspectTemplate, cfg.history);
+        var histNode:BoardNode = new BoardNode(histAspects, cfg.historyState.nodes.length);
+        cfg.historyState.nodes.push(histNode);
+
         return node;
     }
 
-    inline function makeSquareGraph(width:Int, nodeTemplate:AspectSet):BoardNode {
+    inline function makeSquareGraph(width:Int):BoardNode {
 
         // Make a connected grid of nodes with default values
-        var node:BoardNode = makeNode(nodeTemplate);
-        for (ike in 1...width) node = node.attach(makeNode(nodeTemplate), Gr.e);
+        var node:BoardNode = makeNode();
+        for (ike in 1...width) node = node.attach(makeNode(), Gr.e);
 
         var row:BoardNode = node.run(Gr.w);
         for (ike in 1...width) {
             for (column in row.walk(Gr.e)) {
-                var next:BoardNode = makeNode(nodeTemplate);
+                var next:BoardNode = makeNode();
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);
@@ -254,14 +259,5 @@ class BuildBoardRule extends Rule {
             state.players[ike].mod(bodyFirst_, bodyFirstNode.id);
             body.chainByAspect(bodyNext_, bodyPrev_);
         }
-    }
-
-    inline function createAspectSet(template:AspectSet, history:StateHistory):AspectSet {
-        var aspects:AspectSet = new AspectSet();
-        for (val in template) {
-            //aspects.push(history.alloc(val)); // H
-            aspects.push(val);
-        }
-        return aspects;
     }
 }

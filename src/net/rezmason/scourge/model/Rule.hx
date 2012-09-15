@@ -5,6 +5,7 @@ import net.rezmason.scourge.model.ModelTypes;
 class Rule {
 
     var state:State;
+    var plan:StatePlan;
 
     public var options(default, null):Array<Option>;
     public var stateAspectRequirements(default, null):AspectRequirements;
@@ -18,7 +19,10 @@ class Rule {
         options = [];
     }
 
-    public function init(state:State, plan:StatePlan):Void { this.state = state; }
+    public function init(state:State, plan:StatePlan):Void {
+        this.state = state;
+        this.plan = plan;
+    }
     public function update():Void {}
 
     public function chooseOption(choice:Int):Void {
@@ -26,5 +30,9 @@ class Rule {
             throw "Invalid choice index.";
         }
     }
+
+    inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup[prop.id]; }
+    inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup[prop.id]; }
+    inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup[prop.id]; }
 }
 

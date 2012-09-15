@@ -67,18 +67,18 @@ class DropPieceRule extends Rule {
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
 
-        freshness_ = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        maxFreshness_ = plan.stateAspectLookup[FreshnessAspect.MAX_FRESHNESS.id];
-        occupier_ = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        isFilled_ = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        currentPlayer_ = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        pieceID_ = plan.stateAspectLookup[PieceAspect.PIECE_ID.id];
-        pieceReflection_ = plan.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
-        pieceRotation_ = plan.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
+        freshness_ = nodePtr(FreshnessAspect.FRESHNESS);
+        maxFreshness_ = statePtr(FreshnessAspect.MAX_FRESHNESS);
+        occupier_ = nodePtr(OwnershipAspect.OCCUPIER);
+        isFilled_ = nodePtr(OwnershipAspect.IS_FILLED);
+        currentPlayer_ = statePtr(PlyAspect.CURRENT_PLAYER);
+        pieceID_ = statePtr(PieceAspect.PIECE_ID);
+        pieceReflection_ = statePtr(PieceAspect.PIECE_REFLECTION);
+        pieceRotation_ = statePtr(PieceAspect.PIECE_ROTATION);
 
-        bodyFirst_ = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        bodyNext_ = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        bodyPrev_ = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        bodyFirst_ = playerPtr(BodyAspect.BODY_FIRST);
+        bodyNext_ = nodePtr(BodyAspect.BODY_NEXT);
+        bodyPrev_ = nodePtr(BodyAspect.BODY_PREV);
     }
 
     override public function update():Void {
@@ -187,16 +187,10 @@ class DropPieceRule extends Rule {
     }
 
     inline function fillAndOccupyCell(node:BoardNode, currentPlayer:Int, maxFreshness, bodyNode:BoardNode):BoardNode {
-
         var me:AspectSet = node.value;
-
-        if (me.at(occupier_) != currentPlayer || me.at(isFilled_) == Aspect.FALSE) {
-            me.mod(freshness_, maxFreshness);
-        }
-
+        if (me.at(occupier_) != currentPlayer || me.at(isFilled_) == Aspect.FALSE) me.mod(freshness_, maxFreshness);
         me.mod(occupier_, currentPlayer);
         me.mod(isFilled_, Aspect.TRUE);
-
         return bodyNode.addNode(node, state.nodes, bodyNext_, bodyPrev_);
     }
 

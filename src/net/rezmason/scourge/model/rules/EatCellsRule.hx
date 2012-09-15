@@ -59,16 +59,16 @@ class EatCellsRule extends Rule {
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
-        occupier_ = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        isFilled_ = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        freshness_ = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        maxFreshness_ = plan.stateAspectLookup[FreshnessAspect.MAX_FRESHNESS.id];
-        head_ =   plan.playerAspectLookup[BodyAspect.HEAD.id];
-        currentPlayer_ = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        occupier_ = nodePtr(OwnershipAspect.OCCUPIER);
+        isFilled_ = nodePtr(OwnershipAspect.IS_FILLED);
+        freshness_ = nodePtr(FreshnessAspect.FRESHNESS);
+        maxFreshness_ = statePtr(FreshnessAspect.MAX_FRESHNESS);
+        head_ =   playerPtr(BodyAspect.HEAD);
+        currentPlayer_ = statePtr(PlyAspect.CURRENT_PLAYER);
 
-        bodyFirst_ = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        bodyNext_ = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        bodyPrev_ = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        bodyFirst_ = playerPtr(BodyAspect.BODY_FIRST);
+        bodyNext_ = nodePtr(BodyAspect.BODY_NEXT);
+        bodyPrev_ = nodePtr(BodyAspect.BODY_PREV);
     }
 
     override public function chooseOption(choice:Int):Void {

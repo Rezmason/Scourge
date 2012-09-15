@@ -35,6 +35,9 @@ Game varieties
 			Ideally, powers are incomparable to one another
 				Otherwise, new powers will introduce power creep
 
+	Locomotion
+		pick up a chunk of yourself and place it somewhere else on your body
+
 	Local powerups
 		Abilities that require that the user inhabits a particular space or spaces
 			Similar to Domination

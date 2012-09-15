@@ -1,13 +1,5 @@
-The octopus should hold all the cards
-	Twin States
-		One contains the history indices
-		The other contains the values
-		StateHistoryManager swaps values between them
-
-And then clean up
-	Lots of code is used over and over again, especially in rules
-	Are there leftover aspects?
-	Finally, comment the rule code
+StateHistorian
+	Use history state to map state to history and vice versa
 
 Piece choice
 	Config
@@ -22,8 +14,8 @@ Piece choice
 	Generating possible states from this is complicated
 
 Per-ply replenishing
-	player values
-	state values
+	player values, their step and their frequency
+	state values, their step and their frequency
 
 Biting
 	Config
@@ -45,35 +37,30 @@ Cavities
 	Biting through these should be an option
 	Tough?
 
-Moving
-	pick up a chunk of yourself and place it somewhere else on your body
-	Think this one through first
 
-Expand board when placing a piece
+Infinite board
+	Expand board when placing a piece
 	Tough?
 
 Group rules together!
 
+Clean up
+	Lots of code is used over and over again, especially in rules
+	Comment the rule code
+
 And then SPEED EVERYTHING UP
 	Use timing output to find the bottlenecks
-	Graph expansion is expensive, but so is Lambda.has.
-		Switch to using tables of ids
+	Lambda.has is expensive - switch to using tables of ids
 	Store useful information, like edges, distance and connectedness values
 		Rules that take advantage of these values would expand a graph from an affected square
 		Just make sure to update this information when it changes
 	Take advantage of linked lists for storing sets of nodes
-		See body linked lists
 	Also, haxe.List might be better than Array in some situations
 
 Level Editing
 	Just a bunch of rules, aha
 
 New architecture - what's left
-	Options
-		IDs that should be the same every time the same situation is run
-			This allows options to be inexpensively sent to opponents on other machines
-		Other parameters, such as relevantNodes:Array<Int>
-			The View will *have* to type options
 	IPlayer: an object that picks an optimal State from a set of States
 		The initial state is also provided
 		Evaluator: Turns a State into a number based on averaging values from IGoals
@@ -120,27 +107,11 @@ New architecture - what's left
 		Interprets user interaction, generates a Command and broadcasts it to the HumanPlayer object
 		Receives goal events and timer tick events and visually interprets them
 
-	Forum
-		Depicts players on a network
-		Allows for chat
-		Allows for the creation and joining of games
-			Includes rule configuration
-		Sends initialization data to the coordinator
-		Uses InitialStateFactory
-
-	Mission
-		Depicts a single player narrative interspersed with gameplay
-			Including tutorials
-		Uses MissionStateFactory
-
 Coarse evaluation
-	Obvious
-		Area
-		Attribute count (bites and swaps) times attribute range
-	Maybe
-		Outer perimeter (based on largest attribute range)
-		Porosity
-		Connectedness
+	Number of nodes (filled and enclosed)
+	Attribute count (bites and swaps) times attribute range
+	Percentage of nodes that are outer edges!
+	Number of nodes
 
 
 A.I. thoughts

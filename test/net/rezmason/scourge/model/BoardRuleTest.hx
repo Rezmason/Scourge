@@ -9,7 +9,7 @@ import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
-import net.rezmason.scourge.model.rules.DraftPlayersRule;
+import net.rezmason.scourge.model.rules.BuildPlayersRule;
 
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;

@@ -1,0 +1,12 @@
+Forum view
+    Depicts players on a network
+    Allows for chat
+    Allows for the creation and joining of games
+        Includes rule configuration
+
+
+Survival
+Team survival
+Domination
+Missions?
+Racing??

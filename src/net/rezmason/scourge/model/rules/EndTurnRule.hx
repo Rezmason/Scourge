@@ -33,9 +33,9 @@ class EndTurnRule extends Rule {
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
-        head_ = plan.playerAspectLookup[BodyAspect.HEAD.id];
-        currentPlayer_ = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        maxFreshness_ = plan.stateAspectLookup[FreshnessAspect.MAX_FRESHNESS.id];
+        head_ = playerPtr(BodyAspect.HEAD);
+        currentPlayer_ = statePtr(PlyAspect.CURRENT_PLAYER);
+        maxFreshness_ = statePtr(FreshnessAspect.MAX_FRESHNESS);
     }
 
     override public function chooseOption(choice:Int):Void {

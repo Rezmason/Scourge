@@ -4,8 +4,8 @@ import massive.munit.Assert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
-import net.rezmason.scourge.model.rules.CreateStateRule;
-import net.rezmason.scourge.model.rules.DraftPlayersRule;
+import net.rezmason.scourge.model.rules.BuildStateRule;
+import net.rezmason.scourge.model.rules.BuildPlayersRule;
 
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.scourge.model.GridUtils;
@@ -17,6 +17,7 @@ class RuleTest
     var time:Float;
 
     var state:State;
+    var historyState:State;
     var plan:StatePlan;
 
     public function new() {
@@ -37,24 +38,25 @@ class RuleTest
     private function makeState(initGrid:String, numPlayers:Int, rules:Array<Rule> = null, circular:Bool = false):Void {
 
         history.wipe();
+        historyState = new State();
 
         if (rules == null) rules = [];
 
         // make state config and generate state
-        var createStateConfig:CreateStateConfig = {firstPlayer:0, history:history};
-        var createStateRule:CreateStateRule = new CreateStateRule(createStateConfig);
+        var buildStateConfig:BuildStateConfig = {firstPlayer:0, history:history, historyState:historyState};
+        var buildStateRule:BuildStateRule = new BuildStateRule(buildStateConfig);
 
         // make player config and generate players
-        var playerCfg:PlayerConfig = {numPlayers:numPlayers, history:history};
-        var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
+        var buildPlayersCfg:BuildPlayersConfig = {numPlayers:numPlayers, history:history, historyState:historyState};
+        var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule(buildPlayersCfg);
 
         // make board config and generate board
-        var boardCfg:BoardConfig = {circular:circular, initGrid:initGrid, history:history};
-        var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
+        var buildBoardCfg:BuildBoardConfig = {circular:circular, initGrid:initGrid, history:history, historyState:historyState};
+        var buildBoardRule:BuildBoardRule = new BuildBoardRule(buildBoardCfg);
 
         rules.unshift(buildBoardRule);
-        rules.unshift(draftPlayersRule);
-        rules.unshift(createStateRule);
+        rules.unshift(buildPlayersRule);
+        rules.unshift(buildStateRule);
 
         state = new State();
         plan = new StatePlanner().planState(state, rules);

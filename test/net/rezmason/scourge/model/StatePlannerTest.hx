@@ -7,7 +7,7 @@ import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.Aspect;
 import net.rezmason.scourge.model.aspects.TestAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.rules.CreateStateRule;
+import net.rezmason.scourge.model.rules.BuildStateRule;
 import net.rezmason.scourge.model.rules.TestRule;
 
 using net.rezmason.scourge.model.GridUtils;
@@ -32,11 +32,12 @@ class StatePlannerTest {
     public function configTest1():Void {
 
         var history:StateHistory = new StateHistory();
+        var historyState:State = new State();
 
         // make state config and generate state
         var planner:StatePlanner = new StatePlanner();
-        var createStateConfig:CreateStateConfig = {firstPlayer:0, history:history};
-        var rules:Array<Rule> = [null, new CreateStateRule(createStateConfig), new TestRule()];
+        var buildStateConfig:BuildStateConfig = {firstPlayer:0, history:history, historyState:historyState};
+        var rules:Array<Rule> = [null, new BuildStateRule(buildStateConfig), new TestRule()];
         var state:State = new State();
         var plan:StatePlan = planner.planState(state, rules);
 

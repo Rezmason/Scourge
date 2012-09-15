@@ -39,13 +39,13 @@ class DecayRule extends Rule {
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
-        occupier_ = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        isFilled_ = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        head_ =   plan.playerAspectLookup[BodyAspect.HEAD.id];
+        occupier_ = nodePtr(OwnershipAspect.OCCUPIER);
+        isFilled_ = nodePtr(OwnershipAspect.IS_FILLED);
+        head_ =   playerPtr(BodyAspect.HEAD);
 
-        bodyFirst_ = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        bodyNext_ = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        bodyPrev_ = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        bodyFirst_ = playerPtr(BodyAspect.BODY_FIRST);
+        bodyNext_ = nodePtr(BodyAspect.BODY_NEXT);
+        bodyPrev_ = nodePtr(BodyAspect.BODY_PREV);
     }
 
     override public function chooseOption(choice:Int):Void {
