@@ -1,7 +1,5 @@
 package net.rezmason.scourge.model;
 
-using net.rezmason.utils.Pointers;
-
 class History<T> {
 
     public var length(default, null):Int;
@@ -96,18 +94,18 @@ class History<T> {
         return revision;
     }
 
-    public inline function alloc(val:Null<T>):Ptr<T> {
+    public inline function alloc(val:Null<T>):Int {
         array[length] = val;
-        return array.ptr(length++);
+        return length++;
     }
 
-    public inline function get(ptr:Ptr<T>):Null<T> {
+    public inline function get(index:Int):Null<T> {
         if (length == 0) throw "Invalid get : no data allocated";
-        return array.at(ptr);
+        return array[index];
     }
 
-    public inline function set(ptr:Ptr<T>, val:Null<T>):Null<T> {
+    public inline function set(index:Int, val:Null<T>):Null<T> {
         if (length == 0) throw "Invalid set : no data allocated";
-        return array.mod(ptr, val);
+        return array[index] = val;
     }
 }

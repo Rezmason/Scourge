@@ -44,26 +44,26 @@ class PieceRulesTest extends RuleTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:true};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        state = makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
+        makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
         dropRule.update();
         var options:Array<DropPieceOption> = cast dropRule.options;
 
         Assert.areEqual(72, options.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
         dropRule.chooseOption(0);
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
 
-        var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
@@ -81,21 +81,21 @@ class PieceRulesTest extends RuleTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:true};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        state = makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
+        makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
         dropRule.update();
         var options:Array<DropPieceOption> = cast dropRule.options;
 
         Assert.areEqual(36, options.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
         dropRule.chooseOption(0);
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -111,21 +111,21 @@ class PieceRulesTest extends RuleTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        state = makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
+        makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
         dropRule.update();
         var options:Array<DropPieceOption> = cast dropRule.options;
 
         Assert.areEqual(18, options.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
         dropRule.chooseOption(0);
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -141,21 +141,21 @@ class PieceRulesTest extends RuleTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        state = makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
+        makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
         dropRule.update();
         var options:Array<DropPieceOption> = cast dropRule.options;
 
         Assert.areEqual(9, options.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
         dropRule.chooseOption(0);
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -171,21 +171,21 @@ class PieceRulesTest extends RuleTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:true, allowFlipping:false, allowRotating:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        state = makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
+        makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
         dropRule.update();
         var options:Array<DropPieceOption> = cast dropRule.options;
 
         Assert.areEqual(9 + 4, options.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
         dropRule.chooseOption(0);
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 }

@@ -14,16 +14,16 @@ class TestEvaluator extends Evaluator {
 
         var history:StateHistory = state.history;
 
-        var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
 
-        var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
+        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
         var head:Int = state.players[currentPlayer].at(head_);
 
         var playerHead:BoardNode = state.nodes[head];
 
-        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
 
         function myContiguous(me:AspectSet, you:AspectSet):Bool {
             var occupier:Int = me.at(occupier_);

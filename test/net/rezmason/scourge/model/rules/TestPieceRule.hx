@@ -29,15 +29,15 @@ class TestPieceRule extends Rule {
         ];
     }
 
-    override public function init(state:State):Void {
-        super.init(state);
-        var pieceID_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_ID.id];
+    override public function init(state:State, plan:StatePlan):Void {
+        super.init(state, plan);
+        var pieceID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_ID.id];
         state.aspects.mod(pieceID_, cfg.pieceID);
 
-        var pieceReflection_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
+        var pieceReflection_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
         state.aspects.mod(pieceReflection_, cfg.reflection);
 
-        var pieceRotation_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
+        var pieceRotation_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
         state.aspects.mod(pieceRotation_, cfg.rotation);
     }
 }

@@ -31,8 +31,8 @@ class HistoryTest
         Assert.areEqual(0, history.revision);
         Assert.areEqual(1, history.commit()); // Commit with no subscribers
 
-        var propA:Ptr<Int> = history.alloc(0);
-        var propB:Ptr<Int> = history.alloc(0);
+        var propA:Int = history.alloc(0);
+        var propB:Int = history.alloc(0);
 
         history.set(propA, 0);
 
@@ -46,7 +46,7 @@ class HistoryTest
         history.set(propA, 3);
         history.set(propB, 3);
 
-        var propC:Ptr<Int> = history.alloc(3); // Late subscription
+        var propC:Int = history.alloc(3); // Late subscription
 
         Assert.areEqual(5, history.commit()); // Commit
 
@@ -102,11 +102,11 @@ class HistoryTest
             Assert.fail("Bad get failed to throw error");
         } catch (error:Dynamic) {}
 
-        var propD:Ptr<Int> = history.alloc(1);
+        var propD:Int = history.alloc(1);
 
         Assert.areEqual(1, history.commit()); // Commit after wipe
 
-        var pointers:Array<Ptr<Int>> = [];
+        var pointers:Array<Int> = [];
 
         for (ike in 0...100) pointers[ike] = history.alloc(1);
 
@@ -117,7 +117,7 @@ class HistoryTest
 
         history.wipe();
 
-        var propE:Ptr<Int> = history.alloc(0);
+        var propE:Int = history.alloc(0);
         history.wipe();
 
         try {

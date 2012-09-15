@@ -34,9 +34,9 @@ class TurnRulesTest extends RuleTest
         // Should go to the next player who is alive (has a head)
 
         var endTurnRule:EndTurnRule = new EndTurnRule();
-        state = makeState(TestBoards.emptySquareFourPlayerSkirmish, 4, cast [endTurnRule]);
+        makeState(TestBoards.emptySquareFourPlayerSkirmish, 4, cast [endTurnRule]);
 
-        var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
 
         var expectedCurrentPlayer:Int = 0;
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
@@ -45,7 +45,7 @@ class TurnRulesTest extends RuleTest
 
         // Get rid of player 4's head
 
-        var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
+        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
         state.players[3].mod(head_, Aspect.NULL);
 
 
@@ -68,13 +68,13 @@ class TurnRulesTest extends RuleTest
         // Should kill and freshen body of current player
 
         var forfeitRule:ForfeitRule = new ForfeitRule();
-        state = makeState(TestBoards.oaf, 4, cast [forfeitRule]);
+        makeState(TestBoards.oaf, 4, cast [forfeitRule]);
 
-        var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
-        var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
+        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
 
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var head:Int = state.players[currentPlayer].at(head_);
@@ -85,18 +85,18 @@ class TurnRulesTest extends RuleTest
         Assert.isNotNull(options);
         Assert.areEqual(1, options.length);
 
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
         forfeitRule.chooseOption(0);
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
 
         Assert.areEqual(Aspect.NULL, playerHead.value.at(occupier_));
         Assert.areEqual(0, playerHead.value.at(isFilled_));
 
         // Player 1 should be gone
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(0, numCells);
 
-        var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         Assert.areEqual(Aspect.NULL, state.players[currentPlayer].at(bodyFirst_));
     }
 
@@ -106,16 +106,16 @@ class TurnRulesTest extends RuleTest
         // Should remove heads that are not occupied by their owner
 
         var killHeadlessPlayerRule:KillHeadlessPlayerRule = new KillHeadlessPlayerRule();
-        state = makeState(TestBoards.emptyPetri, 4, cast [killHeadlessPlayerRule]);
+        makeState(TestBoards.emptyPetri, 4, cast [killHeadlessPlayerRule]);
 
         // Change occupier of current player's head
 
-        var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
-        var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
+        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
 
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var head:Int = state.players[currentPlayer].at(head_);

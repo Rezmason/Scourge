@@ -64,21 +64,21 @@ class DropPieceRule extends Rule {
         ];
     }
 
-    override public function init(state:State):Void {
-        super.init(state);
+    override public function init(state:State, plan:StatePlan):Void {
+        super.init(state, plan);
 
-        freshness_ = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        maxFreshness_ = state.stateAspectLookup[FreshnessAspect.MAX_FRESHNESS.id];
-        occupier_ = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        currentPlayer_ = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        pieceID_ = state.stateAspectLookup[PieceAspect.PIECE_ID.id];
-        pieceReflection_ = state.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
-        pieceRotation_ = state.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
+        freshness_ = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        maxFreshness_ = plan.stateAspectLookup[FreshnessAspect.MAX_FRESHNESS.id];
+        occupier_ = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        isFilled_ = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        currentPlayer_ = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        pieceID_ = plan.stateAspectLookup[PieceAspect.PIECE_ID.id];
+        pieceReflection_ = plan.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
+        pieceRotation_ = plan.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
 
-        bodyFirst_ = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        bodyPrev_ = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        bodyFirst_ = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyNext_ = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        bodyPrev_ = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
     }
 
     override public function update():Void {

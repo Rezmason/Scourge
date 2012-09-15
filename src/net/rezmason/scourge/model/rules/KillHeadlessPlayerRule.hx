@@ -37,15 +37,15 @@ class KillHeadlessPlayerRule extends Rule {
         options.push({optionID:0});
     }
 
-    override public function init(state:State):Void {
-        super.init(state);
-        occupier_ = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
+    override public function init(state:State, plan:StatePlan):Void {
+        super.init(state, plan);
+        occupier_ = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        isFilled_ = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        head_ =   plan.playerAspectLookup[BodyAspect.HEAD.id];
 
-        bodyFirst_ = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        bodyPrev_ = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        bodyFirst_ = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyNext_ = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        bodyPrev_ = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
     }
 
     override public function chooseOption(choice:Int):Void {

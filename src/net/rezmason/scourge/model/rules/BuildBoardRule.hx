@@ -59,22 +59,17 @@ class BuildBoardRule extends Rule {
         ];
     }
 
-    override public function init(state:State):Void {
+    override public function init(state:State, plan:StatePlan):Void {
 
-        super.init(state);
+        super.init(state, plan);
 
-        occupier_ = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        isFilled_ = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        head_ =   state.playerAspectLookup[BodyAspect.HEAD.id];
+        occupier_ = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        isFilled_ = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        head_ =   plan.playerAspectLookup[BodyAspect.HEAD.id];
 
-        bodyFirst_ = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        bodyNext_ = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        bodyPrev_ = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
-
-        makeBoard();
-    }
-
-    function makeBoard():Void {
+        bodyFirst_ = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        bodyNext_ = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        bodyPrev_ = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
 
         // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
         // Player 1's head is at a 45 degree angle
@@ -120,7 +115,7 @@ class BuildBoardRule extends Rule {
             coord.y = Std.int(coord.y + PADDING - minCoord.y);
         }
 
-        var grid:BoardNode = makeSquareGraph(boardWidth);
+        var grid:BoardNode = makeSquareGraph(boardWidth, plan.nodeAspectTemplate);
         obstructGraphRim(grid);
         populateGraphHeads(grid, headCoords);
         if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM);
@@ -149,28 +144,22 @@ class BuildBoardRule extends Rule {
         return {x:maxX, y:maxY};
     }
 
-    inline function makeNode():BoardNode {
-        var aspects:AspectSet = new AspectSet();
-        var template:AspectSet = state.nodeAspectTemplate;
-        for (val in template) {
-            //aspects.push(cfg.history.alloc(val)); // H
-            aspects.push(val);
-        }
-        var node:BoardNode = new BoardNode(aspects, state.nodes.length);
+    inline function makeNode(template:AspectSet):BoardNode {
+        var node:BoardNode = new BoardNode(createAspectSet(template, cfg.history), state.nodes.length);
         state.nodes.push(node);
         return node;
     }
 
-    inline function makeSquareGraph(width:Int):BoardNode {
+    inline function makeSquareGraph(width:Int, nodeTemplate:AspectSet):BoardNode {
 
         // Make a connected grid of nodes with default values
-        var node:BoardNode = makeNode();
-        for (ike in 1...width) node = node.attach(makeNode(), Gr.e);
+        var node:BoardNode = makeNode(nodeTemplate);
+        for (ike in 1...width) node = node.attach(makeNode(nodeTemplate), Gr.e);
 
         var row:BoardNode = node.run(Gr.w);
         for (ike in 1...width) {
             for (column in row.walk(Gr.e)) {
-                var next:BoardNode = makeNode();
+                var next:BoardNode = makeNode(nodeTemplate);
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);
@@ -265,5 +254,14 @@ class BuildBoardRule extends Rule {
             state.players[ike].mod(bodyFirst_, bodyFirstNode.id);
             body.chainByAspect(bodyNext_, bodyPrev_);
         }
+    }
+
+    inline function createAspectSet(template:AspectSet, history:StateHistory):AspectSet {
+        var aspects:AspectSet = new AspectSet();
+        for (val in template) {
+            //aspects.push(history.alloc(val)); // H
+            aspects.push(val);
+        }
+        return aspects;
     }
 }

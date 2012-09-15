@@ -13,26 +13,25 @@ class BoardUtils {
 
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
-    public static function freshen(state:State, east:Int, south:Int, value:Int = 1):Void {
+    public static function freshen(state:State, freshness_:AspectPtr, east:Int, south:Int, value:Int = 1):Void {
         var node:BoardNode = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n).run(Gr.s, south).run(Gr.e, east);
-        var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         node.value.mod(freshness_, value);
     }
 
-    public static function spitBoard(state:State, addSpaces:Bool = true, otherNodeAspects:IntHash<String> = null):String {
+    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:IntHash<String> = null):String {
 
         if (state.nodes.length == 0) return "empty grid";
 
         if (otherNodeAspects == null) otherNodeAspects = new IntHash<String>();
         var otherAspectPtrs:IntHash<AspectPtr> = new IntHash<AspectPtr>();
-        for (id in otherNodeAspects.keys()) otherAspectPtrs.set(id, state.nodeAspectLookup[id]);
+        for (id in otherNodeAspects.keys()) otherAspectPtrs.set(id, plan.nodeAspectLookup[id]);
 
         var str:String = "";
 
         var grid:BoardNode = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n);
 
-        var occupier_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
 
         for (row in grid.walk(Gr.s)) {
             str += "\n";

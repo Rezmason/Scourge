@@ -1,8 +1,8 @@
 The octopus should hold all the cards
-	Split aspects into two objects
-		One stores values
-		The other stores history pointers
-		Something else copies values to and from the history
+	Twin States
+		One contains the history indices
+		The other contains the values
+		StateHistoryManager swaps values between them
 
 And then clean up
 	Lots of code is used over and over again, especially in rules

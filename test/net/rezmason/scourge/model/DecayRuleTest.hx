@@ -27,22 +27,22 @@ class DecayRuleTest extends RuleTest
     public function decayRuleTest():Void {
 
         var decayRule:DecayRule = new DecayRule();
-        state = makeState(TestBoards.loosePetri, 1, cast [decayRule]);
+        makeState(TestBoards.loosePetri, 1, cast [decayRule]);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
 
         Assert.areEqual(17, numCells); // 51 cells for player 0
 
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
         decayRule.chooseOption(0);
-        //trace(state.spitBoard());
+        //trace(state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // only one cell for player 0
 
-        var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));

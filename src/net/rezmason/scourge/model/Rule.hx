@@ -18,7 +18,7 @@ class Rule {
         options = [];
     }
 
-    public function init(state:State):Void { this.state = state; }
+    public function init(state:State, plan:StatePlan):Void { this.state = state; }
     public function update():Void {}
 
     public function chooseOption(choice:Int):Void {

@@ -4,10 +4,11 @@ import massive.munit.Assert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
+import net.rezmason.scourge.model.rules.CreateStateRule;
 import net.rezmason.scourge.model.rules.DraftPlayersRule;
 
-using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class RuleTest
@@ -16,6 +17,7 @@ class RuleTest
     var time:Float;
 
     var state:State;
+    var plan:StatePlan;
 
     public function new() {
 
@@ -32,22 +34,30 @@ class RuleTest
         history = null;
     }
 
-    private function makeState(initGrid:String, numPlayers:Int, rules:Array<Rule>):State {
+    private function makeState(initGrid:String, numPlayers:Int, rules:Array<Rule> = null, circular:Bool = false):Void {
 
         history.wipe();
+
+        if (rules == null) rules = [];
+
+        // make state config and generate state
+        var createStateConfig:CreateStateConfig = {firstPlayer:0, history:history};
+        var createStateRule:CreateStateRule = new CreateStateRule(createStateConfig);
 
         // make player config and generate players
         var playerCfg:PlayerConfig = {numPlayers:numPlayers, history:history};
         var draftPlayersRule:DraftPlayersRule = new DraftPlayersRule(playerCfg);
 
         // make board config and generate board
-        var boardCfg:BoardConfig = {circular:false, initGrid:initGrid, history:history};
+        var boardCfg:BoardConfig = {circular:circular, initGrid:initGrid, history:history};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardCfg);
 
         rules.unshift(buildBoardRule);
         rules.unshift(draftPlayersRule);
+        rules.unshift(createStateRule);
 
-        return new StateFactory().makeState(rules, history);
+        state = new State();
+        plan = new StatePlanner().planState(state, rules);
     }
 
     private function testListLength(expectedLength:Int, first:BoardNode, next:AspectPtr, prev:AspectPtr):Int {
