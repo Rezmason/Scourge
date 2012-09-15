@@ -39,14 +39,14 @@ class TurnRulesTest extends RuleTest
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
 
         var expectedCurrentPlayer:Int = 0;
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
 
         Assert.areEqual(expectedCurrentPlayer, currentPlayer);
 
         // Get rid of player 4's head
 
         var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
-        history.set(state.players[3].at(head_), Aspect.NULL);
+        state.players[3].mod(head_, Aspect.NULL);
 
 
         endTurnRule.update();
@@ -57,7 +57,7 @@ class TurnRulesTest extends RuleTest
         while (expectedCurrentPlayer < 10) {
             expectedCurrentPlayer++;
             endTurnRule.chooseOption(0);
-            currentPlayer = history.get(state.aspects.at(currentPlayer_));
+            currentPlayer = state.aspects.at(currentPlayer_);
             Assert.areEqual(expectedCurrentPlayer % 3, currentPlayer);
         }
     }
@@ -76,8 +76,8 @@ class TurnRulesTest extends RuleTest
         var isFilled_:AspectPtr = state.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
 
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var head:Int = state.players[currentPlayer].at(head_);
         var playerHead:BoardNode = state.nodes[head];
 
         forfeitRule.update();
@@ -89,15 +89,15 @@ class TurnRulesTest extends RuleTest
         forfeitRule.chooseOption(0);
         //trace(state.spitBoard());
 
-        Assert.areEqual(Aspect.NULL, history.get(playerHead.value.at(occupier_)));
-        Assert.areEqual(0, history.get(playerHead.value.at(isFilled_)));
+        Assert.areEqual(Aspect.NULL, playerHead.value.at(occupier_));
+        Assert.areEqual(0, playerHead.value.at(isFilled_));
 
         // Player 1 should be gone
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(0, numCells);
 
         var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        Assert.areEqual(Aspect.NULL, history.get(state.players[currentPlayer].at(bodyFirst_)));
+        Assert.areEqual(Aspect.NULL, state.players[currentPlayer].at(bodyFirst_));
     }
 
     @Test
@@ -117,11 +117,11 @@ class TurnRulesTest extends RuleTest
         var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
 
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var head:Int = state.players[currentPlayer].at(head_);
         var playerHead:BoardNode = state.nodes[head];
 
-        history.set(playerHead.value.at(occupier_), 1);
+        playerHead.value.mod(occupier_, 1);
 
         killHeadlessPlayerRule.update();
         var options:Array<Option> = killHeadlessPlayerRule.options;
@@ -130,10 +130,10 @@ class TurnRulesTest extends RuleTest
 
         killHeadlessPlayerRule.chooseOption(0);
 
-        head = history.get(state.players[currentPlayer].at(head_));
+        head = state.players[currentPlayer].at(head_);
         Assert.areEqual(Aspect.NULL, head);
 
-        var bodyFirst:Int = history.get(state.players[currentPlayer].at(bodyFirst_));
+        var bodyFirst:Int = state.players[currentPlayer].at(bodyFirst_);
         Assert.areEqual(Aspect.NULL, bodyFirst);
     }
 }

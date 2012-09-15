@@ -63,7 +63,7 @@ class BoardRuleTest {
 
         for (node in state.nodes) {
             Assert.isNotNull(node);
-            Assert.isNotNull(history.get(node.value.at(occupier_)));
+            Assert.isNotNull(node.value.at(occupier_));
         }
 
         #if VISUAL_TEST
@@ -74,24 +74,24 @@ class BoardRuleTest {
         #end
 
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
 
-        var playerHead:BoardNode = state.nodes[history.get(state.players[currentPlayer].at(head_))];
+        var playerHead:BoardNode = state.nodes[state.players[currentPlayer].at(head_)];
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);
-            Assert.areEqual(Aspect.NULL, history.get(neighbor.value.at(occupier_)));
-            history.set(neighbor.value.at(occupier_), 0);
+            Assert.areEqual(Aspect.NULL, neighbor.value.at(occupier_));
+            neighbor.value.mod(occupier_, 0);
         }
 
-        Assert.areEqual(0, history.get(playerHead.nw().value.at(occupier_)));
-        Assert.areEqual(0, history.get(playerHead.n( ).value.at(occupier_)));
-        Assert.areEqual(0, history.get(playerHead.ne().value.at(occupier_)));
-        Assert.areEqual(0, history.get(playerHead.e( ).value.at(occupier_)));
-        Assert.areEqual(0, history.get(playerHead.se().value.at(occupier_)));
-        Assert.areEqual(0, history.get(playerHead.s( ).value.at(occupier_)));
-        Assert.areEqual(0, history.get(playerHead.sw().value.at(occupier_)));
-        Assert.areEqual(0, history.get(playerHead.w( ).value.at(occupier_)));
+        Assert.areEqual(0, playerHead.nw().value.at(occupier_));
+        Assert.areEqual(0, playerHead.n( ).value.at(occupier_));
+        Assert.areEqual(0, playerHead.ne().value.at(occupier_));
+        Assert.areEqual(0, playerHead.e( ).value.at(occupier_));
+        Assert.areEqual(0, playerHead.se().value.at(occupier_));
+        Assert.areEqual(0, playerHead.s( ).value.at(occupier_));
+        Assert.areEqual(0, playerHead.sw().value.at(occupier_));
+        Assert.areEqual(0, playerHead.w( ).value.at(occupier_));
     }
 
     @Test
@@ -137,7 +137,7 @@ class BoardRuleTest {
         var bodyNext_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
         var bodyPrev_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
 
-        var bodyFirst:Int = history.get(state.players[0].at(bodyFirst_));
+        var bodyFirst:Int = state.players[0].at(bodyFirst_);
         Assert.areNotEqual(Aspect.NULL, bodyFirst);
 
         testListLength(numCells, state, state.nodes[bodyFirst], bodyNext_, bodyPrev_);

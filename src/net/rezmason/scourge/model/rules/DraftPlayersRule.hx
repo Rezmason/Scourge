@@ -24,9 +24,12 @@ class DraftPlayersRule extends Rule {
         for (ike in 0...cfg.numPlayers) state.players.push(createAspectSet(state.playerAspectTemplate, history));
     }
 
-    inline function createAspectSet(template:AspectTemplate, history:StateHistory):AspectSet {
+    inline function createAspectSet(template:AspectSet, history:StateHistory):AspectSet {
         var aspects:AspectSet = new AspectSet();
-        for (val in template) aspects.push(history.alloc(val));
+        for (val in template) {
+            //aspects.push(history.alloc(val)); // H
+            aspects.push(val);
+        }
         return aspects;
     }
 }

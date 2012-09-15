@@ -1,10 +1,10 @@
 The octopus should hold all the cards
-	GOD DAMN IT!
-	Why am I referencing and dereferencing to the History EVERYWHERE??
 	Split aspects into two objects
 		One stores values
 		The other stores history pointers
-		StateHistorian copies values to and from the history
+		Something else copies values to and from the history
+	Then clean up
+		Get rid of all unneeded state and history params
 
 And then clean up
 	Lots of code is used over and over again, especially in rules

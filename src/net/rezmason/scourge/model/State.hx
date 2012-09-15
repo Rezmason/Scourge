@@ -10,9 +10,9 @@ class State {
     public var players:Array<AspectSet>;
     public var nodes:Array<BoardNode>;
 
-    public var stateAspectTemplate:AspectTemplate;
-    public var playerAspectTemplate:AspectTemplate;
-    public var nodeAspectTemplate:AspectTemplate;
+    public var stateAspectTemplate:AspectSet;
+    public var playerAspectTemplate:AspectSet;
+    public var nodeAspectTemplate:AspectSet;
 
     public var stateAspectLookup:AspectLookup;
     public var playerAspectLookup:AspectLookup;

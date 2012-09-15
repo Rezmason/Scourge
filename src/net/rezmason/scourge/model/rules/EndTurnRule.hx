@@ -43,18 +43,18 @@ class EndTurnRule extends Rule {
 
         // Get current player
 
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var numPlayers:Int = state.players.length;
 
         var playerIndex:Int = (currentPlayer + 1) % numPlayers;
 
-        while (history.get(state.players[playerIndex].at(head_)) == Aspect.NULL) {
+        while (state.players[playerIndex].at(head_) == Aspect.NULL) {
             playerIndex = (playerIndex + 1) % numPlayers;
             if (playerIndex == currentPlayer) throw "No players have heads!";
         }
 
-        history.set(state.aspects.at(currentPlayer_), playerIndex);
-        history.set(state.aspects.at(maxFreshness_), 0);
+        state.aspects.mod(currentPlayer_, playerIndex);
+        state.aspects.mod(maxFreshness_, 0);
     }
 }
 

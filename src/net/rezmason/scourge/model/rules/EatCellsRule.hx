@@ -76,14 +76,14 @@ class EatCellsRule extends Rule {
 
         // Find all fresh body nodes of the current player
 
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var head:Int = state.players[currentPlayer].at(head_);
         var playerHead:BoardNode = state.nodes[head];
-        var bodyNode:BoardNode = state.nodes[history.get(state.players[currentPlayer].at(bodyFirst_))];
-        var maxFreshness:Int = history.get(state.aspects.at(maxFreshness_)) + 1;
+        var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
+        var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
         var headIndices:Array<Int> = [];
-        for (player in state.players) headIndices.push(history.get(player.at(head_)));
+        for (player in state.players) headIndices.push(player.at(head_));
 
         var nodes:Array<BoardNode> = bodyNode.boardListToArray(state, bodyNext_);
         nodes = nodes.filter(isFresh).array();
@@ -97,8 +97,8 @@ class EatCellsRule extends Rule {
                 var pendingNodes:Array<BoardNode> = [];
                 for (scout in node.walk(direction)) {
                     if (scout == node) continue;
-                    if (history.get(scout.value.at(isFilled_)) > 0) {
-                        var scoutOccupier:Int = history.get(scout.value.at(occupier_));
+                    if (scout.value.at(isFilled_) > 0) {
+                        var scoutOccupier:Int = scout.value.at(occupier_);
                         if (scoutOccupier == currentPlayer || eatenNodes.has(scout)) {
                             for (pendingNode in pendingNodes) {
                                 var playerIndex:Int = headIndices.indexOf(pendingNode.id);
@@ -126,27 +126,27 @@ class EatCellsRule extends Rule {
 
         for (node in eatenNodes) bodyNode = eatCell(node, currentPlayer, maxFreshness++, bodyNode);
 
-        history.set(state.players[currentPlayer].at(bodyFirst_), bodyNode.id);
-        history.set(state.aspects.at(maxFreshness_), maxFreshness);
+        state.players[currentPlayer].mod(bodyFirst_, bodyNode.id);
+        state.aspects.mod(maxFreshness_, maxFreshness);
     }
 
     function getBody(player:Int):Array<BoardNode> {
-        var bodyNode:BoardNode = state.nodes[history.get(state.players[player].at(bodyFirst_))];
+        var bodyNode:BoardNode = state.nodes[state.players[player].at(bodyFirst_)];
         return bodyNode.boardListToArray(state, bodyNext_);
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
-        if (history.get(me.at(isFilled_)) == Aspect.FALSE) return false;
-        return history.get(me.at(occupier_)) == history.get(you.at(occupier_));
+        if (me.at(isFilled_) == Aspect.FALSE) return false;
+        return me.at(occupier_) == you.at(occupier_);
     }
 
     function isFresh(node:BoardNode):Bool {
-        return history.get(node.value.at(freshness_)) > 0;
+        return node.value.at(freshness_) > 0;
     }
 
     function eatCell(node:BoardNode, currentPlayer:Int, maxFreshness:Int, bodyNode:BoardNode):BoardNode {
-        history.set(node.value.at(occupier_), currentPlayer);
-        history.set(node.value.at(freshness_), maxFreshness);
+        node.value.mod(occupier_, currentPlayer);
+        node.value.mod(freshness_, maxFreshness);
         return bodyNode.addNode(node, state, bodyNext_, bodyPrev_);
     }
 }

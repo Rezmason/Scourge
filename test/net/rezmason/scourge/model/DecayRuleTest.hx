@@ -43,7 +43,7 @@ class DecayRuleTest extends RuleTest
         var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         var bodyNext_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
         var bodyPrev_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
-        var bodyNode:BoardNode = state.nodes[history.get(state.players[0].at(bodyFirst_))];
+        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }

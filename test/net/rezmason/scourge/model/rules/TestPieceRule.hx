@@ -32,12 +32,12 @@ class TestPieceRule extends Rule {
     override public function init(state:State):Void {
         super.init(state);
         var pieceID_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_ID.id];
-        history.set(state.aspects.at(pieceID_), cfg.pieceID);
+        state.aspects.mod(pieceID_, cfg.pieceID);
 
         var pieceReflection_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
-        history.set(state.aspects.at(pieceReflection_), cfg.reflection);
+        state.aspects.mod(pieceReflection_, cfg.reflection);
 
         var pieceRotation_:AspectPtr = state.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
-        history.set(state.aspects.at(pieceRotation_), cfg.rotation);
+        state.aspects.mod(pieceRotation_, cfg.rotation);
     }
 }

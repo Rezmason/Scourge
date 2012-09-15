@@ -86,15 +86,15 @@ class DropPieceRule extends Rule {
         var dropOptions:Array<DropPieceOption> = [];
 
         // get current player head
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-        var bodyNode:BoardNode = state.nodes[history.get(state.players[currentPlayer].at(bodyFirst_))];
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
 
         // Find edge nodes of current player
         var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state, bodyNext_).filter(isFreeEdge).array();
 
-        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(history.get(state.aspects.at(pieceID_)))];
-        var pieceReflection:Int = history.get(state.aspects.at(pieceReflection_));
-        var pieceRotation:Int = history.get(state.aspects.at(pieceRotation_));
+        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(state.aspects.at(pieceID_))];
+        var pieceReflection:Int = state.aspects.at(pieceReflection_);
+        var pieceRotation:Int = state.aspects.at(pieceRotation_);
 
         for (pieceIndex in 0...pieceGroups.length) {
 
@@ -135,7 +135,7 @@ class DropPieceRule extends Rule {
                         var valid:Bool = true;
 
                         for (coord in coords) {
-                            var occupier:Int = history.get(walkNode(node, homeCoord, coord).value.at(occupier_));
+                            var occupier:Int = walkNode(node, homeCoord, coord).value.at(occupier_);
                             if (occupier > 0 && !(cfg.overlapSelf && occupier == currentPlayer)) {
                                 valid = false;
                                 break;
@@ -163,19 +163,19 @@ class DropPieceRule extends Rule {
         super.chooseOption(choice);
 
         var option:DropPieceOption = cast options[choice];
-        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(history.get(state.aspects.at(pieceID_)))];
+        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(state.aspects.at(pieceID_))];
         var node:BoardNode = state.nodes[option.targetNode];
         var coords:Array<IntCoord> = pieceGroups[option.pieceID][option.reflection][option.rotation][0];
         var homeCoord:IntCoord = coords[0];
-        var maxFreshness:Int = history.get(state.aspects.at(maxFreshness_)) + 1;
+        var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-        var bodyNode:BoardNode = state.nodes[history.get(state.players[currentPlayer].at(bodyFirst_))];
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
 
         for (coord in coords) bodyNode = fillAndOccupyCell(walkNode(node, coord, homeCoord), currentPlayer, maxFreshness, bodyNode);
-        history.set(state.players[currentPlayer].at(bodyFirst_), bodyNode.id);
+        state.players[currentPlayer].mod(bodyFirst_, bodyNode.id);
 
-        history.set(state.aspects.at(maxFreshness_), maxFreshness);
+        state.aspects.mod(maxFreshness_, maxFreshness);
     }
 
     inline function isFreeEdge(node:BoardNode):Bool {
@@ -183,19 +183,19 @@ class DropPieceRule extends Rule {
     }
 
     inline function isVacant(node:BoardNode):Bool {
-        return history.get(node.value.at(isFilled_)) == Aspect.FALSE;
+        return node.value.at(isFilled_) == Aspect.FALSE;
     }
 
     inline function fillAndOccupyCell(node:BoardNode, currentPlayer:Int, maxFreshness, bodyNode:BoardNode):BoardNode {
 
         var me:AspectSet = node.value;
 
-        if (history.get(me.at(occupier_)) != currentPlayer || history.get(me.at(isFilled_)) == Aspect.FALSE) {
-            history.set(me.at(freshness_), maxFreshness);
+        if (me.at(occupier_) != currentPlayer || me.at(isFilled_) == Aspect.FALSE) {
+            me.mod(freshness_, maxFreshness);
         }
 
-        history.set(me.at(occupier_), currentPlayer);
-        history.set(me.at(isFilled_), Aspect.TRUE);
+        me.mod(occupier_, currentPlayer);
+        me.mod(isFilled_, Aspect.TRUE);
 
         return bodyNode.addNode(node, state, bodyNext_, bodyPrev_);
     }

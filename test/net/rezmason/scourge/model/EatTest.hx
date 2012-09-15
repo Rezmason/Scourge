@@ -40,8 +40,8 @@ class EatTest extends RuleTest
         var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var head:Int = state.players[currentPlayer].at(head_);
         var playerHead:BoardNode = state.nodes[head];
         var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         var bodyNext_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
@@ -65,7 +65,7 @@ class EatTest extends RuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(25 + 6, numCells);
 
-        var bodyNode:BoardNode = state.nodes[history.get(state.players[0].at(bodyFirst_))];
+        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -83,8 +83,8 @@ class EatTest extends RuleTest
         var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var head:Int = state.players[currentPlayer].at(head_);
         var playerHead:BoardNode = state.nodes[head];
         var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         var bodyNext_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
@@ -105,7 +105,7 @@ class EatTest extends RuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(), "").length;
         Assert.areEqual(25 + 6 + 2, numCells);
 
-        var bodyNode:BoardNode = state.nodes[history.get(state.players[0].at(bodyFirst_))];
+        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -123,8 +123,8 @@ class EatTest extends RuleTest
         var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var head:Int = state.players[currentPlayer].at(head_);
         var playerHead:BoardNode = state.nodes[head];
 
         state.freshen(12, 6);
@@ -142,7 +142,7 @@ class EatTest extends RuleTest
         var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         var bodyNext_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
         var bodyPrev_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
-        var bodyNode:BoardNode = state.nodes[history.get(state.players[0].at(bodyFirst_))];
+        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -160,8 +160,8 @@ class EatTest extends RuleTest
         var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
         var head_:AspectPtr = state.playerAspectLookup[BodyAspect.HEAD.id];
         var currentPlayer_:AspectPtr = state.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var currentPlayer:Int = history.get(state.aspects.at(currentPlayer_));
-        var head:Int = history.get(state.players[currentPlayer].at(head_));
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var head:Int = state.players[currentPlayer].at(head_);
         var playerHead:BoardNode = state.nodes[head];
 
         state.freshen(12, 6);
@@ -179,7 +179,7 @@ class EatTest extends RuleTest
         var bodyFirst_:AspectPtr = state.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         var bodyNext_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
         var bodyPrev_:AspectPtr = state.nodeAspectLookup[BodyAspect.BODY_PREV.id];
-        var bodyNode:BoardNode = state.nodes[history.get(state.players[0].at(bodyFirst_))];
+        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }

@@ -16,7 +16,7 @@ class BoardUtils {
     public static function freshen(state:State, east:Int, south:Int, value:Int = 1):Void {
         var node:BoardNode = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n).run(Gr.s, south).run(Gr.e, east);
         var freshness_:AspectPtr = state.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        state.history.set(node.value.at(freshness_), value);
+        node.value.mod(freshness_, value);
     }
 
     public static function spitBoard(state:State, addSpaces:Bool = true, otherNodeAspects:IntHash<String> = null):String {
@@ -42,7 +42,7 @@ class BoardUtils {
 
                 for (id in otherAspectPtrs.keys()) {
                     var ptr:AspectPtr = otherAspectPtrs.get(id);
-                    if (state.history.get(column.value.at(ptr)) > 0) {
+                    if (column.value.at(ptr) > 0) {
                         otherAspectFound = true;
                         str += otherNodeAspects.get(id);
                         break;
@@ -50,8 +50,8 @@ class BoardUtils {
                 }
 
                 if (!otherAspectFound) {
-                    var occupier:Int = state.history.get(column.value.at(occupier_));
-                    var isFilled:Int = state.history.get(column.value.at(isFilled_));
+                    var occupier:Int = column.value.at(occupier_);
+                    var isFilled:Int = column.value.at(isFilled_);
 
                     str += switch (true) {
                         case (occupier != Aspect.NULL): "" + occupier;
@@ -79,8 +79,8 @@ class BoardUtils {
 
     public inline static function removeNode(node:BoardNode, state:State, next:AspectPtr, prev:AspectPtr):BoardNode {
         var history:StateHistory = state.history;
-        var nextNodeID:Int = history.get(node.value.at(next));
-        var prevNodeID:Int = history.get(node.value.at(prev));
+        var nextNodeID:Int = node.value.at(next);
+        var prevNodeID:Int = node.value.at(prev);
 
         var nextNode:BoardNode = null;
 
@@ -89,17 +89,17 @@ class BoardUtils {
         if (nextNodeID != Aspect.NULL) {
             wasConnected = true;
             nextNode = state.nodes[nextNodeID];
-            history.set(state.nodes[nextNodeID].value.at(prev), prevNodeID);
+            state.nodes[nextNodeID].value.mod(prev, prevNodeID);
         }
 
         if (prevNodeID != Aspect.NULL) {
             wasConnected = true;
-            history.set(state.nodes[prevNodeID].value.at(next), nextNodeID);
+            state.nodes[prevNodeID].value.mod(next, nextNodeID);
         }
 
         if (wasConnected) {
-            history.set(node.value.at(next), Aspect.NULL);
-            history.set(node.value.at(prev), Aspect.NULL);
+            node.value.mod(next, Aspect.NULL);
+            node.value.mod(prev, Aspect.NULL);
         }
 
         return nextNode;
@@ -110,14 +110,14 @@ class BoardUtils {
 
         removeNode(addedNode, state, next, prev);
 
-        var prevNodeID:Int = history.get(node.value.at(prev));
+        var prevNodeID:Int = node.value.at(prev);
 
-        history.set(addedNode.value.at(next), node.id);
-        history.set(addedNode.value.at(prev), prevNodeID);
-        history.set(node.value.at(prev), addedNode.id);
+        addedNode.value.mod(next, node.id);
+        addedNode.value.mod(prev, prevNodeID);
+        node.value.mod(prev, addedNode.id);
         if (prevNodeID != Aspect.NULL) {
             var prevNode:BoardNode = state.nodes[prevNodeID];
-            history.set(prevNode.value.at(next), addedNode.id);
+            prevNode.value.mod(next, addedNode.id);
         }
 
         return addedNode;
@@ -133,14 +133,14 @@ class BoardUtils {
 
         for (ike in 1...nodes.length) {
             var nextNode:BoardNode = nodes[ike];
-            history.set(node.value.at(next), nextNode.id);
-            history.set(nextNode.value.at(prev), node.id);
+            node.value.mod(next, nextNode.id);
+            nextNode.value.mod(prev, node.id);
             node = nextNode;
         }
 
-        history.set(node.value.at(next), Aspect.NULL);
+        node.value.mod(next, Aspect.NULL);
         node = nodes[0];
-        history.set(node.value.at(prev), Aspect.NULL);
+        node.value.mod(prev, Aspect.NULL);
     }
 }
 
@@ -162,7 +162,7 @@ class BoardNodeIterator {
 
     public function next():BoardNode {
         var lastNode:BoardNode = node;
-        var nodeIndex:Int = state.history.get(node.value.at(aspectPointer));
+        var nodeIndex:Int = node.value.at(aspectPointer);
         if (nodeIndex == Aspect.NULL) node = null;
         else node = state.nodes[nodeIndex];
         return lastNode;

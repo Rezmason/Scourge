@@ -54,7 +54,7 @@ class DecayRule extends Rule {
 
         var heads:Array<BoardNode> = [];
         for (player in state.players) {
-            var headIndex:Int = history.get(player.at(head_));
+            var headIndex:Int = player.at(head_);
             if (headIndex != Aspect.NULL) heads.push(state.nodes[headIndex]);
         }
         var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(true, isLivingBodyNeighbor);
@@ -63,24 +63,24 @@ class DecayRule extends Rule {
 
             // Removing nodes is not something to do haphazardly - what if you remove the first one?
 
-            var bodyFirst:Int = history.get(player.at(bodyFirst_));
+            var bodyFirst:Int = player.at(bodyFirst_);
             if (bodyFirst != Aspect.NULL) {
                 for (node in state.nodes[bodyFirst].iterate(state, bodyNext_)) {
                     if (!livingBodyNeighbors.has(node)) bodyFirst = killCell(node, bodyFirst);
                 }
             }
-            history.set(player.at(bodyFirst_), bodyFirst);
+            player.mod(bodyFirst_, bodyFirst);
         }
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
-        if (history.get(me.at(isFilled_)) == Aspect.FALSE) return false;
-        return history.get(me.at(occupier_)) == history.get(you.at(occupier_));
+        if (me.at(isFilled_) == Aspect.FALSE) return false;
+        return me.at(occupier_) == you.at(occupier_);
     }
 
     function killCell(node:BoardNode, firstIndex:Int):Int {
-        history.set(node.value.at(isFilled_), Aspect.FALSE);
-        history.set(node.value.at(occupier_), Aspect.NULL);
+        node.value.mod(isFilled_, Aspect.FALSE);
+        node.value.mod(occupier_, Aspect.NULL);
 
         var nextNode:BoardNode = node.removeNode(state, bodyNext_, bodyPrev_);
         if (firstIndex == node.id) firstIndex = nextNode == null ? Aspect.NULL : nextNode.id;

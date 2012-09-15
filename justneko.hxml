@@ -1,0 +1,14 @@
+# Neko
+
+-main TestMain
+-lib munit
+-lib hamcrest
+-cp src
+-debug
+-resource tables/pieces.json@pieces
+#-D VISUAL_TEST
+-D USE_POINTERS
+-D haxeJSON
+
+-cp test
+-neko build/neko_test.n

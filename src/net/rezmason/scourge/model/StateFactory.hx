@@ -62,7 +62,7 @@ class StateFactory {
         return state;
     }
 
-    function bakeAspectSet(requirements:AspectRequirements, lookup:AspectLookup, template:AspectTemplate):Void {
+    function bakeAspectSet(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet):Void {
         for (ike in 0...requirements.length) {
             var prop:AspectProperty = requirements[ike];
             lookup[prop.id] = ike.pointerArithmetic();
@@ -70,9 +70,12 @@ class StateFactory {
         }
     }
 
-    inline function createAspectSet(template:AspectTemplate, history:StateHistory):AspectSet {
+    inline function createAspectSet(template:AspectSet, history:StateHistory):AspectSet {
         var aspects:AspectSet = new AspectSet();
-        for (val in template) aspects.push(history.alloc(val));
+        for (val in template) {
+            //aspects.push(history.alloc(val)); // H
+            aspects.push(val);
+        }
         return aspects;
     }
 }

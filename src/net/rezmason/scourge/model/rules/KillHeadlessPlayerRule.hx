@@ -54,15 +54,15 @@ class KillHeadlessPlayerRule extends Rule {
         for (playerIndex in 0...state.players.length) {
             var player:AspectSet = state.players[playerIndex];
 
-            var head:Int = history.get(player.at(head_));
-            var bodyFirst:Int = history.get(player.at(bodyFirst_));
+            var head:Int = player.at(head_);
+            var bodyFirst:Int = player.at(bodyFirst_);
 
             if (head != Aspect.NULL) {
                 var playerHead:BoardNode = state.nodes[head];
-                if (history.get(playerHead.value.at(occupier_)) != playerIndex || history.get(playerHead.value.at(isFilled_)) == Aspect.FALSE) {
-                    history.set(player.at(head_), Aspect.NULL);
+                if (playerHead.value.at(occupier_) != playerIndex || playerHead.value.at(isFilled_) == Aspect.FALSE) {
+                    player.mod(head_, Aspect.NULL);
                     for (node in state.nodes[bodyFirst].iterate(state, bodyNext_)) node.removeNode(state, bodyNext_, bodyPrev_);
-                    history.set(player.at(bodyFirst_), Aspect.NULL);
+                    player.mod(bodyFirst_, Aspect.NULL);
                 }
             }
 
