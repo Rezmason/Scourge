@@ -7,6 +7,7 @@ typedef TestCell = {str:String, symbol:String};
 class GridTest {
 
     private var grid:Grid<TestCell>;
+    #if TIME_TESTS
     var time:Float;
 
     @Before
@@ -19,6 +20,7 @@ class GridTest {
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
     //@Test
     public function spitTest():Void {

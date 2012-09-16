@@ -8,6 +8,7 @@ import net.rezmason.scourge.tools.PieceGenerator;
 
 class PieceGeneratorTest {
 
+    #if TIME_TESTS
     var time:Float;
 
     @Before
@@ -20,6 +21,7 @@ class PieceGeneratorTest {
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
     @Test
     public function jsonTest():Void {

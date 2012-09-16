@@ -7,6 +7,7 @@ import net.rezmason.scourge.unused.Pointer;
 
 class PointerHistoryTest {
 
+    #if TIME_TESTS
     var time:Float;
 
 	@Before
@@ -19,6 +20,7 @@ class PointerHistoryTest {
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
 	//@Test
 	public function historyTest1():Void

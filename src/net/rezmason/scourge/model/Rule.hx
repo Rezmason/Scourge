@@ -8,6 +8,7 @@ class Rule {
     var plan:StatePlan;
 
     public var options(default, null):Array<Option>;
+    public var quantumOptions(default, null):Array<QuantumOption>;
     public var stateAspectRequirements(default, null):AspectRequirements;
     public var playerAspectRequirements(default, null):AspectRequirements;
     public var nodeAspectRequirements(default, null):AspectRequirements;
@@ -17,6 +18,7 @@ class Rule {
         playerAspectRequirements = [];
         nodeAspectRequirements = [];
         options = [];
+        quantumOptions = [];
     }
 
     public function init(state:State, plan:StatePlan):Void {
@@ -27,6 +29,12 @@ class Rule {
 
     public function chooseOption(choice:Int):Void {
         if (options == null || options.length < choice || options[choice] == null) {
+            throw "Invalid choice index.";
+        }
+    }
+
+    public function chooseQuantumOption(choice:Int):Void {
+        if (quantumOptions == null || quantumOptions.length < choice || quantumOptions[choice] == null) {
             throw "Invalid choice index.";
         }
     }

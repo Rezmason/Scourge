@@ -6,6 +6,7 @@
 -debug
 -resource tables/pieces.json@pieces
 #-D VISUAL_TEST
+#-D TIME_TESTS
 -D USE_POINTERS
 -D haxeJSON
 
@@ -22,6 +23,7 @@
 -debug
 -resource tables/pieces.json@pieces
 #-D VISUAL_TEST
+#-D TIME_TESTS
 -D USE_POINTERS
 -D haxeJSON
 
@@ -39,6 +41,7 @@
 -debug
 -resource tables/pieces.json@pieces
 #-D VISUAL_TEST
+#-D TIME_TESTS
 -D USE_POINTERS
 -D haxeJSON
 

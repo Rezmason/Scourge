@@ -12,6 +12,9 @@ using net.rezmason.utils.Pointers;
 
 class DecayRuleTest extends RuleTest
 {
+    #if TIME_TESTS
+    var time:Float;
+
     @Before
     public function setup():Void {
         time = massive.munit.util.Timer.stamp();
@@ -22,6 +25,7 @@ class DecayRuleTest extends RuleTest
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
     @Test
     public function decayRuleTest():Void {

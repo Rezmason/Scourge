@@ -13,5 +13,6 @@ typedef AspectSet = Array<Atom>; // The properties of an element of the state
 typedef AspectLookup = Array<AspectPtr>; // The indices of property types in the AspectSet of an element
 typedef BoardNode = GridNode<AspectSet>;
 typedef Option = {optionID:Int};
+typedef QuantumOption = {>Option, relatedOptionID:Int};
 
 typedef StateHistory = History<Atom>;

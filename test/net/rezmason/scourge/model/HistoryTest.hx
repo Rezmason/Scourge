@@ -10,6 +10,7 @@ using net.rezmason.utils.Pointers;
 
 class HistoryTest
 {
+    #if TIME_TESTS
     var time:Float;
 
     @Before
@@ -22,6 +23,7 @@ class HistoryTest
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
     @Test
     public function historyTest1():Void

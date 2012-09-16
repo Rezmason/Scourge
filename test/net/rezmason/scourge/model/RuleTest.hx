@@ -14,7 +14,6 @@ using net.rezmason.utils.Pointers;
 class RuleTest
 {
     var history:StateHistory;
-    var time:Float;
 
     var state:State;
     var historyState:State;

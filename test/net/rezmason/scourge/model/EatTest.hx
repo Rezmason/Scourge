@@ -16,6 +16,9 @@ using net.rezmason.utils.Pointers;
 
 class EatTest extends RuleTest
 {
+    #if TIME_TESTS
+    var time:Float;
+
     @Before
     public function setup():Void {
         time = massive.munit.util.Timer.stamp();
@@ -26,10 +29,11 @@ class EatTest extends RuleTest
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
     @Test
     public function eatRuleTest():Void {
-        var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:false};
+        var eatConfig:EatCellsConfig = {recursive:false, eatHeads:false, takeBodiesFromHeads:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         makeState(TestBoards.twoPlayerGrab, 2, cast [eatRule]);
 
@@ -49,6 +53,7 @@ class EatTest extends RuleTest
 
         state.freshen(freshness_, 7, 7);
         state.freshen(freshness_, 9, 7);
+        state.freshen(freshness_, 12, 6); // Don't eat that head!
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25, numCells);
@@ -72,7 +77,7 @@ class EatTest extends RuleTest
 
     @Test
     public function eatRecursivelyRuleTest():Void {
-        var eatConfig:EatCellsConfig = {recursive:true, eatHeads:true, takeBodiesFromHeads:false};
+        var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         makeState(TestBoards.twoPlayerGrab, 2, cast [eatRule]);
 
@@ -92,6 +97,7 @@ class EatTest extends RuleTest
 
         state.freshen(freshness_, 7, 7);
         state.freshen(freshness_, 9, 7);
+        state.freshen(freshness_, 12, 6); // Don't eat that head!
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25, numCells);

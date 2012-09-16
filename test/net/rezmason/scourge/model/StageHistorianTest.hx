@@ -13,6 +13,7 @@ using net.rezmason.scourge.model.BoardUtils;
 
 class StageHistorianTest {
 
+	#if TIME_TESTS
 	var time:Float;
 
 	@Before
@@ -25,6 +26,7 @@ class StageHistorianTest {
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
 
 	@Test

@@ -9,6 +9,7 @@ using net.rezmason.scourge.model.GridUtils;
 class GridUtilsTest {
 
     var nodeItr:Int;
+    #if TIME_TESTS
     var time:Float;
 
     @Before
@@ -21,6 +22,7 @@ class GridUtilsTest {
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
     @Test
     public function rowTest():Void {

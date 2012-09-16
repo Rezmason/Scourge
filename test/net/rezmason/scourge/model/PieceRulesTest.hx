@@ -14,7 +14,10 @@ class PieceRulesTest extends RuleTest
 {
     private static var PIECE_SIZE:Int = 4;
 
-	@Before
+	#if TIME_TESTS
+	var time:Float;
+
+    @Before
     public function setup():Void {
         time = massive.munit.util.Timer.stamp();
     }
@@ -24,6 +27,7 @@ class PieceRulesTest extends RuleTest
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
     // An L/J block has nine neighbor cells.
     // Reflection allowed   rotation allowed    option count

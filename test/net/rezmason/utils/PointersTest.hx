@@ -6,6 +6,7 @@ using net.rezmason.utils.Pointers;
 
 class PointersTest {
 
+    #if TIME_TESTS
     var time:Float;
 
 	@Before
@@ -18,6 +19,7 @@ class PointersTest {
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
 	@Test
 	public function testExample():Void

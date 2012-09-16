@@ -9,10 +9,20 @@ Piece choice
 	Swapping is just an option of piece choice, you dope
 
 	Generating possible states from this is complicated
+		Quantum options - relate to future options
+		chooseQuantumOption
 
 Per-ply replenishing
-	player values, their step and their frequency
-	state values, their step and their frequency
+	typedef ReplenishProperty = {
+		prop:AspectProperty,
+		amount:Int,
+		period:Int,
+	}
+
+	Config
+		playerValues:Array<ReplenishProperty>
+		stateValues:Array<ReplenishProperty>
+		nodeValues:Array<ReplenishProperty>
 
 Biting
 	Config
@@ -40,6 +50,7 @@ Infinite board
 	Tough?
 
 Group rules together!
+	Rule groups are updated after rules are updated
 
 Clean up
 	Lots of code is used over and over again, especially in rules

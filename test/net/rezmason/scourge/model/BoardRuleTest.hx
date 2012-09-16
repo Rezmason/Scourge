@@ -17,6 +17,9 @@ using net.rezmason.utils.Pointers;
 
 class BoardRuleTest extends RuleTest {
 
+    #if TIME_TESTS
+    var time:Float;
+
     @Before
     public function setup():Void {
         time = massive.munit.util.Timer.stamp();
@@ -27,6 +30,7 @@ class BoardRuleTest extends RuleTest {
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
     @Test
     public function configTest1():Void {

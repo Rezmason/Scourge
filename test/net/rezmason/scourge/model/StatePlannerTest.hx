@@ -15,6 +15,7 @@ using net.rezmason.utils.Pointers;
 
 class StatePlannerTest {
 
+    #if TIME_TESTS
     var time:Float;
 
     @Before
@@ -27,6 +28,7 @@ class StatePlannerTest {
         time = massive.munit.util.Timer.stamp() - time;
         trace("tick " + time);
     }
+    #end
 
     @Test
     public function configTest1():Void {
