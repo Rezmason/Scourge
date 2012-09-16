@@ -58,9 +58,9 @@ class EatTest extends RuleTest
 
         // straight up eating
 
-        //trace(state.spitBoard(true));
+        //trace(state.spitBoard(plan, true));
         eatRule.chooseOption(0);
-        //trace(state.spitBoard(true));
+        //trace(state.spitBoard(plan, true));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25 + 6, numCells);
@@ -98,12 +98,12 @@ class EatTest extends RuleTest
 
         // recursive eating
 
-        //trace(state.spitBoard(true));
+        //trace(state.spitBoard(plan, true));
         eatRule.chooseOption(0);
-        //trace(state.spitBoard(true));
+        //trace(state.spitBoard(plan, true));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
-        Assert.areEqual(25 + 6 + 2, numCells);
+        Assert.areEqual(25 + 6 + 1, numCells);
 
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
@@ -134,10 +134,10 @@ class EatTest extends RuleTest
 
         eatRule.chooseOption(0);
 
-        //trace(state.spitBoard(true));
+        //trace(state.spitBoard(plan, true));
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
-        Assert.areEqual(25 + 17, numCells); // Eat everything
+        Assert.areEqual(25 + 13, numCells); // Eat everything
 
         var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
@@ -171,7 +171,7 @@ class EatTest extends RuleTest
 
         eatRule.chooseOption(0);
 
-        //trace(state.spitBoard(true));
+        //trace(state.spitBoard(plan, true));
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25 + 1, numCells); // Only eat the head
