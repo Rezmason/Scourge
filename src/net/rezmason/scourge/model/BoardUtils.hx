@@ -49,10 +49,11 @@ class BoardUtils {
                 }
 
                 if (!otherAspectFound) {
-                    var occupier:Int = column.value.at(occupier_);
-                    var isFilled:Int = column.value.at(isFilled_);
+                    var occupier:Null<Int> = column.value.at(occupier_);
+                    var isFilled:Null<Int> = column.value.at(isFilled_);
 
                     str += switch (true) {
+                        case (occupier == null): "n";
                         case (occupier != Aspect.NULL): "" + occupier;
                         case (isFilled == 1): "X";
                         default: " ";

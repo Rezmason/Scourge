@@ -66,7 +66,7 @@ class HistoryTest
         history.revert(4);
         Assert.areEqual(1, history.get(propA));
         Assert.areEqual(2, history.get(propB));
-        Assert.areEqual(null, history.get(propC));
+        Assert.areEqual(3, history.get(propC));
 
         Assert.areEqual(4, history.revision);
 
@@ -79,13 +79,13 @@ class HistoryTest
         history.reset();
         Assert.areEqual(1, history.get(propA));
         Assert.areEqual(2, history.get(propB));
-        Assert.areEqual(null, history.get(propC));
+        Assert.areEqual(3, history.get(propC));
 
         // revert to first state
         history.revert(0);
-        Assert.areEqual(null, history.get(propA));
-        Assert.areEqual(null, history.get(propB));
-        Assert.areEqual(null, history.get(propC));
+        Assert.areEqual(0, history.get(propA));
+        Assert.areEqual(0, history.get(propB));
+        Assert.areEqual(3, history.get(propC));
 
         Assert.areEqual(0, history.revision);
 

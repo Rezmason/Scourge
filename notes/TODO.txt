@@ -1,6 +1,3 @@
-StateHistorian
-	Use history state to map state to history and vice versa
-
 Piece choice
 	Config
 		pieceIDs

@@ -30,9 +30,11 @@ class StageHistorianTest {
 	@Test
 	public function transferAndCommitTest():Void {
 
-		var history:StateHistory = new StateHistory();
-		var historyState:State = new State();
-		var state:State = new State();
+		var historian:StateHistorian = new StateHistorian();
+
+		var history:StateHistory = historian.history;
+		var historyState:State = historian.historyState;
+		var state:State = historian.state;
 
 		var config = {
 			firstPlayer:0,
@@ -58,11 +60,10 @@ class StageHistorianTest {
 
         var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
 
-		var historian:StateHistorian = new StateHistorian(state, historyState, history);
-
 		var board0:String = state.spitBoard(plan);
+		historian.write();
 		//trace(board0);
-		var time0:Int = history.revision;
+		var time0:Int = history.commit();
 
 		// Freshen and eat body
 		state.freshen(freshness_, 7, 7);
@@ -70,7 +71,6 @@ class StageHistorianTest {
         eatRule.chooseOption(0);
 
 		var board1:String = state.spitBoard(plan);
-		//trace(board1);
 		historian.write();
 		var time1:Int = history.commit();
 
@@ -79,14 +79,12 @@ class StageHistorianTest {
 		eatRule.chooseOption(0);
 
 		var board2:String = state.spitBoard(plan);
-		//trace(board2);
 		historian.write();
 		var time2:Int = history.commit();
 
 		// No change!
 
 		var board3:String = state.spitBoard(plan);
-		//trace(board3);
 		historian.write();
 		var time3:Int = history.commit();
 

@@ -96,6 +96,7 @@ class History<T> {
 
     public inline function alloc(val:Null<T>):Int {
         array[length] = val;
+        for (change in fullChanges) if (change != null) change[length] = val;
         return length++;
     }
 
