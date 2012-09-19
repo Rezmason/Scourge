@@ -1,10 +1,6 @@
 Piece choice
-	Config
-		pieceIDs
-		allowFlipping
-		allowRotating
-		allowAll
-		hatSize
+	Make hat
+		I'm thinking, I'm thinking!
 
 	Swapping is just an option of piece choice, you dope
 

@@ -46,7 +46,7 @@ class PieceRulesTest extends RuleTest
         };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:true};
+        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:true, growGraph:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
@@ -83,7 +83,7 @@ class PieceRulesTest extends RuleTest
         };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:true};
+        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:true, growGraph:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
@@ -113,7 +113,7 @@ class PieceRulesTest extends RuleTest
         };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:false};
+        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:false, growGraph:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
@@ -143,7 +143,7 @@ class PieceRulesTest extends RuleTest
         };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:false};
+        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:false, growGraph:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 
@@ -173,7 +173,7 @@ class PieceRulesTest extends RuleTest
         };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:true, allowFlipping:false, allowRotating:false};
+        var dropConfig:DropPieceConfig = {overlapSelf:true, allowFlipping:false, allowRotating:false, growGraph:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
 

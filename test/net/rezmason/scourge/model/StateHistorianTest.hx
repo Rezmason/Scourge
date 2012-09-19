@@ -11,7 +11,7 @@ import net.rezmason.scourge.model.rules.EatCellsRule;
 
 using net.rezmason.scourge.model.BoardUtils;
 
-class StageHistorianTest {
+class StateHistorianTest {
 
 	#if TIME_TESTS
 	var time:Float;

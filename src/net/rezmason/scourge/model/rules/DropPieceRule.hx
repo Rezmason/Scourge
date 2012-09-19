@@ -18,6 +18,7 @@ typedef DropPieceConfig = {
     public var overlapSelf:Bool;
     public var allowFlipping:Bool;
     public var allowRotating:Bool;
+    public var growGraph:Bool;
 }
 
 class DropPieceRule extends Rule {

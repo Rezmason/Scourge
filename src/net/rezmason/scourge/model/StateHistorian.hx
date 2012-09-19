@@ -8,10 +8,10 @@ class StateHistorian {
     public var historyState(default, null):State;
     public var history(default, null):StateHistory;
 
-    var a:Array<Int>;
+    //var a:Array<Int>;
 
     public function new():Void {
-        a = [];
+        //a = [];
         state = new State();
         historyState = new State();
         history = new StateHistory();
@@ -38,15 +38,15 @@ class StateHistorian {
     private inline function writeAspects(aspects:AspectSet, histAspects:AspectSet):Void {
         for (ike in 0...aspects.length) {
             history.set(histAspects[ike], aspects[ike]);
-            if (a[histAspects[ike]] == null) a[histAspects[ike]] = 1;
-            else a[histAspects[ike]]++;
+            //if (a[histAspects[ike]] == null) a[histAspects[ike]] = 1;
+            //else a[histAspects[ike]]++;
         }
     }
 
     private inline function readAspects(aspects:AspectSet, histAspects:AspectSet):Void {
         for (ike in 0...aspects.length) {
             aspects[ike] = history.get(histAspects[ike]);
-            a[histAspects[ike]]--;
+            //a[histAspects[ike]]--;
         }
     }
 }
