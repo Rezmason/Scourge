@@ -94,7 +94,7 @@ class BoardRuleTest extends RuleTest {
     @Test
     public function configTest3():Void {
 
-        makeState(TestBoards.spiral, 4);
+        makeState(null, 4, TestBoards.spiral);
 
         #if VISUAL_TEST
             trace("VISUAL ASSERTION: Should appear to be a four-player board with a spiral interior");

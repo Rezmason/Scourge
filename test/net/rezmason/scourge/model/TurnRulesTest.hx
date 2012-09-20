@@ -38,7 +38,7 @@ class TurnRulesTest extends RuleTest
         // Should go to the next player who is alive (has a head)
 
         var endTurnRule:EndTurnRule = new EndTurnRule();
-        makeState(TestBoards.emptySquareFourPlayerSkirmish, 4, cast [endTurnRule]);
+        makeState(cast [endTurnRule], 4, TestBoards.emptySquareFourPlayerSkirmish);
 
         var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
 
@@ -72,7 +72,7 @@ class TurnRulesTest extends RuleTest
         // Should kill and freshen body of current player
 
         var forfeitRule:ForfeitRule = new ForfeitRule();
-        makeState(TestBoards.oaf, 4, cast [forfeitRule]);
+        makeState(cast [forfeitRule], 4, TestBoards.oaf);
 
         var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
         var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
@@ -110,7 +110,7 @@ class TurnRulesTest extends RuleTest
         // Should remove heads that are not occupied by their owner
 
         var killHeadlessPlayerRule:KillHeadlessPlayerRule = new KillHeadlessPlayerRule();
-        makeState(TestBoards.emptyPetri, 4, cast [killHeadlessPlayerRule]);
+        makeState(cast [killHeadlessPlayerRule], 4, TestBoards.emptyPetri);
 
         // Change occupier of current player's head
 

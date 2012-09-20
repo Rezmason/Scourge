@@ -1,6 +1,7 @@
 Piece choice
-	Make hat
-		I'm thinking, I'm thinking!
+	Make hat out of EXTRAS
+		Extend BuildRule
+
 
 	Swapping is just an option of piece choice, you dope
 

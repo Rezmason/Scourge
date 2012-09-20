@@ -31,7 +31,7 @@ class DecayRuleTest extends RuleTest
     public function decayRuleTest():Void {
 
         var decayRule:DecayRule = new DecayRule();
-        makeState(TestBoards.loosePetri, 1, cast [decayRule]);
+        makeState(cast [decayRule], 1, TestBoards.loosePetri);
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
 

@@ -35,7 +35,7 @@ class EatTest extends RuleTest
     public function eatRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:false, takeBodiesFromHeads:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        makeState(TestBoards.twoPlayerGrab, 2, cast [eatRule]);
+        makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
@@ -79,7 +79,7 @@ class EatTest extends RuleTest
     public function eatRecursivelyRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        makeState(TestBoards.twoPlayerGrab, 2, cast [eatRule]);
+        makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
@@ -120,7 +120,7 @@ class EatTest extends RuleTest
     public function eatHeadAndBodyRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:true};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        makeState(TestBoards.twoPlayerGrab, 2, cast [eatRule]);
+        makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
@@ -157,7 +157,7 @@ class EatTest extends RuleTest
     public function eatHeadKillBodyTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        makeState(TestBoards.twoPlayerGrab, 2, cast [eatRule]);
+        makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 

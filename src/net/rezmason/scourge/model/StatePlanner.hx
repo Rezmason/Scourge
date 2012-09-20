@@ -21,7 +21,8 @@ class StatePlanner {
 
         var plan:StatePlan = new StatePlan();
 
-        while (rules.has(null)) rules.remove(null);
+        for (ike in 0...rules.length) if (rules.indexOf(rules[ike]) != ike) rules[ike] = null;
+        while (rules.remove(null)) {}
 
         var stateRequirements:AspectRequirements = new AspectRequirements();
         var playerRequirements:AspectRequirements = new AspectRequirements();

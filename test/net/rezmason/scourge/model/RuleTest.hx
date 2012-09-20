@@ -26,18 +26,26 @@ class RuleTest
     @BeforeClass
     public function beforeClass():Void {
         history = new StateHistory();
+        state = new State();
+        historyState = new State();
     }
 
     @AfterClass
     public function afterClass():Void {
         history.wipe();
+        historyState.wipe();
+        state.wipe();
+
         history = null;
+        historyState = null;
+        state = null;
     }
 
-    private function makeState(initGrid:String, numPlayers:Int, rules:Array<Rule> = null, circular:Bool = false):Void {
+    private function makeState(rules:Array<Rule> = null,  numPlayers:Int = 1, initGrid:String = null, circular:Bool = false):Void {
 
         history.wipe();
-        historyState = new State();
+        historyState.wipe();
+        state.wipe();
 
         if (rules == null) rules = [];
 
@@ -57,7 +65,6 @@ class RuleTest
         rules.unshift(buildPlayersRule);
         rules.unshift(buildStateRule);
 
-        state = new State();
         plan = new StatePlanner().planState(state, rules);
     }
 

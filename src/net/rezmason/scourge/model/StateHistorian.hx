@@ -23,6 +23,8 @@ class StateHistorian {
             writeAspects(state.players[ike], historyState.players[ike]);
         for (ike in 0...state.nodes.length)
             writeAspects(state.nodes[ike].value, historyState.nodes[ike].value);
+        for (ike in 0...state.extras.length)
+            writeAspects(state.extras[ike], historyState.extras[ike]);
         //trace(a.join(""));
     }
 
@@ -32,6 +34,8 @@ class StateHistorian {
             readAspects(state.players[ike], historyState.players[ike]);
         for (ike in 0...state.nodes.length)
             readAspects(state.nodes[ike].value, historyState.nodes[ike].value);
+        for (ike in 0...state.extras.length)
+            readAspects(state.extras[ike], historyState.extras[ike]);
         //trace(a.join(""));
     }
 

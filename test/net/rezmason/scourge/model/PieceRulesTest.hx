@@ -6,6 +6,7 @@ import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.rules.DropPieceRule;
 import net.rezmason.scourge.model.rules.TestPieceRule;
+import net.rezmason.scourge.model.rules.PickPieceRule;
 
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
@@ -48,7 +49,7 @@ class PieceRulesTest extends RuleTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:true, growGraph:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
+        makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
         var options:Array<DropPieceOption> = cast dropRule.options;
@@ -85,7 +86,7 @@ class PieceRulesTest extends RuleTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:true, growGraph:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
+        makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
         var options:Array<DropPieceOption> = cast dropRule.options;
@@ -115,7 +116,7 @@ class PieceRulesTest extends RuleTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:false, growGraph:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
+        makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
         var options:Array<DropPieceOption> = cast dropRule.options;
@@ -145,7 +146,7 @@ class PieceRulesTest extends RuleTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:false, growGraph:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
+        makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
         var options:Array<DropPieceOption> = cast dropRule.options;
@@ -175,7 +176,7 @@ class PieceRulesTest extends RuleTest
 
         var dropConfig:DropPieceConfig = {overlapSelf:true, allowFlipping:false, allowRotating:false, growGraph:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
-        makeState(TestBoards.emptyPetri, 1, [testPieceRule, dropRule]);
+        makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
         var options:Array<DropPieceOption> = cast dropRule.options;
@@ -191,5 +192,22 @@ class PieceRulesTest extends RuleTest
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
+    }
+
+    @Test
+    public function pickPieceTest():Void {
+        var pickPieceCfg:PickPieceConfig = {
+            history:history,
+            historyState:historyState,
+            pieceIDs:[0, 1, 2, 3, 4],
+            allowFlipping:true,
+            allowRotating:true,
+            allowAll:false,
+            hatSize:3,
+        };
+        var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
+        makeState(cast [pickPieceRule], 1, TestBoards.emptyPetri);
+
+        pickPieceRule.update();
     }
 }
