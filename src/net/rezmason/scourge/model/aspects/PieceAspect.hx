@@ -10,6 +10,7 @@ class PieceAspect extends Aspect {
     public static var PIECE_HAT_NEXT:AspectProperty = {id:Aspect.ids++, initialValue:Aspect.NULL};
 
     public static var PIECE_ID:AspectProperty = {id:Aspect.ids++, initialValue:Aspect.NULL};
+    public static var PIECE_TABLE_ID:AspectProperty = {id:Aspect.ids++, initialValue:Aspect.NULL};
     public static var PIECE_REFLECTION:AspectProperty = {id:Aspect.ids++, initialValue:0};
     public static var PIECE_ROTATION:AspectProperty = {id:Aspect.ids++, initialValue:0};
 }

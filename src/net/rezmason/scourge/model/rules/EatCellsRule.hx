@@ -20,6 +20,7 @@ typedef EatCellsConfig = {
 
 class EatCellsRule extends Rule {
 
+    var nodeID_:AspectPtr;
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var freshness_:AspectPtr;
@@ -47,6 +48,7 @@ class EatCellsRule extends Rule {
         ];
 
         nodeAspectRequirements = [
+            BodyAspect.NODE_ID,
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
             FreshnessAspect.FRESHNESS,
@@ -59,6 +61,9 @@ class EatCellsRule extends Rule {
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
+
+        nodeID_ = nodePtr(BodyAspect.NODE_ID);
+
         occupier_ = nodePtr(OwnershipAspect.OCCUPIER);
         isFilled_ = nodePtr(OwnershipAspect.IS_FILLED);
         freshness_ = nodePtr(FreshnessAspect.FRESHNESS);
@@ -101,7 +106,7 @@ class EatCellsRule extends Rule {
                         var scoutOccupier:Int = scout.value.at(occupier_);
                         if (scoutOccupier == currentPlayer || eatenNodes.has(scout)) {
                             for (pendingNode in pendingNodes) {
-                                var playerIndex:Int = headIndices.indexOf(pendingNode.id);
+                                var playerIndex:Int = headIndices.indexOf(pendingNode.value.at(nodeID_));
                                 if (playerIndex != -1) {
                                     if (cfg.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerIndex));
                                 } else {
@@ -110,7 +115,7 @@ class EatCellsRule extends Rule {
                                 eatenNodes.push(pendingNode);
                             }
                             break;
-                        } else if (headIndices[scoutOccupier] == scout.id) {
+                        } else if (headIndices[scoutOccupier] == scout.value.at(nodeID_)) {
                             if (cfg.eatHeads) pendingNodes.push(scout);
                             else break;
                         } else {
@@ -126,7 +131,7 @@ class EatCellsRule extends Rule {
 
         for (node in eatenNodes) bodyNode = eatCell(node, currentPlayer, maxFreshness++, bodyNode);
 
-        state.players[currentPlayer].mod(bodyFirst_, bodyNode.id);
+        state.players[currentPlayer].mod(bodyFirst_, bodyNode.value.at(nodeID_));
         state.aspects.mod(maxFreshness_, maxFreshness);
     }
 
@@ -147,7 +152,7 @@ class EatCellsRule extends Rule {
     function eatCell(node:BoardNode, currentPlayer:Int, maxFreshness:Int, bodyNode:BoardNode):BoardNode {
         node.value.mod(occupier_, currentPlayer);
         node.value.mod(freshness_, maxFreshness);
-        return bodyNode.addNode(node, state.nodes, bodyNext_, bodyPrev_);
+        return bodyNode.addNode(node, state.nodes, nodeID_, bodyNext_, bodyPrev_);
     }
 }
 

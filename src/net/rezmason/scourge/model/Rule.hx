@@ -19,12 +19,18 @@ class Rule {
         nodeAspectRequirements = [];
         options = [];
         quantumOptions = [];
+        __initReqs();
     }
 
     public function init(state:State, plan:StatePlan):Void {
         this.state = state;
         this.plan = plan;
+        __initPtrs();
     }
+
+    private function __initReqs():Void {}
+    private function __initPtrs():Void {}
+
     public function update():Void {}
 
     public function chooseOption(choice:Int):Void {
@@ -38,6 +44,8 @@ class Rule {
             throw "Invalid choice index.";
         }
     }
+
+    private function boom():Void {}
 
     inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup[prop.id]; }
     inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup[prop.id]; }

@@ -12,6 +12,7 @@ using net.rezmason.utils.Pointers;
 
 class DecayRule extends Rule {
 
+    var nodeID_:AspectPtr;
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var head_:AspectPtr;
@@ -28,6 +29,7 @@ class DecayRule extends Rule {
         ];
 
         nodeAspectRequirements = [
+            BodyAspect.NODE_ID,
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
             BodyAspect.BODY_NEXT,
@@ -39,6 +41,9 @@ class DecayRule extends Rule {
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
+
+        nodeID_ = nodePtr(BodyAspect.NODE_ID);
+
         occupier_ = nodePtr(OwnershipAspect.OCCUPIER);
         isFilled_ = nodePtr(OwnershipAspect.IS_FILLED);
         head_ =   playerPtr(BodyAspect.HEAD);
@@ -83,7 +88,7 @@ class DecayRule extends Rule {
         node.value.mod(occupier_, Aspect.NULL);
 
         var nextNode:BoardNode = node.removeNode(state.nodes, bodyNext_, bodyPrev_);
-        if (firstIndex == node.id) firstIndex = nextNode == null ? Aspect.NULL : nextNode.id;
+        if (firstIndex == node.value.at(nodeID_)) firstIndex = nextNode == null ? Aspect.NULL : nextNode.value.at(nodeID_);
         return firstIndex;
     }
 }

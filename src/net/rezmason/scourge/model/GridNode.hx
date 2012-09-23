@@ -2,12 +2,10 @@ package net.rezmason.scourge.model;
 
 class GridNode<T> {
     public var value(default, null):T;
-    public var id(default, null):Int;
     public var neighbors(default, null):Array<GridNode<T>>;
 
-    public function new(value:T, id:Int = 0):Void {
+    public function new(value:T):Void {
         this.value = value;
-        this.id = id;
         neighbors = [];
     }
 }

@@ -46,6 +46,12 @@ Infinite board
 	Expand board when placing a piece
 	Tough?
 
+Rule macros
+	@stateAspect(BodyAspect.HEAD)
+	@playerAspect
+	@nodeAspect
+	BuildRule: macro @extraAspect
+
 Group rules together!
 	Rule groups are updated after rules are updated
 

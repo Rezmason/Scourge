@@ -4,6 +4,7 @@ import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.rules.BuildRule;
 
+using net.rezmason.scourge.model.AspectUtils;
 using net.rezmason.utils.Pointers;
 
 typedef PickPieceConfig = {>BuildConfig,
@@ -14,56 +15,48 @@ typedef PickPieceConfig = {>BuildConfig,
     public var hatSize:Int; // Number of pieces in the "hat" before it's refilled
 }
 
-class PickPieceRule extends BuildRule {
+@:build(net.rezmason.scourge.model.RuleBuilder.build()) class PickPieceRule extends BuildRule {
 
     static var stateReqs:AspectRequirements;
 
     private var cfg:PickPieceConfig;
 
-    var pieceID_:AspectPtr;
-    var piecesPicked_:AspectPtr;
-    var pieceReflection_:AspectPtr;
-    var pieceRotation_:AspectPtr;
-
-    var pieceFirst_:AspectPtr;
-    var pieceNext_:AspectPtr;
-    var pieceHatFirst_:AspectPtr;
-    var pieceHatNext_:AspectPtr;
+    //@requireExtra(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_:AspectPtr;
+    //@requireExtra(PieceAspect.PIECE_ID) var pieceID_:AspectPtr;
+    //@requireExtra(PieceAspect.PIECE_NEXT) var pieceNext_:AspectPtr;
+    @requireState(PieceAspect.PIECES_PICKED) var piecesPicked_:AspectPtr;
+    @requireState(PieceAspect.PIECE_FIRST) var pieceFirst_:AspectPtr;
+    @requireState(PieceAspect.PIECE_HAT_FIRST) var pieceHatFirst_:AspectPtr;
+    @requireState(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
+    @requireState(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
+    @requireState(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
 
     public function new(cfg:PickPieceConfig):Void {
         super();
-
         this.cfg = cfg;
-
-        stateAspectRequirements = [
-            PieceAspect.PIECE_ID,
-            PieceAspect.PIECES_PICKED,
-            PieceAspect.PIECE_REFLECTION,
-            PieceAspect.PIECE_ROTATION,
-            PieceAspect.PIECE_FIRST,
-            PieceAspect.PIECE_HAT_FIRST,
-        ];
-
-        extraAspectRequirements = [
-            PieceAspect.PIECE_ID,
-            PieceAspect.PIECE_NEXT,
-            PieceAspect.PIECE_HAT_NEXT,
-        ];
     }
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
-
-        pieceID_ = statePtr(PieceAspect.PIECE_ID);
-        pieceReflection_ = statePtr(PieceAspect.PIECE_REFLECTION);
-        pieceRotation_ = statePtr(PieceAspect.PIECE_ROTATION);
-
         buildPieces();
-
     }
 
     override public function update():Void {
+        /*
+        piece = state.piece
+        state = state.picked
+        if piece == NULL || picked >= cfg.hatSize
+            state.firstHat = state.firstPiece
+            piece = state.firstPiece
+            while (piece != null)
+                piece.nextHat = piece.nextPiece
+                piece = piece.nextPiece
+            state.picked = 0
 
+        rand = random(0-cfg.pieces.length)
+        piece = pieces[rand]
+        removeNode... SHIT
+        */
     }
 
     override public function chooseOption(choice:Int):Void {

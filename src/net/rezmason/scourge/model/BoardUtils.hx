@@ -104,23 +104,24 @@ class BoardUtils {
         return nextNode;
     }
 
-    public inline static function addNode(node:BoardNode, addedNode:BoardNode, nodes:Array<BoardNode>, next:AspectPtr, prev:AspectPtr):BoardNode {
+    public inline static function addNode(node:BoardNode, addedNode:BoardNode, nodes:Array<BoardNode>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):BoardNode {
         removeNode(addedNode, nodes, next, prev);
 
         var prevNodeID:Int = node.value.at(prev);
+        var addedNodeID:Int = addedNode.value.at(id);
 
-        addedNode.value.mod(next, node.id);
+        addedNode.value.mod(next, node.value.at(id));
         addedNode.value.mod(prev, prevNodeID);
-        node.value.mod(prev, addedNode.id);
+        node.value.mod(prev, addedNodeID);
         if (prevNodeID != Aspect.NULL) {
             var prevNode:BoardNode = nodes[prevNodeID];
-            prevNode.value.mod(next, addedNode.id);
+            prevNode.value.mod(next, addedNodeID);
         }
 
         return addedNode;
     }
 
-    public inline static function chainByAspect(nodes:Array<BoardNode>, next:AspectPtr, prev:AspectPtr):Void {
+    public inline static function chainByAspect(nodes:Array<BoardNode>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):Void {
         nodes = nodes.copy();
         while (nodes.remove(null)) {}
 
@@ -128,8 +129,8 @@ class BoardUtils {
 
         for (ike in 1...nodes.length) {
             var nextNode:BoardNode = nodes[ike];
-            node.value.mod(next, nextNode.id);
-            nextNode.value.mod(prev, node.id);
+            node.value.mod(next, nextNode.value.at(id));
+            nextNode.value.mod(prev, node.value.at(id));
             node = nextNode;
         }
 

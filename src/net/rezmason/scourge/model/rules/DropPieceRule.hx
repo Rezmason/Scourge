@@ -23,6 +23,7 @@ typedef DropPieceConfig = {
 
 class DropPieceRule extends Rule {
 
+    var nodeID_:AspectPtr;
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var freshness_:AspectPtr;
@@ -57,6 +58,7 @@ class DropPieceRule extends Rule {
         ];
 
         nodeAspectRequirements = [
+            BodyAspect.NODE_ID,
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
             FreshnessAspect.FRESHNESS,
@@ -67,6 +69,8 @@ class DropPieceRule extends Rule {
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
+
+        nodeID_ = nodePtr(BodyAspect.NODE_ID);
 
         freshness_ = nodePtr(FreshnessAspect.FRESHNESS);
         maxFreshness_ = statePtr(FreshnessAspect.MAX_FRESHNESS);
@@ -145,7 +149,7 @@ class DropPieceRule extends Rule {
 
                         if (valid) {
                             dropOptions.push({
-                                targetNode:node.id,
+                                targetNode:node.value.at(nodeID_),
                                 pieceID:pieceIndex,
                                 rotation:rotationIndex,
                                 reflection:reflectionIndex,
@@ -174,7 +178,7 @@ class DropPieceRule extends Rule {
         var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
 
         for (coord in coords) bodyNode = fillAndOccupyCell(walkNode(node, coord, homeCoord), currentPlayer, maxFreshness, bodyNode);
-        state.players[currentPlayer].mod(bodyFirst_, bodyNode.id);
+        state.players[currentPlayer].mod(bodyFirst_, bodyNode.value.at(nodeID_));
 
         state.aspects.mod(maxFreshness_, maxFreshness);
     }
@@ -192,7 +196,7 @@ class DropPieceRule extends Rule {
         if (me.at(occupier_) != currentPlayer || me.at(isFilled_) == Aspect.FALSE) me.mod(freshness_, maxFreshness);
         me.mod(occupier_, currentPlayer);
         me.mod(isFilled_, Aspect.TRUE);
-        return bodyNode.addNode(node, state.nodes, bodyNext_, bodyPrev_);
+        return bodyNode.addNode(node, state.nodes, nodeID_, bodyNext_, bodyPrev_);
     }
 
     inline function walkNode(node:BoardNode, fromCoord:IntCoord, toCoord:IntCoord):BoardNode {

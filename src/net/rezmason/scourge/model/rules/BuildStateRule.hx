@@ -11,19 +11,15 @@ typedef BuildStateConfig = {>BuildConfig,
     public var firstPlayer:Int;
 }
 
-class BuildStateRule extends BuildRule {
+@:build(net.rezmason.scourge.model.RuleBuilder.build()) class BuildStateRule extends BuildRule {
 
     private var cfg:BuildStateConfig;
 
-    var currentPlayer_:AspectPtr;
+    @requireState(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
 
     public function new(cfg:BuildStateConfig):Void {
         super();
         this.cfg = cfg;
-
-        stateAspectRequirements = [
-            PlyAspect.CURRENT_PLAYER,
-        ];
     }
 
     override public function init(state:State, plan:StatePlan):Void {
@@ -35,7 +31,6 @@ class BuildStateRule extends BuildRule {
         var aspects:AspectSet = buildHistAspectSet(plan.stateAspectTemplate, cfg.history);
         for (ike in 0...aspects.length) historyState.aspects[ike] = ike;
 
-        currentPlayer_ = statePtr(PlyAspect.CURRENT_PLAYER);
         state.aspects.mod(currentPlayer_, cfg.firstPlayer);
     }
 }

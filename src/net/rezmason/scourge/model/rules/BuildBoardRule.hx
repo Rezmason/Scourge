@@ -33,6 +33,9 @@ class BuildBoardRule extends BuildRule {
 
     private var cfg:BuildBoardConfig;
 
+    var nodeAspectTemplate:AspectSet;
+
+    var nodeID_:AspectPtr;
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var head_:AspectPtr;
@@ -52,6 +55,7 @@ class BuildBoardRule extends BuildRule {
         ];
 
         nodeAspectRequirements = [
+            BodyAspect.NODE_ID,
             OwnershipAspect.IS_FILLED,
             OwnershipAspect.OCCUPIER,
             BodyAspect.BODY_NEXT,
@@ -62,6 +66,10 @@ class BuildBoardRule extends BuildRule {
     override public function init(state:State, plan:StatePlan):Void {
 
         super.init(state, plan);
+
+        nodeAspectTemplate = plan.nodeAspectTemplate.copy();
+
+        nodeID_ = nodePtr(BodyAspect.NODE_ID);
 
         occupier_ = nodePtr(OwnershipAspect.OCCUPIER);
         isFilled_ = nodePtr(OwnershipAspect.IS_FILLED);
@@ -145,11 +153,13 @@ class BuildBoardRule extends BuildRule {
     }
 
     inline function makeNode():BoardNode {
-        var node:BoardNode = new BoardNode(buildAspectSet(plan.nodeAspectTemplate), state.nodes.length);
+        nodeAspectTemplate.mod(nodeID_, state.nodes.length);
+
+        var node:BoardNode = new BoardNode(buildAspectSet(nodeAspectTemplate));
         state.nodes.push(node);
 
-        var histAspects:AspectSet = buildHistAspectSet(plan.nodeAspectTemplate, cfg.history);
-        var histNode:BoardNode = new BoardNode(histAspects, cfg.historyState.nodes.length);
+        var histAspects:AspectSet = buildHistAspectSet(nodeAspectTemplate, cfg.history);
+        var histNode:BoardNode = new BoardNode(histAspects);
         cfg.historyState.nodes.push(histNode);
 
         return node;
@@ -190,7 +200,7 @@ class BuildBoardRule extends BuildRule {
         for (ike in 0...headCoords.length) {
             var coord:XY = headCoords[ike];
             var head:BoardNode = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
-            state.players[ike].mod(head_, head.id);
+            state.players[ike].mod(head_, head.value.at(nodeID_));
             head.value.mod(isFilled_, Aspect.TRUE);
             head.value.mod(occupier_, ike);
         }
@@ -256,8 +266,8 @@ class BuildBoardRule extends BuildRule {
         for (ike in 0...state.players.length) {
             var body:Array<BoardNode> = bodies[ike];
             var bodyFirstNode:BoardNode = body[0];
-            state.players[ike].mod(bodyFirst_, bodyFirstNode.id);
-            body.chainByAspect(bodyNext_, bodyPrev_);
+            state.players[ike].mod(bodyFirst_, bodyFirstNode.value.at(nodeID_));
+            body.chainByAspect(nodeID_, bodyNext_, bodyPrev_);
         }
     }
 }

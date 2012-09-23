@@ -17,21 +17,22 @@ class BuildRule extends Rule {
     private var extraAspectLookup:AspectLookup;
 
     public function new():Void {
-        super();
         extraAspectRequirements = [];
         extraAspectTemplate = [];
         extraAspectLookup = [];
+
+        super();
     }
 
     override public function init(state:State, plan:StatePlan):Void {
-        super.init(state, plan);
-
         // set up extra template and lookup
         for (ike in 0...extraAspectRequirements.length) {
             var prop:AspectProperty = extraAspectRequirements[ike];
             extraAspectLookup[prop.id] = ike.pointerArithmetic();
             extraAspectTemplate[ike] = prop.initialValue;
         }
+
+        super.init(state, plan);
     }
 
     inline function buildAspectSet(template:AspectSet):AspectSet {
