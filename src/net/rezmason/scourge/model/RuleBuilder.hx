@@ -77,13 +77,79 @@ class RuleBuilder {
 
                     // reqs.push(Aspect.ASPECT)
 
-                    var reqExpr:Expr = {expr: ECall({expr: EField({expr: EConst(CIdent(reqName)), pos: pos }, "push"), pos: pos},[{expr: EField({expr: EConst(CIdent(aspectCategory)), pos: pos}, aspectName), pos: pos}]), pos: pos};
+                    var reqExpr:Expr = {
+                        expr: ECall(
+                        {
+                            expr: EField(
+                            {
+                                expr: EConst( CIdent( reqName ) ),
+                                pos: pos
+                            },
+                            "push"
+                            ),
+                            pos: pos
+                        },
+                        [
+                            {
+                                expr: EField(
+                                    {
+                                        expr: EConst( CIdent( aspectCategory ) ),
+                                        pos: pos
+                                    },
+                                    aspectName
+                                ),
+                                pos: pos
+                            }
+                        ]
+                        ),
+                        pos: pos
+                    };
 
                     reqExpressions.push(reqExpr);
 
                     // field = plan.stateAspectLookup[Aspect.ASPECT.id];
 
-                    var ptrExpr:Expr = {expr: EBinop(OpAssign,{expr: EConst(CIdent(ptrName)), pos: pos },{expr: EArray({expr: EField({expr: EConst(CIdent("plan")), pos: pos }, lookupName), pos: pos},{expr: EField({expr:EField({expr: EConst(CIdent(aspectCategory)), pos: pos }, aspectName),pos: pos}, "id"),pos: pos}),pos: pos}),pos: pos};
+                    var ptrExpr:Expr = {
+                        expr: EBinop(
+                            OpAssign,
+                            {
+                                expr: EConst( CIdent( ptrName ) ),
+                                pos: pos
+                            },
+                            {
+                                expr: EArray(
+                                    {
+                                        expr: EField(
+                                            {
+                                                expr: EConst( CIdent( "plan" ) ),
+                                                pos: pos
+                                            },
+                                            lookupName
+                                        ),
+                                        pos: pos
+                                    },
+                                    {
+                                        expr: EField(
+                                            {
+                                                expr:EField(
+                                                    {
+                                                        expr: EConst( CIdent( aspectCategory ) ),
+                                                        pos: pos
+                                                    },
+                                                    aspectName
+                                                ),
+                                                pos: pos
+                                            },
+                                            "id"
+                                        ),
+                                        pos: pos
+                                    }
+                                ),
+                                pos: pos
+                            }
+                        ),
+                        pos: pos
+                    };
 
                     ptrExpressions.push(ptrExpr);
 
