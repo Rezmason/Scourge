@@ -6,6 +6,7 @@ import haxe.macro.Expr;
 import net.rezmason.scourge.model.ModelTypes;
 
 using Lambda;
+using StringTools;
 using Type;
 
 class RuleBuilder {
@@ -39,6 +40,8 @@ class RuleBuilder {
 
         var reqExpressions:Array<Expr> = [];
         var ptrExpressions:Array<Expr> = [];
+
+        var notes:Array<Array<String>> = [];
 
         inline function overrider(name:String, expressions:Array<Expr>):Field {
             var func:Function = {params:[], args:[], ret:null, expr:{pos:pos, expr:EBlock(expressions)}};
@@ -85,25 +88,25 @@ class RuleBuilder {
                         aspectCategory = categoryParams[0];
                         aspectName = aspectParams[1];
                     } catch (whatever:Dynamic) {
-                        throw new Error("invalid Aspect " + aspect, field.pos);
+                        throw new Error("invalid AspectProperty " + aspect, field.pos);
                     }
 
-                    neko.Lib.println([aspectCategory, aspectName, ptrName, reqName, lookupName]);
+                    notes.push([field.name, aspectCategory, aspectName, metaTag.name.substr("require".length)]);
 
-                    // reqs.push(Aspect.ASPECT)
-
+                    // Aspect.ASPECT
                     var aspectExpr:Expr = prop(constant(aspectCategory), aspectName);
+
+                    // preqs.push(Aspect.ASPECT)
                     var reqExpr:Expr = call(constant(reqName), "push", [aspectExpr]);
 
-                    reqExpressions.push(reqExpr);
+
+                    // plan | this
+                    var lookupExpr:Expr = constant(metaTag.name == "requireExtra" ? "this" : "plan");
 
                     // field = plan.stateAspectLookup[Aspect.ASPECT.id];
+                    var ptrExpr:Expr = assign(constant(ptrName), arrayLookup(prop(lookupExpr, lookupName), prop(aspectExpr, "id")));
 
-                    var lookupExpr:Expr = prop(constant("plan"), lookupName);
-                    if (metaTag.name == "requireExtra") lookupExpr = constant(lookupName);
-
-                    var ptrExpr:Expr = assign(constant(ptrName), arrayLookup(lookupExpr, prop(aspectExpr, "id")));
-
+                    reqExpressions.push(reqExpr);
                     ptrExpressions.push(ptrExpr);
 
                     break;
@@ -111,10 +114,36 @@ class RuleBuilder {
             }
         }
 
+        if (notes.length > 0) printCaption(Context.getLocalClass().get().module, notes);
+
         fields.push(overrider("__initReqs", reqExpressions));
         fields.push(overrider("__initPtrs", ptrExpressions));
 
         return fields;
+    }
+
+    private static function printCaption(module:String, notes:Array<Array<String>>):Void {
+        neko.Lib.println("Building " + module);
+        var column1:Int = 0;
+        var column2:Int = 0;
+        var column3:Int = 0;
+
+        for (note in notes) {
+            if (column1 < note[0].length) column1 = note[0].length;
+            if (column2 < note[1].length + note[2].length + 1) column2 = note[1].length + note[2].length + 1;
+            if (column3 < note[3].length) column3 = note[3].length;
+        }
+
+        for (note in notes) {
+            var str:String = "|\t" +
+                note.shift().rpad(" ", column1 + 2) +
+                (note.shift() + "." + note.shift()).rpad(" ", column2 + 2) +
+                note.shift().lpad(" ", column3);
+
+            neko.Lib.println(str);
+        }
+
+        neko.Lib.println("");
     }
 }
 
