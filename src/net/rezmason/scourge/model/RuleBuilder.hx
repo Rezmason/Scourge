@@ -68,7 +68,7 @@ class RuleBuilder {
 
                 if (reqsByMetaTag.exists(metaTag.name)) {
 
-                    var aspect = metaTag.params[0];
+                    var aspectExpr:Expr = metaTag.params[0];
                     metaTag.params = [];
 
                     var aspectCategory:String;
@@ -80,7 +80,7 @@ class RuleBuilder {
                     // EField({expr:EConst(CIdent(aspectCategory)), pos:pos}, aspectName)
 
                     try {
-                        var aspectParams = aspect.expr.enumParameters();
+                        var aspectParams = aspectExpr.expr.enumParameters();
                         var category:Expr = aspectParams[0];
                         var categoryIdent:Constant = category.expr.enumParameters()[0];
                         var categoryParams = categoryIdent.enumParameters();
@@ -88,17 +88,13 @@ class RuleBuilder {
                         aspectCategory = categoryParams[0];
                         aspectName = aspectParams[1];
                     } catch (whatever:Dynamic) {
-                        throw new Error("invalid AspectProperty " + aspect, field.pos);
+                        throw new Error("invalid AspectProperty " + aspectExpr, field.pos);
                     }
 
                     notes.push([field.name, aspectCategory, aspectName, metaTag.name.substr("require".length)]);
 
-                    // Aspect.ASPECT
-                    var aspectExpr:Expr = prop(constant(aspectCategory), aspectName);
-
                     // preqs.push(Aspect.ASPECT)
                     var reqExpr:Expr = call(constant(reqName), "push", [aspectExpr]);
-
 
                     // plan | this
                     var lookupExpr:Expr = constant(metaTag.name == "requireExtra" ? "this" : "plan");
