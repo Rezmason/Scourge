@@ -4,7 +4,6 @@ import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.rules.BuildRule;
 
 using Lambda;
 using Std;
@@ -19,7 +18,7 @@ typedef BuildBoardConfig = {>BuildConfig,
     public var initGrid:String;
 }
 
-class BuildBoardRule extends BuildRule {
+class BuildBoardRule extends Rule {
 
     // Creates boards for "skirmish games"
 

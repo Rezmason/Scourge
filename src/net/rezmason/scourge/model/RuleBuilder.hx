@@ -15,7 +15,7 @@ class RuleBuilder {
         reqs.set("requireState", "stateAspectRequirements");
         reqs.set("requirePlayer", "playerAspectRequirements");
         reqs.set("requireNode", "nodeAspectRequirements");
-        //reqs.set("requireExtra", "extraAspectRequirements");
+        reqs.set("requireExtra", "extraAspectRequirements");
         reqs;
     }
 
@@ -24,7 +24,7 @@ class RuleBuilder {
         tables.set("requireState", "stateAspectLookup");
         tables.set("requirePlayer", "playerAspectLookup");
         tables.set("requireNode", "nodeAspectLookup");
-        //tables.set("requireExtra", "extraAspectLookup");
+        tables.set("requireExtra", "extraAspectLookup");
         tables;
     }
 
@@ -33,12 +33,27 @@ class RuleBuilder {
         "__initPointers",
     ];
 
-    @:macro public static function build() : Array<Field> {
+    @:macro public static function build():Array<Field> {
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
 
         var reqExpressions:Array<Expr> = [];
         var ptrExpressions:Array<Expr> = [];
+
+        inline function overrider(name:String, expressions:Array<Expr>):Field {
+            var func:Function = {params:[], args:[], ret:null, expr:{pos:pos, expr:EBlock(expressions)}};
+            return { name:name, doc:null, meta:[], access:[APrivate, AOverride], kind:FFun(func), pos:pos };
+        }
+
+        inline function constant(name:String):Expr { return { expr:EConst( CIdent( name ) ), pos:pos }; }
+
+        inline function prop(obj:Expr, name:String):Expr { return { expr:EField(obj, name), pos:pos}; }
+
+        inline function call(obj:Expr, name:String, args:Array<Expr>):Expr { return { expr:ECall(prop(obj, name), args), pos:pos}; }
+
+        inline function arrayLookup(obj:Expr, index:Expr):Expr { return { expr:EArray(obj, index), pos:pos}; }
+
+        inline function assign(left:Expr, right:Expr):Expr { return { expr:EBinop(OpAssign, left, right), pos:pos}; }
 
         for (field in fields) {
 
@@ -77,79 +92,17 @@ class RuleBuilder {
 
                     // reqs.push(Aspect.ASPECT)
 
-                    var reqExpr:Expr = {
-                        expr: ECall(
-                        {
-                            expr: EField(
-                            {
-                                expr: EConst( CIdent( reqName ) ),
-                                pos: pos
-                            },
-                            "push"
-                            ),
-                            pos: pos
-                        },
-                        [
-                            {
-                                expr: EField(
-                                    {
-                                        expr: EConst( CIdent( aspectCategory ) ),
-                                        pos: pos
-                                    },
-                                    aspectName
-                                ),
-                                pos: pos
-                            }
-                        ]
-                        ),
-                        pos: pos
-                    };
+                    var aspectExpr:Expr = prop(constant(aspectCategory), aspectName);
+                    var reqExpr:Expr = call(constant(reqName), "push", [aspectExpr]);
 
                     reqExpressions.push(reqExpr);
 
                     // field = plan.stateAspectLookup[Aspect.ASPECT.id];
 
-                    var ptrExpr:Expr = {
-                        expr: EBinop(
-                            OpAssign,
-                            {
-                                expr: EConst( CIdent( ptrName ) ),
-                                pos: pos
-                            },
-                            {
-                                expr: EArray(
-                                    {
-                                        expr: EField(
-                                            {
-                                                expr: EConst( CIdent( "plan" ) ),
-                                                pos: pos
-                                            },
-                                            lookupName
-                                        ),
-                                        pos: pos
-                                    },
-                                    {
-                                        expr: EField(
-                                            {
-                                                expr:EField(
-                                                    {
-                                                        expr: EConst( CIdent( aspectCategory ) ),
-                                                        pos: pos
-                                                    },
-                                                    aspectName
-                                                ),
-                                                pos: pos
-                                            },
-                                            "id"
-                                        ),
-                                        pos: pos
-                                    }
-                                ),
-                                pos: pos
-                            }
-                        ),
-                        pos: pos
-                    };
+                    var lookupExpr:Expr = prop(constant("plan"), lookupName);
+                    if (metaTag.name == "requireExtra") lookupExpr = constant(lookupName);
+
+                    var ptrExpr:Expr = assign(constant(ptrName), arrayLookup(lookupExpr, prop(aspectExpr, "id")));
 
                     ptrExpressions.push(ptrExpr);
 
@@ -158,15 +111,10 @@ class RuleBuilder {
             }
         }
 
-        fields.push(makePrivateFuncField("__initReqs", Context.currentPos(), reqExpressions));
-        fields.push(makePrivateFuncField("__initPtrs", Context.currentPos(), ptrExpressions));
+        fields.push(overrider("__initReqs", reqExpressions));
+        fields.push(overrider("__initPtrs", ptrExpressions));
 
         return fields;
-    }
-
-    private static function makePrivateFuncField(name:String, pos:Position, expressions:Array<Expr>):Field {
-        var func:Function = {params:[], args:[], ret:null, expr:{pos:pos, expr: EBlock(expressions)}};
-        return { name:name, doc:null, meta:[], access:[APrivate, AOverride], kind:FFun(func), pos:pos };
     }
 }
 

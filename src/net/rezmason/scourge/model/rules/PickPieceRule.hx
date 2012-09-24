@@ -2,7 +2,6 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.PieceAspect;
-import net.rezmason.scourge.model.rules.BuildRule;
 
 using net.rezmason.scourge.model.AspectUtils;
 using net.rezmason.utils.Pointers;
@@ -15,15 +14,15 @@ typedef PickPieceConfig = {>BuildConfig,
     public var hatSize:Int; // Number of pieces in the "hat" before it's refilled
 }
 
-@:build(net.rezmason.scourge.model.RuleBuilder.build()) class PickPieceRule extends BuildRule {
+@:build(net.rezmason.scourge.model.RuleBuilder.build()) class PickPieceRule extends Rule {
 
     static var stateReqs:AspectRequirements;
 
     private var cfg:PickPieceConfig;
 
-    //@requireExtra(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_:AspectPtr;
-    //@requireExtra(PieceAspect.PIECE_ID) var pieceID_:AspectPtr;
-    //@requireExtra(PieceAspect.PIECE_NEXT) var pieceNext_:AspectPtr;
+    @requireExtra(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_:AspectPtr;
+    @requireExtra(PieceAspect.PIECE_ID) var pieceID_:AspectPtr;
+    @requireExtra(PieceAspect.PIECE_NEXT) var pieceNext_:AspectPtr;
     @requireState(PieceAspect.PIECES_PICKED) var piecesPicked_:AspectPtr;
     @requireState(PieceAspect.PIECE_FIRST) var pieceFirst_:AspectPtr;
     @requireState(PieceAspect.PIECE_HAT_FIRST) var pieceHatFirst_:AspectPtr;

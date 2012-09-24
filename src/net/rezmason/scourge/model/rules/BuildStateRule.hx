@@ -2,7 +2,6 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.PlyAspect;
-import net.rezmason.scourge.model.rules.BuildRule;
 
 using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.Pointers;
@@ -11,7 +10,7 @@ typedef BuildStateConfig = {>BuildConfig,
     public var firstPlayer:Int;
 }
 
-@:build(net.rezmason.scourge.model.RuleBuilder.build()) class BuildStateRule extends BuildRule {
+@:build(net.rezmason.scourge.model.RuleBuilder.build()) class BuildStateRule extends Rule {
 
     private var cfg:BuildStateConfig;
 

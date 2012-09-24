@@ -1,13 +1,12 @@
 package net.rezmason.scourge.model.rules;
 
 import net.rezmason.scourge.model.ModelTypes;
-import net.rezmason.scourge.model.rules.BuildRule;
 
 typedef BuildPlayersConfig = {>BuildConfig,
     public var numPlayers:Int;
 }
 
-class BuildPlayersRule extends BuildRule {
+class BuildPlayersRule extends Rule {
 
     private var cfg:BuildPlayersConfig;
 
