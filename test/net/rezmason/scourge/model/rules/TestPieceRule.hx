@@ -13,31 +13,21 @@ typedef TestPieceConfig = {
 
 class TestPieceRule extends Rule {
 
-    static var stateReqs:AspectRequirements;
+    @state(PieceAspect.PIECE_ID) var pieceID_:AspectPtr;
+    @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
+    @state(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
 
     private var cfg:TestPieceConfig;
 
     public function new(cfg:TestPieceConfig):Void {
         super();
-
         this.cfg = cfg;
-
-        stateAspectRequirements = [
-            PieceAspect.PIECE_ID,
-            PieceAspect.PIECE_REFLECTION,
-            PieceAspect.PIECE_ROTATION,
-        ];
     }
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
-        var pieceID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_ID.id];
         state.aspects.mod(pieceID_, cfg.pieceID);
-
-        var pieceReflection_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_REFLECTION.id];
         state.aspects.mod(pieceReflection_, cfg.reflection);
-
-        var pieceRotation_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_ROTATION.id];
         state.aspects.mod(pieceRotation_, cfg.rotation);
     }
 }

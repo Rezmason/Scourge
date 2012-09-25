@@ -34,32 +34,17 @@ class BuildBoardRule extends Rule {
 
     var nodeAspectTemplate:AspectSet;
 
-    var nodeID_:AspectPtr;
-    var occupier_:AspectPtr;
-    var isFilled_:AspectPtr;
-    var head_:AspectPtr;
-    var bodyFirst_:AspectPtr;
-    var bodyNext_:AspectPtr;
-    var bodyPrev_:AspectPtr;
+    @node(BodyAspect.BODY_NEXT) var bodyNext_:AspectPtr;
+    @node(BodyAspect.BODY_PREV) var bodyPrev_:AspectPtr;
+    @node(BodyAspect.NODE_ID) var nodeID_:AspectPtr;
+    @node(OwnershipAspect.IS_FILLED) var isFilled_:AspectPtr;
+    @node(OwnershipAspect.OCCUPIER) var occupier_:AspectPtr;
+    @player(BodyAspect.BODY_FIRST) var bodyFirst_:AspectPtr;
+    @player(BodyAspect.HEAD) var head_:AspectPtr;
 
     public function new(cfg:BuildBoardConfig):Void {
         super();
-
         this.cfg = cfg;
-        if (cfg == null) throw "Missing board config.";
-
-        playerAspectRequirements = [
-            BodyAspect.HEAD,
-            BodyAspect.BODY_FIRST,
-        ];
-
-        nodeAspectRequirements = [
-            BodyAspect.NODE_ID,
-            OwnershipAspect.IS_FILLED,
-            OwnershipAspect.OCCUPIER,
-            BodyAspect.BODY_NEXT,
-            BodyAspect.BODY_PREV,
-        ];
     }
 
     override public function init(state:State, plan:StatePlan):Void {
@@ -67,16 +52,6 @@ class BuildBoardRule extends Rule {
         super.init(state, plan);
 
         nodeAspectTemplate = plan.nodeAspectTemplate.copy();
-
-        nodeID_ = nodePtr(BodyAspect.NODE_ID);
-
-        occupier_ = nodePtr(OwnershipAspect.OCCUPIER);
-        isFilled_ = nodePtr(OwnershipAspect.IS_FILLED);
-        head_ =   playerPtr(BodyAspect.HEAD);
-
-        bodyFirst_ = playerPtr(BodyAspect.BODY_FIRST);
-        bodyNext_ = nodePtr(BodyAspect.BODY_NEXT);
-        bodyPrev_ = nodePtr(BodyAspect.BODY_PREV);
 
         // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
         // Player 1's head is at a 45 degree angle

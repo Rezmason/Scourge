@@ -17,6 +17,7 @@ class BuildPlayersRule extends Rule {
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
+
         if (cfg.numPlayers < 1) throw "Invalid number of players in player config.";
 
         var historyState:State = cfg.historyState;

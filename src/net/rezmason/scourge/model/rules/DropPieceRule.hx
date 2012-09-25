@@ -23,67 +23,24 @@ typedef DropPieceConfig = {
 
 class DropPieceRule extends Rule {
 
-    var nodeID_:AspectPtr;
-    var occupier_:AspectPtr;
-    var isFilled_:AspectPtr;
-    var freshness_:AspectPtr;
-    var maxFreshness_:AspectPtr;
-    var currentPlayer_:AspectPtr;
-    var pieceID_:AspectPtr;
-
-    var pieceReflection_:AspectPtr;
-    var pieceRotation_:AspectPtr;
-
-    var bodyFirst_:AspectPtr;
-    var bodyNext_:AspectPtr;
-    var bodyPrev_:AspectPtr;
+    @node(BodyAspect.BODY_NEXT) var bodyNext_:AspectPtr;
+    @node(BodyAspect.BODY_PREV) var bodyPrev_:AspectPtr;
+    @node(BodyAspect.NODE_ID) var nodeID_:AspectPtr;
+    @node(FreshnessAspect.FRESHNESS) var freshness_:AspectPtr;
+    @node(OwnershipAspect.IS_FILLED) var isFilled_:AspectPtr;
+    @node(OwnershipAspect.OCCUPIER) var occupier_:AspectPtr;
+    @player(BodyAspect.BODY_FIRST) var bodyFirst_:AspectPtr;
+    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_:AspectPtr;
+    @state(PieceAspect.PIECE_ID) var pieceID_:AspectPtr;
+    @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
+    @state(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
+    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
 
     private var cfg:DropPieceConfig;
 
     public function new(cfg:DropPieceConfig):Void {
         super();
         this.cfg = cfg;
-
-        stateAspectRequirements = [
-            PlyAspect.CURRENT_PLAYER,
-            PieceAspect.PIECE_ID,
-            PieceAspect.PIECE_REFLECTION,
-            PieceAspect.PIECE_ROTATION,
-            FreshnessAspect.MAX_FRESHNESS,
-        ];
-
-        playerAspectRequirements = [
-            BodyAspect.HEAD,
-            BodyAspect.BODY_FIRST,
-        ];
-
-        nodeAspectRequirements = [
-            BodyAspect.NODE_ID,
-            OwnershipAspect.IS_FILLED,
-            OwnershipAspect.OCCUPIER,
-            FreshnessAspect.FRESHNESS,
-            BodyAspect.BODY_NEXT,
-            BodyAspect.BODY_PREV,
-        ];
-    }
-
-    override public function init(state:State, plan:StatePlan):Void {
-        super.init(state, plan);
-
-        nodeID_ = nodePtr(BodyAspect.NODE_ID);
-
-        freshness_ = nodePtr(FreshnessAspect.FRESHNESS);
-        maxFreshness_ = statePtr(FreshnessAspect.MAX_FRESHNESS);
-        occupier_ = nodePtr(OwnershipAspect.OCCUPIER);
-        isFilled_ = nodePtr(OwnershipAspect.IS_FILLED);
-        currentPlayer_ = statePtr(PlyAspect.CURRENT_PLAYER);
-        pieceID_ = statePtr(PieceAspect.PIECE_ID);
-        pieceReflection_ = statePtr(PieceAspect.PIECE_REFLECTION);
-        pieceRotation_ = statePtr(PieceAspect.PIECE_ROTATION);
-
-        bodyFirst_ = playerPtr(BodyAspect.BODY_FIRST);
-        bodyNext_ = nodePtr(BodyAspect.BODY_NEXT);
-        bodyPrev_ = nodePtr(BodyAspect.BODY_PREV);
     }
 
     override public function update():Void {

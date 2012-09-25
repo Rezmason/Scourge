@@ -20,60 +20,23 @@ typedef EatCellsConfig = {
 
 class EatCellsRule extends Rule {
 
-    var nodeID_:AspectPtr;
-    var occupier_:AspectPtr;
-    var isFilled_:AspectPtr;
-    var freshness_:AspectPtr;
-    var maxFreshness_:AspectPtr;
-    var head_:AspectPtr;
-    var currentPlayer_:AspectPtr;
-    var bodyFirst_:AspectPtr;
-    var bodyNext_:AspectPtr;
-    var bodyPrev_:AspectPtr;
+    @node(BodyAspect.BODY_NEXT) var bodyNext_:AspectPtr;
+    @node(BodyAspect.BODY_PREV) var bodyPrev_:AspectPtr;
+    @node(BodyAspect.NODE_ID) var nodeID_:AspectPtr;
+    @node(FreshnessAspect.FRESHNESS) var freshness_:AspectPtr;
+    @node(OwnershipAspect.IS_FILLED) var isFilled_:AspectPtr;
+    @node(OwnershipAspect.OCCUPIER) var occupier_:AspectPtr;
+    @player(BodyAspect.BODY_FIRST) var bodyFirst_:AspectPtr;
+    @player(BodyAspect.HEAD) var head_:AspectPtr;
+    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_:AspectPtr;
+    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
 
     private var cfg:EatCellsConfig;
 
     public function new(cfg:EatCellsConfig):Void {
         super();
         this.cfg = cfg;
-
-        stateAspectRequirements = [
-            PlyAspect.CURRENT_PLAYER,
-            FreshnessAspect.MAX_FRESHNESS,
-        ];
-
-        playerAspectRequirements = [
-            BodyAspect.HEAD,
-            BodyAspect.BODY_FIRST,
-        ];
-
-        nodeAspectRequirements = [
-            BodyAspect.NODE_ID,
-            OwnershipAspect.IS_FILLED,
-            OwnershipAspect.OCCUPIER,
-            FreshnessAspect.FRESHNESS,
-            BodyAspect.BODY_NEXT,
-            BodyAspect.BODY_PREV,
-        ];
-
         options.push({optionID:0});
-    }
-
-    override public function init(state:State, plan:StatePlan):Void {
-        super.init(state, plan);
-
-        nodeID_ = nodePtr(BodyAspect.NODE_ID);
-
-        occupier_ = nodePtr(OwnershipAspect.OCCUPIER);
-        isFilled_ = nodePtr(OwnershipAspect.IS_FILLED);
-        freshness_ = nodePtr(FreshnessAspect.FRESHNESS);
-        maxFreshness_ = statePtr(FreshnessAspect.MAX_FRESHNESS);
-        head_ =   playerPtr(BodyAspect.HEAD);
-        currentPlayer_ = statePtr(PlyAspect.CURRENT_PLAYER);
-
-        bodyFirst_ = playerPtr(BodyAspect.BODY_FIRST);
-        bodyNext_ = nodePtr(BodyAspect.BODY_NEXT);
-        bodyPrev_ = nodePtr(BodyAspect.BODY_PREV);
     }
 
     override public function chooseOption(choice:Int):Void {

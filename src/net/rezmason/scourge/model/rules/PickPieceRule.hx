@@ -20,15 +20,15 @@ class PickPieceRule extends Rule {
 
     private var cfg:PickPieceConfig;
 
-    @requireExtra(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_:AspectPtr;
-    @requireExtra(PieceAspect.PIECE_ID) var pieceID_:AspectPtr;
-    @requireExtra(PieceAspect.PIECE_NEXT) var pieceNext_:AspectPtr;
-    @requireState(PieceAspect.PIECES_PICKED) var piecesPicked_:AspectPtr;
-    @requireState(PieceAspect.PIECE_FIRST) var pieceFirst_:AspectPtr;
-    @requireState(PieceAspect.PIECE_HAT_FIRST) var pieceHatFirst_:AspectPtr;
-    @requireState(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
-    @requireState(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
-    @requireState(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
+    @extra(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_:AspectPtr;
+    @extra(PieceAspect.PIECE_ID) var pieceID_:AspectPtr;
+    @extra(PieceAspect.PIECE_NEXT) var pieceNext_:AspectPtr;
+    @state(PieceAspect.PIECES_PICKED) var piecesPicked_:AspectPtr;
+    @state(PieceAspect.PIECE_FIRST) var pieceFirst_:AspectPtr;
+    @state(PieceAspect.PIECE_HAT_FIRST) var pieceHatFirst_:AspectPtr;
+    @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
+    @state(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
+    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
 
     public function new(cfg:PickPieceConfig):Void {
         super();

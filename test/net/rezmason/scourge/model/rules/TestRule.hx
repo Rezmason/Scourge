@@ -5,12 +5,9 @@ import net.rezmason.scourge.model.aspects.TestAspect;
 
 class TestRule extends Rule {
 
-    public function new():Void {
-        super();
-
-        stateAspectRequirements.push(TestAspect.VALUE);
-        playerAspectRequirements.push(TestAspect.VALUE);
-        nodeAspectRequirements.push(TestAspect.VALUE);
-    }
+    @extra(TestAspect.VALUE) var extraVal_:AspectPtr;
+    @node(TestAspect.VALUE) var nodeVal_:AspectPtr;
+    @player(TestAspect.VALUE) var playerVal_:AspectPtr;
+    @state(TestAspect.VALUE) var stateVal_:AspectPtr;
 }
 

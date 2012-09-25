@@ -12,9 +12,9 @@ using net.rezmason.utils.Pointers;
 
 class EndTurnRule extends Rule {
 
-    var head_:AspectPtr;
-    var currentPlayer_:AspectPtr;
-    var maxFreshness_:AspectPtr;
+    @player(BodyAspect.HEAD) var head_:AspectPtr;
+    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
+    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_:AspectPtr;
 
     public function new():Void {
         super();
@@ -29,13 +29,6 @@ class EndTurnRule extends Rule {
         ];
 
         options.push({optionID:0});
-    }
-
-    override public function init(state:State, plan:StatePlan):Void {
-        super.init(state, plan);
-        head_ = playerPtr(BodyAspect.HEAD);
-        currentPlayer_ = statePtr(PlyAspect.CURRENT_PLAYER);
-        maxFreshness_ = statePtr(FreshnessAspect.MAX_FRESHNESS);
     }
 
     override public function chooseOption(choice:Int):Void {

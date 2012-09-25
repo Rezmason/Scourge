@@ -14,7 +14,7 @@ class BuildStateRule extends Rule {
 
     private var cfg:BuildStateConfig;
 
-    @requireState(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
+    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
 
     public function new(cfg:BuildStateConfig):Void {
         super();

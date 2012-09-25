@@ -13,30 +13,29 @@ class RuleBuilder {
 
     private static var reqsByMetaTag:Hash<String> = {
         var reqs:Hash<String> = new Hash<String>();
-        reqs.set("requireState", "stateAspectRequirements");
-        reqs.set("requirePlayer", "playerAspectRequirements");
-        reqs.set("requireNode", "nodeAspectRequirements");
-        reqs.set("requireExtra", "extraAspectRequirements");
+        reqs.set("state", "state");
+        reqs.set("player", "playerAspectRequirements");
+        reqs.set("node", "nodeAspectRequirements");
+        reqs.set("extra", "extraAspectRequirements");
         reqs;
     }
 
     private static var lookupTablesByMetaTag:Hash<String> = {
         var tables:Hash<String> = new Hash<String>();
-        tables.set("requireState", "stateAspectLookup");
-        tables.set("requirePlayer", "playerAspectLookup");
-        tables.set("requireNode", "nodeAspectLookup");
-        tables.set("requireExtra", "extraAspectLookup");
+        tables.set("state", "stateAspectLookup");
+        tables.set("player", "playerAspectLookup");
+        tables.set("node", "nodeAspectLookup");
+        tables.set("extra", "extraAspectLookup");
         tables;
     }
 
-    private static var restrictedFields:Array<String> = [
-        "__initReqs",
-        "__initPointers",
-    ];
+    private static var tags:Array<String> = [ "state", "player", "node", "extra" ];
+
+    private static var restrictedFields:Array<String> = [ "__initReqs", "__initPointers", ];
 
     @:macro public static function build():Array<Field> {
 
-        trace("GOD DAMN IT");
+        neko.Lib.print("Building " + Context.getLocalClass().get().name);
 
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
@@ -69,7 +68,7 @@ class RuleBuilder {
 
             for (metaTag in field.meta) {
 
-                if (reqsByMetaTag.exists(metaTag.name)) {
+                if (tags.has(metaTag.name)) {
 
                     var aspectExpr:Expr = metaTag.params[0];
                     metaTag.params = [];
@@ -77,8 +76,8 @@ class RuleBuilder {
                     var aspectCategory:String;
                     var aspectName:String;
                     var ptrName:String = field.name;
-                    var reqName:String = reqsByMetaTag.get(metaTag.name);
-                    var lookupName:String = lookupTablesByMetaTag.get(metaTag.name);
+                    var reqName:String = metaTag.name + "AspectRequirements";
+                    var lookupName:String = metaTag.name + "AspectLookup";
 
                     // EField({expr:EConst(CIdent(aspectCategory)), pos:pos}, aspectName)
 
@@ -94,13 +93,13 @@ class RuleBuilder {
                         throw new Error("invalid AspectProperty " + aspectExpr, field.pos);
                     }
 
-                    notes.push([field.name, aspectCategory, aspectName, metaTag.name.substr("require".length)]);
+                    notes.push([field.name, aspectCategory, aspectName, metaTag.name]);
 
                     // reqs.push(Aspect.ASPECT)
                     var reqExpr:Expr = call(constant(reqName), "push", [aspectExpr]);
 
                     // plan | this
-                    var lookupExpr:Expr = constant(metaTag.name == "requireExtra" ? "this" : "plan");
+                    var lookupExpr:Expr = constant(metaTag.name == "extra" ? "this" : "plan");
 
                     // field = plan.stateAspectLookup[Aspect.ASPECT.id];
                     var ptrExpr:Expr = assign(constant(ptrName), arrayLookup(prop(lookupExpr, lookupName), prop(aspectExpr, "id")));
@@ -113,7 +112,9 @@ class RuleBuilder {
             }
         }
 
-        if (notes.length > 0) printCaption(Context.getLocalClass().get().module, notes);
+        if (notes.length > 0) printCaption(notes);
+
+        neko.Lib.print("\n");
 
         fields.push(overrider("__initReqs", reqExpressions));
         fields.push(overrider("__initPtrs", ptrExpressions));
@@ -121,8 +122,11 @@ class RuleBuilder {
         return fields;
     }
 
-    private static function printCaption(module:String, notes:Array<Array<String>>):Void {
-        neko.Lib.println("Building " + module);
+    private static function printCaption(notes:Array<Array<String>>):Void {
+
+        /*
+        neko.Lib.println("");
+
         var column1:Int = 0;
         var column2:Int = 0;
         var column3:Int = 0;
@@ -141,8 +145,11 @@ class RuleBuilder {
 
             neko.Lib.println(str);
         }
+        */
 
-        neko.Lib.println("");
+        var str:String = "  ";
+        for (note in notes) str += note[3].charAt(0);
+        neko.Lib.print(str);
     }
 }
 
