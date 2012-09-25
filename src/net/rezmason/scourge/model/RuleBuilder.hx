@@ -2,12 +2,10 @@ package net.rezmason.scourge.model;
 
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import haxe.macro.Type;
 
 import net.rezmason.scourge.model.ModelTypes;
 
 using Lambda;
-using StringTools;
 using Type;
 
 class RuleBuilder {

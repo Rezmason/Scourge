@@ -41,7 +41,7 @@ class PieceRulesTest extends RuleTest
 	public function placePieceRuleTest1():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
             reflection:0,
             rotation:0,
         };
@@ -78,7 +78,7 @@ class PieceRulesTest extends RuleTest
     public function placePieceRuleTest2():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
             reflection:0,
             rotation:0,
         };
@@ -108,7 +108,7 @@ class PieceRulesTest extends RuleTest
     public function placePieceRuleTest3():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
             reflection:0,
             rotation:0,
         };
@@ -138,7 +138,7 @@ class PieceRulesTest extends RuleTest
     public function placePieceRuleTest4():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
             reflection:0,
             rotation:0,
         };
@@ -168,7 +168,7 @@ class PieceRulesTest extends RuleTest
     public function placePieceRuleTest5():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
             reflection:0,
             rotation:0,
         };
@@ -199,7 +199,7 @@ class PieceRulesTest extends RuleTest
         var pickPieceCfg:PickPieceConfig = {
             history:history,
             historyState:historyState,
-            pieceIDs:[0, 1, 2, 3, 4],
+            pieceTableIDs:[0, 1, 2, 3, 4],
             allowFlipping:true,
             allowRotating:true,
             allowAll:false,

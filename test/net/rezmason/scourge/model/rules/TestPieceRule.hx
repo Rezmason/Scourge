@@ -6,14 +6,14 @@ import net.rezmason.scourge.model.aspects.PieceAspect;
 using net.rezmason.utils.Pointers;
 
 typedef TestPieceConfig = {
-    var pieceID:Int;
+    var pieceTableID:Int;
     var reflection:Int;
     var rotation:Int;
 }
 
 class TestPieceRule extends Rule {
 
-    @state(PieceAspect.PIECE_ID) var pieceID_:AspectPtr;
+    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
     @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
     @state(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
 
@@ -26,7 +26,7 @@ class TestPieceRule extends Rule {
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
-        state.aspects.mod(pieceID_, cfg.pieceID);
+        state.aspects.mod(pieceTableID_, cfg.pieceTableID);
         state.aspects.mod(pieceReflection_, cfg.reflection);
         state.aspects.mod(pieceRotation_, cfg.rotation);
     }

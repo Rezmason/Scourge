@@ -7,7 +7,7 @@ using net.rezmason.scourge.model.AspectUtils;
 using net.rezmason.utils.Pointers;
 
 typedef PickPieceConfig = {>BuildConfig,
-    public var pieceIDs:Array<Int>; // The list of pieces available at any point in the game
+    public var pieceTableIDs:Array<Int>; // The list of pieces available at any point in the game
     public var allowFlipping:Bool; // If false, the reflection is left to chance
     public var allowRotating:Bool; // If false, the rotation is left to chance
     public var allowAll:Bool; // if true, nothing is left to chance
@@ -54,7 +54,7 @@ class PickPieceRule extends Rule {
 
         rand = random(0-cfg.pieces.length)
         piece = pieces[rand]
-        removeNode... SHIT
+        removeSet
         */
     }
 
@@ -70,7 +70,7 @@ class PickPieceRule extends Rule {
 
     private function buildPieces():Void {
         var allPieces:Array<AspectSet> = [];
-        for (id in cfg.pieceIDs) {
+        for (id in cfg.pieceTableIDs) {
             var piece:AspectSet = buildExtra();
             allPieces.push(piece);
             state.extras.push(piece);

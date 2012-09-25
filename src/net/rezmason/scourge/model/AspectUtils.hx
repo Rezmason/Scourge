@@ -18,23 +18,23 @@ class AspectUtils {
         return arr;
     }
 
-    public inline static function removeNode(me:AspectSet, list:Array<AspectSet>, next:AspectPtr, prev:AspectPtr):AspectSet {
-        var nextNodeID:Int = me.at(next);
-        var prevNodeID:Int = me.at(prev);
+    public inline static function removeSet(me:AspectSet, list:Array<AspectSet>, next:AspectPtr, prev:AspectPtr):AspectSet {
+        var nextSetID:Int = me.at(next);
+        var prevSetID:Int = me.at(prev);
 
-        var nextNode:AspectSet = null;
+        var nextSet:AspectSet = null;
 
         var wasConnected:Bool = false;
 
-        if (nextNodeID != Aspect.NULL) {
+        if (nextSetID != Aspect.NULL) {
             wasConnected = true;
-            nextNode = list[nextNodeID];
-            list[nextNodeID].mod(prev, prevNodeID);
+            nextSet = list[nextSetID];
+            list[nextSetID].mod(prev, prevSetID);
         }
 
-        if (prevNodeID != Aspect.NULL) {
+        if (prevSetID != Aspect.NULL) {
             wasConnected = true;
-            list[prevNodeID].mod(next, nextNodeID);
+            list[prevSetID].mod(next, nextSetID);
         }
 
         if (wasConnected) {
@@ -42,21 +42,21 @@ class AspectUtils {
             me.mod(prev, Aspect.NULL);
         }
 
-        return nextNode;
+        return nextSet;
     }
 
-    public inline static function addNode(you:AspectSet, me:AspectSet, list:Array<AspectSet>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):AspectSet {
-        removeNode(me, list, next, prev);
+    public inline static function addSet(you:AspectSet, me:AspectSet, list:Array<AspectSet>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):AspectSet {
+        removeSet(me, list, next, prev);
 
-        var prevNodeID:Int = you.at(prev);
+        var prevSetID:Int = you.at(prev);
         var myID:Int = me.at(id);
 
         me.mod(next, you.at(id));
-        me.mod(prev, prevNodeID);
+        me.mod(prev, prevSetID);
         you.mod(prev, myID);
-        if (prevNodeID != Aspect.NULL) {
-            var prevNode:AspectSet = list[prevNodeID];
-            prevNode.mod(next, myID);
+        if (prevSetID != Aspect.NULL) {
+            var prevSet:AspectSet = list[prevSetID];
+            prevSet.mod(next, myID);
         }
 
         return me;
@@ -69,10 +69,10 @@ class AspectUtils {
         var me:AspectSet = list[0];
 
         for (ike in 1...list.length) {
-            var nextNode:AspectSet = list[ike];
-            me.mod(next, nextNode.at(id));
-            nextNode.mod(prev, me.at(id));
-            me = nextNode;
+            var nextSet:AspectSet = list[ike];
+            me.mod(next, nextSet.at(id));
+            nextSet.mod(prev, me.at(id));
+            me = nextSet;
         }
 
         me.mod(next, Aspect.NULL);
@@ -98,10 +98,10 @@ class AspectSetIterator {
     }
 
     public function next():AspectSet {
-        var lastNode:AspectSet = me;
+        var lastSet:AspectSet = me;
         var meIndex:Int = me.at(aspectPointer);
         if (meIndex == Aspect.NULL) me = null;
         else me = list[meIndex];
-        return lastNode;
+        return lastSet;
     }
 }

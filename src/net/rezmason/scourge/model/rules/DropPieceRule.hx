@@ -31,7 +31,7 @@ class DropPieceRule extends Rule {
     @node(OwnershipAspect.OCCUPIER) var occupier_:AspectPtr;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_:AspectPtr;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_:AspectPtr;
-    @state(PieceAspect.PIECE_ID) var pieceID_:AspectPtr;
+    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
     @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
     @state(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
@@ -54,7 +54,7 @@ class DropPieceRule extends Rule {
         // Find edge nodes of current player
         var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge).array();
 
-        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(state.aspects.at(pieceID_))];
+        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(state.aspects.at(pieceTableID_))];
         var pieceReflection:Int = state.aspects.at(pieceReflection_);
         var pieceRotation:Int = state.aspects.at(pieceRotation_);
 
@@ -125,7 +125,7 @@ class DropPieceRule extends Rule {
         super.chooseOption(choice);
 
         var option:DropPieceOption = cast options[choice];
-        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(state.aspects.at(pieceID_))];
+        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(state.aspects.at(pieceTableID_))];
         var node:BoardNode = state.nodes[option.targetNode];
         var coords:Array<IntCoord> = pieceGroups[option.pieceID][option.reflection][option.rotation][0];
         var homeCoord:IntCoord = coords[0];
