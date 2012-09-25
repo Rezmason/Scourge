@@ -1,7 +1,5 @@
 Piece choice
 	Make hat out of EXTRAS
-		Extend BuildRule
-
 
 	Swapping is just an option of piece choice, you dope
 
