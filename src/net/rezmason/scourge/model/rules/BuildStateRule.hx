@@ -10,7 +10,7 @@ typedef BuildStateConfig = {>BuildConfig,
     public var firstPlayer:Int;
 }
 
-@:build(net.rezmason.scourge.model.RuleBuilder.build()) class BuildStateRule extends Rule {
+class BuildStateRule extends Rule {
 
     private var cfg:BuildStateConfig;
 

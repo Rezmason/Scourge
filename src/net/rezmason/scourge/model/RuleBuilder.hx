@@ -35,6 +35,9 @@ class RuleBuilder {
     ];
 
     @:macro public static function build():Array<Field> {
+
+        trace("GOD DAMN IT");
+
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
 
@@ -93,7 +96,7 @@ class RuleBuilder {
 
                     notes.push([field.name, aspectCategory, aspectName, metaTag.name.substr("require".length)]);
 
-                    // preqs.push(Aspect.ASPECT)
+                    // reqs.push(Aspect.ASPECT)
                     var reqExpr:Expr = call(constant(reqName), "push", [aspectExpr]);
 
                     // plan | this

@@ -14,7 +14,7 @@ typedef PickPieceConfig = {>BuildConfig,
     public var hatSize:Int; // Number of pieces in the "hat" before it's refilled
 }
 
-@:build(net.rezmason.scourge.model.RuleBuilder.build()) class PickPieceRule extends Rule {
+class PickPieceRule extends Rule {
 
     static var stateReqs:AspectRequirements;
 
