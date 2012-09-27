@@ -23,12 +23,13 @@ class BuildStateRule extends Rule {
 
     override public function init(state:State, plan:StatePlan):Void {
         super.init(state, plan);
+
         var aspects:AspectSet = buildAspectSet(plan.stateAspectTemplate);
-        for (ike in 0...aspects.length) state.aspects[ike] = ike;
+        for (ike in 0...aspects.length) state.aspects[ike] = aspects[ike];
 
         var historyState:State = cfg.historyState;
         var aspects:AspectSet = buildHistAspectSet(plan.stateAspectTemplate, cfg.history);
-        for (ike in 0...aspects.length) historyState.aspects[ike] = ike;
+        for (ike in 0...aspects.length) historyState.aspects[ike] = aspects[ike];
 
         state.aspects.mod(currentPlayer_, cfg.firstPlayer);
     }

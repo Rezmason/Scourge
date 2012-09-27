@@ -4,6 +4,7 @@ import massive.munit.Assert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
+import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.rules.DropPieceRule;
 import net.rezmason.scourge.model.rules.TestPieceRule;
 import net.rezmason.scourge.model.rules.PickPieceRule;
@@ -47,7 +48,7 @@ class PieceRulesTest extends RuleTest
         };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:true, growGraph:false};
+        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:true, growGraph:false, allowNowhere:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
@@ -84,7 +85,7 @@ class PieceRulesTest extends RuleTest
         };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:true, growGraph:false};
+        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:true, growGraph:false, allowNowhere:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
@@ -114,7 +115,7 @@ class PieceRulesTest extends RuleTest
         };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:false, growGraph:false};
+        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:true, allowRotating:false, growGraph:false, allowNowhere:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
@@ -144,7 +145,7 @@ class PieceRulesTest extends RuleTest
         };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:false, growGraph:false};
+        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:false, growGraph:false, allowNowhere:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
@@ -174,7 +175,7 @@ class PieceRulesTest extends RuleTest
         };
         var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {overlapSelf:true, allowFlipping:false, allowRotating:false, growGraph:false};
+        var dropConfig:DropPieceConfig = {overlapSelf:true, allowFlipping:false, allowRotating:false, growGraph:false, allowNowhere:false};
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
@@ -192,6 +193,29 @@ class PieceRulesTest extends RuleTest
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
+    }
+
+    @Test
+    public function placePieceRuleTest6():Void {
+
+        var dropConfig:DropPieceConfig = {overlapSelf:false, allowFlipping:false, allowRotating:false, growGraph:false, allowNowhere:true};
+        var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
+        makeState([dropRule], 1, TestBoards.emptyPetri);
+
+        dropRule.update();
+        var options:Array<DropPieceOption> = cast dropRule.options;
+
+        Assert.areEqual(1, options.length);
+
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        Assert.areEqual(1, numCells); // 1 cell for player 0
+
+        //trace(state.spitBoard(plan));
+        dropRule.chooseOption(0);
+        //trace(state.spitBoard(plan));
+
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        Assert.areEqual(1, numCells); // 5 cells for player 0
     }
 
     @Test

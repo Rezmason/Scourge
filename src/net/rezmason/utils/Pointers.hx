@@ -1,5 +1,10 @@
 package net.rezmason.utils;
 
+#if macro
+import haxe.macro.Context;
+import haxe.macro.Expr;
+#end
+
 #if USE_POINTERS
     typedef Ptr<T> = {
         var _(default, null):Null<Int>;

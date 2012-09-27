@@ -1,11 +1,14 @@
-Piece choice
-	Make hat out of EXTRAS
+Drop piece
+	Test for needless options
 
+Piece choice
 	Swapping is just an option of piece choice, you dope
 
 	Generating possible states from this is complicated
 		Quantum options - relate to future options
 		chooseQuantumOption
+
+Make sure to test extras in the state historian
 
 Per-ply replenishing
 	typedef ReplenishProperty = {

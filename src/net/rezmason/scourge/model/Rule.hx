@@ -10,7 +10,7 @@ using net.rezmason.utils.Pointers;
     var plan:StatePlan;
 
     public var options(default, null):Array<Option>;
-    public var quantumOptions(default, null):Array<QuantumOption>;
+    public var quantumOptions(default, null):Array<Option>;
     public var stateAspectRequirements(default, null):AspectRequirements;
     public var playerAspectRequirements(default, null):AspectRequirements;
     public var nodeAspectRequirements(default, null):AspectRequirements;

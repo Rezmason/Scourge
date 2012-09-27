@@ -19,6 +19,13 @@ typedef DropPieceConfig = {
     public var allowFlipping:Bool;
     public var allowRotating:Bool;
     public var growGraph:Bool;
+    public var allowNowhere:Bool;
+}
+
+typedef DropPieceOption = {>Option,
+    var targetNode:Int;
+    var rotation:Int;
+    var reflection:Int;
 }
 
 class DropPieceRule extends Rule {
@@ -47,26 +54,24 @@ class DropPieceRule extends Rule {
 
         var dropOptions:Array<DropPieceOption> = [];
 
-        // get current player head
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
+        if (state.aspects.at(pieceTableID_) != Aspect.NULL) {
 
-        // Find edge nodes of current player
-        var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge).array();
+            // get current player head
+            var currentPlayer:Int = state.aspects.at(currentPlayer_);
+            var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
 
-        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(state.aspects.at(pieceTableID_))];
-        var pieceReflection:Int = state.aspects.at(pieceReflection_);
-        var pieceRotation:Int = state.aspects.at(pieceRotation_);
+            // Find edge nodes of current player
+            var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge).array();
 
-        for (pieceIndex in 0...pieceGroups.length) {
+            var pieceGroup:PieceGroup = Pieces.getPieceById(state.aspects.at(pieceTableID_));
+            var pieceReflection:Int = state.aspects.at(pieceReflection_);
+            var pieceRotation:Int = state.aspects.at(pieceRotation_);
 
-            var PieceGroup:PieceGroup = pieceGroups[pieceIndex];
-
-            var allowedReflectionIndex:Int = pieceReflection % PieceGroup.length;
-            for (reflectionIndex in 0...PieceGroup.length) {
+            var allowedReflectionIndex:Int = pieceReflection % pieceGroup.length;
+            for (reflectionIndex in 0...pieceGroup.length) {
 
                 if (!cfg.allowFlipping && reflectionIndex != allowedReflectionIndex) continue;
-                var reflection:Array<Piece> = PieceGroup[reflectionIndex];
+                var reflection:Array<Piece> = pieceGroup[reflectionIndex];
 
                 var allowedRotationIndex:Int = pieceRotation % reflection.length;
                 for (rotationIndex in 0...reflection.length) {
@@ -107,7 +112,6 @@ class DropPieceRule extends Rule {
                         if (valid) {
                             dropOptions.push({
                                 targetNode:node.value.at(nodeID_),
-                                pieceID:pieceIndex,
                                 rotation:rotationIndex,
                                 reflection:reflectionIndex,
                                 optionID:dropOptions.length,
@@ -118,6 +122,11 @@ class DropPieceRule extends Rule {
             }
         }
 
+        if (cfg.allowNowhere) {
+            var nowhereOption:DropPieceOption = {targetNode:Aspect.NULL, rotation:0, reflection:0, optionID:dropOptions.length};
+            dropOptions.push(cast nowhereOption);
+        }
+
         options = cast dropOptions;
     }
 
@@ -125,19 +134,24 @@ class DropPieceRule extends Rule {
         super.chooseOption(choice);
 
         var option:DropPieceOption = cast options[choice];
-        var pieceGroups:Array<PieceGroup> = [Pieces.getPieceById(state.aspects.at(pieceTableID_))];
-        var node:BoardNode = state.nodes[option.targetNode];
-        var coords:Array<IntCoord> = pieceGroups[option.pieceID][option.reflection][option.rotation][0];
-        var homeCoord:IntCoord = coords[0];
-        var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
+        if (option.targetNode != Aspect.NULL) {
+            var pieceGroup:PieceGroup = Pieces.getPieceById(state.aspects.at(pieceTableID_));
+            var node:BoardNode = state.nodes[option.targetNode];
+            var coords:Array<IntCoord> = pieceGroup[option.reflection][option.rotation][0];
+            var homeCoord:IntCoord = coords[0];
+            var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
-        for (coord in coords) bodyNode = fillAndOccupyCell(walkNode(node, coord, homeCoord), currentPlayer, maxFreshness, bodyNode);
-        state.players[currentPlayer].mod(bodyFirst_, bodyNode.value.at(nodeID_));
+            var currentPlayer:Int = state.aspects.at(currentPlayer_);
+            var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
 
-        state.aspects.mod(maxFreshness_, maxFreshness);
+            for (coord in coords) bodyNode = fillAndOccupyCell(walkNode(node, coord, homeCoord), currentPlayer, maxFreshness, bodyNode);
+            state.players[currentPlayer].mod(bodyFirst_, bodyNode.value.at(nodeID_));
+
+            state.aspects.mod(maxFreshness_, maxFreshness);
+        }
+
+        state.aspects.mod(pieceTableID_, 0);
     }
 
     inline function isFreeEdge(node:BoardNode):Bool {
@@ -175,11 +189,3 @@ class DropPieceRule extends Rule {
         return node.run(Gr.n, dn).run(Gr.s, ds).run(Gr.e, de).run(Gr.w, dw);
     }
 }
-
-typedef DropPieceOption = {>Option,
-    var targetNode:Int;
-    var pieceID:Int;
-    var rotation:Int;
-    var reflection:Int;
-}
-
