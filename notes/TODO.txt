@@ -1,5 +1,3 @@
-Piece picking rule
-
 Swap rule
 
 Per-ply replenishing

@@ -124,31 +124,27 @@ class PickPieceRule extends Rule {
         // Create an option for every element being picked randomly
 
         for (pieceTableID in 0...pieceFrequencies.length) {
-            var pieceFrequency:Null<Int> = pieceFrequencies[pieceTableID];
-            if (pieceFrequency == 0 || pieceFrequency == null) continue;
+            var freq:Null<Int> = pieceFrequencies[pieceTableID];
+            if (freq == 0 || freq == null) continue;
 
             var piece:PieceGroup = Pieces.getPieceById(pieceTableID);
 
-            if (!cfg.allowFlipping) {
-                var flipWeight:Float = piece.length % 2;
-                for (reflection in 0...piece.length) {
-                    if (!cfg.allowRotating) {
-                        var spinWeight:Float = piece[reflection].length % 4;
-                        for (rotation in 0...piece[reflection].length) {
-                            makeOption(pieceTableID, reflection, rotation, pieceFrequency * flipWeight * spinWeight);
-                        }
-                    } else {
-                        makeOption(pieceTableID, reflection, 0, pieceFrequency * flipWeight);
-                    }
-                }
-            } else if (!cfg.allowRotating) {
-                var reflection:Int = 0;
-                var spinWeight:Float = piece[reflection].length % 4;
-                for (rotation in 0...piece[reflection].length) {
-                    makeOption(pieceTableID, 0, rotation, pieceFrequency * spinWeight);
+            if (cfg.allowFlipping) {
+                if (cfg.allowRotating) {
+                    makeOption(pieceTableID, 0, 0, freq);
+                } else {
+                    var spinWeight:Int = Std.int(piece[0].length / 4);
+                    for (rotation in 0...piece[0].length) makeOption(pieceTableID, 0, rotation, freq * spinWeight);
                 }
             } else {
-                makeOption(pieceTableID, 0, 0, pieceFrequency);
+                for (flip in 0...piece.length) {
+                    if (cfg.allowRotating) {
+                        makeOption(pieceTableID, flip, 0, freq);
+                    } else {
+                        var spinWeight:Int = Std.int(piece[flip].length / 4);
+                        for (rotation in 0...piece[flip].length) makeOption(pieceTableID, flip, rotation, freq * spinWeight);
+                    }
+                }
             }
         }
 
@@ -168,7 +164,7 @@ class PickPieceRule extends Rule {
         state.aspects.mod(pieceFirst_, allPieces[0].at(pieceID_));
     }
 
-    private function makeOption(pieceTableID:Int, reflection:Int, rotation:Int, weight:Float):Void {
+    private function makeOption(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):Void {
         allOptions.push({
             pieceTableID:pieceTableID,
             rotation:rotation,
@@ -209,8 +205,12 @@ class PickPieceRule extends Rule {
 
         state.aspects.mod(piecesPicked_, state.aspects.at(piecesPicked_) + 1);
 
+        var nextPiece:AspectSet = pickedPiece.removeSet(state.extras, pieceHatNext_, pieceHatPrev_);
 
-        pickedPiece.removeSet(state.extras, pieceHatNext_, pieceHatPrev_);
+        if (pickedPiece == firstHatPiece) {
+            firstHatPiece = nextPiece;
+            state.aspects.mod(pieceHatFirst_, firstHatPiece.at(pieceID_));
+        }
 
         return option;
     }
@@ -221,6 +221,7 @@ class PickPieceRule extends Rule {
         allPieces.chainByAspect(pieceID_, pieceHatNext_, pieceHatPrev_);
         state.aspects.mod(pieceHatFirst_, firstPiece.at(pieceID_));
         state.aspects.mod(piecesPicked_, 0);
+        state.aspects.mod(pieceHatPlayer_, state.aspects.at(currentPlayer_));
     }
 
     private function binarySearch(val:Float, list:Array<Float>):Int {

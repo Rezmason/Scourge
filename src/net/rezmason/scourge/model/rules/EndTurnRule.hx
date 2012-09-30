@@ -18,16 +18,6 @@ class EndTurnRule extends Rule {
 
     public function new():Void {
         super();
-
-        stateAspectRequirements = [
-            PlyAspect.CURRENT_PLAYER,
-            FreshnessAspect.MAX_FRESHNESS,
-        ];
-
-        playerAspectRequirements = [
-            BodyAspect.HEAD,
-        ];
-
         options.push({optionID:0});
     }
 

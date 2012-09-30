@@ -3,6 +3,7 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 
 import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.scourge.model.Aspect;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.rules.DropPieceRule;
@@ -221,11 +222,44 @@ class PieceRulesTest extends RuleTest
     @Test
     public function pickPieceTest():Void {
 
+        var hatSize:Int = 3;
+        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4];
         var pickPieceCfg:PickPieceConfig = {
             history:history,
             historyState:historyState,
-            pieceTableIDs:[0, 1, 2, 3, 4],
+            pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
+            allowRotating:true,
+            allowAll:false,
+            hatSize:hatSize,
+            randomFunction:function() return 0,
+        };
+        var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
+        makeState(cast [pickPieceRule], 1, TestBoards.emptyPetri);
+
+        var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
+
+        pickPieceRule.update();
+
+        for (ike in 0...hatSize + 1) {
+            Assert.areEqual(1, pickPieceRule.options.length);
+            Assert.areEqual(pieceTableIDs.length - (ike % hatSize), pickPieceRule.quantumOptions.length);
+            pickPieceRule.chooseOption(0);
+            state.aspects.mod(pieceTableID_, Aspect.NULL);
+            pickPieceRule.update();
+        }
+    }
+
+    @Test
+    public function pickPieceTestNoFlipping():Void {
+
+        var hatSize:Int = 3;
+        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 5]; // 5 is an L/J block
+        var pickPieceCfg:PickPieceConfig = {
+            history:history,
+            historyState:historyState,
+            pieceTableIDs:pieceTableIDs,
+            allowFlipping:false,
             allowRotating:true,
             allowAll:false,
             hatSize:3,
@@ -234,6 +268,67 @@ class PieceRulesTest extends RuleTest
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
         makeState(cast [pickPieceRule], 1, TestBoards.emptyPetri);
 
+        var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
+
         pickPieceRule.update();
+
+        Assert.areEqual(1, pickPieceRule.options.length);
+        Assert.areEqual(6, pickPieceRule.quantumOptions.length);
+    }
+
+    @Test
+    public function pickPieceTestNoSpinning():Void {
+
+        var hatSize:Int = 3;
+        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4];
+        var pickPieceCfg:PickPieceConfig = {
+            history:history,
+            historyState:historyState,
+            pieceTableIDs:pieceTableIDs,
+            allowFlipping:true,
+            allowRotating:false,
+            allowAll:false,
+            hatSize:3,
+            randomFunction:function() return 0,
+        };
+        var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
+        makeState(cast [pickPieceRule], 1, TestBoards.emptyPetri);
+
+        var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
+
+        pickPieceRule.update();
+
+        Assert.areEqual(1, pickPieceRule.options.length);
+        Assert.areEqual(11, pickPieceRule.quantumOptions.length);
+    }
+
+    @Test
+    public function pickPieceTestFreePickins():Void {
+
+        var hatSize:Int = 3;
+        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4];
+        var pickPieceCfg:PickPieceConfig = {
+            history:history,
+            historyState:historyState,
+            pieceTableIDs:pieceTableIDs,
+            allowFlipping:true,
+            allowRotating:true,
+            allowAll:true,
+            hatSize:3,
+            randomFunction:function() return 0,
+        };
+        var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
+        makeState(cast [pickPieceRule], 1, TestBoards.emptyPetri);
+
+        var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
+
+        pickPieceRule.update();
+
+        for (ike in 0...hatSize + 1) {
+            Assert.areEqual(pieceTableIDs.length, pickPieceRule.options.length);
+            pickPieceRule.chooseOption(0);
+            state.aspects.mod(pieceTableID_, Aspect.NULL);
+            pickPieceRule.update();
+        }
     }
 }
