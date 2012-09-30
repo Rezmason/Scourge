@@ -1,14 +1,6 @@
-Drop piece
-	Test for needless options
+Piece picking rule
 
-Piece choice
-	Swapping is just an option of piece choice, you dope
-
-	Generating possible states from this is complicated
-		Quantum options - relate to future options
-		chooseQuantumOption
-
-Make sure to test extras in the state historian
+Swap rule
 
 Per-ply replenishing
 	typedef ReplenishProperty = {
@@ -42,16 +34,14 @@ Cavities
 	Biting through these should be an option
 	Tough?
 
-
 Infinite board
 	Expand board when placing a piece
 	Tough?
 
-Rule macros
-	@stateAspect(BodyAspect.HEAD)
-	@playerAspect
-	@nodeAspect
-	BuildRule: macro @extraAspect
+Maybe turn nodes into aspects
+	Store their neighbors on them
+
+Make sure to test extras in the state historian
 
 Group rules together!
 	Rule groups are updated after rules are updated

@@ -46,6 +46,7 @@ using net.rezmason.utils.Pointers;
     private function __initReqs():Void {}
     private function __initPtrs():Void {}
 
+    // Note: Rules *should not* change the State during the update function.
     public function update():Void {}
 
     public function chooseOption(choice:Int):Void {
