@@ -220,6 +220,7 @@ class PieceRulesTest extends RuleTest
 
     @Test
     public function pickPieceTest():Void {
+
         var pickPieceCfg:PickPieceConfig = {
             history:history,
             historyState:historyState,
@@ -228,6 +229,7 @@ class PieceRulesTest extends RuleTest
             allowRotating:true,
             allowAll:false,
             hatSize:3,
+            randomFunction:function() return 0,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
         makeState(cast [pickPieceRule], 1, TestBoards.emptyPetri);

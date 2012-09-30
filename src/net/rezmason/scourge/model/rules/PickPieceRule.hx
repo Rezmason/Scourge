@@ -14,6 +14,7 @@ typedef PickPieceConfig = {>BuildConfig,
     public var allowRotating:Bool; // If false, the rotation is left to chance
     public var allowAll:Bool; // if true, nothing is left to chance
     public var hatSize:Int; // Number of pieces in the "hat" before it's refilled
+    public var randomFunction:Void->Float; // Source of random numbers
 }
 
 typedef PickPieceOption = {>Option,
@@ -72,7 +73,9 @@ class PickPieceRule extends Rule {
         if (cfg.allowAll) {
             options = cast allOptions.copy();
             quantumOptions = [];
-        } else if (state.aspects.at(pieceHatPlayer_) != state.aspects.at(currentPlayer_)) {
+        } else if (
+                state.aspects.at(pieceHatPlayer_) != state.aspects.at(currentPlayer_) ||
+                state.aspects.at(piecesPicked_) == cfg.hatSize) {
             remakeHat = true;
             options = [pickOption];
             quantumOptions = cast allOptions.copy();
@@ -188,11 +191,24 @@ class PickPieceRule extends Rule {
         var firstHatPiece:AspectSet = state.extras[state.aspects.at(pieceHatFirst_)];
         var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
 
-        if (option == null) {
-            // pick an element
+        var maxWeight:Float = 0;
+        var weights:Array<Float> = [];
+        for (piece in hatPieces) {
+            weights.push(maxWeight);
+            maxWeight += allOptions[piece.at(pieceOptionID_)].weight;
         }
 
-        var pickedPiece:AspectSet = state.extras[option.hatIndex];
+        var pickedPiece:AspectSet = null;
+        if (option == null) {
+            var pick:Float = cfg.randomFunction() * maxWeight;
+            pickedPiece = hatPieces[binarySearch(pick, weights)];
+            option = allOptions[pickedPiece.at(pieceOptionID_)];
+        } else {
+            pickedPiece = state.extras[option.hatIndex];
+        }
+
+        state.aspects.mod(piecesPicked_, state.aspects.at(piecesPicked_) + 1);
+
 
         pickedPiece.removeSet(state.extras, pieceHatNext_, pieceHatPrev_);
 
@@ -205,5 +221,17 @@ class PickPieceRule extends Rule {
         allPieces.chainByAspect(pieceID_, pieceHatNext_, pieceHatPrev_);
         state.aspects.mod(pieceHatFirst_, firstPiece.at(pieceID_));
         state.aspects.mod(piecesPicked_, 0);
+    }
+
+    private function binarySearch(val:Float, list:Array<Float>):Int {
+        function search(min:Int, max:Int):Int {
+            var halfway:Int = Std.int((min + max) * 0.5);
+            if (max < min) return -1;
+            else if (list[halfway] > val) return search(min, halfway - 1);
+            else if (list[halfway] < val) return search(halfway + 1, max);
+            else return halfway;
+        }
+
+        return search(0, list.length);
     }
 }
