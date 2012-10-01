@@ -60,6 +60,8 @@ class StateHistorianTest {
         var rules:Array<Rule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule];
         var plan:StatePlan = new StatePlanner().planState(state, rules);
 
+        for (rule in rules) rule.prime(state, plan);
+
         var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
 
 		var board0:String = state.spitBoard(plan);

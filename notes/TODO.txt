@@ -1,5 +1,3 @@
-Swap rule
-
 Per-ply replenishing
 	typedef ReplenishProperty = {
 		prop:AspectProperty,

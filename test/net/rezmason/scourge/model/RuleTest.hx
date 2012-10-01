@@ -66,6 +66,7 @@ class RuleTest
         rules.unshift(buildStateRule);
 
         plan = new StatePlanner().planState(state, rules);
+        for (rule in rules) rule.prime(state, plan);
     }
 
     private function testListLength(expectedLength:Int, first:BoardNode, next:AspectPtr, prev:AspectPtr):Int {

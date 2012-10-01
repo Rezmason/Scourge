@@ -24,8 +24,7 @@ class TestPieceRule extends Rule {
         this.cfg = cfg;
     }
 
-    override public function init(state:State, plan:StatePlan):Void {
-        super.init(state, plan);
+    override public function init():Void {
         state.aspects.mod(pieceTableID_, cfg.pieceTableID);
         state.aspects.mod(pieceReflection_, cfg.reflection);
         state.aspects.mod(pieceRotation_, cfg.rotation);

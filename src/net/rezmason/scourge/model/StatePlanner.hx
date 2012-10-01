@@ -22,6 +22,7 @@ class StatePlanner {
         var plan:StatePlan = new StatePlan();
 
         for (ike in 0...rules.length) if (rules.indexOf(rules[ike]) != ike) rules[ike] = null;
+        rules = rules.copy();
         while (rules.remove(null)) {}
 
         var stateRequirements:AspectRequirements = new AspectRequirements();
@@ -37,8 +38,6 @@ class StatePlanner {
         planAspects(stateRequirements, plan.stateAspectLookup, plan.stateAspectTemplate);
         planAspects(playerRequirements, plan.playerAspectLookup, plan.playerAspectTemplate);
         planAspects(nodeRequirements, plan.nodeAspectLookup, plan.nodeAspectTemplate);
-
-        for (rule in rules) rule.init(state, plan);
 
         return plan;
     }

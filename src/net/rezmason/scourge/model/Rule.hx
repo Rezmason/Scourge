@@ -31,7 +31,7 @@ using net.rezmason.utils.Pointers;
         __initReqs();
     }
 
-    public function init(state:State, plan:StatePlan):Void {
+    public function prime(state:State, plan:StatePlan):Void {
         this.state = state;
         this.plan = plan;
 
@@ -41,7 +41,10 @@ using net.rezmason.utils.Pointers;
             extraAspectTemplate[ike] = prop.initialValue;
         }
         __initPtrs();
+        init();
     }
+
+    public function init():Void {}
 
     private function __initReqs():Void {}
     private function __initPtrs():Void {}

@@ -9,6 +9,7 @@ import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.rules.DropPieceRule;
 import net.rezmason.scourge.model.rules.TestPieceRule;
 import net.rezmason.scourge.model.rules.PickPieceRule;
+import net.rezmason.scourge.model.rules.SwapPieceRule;
 
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
@@ -330,5 +331,31 @@ class PieceRulesTest extends RuleTest
             state.aspects.mod(pieceTableID_, Aspect.NULL);
             pickPieceRule.update();
         }
+    }
+
+    @Test
+    public function swapPieceTest():Void {
+        var swapPieceCfg:SwapPieceConfig = {
+            startingSwaps:5,
+        };
+        var swapPieceRule:SwapPieceRule = new SwapPieceRule(swapPieceCfg);
+        makeState(cast [swapPieceRule], 1, TestBoards.emptyPetri);
+
+        var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
+
+        state.aspects.mod(pieceTableID_, 0);
+
+        swapPieceRule.update();
+
+        for (ike in 0...swapPieceCfg.startingSwaps) {
+            Assert.areEqual(1, swapPieceRule.options.length);
+            swapPieceRule.chooseOption(0);
+            swapPieceRule.update();
+            Assert.areEqual(0, swapPieceRule.options.length);
+            state.aspects.mod(pieceTableID_, 0);
+            swapPieceRule.update();
+        }
+
+        Assert.areEqual(0, swapPieceRule.options.length);
     }
 }

@@ -62,8 +62,7 @@ class PickPieceRule extends Rule {
         if (cfg.hatSize > cfg.pieceTableIDs.length) cfg.hatSize = cfg.pieceTableIDs.length;
     }
 
-    override public function init(state:State, plan:StatePlan):Void {
-        super.init(state, plan);
+    override public function init():Void {
         buildPieceOptions();
     }
 

@@ -43,6 +43,8 @@ class StatePlannerTest {
         var state:State = new State();
         var plan:StatePlan = planner.planState(state, rules);
 
+        for (rule in rules) if (rule != null) rule.prime(state, plan);
+
         // Make sure there's the right aspects on the state
 
         var stateTestValue_:AspectPtr = plan.stateAspectLookup[TestAspect.VALUE.id];

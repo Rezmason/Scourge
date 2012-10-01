@@ -21,8 +21,7 @@ class BuildStateRule extends Rule {
         this.cfg = cfg;
     }
 
-    override public function init(state:State, plan:StatePlan):Void {
-        super.init(state, plan);
+    override public function init():Void {
 
         var aspects:AspectSet = buildAspectSet(plan.stateAspectTemplate);
         for (ike in 0...aspects.length) state.aspects[ike] = aspects[ike];
