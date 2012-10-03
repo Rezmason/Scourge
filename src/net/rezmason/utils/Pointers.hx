@@ -45,4 +45,10 @@ class Pointers {
         #else return i;
         #end
     }
+
+    public inline static function pointerToInt<T>(p:Ptr<T>):Int {
+        #if USE_POINTERS if (p == null) throw "Null pointer"; return p._;
+        #else return p;
+        #end
+    }
 }

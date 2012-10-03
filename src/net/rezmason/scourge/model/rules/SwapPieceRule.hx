@@ -38,6 +38,7 @@ class SwapPieceRule extends Rule {
     }
 
     override public function chooseOption(choice:Int):Void {
+        super.chooseOption(choice);
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var numSwaps:Int = state.players[currentPlayer].at(numSwaps_);
         state.players[currentPlayer].mod(numSwaps_, numSwaps - 1);

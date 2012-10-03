@@ -1,14 +1,11 @@
-Per-ply replenishing
-	typedef ReplenishProperty = {
-		prop:AspectProperty,
-		amount:Int,
-		period:Int,
-	}
+Test per-ply replenishing
+	On the state
+	On players
+	On nodes
 
-	Config
-		playerValues:Array<ReplenishProperty>
-		stateValues:Array<ReplenishProperty>
-		nodeValues:Array<ReplenishProperty>
+Abolish template modding
+	Let's just not pass initial vals into alloc!
+	Set it and forget it. ;-)
 
 Biting
 	Config
