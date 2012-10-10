@@ -125,18 +125,20 @@ class BoardUtils {
         nodes = nodes.copy();
         while (nodes.remove(null)) {}
 
-        var node:BoardNode = nodes[0];
+        if (nodes.length > 0) {
+            var node:BoardNode = nodes[0];
 
-        for (ike in 1...nodes.length) {
-            var nextNode:BoardNode = nodes[ike];
-            node.value.mod(next, nextNode.value.at(id));
-            nextNode.value.mod(prev, node.value.at(id));
-            node = nextNode;
+            for (ike in 1...nodes.length) {
+                var nextNode:BoardNode = nodes[ike];
+                node.value.mod(next, nextNode.value.at(id));
+                nextNode.value.mod(prev, node.value.at(id));
+                node = nextNode;
+            }
+
+            node.value.mod(next, Aspect.NULL);
+            node = nodes[0];
+            node.value.mod(prev, Aspect.NULL);
         }
-
-        node.value.mod(next, Aspect.NULL);
-        node = nodes[0];
-        node.value.mod(prev, Aspect.NULL);
     }
 }
 

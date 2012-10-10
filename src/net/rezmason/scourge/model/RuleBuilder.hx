@@ -43,11 +43,13 @@ class RuleBuilder {
                     var aspectExpr:Expr = metaTag.params[0];
                     metaTag.params = [];
 
+                    /*
                     if (Context.typeof(aspectExpr).enumParameters()[0].get().name != "AspectProperty") {
                         Context.warning("Value assigned to " + field.name + " is not an AspectProperty", aspectExpr.pos);
                         neko.Lib.print("X");
                         continue;
                     }
+                    */
 
                     if (field.access.has(AStatic)) {
                         Context.warning(field.name + " cannot be static", field.pos);

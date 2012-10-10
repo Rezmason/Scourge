@@ -63,21 +63,25 @@ class AspectUtils {
     }
 
     public inline static function chainByAspect(list:Array<AspectSet>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):Void {
+
         list = list.copy();
         while (list.remove(null)) {}
 
-        var me:AspectSet = list[0];
+        if (list.length > 0) {
 
-        for (ike in 1...list.length) {
-            var nextSet:AspectSet = list[ike];
-            me.mod(next, nextSet.at(id));
-            nextSet.mod(prev, me.at(id));
-            me = nextSet;
+            var me:AspectSet = list[0];
+
+            for (ike in 1...list.length) {
+                var nextSet:AspectSet = list[ike];
+                me.mod(next, nextSet.at(id));
+                nextSet.mod(prev, me.at(id));
+                me = nextSet;
+            }
+
+            me.mod(next, Aspect.NULL);
+            me = list[0];
+            me.mod(prev, Aspect.NULL);
         }
-
-        me.mod(next, Aspect.NULL);
-        me = list[0];
-        me.mod(prev, Aspect.NULL);
     }
 }
 

@@ -9,11 +9,11 @@ using net.rezmason.scourge.model.AspectUtils;
 using net.rezmason.utils.Pointers;
 
 typedef ReplenishableConfig = {
-    var prop:AspectProperty;
-    var amount:Int;
-    var period:Int;
-    var maxAmount:Int;
-    @optional var replenishableID:Int;
+    prop:AspectProperty,
+    amount:Int,
+    period:Int,
+    maxAmount:Int,
+    ?replenishableID:Int, // Not preferred syntax; ask the list
 }
 
 typedef ReplenishConfig = {>BuildConfig,
@@ -74,14 +74,26 @@ class ReplenishRule extends Rule {
             nodeReps.push(replenishable);
         }
 
-        stateReps.chainByAspect(repID_, repNext_, repPrev_);
-        state.aspects.mod(stateRepFirst_, stateReps[0].at(repID_));
+        if (stateReps.length > 0) {
+            stateReps.chainByAspect(repID_, repNext_, repPrev_);
+            state.aspects.mod(stateRepFirst_, stateReps[0].at(repID_));
+        } else {
+            state.aspects.mod(stateRepFirst_, Aspect.NULL);
+        }
 
-        playerReps.chainByAspect(repID_, repNext_, repPrev_);
-        state.aspects.mod(playerRepFirst_, playerReps[0].at(repID_));
+        if (playerReps.length > 0) {
+            playerReps.chainByAspect(repID_, repNext_, repPrev_);
+            state.aspects.mod(playerRepFirst_, playerReps[0].at(repID_));
+        } else {
+            state.aspects.mod(playerRepFirst_, Aspect.NULL);
+        }
 
-        nodeReps.chainByAspect(repID_, repNext_, repPrev_);
-        state.aspects.mod(nodeRepFirst_, nodeReps[0].at(repID_));
+        if (nodeReps.length > 0) {
+            nodeReps.chainByAspect(repID_, repNext_, repPrev_);
+            state.aspects.mod(nodeRepFirst_, nodeReps[0].at(repID_));
+        } else {
+            state.aspects.mod(nodeRepFirst_, Aspect.NULL);
+        }
     }
 
     override public function chooseOption(choice:Int):Void {
@@ -105,12 +117,12 @@ class ReplenishRule extends Rule {
         return rep;
     }
 
-    private function updateReps(repCfgs:Array<ReplenishConfig>, updateFunc:ReplenishConfig->AspectPtr->Void):Void {
-        for (repCfg in cfg.stateProperties) {
+    private function updateReps(repCfgs:Array<ReplenishableConfig>, updateFunc:ReplenishableConfig->AspectPtr->Void):Void {
+        for (repCfg in repCfgs) {
             var replenishable:AspectSet = state.extras[repCfg.replenishableID];
             var step:Int = replenishable.at(repStep_);
             step++;
-            if (step > repCfg.period) {
+            if (step == repCfg.period) {
                 step = 0;
                 var ptr:AspectPtr = replenishable.at(repPropLookup_).pointerArithmetic();
                 updateFunc(repCfg, ptr);
@@ -119,7 +131,7 @@ class ReplenishRule extends Rule {
         }
     }
 
-    private function updateState(repCfg:ReplenishConfig, ptr:AspectPtr):Void {
+    private function updateState(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
         var value:Int = state.aspects.at(ptr);
         value += repCfg.amount;
         if (value > repCfg.maxAmount) value = repCfg.maxAmount;
@@ -127,17 +139,17 @@ class ReplenishRule extends Rule {
     }
 
 
-    private function updatePlayers(repCfg:ReplenishConfig, ptr:AspectPtr):Void {
+    private function updatePlayers(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
         for (player in state.players) {
-            var value:Int = player.aspects.at(ptr);
+            var value:Int = player.at(ptr);
             value += repCfg.amount;
             if (value > repCfg.maxAmount) value = repCfg.maxAmount;
-            player.aspects.mod(ptr, value);
+            player.mod(ptr, value);
         }
     }
 
 
-    private function updateNodes(repCfg:ReplenishConfig, ptr:AspectPtr):Void {
+    private function updateNodes(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
         for (node in state.nodes) {
             var value:Int = node.value.at(ptr);
             value += repCfg.amount;

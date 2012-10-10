@@ -5,8 +5,10 @@ import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
+import Math.*;
+import Std.int;
+
 using Lambda;
-using Std;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.Pointers;
@@ -56,17 +58,17 @@ class BuildBoardRule extends Rule {
 
         var numPlayers:Int = state.players.length;
         var headAngle:Float = 2 / numPlayers;
-        var boardRadius:Float = (numPlayers == 1) ? 0 : PLAYER_DIST / (2 * Math.sin(Math.PI * headAngle * 0.5));
+        var boardRadius:Float = (numPlayers == 1) ? 0 : PLAYER_DIST / (2 * sin(PI * headAngle * 0.5));
 
         // First, find the bounds of the rectangle containing all heads as if they were arranged on a circle
 
         var headCoords:Array<XY> = [];
         for (ike in 0...numPlayers) {
-            var angle:Float = Math.PI * (ike * headAngle + START_ANGLE);
+            var angle:Float = PI * (ike * headAngle + START_ANGLE);
             var coord:XY = {x:0., y:0.};
             headCoords.push(coord);
-            coord.x = Math.cos(angle) * boardRadius;
-            coord.y = Math.sin(angle) * boardRadius;
+            coord.x = cos(angle) * boardRadius;
+            coord.y = sin(angle) * boardRadius;
         }
 
         var minCoord:XY = findMinCoord(headCoords);
@@ -79,8 +81,8 @@ class BuildBoardRule extends Rule {
         // So we scale their positions to fit within a square.
 
         for (coord in headCoords) {
-            coord.x = Math.floor(coord.x / scaleX);
-            coord.y = Math.floor(coord.y / scaleY);
+            coord.x = floor(coord.x / scaleX);
+            coord.y = floor(coord.y / scaleY);
         }
 
         minCoord = findMinCoord(headCoords);
@@ -88,11 +90,11 @@ class BuildBoardRule extends Rule {
 
         // The square's width and the positions of each head are returned.
 
-        var boardWidth:Int = Std.int(maxCoord.x - minCoord.x + 1 + 2 * PADDING);
+        var boardWidth:Int = int(maxCoord.x - minCoord.x + 1 + 2 * PADDING);
 
         for (coord in headCoords) {
-            coord.x = Std.int(coord.x + PADDING - minCoord.x);
-            coord.y = Std.int(coord.y + PADDING - minCoord.y);
+            coord.x = int(coord.x + PADDING - minCoord.x);
+            coord.y = int(coord.y + PADDING - minCoord.y);
         }
 
         var grid:BoardNode = makeSquareGraph(boardWidth);
@@ -104,8 +106,8 @@ class BuildBoardRule extends Rule {
     }
 
     inline function findMinCoord(coords:Array<XY>):XY {
-        var minX:Float = Math.POSITIVE_INFINITY;
-        var minY:Float = Math.POSITIVE_INFINITY;
+        var minX:Float = POSITIVE_INFINITY;
+        var minY:Float = POSITIVE_INFINITY;
         for (coord in coords) {
             if (minX > coord.x) minX = coord.x;
             if (minY > coord.y) minY = coord.y;
@@ -114,8 +116,8 @@ class BuildBoardRule extends Rule {
     }
 
     inline function findMaxCoord(coords:Array<XY>):XY {
-        var maxX:Float = Math.NEGATIVE_INFINITY;
-        var maxY:Float = Math.NEGATIVE_INFINITY;
+        var maxX:Float = NEGATIVE_INFINITY;
+        var maxY:Float = NEGATIVE_INFINITY;
 
         for (coord in coords) {
             if (maxX < coord.x) maxX = coord.x;
@@ -171,7 +173,7 @@ class BuildBoardRule extends Rule {
 
         for (ike in 0...headCoords.length) {
             var coord:XY = headCoords[ike];
-            var head:BoardNode = grid.run(Gr.e, coord.x.int()).run(Gr.s, coord.y.int());
+            var head:BoardNode = grid.run(Gr.e, int(coord.x)).run(Gr.s, int(coord.y));
             state.players[ike].mod(head_, head.value.at(nodeID_));
             head.value.mod(isFilled_, Aspect.TRUE);
             head.value.mod(occupier_, ike);
@@ -188,7 +190,7 @@ class BuildBoardRule extends Rule {
                 if (column.value.at(isFilled_) == 0) {
                     var fx:Float = x - radius + 0.5 - RIM;
                     var fy:Float = y - radius + 0.5 - RIM;
-                    var insideCircle:Bool = Math.sqrt(fx * fx + fy * fy) < radius;
+                    var insideCircle:Bool = sqrt(fx * fx + fy * fy) < radius;
                     if (!insideCircle) column.value.mod(isFilled_, 1);
                 }
                 x++;

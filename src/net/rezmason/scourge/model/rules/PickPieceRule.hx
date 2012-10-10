@@ -5,6 +5,8 @@ import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 
+import Std.int;
+
 using net.rezmason.scourge.model.AspectUtils;
 using net.rezmason.utils.Pointers;
 
@@ -132,7 +134,7 @@ class PickPieceRule extends Rule {
                 if (cfg.allowRotating) {
                     makeOption(pieceTableID, 0, 0, freq);
                 } else {
-                    var spinWeight:Int = Std.int(piece[0].length / 4);
+                    var spinWeight:Int = int(piece[0].length / 4);
                     for (rotation in 0...piece[0].length) makeOption(pieceTableID, 0, rotation, freq * spinWeight);
                 }
             } else {
@@ -140,7 +142,7 @@ class PickPieceRule extends Rule {
                     if (cfg.allowRotating) {
                         makeOption(pieceTableID, flip, 0, freq);
                     } else {
-                        var spinWeight:Int = Std.int(piece[flip].length / 4);
+                        var spinWeight:Int = int(piece[flip].length / 4);
                         for (rotation in 0...piece[flip].length) makeOption(pieceTableID, flip, rotation, freq * spinWeight);
                     }
                 }
@@ -225,7 +227,7 @@ class PickPieceRule extends Rule {
 
     private function binarySearch(val:Float, list:Array<Float>):Int {
         function search(min:Int, max:Int):Int {
-            var halfway:Int = Std.int((min + max) * 0.5);
+            var halfway:Int = int((min + max) * 0.5);
             if (max < min) return -1;
             else if (list[halfway] > val) return search(min, halfway - 1);
             else if (list[halfway] < val) return search(halfway + 1, max);

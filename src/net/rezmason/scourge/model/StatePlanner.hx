@@ -6,7 +6,6 @@ import net.rezmason.scourge.model.Aspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 
 using Lambda;
-using Std;
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.Pointers;

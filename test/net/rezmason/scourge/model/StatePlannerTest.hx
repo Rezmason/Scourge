@@ -47,17 +47,17 @@ class StatePlannerTest {
 
         // Make sure there's the right aspects on the state
 
-        var stateTestValue_:AspectPtr = plan.stateAspectLookup[TestAspect.VALUE.id];
+        var stateTestValue_:AspectPtr = plan.stateAspectLookup[TestAspect.VALUE_1.id];
         Assert.isNotNull(state.aspects.at(stateTestValue_));
 
         // Make sure there's the right aspects on each player
-        var playerTestValue_:AspectPtr = plan.playerAspectLookup[TestAspect.VALUE.id];
+        var playerTestValue_:AspectPtr = plan.playerAspectLookup[TestAspect.VALUE_1.id];
         for (ike in 0...state.players.length) {
             Assert.isNotNull(state.players[ike].at(playerTestValue_));
         }
 
         // Make sure there's the right aspects on each node
-        var nodeTestValue_:AspectPtr = plan.nodeAspectLookup[TestAspect.VALUE.id];
+        var nodeTestValue_:AspectPtr = plan.nodeAspectLookup[TestAspect.VALUE_1.id];
 
         for (node in state.nodes) {
             Assert.isNotNull(node.value.at(nodeTestValue_));
