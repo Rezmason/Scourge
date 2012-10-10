@@ -66,6 +66,7 @@ class PickPieceRule extends Rule {
 
     override public function init():Void {
         buildPieceOptions();
+        buildHat();
     }
 
     override public function update():Void {
@@ -154,8 +155,8 @@ class PickPieceRule extends Rule {
         for (option in allOptions) {
             extraAspectTemplate.mod(pieceID_, state.extras.length);
             option.hatIndex = state.extras.length;
-            extraAspectTemplate.mod(pieceOptionID_, option.optionID);
             var piece:AspectSet = buildExtra();
+            piece.mod(pieceOptionID_, option.optionID);
             allPieces.push(piece);
             state.extras.push(piece);
             cfg.historyState.extras.push(buildHistExtra(cfg.history));

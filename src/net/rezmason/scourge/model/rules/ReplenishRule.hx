@@ -24,7 +24,7 @@ typedef ReplenishConfig = {>BuildConfig,
 
 class ReplenishRule extends Rule {
 
-    // state, extra for each extraAspectTemplate.mod(replenishable
+    // state, extra for each replenishable
     @extra(ReplenishableAspect.REP_ID) var repID_:AspectPtr;
     @extra(ReplenishableAspect.REP_NEXT) var repNext_:AspectPtr;
     @extra(ReplenishableAspect.REP_PREV) var repPrev_:AspectPtr;
@@ -107,10 +107,10 @@ class ReplenishRule extends Rule {
 
     private function makeReplenishable(repCfg:ReplenishableConfig, lookup:AspectLookup):AspectSet {
 
-        extraAspectTemplate.mod(repPropLookup_, lookup[repCfg.prop.id].pointerToInt());
-        extraAspectTemplate.mod(repID_, state.extras.length);
-
         var rep:AspectSet = buildExtra();
+        rep.mod(repPropLookup_, lookup[repCfg.prop.id].pointerToInt());
+        rep.mod(repID_, state.extras.length);
+
         state.extras.push(rep);
         cfg.historyState.extras.push(buildHistExtra(cfg.history));
 

@@ -1,8 +1,3 @@
-Abolish template modding
-	Let's just not pass initial vals into alloc!
-	Set it and forget it. ;-)
-	While you're at it, make the hat in PickPieceRule.init
-
 Biting
 	Config
 		maxReach

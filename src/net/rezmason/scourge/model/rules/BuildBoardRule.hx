@@ -127,9 +127,8 @@ class BuildBoardRule extends Rule {
     }
 
     inline function makeNode():BoardNode {
-        nodeAspectTemplate.mod(nodeID_, state.nodes.length);
-
         var node:BoardNode = new BoardNode(buildAspectSet(nodeAspectTemplate));
+        node.value.mod(nodeID_, state.nodes.length);
         state.nodes.push(node);
 
         var histAspects:AspectSet = buildHistAspectSet(nodeAspectTemplate, cfg.history);
