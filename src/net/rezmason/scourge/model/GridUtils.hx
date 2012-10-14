@@ -31,6 +31,10 @@ class GridUtils {
         return node2;
     }
 
+    public inline static function orthoNeighbors<T>(node:GridNode<T>):Array<GridNode<T>> {
+        return [n(node), e(node), s(node), w(node)];
+    }
+
     public inline static function getGraph<T>(source:GridNode<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridNode<T>> {
         return expandGraph([source], orthoOnly, spreadFilter);
     }
@@ -39,19 +43,17 @@ class GridUtils {
         var nodes:Array<GridNode<T>> = sources.copy();
         var newNodes:Array<GridNode<T>> = sources.copy();
 
-        var step:Int = orthoOnly ? 2 : 1;
-
         var node:GridNode<T> = newNodes.pop();
         while (node != null) {
-            var direction:Int = 0;
-            while (direction < 8) {
-                var neighbor:GridNode<T> = node.neighbors[direction];
+
+            var neighbors:Array<GridNode<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
+
+            for (neighbor in neighbors) {
                 if (neighbor != null && !nodes.has(neighbor) &&
                         (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
                     nodes.push(neighbor);
                     newNodes.push(neighbor);
                 }
-                direction += step;
             }
             node = newNodes.pop();
         }

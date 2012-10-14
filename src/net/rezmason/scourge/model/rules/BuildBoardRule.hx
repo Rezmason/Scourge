@@ -232,7 +232,10 @@ class BuildBoardRule extends Rule {
         for (node in state.nodes) {
             if (node.value.at(isFilled_) != Aspect.FALSE) {
                 var occupier:Int = node.value.at(occupier_);
-                if (occupier != Aspect.NULL) bodies[occupier].push(node);
+                if (occupier != Aspect.NULL) {
+                    if (bodies[occupier] == null) throw "A node is owned by a player that doesn't exist: " + occupier;
+                    else bodies[occupier].push(node);
+                }
             }
         }
 

@@ -56,8 +56,6 @@ class PickPieceRule extends Rule {
     @state(PieceAspect.PIECE_HAT_PLAYER) var pieceHatPlayer_:AspectPtr;
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
 
-    var remakeHat:Bool;
-
     public function new(cfg:PickPieceConfig):Void {
         super();
         this.cfg = cfg;
@@ -70,15 +68,10 @@ class PickPieceRule extends Rule {
     }
 
     override public function update():Void {
-        remakeHat = false;
-
         if (cfg.allowAll) {
             options = cast allOptions.copy();
             quantumOptions = [];
-        } else if (
-                state.aspects.at(pieceHatPlayer_) != state.aspects.at(currentPlayer_) ||
-                state.aspects.at(piecesPicked_) == cfg.hatSize) {
-            remakeHat = true;
+        } else if (remakeHat()) {
             options = [pickOption];
             quantumOptions = cast allOptions.copy();
         } else if (state.aspects.at(pieceTableID_) == Aspect.NULL) {
@@ -98,7 +91,7 @@ class PickPieceRule extends Rule {
         if (cfg.allowAll) {
             setPiece(option.pieceTableID, option.reflection, option.rotation);
         } else {
-            if (remakeHat) buildHat();
+            if (remakeHat()) buildHat();
             option = pickOptionFromHat();
             setPiece(option.pieceTableID, option.reflection, option.rotation);
         }
@@ -108,7 +101,7 @@ class PickPieceRule extends Rule {
         super.chooseQuantumOption(choice);
 
         var option:PickPieceOption = cast options[choice];
-        if (remakeHat) buildHat();
+        if (remakeHat()) buildHat();
         pickOptionFromHat(option);
         setPiece(option.pieceTableID, option.reflection, option.rotation);
     }
@@ -117,7 +110,7 @@ class PickPieceRule extends Rule {
         allOptions = [];
         pickOption = {optionID:0};
 
-        var pieceFrequencies:Array<Int> = [];
+        var pieceFrequencies:Array<Null<Int>> = [];
         for (pieceTableID in cfg.pieceTableIDs) {
             if (pieceFrequencies[pieceTableID] == null) pieceFrequencies[pieceTableID] = 0;
             pieceFrequencies[pieceTableID]++;
@@ -166,8 +159,8 @@ class PickPieceRule extends Rule {
         state.aspects.mod(pieceFirst_, allPieces[0].at(pieceID_));
     }
 
-    private function makeOption(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):Void {
-        allOptions.push({
+    private function makeOption(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):PickPieceOption {
+        var option:PickPieceOption = {
             pieceTableID:pieceTableID,
             rotation:rotation,
             reflection:reflection,
@@ -175,7 +168,9 @@ class PickPieceRule extends Rule {
             relatedOptionID:0,
             optionID:allOptions.length,
             hatIndex:0,
-        });
+        };
+        allOptions.push(option);
+        return option;
     }
 
     private function setPiece(pieceTableID:Int, reflection:Int, rotation:Int):Void {
@@ -236,5 +231,10 @@ class PickPieceRule extends Rule {
         }
 
         return search(0, list.length);
+    }
+
+    private inline function remakeHat():Bool {
+        return state.aspects.at(pieceHatPlayer_) != state.aspects.at(currentPlayer_) ||
+                state.aspects.at(piecesPicked_) == cfg.hatSize;
     }
 }

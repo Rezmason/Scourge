@@ -11,6 +11,8 @@ using net.rezmason.utils.Pointers;
 
 class BoardUtils {
 
+    private inline static var ALPHABET:Int = "a".charCodeAt(0);
+
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
     public static function freshen(state:State, freshness_:AspectPtr, east:Int, south:Int, value:Int = 1):Void {
@@ -54,8 +56,9 @@ class BoardUtils {
 
                     str += switch (true) {
                         case (occupier == null): "n";
+                        case (occupier != Aspect.NULL && isFilled == Aspect.FALSE): String.fromCharCode(ALPHABET + occupier);
                         case (occupier != Aspect.NULL): "" + occupier;
-                        case (isFilled == 1): "X";
+                        case (isFilled == Aspect.TRUE): "X";
                         default: " ";
                     }
                 }

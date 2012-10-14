@@ -1,22 +1,10 @@
-Biting
-	Config
-		maxReach
-		maxSizeReference
-		baseReachOnThickness
-		omnidirectional
-		biteThroughOccupiedAir
-		biteHeads
-
-	Bitten areas MUST be fresh
-		The decay rule relies on this
-
 Cavities
 	Cavity linked lists on BodyAspects
 
 	Count these regions when determining area (Zuser)
-	Updated during the decay algorithm
-	Biting through these should be an option
-	Tough?
+	Updated after the decay algorithm
+
+	Get bite rule to count cavities
 
 Infinite board
 	Expand board when placing a piece
