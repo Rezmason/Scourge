@@ -102,6 +102,21 @@ class TestBoards {
         "XXXX     XXXX\n" +
         "XXXXXXXXXXXXX";
 
+    public static var cavityCity:String = "\n" +
+        "XXXXXXXXXXXXX\n" +
+        "X           X\n" +
+        "X 000000000 X\n" +
+        "X 0 0 0   0 X\n" +
+        "X 00 000000 X\n" +
+        "X 0 0 0 0 0 X\n" +
+        "X 000000000 X\n" +
+        "X 0       0 X\n" +
+        "X 0       0 X\n" +
+        "X 0       0 X\n" +
+        "X 000000000 X\n" +
+        "X           X\n" +
+        "XXXXXXXXXXXXX";
+
    public static var fourSquares:String = "\n" +
         "XXXXXXXXXXXXXXXXXXXXXXXX\n" +
         "X                      X\n" +

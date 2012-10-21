@@ -41,7 +41,7 @@ class GridUtils {
 
     public inline static function expandGraph<T>(sources:Array<GridNode<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridNode<T>> {
         var nodes:Array<GridNode<T>> = sources.copy();
-        var newNodes:Array<GridNode<T>> = sources.copy();
+        var newNodes:List<GridNode<T>> = sources.list();
 
         var node:GridNode<T> = newNodes.pop();
         while (node != null) {
@@ -52,7 +52,7 @@ class GridUtils {
                 if (neighbor != null && !nodes.has(neighbor) &&
                         (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
                     nodes.push(neighbor);
-                    newNodes.push(neighbor);
+                    newNodes.add(neighbor);
                 }
             }
             node = newNodes.pop();

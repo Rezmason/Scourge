@@ -53,10 +53,9 @@ class EatCellsRule extends Rule {
         var headIndices:Array<Int> = [];
         for (player in state.players) headIndices.push(player.at(head_));
 
-        var nodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_);
-        nodes = nodes.filter(isFresh).array();
+        var nodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFresh).array();
 
-        var newNodes:Array<BoardNode> = nodes.copy();
+        var newNodes:List<BoardNode> = nodes.list();
         var eatenNodes:Array<BoardNode> = [];
 
         var node:BoardNode = newNodes.pop();
@@ -73,7 +72,7 @@ class EatCellsRule extends Rule {
                                 if (playerIndex != -1) {
                                     if (cfg.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerIndex));
                                 } else {
-                                    if (cfg.recursive && !newNodes.has(pendingNode)) newNodes.push(pendingNode);
+                                    if (cfg.recursive && !newNodes.has(pendingNode)) newNodes.add(pendingNode);
                                 }
                                 eatenNodes.push(pendingNode);
                             }

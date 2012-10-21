@@ -50,5 +50,9 @@ class DecayRuleTest extends RuleTest
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
+
+        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea:Int = state.players[0].at(totalArea_);
+        Assert.areEqual(numCells, totalArea);
     }
 }

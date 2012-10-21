@@ -1,10 +1,8 @@
-Cavities
-	Cavity linked lists on BodyAspects
-
-	Count these regions when determining area (Zuser)
-	Updated after the decay algorithm
-
-	Get bite rule to count cavities
+Change freshness to a linked list
+Freshen decayed nodes
+Freshen nodes that have changed their cavity state
+Freshen forfeited nodes
+Freshen killed headless body nodes
 
 Infinite board
 	Expand board when placing a piece
@@ -15,8 +13,9 @@ Maybe turn nodes into aspects
 
 Make sure to test extras in the state historian
 
-Group rules together!
-	Rule groups are updated after rules are updated
+Group rules together! At runtime!!
+	Rule groups are updated after their rules are updated
+	Group BuildBoardRule with DecayRule and CavityRule.
 
 Clean up
 	Lots of code is used over and over again, especially in rules

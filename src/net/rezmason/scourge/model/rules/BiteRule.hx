@@ -41,6 +41,7 @@ class BiteRule extends Rule {
     @player(BiteAspect.NUM_BITES) var numBites_:AspectPtr;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_:AspectPtr;
     @player(BodyAspect.HEAD) var head_:AspectPtr;
+    @player(BodyAspect.TOTAL_AREA) var totalArea_:AspectPtr;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_:AspectPtr;
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
 
@@ -63,6 +64,7 @@ class BiteRule extends Rule {
         for (player in state.players) headIDs.push(player.at(head_));
 
         if (state.players[currentPlayer].at(numBites_) > 0) {
+            var totalArea:Int = state.players[currentPlayer].at(totalArea_);
             var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
             var body:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_);
             var frontNodes:Array<BoardNode> = body.filter(callback(isFront, headIDs)).array();
@@ -93,7 +95,7 @@ class BiteRule extends Rule {
             // Extend the existing valid bites
 
             var reachItr:Int = 1;
-            var growthPercent:Float = Math.min(1, body.length / cfg.maxSizeReference);
+            var growthPercent:Float = Math.min(1, totalArea / cfg.maxSizeReference);
             var reach:Int = Std.int(cfg.minReach + growthPercent * (cfg.maxReach - cfg.minReach));
             if (cfg.baseReachOnThickness) reach = cfg.maxReach;
 
@@ -185,8 +187,7 @@ class BiteRule extends Rule {
 
     inline function isValidEnemy(headIDs:Array<Int>, allegiance:Int, node:BoardNode):Bool {
         var val:Bool = true;
-        if (node == null) val = false; // Can't be null obviously
-        else if (node.value.at(occupier_) == allegiance) val = false; // Can't be the current player
+        if (node.value.at(occupier_) == allegiance) val = false; // Can't be the current player
         else if (node.value.at(occupier_) == Aspect.NULL) val = false; // Can't be the current player
         else if (!cfg.biteThroughCavities && node.value.at(isFilled_) == Aspect.FALSE) val = false; // Must be filled, or must allow biting through a cavity
         else if (!cfg.biteHeads && headIDs.has(node.value.at(nodeID_))) val = false;

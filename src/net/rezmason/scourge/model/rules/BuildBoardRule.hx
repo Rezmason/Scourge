@@ -43,6 +43,7 @@ class BuildBoardRule extends Rule {
     @node(OwnershipAspect.OCCUPIER) var occupier_:AspectPtr;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_:AspectPtr;
     @player(BodyAspect.HEAD) var head_:AspectPtr;
+    @player(BodyAspect.TOTAL_AREA) var totalArea_:AspectPtr; // TEMPORARY
 
     public function new(cfg:BuildBoardConfig):Void {
         super();
@@ -243,6 +244,7 @@ class BuildBoardRule extends Rule {
             var body:Array<BoardNode> = bodies[ike];
             var bodyFirstNode:BoardNode = body[0];
             state.players[ike].mod(bodyFirst_, bodyFirstNode.value.at(nodeID_));
+            state.players[ike].mod(totalArea_, body.length); // TEMPORARY
             body.chainByAspect(nodeID_, bodyNext_, bodyPrev_);
         }
     }

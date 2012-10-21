@@ -18,6 +18,7 @@ class DecayRule extends Rule {
     @node(OwnershipAspect.IS_FILLED) var isFilled_:AspectPtr;
     @node(OwnershipAspect.OCCUPIER) var occupier_:AspectPtr;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_:AspectPtr;
+    @player(BodyAspect.TOTAL_AREA) var totalArea_:AspectPtr;
     @player(BodyAspect.HEAD) var head_:AspectPtr;
 
     public function new():Void {
@@ -38,15 +39,20 @@ class DecayRule extends Rule {
 
         for (player in state.players) {
 
+            var totalArea:Int = 0;
+
             // Removing nodes is not something to do haphazardly - what if you remove the first one?
 
             var bodyFirst:Int = player.at(bodyFirst_);
             if (bodyFirst != Aspect.NULL) {
                 for (node in state.nodes[bodyFirst].iterate(state.nodes, bodyNext_)) {
                     if (!livingBodyNeighbors.has(node)) bodyFirst = killCell(node, bodyFirst);
+                    else totalArea++;
                 }
             }
+
             player.mod(bodyFirst_, bodyFirst);
+            player.mod(totalArea_, totalArea);
         }
     }
 
