@@ -15,6 +15,8 @@ class GridUtils {
 
     public inline static function allDirections():Iterator<Int> { return 0...8; }
 
+    public inline static function orthoDirections():Iterator<Int> { return [0, 2, 4, 6].iterator(); }
+
     // Returns the furthest reachable node from the given node in the specified direction
     public inline static function run<T> (node:GridNode<T>, direction:Int, maxDist:Int = -1):GridNode<T> {
         var distance:Int = 0;

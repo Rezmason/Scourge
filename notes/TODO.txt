@@ -1,17 +1,11 @@
-Change freshness to a linked list
-Freshen decayed nodes
-Freshen nodes that have changed their cavity state
-Freshen forfeited nodes
-Freshen killed headless body nodes
+Freshness
+	Change freshness to a linked list
+	Freshen decayed nodes
+	Freshen nodes that have changed their cavity state
+	Freshen forfeited nodes
+	Freshen killed headless body nodes
 
-Infinite board
-	Expand board when placing a piece
-	Tough?
-
-Maybe turn nodes into aspects
-	Store their neighbors on them
-
-Make sure to test extras in the state historian
+Test extras in the state historian
 
 Group rules together! At runtime!!
 	Rule groups are updated after their rules are updated
@@ -29,9 +23,6 @@ And then SPEED EVERYTHING UP
 		Just make sure to update this information when it changes
 	Take advantage of linked lists for storing sets of nodes
 	Also, haxe.List might be better than Array in some situations
-
-Level Editing
-	Just a bunch of rules, aha
 
 New architecture - what's left
 	IPlayer: an object that picks an optimal State from a set of States
@@ -97,6 +88,21 @@ A.I. thoughts
 	Fretting
 		aka "Permanent brain"
 		Players technically aren't limited to their turn in order to evaluate the board
+
+
+Later
+
+	Maybe turn nodes into aspects
+		Store their neighbors on them
+
+	Level Editing
+		Just a bunch of rules, aha
+
+	Infinite board
+		Expand board when placing a piece
+		Tough?
+
+
 
 
 New UI

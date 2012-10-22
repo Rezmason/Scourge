@@ -50,6 +50,28 @@ class TestBoards {
         "X                  X\n" +
         "XXXXXXXXXXXXXXXXXXXX\n";
 
+    public static var twoPlayerN:String = "\n" +
+        "XXXXXXXXXXXXXXXXXXXX\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X   000000000000   X\n" +
+        "X   000000000000   X\n" +
+        "X   0011    1100   X\n" +
+        "X   00111   1100   X\n" +
+        "X   001111  1100   X\n" +
+        "X   0011 11 1100   X\n" +
+        "X   0011  111100   X\n" +
+        "X   0011   11100   X\n" +
+        "X   0011    1100   X\n" +
+        "X   000000000000   X\n" +
+        "X   000000000000   X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "XXXXXXXXXXXXXXXXXXXX\n";
+
     public static var twoPlayerBite:String = "\n" +
         "XXXXXXXXXXXXXXXXXXXX\n" +
         "X                  X\n" +

@@ -93,7 +93,6 @@ class CavityRule extends Rule {
                 cavityNodes.chainByAspect(nodeID_, cavityNext_, cavityPrev_);
                 player.mod(cavityFirst_, cavityNodes[0].value.at(nodeID_));
                 var totalArea:Int = player.at(totalArea_) + cavityNodes.length;
-                trace(cavityNodes.length);
                 player.mod(totalArea_, totalArea);
             }
         }

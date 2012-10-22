@@ -33,20 +33,13 @@ class EatTest extends RuleTest
 
     @Test
     public function eatRuleTest():Void {
-        var eatConfig:EatCellsConfig = {recursive:false, eatHeads:false, takeBodiesFromHeads:false};
+        var eatConfig:EatCellsConfig = {recursive:false, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
-        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var head:Int = state.players[currentPlayer].at(head_);
-        var playerHead:BoardNode = state.nodes[head];
         var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
         var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
@@ -77,20 +70,13 @@ class EatTest extends RuleTest
 
     @Test
     public function eatRecursivelyRuleTest():Void {
-        var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false};
+        var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
-        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var head:Int = state.players[currentPlayer].at(head_);
-        var playerHead:BoardNode = state.nodes[head];
         var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
         var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
         var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
@@ -118,20 +104,16 @@ class EatTest extends RuleTest
 
     @Test
     public function eatHeadAndBodyRuleTest():Void {
-        var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:true};
+        var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:true, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
-        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var head:Int = state.players[currentPlayer].at(head_);
-        var playerHead:BoardNode = state.nodes[head];
+        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
 
         state.freshen(freshness_, 12, 6);
 
@@ -145,9 +127,6 @@ class EatTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25 + 13, numCells); // Eat everything
 
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
@@ -155,20 +134,13 @@ class EatTest extends RuleTest
 
     @Test
     public function eatHeadKillBodyTest():Void {
-        var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:false};
+        var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:false, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
-        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var head:Int = state.players[currentPlayer].at(head_);
-        var playerHead:BoardNode = state.nodes[head];
 
         state.freshen(freshness_, 12, 6);
 
@@ -189,4 +161,42 @@ class EatTest extends RuleTest
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
+
+    @Test
+    public function eatOrthoRuleTest():Void {
+        var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:true};
+        var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
+        makeState(cast [eatRule], 2, TestBoards.twoPlayerN);
+
+        // set up the board for the test
+
+        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
+        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+
+        state.freshen(freshness_, 6, 13);
+        state.freshen(freshness_, 7, 13);
+
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        Assert.areEqual(76, numCells);
+
+        eatRule.update();
+        Assert.areEqual(1, eatRule.options.length);
+
+        // straight up eating
+
+        //trace(state.spitBoard(plan, true));
+        eatRule.chooseOption(0);
+        //trace(state.spitBoard(plan, true));
+
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        Assert.areEqual(76 + 14, numCells);
+
+        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
+
+        Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
+    }
+
+
 }

@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model;
 
-class Aspect {
+@:autoBuild(net.rezmason.scourge.model.AspectBuilder.build()) class Aspect {
     private static var ids:Int = 0;
     public inline static var TRUE:Int = 1;
     public inline static var FALSE:Int = 0;

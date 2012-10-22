@@ -1,8 +1,6 @@
 package net.rezmason.scourge.model.aspects;
 
-import net.rezmason.scourge.model.ModelTypes;
-
 class FreshnessAspect extends Aspect {
-    public static var FRESHNESS:AspectProperty = {id:Aspect.ids++, initialValue:0};
-    public static var MAX_FRESHNESS:AspectProperty = {id:Aspect.ids++, initialValue:0};
+    @aspect(0) var FRESHNESS;
+    @aspect(0) var MAX_FRESHNESS;
 }

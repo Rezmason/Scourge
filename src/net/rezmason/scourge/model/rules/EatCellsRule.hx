@@ -16,6 +16,7 @@ typedef EatCellsConfig = {
     public var recursive:Bool;
     public var eatHeads:Bool;
     public var takeBodiesFromHeads:Bool;
+    public var orthoOnly:Bool;
 }
 
 class EatCellsRule extends Rule {
@@ -60,7 +61,7 @@ class EatCellsRule extends Rule {
 
         var node:BoardNode = newNodes.pop();
         while (node != null) {
-            for (direction in GridUtils.allDirections()) {
+            for (direction in directionsFor(cfg.orthoOnly)) {
                 var pendingNodes:Array<BoardNode> = [];
                 for (scout in node.walk(direction)) {
                     if (scout == node) continue;
@@ -115,6 +116,10 @@ class EatCellsRule extends Rule {
         node.value.mod(occupier_, currentPlayer);
         node.value.mod(freshness_, maxFreshness);
         return bodyNode.addNode(node, state.nodes, nodeID_, bodyNext_, bodyPrev_);
+    }
+
+    function directionsFor(ortho:Bool):Iterator<Int> {
+        return ortho ? GridUtils.orthoDirections() : GridUtils.allDirections();
     }
 }
 

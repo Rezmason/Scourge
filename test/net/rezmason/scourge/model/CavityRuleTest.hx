@@ -87,9 +87,9 @@ class CavityRuleTest extends RuleTest
         Assert.areEqual(51, numCells);
         Assert.areEqual(0, numCavityCells);
 
-        trace(state.spitBoard(plan));
+        //trace(state.spitBoard(plan));
         cavityRule.chooseOption(0);
-        trace(state.spitBoard(plan));
+        //trace(state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         numCavityCells = ~/([^a])/g.replace(state.spitBoard(plan), "").length;
