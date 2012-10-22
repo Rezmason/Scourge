@@ -29,6 +29,16 @@ class AspectBuilder {
                     }
 
                     var aspectExpr:Expr = metaTag.params[0];
+
+                    switch (aspectExpr.expr) {
+                        case EConst(c): switch (c) {
+                            case CIdent(s):
+                                aspectExpr = Context.parse("Aspect." + s, field.pos);
+                            default:
+                        }
+                        default:
+                    }
+
                     metaTag.params = [];
                     var expr:Expr = macro {id:Aspect.ids++, initialValue:$aspectExpr};
 

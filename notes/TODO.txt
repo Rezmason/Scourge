@@ -11,9 +11,9 @@ Group rules together! At runtime!!
 	Rule groups are updated after their rules are updated
 	Group BuildBoardRule with DecayRule and CavityRule.
 
-Clean up
-	Lots of code is used over and over again, especially in rules
-	Comment the rule code
+Clean up the rule code
+Put traces into visual tests
+Comment the rule code
 
 And then SPEED EVERYTHING UP
 	Use timing output to find the bottlenecks
