@@ -31,11 +31,12 @@ class AspectBuilder {
                     var aspectExpr:Expr = metaTag.params[0];
 
                     switch (aspectExpr.expr) {
-                        case EConst(c): switch (c) {
-                            case CIdent(s):
-                                aspectExpr = Context.parse("Aspect." + s, field.pos);
-                            default:
-                        }
+                        case EConst(c):
+                            switch (c) {
+                                case CIdent(s):
+                                    aspectExpr = Context.parse("Aspect." + s.toUpperCase(), field.pos);
+                                default:
+                            }
                         default:
                     }
 
