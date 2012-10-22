@@ -23,7 +23,7 @@ class RuleBuilder {
 
     @:macro public static function build():Array<Field> {
 
-        neko.Lib.print("Building " + Context.getLocalClass().get().name + "  ");
+        var msg:String = "Building " + Context.getLocalClass().get().name + "  ";
 
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
@@ -46,20 +46,20 @@ class RuleBuilder {
                     /*
                     if (Context.typeof(aspectExpr).enumParameters()[0].get().name != "AspectProperty") {
                         Context.warning("Value assigned to " + field.name + " is not an AspectProperty", aspectExpr.pos);
-                        neko.Lib.print("X");
+                        msg += "X";
                         continue;
                     }
                     */
 
                     if (field.access.has(AStatic)) {
                         Context.warning(field.name + " cannot be static", field.pos);
-                        neko.Lib.print("X");
+                        msg += "X";
                         continue;
                     }
 
                     if (field.kind.enumConstructor() != "FVar") {
                         Context.warning(field.name + " must be a variable", field.pos);
-                        neko.Lib.print("X");
+                        msg += "X";
                         continue;
                     }
 
@@ -70,17 +70,21 @@ class RuleBuilder {
                     reqExpressions.push( macro $reqs.push($aspectExpr) );
                     ptrExpressions.push( macro $ptr = $lkp[$aspectExpr.id] );
 
-                    neko.Lib.print(metaTag.name.charAt(0));
+                    msg += metaTag.name.charAt(0);
 
                     break;
                 }
             }
         }
 
-        neko.Lib.print("\n");
+        msg += "\n";
 
         fields.push(overrider("__initReqs", reqExpressions, pos));
         fields.push(overrider("__initPtrs", ptrExpressions, pos));
+
+        #if SCOURGE_VERBOSE
+            neko.Lib.print(msg);
+        #end
 
         return fields;
     }

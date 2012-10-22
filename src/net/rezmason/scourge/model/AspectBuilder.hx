@@ -12,7 +12,7 @@ class AspectBuilder {
 
     @:macro public static function build():Array<Field> {
 
-        neko.Lib.print("Building " + Context.getLocalClass().get().name + "  ");
+        var msg:String = "Building " + Context.getLocalClass().get().name + "  ";
 
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
@@ -24,7 +24,7 @@ class AspectBuilder {
 
                     if (field.kind.enumConstructor() != "FVar") {
                         Context.warning(field.name + " must be a variable", field.pos);
-                        neko.Lib.print("X");
+                        msg += "X";
                         continue;
                     }
 
@@ -46,14 +46,18 @@ class AspectBuilder {
                     field.access = [AStatic, APublic];
                     field.kind = FVar(null, {pos:field.pos, expr:expr.expr});
 
-                    neko.Lib.print(metaTag.name.charAt(0));
+                    msg += metaTag.name.charAt(0);
 
                     break;
                 }
             }
         }
 
-        neko.Lib.print("\n");
+        msg += "\n";
+
+        #if SCOURGE_VERBOSE
+            neko.Lib.print(msg);
+        #end
 
         return fields;
     }

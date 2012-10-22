@@ -9,6 +9,7 @@
 #-D TIME_TESTS
 -D USE_POINTERS
 -D haxeJSON
+#-D SCOURGE_VERBOSE
 
 -cp test
 -swf-version 9
@@ -26,6 +27,7 @@
 #-D TIME_TESTS
 -D USE_POINTERS
 -D haxeJSON
+#-D SCOURGE_VERBOSE
 
 -cp test
 -js build/js_test.js
@@ -44,6 +46,7 @@
 #-D TIME_TESTS
 -D USE_POINTERS
 -D haxeJSON
+#-D SCOURGE_VERBOSE
 
 -cp test
 -neko build/neko_test.n
