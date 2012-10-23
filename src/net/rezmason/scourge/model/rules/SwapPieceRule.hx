@@ -1,6 +1,5 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.SwapAspect;
@@ -15,9 +14,9 @@ typedef SwapPieceConfig = {
 
 class SwapPieceRule extends Rule {
 
-    @player(SwapAspect.NUM_SWAPS) var numSwaps_:AspectPtr;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
-    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
+    @player(SwapAspect.NUM_SWAPS) var numSwaps_;
+    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
 
     var cfg:SwapPieceConfig;
 

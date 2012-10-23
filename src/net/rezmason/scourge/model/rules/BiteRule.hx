@@ -1,6 +1,5 @@
 package net.rezmason.scourge.model.rules;
 
-//import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
@@ -32,18 +31,18 @@ typedef BiteOption = {>Option,
 
 class BiteRule extends Rule {
 
-    @node(BodyAspect.BODY_NEXT) var bodyNext_:AspectPtr;
-    @node(BodyAspect.BODY_PREV) var bodyPrev_:AspectPtr;
-    @node(BodyAspect.NODE_ID) var nodeID_:AspectPtr;
-    @node(FreshnessAspect.FRESHNESS) var freshness_:AspectPtr;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_:AspectPtr;
-    @node(OwnershipAspect.OCCUPIER) var occupier_:AspectPtr;
-    @player(BiteAspect.NUM_BITES) var numBites_:AspectPtr;
-    @player(BodyAspect.BODY_FIRST) var bodyFirst_:AspectPtr;
-    @player(BodyAspect.HEAD) var head_:AspectPtr;
-    @player(BodyAspect.TOTAL_AREA) var totalArea_:AspectPtr;
-    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_:AspectPtr;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
+    @node(BodyAspect.BODY_NEXT) var bodyNext_;
+    @node(BodyAspect.BODY_PREV) var bodyPrev_;
+    @node(BodyAspect.NODE_ID) var nodeID_;
+    @node(FreshnessAspect.FRESHNESS) var freshness_;
+    @node(OwnershipAspect.IS_FILLED) var isFilled_;
+    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @player(BiteAspect.NUM_BITES) var numBites_;
+    @player(BodyAspect.BODY_FIRST) var bodyFirst_;
+    @player(BodyAspect.HEAD) var head_;
+    @player(BodyAspect.TOTAL_AREA) var totalArea_;
+    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var cfg:BiteConfig;
     private var biteOptions:Array<BiteOption>;

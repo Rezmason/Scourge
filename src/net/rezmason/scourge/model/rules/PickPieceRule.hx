@@ -37,24 +37,24 @@ class PickPieceRule extends Rule {
 
     // This rule is surprisingly complex
 
-    @extra(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_:AspectPtr;
-    @extra(PieceAspect.PIECE_HAT_PREV) var pieceHatPrev_:AspectPtr;
+    @extra(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_;
+    @extra(PieceAspect.PIECE_HAT_PREV) var pieceHatPrev_;
 
-    @extra(PieceAspect.PIECE_ID) var pieceID_:AspectPtr;
-    @extra(PieceAspect.PIECE_NEXT) var pieceNext_:AspectPtr;
-    @extra(PieceAspect.PIECE_PREV) var piecePrev_:AspectPtr;
+    @extra(PieceAspect.PIECE_ID) var pieceID_;
+    @extra(PieceAspect.PIECE_NEXT) var pieceNext_;
+    @extra(PieceAspect.PIECE_PREV) var piecePrev_;
 
-    @extra(PieceAspect.PIECE_OPTION_ID) var pieceOptionID_:AspectPtr;
+    @extra(PieceAspect.PIECE_OPTION_ID) var pieceOptionID_;
 
-    @state(PieceAspect.PIECES_PICKED) var piecesPicked_:AspectPtr;
-    @state(PieceAspect.PIECE_FIRST) var pieceFirst_:AspectPtr;
-    @state(PieceAspect.PIECE_HAT_FIRST) var pieceHatFirst_:AspectPtr;
-    @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
-    @state(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
-    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
+    @state(PieceAspect.PIECES_PICKED) var piecesPicked_;
+    @state(PieceAspect.PIECE_FIRST) var pieceFirst_;
+    @state(PieceAspect.PIECE_HAT_FIRST) var pieceHatFirst_;
+    @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
+    @state(PieceAspect.PIECE_ROTATION) var pieceRotation_;
+    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
 
-    @state(PieceAspect.PIECE_HAT_PLAYER) var pieceHatPlayer_:AspectPtr;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
+    @state(PieceAspect.PIECE_HAT_PLAYER) var pieceHatPlayer_;
+    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     public function new(cfg:PickPieceConfig):Void {
         super();

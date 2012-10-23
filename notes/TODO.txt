@@ -1,9 +1,7 @@
-Freshness
-	Change freshness to a linked list
-	Freshen decayed nodes
-	Freshen nodes that have changed their cavity state
-	Freshen forfeited nodes
-	Freshen killed headless body nodes
+Freshen decayed nodes
+Freshen nodes that have changed their cavity state
+Freshen forfeited nodes
+Freshen killed headless body nodes
 
 Test extras in the state historian
 

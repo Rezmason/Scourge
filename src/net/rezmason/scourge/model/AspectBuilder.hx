@@ -5,9 +5,6 @@ import haxe.macro.Expr;
 
 import net.rezmason.scourge.model.ModelTypes;
 
-using Lambda;
-using Type;
-
 class AspectBuilder {
 
     @:macro public static function build():Array<Field> {
@@ -22,14 +19,9 @@ class AspectBuilder {
             for (metaTag in field.meta) {
                 if (metaTag.name == "aspect") {
 
-                    if (field.kind.enumConstructor() != "FVar") {
-                        Context.warning(field.name + " must be a variable", field.pos);
-                        msg += "X";
-                        continue;
-                    }
-
                     var aspectExpr:Expr = metaTag.params[0];
 
+                    // Turn some literal values into Aspect consts
                     switch (aspectExpr.expr) {
                         case EConst(c):
                             switch (c) {

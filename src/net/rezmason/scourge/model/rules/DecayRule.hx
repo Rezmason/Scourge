@@ -12,14 +12,14 @@ using net.rezmason.utils.Pointers;
 
 class DecayRule extends Rule {
 
-    @node(BodyAspect.BODY_NEXT) var bodyNext_:AspectPtr;
-    @node(BodyAspect.BODY_PREV) var bodyPrev_:AspectPtr;
-    @node(BodyAspect.NODE_ID) var nodeID_:AspectPtr;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_:AspectPtr;
-    @node(OwnershipAspect.OCCUPIER) var occupier_:AspectPtr;
-    @player(BodyAspect.BODY_FIRST) var bodyFirst_:AspectPtr;
-    @player(BodyAspect.TOTAL_AREA) var totalArea_:AspectPtr;
-    @player(BodyAspect.HEAD) var head_:AspectPtr;
+    @node(BodyAspect.BODY_NEXT) var bodyNext_;
+    @node(BodyAspect.BODY_PREV) var bodyPrev_;
+    @node(BodyAspect.NODE_ID) var nodeID_;
+    @node(OwnershipAspect.IS_FILLED) var isFilled_;
+    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @player(BodyAspect.BODY_FIRST) var bodyFirst_;
+    @player(BodyAspect.TOTAL_AREA) var totalArea_;
+    @player(BodyAspect.HEAD) var head_;
 
     public function new():Void {
         super();

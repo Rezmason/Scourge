@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.scourge.model.ModelTypes;
+//import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 
 using net.rezmason.utils.Pointers;

@@ -1,6 +1,5 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
@@ -12,9 +11,10 @@ using net.rezmason.utils.Pointers;
 
 class EndTurnRule extends Rule {
 
-    @player(BodyAspect.HEAD) var head_:AspectPtr;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
-    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_:AspectPtr;
+    @player(BodyAspect.HEAD) var head_;
+    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @state(FreshnessAspect.FRESHNESS) var freshness_;
 
     public function new():Void {
         super();
@@ -35,6 +35,9 @@ class EndTurnRule extends Rule {
             playerIndex = (playerIndex + 1) % numPlayers;
             if (playerIndex == currentPlayer) throw "No players have heads!";
         }
+
+        // reset freshness on all nodes
+        for (node in state.nodes) node.value.mod(freshness_, 0);
 
         state.aspects.mod(currentPlayer_, playerIndex);
         state.aspects.mod(maxFreshness_, 0);

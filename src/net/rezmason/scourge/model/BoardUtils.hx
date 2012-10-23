@@ -15,9 +15,8 @@ class BoardUtils {
 
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
-    public static function freshen(state:State, freshness_:AspectPtr, east:Int, south:Int, value:Int = 1):Void {
-        var node:BoardNode = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n).run(Gr.s, south).run(Gr.e, east);
-        node.value.mod(freshness_, value);
+    public inline static function grabXY(state:State, east:Int, south:Int):BoardNode {
+        return state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n).run(Gr.s, south).run(Gr.e, east);
     }
 
     public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:IntHash<String> = null):String {

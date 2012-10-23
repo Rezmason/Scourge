@@ -25,16 +25,16 @@ typedef ReplenishConfig = {>BuildConfig,
 class ReplenishRule extends Rule {
 
     // state, extra for each replenishable
-    @extra(ReplenishableAspect.REP_ID) var repID_:AspectPtr;
-    @extra(ReplenishableAspect.REP_NEXT) var repNext_:AspectPtr;
-    @extra(ReplenishableAspect.REP_PREV) var repPrev_:AspectPtr;
+    @extra(ReplenishableAspect.REP_ID) var repID_;
+    @extra(ReplenishableAspect.REP_NEXT) var repNext_;
+    @extra(ReplenishableAspect.REP_PREV) var repPrev_;
 
-    @extra(ReplenishableAspect.REP_PROP_LOOKUP) var repPropLookup_:AspectPtr;
-    @extra(ReplenishableAspect.REP_STEP) var repStep_:AspectPtr;
+    @extra(ReplenishableAspect.REP_PROP_LOOKUP) var repPropLookup_;
+    @extra(ReplenishableAspect.REP_STEP) var repStep_;
 
-    @state(ReplenishableAspect.STATE_REP_FIRST) var stateRepFirst_:AspectPtr;
-    @state(ReplenishableAspect.PLAYER_REP_FIRST) var playerRepFirst_:AspectPtr;
-    @state(ReplenishableAspect.NODE_REP_FIRST) var nodeRepFirst_:AspectPtr;
+    @state(ReplenishableAspect.STATE_REP_FIRST) var stateRepFirst_;
+    @state(ReplenishableAspect.PLAYER_REP_FIRST) var playerRepFirst_;
+    @state(ReplenishableAspect.NODE_REP_FIRST) var nodeRepFirst_;
 
     var cfg:ReplenishConfig;
 

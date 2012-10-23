@@ -9,6 +9,7 @@ import net.rezmason.scourge.model.rules.BuildPlayersRule;
 import net.rezmason.scourge.model.rules.BuildStateRule;
 import net.rezmason.scourge.model.rules.EatCellsRule;
 
+using net.rezmason.utils.Pointers;
 using net.rezmason.scourge.model.BoardUtils;
 
 class StateHistorianTest {
@@ -70,8 +71,9 @@ class StateHistorianTest {
 		var time0:Int = history.commit();
 
 		// Freshen and eat body
-		state.freshen(freshness_, 7, 7);
-        state.freshen(freshness_, 9, 7);
+
+        state.grabXY(7, 7).value.mod(freshness_, 1);
+        state.grabXY(9, 7).value.mod(freshness_, 1);
         eatRule.chooseOption(0);
 
 		var board1:String = state.spitBoard(plan);
@@ -79,7 +81,7 @@ class StateHistorianTest {
 		var time1:Int = history.commit();
 
 		// Freshen and eat head
-		state.freshen(freshness_, 12, 6);
+        state.grabXY(12, 6).value.mod(freshness_, 1);
 		eatRule.chooseOption(0);
 
 		var board2:String = state.spitBoard(plan);

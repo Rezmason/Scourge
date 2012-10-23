@@ -30,18 +30,18 @@ typedef DropPieceOption = {>Option,
 
 class DropPieceRule extends Rule {
 
-    @node(BodyAspect.BODY_NEXT) var bodyNext_:AspectPtr;
-    @node(BodyAspect.BODY_PREV) var bodyPrev_:AspectPtr;
-    @node(BodyAspect.NODE_ID) var nodeID_:AspectPtr;
-    @node(FreshnessAspect.FRESHNESS) var freshness_:AspectPtr;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_:AspectPtr;
-    @node(OwnershipAspect.OCCUPIER) var occupier_:AspectPtr;
-    @player(BodyAspect.BODY_FIRST) var bodyFirst_:AspectPtr;
-    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_:AspectPtr;
-    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
-    @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
-    @state(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_:AspectPtr;
+    @node(BodyAspect.BODY_NEXT) var bodyNext_;
+    @node(BodyAspect.BODY_PREV) var bodyPrev_;
+    @node(BodyAspect.NODE_ID) var nodeID_;
+    @node(FreshnessAspect.FRESHNESS) var freshness_;
+    @node(OwnershipAspect.IS_FILLED) var isFilled_;
+    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @player(BodyAspect.BODY_FIRST) var bodyFirst_;
+    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
+    @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
+    @state(PieceAspect.PIECE_ROTATION) var pieceRotation_;
+    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var cfg:DropPieceConfig;
 

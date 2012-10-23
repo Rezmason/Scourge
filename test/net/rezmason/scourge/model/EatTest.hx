@@ -44,9 +44,9 @@ class EatTest extends RuleTest
         var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
         var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
 
-        state.freshen(freshness_, 7, 7);
-        state.freshen(freshness_, 9, 7);
-        state.freshen(freshness_, 12, 6); // Don't eat that head!
+        state.grabXY(7, 7).value.mod(freshness_, 1);
+        state.grabXY(9, 7).value.mod(freshness_, 1);
+        state.grabXY(12, 6).value.mod(freshness_, 1);// Don't eat that head!
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25, numCells);
@@ -81,9 +81,9 @@ class EatTest extends RuleTest
         var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
         var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
 
-        state.freshen(freshness_, 7, 7);
-        state.freshen(freshness_, 9, 7);
-        state.freshen(freshness_, 12, 6); // Don't eat that head!
+        state.grabXY(7, 7).value.mod(freshness_, 1);
+        state.grabXY(9, 7).value.mod(freshness_, 1);
+        state.grabXY(12, 6).value.mod(freshness_, 1);// Don't eat that head!
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25, numCells);
@@ -115,7 +115,7 @@ class EatTest extends RuleTest
         var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
         var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
 
-        state.freshen(freshness_, 12, 6);
+        state.grabXY(12, 6).value.mod(freshness_, 1);
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25, numCells);
@@ -142,7 +142,7 @@ class EatTest extends RuleTest
 
         var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
 
-        state.freshen(freshness_, 12, 6);
+        state.grabXY(12, 6).value.mod(freshness_, 1);
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25, numCells);
@@ -175,8 +175,8 @@ class EatTest extends RuleTest
         var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
         var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
 
-        state.freshen(freshness_, 6, 13);
-        state.freshen(freshness_, 7, 13);
+        state.grabXY(6, 13).value.mod(freshness_, 1);
+        state.grabXY(7, 13).value.mod(freshness_, 1);
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(76, numCells);
