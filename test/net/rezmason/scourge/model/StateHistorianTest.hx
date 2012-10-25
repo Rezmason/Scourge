@@ -8,6 +8,7 @@ import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.BuildPlayersRule;
 import net.rezmason.scourge.model.rules.BuildStateRule;
 import net.rezmason.scourge.model.rules.EatCellsRule;
+import net.rezmason.scourge.model.rules.PickPieceRule;
 
 using net.rezmason.utils.Pointers;
 using net.rezmason.scourge.model.BoardUtils;
@@ -51,24 +52,47 @@ class StateHistorianTest {
 			recursive:false,
 			eatHeads:true,
 			takeBodiesFromHeads:false,
+
+            pieceTableIDs:[0, 1, 2, 3, 4],
+            allowFlipping:true,
+            allowRotating:true,
+            allowAll:false,
+            hatSize:1,
+            randomFunction:function() return 0,
 		}
 
         var buildStateRule:BuildStateRule = new BuildStateRule(cast config);
 		var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule(cast config);
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(cast config);
         var eatRule:EatCellsRule = new EatCellsRule(cast config);
+        var pickPieceRule:PickPieceRule = new PickPieceRule(cast config);
 
-        var rules:Array<Rule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule];
+        var rules:Array<Rule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];
         var plan:StatePlan = new StatePlanner().planState(state, rules);
 
         for (rule in rules) rule.prime(state, plan);
 
         var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
 
-		var board0:String = state.spitBoard(plan);
-		historian.write();
-		//trace(board0);
-		var time0:Int = history.commit();
+
+        var boards:Array<String> = [];
+        var times:Array<Int> = [];
+        var extras:Array<String> = [];
+
+        function pushChange():Void {
+            boards.push(state.spitBoard(plan));
+            extras.push(Std.string(state.extras));
+            historian.write();
+            times.push(history.commit());
+        }
+
+		pushChange();
+
+        // Pick a few pieces
+        for (ike in 0...10) {
+            pickPieceRule.update();
+            pickPieceRule.chooseOption(0);
+        }
 
 		// Freshen and eat body
 
@@ -76,37 +100,23 @@ class StateHistorianTest {
         state.grabXY(9, 7).value.mod(freshness_, 1);
         eatRule.chooseOption(0);
 
-		var board1:String = state.spitBoard(plan);
-		historian.write();
-		var time1:Int = history.commit();
+		pushChange();
 
 		// Freshen and eat head
         state.grabXY(12, 6).value.mod(freshness_, 1);
 		eatRule.chooseOption(0);
 
-		var board2:String = state.spitBoard(plan);
-		historian.write();
-		var time2:Int = history.commit();
+		pushChange();
 
 		// No change!
 
-		var board3:String = state.spitBoard(plan);
-		historian.write();
-		var time3:Int = history.commit();
+		pushChange();
 
-		historian.read();
-		Assert.areEqual(board3, state.spitBoard(plan));
-
-		history.revert(time2);
-		historian.read();
-		Assert.areEqual(board2, state.spitBoard(plan));
-
-		history.revert(time1);
-		historian.read();
-		Assert.areEqual(board1, state.spitBoard(plan));
-
-		history.revert(time0);
-		historian.read();
-		Assert.areEqual(board0, state.spitBoard(plan));
+        while (times.length > 0) {
+            history.revert(times.pop());
+            historian.read();
+            Assert.areEqual(boards.pop(), state.spitBoard(plan));
+            Assert.areEqual(extras.pop(), Std.string(state.extras));
+        }
 	}
 }

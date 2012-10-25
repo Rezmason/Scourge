@@ -68,6 +68,7 @@ class PickPieceRule extends Rule {
     }
 
     override public function update():Void {
+
         if (cfg.allowAll) {
             options = cast allOptions.copy();
             quantumOptions = [];
@@ -234,6 +235,7 @@ class PickPieceRule extends Rule {
     }
 
     private inline function remakeHat():Bool {
+
         return state.aspects.at(pieceHatPlayer_) != state.aspects.at(currentPlayer_) ||
                 state.aspects.at(piecesPicked_) == cfg.hatSize;
     }

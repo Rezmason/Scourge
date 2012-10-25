@@ -153,6 +153,7 @@ class BiteRule extends Rule {
         var option:BiteOption = cast options[choice];
 
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
+        var numBites:Int = state.players[currentPlayer].at(numBites_) - 1;
 
         if (option.targetNode != Aspect.NULL) {
             var node:BoardNode = state.nodes[option.targetNode];
@@ -177,6 +178,7 @@ class BiteRule extends Rule {
             }
 
             state.aspects.mod(maxFreshness_, maxFreshness);
+            state.players[currentPlayer].mod(numBites_, numBites);
         }
     }
 

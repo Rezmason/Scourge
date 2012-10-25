@@ -48,10 +48,10 @@ class CavityRule extends Rule {
 
             // Destroy existing cavity list
             var cavityFirst:Int = player.at(cavityFirst_);
-            var oldCavitySet:Array<BoardNode> = [];
+            var oldCavityNodes:Array<BoardNode> = [];
             if (cavityFirst != Aspect.NULL) {
-                oldCavitySet = state.nodes[cavityFirst].boardListToArray(state.nodes, bodyNext_);
-                for (node in oldCavitySet) clearCavityCell(node);
+                oldCavityNodes = state.nodes[cavityFirst].boardListToArray(state.nodes, bodyNext_);
+                for (node in oldCavityNodes) clearCavityCell(node, maxFreshness);
             }
             player.mod(cavityFirst_, Aspect.NULL);
 
@@ -86,10 +86,9 @@ class CavityRule extends Rule {
             var cavityNodes:Array<BoardNode> = widePerimeter.filter(isEmpty).array();
 
             if (cavityNodes.length > 0) {
-                for (node in cavityNodes) {
-                    createCavity(ike, node);
-                    if (!oldCavitySet.has(node)) node.value.mod(freshness_, maxFreshness);
-                }
+                for (node in cavityNodes) createCavity(ike, oldCavityNodes.has(node) ? 0 : maxFreshness, node);
+                // Find the nodes that were cavityNodes and now aren't, or weren't cavityNodes and now are
+                // node.value.mod(freshness_, maxFreshness);
                 cavityNodes.chainByAspect(nodeID_, cavityNext_, cavityPrev_);
                 player.mod(cavityFirst_, cavityNodes[0].value.at(nodeID_));
                 var totalArea:Int = player.at(totalArea_) + cavityNodes.length;
@@ -118,14 +117,16 @@ class CavityRule extends Rule {
         return true;
     }
 
-    inline function createCavity(occupier:Int, node:BoardNode):Void {
+    inline function createCavity(occupier:Int, maxFreshness:Int, node:BoardNode):Void {
         node.value.mod(isFilled_, Aspect.FALSE);
         node.value.mod(occupier_, occupier);
+        node.value.mod(freshness_, maxFreshness);
     }
 
-    inline function clearCavityCell(node:BoardNode):Void {
+    inline function clearCavityCell(node:BoardNode, maxFreshness:Int):Void {
         node.value.mod(isFilled_, Aspect.FALSE);
         node.value.mod(occupier_, Aspect.NULL);
+        node.value.mod(freshness_, maxFreshness);
         node.removeNode(state.nodes, cavityNext_, cavityPrev_);
     }
 }

@@ -2,6 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
+import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
@@ -14,10 +15,12 @@ class KillHeadlessPlayerRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
+    @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
+    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
     public function new():Void {
         super();
@@ -26,6 +29,8 @@ class KillHeadlessPlayerRule extends Rule {
 
     override public function chooseOption(choice:Int):Void {
         super.chooseOption(choice);
+
+        var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
         for (playerIndex in 0...state.players.length) {
             var player:AspectSet = state.players[playerIndex];
@@ -37,12 +42,23 @@ class KillHeadlessPlayerRule extends Rule {
                 var playerHead:BoardNode = state.nodes[head];
                 if (playerHead.value.at(occupier_) != playerIndex || playerHead.value.at(isFilled_) == Aspect.FALSE) {
                     player.mod(head_, Aspect.NULL);
-                    for (node in state.nodes[bodyFirst].iterate(state.nodes, bodyNext_)) node.removeNode(state.nodes, bodyNext_, bodyPrev_);
+                    var bodyNode:BoardNode = state.nodes[bodyFirst];
+                    for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
                     player.mod(bodyFirst_, Aspect.NULL);
                 }
             }
 
         }
+
+        state.aspects.mod(maxFreshness_, maxFreshness);
+    }
+
+    function killCell(node:BoardNode, maxFreshness:Int):Void {
+        node.value.mod(isFilled_, Aspect.FALSE);
+        node.value.mod(occupier_, Aspect.NULL);
+        node.value.mod(freshness_, maxFreshness);
+
+        node.removeNode(state.nodes, bodyNext_, bodyPrev_);
     }
 }
 

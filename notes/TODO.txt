@@ -1,16 +1,16 @@
-Freshen decayed nodes
-Freshen nodes that have changed their cavity state
-Freshen forfeited nodes
-Freshen killed headless body nodes
+Is working on this game your top priority at the moment?
 
-Test extras in the state historian
-
-Group rules together! At runtime!!
-	Rule groups are updated after their rules are updated
-	Group BuildBoardRule with DecayRule and CavityRule.
+Joint rules
+	cleanup: decay, cavities, kill headless players
+	wrapup: end turn, replenish, pick piece, <clear freshness>, <evaluate win condition>
+	startGame: Build-build-build, cleanup, pick piece
+	bite: Bite, cleanup, <evaluate win condition>
+	swap: Swap, pick piece
+	quit: Forfeit, cleanup, wrapup
+	drop/skip: place piece, cleanup, wrapup
 
 Clean up the rule code
-Put traces into visual tests
+Put board traces into visual tests
 Comment the rule code
 
 And then SPEED EVERYTHING UP
