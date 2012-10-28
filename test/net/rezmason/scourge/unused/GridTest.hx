@@ -1,6 +1,7 @@
 package net.rezmason.scourge.unused;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 typedef TestCell = {str:String, symbol:String};
 

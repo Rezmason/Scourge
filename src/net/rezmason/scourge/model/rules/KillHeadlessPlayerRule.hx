@@ -32,6 +32,8 @@ class KillHeadlessPlayerRule extends Rule {
 
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
+        // Check each player to see if their heads are no longer theirs
+
         for (playerIndex in 0...state.players.length) {
             var player:AspectSet = state.players[playerIndex];
 
@@ -41,6 +43,9 @@ class KillHeadlessPlayerRule extends Rule {
             if (head != Aspect.NULL) {
                 var playerHead:BoardNode = state.nodes[head];
                 if (playerHead.value.at(occupier_) != playerIndex || playerHead.value.at(isFilled_) == Aspect.FALSE) {
+
+                    // Destroy the head and body
+
                     player.mod(head_, Aspect.NULL);
                     var bodyNode:BoardNode = state.nodes[bodyFirst];
                     for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);

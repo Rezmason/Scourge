@@ -33,6 +33,10 @@ class GridUtils {
         return node2;
     }
 
+    public inline static function allNeighbors<T>(node:GridNode<T>):Array<GridNode<T>> {
+        return node.neighbors;
+    }
+
     public inline static function orthoNeighbors<T>(node:GridNode<T>):Array<GridNode<T>> {
         return [n(node), e(node), s(node), w(node)];
     }

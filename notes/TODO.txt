@@ -1,26 +1,23 @@
 Is working on this game your top priority at the moment?
 
-Joint rules
-	cleanup: decay, cavities, kill headless players
-	wrapup: end turn, replenish, pick piece, <clear freshness>, <evaluate win condition>
-	startGame: Build-build-build, cleanup, pick piece
-	bite: Bite, cleanup, <evaluate win condition>
-	swap: Swap, pick piece
-	quit: Forfeit, cleanup, wrapup
-	drop/skip: place piece, cleanup, wrapup
+Clean up and comment the rule code
 
-Clean up the rule code
-Put board traces into visual tests
-Comment the rule code
+RuleFactory
+	Generates rules from a game config
 
-And then SPEED EVERYTHING UP
-	Use timing output to find the bottlenecks
-	Lambda.has is expensive - switch to using tables of ids
-	Store useful information, like edges, distance and connectedness values
-		Rules that take advantage of these values would expand a graph from an affected square
-		Just make sure to update this information when it changes
-	Take advantage of linked lists for storing sets of nodes
-	Also, haxe.List might be better than Array in some situations
+	cleanUp: decay, cavities, killHeadless
+	wrapUp: endTurn, replenish, pickPiece
+	START: cleanUp, pickPiece
+	BITE: bite, cleanUp
+	SWAP: swap, pickPiece
+	FOLD: forfeit, cleanUp, wrapUp
+	DROP/SKIP: dropPiece, cleanUp, wrapUp
+
+Game
+	Maintains states and rules
+	Accepts, validates commands (player choices)
+	Serializes options?
+
 
 New architecture - what's left
 	IPlayer: an object that picks an optimal State from a set of States
@@ -34,11 +31,6 @@ New architecture - what's left
 		ExternalPlayer
 	PlayerFactory: an object that creates Players of different sorts
 	Game
-		Maintains a list of States
-		Validates commands
-			Are they from the right player?
-			Are they associated with an existing rule?
-			Is there a legal move in that rule's space that corresponds with the command?
 		Configuration
 			Initialization parameters passed from outside the game
 				Initial board state, initial player states, default command when the time's up
@@ -68,6 +60,15 @@ New architecture - what's left
 		Receives a list of legal moves and maps them to the UI
 		Interprets user interaction, generates a Command and broadcasts it to the HumanPlayer object
 		Receives goal events and timer tick events and visually interprets them
+
+And then SPEED EVERYTHING UP
+	Use timing output to find the bottlenecks
+	Lambda.has is expensive - switch to using tables of ids
+	Store useful information, like edges, distance and connectedness values
+		Rules that take advantage of these values would expand a graph from an affected square
+		Just make sure to update this information when it changes
+	Take advantage of linked lists for storing sets of nodes
+	Also, haxe.List might be better than Array in some situations
 
 Coarse evaluation
 	Number of nodes (filled and enclosed)

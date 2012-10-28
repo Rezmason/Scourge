@@ -1,6 +1,7 @@
 package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.GridNode;

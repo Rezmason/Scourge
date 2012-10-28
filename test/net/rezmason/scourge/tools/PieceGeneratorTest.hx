@@ -1,6 +1,7 @@
 package net.rezmason.scourge.tools;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.Pieces;
@@ -53,7 +54,7 @@ class PieceGeneratorTest {
                 str += "\n" + "____";
             }
 
-        //trace(str);
+            VisualAssert.assert("all rotations and reflections of pieces of sizes 0-" + size, str);
         }
     }
 
@@ -112,7 +113,7 @@ class PieceGeneratorTest {
             str += "\n" + "____";
         }
 
-        //trace(str);
+        VisualAssert.assert("all rotations and reflections of pieces of sizes 0-3", str);
     }
 
     private function spitPiece(piece:Piece):String {
@@ -131,6 +132,11 @@ class PieceGeneratorTest {
         for (coord in piece[1]) {
             var index:Int = max * (coord[1] + 1) + coord[0] + 1;
             str = str.substr(0, index) + "." + str.substr(index + 1);
+        }
+
+        for (coord in piece[2]) {
+            var index:Int = max * (coord[1] + 1) + coord[0] + 1;
+            str = str.substr(0, index) + "*" + str.substr(index + 1);
         }
 
         for (ike in 0...max) {

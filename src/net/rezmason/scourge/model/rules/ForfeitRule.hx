@@ -38,6 +38,8 @@ class ForfeitRule extends Rule {
         var player:AspectSet = state.players[currentPlayer];
         var bodyNode:BoardNode = state.nodes[player.at(bodyFirst_)];
 
+        // Clear the player's head and body
+
         for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
         player.mod(bodyFirst_, Aspect.NULL);
         player.mod(head_, Aspect.NULL);

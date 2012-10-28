@@ -29,6 +29,7 @@ class SwapPieceRule extends Rule {
         for (player in state.players) player.mod(numSwaps_, cfg.startingSwaps);
     }
 
+    // This rule basically zaps the current player's piece and takes away a swap.
     override public function update():Void {
         options = [];
         var currentPlayer:Int = state.aspects.at(currentPlayer_);

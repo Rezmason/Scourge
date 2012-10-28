@@ -1,6 +1,7 @@
 package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 import net.rezmason.scourge.model.Aspect;
 import net.rezmason.scourge.model.ModelTypes;
@@ -45,6 +46,7 @@ class BiteTest extends RuleTest
             omnidirectional:false,
             biteThroughCavities:false,
             biteHeads:false,
+            orthoOnly:true,
         };
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
@@ -55,14 +57,16 @@ class BiteTest extends RuleTest
         var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
         state.players[0].mod(numBites_, 100);
 
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+        VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
+
         biteRule.update();
         var options:Array<BiteOption> = cast biteRule.options;
         Assert.areEqual(9, options.length);
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
         biteRule.chooseOption(0);
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+
+        VisualAssert.assert("two player bite, bite taken up top", state.spitBoard(plan, true, F_isForFreshness));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20 - 1, numCells); // 19 cells for player 1
@@ -81,6 +85,7 @@ class BiteTest extends RuleTest
             omnidirectional:false,
             biteThroughCavities:false,
             biteHeads:false,
+            orthoOnly:true,
         };
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
@@ -92,7 +97,8 @@ class BiteTest extends RuleTest
 
         state.players[0].mod(numBites_, 100);
 
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+        VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
+
         biteRule.update();
         var options:Array<BiteOption> = cast biteRule.options;
         Assert.areEqual(17, options.length);
@@ -106,7 +112,56 @@ class BiteTest extends RuleTest
             }
         }
 
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+        VisualAssert.assert("two player bite, three-unit bite down from top", state.spitBoard(plan, true, F_isForFreshness));
+
+        numCells = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
+        Assert.areEqual(20 - biteConfig.maxReach, numCells); // 19 cells for player 1
+
+        testEnemyBody(numCells);
+    }
+
+    @Test
+    public function diagonalStraightBite3():Void {
+
+        var biteConfig:BiteConfig = {
+            minReach:1,
+            maxReach:3,
+            maxSizeReference:1,
+            baseReachOnThickness:false,
+            omnidirectional:false,
+            biteThroughCavities:false,
+            biteHeads:false,
+            orthoOnly:false,
+        };
+        var biteRule:BiteRule = new BiteRule(biteConfig);
+        makeState([biteRule], 2, TestBoards.twoPlayerBite);
+
+        var F_isForFreshness:IntHash<String> = new IntHash<String>();
+        F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
+
+        var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
+
+        state.players[0].mod(numBites_, 100);
+
+        VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
+
+        biteRule.update();
+        var options:Array<BiteOption> = cast biteRule.options;
+        Assert.areEqual(45, options.length);
+        var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
+        Assert.areEqual(20, numCells); // 20 cells for player 1
+
+        stateHistorian.write();
+
+        for (option in options) {
+            if (option.bitNodes.length == biteConfig.maxReach) {
+                biteRule.chooseOption(option.optionID);
+                break;
+            }
+        }
+
+        VisualAssert.assert("two player bite, three-unit bite down-diagonal from top", state.spitBoard(plan, true, F_isForFreshness));
+
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20 - biteConfig.maxReach, numCells); // 19 cells for player 1
 
@@ -124,6 +179,7 @@ class BiteTest extends RuleTest
             omnidirectional:true,
             biteThroughCavities:false,
             biteHeads:false,
+            orthoOnly:true,
         };
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
@@ -135,7 +191,8 @@ class BiteTest extends RuleTest
 
         state.players[0].mod(numBites_, 100);
 
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+        VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
+
         biteRule.update();
         var options:Array<BiteOption> = cast biteRule.options;
         Assert.areEqual(28, options.length);
@@ -149,7 +206,8 @@ class BiteTest extends RuleTest
             }
         }
 
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+        VisualAssert.assert("two player bite, two-unit byte along top going east", state.spitBoard(plan, true, F_isForFreshness));
+
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20 - biteConfig.maxReach, numCells); // 19 cells for player 1
 
@@ -167,6 +225,7 @@ class BiteTest extends RuleTest
             omnidirectional:false,
             biteThroughCavities:false,
             biteHeads:true,
+            orthoOnly:true,
         };
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
@@ -180,7 +239,8 @@ class BiteTest extends RuleTest
         var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
         state.players[0].mod(numBites_, 100);
 
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+        VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
+
         biteRule.update();
         var options:Array<BiteOption> = cast biteRule.options;
         Assert.areEqual(10, options.length);
@@ -193,7 +253,8 @@ class BiteTest extends RuleTest
                 break;
             }
         }
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+        VisualAssert.assert("two player bite, player one's noggin bit", state.spitBoard(plan, true, F_isForFreshness));
+
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20 - 1, numCells); // 19 cells for player 1
@@ -212,6 +273,7 @@ class BiteTest extends RuleTest
             omnidirectional:false,
             biteThroughCavities:false,
             biteHeads:true,
+            orthoOnly:true,
         };
 
         var biteRule:BiteRule = new BiteRule(biteConfig);
@@ -223,7 +285,8 @@ class BiteTest extends RuleTest
         var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
         state.players[0].mod(numBites_, 100);
 
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+        VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
+
         biteRule.update();
         var options:Array<BiteOption> = cast biteRule.options;
         Assert.areEqual(20, options.length);
@@ -238,7 +301,8 @@ class BiteTest extends RuleTest
             }
         }
         biteRule.chooseOption(thickestOptionID);
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+
+        VisualAssert.assert("two player bite, deep bite right through the middle", state.spitBoard(plan, true, F_isForFreshness));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20 - numBitNodes, numCells); // 19 cells for player 1
@@ -257,6 +321,7 @@ class BiteTest extends RuleTest
             omnidirectional:false,
             biteThroughCavities:true,
             biteHeads:false,
+            orthoOnly:true,
         };
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
@@ -277,7 +342,8 @@ class BiteTest extends RuleTest
         var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
         state.players[0].mod(numBites_, 100);
 
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+        VisualAssert.assert("two player bite with small cavity in player one", state.spitBoard(plan, true, F_isForFreshness));
+
         biteRule.update();
         var options:Array<BiteOption> = cast biteRule.options;
         Assert.areEqual(9 + 6, options.length);
@@ -293,7 +359,7 @@ class BiteTest extends RuleTest
             }
         }
 
-        //trace(state.spitBoard(plan, true, F_isForFreshness));
+        VisualAssert.assert("two player bite, cavity bitten", state.spitBoard(plan, true, F_isForFreshness));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20 - 1, numCells); // 19 cells for player 1

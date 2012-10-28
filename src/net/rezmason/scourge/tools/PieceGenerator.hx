@@ -318,7 +318,8 @@ class PieceGenerator {
     private static function patternToPiece(pattern:Pattern):Piece {
 
         var coords:Array<IntCoord> = [];
-        var neighborCoords:Array<IntCoord> = [];
+        var orthoNeighborCoords:Array<IntCoord> = [];
+        var diagonalNeighborCoords:Array<IntCoord> = [];
 
         pattern = copyPattern(pattern); // !!
         for (row in pattern) row.unshift(false); // !!
@@ -331,24 +332,33 @@ class PieceGenerator {
             for (x in 0...pattern.length) {
                 if (pattern[y][x] != true) {
 
-                    var valid:Bool = false;
+                    var atBottom:Bool = pattern[y-1] != null;
+                    var atTop:Bool =    pattern[y+1] != null;
+
+                    var isOrthoNeighbor:Bool = false;
+                    var isDiagonalNeighbor:Bool = false;
 
                     if (pattern[y][x-1] == true || pattern[y][x+1] == true) {
-                        valid = true;
-                    } else if (pattern[y-1] != null && pattern[y-1][x] == true) {
-                        valid = true;
-                    } else if (pattern[y+1] != null && pattern[y+1][x] == true) {
-                        valid = true;
+                        isOrthoNeighbor = true;
+                    } else if (atBottom && pattern[y-1][x] == true) {
+                        isOrthoNeighbor = true;
+                    } else if (atTop && pattern[y+1][x] == true) {
+                        isOrthoNeighbor = true;
+                    } else if (atBottom && (pattern[y-1][x-1] == true || pattern[y-1][x+1] == true)) {
+                        isDiagonalNeighbor = true;
+                    } else if (atTop && (pattern[y+1][x-1] == true || pattern[y+1][x+1] == true)) {
+                        isDiagonalNeighbor = true;
                     }
 
-                    if (valid) neighborCoords.push([x-1, y-1]);
+                    if (isOrthoNeighbor) orthoNeighborCoords.push([x-1, y-1]);
+                    if (isDiagonalNeighbor) diagonalNeighborCoords.push([x-1, y-1]);
                 }
             }
         }
 
         for (y in 0...pattern.length) for (x in 0...pattern[y].length) if (pattern[y][x] == true) coords.push([x-1, y-1]);
 
-        return [coords, neighborCoords];
+        return [coords, orthoNeighborCoords, diagonalNeighborCoords];
     }
 
     private static function groupToPieceGroup(group:Array<Array<Pattern>>):PieceGroup {

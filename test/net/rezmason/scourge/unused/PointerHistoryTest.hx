@@ -1,6 +1,7 @@
 package net.rezmason.scourge.unused;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 import net.rezmason.scourge.unused.PointerHistory;
 import net.rezmason.scourge.unused.Pointer;

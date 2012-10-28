@@ -1,6 +1,7 @@
 package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.ModelTypes;
@@ -51,7 +52,7 @@ class BoardRuleTest extends RuleTest {
         }
 
         #if VISUAL_TEST
-            trace("VISUAL ASSERTION: Should appear to be four integers, equally spaced and equally distant from the edges of a box");
+            trace("Should appear to be four integers, equally spaced and equally distant from the edges of a box");
             trace(state.spitBoard(plan));
         #else
             Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, state.spitBoard(plan, false));
@@ -84,7 +85,7 @@ class BoardRuleTest extends RuleTest {
         makeState(null, 1, null, true);
 
         #if VISUAL_TEST
-            trace("VISUAL ASSERTION: Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
+            trace("Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
             trace(state.spitBoard(plan));
         #else
             Assert.areEqual(TestBoards.emptyPetri, state.spitBoard(plan, false));
@@ -96,10 +97,7 @@ class BoardRuleTest extends RuleTest {
 
         makeState(null, 4, TestBoards.spiral);
 
-        #if VISUAL_TEST
-            trace("VISUAL ASSERTION: Should appear to be a four-player board with a spiral interior");
-            trace(state.spitBoard(plan));
-        #end
+        VisualAssert.assert("Should appear to be a four-player board with a spiral interior", state.spitBoard(plan));
 
         Assert.areEqual(TestBoards.spiral, state.spitBoard(plan, false));
 
@@ -113,7 +111,5 @@ class BoardRuleTest extends RuleTest {
         Assert.areNotEqual(Aspect.NULL, bodyFirst);
 
         testListLength(numCells, state.nodes[bodyFirst], bodyNext_, bodyPrev_);
-
-        //trace(history.dump());
     }
 }

@@ -1,6 +1,7 @@
 package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
@@ -89,9 +90,11 @@ class TurnRulesTest extends RuleTest
         Assert.isNotNull(options);
         Assert.areEqual(1, options.length);
 
-        //trace(state.spitBoard(plan));
+        VisualAssert.assert("player 0 is alive", state.spitBoard(plan));
+
         forfeitRule.chooseOption(0);
-        //trace(state.spitBoard(plan));
+
+        VisualAssert.assert("player 0 is dead and gone", state.spitBoard(plan));
 
         Assert.areEqual(Aspect.NULL, playerHead.value.at(occupier_));
         Assert.areEqual(0, playerHead.value.at(isFilled_));

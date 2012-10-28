@@ -1,6 +1,7 @@
 package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
@@ -41,9 +42,11 @@ class CavityRuleTest extends RuleTest
         Assert.areEqual(50, numCells);
         Assert.areEqual(0, numCavityCells);
 
-        //trace(state.spitBoard(plan));
+        VisualAssert.assert("cavity city (empty)", state.spitBoard(plan));
+
         cavityRule.chooseOption(0);
-        //trace(state.spitBoard(plan));
+
+        VisualAssert.assert("cavity city (all cavities filled)", state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         numCavityCells = ~/([^a])/g.replace(state.spitBoard(plan), "").length;
@@ -87,9 +90,11 @@ class CavityRuleTest extends RuleTest
         Assert.areEqual(51, numCells);
         Assert.areEqual(0, numCavityCells);
 
-        //trace(state.spitBoard(plan));
+        VisualAssert.assert("cavity city (empty) with broken moat", state.spitBoard(plan));
+
         cavityRule.chooseOption(0);
-        //trace(state.spitBoard(plan));
+
+        VisualAssert.assert("cavity city (all cavities filled) with broken moat", state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         numCavityCells = ~/([^a])/g.replace(state.spitBoard(plan), "").length;

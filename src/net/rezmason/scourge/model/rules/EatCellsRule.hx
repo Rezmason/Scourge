@@ -43,44 +43,51 @@ class EatCellsRule extends Rule {
     override public function chooseOption(choice:Int):Void {
         super.chooseOption(choice);
 
-        // Find all fresh body nodes of the current player
-
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var head:Int = state.players[currentPlayer].at(head_);
         var playerHead:BoardNode = state.nodes[head];
         var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
+        // List all the players' heads
+
         var headIndices:Array<Int> = [];
         for (player in state.players) headIndices.push(player.at(head_));
+
+        // Find all fresh body nodes of the current player
 
         var nodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFresh).array();
 
         var newNodes:List<BoardNode> = nodes.list();
         var eatenNodes:Array<BoardNode> = [];
 
+        // We search space for uninterrupted regions of player cells that begin and end
+        // with cells of the current player. We propagate these searches from cells
+        // that have been freshly eaten, starting with the current player's fresh nodes
+
         var node:BoardNode = newNodes.pop();
         while (node != null) {
+            // search in all directions
             for (direction in directionsFor(cfg.orthoOnly)) {
                 var pendingNodes:Array<BoardNode> = [];
                 for (scout in node.walk(direction)) {
-                    if (scout == node) continue;
+                    if (scout == node) continue; // starting node
                     if (scout.value.at(isFilled_) > 0) {
                         var scoutOccupier:Int = scout.value.at(occupier_);
                         if (scoutOccupier == currentPlayer || eatenNodes.has(scout)) {
+                            // Add nodes to the eaten region
                             for (pendingNode in pendingNodes) {
                                 var playerIndex:Int = headIndices.indexOf(pendingNode.value.at(nodeID_));
-                                if (playerIndex != -1) {
-                                    if (cfg.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerIndex));
-                                } else {
-                                    if (cfg.recursive && !newNodes.has(pendingNode)) newNodes.add(pendingNode);
-                                }
+                                if (playerIndex != -1 && cfg.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerIndex)); // body-from-head eating
+                                else if (cfg.recursive && !newNodes.has(pendingNode)) newNodes.add(pendingNode); // recursive eating
+
                                 eatenNodes.push(pendingNode);
                             }
                             break;
                         } else if (headIndices[scoutOccupier] == scout.value.at(nodeID_)) {
+                            // Only eat heads if the config specifies this
                             if (cfg.eatHeads) pendingNodes.push(scout);
-                            else break;
+                            //else break;
                         } else {
                             pendingNodes.push(scout);
                         }
@@ -92,6 +99,7 @@ class EatCellsRule extends Rule {
             node = newNodes.pop();
         }
 
+        // Update cell in the eaten region
         for (node in eatenNodes) bodyNode = eatCell(node, currentPlayer, maxFreshness++, bodyNode);
 
         state.players[currentPlayer].mod(bodyFirst_, bodyNode.value.at(nodeID_));

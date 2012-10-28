@@ -1,6 +1,7 @@
 package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
@@ -13,8 +14,8 @@ using net.rezmason.utils.Pointers;
 
 class RuleTest
 {
+    var stateHistorian:StateHistorian;
     var history:StateHistory;
-
     var state:State;
     var historyState:State;
     var plan:StatePlan;
@@ -25,9 +26,10 @@ class RuleTest
 
     @BeforeClass
     public function beforeClass():Void {
-        history = new StateHistory();
-        state = new State();
-        historyState = new State();
+        stateHistorian = new StateHistorian();
+        history = stateHistorian.history;
+        state = stateHistorian.state;
+        historyState = stateHistorian.historyState;
     }
 
     @AfterClass

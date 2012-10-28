@@ -11,6 +11,10 @@ using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
 
+typedef DecayConfig = {
+    var orthoOnly:Bool;
+}
+
 class DecayRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
@@ -24,29 +28,34 @@ class DecayRule extends Rule {
     @player(BodyAspect.HEAD) var head_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
-    public function new():Void {
+    private var cfg:DecayConfig;
+
+    public function new(cfg:DecayConfig):Void {
         super();
+        this.cfg = cfg;
         options.push({optionID:0});
     }
 
     override public function chooseOption(choice:Int):Void {
         super.chooseOption(choice);
-        // perform kill operation on state
 
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
+
+        // Grab all the player heads
 
         var heads:Array<BoardNode> = [];
         for (player in state.players) {
             var headIndex:Int = player.at(head_);
             if (headIndex != Aspect.NULL) heads.push(state.nodes[headIndex]);
         }
-        var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(true, isLivingBodyNeighbor);
 
+        // Use the heads as starting points for a flood fill of connected living cells
+        var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(cfg.orthoOnly, isLivingBodyNeighbor);
+
+        // Remove cells from player bodies
         for (player in state.players) {
 
             var totalArea:Int = 0;
-
-            // Removing nodes is not something to do haphazardly - what if you remove the first one?
 
             var bodyFirst:Int = player.at(bodyFirst_);
             if (bodyFirst != Aspect.NULL) {

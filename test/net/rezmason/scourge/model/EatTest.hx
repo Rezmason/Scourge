@@ -1,6 +1,7 @@
 package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 import net.rezmason.scourge.model.GridNode;
 import net.rezmason.scourge.model.ModelTypes;
@@ -56,9 +57,11 @@ class EatTest extends RuleTest
 
         // straight up eating
 
-        //trace(state.spitBoard(plan, true));
+        VisualAssert.assert("two player grab", state.spitBoard(plan));
+
         eatRule.chooseOption(0);
-        //trace(state.spitBoard(plan, true));
+
+        VisualAssert.assert("two player grab, vertical portions of horseshoe arm eaten", state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25 + 6, numCells);
@@ -90,9 +93,11 @@ class EatTest extends RuleTest
 
         // recursive eating
 
-        //trace(state.spitBoard(plan, true));
+        VisualAssert.assert("two player grab", state.spitBoard(plan));
+
         eatRule.chooseOption(0);
-        //trace(state.spitBoard(plan, true));
+
+        VisualAssert.assert("two player grab, horseshoe arms eaten", state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25 + 6 + 1, numCells);
@@ -120,9 +125,11 @@ class EatTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25, numCells);
 
+        VisualAssert.assert("two player grab", state.spitBoard(plan));
+
         eatRule.chooseOption(0);
 
-        //trace(state.spitBoard(plan, true));
+        VisualAssert.assert("two player grab, player one eaten", state.spitBoard(plan));
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25 + 13, numCells); // Eat everything
@@ -149,7 +156,7 @@ class EatTest extends RuleTest
 
         eatRule.chooseOption(0);
 
-        //trace(state.spitBoard(plan, true));
+        VisualAssert.assert("two player grab, player one head eaten and body killed", state.spitBoard(plan));
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25 + 1, numCells); // Only eat the head
@@ -186,9 +193,11 @@ class EatTest extends RuleTest
 
         // straight up eating
 
-        //trace(state.spitBoard(plan, true));
+        VisualAssert.assert("two player N", state.spitBoard(plan));
+
         eatRule.chooseOption(0);
-        //trace(state.spitBoard(plan, true));
+
+        VisualAssert.assert("two player N, left descender eaten", state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(76 + 14, numCells);

@@ -109,6 +109,21 @@ class TestBoards {
         "XXXX     XXXX\n" +
         "XXXXXXXXXXXXX";
 
+    public static var flowerPetri:String = "\n" +
+        "XXXXXXXXXXXXX\n" +
+        "XXXX     XXXX\n" +
+        "XXX       XXX\n" +
+        "XX         XX\n" +
+        "X           X\n" +
+        "X     0     X\n" +
+        "X    000    X\n" +
+        "X     0     X\n" +
+        "X           X\n" +
+        "XX         XX\n" +
+        "XXX       XXX\n" +
+        "XXXX     XXXX\n" +
+        "XXXXXXXXXXXXX";
+
     public static var loosePetri:String = "\n" +
         "XXXXXXXXXXXXX\n" +
         "XXXX     XXXX\n" +

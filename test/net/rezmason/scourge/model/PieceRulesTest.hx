@@ -1,10 +1,12 @@
 package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
+import VisualAssert;
 
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.Aspect;
 import net.rezmason.scourge.model.aspects.BodyAspect;
+import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.rules.DropPieceRule;
 import net.rezmason.scourge.model.rules.TestPieceRule;
@@ -41,7 +43,7 @@ class PieceRulesTest extends RuleTest
     // Y                    Y                   72
 
 	@Test
-	public function placePieceRuleTest1():Void {
+	public function placePieceRuleTestOrtho():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -56,6 +58,8 @@ class PieceRulesTest extends RuleTest
             allowRotating:true,
             growGraph:false,
             allowNowhere:false,
+            orthoOnly:true,
+            diagOnly:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -68,9 +72,11 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard(plan));
+        VisualAssert.assert("empty petri", state.spitBoard(plan));
+
         dropRule.chooseOption(0);
-        //trace(state.spitBoard(plan));
+
+        VisualAssert.assert("empty petri, L piece on bottom left extending up", state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
@@ -84,7 +90,7 @@ class PieceRulesTest extends RuleTest
 	}
 
     @Test
-    public function placePieceRuleTest2():Void {
+    public function placePieceRuleTestOrthoNoFlipping():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -99,6 +105,8 @@ class PieceRulesTest extends RuleTest
             allowRotating:true,
             growGraph:false,
             allowNowhere:false,
+            orthoOnly:true,
+            diagOnly:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -111,16 +119,14 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard(plan));
         dropRule.chooseOption(0);
-        //trace(state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
     @Test
-    public function placePieceRuleTest3():Void {
+    public function placePieceRuleTestOrthoNoSpinning():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -135,6 +141,8 @@ class PieceRulesTest extends RuleTest
             allowRotating:false,
             growGraph:false,
             allowNowhere:false,
+            orthoOnly:true,
+            diagOnly:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -147,16 +155,14 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard(plan));
         dropRule.chooseOption(0);
-        //trace(state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
     @Test
-    public function placePieceRuleTest4():Void {
+    public function placePieceRuleTestOrthoNoSpinningOrFlipping():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -171,6 +177,8 @@ class PieceRulesTest extends RuleTest
             allowRotating:false,
             growGraph:false,
             allowNowhere:false,
+            orthoOnly:true,
+            diagOnly:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -183,16 +191,14 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard(plan));
         dropRule.chooseOption(0);
-        //trace(state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
     @Test
-    public function placePieceRuleTest5():Void {
+    public function placePieceRuleTestOrthoSelf():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -207,6 +213,8 @@ class PieceRulesTest extends RuleTest
             allowRotating:false,
             growGraph:false,
             allowNowhere:false,
+            orthoOnly:true,
+            diagOnly:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -219,16 +227,14 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard(plan));
         dropRule.chooseOption(0);
-        //trace(state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
-        Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
+        Assert.areEqual(PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
     @Test
-    public function placePieceRuleTest6():Void {
+    public function placePieceRuleTestOrthoAllowNowhere():Void {
 
         var dropConfig:DropPieceConfig = {
             overlapSelf:false,
@@ -236,6 +242,8 @@ class PieceRulesTest extends RuleTest
             allowRotating:false,
             growGraph:false,
             allowNowhere:true,
+            orthoOnly:true,
+            diagOnly:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([dropRule], 1, TestBoards.emptyPetri);
@@ -248,12 +256,14 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        //trace(state.spitBoard(plan));
+        VisualAssert.assert("empty petri", state.spitBoard(plan));
+
         dropRule.chooseOption(0);
-        //trace(state.spitBoard(plan));
+
+        VisualAssert.assert("empty petri", state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
-        Assert.areEqual(1, numCells); // 5 cells for player 0
+        Assert.areEqual(1, numCells); // 1 cell still for player 0
     }
 
     @Test
@@ -337,6 +347,79 @@ class PieceRulesTest extends RuleTest
 
         Assert.areEqual(1, pickPieceRule.options.length);
         Assert.areEqual(11, pickPieceRule.quantumOptions.length);
+    }
+
+    @Test
+    public function placePieceRuleTestDiag():Void {
+
+        var testPieceCfg:TestPieceConfig = {
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            reflection:0,
+            rotation:0,
+        };
+        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
+
+        var dropConfig:DropPieceConfig = {
+            overlapSelf:false,
+            allowFlipping:true,
+            allowRotating:true,
+            growGraph:false,
+            allowNowhere:false,
+            orthoOnly:false,
+            diagOnly:true,
+        };
+        var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
+        makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
+
+        dropRule.update();
+        var options:Array<DropPieceOption> = cast dropRule.options;
+
+        Assert.areEqual(40, options.length);
+
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        Assert.areEqual(1, numCells); // 1 cell for player 0
+
+        dropRule.chooseOption(0);
+
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
+    }
+
+    @Test
+    public function placePieceRuleTestOrthoDiag():Void {
+
+        var testPieceCfg:TestPieceConfig = {
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            reflection:0,
+            rotation:0,
+        };
+
+        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
+
+        var dropConfig:DropPieceConfig = {
+            overlapSelf:false,
+            allowFlipping:false,
+            allowRotating:false,
+            growGraph:false,
+            allowNowhere:false,
+            orthoOnly:false,
+            diagOnly:false,
+        };
+        var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
+        makeState([testPieceRule, dropRule], 1, TestBoards.flowerPetri);
+
+        dropRule.update();
+        var options:Array<DropPieceOption> = cast dropRule.options;
+
+        Assert.areEqual(33, options.length);
+
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        Assert.areEqual(5, numCells); // 5 cells for player 0
+
+        dropRule.chooseOption(0);
+
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        Assert.areEqual(5 + 4, numCells); // 9 cells for player 0
     }
 
     @Test

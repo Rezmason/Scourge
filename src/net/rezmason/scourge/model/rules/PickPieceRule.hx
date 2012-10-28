@@ -62,6 +62,8 @@ class PickPieceRule extends Rule {
         if (cfg.hatSize > cfg.pieceTableIDs.length) cfg.hatSize = cfg.pieceTableIDs.length;
     }
 
+    // All this for an overglorified random piece picker!
+
     override public function init():Void {
         buildPieceOptions();
         buildHat();
@@ -70,13 +72,18 @@ class PickPieceRule extends Rule {
     override public function update():Void {
 
         if (cfg.allowAll) {
+            // The simplest system; the player can use any provided piece at any time
             options = cast allOptions.copy();
             quantumOptions = [];
         } else if (remakeHat()) {
+            // The hat's been refilled; all piece options are available as quantum options
             options = [pickOption];
             quantumOptions = cast allOptions.copy();
         } else if (state.aspects.at(pieceTableID_) == Aspect.NULL) {
             options = [pickOption];
+
+            // Iterate over the hat's contents and incrlude the corresopnding quantum options
+
             var quantumPieceOptions:Array<PickPieceOption> = [];
             var firstHatPiece:AspectSet = state.extras[state.aspects.at(pieceHatFirst_)];
             var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
@@ -90,8 +97,10 @@ class PickPieceRule extends Rule {
 
         var option:PickPieceOption = cast options[choice];
         if (cfg.allowAll) {
+            // The player's choice is selected
             setPiece(option.pieceTableID, option.reflection, option.rotation);
         } else {
+            // A selection is made randomly
             if (remakeHat()) buildHat();
             option = pickOptionFromHat();
             setPiece(option.pieceTableID, option.reflection, option.rotation);
@@ -100,7 +109,7 @@ class PickPieceRule extends Rule {
 
     override public function chooseQuantumOption(choice:Int):Void {
         super.chooseQuantumOption(choice);
-
+        // The player's choice is selected
         var option:PickPieceOption = cast options[choice];
         if (remakeHat()) buildHat();
         pickOptionFromHat(option);
@@ -108,8 +117,14 @@ class PickPieceRule extends Rule {
     }
 
     private function buildPieceOptions():Void {
+
+        // Every option has to be made before the game begins. These options
+        // are reused throughout the game to represent the hat's contents.
+
         allOptions = [];
         pickOption = {optionID:0};
+
+        // We create the table of piece frequencies from the config
 
         var pieceFrequencies:Array<Null<Int>> = [];
         for (pieceTableID in cfg.pieceTableIDs) {
@@ -124,6 +139,9 @@ class PickPieceRule extends Rule {
             if (freq == 0 || freq == null) continue;
 
             var piece:PieceGroup = Pieces.getPieceById(pieceTableID);
+
+            // A piece that can't be flipped or rotated has its multiple symmetries
+            // added to the hat, and so it has more options
 
             if (cfg.allowFlipping) {
                 if (cfg.allowRotating) {
@@ -185,6 +203,11 @@ class PickPieceRule extends Rule {
         var firstHatPiece:AspectSet = state.extras[state.aspects.at(pieceHatFirst_)];
         var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
 
+        // Because pieces are differently weighted, we need to use a binary search algo
+        // to retrieve a picked piece
+
+        // ...or maybe not. TODO: Revisit this
+
         var maxWeight:Float = 0;
         var weights:Array<Float> = [];
         for (piece in hatPieces) {
@@ -234,6 +257,7 @@ class PickPieceRule extends Rule {
         return search(0, list.length);
     }
 
+    // We fill the hat up again if it's empty
     private inline function remakeHat():Bool {
 
         return state.aspects.at(pieceHatPlayer_) != state.aspects.at(currentPlayer_) ||

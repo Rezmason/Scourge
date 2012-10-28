@@ -9,11 +9,11 @@ using net.rezmason.scourge.model.AspectUtils;
 using net.rezmason.utils.Pointers;
 
 typedef ReplenishableConfig = {
-    prop:AspectProperty,
-    amount:Int,
-    period:Int,
-    maxAmount:Int,
-    ?replenishableID:Int, // Not preferred syntax; ask the list
+    var prop:AspectProperty;
+    var amount:Int;
+    var period:Int;
+    var maxAmount:Int;
+    @:optional var replenishableID:Int;
 }
 
 typedef ReplenishConfig = {>BuildConfig,
@@ -51,6 +51,8 @@ class ReplenishRule extends Rule {
 
     override public function init():Void {
 
+        // As a meta-rule, ReplenishRule has a relatively complex init function.
+
         var stateReps:Array<AspectSet> = [];
         var playerReps:Array<AspectSet> = [];
         var nodeReps:Array<AspectSet> = [];
@@ -73,6 +75,8 @@ class ReplenishRule extends Rule {
             repCfg.replenishableID = replenishable.at(repID_);
             nodeReps.push(replenishable);
         }
+
+        // List the replenishables
 
         if (stateReps.length > 0) {
             stateReps.chainByAspect(repID_, repNext_, repPrev_);
@@ -102,11 +106,14 @@ class ReplenishRule extends Rule {
         updateReps(cfg.stateProperties, updateState);
         updateReps(cfg.playerProperties, updatePlayers);
         updateReps(cfg.nodeProperties, updateNodes);
-
     }
 
     private function makeReplenishable(repCfg:ReplenishableConfig, lookup:AspectLookup):AspectSet {
 
+        // A replenishable is really just an accumulator that performs an action
+        // on a value stored in a particular aspect set, at a specific index
+
+        // We represent replenishables as extras
         var rep:AspectSet = buildExtra();
         rep.mod(repPropLookup_, lookup[repCfg.prop.id].pointerToInt());
         rep.mod(repID_, state.extras.length);
@@ -118,19 +125,22 @@ class ReplenishRule extends Rule {
     }
 
     private function updateReps(repCfgs:Array<ReplenishableConfig>, updateFunc:ReplenishableConfig->AspectPtr->Void):Void {
+        // Each replenishable gets its iterator incremented
         for (repCfg in repCfgs) {
             var replenishable:AspectSet = state.extras[repCfg.replenishableID];
             var step:Int = replenishable.at(repStep_);
             step++;
             if (step == repCfg.period) {
+                // Time for action! Resolve the pointer and update values at that location
                 step = 0;
                 var ptr:AspectPtr = replenishable.at(repPropLookup_).pointerArithmetic();
-                updateFunc(repCfg, ptr);
+                updateFunc(repCfg, ptr); // TODO: Do this with fewer function calls (and iterations)
             }
             replenishable.mod(repStep_, step);
         }
     }
 
+    // Only one aspect set to update– the state's.
     private function updateState(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
         var value:Int = state.aspects.at(ptr);
         value += repCfg.amount;
@@ -138,7 +148,7 @@ class ReplenishRule extends Rule {
         state.aspects.mod(ptr, value);
     }
 
-
+    // Update each player's aspect set
     private function updatePlayers(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
         for (player in state.players) {
             var value:Int = player.at(ptr);
@@ -148,7 +158,7 @@ class ReplenishRule extends Rule {
         }
     }
 
-
+    // Update each node's aspect set
     private function updateNodes(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
         for (node in state.nodes) {
             var value:Int = node.value.at(ptr);

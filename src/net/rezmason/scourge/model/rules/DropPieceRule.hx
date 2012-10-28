@@ -20,12 +20,17 @@ typedef DropPieceConfig = {
     public var allowRotating:Bool;
     public var growGraph:Bool;
     public var allowNowhere:Bool;
+    public var orthoOnly:Bool;
+    public var diagOnly:Bool;
 }
 
 typedef DropPieceOption = {>Option,
     var targetNode:Int;
+    var addedNodes:Array<Int>;
     var rotation:Int;
     var reflection:Int;
+    var coord:IntCoord;
+    var duplicate:Bool;
 }
 
 class DropPieceRule extends Rule {
@@ -67,63 +72,100 @@ class DropPieceRule extends Rule {
             var pieceReflection:Int = state.aspects.at(pieceReflection_);
             var pieceRotation:Int = state.aspects.at(pieceRotation_);
 
+            // For each allowed reflection,
             var allowedReflectionIndex:Int = pieceReflection % pieceGroup.length;
             for (reflectionIndex in 0...pieceGroup.length) {
 
                 if (!cfg.allowFlipping && reflectionIndex != allowedReflectionIndex) continue;
                 var reflection:Array<Piece> = pieceGroup[reflectionIndex];
 
+                // For each allowed rotation,
                 var allowedRotationIndex:Int = pieceRotation % reflection.length;
+
                 for (rotationIndex in 0...reflection.length) {
 
                     if (!cfg.allowRotating && rotationIndex != allowedRotationIndex) continue;
                     var rotation:Piece = reflection[rotationIndex];
 
-                    var touchedNodes:Array<BoardNode> = [];
+                    var coordCache:IntHash<Array<IntCoord>> = new IntHash<Array<IntCoord>>();
 
-                    var coords:Array<IntCoord> = rotation[0];
-                    var homeCoord:IntCoord = coords[0];
-
+                    // For each edge node,
                     for (node in edgeNodes) {
-                        for (neighborCoord in rotation[1]) {
-                            var nodeAtCoord:BoardNode = walkNode(node, neighborCoord, homeCoord);
-                            if (!touchedNodes.has(nodeAtCoord)) touchedNodes.push(nodeAtCoord);
-                        }
 
-                        if (cfg.overlapSelf) {
-                            for (coord in rotation[0]) {
-                                var nodeAtCoord:BoardNode = walkNode(node, coord, homeCoord);
-                                if (!touchedNodes.has(nodeAtCoord)) touchedNodes.push(nodeAtCoord);
+                        // Generate the piece's footprint
+
+                        var footprint:Array<IntCoord> = [];
+                        if (cfg.overlapSelf) footprint = footprint.concat(rotation[0]);
+                        if (!cfg.diagOnly) footprint = footprint.concat(rotation[1]);
+                        if (!cfg.orthoOnly) footprint = footprint.concat(rotation[2]);
+
+                        // Using each footprint coord as a home coord (aka the point of connection),
+                        for (homeCoord in footprint) {
+
+                            var nodeID:Int = node.value.at(nodeID_);
+                            var cache:Array<IntCoord> = coordCache.get(nodeID);
+                            if (cache == null) coordCache.set(nodeID, cache = []);
+                            if (!cache.has(homeCoord)) {
+                                cache.push(homeCoord);
+
+                                // Is the piece's body clear?
+
+                                var valid:Bool = true;
+
+                                var addedNodes:Array<Int> = [];
+
+                                for (coord in rotation[0]) {
+                                    var nodeAtCoord:BoardNode = walkNode(node, coord, homeCoord);
+                                    addedNodes.push(nodeAtCoord.value.at(nodeID_));
+                                    var occupier:Int = nodeAtCoord.value.at(occupier_);
+                                    var isFilled:Int = nodeAtCoord.value.at(isFilled_);
+
+                                    if (isFilled == Aspect.TRUE && occupier != Aspect.NULL && !(cfg.overlapSelf && occupier == currentPlayer)) {
+                                        valid = false;
+                                        break;
+                                    }
+                                }
+
+                                if (valid) {
+                                    dropOptions.push({
+                                        targetNode:nodeID,
+                                        coord:homeCoord,
+                                        rotation:rotationIndex,
+                                        reflection:reflectionIndex,
+                                        optionID:dropOptions.length,
+                                        addedNodes:addedNodes,
+                                        duplicate:false,
+                                    });
+                                }
                             }
-                        }
-                    }
-
-                    for (node in touchedNodes) {
-                        var valid:Bool = true;
-
-                        for (coord in coords) {
-                            var occupier:Int = walkNode(node, homeCoord, coord).value.at(occupier_);
-                            if (occupier > 0 && !(cfg.overlapSelf && occupier == currentPlayer)) {
-                                valid = false;
-                                break;
-                            }
-                        }
-
-                        if (valid) {
-                            dropOptions.push({
-                                targetNode:node.value.at(nodeID_),
-                                rotation:rotationIndex,
-                                reflection:reflectionIndex,
-                                optionID:dropOptions.length,
-                            });
                         }
                     }
                 }
             }
         }
 
+        // We find and mark duplicate options, to help AI players
+        for (ike in 0...dropOptions.length) {
+            var dropOption:DropPieceOption = dropOptions[ike];
+            if (dropOption.duplicate) continue;
+            for (jen in ike + 1...dropOptions.length) {
+                if (dropOptions[jen].duplicate) continue;
+                dropOptions[jen].duplicate = optionsAreEqual(dropOption, dropOptions[jen]);
+            }
+        }
+
+        // This allows the place-piece function to behave like a skip function
+        // Setting this to false also forces players to forfeit if they can't place a piece
         if (cfg.allowNowhere) {
-            var nowhereOption:DropPieceOption = {targetNode:Aspect.NULL, rotation:0, reflection:0, optionID:dropOptions.length};
+            var nowhereOption:DropPieceOption = {
+                targetNode:Aspect.NULL,
+                coord:null,
+                rotation:0,
+                reflection:0,
+                optionID:dropOptions.length,
+                duplicate:false,
+                addedNodes:null,
+            };
             dropOptions.push(cast nowhereOption);
         }
 
@@ -139,7 +181,7 @@ class DropPieceRule extends Rule {
             var pieceGroup:PieceGroup = Pieces.getPieceById(state.aspects.at(pieceTableID_));
             var node:BoardNode = state.nodes[option.targetNode];
             var coords:Array<IntCoord> = pieceGroup[option.reflection][option.rotation][0];
-            var homeCoord:IntCoord = coords[0];
+            var homeCoord:IntCoord = option.coord;
             var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
             var currentPlayer:Int = state.aspects.at(currentPlayer_);
@@ -155,11 +197,19 @@ class DropPieceRule extends Rule {
     }
 
     inline function isFreeEdge(node:BoardNode):Bool {
-        return node.neighbors.exists(isVacant);
+        return neighborsFor(node, cfg.orthoOnly).exists(isVacant);
     }
 
     inline function isVacant(node:BoardNode):Bool {
         return node.value.at(isFilled_) == Aspect.FALSE;
+    }
+
+    inline function optionsAreEqual(option1:DropPieceOption, option2:DropPieceOption):Bool {
+        var val:Bool = true;
+        //if (option1.targetNode != option2.targetNode) val = false;
+        if (option1.addedNodes.length != option2.addedNodes.length) val = false;
+        else for (addedNode in option1.addedNodes) if (!option2.addedNodes.has(addedNode)) { val = false; break; }
+        return val;
     }
 
     inline function fillAndOccupyCell(node:BoardNode, currentPlayer:Int, maxFreshness, bodyNode:BoardNode):BoardNode {
@@ -170,6 +220,7 @@ class DropPieceRule extends Rule {
         return bodyNode.addNode(node, state.nodes, nodeID_, bodyNext_, bodyPrev_);
     }
 
+    // A works-for-now function for translating piece coords into nodes accessible from a given starting point
     inline function walkNode(node:BoardNode, fromCoord:IntCoord, toCoord:IntCoord):BoardNode {
         var dn:Int = 0;
         var dw:Int = 0;
@@ -187,5 +238,9 @@ class DropPieceRule extends Rule {
         }
 
         return node.run(Gr.n, dn).run(Gr.s, ds).run(Gr.e, de).run(Gr.w, dw);
+    }
+
+    inline function neighborsFor(node:BoardNode, ortho:Bool):Array<BoardNode> {
+        return ortho ? node.orthoNeighbors() : node.allNeighbors();
     }
 }

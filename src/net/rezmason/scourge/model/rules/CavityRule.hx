@@ -33,20 +33,18 @@ class CavityRule extends Rule {
         options.push({optionID:0});
     }
 
-    override public function update():Void {
-
-    }
-
     override public function chooseOption(choice:Int):Void {
         super.chooseOption(choice);
 
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
+        // We update the cavities for each player's body
+
         for (ike in 0...state.players.length) {
 
             var player:AspectSet = state.players[ike];
 
-            // Destroy existing cavity list
+            // We destroy the existing cavity list
             var cavityFirst:Int = player.at(cavityFirst_);
             var oldCavityNodes:Array<BoardNode> = [];
             if (cavityFirst != Aspect.NULL) {
@@ -55,16 +53,23 @@ class CavityRule extends Rule {
             }
             player.mod(cavityFirst_, Aspect.NULL);
 
-            // Now for the fun part! Find all the cavity nodes.
+            // Now for the fun part: finding all the cavity nodes.
+
+            // We grab the player's body and head
 
             var body:Array<BoardNode> = state.nodes[player.at(bodyFirst_)].boardListToArray(state.nodes, bodyNext_);
             var head:BoardNode = state.nodes[player.at(head_)];
 
+            // We're going to search the board for ALL nodes UNTIL we have found all body nodes
+            // This takes advantage of the FILO search pattern of GridUtils.getGraph
+
             remainingNodes = body.length - 1;
             var widePerimeter:Array<BoardNode> = head.getGraph(true, callback(isWithinPerimeter, ike));
 
+            // After reversing the search results, they are sorted in the order of most-outside to least-outside
             widePerimeter.reverse();
 
+            // Searching from the outside in, we remove exposed empty nodes from the set
             for (jen in 0...widePerimeter.length) {
 
                 var node:BoardNode = widePerimeter[jen];
@@ -83,14 +88,17 @@ class CavityRule extends Rule {
                 }
             }
 
+            // The cavities are the nodes that remain and are empty
             var cavityNodes:Array<BoardNode> = widePerimeter.filter(isEmpty).array();
 
             if (cavityNodes.length > 0) {
+                // Cavity nodes that haven't changed don't get freshened
                 for (node in cavityNodes) createCavity(ike, oldCavityNodes.has(node) ? 0 : maxFreshness, node);
-                // Find the nodes that were cavityNodes and now aren't, or weren't cavityNodes and now are
-                // node.value.mod(freshness_, maxFreshness);
+
                 cavityNodes.chainByAspect(nodeID_, cavityNext_, cavityPrev_);
                 player.mod(cavityFirst_, cavityNodes[0].value.at(nodeID_));
+
+                // Cavities affect the player's total area:
                 var totalArea:Int = player.at(totalArea_) + cavityNodes.length;
                 player.mod(totalArea_, totalArea);
             }
@@ -111,6 +119,8 @@ class CavityRule extends Rule {
         return node != null && node.value.at(isFilled_) == Aspect.FALSE;
     }
 
+    // This comparator doesn't actually compare aspect sets; it counts the number
+    // of aspects it has found, and ends the search when they're all found
     function isWithinPerimeter(allegiance:Int, me:AspectSet, you:AspectSet):Bool {
         if (remainingNodes <= 0) return false;
         if (me.at(isFilled_) == Aspect.TRUE && me.at(occupier_) == allegiance) remainingNodes--;
