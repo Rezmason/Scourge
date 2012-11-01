@@ -16,7 +16,8 @@ typedef ReplenishableConfig = {
     @:optional var replenishableID:Int;
 }
 
-typedef ReplenishConfig = {>BuildConfig,
+typedef ReplenishConfig = {
+    var buildCfg:BuildConfig;
     var stateProperties:Array<ReplenishableConfig>;
     var playerProperties:Array<ReplenishableConfig>;
     var nodeProperties:Array<ReplenishableConfig>;
@@ -119,7 +120,7 @@ class ReplenishRule extends Rule {
         rep.mod(repID_, state.extras.length);
 
         state.extras.push(rep);
-        cfg.historyState.extras.push(buildHistExtra(cfg.history));
+        cfg.buildCfg.historyState.extras.push(buildHistExtra(cfg.buildCfg.history));
 
         return rep;
     }

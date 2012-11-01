@@ -51,16 +51,18 @@ class RuleTest
 
         if (rules == null) rules = [];
 
+        var buildConfig:BuildConfig = {history:history, historyState:historyState};
+
         // make state config and generate state
-        var buildStateConfig:BuildStateConfig = {firstPlayer:0, history:history, historyState:historyState};
+        var buildStateConfig:BuildStateConfig = {firstPlayer:0, buildCfg:buildConfig};
         var buildStateRule:BuildStateRule = new BuildStateRule(buildStateConfig);
 
         // make player config and generate players
-        var buildPlayersCfg:BuildPlayersConfig = {numPlayers:numPlayers, history:history, historyState:historyState};
+        var buildPlayersCfg:BuildPlayersConfig = {numPlayers:numPlayers, buildCfg:buildConfig};
         var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule(buildPlayersCfg);
 
         // make board config and generate board
-        var buildBoardCfg:BuildBoardConfig = {circular:circular, initGrid:initGrid, history:history, historyState:historyState};
+        var buildBoardCfg:BuildBoardConfig = {circular:circular, initGrid:initGrid, buildCfg:buildConfig};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(buildBoardCfg);
 
         rules.unshift(buildBoardRule);

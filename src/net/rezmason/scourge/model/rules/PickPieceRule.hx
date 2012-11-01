@@ -10,7 +10,8 @@ import Std.int;
 using net.rezmason.scourge.model.AspectUtils;
 using net.rezmason.utils.Pointers;
 
-typedef PickPieceConfig = {>BuildConfig,
+typedef PickPieceConfig = {
+    public var buildCfg:BuildConfig;
     public var pieceTableIDs:Array<Int>; // The list of pieces available at any point in the game
     public var allowFlipping:Bool; // If false, the reflection is left to chance
     public var allowRotating:Bool; // If false, the rotation is left to chance
@@ -171,7 +172,7 @@ class PickPieceRule extends Rule {
             piece.mod(pieceOptionID_, option.optionID);
             allPieces.push(piece);
             state.extras.push(piece);
-            cfg.historyState.extras.push(buildHistExtra(cfg.history));
+            cfg.buildCfg.historyState.extras.push(buildHistExtra(cfg.buildCfg.history));
         }
 
         allPieces.chainByAspect(pieceID_, pieceNext_, piecePrev_);

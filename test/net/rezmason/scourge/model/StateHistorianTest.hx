@@ -47,8 +47,7 @@ class StateHistorianTest {
 			circular:false,
 			initGrid:TestBoards.twoPlayerGrab,
 
-			history:history,
-			historyState:historyState,
+            buildCfg: { history:history, historyState:historyState },
 
 			recursive:false,
 			eatHeads:true,

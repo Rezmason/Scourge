@@ -272,8 +272,7 @@ class PieceRulesTest extends RuleTest
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4];
         var pickPieceCfg:PickPieceConfig = {
-            history:history,
-            historyState:historyState,
+            buildCfg:{ history:history, historyState:historyState },
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:true,
@@ -303,8 +302,7 @@ class PieceRulesTest extends RuleTest
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 5]; // 5 is an L/J block
         var pickPieceCfg:PickPieceConfig = {
-            history:history,
-            historyState:historyState,
+            buildCfg:{ history:history, historyState:historyState },
             pieceTableIDs:pieceTableIDs,
             allowFlipping:false,
             allowRotating:true,
@@ -329,8 +327,7 @@ class PieceRulesTest extends RuleTest
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4];
         var pickPieceCfg:PickPieceConfig = {
-            history:history,
-            historyState:historyState,
+            buildCfg:{ history:history, historyState:historyState },
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:false,
@@ -428,8 +425,7 @@ class PieceRulesTest extends RuleTest
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4];
         var pickPieceCfg:PickPieceConfig = {
-            history:history,
-            historyState:historyState,
+            buildCfg:{ history:history, historyState:historyState, },
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:true,

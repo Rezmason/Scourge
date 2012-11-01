@@ -15,7 +15,8 @@ using net.rezmason.utils.Pointers;
 
 typedef XY = {x:Float, y:Float};
 
-typedef BuildBoardConfig = {>BuildConfig,
+typedef BuildBoardConfig = {
+    public var buildCfg:BuildConfig;
     public var circular:Bool;
     public var initGrid:String;
 }
@@ -132,9 +133,9 @@ class BuildBoardRule extends Rule {
         node.value.mod(nodeID_, state.nodes.length);
         state.nodes.push(node);
 
-        var histAspects:AspectSet = buildHistAspectSet(nodeAspectTemplate, cfg.history);
+        var histAspects:AspectSet = buildHistAspectSet(nodeAspectTemplate, cfg.buildCfg.history);
         var histNode:BoardNode = new BoardNode(histAspects);
-        cfg.historyState.nodes.push(histNode);
+        cfg.buildCfg.historyState.nodes.push(histNode);
 
         return node;
     }

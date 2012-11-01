@@ -6,7 +6,8 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.Pointers;
 
-typedef BuildStateConfig = {>BuildConfig,
+typedef BuildStateConfig = {
+    public var buildCfg:BuildConfig;
     public var firstPlayer:Int;
 }
 
@@ -26,8 +27,8 @@ class BuildStateRule extends Rule {
         var aspects:AspectSet = buildAspectSet(plan.stateAspectTemplate);
         for (ike in 0...aspects.length) state.aspects[ike] = aspects[ike];
 
-        var historyState:State = cfg.historyState;
-        var aspects:AspectSet = buildHistAspectSet(plan.stateAspectTemplate, cfg.history);
+        var historyState:State = cfg.buildCfg.historyState;
+        var aspects:AspectSet = buildHistAspectSet(plan.stateAspectTemplate, cfg.buildCfg.history);
         for (ike in 0...aspects.length) historyState.aspects[ike] = aspects[ike];
 
         state.aspects.mod(currentPlayer_, cfg.firstPlayer);

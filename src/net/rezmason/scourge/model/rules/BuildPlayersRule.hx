@@ -1,6 +1,7 @@
 package net.rezmason.scourge.model.rules;
 
-typedef BuildPlayersConfig = {>BuildConfig,
+typedef BuildPlayersConfig = {
+    public var buildCfg:BuildConfig;
     public var numPlayers:Int;
 }
 
@@ -17,11 +18,11 @@ class BuildPlayersRule extends Rule {
 
         if (cfg.numPlayers < 1) throw "Invalid number of players in player config.";
 
-        var historyState:State = cfg.historyState;
+        var historyState:State = cfg.buildCfg.historyState;
 
         for (ike in 0...cfg.numPlayers) {
             state.players.push(buildAspectSet(plan.playerAspectTemplate));
-            historyState.players.push(buildHistAspectSet(plan.playerAspectTemplate, cfg.history));
+            historyState.players.push(buildHistAspectSet(plan.playerAspectTemplate, cfg.buildCfg.history));
         }
     }
 }

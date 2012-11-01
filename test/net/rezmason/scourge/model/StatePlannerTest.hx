@@ -39,7 +39,7 @@ class StatePlannerTest {
 
         // make state config and generate state
         var planner:StatePlanner = new StatePlanner();
-        var buildStateConfig:BuildStateConfig = {firstPlayer:0, history:history, historyState:historyState};
+        var buildStateConfig:BuildStateConfig = {firstPlayer:0, buildCfg:{ history:history, historyState:historyState }};
         var rules:Array<Rule> = [null, new BuildStateRule(buildStateConfig), new TestRule()];
         var state:State = new State();
         var plan:StatePlan = planner.planState(state, rules);

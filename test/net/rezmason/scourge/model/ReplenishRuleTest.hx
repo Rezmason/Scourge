@@ -31,8 +31,7 @@ class ReplenishRuleTest extends RuleTest
     @Test
     public function replenishTest():Void {
         var cfg:ReplenishConfig = {
-            history:history,
-            historyState:historyState,
+            buildCfg: { history:history, historyState:historyState, },
             stateProperties:null,
             playerProperties:null,
             nodeProperties:null,
