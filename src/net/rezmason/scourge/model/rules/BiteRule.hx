@@ -21,6 +21,7 @@ typedef BiteConfig = {
     var biteThroughCavities:Bool;
     var biteHeads:Bool;
     var orthoOnly:Bool;
+    var startingBites:Int;
 }
 
 typedef BiteOption = {>Option,
@@ -51,6 +52,10 @@ class BiteRule extends Rule {
     public function new(cfg:BiteConfig):Void {
         super();
         this.cfg = cfg;
+    }
+
+    override public function init():Void {
+        for (player in state.players) player.mod(numBites_, cfg.startingBites);
     }
 
     override public function update():Void {

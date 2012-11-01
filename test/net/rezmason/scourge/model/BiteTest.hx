@@ -39,6 +39,7 @@ class BiteTest extends RuleTest
     public function straightBite1():Void {
 
         var biteConfig:BiteConfig = {
+            startingBites:100,
             minReach:1,
             maxReach:1,
             maxSizeReference:1,
@@ -53,9 +54,6 @@ class BiteTest extends RuleTest
 
         var F_isForFreshness:IntHash<String> = new IntHash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
-
-        var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
-        state.players[0].mod(numBites_, 100);
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
@@ -78,6 +76,7 @@ class BiteTest extends RuleTest
     public function straightBite3():Void {
 
         var biteConfig:BiteConfig = {
+            startingBites:100,
             minReach:1,
             maxReach:3,
             maxSizeReference:1,
@@ -92,10 +91,6 @@ class BiteTest extends RuleTest
 
         var F_isForFreshness:IntHash<String> = new IntHash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
-
-        var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
-
-        state.players[0].mod(numBites_, 100);
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
@@ -124,6 +119,7 @@ class BiteTest extends RuleTest
     public function diagonalStraightBite3():Void {
 
         var biteConfig:BiteConfig = {
+            startingBites:100,
             minReach:1,
             maxReach:3,
             maxSizeReference:1,
@@ -138,10 +134,6 @@ class BiteTest extends RuleTest
 
         var F_isForFreshness:IntHash<String> = new IntHash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
-
-        var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
-
-        state.players[0].mod(numBites_, 100);
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
@@ -172,6 +164,7 @@ class BiteTest extends RuleTest
     public function omnidirectionalBite2():Void {
 
         var biteConfig:BiteConfig = {
+            startingBites:100,
             minReach:1,
             maxReach:2,
             maxSizeReference:1,
@@ -186,10 +179,6 @@ class BiteTest extends RuleTest
 
         var F_isForFreshness:IntHash<String> = new IntHash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
-
-        var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
-
-        state.players[0].mod(numBites_, 100);
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
@@ -218,6 +207,7 @@ class BiteTest extends RuleTest
     public function straightBiteThroughHeads():Void {
 
         var biteConfig:BiteConfig = {
+            startingBites:100,
             minReach:1,
             maxReach:1,
             maxSizeReference:1,
@@ -235,9 +225,6 @@ class BiteTest extends RuleTest
 
         var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
         var enemyHeadID:Int = state.players[1].at(head_);
-
-        var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
-        state.players[0].mod(numBites_, 100);
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
@@ -266,6 +253,7 @@ class BiteTest extends RuleTest
     public function straightBiteBasedOnThickness():Void {
 
         var biteConfig:BiteConfig = {
+            startingBites:100,
             minReach:1,
             maxReach:20,
             maxSizeReference:1,
@@ -281,9 +269,6 @@ class BiteTest extends RuleTest
 
         var F_isForFreshness:IntHash<String> = new IntHash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
-
-        var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
-        state.players[0].mod(numBites_, 100);
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
@@ -314,6 +299,7 @@ class BiteTest extends RuleTest
     public function cavityBite():Void {
 
         var biteConfig:BiteConfig = {
+            startingBites:100,
             minReach:1,
             maxReach:2,
             maxSizeReference:1,
@@ -329,18 +315,12 @@ class BiteTest extends RuleTest
         var F_isForFreshness:IntHash<String> = new IntHash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
-        var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
-        state.players[0].mod(numBites_, 100);
-
         var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
         var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         var enemyHeadID:Int = state.players[1].at(head_);
         var enemyHead:BoardNode = state.nodes[enemyHeadID];
         var cavity:BoardNode = enemyHead.s().s().e();
         cavity.value.mod(occupier_, 1);
-
-        var numBites_:AspectPtr = plan.playerAspectLookup[BiteAspect.NUM_BITES.id];
-        state.players[0].mod(numBites_, 100);
 
         VisualAssert.assert("two player bite with small cavity in player one", state.spitBoard(plan, true, F_isForFreshness));
 
