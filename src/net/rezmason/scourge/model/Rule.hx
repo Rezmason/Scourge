@@ -4,7 +4,7 @@ import net.rezmason.scourge.model.ModelTypes;
 
 using net.rezmason.utils.Pointers;
 
-@:autoBuild(net.rezmason.scourge.model.RuleBuilder.build()) class Rule {
+#if !macro @:autoBuild(net.rezmason.scourge.model.RuleBuilder.build()) #end class Rule {
 
     var state:State;
     var plan:StatePlan;

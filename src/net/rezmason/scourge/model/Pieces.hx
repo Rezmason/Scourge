@@ -29,4 +29,10 @@ class Pieces {
     public inline static function getNumPiecesBySize(size:Int):Int { return pieceIdsBySize[size - 1].length; }
     public inline static function getPieceId(piece:PieceGroup):Int { return pieceGroupsById.indexOf(piece); }
     public inline static function getAllPiecesOfSize(size:Int):Array<PieceGroup> { return pieceGroupsBySize[size - 1].copy(); }
+
+    public inline static function getAllPieceIDsOfSize(size:Int):Array<Int> {
+        var ids:Array<Int> = [];
+        for (piece in getAllPiecesOfSize(size)) ids.push(pieceGroupsById.indexOf(piece));
+        return ids;
+    }
 }

@@ -1,22 +1,17 @@
 Is working on this game your top priority at the moment?
 
-Clean up and comment the rule code
-
-RuleFactory
-	Generates rules from a game config
-
-	cleanUp: decay, cavities, killHeadless
-	wrapUp: endTurn, replenish, pickPiece
-	START: cleanUp, pickPiece
-	BITE: bite, cleanUp
-	SWAP: swap, pickPiece
-	FOLD: forfeit, cleanUp, wrapUp
-	DROP/SKIP: dropPiece, cleanUp, wrapUp
+Make sure all options' data is simple
+	It will be serialized!
 
 Game
+	Accepts, validates commands (player actions)
+		There's a player action config consisting of joint rule recipes
+	Gets rules from rule factory
 	Maintains states and rules
-	Accepts, validates commands (player choices)
-	Serializes options?
+	Has default command (for when time is up)
+	Generates save-states
+		Rule config and command history
+	Broadcasts when goals are reached and when turns begin
 
 
 New architecture - what's left
@@ -30,12 +25,6 @@ New architecture - what's left
 		TestPlayer
 		ExternalPlayer
 	PlayerFactory: an object that creates Players of different sorts
-	Game
-		Configuration
-			Initialization parameters passed from outside the game
-				Initial board state, initial player states, default command when the time's up
-			Games can be saved as the initialization parameters and the Command history, basically
-		Broadcasts when goals are reached and when turns begin
 	Coordinator
 		Intermediary between players and the game
 			First
