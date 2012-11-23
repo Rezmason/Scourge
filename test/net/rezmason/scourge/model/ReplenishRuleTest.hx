@@ -57,7 +57,7 @@ class ReplenishRuleTest extends RuleTest
 
         var replenishRule:ReplenishRule = new ReplenishRule(cfg);
 
-        makeState(cast [replenishRule], 1, TestBoards.emptyPetri);
+        makeState([replenishRule], 1, TestBoards.emptyPetri);
 
         var stateValue1_:AspectPtr = plan.stateAspectLookup[TestAspect.VALUE_1.id];
         var stateValue2_:AspectPtr = plan.stateAspectLookup[TestAspect.VALUE_2.id];

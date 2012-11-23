@@ -281,7 +281,7 @@ class PieceRulesTest extends RuleTest
             randomFunction:function() return 0,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
-        makeState(cast [pickPieceRule], 1, TestBoards.emptyPetri);
+        makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
 
@@ -311,7 +311,7 @@ class PieceRulesTest extends RuleTest
             randomFunction:function() return 0,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
-        makeState(cast [pickPieceRule], 1, TestBoards.emptyPetri);
+        makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
 
@@ -336,7 +336,7 @@ class PieceRulesTest extends RuleTest
             randomFunction:function() return 0,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
-        makeState(cast [pickPieceRule], 1, TestBoards.emptyPetri);
+        makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
 
@@ -434,7 +434,7 @@ class PieceRulesTest extends RuleTest
             randomFunction:function() return 0,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
-        makeState(cast [pickPieceRule], 1, TestBoards.emptyPetri);
+        makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
 
@@ -454,7 +454,7 @@ class PieceRulesTest extends RuleTest
             startingSwaps:5,
         };
         var swapPieceRule:SwapPieceRule = new SwapPieceRule(swapPieceCfg);
-        makeState(cast [swapPieceRule], 1, TestBoards.emptyPetri);
+        makeState([swapPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
 

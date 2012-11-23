@@ -36,7 +36,7 @@ class DecayRuleTest extends RuleTest
             orthoOnly:true,
         };
         var decayRule:DecayRule = new DecayRule(cfg);
-        makeState(cast [decayRule], 1, TestBoards.loosePetri);
+        makeState([decayRule], 1, TestBoards.loosePetri);
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
 
@@ -70,7 +70,7 @@ class DecayRuleTest extends RuleTest
             orthoOnly:false,
         };
         var decayRule:DecayRule = new DecayRule(cfg);
-        makeState(cast [decayRule], 1, TestBoards.loosePetri);
+        makeState([decayRule], 1, TestBoards.loosePetri);
 
         var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
         var head:BoardNode = state.nodes[state.players[0].at(head_)];

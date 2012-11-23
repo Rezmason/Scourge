@@ -34,7 +34,7 @@ class CavityRuleTest extends RuleTest
     public function cavityRuleTest():Void {
 
         var cavityRule:CavityRule = new CavityRule();
-        makeState(cast [cavityRule], 1, TestBoards.cavityCity);
+        makeState([cavityRule], 1, TestBoards.cavityCity);
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         var numCavityCells:Int = ~/([^a])/g.replace(state.spitBoard(plan), "").length;
@@ -69,7 +69,7 @@ class CavityRuleTest extends RuleTest
     public function cavityRuleTest2():Void {
 
         var cavityRule:CavityRule = new CavityRule();
-        makeState(cast [cavityRule], 1, TestBoards.cavityCity);
+        makeState([cavityRule], 1, TestBoards.cavityCity);
 
         var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
         var head:BoardNode = state.nodes[state.players[0].at(head_)];

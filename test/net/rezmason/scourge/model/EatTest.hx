@@ -36,7 +36,7 @@ class EatTest extends RuleTest
     public function eatRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
+        makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
@@ -75,7 +75,7 @@ class EatTest extends RuleTest
     public function eatRecursivelyRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
+        makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
@@ -111,7 +111,7 @@ class EatTest extends RuleTest
     public function eatHeadAndBodyRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:true, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
+        makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
@@ -143,7 +143,7 @@ class EatTest extends RuleTest
     public function eatHeadKillBodyTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:false, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        makeState(cast [eatRule], 2, TestBoards.twoPlayerGrab);
+        makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
 
@@ -173,7 +173,7 @@ class EatTest extends RuleTest
     public function eatOrthoRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:true};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
-        makeState(cast [eatRule], 2, TestBoards.twoPlayerN);
+        makeState([eatRule], 2, TestBoards.twoPlayerN);
 
         // set up the board for the test
 
