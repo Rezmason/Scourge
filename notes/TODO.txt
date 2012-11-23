@@ -1,7 +1,4 @@
-Expand GameTest
-	Pass it an initGrid
-	Take a complex action
-	Evaluate the result
+Action tests
 
 Game
 	Gets rules from rule factory
