@@ -42,6 +42,7 @@ class DropPieceRule extends Rule {
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
+    @player(PlyAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
     @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
@@ -58,6 +59,21 @@ class DropPieceRule extends Rule {
     override public function update():Void {
 
         var dropOptions:Array<DropPieceOption> = [];
+
+        // This allows the place-piece function to behave like a skip function
+        // Setting this to false also forces players to forfeit if they can't place a piece
+        if (cfg.allowNowhere) {
+            var nowhereOption:DropPieceOption = {
+                targetNode:Aspect.NULL,
+                coord:null,
+                rotation:0,
+                reflection:0,
+                optionID:dropOptions.length,
+                duplicate:false,
+                addedNodes:null,
+            };
+            dropOptions.push(cast nowhereOption);
+        }
 
         if (state.aspects.at(pieceTableID_) != Aspect.NULL) {
 
@@ -154,21 +170,6 @@ class DropPieceRule extends Rule {
             }
         }
 
-        // This allows the place-piece function to behave like a skip function
-        // Setting this to false also forces players to forfeit if they can't place a piece
-        if (cfg.allowNowhere) {
-            var nowhereOption:DropPieceOption = {
-                targetNode:Aspect.NULL,
-                coord:null,
-                rotation:0,
-                reflection:0,
-                optionID:dropOptions.length,
-                duplicate:false,
-                addedNodes:null,
-            };
-            dropOptions.push(cast nowhereOption);
-        }
-
         options = cast dropOptions;
     }
 
@@ -177,6 +178,9 @@ class DropPieceRule extends Rule {
 
         var option:DropPieceOption = cast options[choice];
 
+        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var player:AspectSet = state.players[currentPlayer];
+
         if (option.targetNode != Aspect.NULL) {
             var pieceGroup:PieceGroup = Pieces.getPieceById(state.aspects.at(pieceTableID_));
             var node:BoardNode = state.nodes[option.targetNode];
@@ -184,13 +188,16 @@ class DropPieceRule extends Rule {
             var homeCoord:IntCoord = option.coord;
             var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
-            var currentPlayer:Int = state.aspects.at(currentPlayer_);
             var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
 
             for (coord in coords) bodyNode = fillAndOccupyCell(walkNode(node, coord, homeCoord), currentPlayer, maxFreshness, bodyNode);
-            state.players[currentPlayer].mod(bodyFirst_, bodyNode.value.at(nodeID_));
+            player.mod(bodyFirst_, bodyNode.value.at(nodeID_));
 
             state.aspects.mod(maxFreshness_, maxFreshness);
+
+            player.mod(numConsecutiveSkips_, 0);
+        } else {
+            player.mod(numConsecutiveSkips_, player.at(numConsecutiveSkips_) + 1);
         }
 
         state.aspects.mod(pieceTableID_, 0);

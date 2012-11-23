@@ -8,9 +8,14 @@ import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
+import net.rezmason.scourge.model.aspects.WinAspect;
 import net.rezmason.scourge.model.rules.EndTurnRule;
 import net.rezmason.scourge.model.rules.ForfeitRule;
 import net.rezmason.scourge.model.rules.KillHeadlessPlayerRule;
+import net.rezmason.scourge.model.rules.OneLivingPlayerRule;
+import net.rezmason.scourge.model.rules.SkipsExhaustedRule;
+import net.rezmason.scourge.model.rules.DropPieceRule;
+import net.rezmason.scourge.model.rules.TestPieceRule;
 
 // using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
@@ -142,5 +147,65 @@ class TurnRulesTest extends RuleTest
 
         var bodyFirst:Int = state.players[currentPlayer].at(bodyFirst_);
         Assert.areEqual(Aspect.NULL, bodyFirst);
+    }
+
+    @Test
+    public function skipsExhaustedTest():Void {
+
+        // Create a four-player game with a max skip of five times
+        var skipsExhaustedRule:SkipsExhaustedRule = new SkipsExhaustedRule({maxSkips:5});
+        makeState([skipsExhaustedRule], 4, TestBoards.emptyPetri);
+
+        var winner_:AspectPtr = plan.stateAspectLookup[WinAspect.WINNER.id];
+        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var numConsecutiveSkips_:AspectPtr = plan.playerAspectLookup[PlyAspect.NUM_CONSECUTIVE_SKIPS.id];
+
+        // Have each player skip four times, then check for a winner
+        for (ike in 0...state.players.length) {
+            var player:AspectSet = state.players[ike];
+            player.mod(numConsecutiveSkips_, 4);
+            player.mod(totalArea_, 4 - ike);
+        }
+
+        skipsExhaustedRule.update();
+        skipsExhaustedRule.chooseOption(0);
+        Assert.areEqual(Aspect.NULL, state.aspects.at(winner_));
+
+        // Have each player skip one more time, then check for a winner
+
+        for (ike in 0...state.players.length) {
+            var player:AspectSet = state.players[ike];
+            player.mod(numConsecutiveSkips_, 5);
+            player.mod(totalArea_, 4 - ike);
+        }
+
+        skipsExhaustedRule.update();
+        skipsExhaustedRule.chooseOption(0);
+        Assert.areEqual(3, state.aspects.at(winner_));
+    }
+
+    @Test
+    public function onlyLivingPlayerTest():Void {
+
+        // Create a four-player game
+        var oneLivingPlayerRule:OneLivingPlayerRule = new OneLivingPlayerRule();
+        makeState([oneLivingPlayerRule], 4, TestBoards.emptyPetri);
+
+        var winner_:AspectPtr = plan.stateAspectLookup[WinAspect.WINNER.id];
+        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
+
+        // kill the first, third and fourth players
+        for (ike in 0...state.players.length) {
+            if (ike == 1) continue; // We're skipping player 2
+
+            var player:AspectSet = state.players[ike];
+            player.mod(head_, Aspect.NULL);
+        }
+
+        // update and check for a winner
+
+        oneLivingPlayerRule.update();
+        oneLivingPlayerRule.chooseOption(0);
+        Assert.areEqual(1, state.aspects.at(winner_));
     }
 }

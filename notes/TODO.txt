@@ -1,54 +1,43 @@
-Is working on this game your top priority at the moment?
-
-Make sure all options' data is simple
-	It will be serialized!
+Expand GameTest
+	Pass it an initGrid
+	Take a complex action
+	Evaluate the result
 
 Game
-	Accepts, validates commands (player actions)
-		There's a player action config consisting of joint rule recipes
 	Gets rules from rule factory
-	Maintains states and rules
+	Has internal state historian
 	Has default command (for when time is up)
 	Generates save-states
-		Rule config and command history
+		Config
+		Command history
+		Goals
 	Broadcasts when goals are reached and when turns begin
+	Broadcasts players' commands to one another
+	Accepts commands and updates the state
+	Validates checksums
 
+Coordinator - connects players to the game
+	Has Game
+	Has list of Players
+		from PlayerFactory
+	Has timer
+	Communicates between game and players
 
-New architecture - what's left
-	IPlayer: an object that picks an optimal State from a set of States
-		The initial state is also provided
-		Evaluator: Turns a State into a number based on averaging values from IGoals
-			IGoal: Turns a State into a value between zero and one
-		LocalMachinePlayer
-		HumanPlayer
-		RemotePlayer
-		TestPlayer
-		ExternalPlayer
-	PlayerFactory: an object that creates Players of different sorts
-	Coordinator
-		Intermediary between players and the game
-			First
-				Creates rules with rule factory
-				Creates initial state with state factory
-				Creates players with player factory
-					Initializes them with rule set
-				Initializes game with initial state and rules
-				Starts the game: initial signaling to all players
-			Thereafter
-				Sends commands into game from all players
-				Sends commands from one player to other human and networked players
-				Sends state to each local human player
-					which updates the UI somewhere
-				Sends goal events to each human player
-				Handles time limits
-					Sends the game a default command when the time is up
-				Maintains the list of Players
-	GameView
-		Receives a current State and visually interprets it
-			Allows interactivity when the State's current stat is the stat of a HumanPlayer at that computer
-		Receives a list of legal moves and maps them to the UI
-		Interprets user interaction, generates a Command and broadcasts it to the HumanPlayer object
-		Receives goal events and timer tick events and visually interprets them
+IPlayer
+	TestPlayer
+	HumanPlayer
+		TextView
+			Interprets commands
+			Translates all other game events into human readable output
+			Use a Flash console component
+	LocalMachinePlayer
+
+PlayerFactory
+	Generates player lists from config
+
+GameView
+
+Rewrite the eat rule recursion property to be an Int of depth
 
 And then SPEED EVERYTHING UP
 	Use timing output to find the bottlenecks
@@ -58,6 +47,9 @@ And then SPEED EVERYTHING UP
 		Just make sure to update this information when it changes
 	Take advantage of linked lists for storing sets of nodes
 	Also, haxe.List might be better than Array in some situations
+
+RemotePlayer
+ExternalPlayer
 
 Coarse evaluation
 	Number of nodes (filled and enclosed)
@@ -90,7 +82,8 @@ Later
 		Expand board when placing a piece
 		Tough?
 
-
+	Destination goal rule
+	Allow goal rules to apply to specific players
 
 
 New UI

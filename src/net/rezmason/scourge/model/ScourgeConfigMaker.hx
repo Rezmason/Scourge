@@ -33,6 +33,7 @@ class ScourgeConfigMaker {
     public var firstPlayer:Int;
     public var maxBiteReach:Int;
     public var maxSizeReference:Int;
+    public var maxSkips:Int;
     public var minBiteReach:Int;
     public var numPlayers:Int;
     public var pieceHatSize:Int;
@@ -48,15 +49,17 @@ class ScourgeConfigMaker {
     public var randomFunction:Void->Float;
 
     public static var combinedRuleCfg(default, null):Dynamic<Array<String>> = {
-        cleanUp: ["decay", "cavity", "killHeadlessPlayer"],
+        cleanUp: ["decay", "cavity", "killHeadlessPlayer", "oneLivingPlayer"],
         wrapUp: ["endTurn", "replenish", "pickPiece"],
 
         startAction: ["cleanUp", "pickPiece"],
         biteAction: ["bite", "cleanUp"],
         swapAction: ["swapPiece", "pickPiece"],
         quitAction: ["forfeit", "cleanUp", "wrapUp"],
-        dropAction: ["dropPiece", "eatCells", "cleanUp", "wrapUp"],
+        dropAction: ["dropPiece", "eatCells", "cleanUp", "wrapUp", "skipsExhausted"],
     };
+
+    public static var defaultAction(default, null):String = "dropAction";
 
     public static var actionList(default, null):Array<String> = ["startAction", "biteAction", "swapAction", "quitAction", "dropAction",];
 
@@ -116,11 +119,13 @@ class ScourgeConfigMaker {
             bite: makeBiteConfig(),
             swapPiece: makeSwapConfig(),
             replenish: makeReplenishConfig(buildCfg),
+            skipsExhausted: makeSkipsExhaustedConfig(),
 
             cavity: null,
             endTurn: null,
             forfeit: null,
             killHeadlessPlayer: null,
+            oneLivingPlayer: null,
         };
     }
 
@@ -209,6 +214,12 @@ class ScourgeConfigMaker {
         return {
             startingSwaps:startingSwaps,
         };
+    }
+
+    function makeSkipsExhaustedConfig() {
+        return {
+            maxSkips:maxSkips,
+        }
     }
 
     function makeReplenishConfig(buildCfg) {
