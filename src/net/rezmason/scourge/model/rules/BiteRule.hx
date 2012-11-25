@@ -69,6 +69,7 @@ class BiteRule extends Rule {
         for (player in state.players) headIDs.push(player.at(head_));
 
         if (state.players[currentPlayer].at(numBites_) > 0) {
+
             var totalArea:Int = state.players[currentPlayer].at(totalArea_);
             var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
             var body:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_);
@@ -158,7 +159,7 @@ class BiteRule extends Rule {
         options = cast biteOptions;
     }
 
-    override public function chooseOption(choice:Int):Void {
+    override public function chooseOption(choice:Int = 0):Void {
         super.chooseOption(choice);
 
         var option:BiteOption = cast options[choice];

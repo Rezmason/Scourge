@@ -37,7 +37,7 @@ class SwapPieceRule extends Rule {
         if (numSwaps > 0 && state.aspects.at(pieceTableID_) != Aspect.NULL) options.push({optionID:0});
     }
 
-    override public function chooseOption(choice:Int):Void {
+    override public function chooseOption(choice:Int = 0):Void {
         super.chooseOption(choice);
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var numSwaps:Int = state.players[currentPlayer].at(numSwaps_);

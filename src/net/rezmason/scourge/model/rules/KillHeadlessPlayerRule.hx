@@ -27,7 +27,7 @@ class KillHeadlessPlayerRule extends Rule {
         options.push({optionID:0});
     }
 
-    override public function chooseOption(choice:Int):Void {
+    override public function chooseOption(choice:Int = 0):Void {
         super.chooseOption(choice);
 
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;

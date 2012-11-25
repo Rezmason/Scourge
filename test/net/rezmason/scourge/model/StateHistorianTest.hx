@@ -91,20 +91,20 @@ class StateHistorianTest {
         // Pick a few pieces
         for (ike in 0...10) {
             pickPieceRule.update();
-            pickPieceRule.chooseOption(0);
+            pickPieceRule.chooseOption();
         }
 
 		// Freshen and eat body
 
         state.grabXY(7, 7).value.mod(freshness_, 1);
         state.grabXY(9, 7).value.mod(freshness_, 1);
-        eatRule.chooseOption(0);
+        eatRule.chooseOption();
 
 		pushChange();
 
 		// Freshen and eat head
         state.grabXY(12, 6).value.mod(freshness_, 1);
-		eatRule.chooseOption(0);
+		eatRule.chooseOption();
 
 		pushChange();
 

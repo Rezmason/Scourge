@@ -17,21 +17,18 @@ class JointRule extends Rule {
         }
     }
 
-    override public function prime(state:State, plan:StatePlan):Void { for (rule in rules) rule.prime(state, plan); }
-    override public function init():Void { for (rule in rules) rule.init(); }
-
     override public function update():Void {
         rules[0].update();
         options = rules[0].options;
         quantumOptions = rules[0].quantumOptions;
     }
 
-    override public function chooseOption(choice:Int):Void {
+    override public function chooseOption(choice:Int = 0):Void {
         rules[0].chooseOption(choice);
         for (ike in 1...rules.length) {
             var rule:Rule = rules[ike];
             rule.update();
-            rule.chooseOption(0);
+            rule.chooseOption();
         }
     }
 
@@ -40,7 +37,7 @@ class JointRule extends Rule {
         for (ike in 1...rules.length) {
             var rule:Rule = rules[ike];
             rule.update();
-            rule.chooseOption(0);
+            rule.chooseOption();
         }
     }
 }

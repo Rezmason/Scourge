@@ -44,7 +44,7 @@ class DecayRuleTest extends RuleTest
 
         VisualAssert.assert("Loose petri", state.spitBoard(plan));
 
-        decayRule.chooseOption(0);
+        decayRule.chooseOption();
 
         VisualAssert.assert("Empty petri, disconnected region gone", state.spitBoard(plan));
 
@@ -87,7 +87,7 @@ class DecayRuleTest extends RuleTest
 
         VisualAssert.assert("Loose petri", state.spitBoard(plan));
 
-        decayRule.chooseOption(0);
+        decayRule.chooseOption();
 
         VisualAssert.assert("Empty petri, disconnected region gone", state.spitBoard(plan));
 

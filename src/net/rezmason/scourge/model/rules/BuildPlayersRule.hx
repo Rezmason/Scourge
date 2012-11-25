@@ -11,6 +11,7 @@ class BuildPlayersRule extends Rule {
 
     public function new(cfg:BuildPlayersConfig):Void {
         super();
+        demiurgic = true;
         this.cfg = cfg;
     }
 

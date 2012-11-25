@@ -16,6 +16,7 @@ using net.rezmason.utils.Pointers;
     var state:State;
     var plan:StatePlan;
 
+    public var demiurgic(default, null):Bool;
     public var options(default, null):Array<Option>;
     public var quantumOptions(default, null):Array<Option>;
     public var stateAspectRequirements(default, null):AspectRequirements;
@@ -27,6 +28,7 @@ using net.rezmason.utils.Pointers;
     private var extraAspectLookup:AspectLookup;
 
     public function new():Void {
+        demiurgic = false;
         stateAspectRequirements = [];
         playerAspectRequirements = [];
         nodeAspectRequirements = [];
@@ -38,7 +40,7 @@ using net.rezmason.utils.Pointers;
         __initReqs();
     }
 
-    public function prime(state:State, plan:StatePlan):Void {
+    @final public function prime(state:State, plan:StatePlan):Void {
         this.state = state;
         this.plan = plan;
 
@@ -59,7 +61,7 @@ using net.rezmason.utils.Pointers;
     // Note: Rules *should not* change the State during the update function.
     public function update():Void {}
 
-    public function chooseOption(choice:Int):Void {
+    public function chooseOption(choice:Int = 0):Void {
         if (options == null || options.length < choice || options[choice] == null) {
             throw "Invalid choice index.";
         }
@@ -77,25 +79,25 @@ using net.rezmason.utils.Pointers;
         return aspects;
     }
 
-    inline function buildHistAspectSet(template:AspectSet, history:StateHistory):AspectSet {
+    @final inline function buildHistAspectSet(template:AspectSet, history:StateHistory):AspectSet {
         var aspects:AspectSet = new AspectSet();
         for (val in template) aspects.push(history.alloc(val));
         return aspects;
     }
 
-    inline function buildExtra():AspectSet {
+    @final inline function buildExtra():AspectSet {
         return buildAspectSet(extraAspectTemplate);
     }
 
-    inline function buildHistExtra(history:StateHistory):AspectSet {
+    @final inline function buildHistExtra(history:StateHistory):AspectSet {
         return buildHistAspectSet(extraAspectTemplate, history);
     }
 
     // Are these still necessary?
-    inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup[prop.id]; }
-    inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup[prop.id]; }
-    inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup[prop.id]; }
-    inline function extraPtr(prop:AspectProperty):AspectPtr { return extraAspectLookup[prop.id]; }
+    @final inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup[prop.id]; }
+    @final inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup[prop.id]; }
+    @final inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup[prop.id]; }
+    @final inline function extraPtr(prop:AspectProperty):AspectPtr { return extraAspectLookup[prop.id]; }
 
     #if macro
     private static var lkpSources:Hash<String> = {

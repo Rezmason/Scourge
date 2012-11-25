@@ -50,6 +50,28 @@ class TestBoards {
         "X                  X\n" +
         "XXXXXXXXXXXXXXXXXXXX\n";
 
+    public static var twoPlayerBullshit:String = "\n" +
+        "XXXXXXXXXXXXXXXXXXXX\n" +
+        "X                  X\n" +
+        "X        111111111 X\n" +
+        "X        1       1 X\n" +
+        "X        1       1 X\n" +
+        "X        1       1 X\n" +
+        "X        1111    1 X\n" +
+        "X           11   1 X\n" +
+        "X     000000 1   1 X\n" +
+        "X     0    0 1   1 X\n" +
+        "X     0 00 0 11111 X\n" +
+        "X     0 00 0       X\n" +
+        "X     0    0       X\n" +
+        "X     000000       X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "X                  X\n" +
+        "XXXXXXXXXXXXXXXXXXXX\n";
+
     public static var twoPlayerN:String = "\n" +
         "XXXXXXXXXXXXXXXXXXXX\n" +
         "X                  X\n" +

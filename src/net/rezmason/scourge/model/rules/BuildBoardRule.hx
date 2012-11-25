@@ -44,10 +44,10 @@ class BuildBoardRule extends Rule {
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
-    @player(BodyAspect.TOTAL_AREA) var totalArea_; // TEMPORARY
 
     public function new(cfg:BuildBoardConfig):Void {
         super();
+        demiurgic = true;
         this.cfg = cfg;
     }
 
@@ -100,10 +100,11 @@ class BuildBoardRule extends Rule {
         }
 
         var grid:BoardNode = makeSquareGraph(boardWidth);
+        var hasInitGrid:Bool = cfg.initGrid != null && cfg.initGrid.length > 0;
         obstructGraphRim(grid);
-        populateGraphHeads(grid, headCoords);
         if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM);
-        if (cfg.initGrid != null && cfg.initGrid.length > 0) initGraph(grid, cfg.initGrid, boardWidth);
+        if (hasInitGrid) initGraph(grid, cfg.initGrid, boardWidth);
+        populateGraphHeads(grid, headCoords, !hasInitGrid);
         populateGraphBodies();
     }
 
@@ -169,15 +170,19 @@ class BuildBoardRule extends Rule {
         for (node in grid.run(Gr.e).walk(Gr.s)) node.value.mod(isFilled_, Aspect.TRUE);
     }
 
-    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>):Void {
+    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>, plantHeads:Bool):Void {
         // Identify and change the occupier of each head node
 
         for (ike in 0...headCoords.length) {
             var coord:XY = headCoords[ike];
             var head:BoardNode = grid.run(Gr.e, int(coord.x)).run(Gr.s, int(coord.y));
-            state.players[ike].mod(head_, head.value.at(nodeID_));
-            head.value.mod(isFilled_, Aspect.TRUE);
-            head.value.mod(occupier_, ike);
+            if (plantHeads) {
+                head.value.mod(isFilled_, Aspect.TRUE);
+                head.value.mod(occupier_, ike);
+                state.players[ike].mod(head_, head.value.at(nodeID_));
+            } else if (head.value.at(isFilled_) == Aspect.TRUE && head.value.at(occupier_) == ike) {
+                state.players[ike].mod(head_, head.value.at(nodeID_));
+            }
         }
     }
 
@@ -243,10 +248,11 @@ class BuildBoardRule extends Rule {
 
         for (ike in 0...state.players.length) {
             var body:Array<BoardNode> = bodies[ike];
-            var bodyFirstNode:BoardNode = body[0];
-            state.players[ike].mod(bodyFirst_, bodyFirstNode.value.at(nodeID_));
-            state.players[ike].mod(totalArea_, body.length); // TEMPORARY
-            body.chainByAspect(nodeID_, bodyNext_, bodyPrev_);
+            if (body.length > 0) {
+                var bodyFirstNode:BoardNode = body[0];
+                state.players[ike].mod(bodyFirst_, bodyFirstNode.value.at(nodeID_));
+                body.chainByAspect(nodeID_, bodyNext_, bodyPrev_);
+            }
         }
     }
 }

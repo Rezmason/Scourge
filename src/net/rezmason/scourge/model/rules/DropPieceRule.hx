@@ -68,9 +68,9 @@ class DropPieceRule extends Rule {
                 coord:null,
                 rotation:0,
                 reflection:0,
-                optionID:dropOptions.length,
+                optionID:0,
                 duplicate:false,
-                addedNodes:null,
+                addedNodes:[],
             };
             dropOptions.push(cast nowhereOption);
         }
@@ -173,7 +173,7 @@ class DropPieceRule extends Rule {
         options = cast dropOptions;
     }
 
-    override public function chooseOption(choice:Int):Void {
+    override public function chooseOption(choice:Int = 0):Void {
         super.chooseOption(choice);
 
         var option:DropPieceOption = cast options[choice];

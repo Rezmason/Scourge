@@ -93,7 +93,7 @@ class PickPieceRule extends Rule {
         }
     }
 
-    override public function chooseOption(choice:Int):Void {
+    override public function chooseOption(choice:Int = 0):Void {
         super.chooseOption(choice);
 
         var option:PickPieceOption = cast options[choice];

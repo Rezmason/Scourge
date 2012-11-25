@@ -33,7 +33,7 @@ class CavityRule extends Rule {
         options.push({optionID:0});
     }
 
-    override public function chooseOption(choice:Int):Void {
+    override public function chooseOption(choice:Int = 0):Void {
         super.chooseOption(choice);
 
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
@@ -55,41 +55,76 @@ class CavityRule extends Rule {
 
             // Now for the fun part: finding all the cavity nodes.
 
-            // We grab the player's body and head
+            var cavityNodes:Array<BoardNode> = [];
 
-            var body:Array<BoardNode> = state.nodes[player.at(bodyFirst_)].boardListToArray(state.nodes, bodyNext_);
-            var head:BoardNode = state.nodes[player.at(head_)];
+            if (player.at(head_) != Aspect.NULL) {
+                // We grab the player's body and head
 
-            // We're going to search the board for ALL nodes UNTIL we have found all body nodes
-            // This takes advantage of the FILO search pattern of GridUtils.getGraph
+                var body:Array<BoardNode> = state.nodes[player.at(bodyFirst_)].boardListToArray(state.nodes, bodyNext_);
+                var head:BoardNode = state.nodes[player.at(head_)];
 
-            remainingNodes = body.length - 1;
-            var widePerimeter:Array<BoardNode> = head.getGraph(true, callback(isWithinPerimeter, ike));
+                // We're going to search the board for ALL nodes UNTIL we have found all body nodes
+                // This takes advantage of the FILO search pattern of GridUtils.getGraph
 
-            // After reversing the search results, they are sorted in the order of most-outside to least-outside
-            widePerimeter.reverse();
+                remainingNodes = body.length - 1;
+                var widePerimeter:Array<BoardNode> = head.getGraph(true, callback(isWithinPerimeter, ike));
 
-            // Searching from the outside in, we remove exposed empty nodes from the set
-            for (jen in 0...widePerimeter.length) {
+                // After reversing the search results, they are sorted in the order of most-outside to least-outside
+                widePerimeter.reverse();
 
-                var node:BoardNode = widePerimeter[jen];
+                var nodeIDs:IntHash<Bool> = new IntHash<Bool>();
+                for (node in widePerimeter) nodeIDs.set(node.value.at(nodeID_), true);
 
-                var occupier:Int = node.value.at(occupier_);
-                var isFilled:Int = node.value.at(isFilled_);
-                if (occupier == ike && isFilled == Aspect.TRUE) {
-                    continue;
-                }
+                var empties:Array<BoardNode> = [];
 
-                for (neighbor in node.orthoNeighbors()) {
-                    if (neighbor == null || !widePerimeter.has(neighbor)) {
-                        widePerimeter[jen] = null;
-                        break;
+                // Searching from the outside in, we remove exposed empty nodes from the set
+                for (jen in 0...widePerimeter.length) {
+
+                    var node:BoardNode = widePerimeter[jen];
+
+                    var occupier:Int = node.value.at(occupier_);
+                    var isFilled:Int = node.value.at(isFilled_);
+
+                    // Dismiss filled nodes
+                    if (isFilled == Aspect.TRUE) {
+                        // remove enemy filled nodes from the nodeIDs
+                        if (occupier != ike) nodeIDs.remove(node.value.at(nodeID_));
+                    } else {
+                        empties.push(node);
+
+                        for (neighbor in node.orthoNeighbors()) {
+                            if (neighbor == null || !nodeIDs.exists(neighbor.value.at(nodeID_))) {
+                                widePerimeter[jen] = null;
+                                nodeIDs.remove(node.value.at(nodeID_));
+                                empties.pop();
+                                break;
+                            }
+                        }
                     }
                 }
-            }
 
-            // The cavities are the nodes that remain and are empty
-            var cavityNodes:Array<BoardNode> = widePerimeter.filter(isEmpty).array();
+                // Of those cells, we repeatedly remove cells which are in fact still exposed
+                // TODO: use getGraph for this instead
+                var lastLength:Int = 0;
+                while (empties.length != lastLength) {
+                    lastLength = empties.length;
+                    var newEmpties:Array<BoardNode> = [];
+                    for (node in empties) {
+                        newEmpties.push(node);
+                        for (neighbor in node.orthoNeighbors()) {
+                            if (neighbor == null || !nodeIDs.exists(neighbor.value.at(nodeID_))) {
+                                nodeIDs.remove(node.value.at(nodeID_));
+                                newEmpties.pop();
+                                break;
+                            }
+                        }
+                    }
+                    empties = newEmpties;
+                }
+
+                // The cavities are the nodes that remain and are empty
+                cavityNodes = empties;
+            }
 
             if (cavityNodes.length > 0) {
                 // Cavity nodes that haven't changed don't get freshened
@@ -105,18 +140,6 @@ class CavityRule extends Rule {
         }
 
         state.aspects.mod(maxFreshness_, maxFreshness);
-    }
-
-    inline function isEdge(node:BoardNode):Bool {
-        return node.neighbors.exists(isOutside);
-    }
-
-    inline function isOutside(node:BoardNode):Bool {
-        return node.value.at(isFilled_) == Aspect.FALSE;
-    }
-
-    inline function isEmpty(node:BoardNode):Bool {
-        return node != null && node.value.at(isFilled_) == Aspect.FALSE;
     }
 
     // This comparator doesn't actually compare aspect sets; it counts the number

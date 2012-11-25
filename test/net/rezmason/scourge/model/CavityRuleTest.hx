@@ -44,7 +44,10 @@ class CavityRuleTest extends RuleTest
 
         VisualAssert.assert("cavity city (empty)", state.spitBoard(plan));
 
-        cavityRule.chooseOption(0);
+        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
+
+        cavityRule.chooseOption();
 
         VisualAssert.assert("cavity city (all cavities filled)", state.spitBoard(plan));
 
@@ -92,7 +95,10 @@ class CavityRuleTest extends RuleTest
 
         VisualAssert.assert("cavity city (empty) with broken moat", state.spitBoard(plan));
 
-        cavityRule.chooseOption(0);
+        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
+
+        cavityRule.chooseOption();
 
         VisualAssert.assert("cavity city (all cavities filled) with broken moat", state.spitBoard(plan));
 

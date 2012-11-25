@@ -34,13 +34,13 @@ class RuleTest
 
     @AfterClass
     public function afterClass():Void {
-        history.wipe();
-        historyState.wipe();
-        state.wipe();
+        stateHistorian.reset();
 
+        stateHistorian = null;
         history = null;
         historyState = null;
         state = null;
+        plan = null;
     }
 
     private function makeState(rules:Array<Rule> = null,  numPlayers:Int = 1, initGrid:String = null, circular:Bool = false):Void {

@@ -38,6 +38,7 @@ class ScourgeConfigMaker {
     public var numPlayers:Int;
     public var pieceHatSize:Int;
     public var startingSwaps:Int;
+    public var startingBites:Int;
     public var swapBoost:Int;
     public var swapPeriod:Int;
     public var maxSwaps:Int;
@@ -82,7 +83,7 @@ class ScourgeConfigMaker {
         growGraphWithDrop = false;
         omnidirectionalBite = false;
         orthoBiteOnly = true;
-        orthoDecayOnly = false;
+        orthoDecayOnly = true;
         orthoDropOnly = true;
         orthoEatOnly = false;
         overlapSelf = false;
@@ -94,6 +95,7 @@ class ScourgeConfigMaker {
         numPlayers = 4;
         pieceHatSize = 5;
         startingSwaps = 5;
+        startingBites = 5;
         swapBoost = 1;
         swapPeriod = 4;
         maxSwaps = 10;
@@ -207,6 +209,7 @@ class ScourgeConfigMaker {
             biteThroughCavities:biteThroughCavities,
             biteHeads:biteHeads,
             orthoOnly:orthoBiteOnly,
+            startingBites:startingBites,
         };
     }
 

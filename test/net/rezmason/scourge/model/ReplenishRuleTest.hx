@@ -97,7 +97,7 @@ class ReplenishRuleTest extends RuleTest
                 Assert.areEqual(expectedValues3[index3], node.value.at(nodeValue3_));
             }
 
-            replenishRule.chooseOption(0);
+            replenishRule.chooseOption();
         }
     }
 }

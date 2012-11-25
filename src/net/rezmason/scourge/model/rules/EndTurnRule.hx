@@ -12,16 +12,16 @@ using net.rezmason.utils.Pointers;
 class EndTurnRule extends Rule {
 
     @player(BodyAspect.HEAD) var head_;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @player(FreshnessAspect.FRESHNESS) var freshness_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
-    @state(FreshnessAspect.FRESHNESS) var freshness_;
+    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     public function new():Void {
         super();
         options.push({optionID:0});
     }
 
-    override public function chooseOption(choice:Int):Void {
+    override public function chooseOption(choice:Int = 0):Void {
         super.chooseOption(choice);
 
         // Get current player

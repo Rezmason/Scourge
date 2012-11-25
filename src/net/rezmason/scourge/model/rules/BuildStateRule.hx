@@ -19,6 +19,7 @@ class BuildStateRule extends Rule {
 
     public function new(cfg:BuildStateConfig):Void {
         super();
+        demiurgic = true;
         this.cfg = cfg;
     }
 

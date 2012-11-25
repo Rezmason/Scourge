@@ -74,7 +74,7 @@ class PieceRulesTest extends RuleTest
 
         VisualAssert.assert("empty petri", state.spitBoard(plan));
 
-        dropRule.chooseOption(0);
+        dropRule.chooseOption();
 
         VisualAssert.assert("empty petri, L piece on bottom left extending up", state.spitBoard(plan));
 
@@ -119,7 +119,7 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        dropRule.chooseOption(0);
+        dropRule.chooseOption();
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
@@ -155,7 +155,7 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        dropRule.chooseOption(0);
+        dropRule.chooseOption();
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
@@ -191,7 +191,7 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        dropRule.chooseOption(0);
+        dropRule.chooseOption();
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
@@ -227,7 +227,7 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        dropRule.chooseOption(0);
+        dropRule.chooseOption();
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(PIECE_SIZE, numCells); // 5 cells for player 0
@@ -258,7 +258,7 @@ class PieceRulesTest extends RuleTest
 
         VisualAssert.assert("empty petri", state.spitBoard(plan));
 
-        dropRule.chooseOption(0);
+        dropRule.chooseOption();
 
         VisualAssert.assert("empty petri", state.spitBoard(plan));
 
@@ -290,7 +290,7 @@ class PieceRulesTest extends RuleTest
         for (ike in 0...hatSize + 1) {
             Assert.areEqual(1, pickPieceRule.options.length);
             Assert.areEqual(pieceTableIDs.length - (ike % hatSize), pickPieceRule.quantumOptions.length);
-            pickPieceRule.chooseOption(0);
+            pickPieceRule.chooseOption();
             state.aspects.mod(pieceTableID_, Aspect.NULL);
             pickPieceRule.update();
         }
@@ -376,7 +376,7 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        dropRule.chooseOption(0);
+        dropRule.chooseOption();
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
@@ -413,7 +413,7 @@ class PieceRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(5, numCells); // 5 cells for player 0
 
-        dropRule.chooseOption(0);
+        dropRule.chooseOption();
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(5 + 4, numCells); // 9 cells for player 0
@@ -442,7 +442,7 @@ class PieceRulesTest extends RuleTest
 
         for (ike in 0...hatSize + 1) {
             Assert.areEqual(pieceTableIDs.length, pickPieceRule.options.length);
-            pickPieceRule.chooseOption(0);
+            pickPieceRule.chooseOption();
             state.aspects.mod(pieceTableID_, Aspect.NULL);
             pickPieceRule.update();
         }
@@ -464,7 +464,7 @@ class PieceRulesTest extends RuleTest
 
         for (ike in 0...swapPieceCfg.startingSwaps) {
             Assert.areEqual(1, swapPieceRule.options.length);
-            swapPieceRule.chooseOption(0);
+            swapPieceRule.chooseOption();
             swapPieceRule.update();
             Assert.areEqual(0, swapPieceRule.options.length);
             state.aspects.mod(pieceTableID_, 0);

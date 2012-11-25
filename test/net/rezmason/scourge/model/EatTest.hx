@@ -59,7 +59,7 @@ class EatTest extends RuleTest
 
         VisualAssert.assert("two player grab", state.spitBoard(plan));
 
-        eatRule.chooseOption(0);
+        eatRule.chooseOption();
 
         VisualAssert.assert("two player grab, vertical portions of horseshoe arm eaten", state.spitBoard(plan));
 
@@ -95,7 +95,7 @@ class EatTest extends RuleTest
 
         VisualAssert.assert("two player grab", state.spitBoard(plan));
 
-        eatRule.chooseOption(0);
+        eatRule.chooseOption();
 
         VisualAssert.assert("two player grab, horseshoe arms eaten", state.spitBoard(plan));
 
@@ -127,7 +127,7 @@ class EatTest extends RuleTest
 
         VisualAssert.assert("two player grab", state.spitBoard(plan));
 
-        eatRule.chooseOption(0);
+        eatRule.chooseOption();
 
         VisualAssert.assert("two player grab, player one eaten", state.spitBoard(plan));
 
@@ -154,7 +154,7 @@ class EatTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25, numCells);
 
-        eatRule.chooseOption(0);
+        eatRule.chooseOption();
 
         VisualAssert.assert("two player grab, player one head eaten and body killed", state.spitBoard(plan));
 
@@ -195,7 +195,7 @@ class EatTest extends RuleTest
 
         VisualAssert.assert("two player N", state.spitBoard(plan));
 
-        eatRule.chooseOption(0);
+        eatRule.chooseOption();
 
         VisualAssert.assert("two player N, left descender eaten", state.spitBoard(plan));
 

@@ -66,7 +66,7 @@ class TurnRulesTest extends RuleTest
 
         while (expectedCurrentPlayer < 10) {
             expectedCurrentPlayer++;
-            endTurnRule.chooseOption(0);
+            endTurnRule.chooseOption();
             currentPlayer = state.aspects.at(currentPlayer_);
             Assert.areEqual(expectedCurrentPlayer % 3, currentPlayer);
         }
@@ -97,7 +97,7 @@ class TurnRulesTest extends RuleTest
 
         VisualAssert.assert("player 0 is alive", state.spitBoard(plan));
 
-        forfeitRule.chooseOption(0);
+        forfeitRule.chooseOption();
 
         VisualAssert.assert("player 0 is dead and gone", state.spitBoard(plan));
 
@@ -118,7 +118,7 @@ class TurnRulesTest extends RuleTest
         // Should remove heads that are not occupied by their owner
 
         var killHeadlessPlayerRule:KillHeadlessPlayerRule = new KillHeadlessPlayerRule();
-        makeState([killHeadlessPlayerRule], 4, TestBoards.emptyPetri);
+        makeState([killHeadlessPlayerRule], 4);
 
         // Change occupier of current player's head
 
@@ -140,7 +140,7 @@ class TurnRulesTest extends RuleTest
         Assert.isNotNull(options);
         Assert.areEqual(1, options.length);
 
-        killHeadlessPlayerRule.chooseOption(0);
+        killHeadlessPlayerRule.chooseOption();
 
         head = state.players[currentPlayer].at(head_);
         Assert.areEqual(Aspect.NULL, head);
@@ -154,7 +154,7 @@ class TurnRulesTest extends RuleTest
 
         // Create a four-player game with a max skip of five times
         var skipsExhaustedRule:SkipsExhaustedRule = new SkipsExhaustedRule({maxSkips:5});
-        makeState([skipsExhaustedRule], 4, TestBoards.emptyPetri);
+        makeState([skipsExhaustedRule], 4);
 
         var winner_:AspectPtr = plan.stateAspectLookup[WinAspect.WINNER.id];
         var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
@@ -168,7 +168,7 @@ class TurnRulesTest extends RuleTest
         }
 
         skipsExhaustedRule.update();
-        skipsExhaustedRule.chooseOption(0);
+        skipsExhaustedRule.chooseOption();
         Assert.areEqual(Aspect.NULL, state.aspects.at(winner_));
 
         // Have each player skip one more time, then check for a winner
@@ -180,7 +180,7 @@ class TurnRulesTest extends RuleTest
         }
 
         skipsExhaustedRule.update();
-        skipsExhaustedRule.chooseOption(0);
+        skipsExhaustedRule.chooseOption();
         Assert.areEqual(3, state.aspects.at(winner_));
     }
 
@@ -189,7 +189,7 @@ class TurnRulesTest extends RuleTest
 
         // Create a four-player game
         var oneLivingPlayerRule:OneLivingPlayerRule = new OneLivingPlayerRule();
-        makeState([oneLivingPlayerRule], 4, TestBoards.emptyPetri);
+        makeState([oneLivingPlayerRule], 4);
 
         var winner_:AspectPtr = plan.stateAspectLookup[WinAspect.WINNER.id];
         var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
@@ -205,7 +205,7 @@ class TurnRulesTest extends RuleTest
         // update and check for a winner
 
         oneLivingPlayerRule.update();
-        oneLivingPlayerRule.chooseOption(0);
+        oneLivingPlayerRule.chooseOption();
         Assert.areEqual(1, state.aspects.at(winner_));
     }
 }
