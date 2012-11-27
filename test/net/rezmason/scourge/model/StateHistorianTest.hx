@@ -13,6 +13,7 @@ import net.rezmason.scourge.model.rules.PickPieceRule;
 
 using net.rezmason.utils.Pointers;
 using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.scourge.model.StatePlan;
 
 class StateHistorianTest {
 
@@ -72,7 +73,7 @@ class StateHistorianTest {
 
         for (rule in rules) rule.prime(state, plan);
 
-        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
 
 
         var boards:Array<String> = [];

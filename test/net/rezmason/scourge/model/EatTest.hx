@@ -13,6 +13,7 @@ import net.rezmason.scourge.model.rules.EatCellsRule;
 
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.scourge.model.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class EatTest extends RuleTest
@@ -40,10 +41,10 @@ class EatTest extends RuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
 
         state.grabXY(7, 7).value.mod(freshness_, 1);
         state.grabXY(9, 7).value.mod(freshness_, 1);
@@ -79,10 +80,10 @@ class EatTest extends RuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
 
         state.grabXY(7, 7).value.mod(freshness_, 1);
         state.grabXY(9, 7).value.mod(freshness_, 1);
@@ -115,10 +116,10 @@ class EatTest extends RuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
 
         state.grabXY(12, 6).value.mod(freshness_, 1);
 
@@ -147,7 +148,7 @@ class EatTest extends RuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
 
         state.grabXY(12, 6).value.mod(freshness_, 1);
 
@@ -161,9 +162,9 @@ class EatTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25 + 1, numCells); // Only eat the head
 
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
@@ -177,10 +178,10 @@ class EatTest extends RuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
 
         state.grabXY(6, 13).value.mod(freshness_, 1);
         state.grabXY(7, 13).value.mod(freshness_, 1);

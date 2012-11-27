@@ -14,6 +14,7 @@ import net.rezmason.scourge.model.rules.BuildPlayersRule;
 
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.scourge.model.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class BoardRuleTest extends RuleTest {
@@ -38,8 +39,8 @@ class BoardRuleTest extends RuleTest {
 
         makeState(null, 4);
 
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
+        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
+        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
         for (player in state.players) {
             Assert.isNotNull(player.at(head_));
@@ -58,7 +59,7 @@ class BoardRuleTest extends RuleTest {
             Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, state.spitBoard(plan, false));
         #end
 
-        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
 
         var playerHead:BoardNode = state.nodes[state.players[currentPlayer].at(head_)];
@@ -103,9 +104,9 @@ class BoardRuleTest extends RuleTest {
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), "").length;
 
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
 
         var bodyFirst:Int = state.players[0].at(bodyFirst_);
         Assert.areNotEqual(Aspect.NULL, bodyFirst);

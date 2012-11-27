@@ -8,6 +8,7 @@ import net.rezmason.scourge.model.aspects.ReplenishableAspect;
 import net.rezmason.scourge.model.aspects.TestAspect;
 import net.rezmason.scourge.model.rules.ReplenishRule;
 
+using net.rezmason.scourge.model.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class ReplenishRuleTest extends RuleTest
@@ -59,17 +60,17 @@ class ReplenishRuleTest extends RuleTest
 
         makeState([replenishRule], 1, TestBoards.emptyPetri);
 
-        var stateValue1_:AspectPtr = plan.stateAspectLookup[TestAspect.VALUE_1.id];
-        var stateValue2_:AspectPtr = plan.stateAspectLookup[TestAspect.VALUE_2.id];
-        var stateValue3_:AspectPtr = plan.stateAspectLookup[TestAspect.VALUE_3.id];
+        var stateValue1_:AspectPtr = plan.onState(TestAspect.VALUE_1);
+        var stateValue2_:AspectPtr = plan.onState(TestAspect.VALUE_2);
+        var stateValue3_:AspectPtr = plan.onState(TestAspect.VALUE_3);
 
-        var playerValue1_:AspectPtr = plan.playerAspectLookup[TestAspect.VALUE_1.id];
-        var playerValue2_:AspectPtr = plan.playerAspectLookup[TestAspect.VALUE_2.id];
-        var playerValue3_:AspectPtr = plan.playerAspectLookup[TestAspect.VALUE_3.id];
+        var playerValue1_:AspectPtr = plan.onPlayer(TestAspect.VALUE_1);
+        var playerValue2_:AspectPtr = plan.onPlayer(TestAspect.VALUE_2);
+        var playerValue3_:AspectPtr = plan.onPlayer(TestAspect.VALUE_3);
 
-        var nodeValue1_:AspectPtr = plan.nodeAspectLookup[TestAspect.VALUE_1.id];
-        var nodeValue2_:AspectPtr = plan.nodeAspectLookup[TestAspect.VALUE_2.id];
-        var nodeValue3_:AspectPtr = plan.nodeAspectLookup[TestAspect.VALUE_3.id];
+        var nodeValue1_:AspectPtr = plan.onNode(TestAspect.VALUE_1);
+        var nodeValue2_:AspectPtr = plan.onNode(TestAspect.VALUE_2);
+        var nodeValue3_:AspectPtr = plan.onNode(TestAspect.VALUE_3);
 
         var expectedValues1:Array<Int> = [0,1,2,3,];
         var expectedValues2:Array<Int> = [0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,];

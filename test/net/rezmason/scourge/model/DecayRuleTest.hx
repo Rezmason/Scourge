@@ -10,6 +10,7 @@ import net.rezmason.scourge.model.rules.DecayRule;
 
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.scourge.model.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class DecayRuleTest extends RuleTest
@@ -51,14 +52,14 @@ class DecayRuleTest extends RuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1, numCells); // only one cell for player 0
 
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         var totalArea:Int = state.players[0].at(totalArea_);
         Assert.areEqual(numCells, totalArea);
     }
@@ -72,12 +73,12 @@ class DecayRuleTest extends RuleTest
         var decayRule:DecayRule = new DecayRule(cfg);
         makeState([decayRule], 1, TestBoards.loosePetri);
 
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
+        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var head:BoardNode = state.nodes[state.players[0].at(head_)];
         var bump:BoardNode = head.nw();
 
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
+        var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
         bump.value.mod(occupier_, 0);
         bump.value.mod(isFilled_, Aspect.TRUE);
 

@@ -19,6 +19,7 @@ import net.rezmason.scourge.model.rules.TestPieceRule;
 
 // using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.scourge.model.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class TurnRulesTest extends RuleTest
@@ -46,7 +47,7 @@ class TurnRulesTest extends RuleTest
         var endTurnRule:EndTurnRule = new EndTurnRule();
         makeState([endTurnRule], 4, TestBoards.emptySquareFourPlayerSkirmish);
 
-        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+        var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
 
         var expectedCurrentPlayer:Int = 0;
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
@@ -55,7 +56,7 @@ class TurnRulesTest extends RuleTest
 
         // Get rid of player 4's head
 
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
+        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         state.players[3].mod(head_, Aspect.NULL);
 
 
@@ -80,11 +81,11 @@ class TurnRulesTest extends RuleTest
         var forfeitRule:ForfeitRule = new ForfeitRule();
         makeState([forfeitRule], 4, TestBoards.oaf);
 
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
-        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
+        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+        var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
+        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
+        var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
+        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
 
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var head:Int = state.players[currentPlayer].at(head_);
@@ -108,7 +109,7 @@ class TurnRulesTest extends RuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(0, numCells);
 
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         Assert.areEqual(Aspect.NULL, state.players[currentPlayer].at(bodyFirst_));
     }
 
@@ -122,12 +123,12 @@ class TurnRulesTest extends RuleTest
 
         // Change occupier of current player's head
 
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
-        var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        var freshness_:AspectPtr = plan.nodeAspectLookup[FreshnessAspect.FRESHNESS.id];
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
+        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+        var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
+        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
+        var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
+        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
 
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var head:Int = state.players[currentPlayer].at(head_);
@@ -156,9 +157,9 @@ class TurnRulesTest extends RuleTest
         var skipsExhaustedRule:SkipsExhaustedRule = new SkipsExhaustedRule({maxSkips:5});
         makeState([skipsExhaustedRule], 4);
 
-        var winner_:AspectPtr = plan.stateAspectLookup[WinAspect.WINNER.id];
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
-        var numConsecutiveSkips_:AspectPtr = plan.playerAspectLookup[PlyAspect.NUM_CONSECUTIVE_SKIPS.id];
+        var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var numConsecutiveSkips_:AspectPtr = plan.onPlayer(PlyAspect.NUM_CONSECUTIVE_SKIPS);
 
         // Have each player skip four times, then check for a winner
         for (ike in 0...state.players.length) {
@@ -191,8 +192,8 @@ class TurnRulesTest extends RuleTest
         var oneLivingPlayerRule:OneLivingPlayerRule = new OneLivingPlayerRule();
         makeState([oneLivingPlayerRule], 4);
 
-        var winner_:AspectPtr = plan.stateAspectLookup[WinAspect.WINNER.id];
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
+        var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
         // kill the first, third and fourth players
         for (ike in 0...state.players.length) {

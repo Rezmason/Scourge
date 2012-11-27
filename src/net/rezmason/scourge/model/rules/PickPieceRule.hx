@@ -225,6 +225,7 @@ class PickPieceRule extends Rule {
             pickedPiece = state.extras[option.hatIndex];
         }
 
+
         state.aspects.mod(piecesPicked_, state.aspects.at(piecesPicked_) + 1);
 
         var nextPiece:AspectSet = pickedPiece.removeSet(state.extras, pieceHatNext_, pieceHatPrev_);

@@ -12,6 +12,7 @@ import net.rezmason.scourge.model.rules.BuildStateRule;
 import net.rezmason.scourge.model.rules.TestRule;
 
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.scourge.model.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class StatePlannerTest {
@@ -48,17 +49,17 @@ class StatePlannerTest {
 
         // Make sure there's the right aspects on the state
 
-        var stateTestValue_:AspectPtr = plan.stateAspectLookup[TestAspect.VALUE_1.id];
+        var stateTestValue_:AspectPtr = plan.onState(TestAspect.VALUE_1);
         Assert.isNotNull(state.aspects.at(stateTestValue_));
 
         // Make sure there's the right aspects on each player
-        var playerTestValue_:AspectPtr = plan.playerAspectLookup[TestAspect.VALUE_1.id];
+        var playerTestValue_:AspectPtr = plan.onPlayer(TestAspect.VALUE_1);
         for (ike in 0...state.players.length) {
             Assert.isNotNull(state.players[ike].at(playerTestValue_));
         }
 
         // Make sure there's the right aspects on each node
-        var nodeTestValue_:AspectPtr = plan.nodeAspectLookup[TestAspect.VALUE_1.id];
+        var nodeTestValue_:AspectPtr = plan.onNode(TestAspect.VALUE_1);
 
         for (node in state.nodes) {
             Assert.isNotNull(node.value.at(nodeTestValue_));

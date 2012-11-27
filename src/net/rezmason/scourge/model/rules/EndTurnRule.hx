@@ -30,10 +30,11 @@ class EndTurnRule extends Rule {
         var numPlayers:Int = state.players.length;
 
         // Find the next living player
-        var playerIndex:Int = (currentPlayer + 1) % numPlayers;
+        var startPlayerIndex:Int = (currentPlayer + 1) % numPlayers;
+        var playerIndex:Int = startPlayerIndex;
         while (state.players[playerIndex].at(head_) == Aspect.NULL) {
             playerIndex = (playerIndex + 1) % numPlayers;
-            if (playerIndex == currentPlayer) throw "No players have heads!";
+            if (playerIndex == startPlayerIndex) throw "No players have heads!";
         }
 
         // reset freshness on all nodes

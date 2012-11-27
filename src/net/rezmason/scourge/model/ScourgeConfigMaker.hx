@@ -62,7 +62,8 @@ class ScourgeConfigMaker {
 
     public static var defaultAction(default, null):String = "dropAction";
 
-    public static var actionList(default, null):Array<String> = ["startAction", "biteAction", "swapAction", "quitAction", "dropAction",];
+    public static var actionList(default, null):Array<String> = ["biteAction", "swapAction", "quitAction", "dropAction",];
+    public static var startAction:String = "startAction";
 
     public function new():Void {
         reset();
@@ -102,6 +103,7 @@ class ScourgeConfigMaker {
         biteBoost = 1;
         bitePeriod = 3;
         maxBites = 10;
+        maxSkips = 3;
         initGrid = null;
         pieceTableIDs = Pieces.getAllPieceIDsOfSize(4);
         randomFunction = function() return 0;

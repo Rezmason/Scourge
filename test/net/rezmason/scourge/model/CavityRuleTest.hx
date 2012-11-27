@@ -11,6 +11,7 @@ import net.rezmason.scourge.model.rules.CavityRule;
 using net.rezmason.scourge.model.GridNode;
 using net.rezmason.scourge.model.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.scourge.model.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class CavityRuleTest extends RuleTest
@@ -44,7 +45,7 @@ class CavityRuleTest extends RuleTest
 
         VisualAssert.assert("cavity city (empty)", state.spitBoard(plan));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         cavityRule.chooseOption();
@@ -57,13 +58,13 @@ class CavityRuleTest extends RuleTest
         Assert.areEqual(50, numCells);
         Assert.areEqual(31, numCavityCells);
 
-        var cavityFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.CAVITY_FIRST.id];
-        var cavityNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.CAVITY_NEXT.id];
-        var cavityPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.CAVITY_PREV.id];
+        var cavityFirst_:AspectPtr = plan.onPlayer(BodyAspect.CAVITY_FIRST);
+        var cavityNext_:AspectPtr = plan.onNode(BodyAspect.CAVITY_NEXT);
+        var cavityPrev_:AspectPtr = plan.onNode(BodyAspect.CAVITY_PREV);
         var cavityNode:BoardNode = state.nodes[state.players[0].at(cavityFirst_)];
         Assert.areEqual(0, testListLength(numCavityCells, cavityNode, cavityNext_, cavityPrev_));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         var totalArea:Int = state.players[0].at(totalArea_);
         Assert.areEqual(numCells + numCavityCells, totalArea);
     }
@@ -74,16 +75,16 @@ class CavityRuleTest extends RuleTest
         var cavityRule:CavityRule = new CavityRule();
         makeState([cavityRule], 1, TestBoards.cavityCity);
 
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
+        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var head:BoardNode = state.nodes[state.players[0].at(head_)];
         var bump:BoardNode = head.run(Gr.s, 5);
 
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
+        var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
         bump.value.mod(occupier_, 0);
         bump.value.mod(isFilled_, Aspect.TRUE);
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         var totalArea:Int = state.players[0].at(totalArea_);
         state.players[0].mod(totalArea_, totalArea + 1);
 
@@ -95,7 +96,7 @@ class CavityRuleTest extends RuleTest
 
         VisualAssert.assert("cavity city (empty) with broken moat", state.spitBoard(plan));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         cavityRule.chooseOption();
@@ -108,9 +109,9 @@ class CavityRuleTest extends RuleTest
         Assert.areEqual(51, numCells);
         Assert.areEqual(31, numCavityCells);
 
-        var cavityFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.CAVITY_FIRST.id];
-        var cavityNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.CAVITY_NEXT.id];
-        var cavityPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.CAVITY_PREV.id];
+        var cavityFirst_:AspectPtr = plan.onPlayer(BodyAspect.CAVITY_FIRST);
+        var cavityNext_:AspectPtr = plan.onNode(BodyAspect.CAVITY_NEXT);
+        var cavityPrev_:AspectPtr = plan.onNode(BodyAspect.CAVITY_PREV);
         var cavityNode:BoardNode = state.nodes[state.players[0].at(cavityFirst_)];
         Assert.areEqual(0, testListLength(numCavityCells, cavityNode, cavityNext_, cavityPrev_));
 

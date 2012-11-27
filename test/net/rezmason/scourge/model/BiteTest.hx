@@ -14,6 +14,7 @@ import net.rezmason.scourge.model.rules.BiteRule;
 using Lambda;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.scourge.model.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class BiteTest extends RuleTest
@@ -57,7 +58,7 @@ class BiteTest extends RuleTest
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
@@ -97,7 +98,7 @@ class BiteTest extends RuleTest
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
@@ -143,7 +144,7 @@ class BiteTest extends RuleTest
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
@@ -191,7 +192,7 @@ class BiteTest extends RuleTest
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
@@ -235,12 +236,12 @@ class BiteTest extends RuleTest
         var F_isForFreshness:IntHash<String> = new IntHash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
+        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var enemyHeadID:Int = state.players[1].at(head_);
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
@@ -287,7 +288,7 @@ class BiteTest extends RuleTest
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
@@ -333,8 +334,8 @@ class BiteTest extends RuleTest
         var F_isForFreshness:IntHash<String> = new IntHash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
-        var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var enemyHeadID:Int = state.players[1].at(head_);
         var enemyHead:BoardNode = state.nodes[enemyHeadID];
         var cavity:BoardNode = enemyHead.s().s().e();
@@ -342,7 +343,7 @@ class BiteTest extends RuleTest
 
         VisualAssert.assert("two player bite with small cavity in player one", state.spitBoard(plan, true, F_isForFreshness));
 
-        var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
+        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
@@ -351,7 +352,7 @@ class BiteTest extends RuleTest
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
-        var nodeID_:AspectPtr = plan.nodeAspectLookup[BodyAspect.NODE_ID.id];
+        var nodeID_:AspectPtr = plan.onNode(BodyAspect.NODE_ID);
         var cavityID:Int = cavity.value.at(nodeID_);
         for (option in options) {
             if (option.bitNodes.has(cavityID)) {
@@ -369,9 +370,9 @@ class BiteTest extends RuleTest
     }
 
     private function testEnemyBody(expectedSize:Int):Void {
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
         var bodyNode:BoardNode = state.nodes[state.players[1].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(expectedSize, bodyNode, bodyNext_, bodyPrev_));

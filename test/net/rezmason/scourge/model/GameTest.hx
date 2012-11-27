@@ -6,10 +6,16 @@ import massive.munit.util.Timer;
 import net.rezmason.scourge.model.ModelTypes;
 import net.rezmason.scourge.model.ScourgeConfigMaker;
 import net.rezmason.scourge.model.aspects.BodyAspect;
+import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
+import net.rezmason.scourge.model.aspects.SwapAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
+import net.rezmason.scourge.model.rules.DropPieceRule;
 
 using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.scourge.model.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class GameTest
@@ -22,6 +28,12 @@ class GameTest
     var configMaker:ScourgeConfigMaker;
     var basicRules:Hash<Rule>;
     var combinedRules:Hash<Rule>;
+
+    var startAction:Rule;
+    var biteAction:Rule;
+    var swapAction:Rule;
+    var quitAction:Rule;
+    var dropAction:Rule;
 
 	public function new() {
 
@@ -65,6 +77,7 @@ class GameTest
 	public function allActionsRegisteredTest():Void {
 		makeState();
 		for (action in ScourgeConfigMaker.actionList) Assert.isNotNull(combinedRules.get(action));
+		Assert.isNotNull(combinedRules.get(ScourgeConfigMaker.startAction));
 	}
 
 	@Test
@@ -82,8 +95,8 @@ class GameTest
 		Assert.areEqual(24, num0Cells);
 		Assert.areEqual(32, num1Cells);
 
-		combinedRules.get("startAction").update();
-		combinedRules.get("startAction").chooseOption();
+		startAction.update();
+		startAction.chooseOption();
 
 		//trace(state.spitBoard(plan));
 		var num0Cells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), "").length;
@@ -92,11 +105,11 @@ class GameTest
 		Assert.areEqual(20, num0Cells);
 		Assert.areEqual(0, num1Cells);
 
-		var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
-		var head_:AspectPtr = plan.playerAspectLookup[BodyAspect.HEAD.id];
+		var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+		var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
-		var winner_:AspectPtr = plan.stateAspectLookup[WinAspect.WINNER.id];
-		var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+		var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
 
 		Assert.areEqual(36, state.players[0].at(totalArea_));
 		Assert.areEqual(Aspect.NULL, state.players[1].at(head_));
@@ -113,15 +126,12 @@ class GameTest
 		configMaker.initGrid = TestBoards.twoPlayerGrab;
 		makeState();
 
-		var winner_:AspectPtr = plan.stateAspectLookup[WinAspect.WINNER.id];
-		var totalArea_:AspectPtr = plan.playerAspectLookup[BodyAspect.TOTAL_AREA.id];
-		var currentPlayer_:AspectPtr = plan.stateAspectLookup[PlyAspect.CURRENT_PLAYER.id];
+		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+		var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+		var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
 
-		combinedRules.get("startAction").update();
-		combinedRules.get("startAction").chooseOption();
-
-		var biteAction:Rule = combinedRules.get("biteAction");
-		var dropAction:Rule = combinedRules.get("dropAction");
+		startAction.update();
+		startAction.chooseOption();
 
 		Assert.areEqual(13, state.players[1].at(totalArea_));
 		//trace(state.spitBoard(plan));
@@ -152,16 +162,36 @@ class GameTest
 	public function swapActionTest():Void {
 		// swapPiece, pickPiece
 
-		configMaker.numPlayers = 2;
-		configMaker.startingSwaps = 5;
+		configMaker.startingSwaps = 100;
+		configMaker.pieceHatSize = 3;
+
+		//trace(configMaker.pieceTableIDs);
+
 		makeState();
-		combinedRules.get("startAction").update();
-		combinedRules.get("startAction").chooseOption();
+		startAction.update();
+		startAction.chooseOption();
 
-		// loop
-		// 	swap a piece
-		// 	check the new piece, and the number of pieces that remain
+		var numSwaps_:AspectPtr = plan.onPlayer(SwapAspect.NUM_SWAPS);
+		var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
 
+		Assert.areEqual(configMaker.startingSwaps, state.players[0].at(numSwaps_));
+
+		var pickedPieces:Array<Int> = [];
+
+		for (ike in 0...configMaker.startingSwaps) {
+
+			swapAction.update();
+			swapAction.chooseOption(0);
+
+			var piece:Int = state.aspects.at(pieceTableID_);
+			//trace(piece);
+
+			var index:Int = ike % configMaker.pieceHatSize;
+			if (pickedPieces[index] == null) pickedPieces[index] = piece;
+			else Assert.areEqual(pickedPieces[index], piece);
+		}
+
+		Assert.areEqual(0, state.players[0].at(numSwaps_));
 	}
 
 	@Test
@@ -170,11 +200,15 @@ class GameTest
 
 		configMaker.numPlayers = 2;
 		makeState();
-		combinedRules.get("startAction").update();
-		combinedRules.get("startAction").chooseOption();
+		startAction.update();
+		startAction.chooseOption();
 
-		// Two player grab with cavity
-		// Have one player forfeit
+		quitAction.update();
+		quitAction.chooseOption(); // player 1 ragequits
+
+		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+
+		Assert.areEqual(1, state.aspects.at(winner_));
 	}
 
 	@Test
@@ -182,14 +216,58 @@ class GameTest
 		// dropPiece, eatCells, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
 		configMaker.numPlayers = 2;
+		configMaker.pieceTableIDs = [Pieces.getPieceIdBySizeAndIndex(4, 1)]; // "L/J block"
 		configMaker.initGrid = TestBoards.twoPlayerGrab;
 		makeState();
-		combinedRules.get("startAction").update();
-		combinedRules.get("startAction").chooseOption();
+		startAction.update();
+		startAction.chooseOption();
 
-		// Have one player eat a limb of the other
-		// Have the other player skip
-		// Have the one player eat the head of the other
+		var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
+
+		//trace(state.spitBoard(plan));
+
+		dropAction.update();
+		dropAction.chooseOption(35); // drop, eat
+
+		//trace(state.spitBoard(plan));
+
+		dropAction.update();
+		dropAction.chooseOption(); // skip
+
+		var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+
+		dropAction.update();
+		dropAction.chooseOption(32); // drop, eat, kill
+
+		/*
+		var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+		var enemyHead:BoardNode = state.nodes[state.players[1].at(head_)];
+
+		var droptions:Array<DropPieceOption> = cast dropAction.options;
+		var bestOption:DropPieceOption = null;
+		for (option in droptions) {
+			if (!option.duplicate) {
+				for (nodeID in option.addedNodes) {
+					var node:BoardNode = state.nodes[nodeID];
+					for (neighbor in node.allNeighbors()) {
+						if (neighbor == enemyHead) {
+							bestOption = option;
+							break;
+						}
+					}
+				}
+			}
+			if (bestOption != null) break;
+		}
+
+		trace(bestOption);
+		*/
+
+		//trace(state.spitBoard(plan));
+
+		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+
+		Assert.areEqual(0, state.aspects.at(winner_));
 	}
 
 	private function makeState():Void {
@@ -208,6 +286,11 @@ class GameTest
 		plan = new StatePlanner().planState(state, rules);
 		for (rule in demiurgicRulesArray) rule.prime(state, plan);
         for (rule in basicRulesArray) rule.prime(state, plan);
+        startAction = combinedRules.get(ScourgeConfigMaker.startAction);
+	    biteAction = combinedRules.get("biteAction");
+	    swapAction = combinedRules.get("swapAction");
+	    quitAction = combinedRules.get("quitAction");
+	    dropAction = combinedRules.get("dropAction");
     }
 
 }

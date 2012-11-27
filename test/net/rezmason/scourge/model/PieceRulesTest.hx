@@ -14,6 +14,7 @@ import net.rezmason.scourge.model.rules.PickPieceRule;
 import net.rezmason.scourge.model.rules.SwapPieceRule;
 
 using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.scourge.model.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class PieceRulesTest extends RuleTest
@@ -81,9 +82,9 @@ class PieceRulesTest extends RuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
 
-        var bodyFirst_:AspectPtr = plan.playerAspectLookup[BodyAspect.BODY_FIRST.id];
-        var bodyNext_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_NEXT.id];
-        var bodyPrev_:AspectPtr = plan.nodeAspectLookup[BodyAspect.BODY_PREV.id];
+        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
@@ -283,7 +284,7 @@ class PieceRulesTest extends RuleTest
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
+        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
 
         pickPieceRule.update();
 
@@ -313,7 +314,7 @@ class PieceRulesTest extends RuleTest
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
+        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
 
         pickPieceRule.update();
 
@@ -338,7 +339,7 @@ class PieceRulesTest extends RuleTest
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
+        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
 
         pickPieceRule.update();
 
@@ -436,7 +437,7 @@ class PieceRulesTest extends RuleTest
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
+        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
 
         pickPieceRule.update();
 
@@ -456,7 +457,7 @@ class PieceRulesTest extends RuleTest
         var swapPieceRule:SwapPieceRule = new SwapPieceRule(swapPieceCfg);
         makeState([swapPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.stateAspectLookup[PieceAspect.PIECE_TABLE_ID.id];
+        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
 
         state.aspects.mod(pieceTableID_, 0);
 

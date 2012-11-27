@@ -21,4 +21,17 @@ class StatePlan {
         playerAspectLookup = [];
         nodeAspectLookup = [];
     }
+
+    public static inline function onState(plan:StatePlan, prop:AspectProperty):AspectPtr {
+        return plan.stateAspectLookup[prop.id];
+    }
+
+    public static inline function onPlayer(plan:StatePlan, prop:AspectProperty):AspectPtr {
+        return plan.playerAspectLookup[prop.id];
+    }
+
+    public static inline function onNode(plan:StatePlan, prop:AspectProperty):AspectPtr {
+        return plan.nodeAspectLookup[prop.id];
+    }
+
 }

@@ -1,4 +1,5 @@
-Action tests
+PickPieceRule seems bonkers
+	Fix it and verify in PieceRulesTest
 
 Game
 	Gets rules from rule factory
@@ -26,7 +27,18 @@ IPlayer
 		TextView
 			Interprets commands
 			Translates all other game events into human readable output
-			Use a Flash console component
+
+			X X X X X X X X  • • •
+			X             X  •
+			X   + + + +   X
+			X   + Ω ¬ +   X
+			X   + ¬ ¬ +   X
+			X   + + +  ◊ X
+			X             X
+			X X X X X X X X
+
+			¬  > Ω Î @ Δ ◊
+
 	LocalMachinePlayer
 
 PlayerFactory

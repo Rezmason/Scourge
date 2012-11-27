@@ -30,10 +30,14 @@ class SkipsExhaustedRule extends Rule {
 
         var stalemate:Bool = true;
 
-        for (player in state.players) {
-            if (player.at(numConsecutiveSkips_) < cfg.maxSkips) {
-                stalemate = false;
-                break;
+        if (state.aspects.at(winner_) != Aspect.NULL) {
+            stalemate = false;
+        } else {
+            for (player in state.players) {
+                if (player.at(numConsecutiveSkips_) < cfg.maxSkips) {
+                    stalemate = false;
+                    break;
+                }
             }
         }
 
