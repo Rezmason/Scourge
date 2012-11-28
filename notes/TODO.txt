@@ -1,6 +1,3 @@
-PickPieceRule seems bonkers
-	Fix it and verify in PieceRulesTest
-
 Game
 	Gets rules from rule factory
 	Has internal state historian
@@ -33,7 +30,7 @@ IPlayer
 			X   + + + +   X
 			X   + Ω ¬ +   X
 			X   + ¬ ¬ +   X
-			X   + + +  ◊ X
+			X  [+]+ +  ◊ X
 			X             X
 			X X X X X X X X
 

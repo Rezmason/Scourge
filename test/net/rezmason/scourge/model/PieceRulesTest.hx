@@ -288,10 +288,11 @@ class PieceRulesTest extends RuleTest
 
         pickPieceRule.update();
 
-        for (ike in 0...hatSize + 1) {
+        for (ike in 0...hatSize * 2) {
             Assert.areEqual(1, pickPieceRule.options.length);
             Assert.areEqual(pieceTableIDs.length - (ike % hatSize), pickPieceRule.quantumOptions.length);
             pickPieceRule.chooseOption();
+            Assert.areEqual(pieceTableIDs[ike % hatSize], state.aspects.at(pieceTableID_));
             state.aspects.mod(pieceTableID_, Aspect.NULL);
             pickPieceRule.update();
         }

@@ -162,10 +162,9 @@ class GameTest
 	public function swapActionTest():Void {
 		// swapPiece, pickPiece
 
-		configMaker.startingSwaps = 100;
 		configMaker.pieceHatSize = 3;
-
-		//trace(configMaker.pieceTableIDs);
+		configMaker.startingSwaps = 6;
+		configMaker.allowFlipping = true;
 
 		makeState();
 		startAction.update();
@@ -179,12 +178,12 @@ class GameTest
 		var pickedPieces:Array<Int> = [];
 
 		for (ike in 0...configMaker.startingSwaps) {
-
 			swapAction.update();
-			swapAction.chooseOption(0);
+			swapAction.chooseOption();
 
 			var piece:Int = state.aspects.at(pieceTableID_);
-			//trace(piece);
+
+			Assert.areEqual(configMaker.pieceTableIDs[(ike + 1) % configMaker.pieceHatSize], state.aspects.at(pieceTableID_));
 
 			var index:Int = ike % configMaker.pieceHatSize;
 			if (pickedPieces[index] == null) pickedPieces[index] = piece;

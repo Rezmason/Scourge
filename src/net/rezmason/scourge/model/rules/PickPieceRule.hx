@@ -232,7 +232,8 @@ class PickPieceRule extends Rule {
 
         if (pickedPiece == firstHatPiece) {
             firstHatPiece = nextPiece;
-            state.aspects.mod(pieceHatFirst_, firstHatPiece.at(pieceID_));
+            if (firstHatPiece == null) state.aspects.mod(pieceHatFirst_, Aspect.NULL);
+            else state.aspects.mod(pieceHatFirst_, firstHatPiece.at(pieceID_));
         }
 
         return option;
@@ -260,8 +261,7 @@ class PickPieceRule extends Rule {
     }
 
     // We fill the hat up again if it's empty
-    private inline function remakeHat():Bool {
-
+    private function remakeHat():Bool {
         return state.aspects.at(pieceHatPlayer_) != state.aspects.at(currentPlayer_) ||
                 state.aspects.at(piecesPicked_) == cfg.hatSize;
     }
