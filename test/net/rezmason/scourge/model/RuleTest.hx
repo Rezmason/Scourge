@@ -3,13 +3,18 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.State;
+import net.rezmason.ropes.StatePlan;
+import net.rezmason.ropes.StatePlanner;
+import net.rezmason.ropes.StateHistorian;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.BuildStateRule;
 import net.rezmason.scourge.model.rules.BuildPlayersRule;
 
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class RuleTest

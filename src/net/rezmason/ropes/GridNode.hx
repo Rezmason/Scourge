@@ -1,4 +1,4 @@
-package net.rezmason.scourge.model;
+package net.rezmason.ropes;
 
 class GridNode<T> {
     public var value(default, null):T;

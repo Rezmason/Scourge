@@ -1,11 +1,11 @@
 package net.rezmason.scourge.model.evaluators;
 
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 
-using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class TestEvaluator extends Evaluator {

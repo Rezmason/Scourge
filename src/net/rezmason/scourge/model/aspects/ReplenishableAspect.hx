@@ -1,5 +1,7 @@
 package net.rezmason.scourge.model.aspects;
 
+import net.rezmason.ropes.Aspect;
+
 class ReplenishableAspect extends Aspect {
     @aspect(null) var STATE_REP_FIRST;
     @aspect(null) var PLAYER_REP_FIRST;

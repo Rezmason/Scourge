@@ -3,12 +3,13 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.ReplenishableAspect;
 import net.rezmason.scourge.model.aspects.TestAspect;
 import net.rezmason.scourge.model.rules.ReplenishRule;
 
-using net.rezmason.scourge.model.StatePlan;
+using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class ReplenishRuleTest extends RuleTest

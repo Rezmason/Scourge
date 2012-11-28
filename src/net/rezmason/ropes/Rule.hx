@@ -1,4 +1,4 @@
-package net.rezmason.scourge.model;
+package net.rezmason.ropes;
 
 #if macro
 import haxe.macro.Context;
@@ -7,11 +7,11 @@ import haxe.macro.Expr;
 using Lambda;
 #end
 
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.ModelTypes;
 
 using net.rezmason.utils.Pointers;
 
-#if !macro @:autoBuild(net.rezmason.scourge.model.Rule.build()) #end class Rule {
+#if !macro @:autoBuild(net.rezmason.ropes.Rule.build()) #end class Rule {
 
     var state:State;
     var plan:StatePlan;
@@ -143,9 +143,9 @@ using net.rezmason.utils.Pointers;
                     reqExpressions.push( macro $reqs.push($aspectExpr) );
                     ptrExpressions.push( macro $ptr = $lkp[$aspectExpr.id] );
 
-                    //neko.Lib.println(macro :net.rezmason.scourge.model.ModelTypes.AspectPtr);
+                    //neko.Lib.println(macro :net.rezmason.ropes.ModelTypes.AspectPtr);
 
-                    field.kind = FVar(macro :net.rezmason.scourge.model.ModelTypes.AspectPtr, null);
+                    field.kind = FVar(macro :net.rezmason.ropes.ModelTypes.AspectPtr, null);
 
                     msg += metaTag.name.charAt(0);
 

@@ -1,12 +1,12 @@
-package net.rezmason.scourge.model;
+package net.rezmason.ropes;
 
 #if macro
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.ModelTypes;
 #end
 
-#if !macro @:autoBuild(net.rezmason.scourge.model.Aspect.build()) #end class Aspect {
+#if !macro @:autoBuild(net.rezmason.ropes.Aspect.build()) #end class Aspect {
     private static var ids:Int = 0;
     public inline static var TRUE:Int = 1;
     public inline static var FALSE:Int = 0;

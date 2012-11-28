@@ -1,13 +1,15 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 
 import Std.int;
 
-using net.rezmason.scourge.model.AspectUtils;
+using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.Pointers;
 
 typedef PickPieceConfig = {

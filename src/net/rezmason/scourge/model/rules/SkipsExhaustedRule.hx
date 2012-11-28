@@ -1,5 +1,7 @@
 package net.rezmason.scourge.model.rules;
 
+import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;

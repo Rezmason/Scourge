@@ -1,9 +1,9 @@
-package net.rezmason.scourge.model;
+package net.rezmason.ropes;
 
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.ModelTypes;
 
 using Lambda;
-using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class AspectUtils {

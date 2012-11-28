@@ -1,5 +1,9 @@
 package net.rezmason.scourge.model.rules;
 
+import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.State;
+
 typedef BuildPlayersConfig = {
     public var buildCfg:BuildConfig;
     public var numPlayers:Int;

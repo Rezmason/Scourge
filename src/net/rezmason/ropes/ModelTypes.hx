@@ -1,6 +1,6 @@
-package net.rezmason.scourge.model;
+package net.rezmason.ropes;
 
-import net.rezmason.scourge.model.Aspect;
+import net.rezmason.ropes.Aspect;
 
 using net.rezmason.utils.Pointers;
 

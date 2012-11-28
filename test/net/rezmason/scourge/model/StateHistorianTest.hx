@@ -3,7 +3,11 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.State;
+import net.rezmason.ropes.StateHistorian;
+import net.rezmason.ropes.StatePlanner;
+import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.BuildPlayersRule;
@@ -13,7 +17,7 @@ import net.rezmason.scourge.model.rules.PickPieceRule;
 
 using net.rezmason.utils.Pointers;
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.scourge.model.StatePlan;
+using net.rezmason.ropes.StatePlan;
 
 class StateHistorianTest {
 

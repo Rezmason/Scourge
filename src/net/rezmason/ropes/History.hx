@@ -1,4 +1,4 @@
-package net.rezmason.scourge.model;
+package net.rezmason.ropes;
 
 class History<T> {
 

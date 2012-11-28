@@ -1,8 +1,10 @@
 package net.rezmason.scourge.model;
 
 import net.rezmason.scourge.model.BuildConfig;
-import net.rezmason.scourge.model.ModelTypes;
-import net.rezmason.scourge.model.State;
+import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.State;
+import net.rezmason.utils.Siphon;
 import net.rezmason.scourge.model.aspects.BiteAspect;
 import net.rezmason.scourge.model.aspects.SwapAspect;
 import net.rezmason.scourge.model.Pieces;
@@ -49,16 +51,18 @@ class ScourgeConfigMaker {
     public var pieceTableIDs:Array<Int>;
     public var randomFunction:Void->Float;
 
-    public static var combinedRuleCfg(default, null):Dynamic<Array<String>> = {
-        cleanUp: ["decay", "cavity", "killHeadlessPlayer", "oneLivingPlayer"],
-        wrapUp: ["endTurn", "replenish", "pickPiece"],
+    public static var ruleDefs:Hash<Class<Rule>> = cast Siphon.getDefs("net.rezmason.scourge.model.rules", "src", "Rule");
 
-        startAction: ["cleanUp", "pickPiece"],
-        biteAction: ["bite", "cleanUp"],
-        swapAction: ["swapPiece", "pickPiece"],
-        quitAction: ["forfeit", "cleanUp", "wrapUp"],
-        dropAction: ["dropPiece", "eatCells", "cleanUp", "wrapUp", "skipsExhausted"],
-    };
+    public static var combinedRuleCfg(default, null):Dynamic<Array<String>> = {
+        cleanUp: ["DecayRule", "CavityRule", "KillHeadlessPlayerRule", "OneLivingPlayerRule"],
+        wrapUp: ["EndTurnRule", "ReplenishRule", "PickPieceRule"],
+
+        startAction: ["cleanUp", "PickPieceRule"],
+        biteAction: ["BiteRule", "cleanUp"],
+        swapAction: ["SwapPieceRule", "PickPieceRule"],
+        quitAction: ["ForfeitRule", "cleanUp", "wrapUp"],
+        dropAction: ["DropPieceRule", "EatCellsRule", "cleanUp", "wrapUp", "SkipsExhaustedRule"],
+    }
 
     public static var defaultAction(default, null):String = "dropAction";
 
@@ -113,23 +117,23 @@ class ScourgeConfigMaker {
         var buildCfg:BuildConfig = makeBuildConfig(history, historyState);
 
         return {
-            buildState: makeBuildStateConfig(buildCfg),
-            buildPlayers: makeBuildPlayersConfig(buildCfg),
-            buildBoard: makeBuildBoardConfig(buildCfg),
-            eatCells: makeEatCellsConfig(),
-            decay: makeDecayConfig(),
-            pickPiece: makePickPieceConfig(buildCfg),
-            dropPiece: makeDropPieceConfig(),
-            bite: makeBiteConfig(),
-            swapPiece: makeSwapConfig(),
-            replenish: makeReplenishConfig(buildCfg),
-            skipsExhausted: makeSkipsExhaustedConfig(),
+            BuildStateRule: makeBuildStateConfig(buildCfg),
+            BuildPlayersRule: makeBuildPlayersConfig(buildCfg),
+            BuildBoardRule: makeBuildBoardConfig(buildCfg),
+            EatCellsRule: makeEatCellsConfig(),
+            DecayRule: makeDecayConfig(),
+            PickPieceRule: makePickPieceConfig(buildCfg),
+            DropPieceRule: makeDropPieceConfig(),
+            BiteRule: makeBiteConfig(),
+            SwapPieceRule: makeSwapConfig(),
+            ReplenishRule: makeReplenishConfig(buildCfg),
+            SkipsExhaustedRule: makeSkipsExhaustedConfig(),
 
-            cavity: null,
-            endTurn: null,
-            forfeit: null,
-            killHeadlessPlayer: null,
-            oneLivingPlayer: null,
+            CavityRule: null,
+            EndTurnRule: null,
+            ForfeitRule: null,
+            KillHeadlessPlayerRule: null,
+            OneLivingPlayerRule: null,
         };
     }
 

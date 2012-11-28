@@ -1,6 +1,9 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.State;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 
 using net.rezmason.utils.ArrayUtils;

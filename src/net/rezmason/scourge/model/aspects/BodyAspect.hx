@@ -1,5 +1,7 @@
 package net.rezmason.scourge.model.aspects;
 
+import net.rezmason.ropes.Aspect;
+
 class BodyAspect extends Aspect {
     @aspect(null) var NODE_ID;
     @aspect(null) var HEAD;

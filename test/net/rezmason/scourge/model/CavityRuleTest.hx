@@ -3,15 +3,16 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.rules.CavityRule;
 
-using net.rezmason.scourge.model.GridNode;
-using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.ropes.GridNode;
+using net.rezmason.ropes.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.scourge.model.StatePlan;
+using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class CavityRuleTest extends RuleTest

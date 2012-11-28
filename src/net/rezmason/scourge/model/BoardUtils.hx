@@ -1,12 +1,15 @@
 package net.rezmason.scourge.model;
 
-import net.rezmason.scourge.model.ModelTypes;
-import net.rezmason.scourge.model.GridNode;
+import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.GridNode;
+import net.rezmason.ropes.State;
+import net.rezmason.ropes.StatePlan;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
-using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class BoardUtils {

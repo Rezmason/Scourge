@@ -1,12 +1,11 @@
-package net.rezmason.scourge.model;
+package net.rezmason.ropes;
 
-import net.rezmason.scourge.model.GridNode;
-import net.rezmason.scourge.model.ModelTypes;
-import net.rezmason.scourge.model.Aspect;
-import net.rezmason.scourge.model.aspects.PlyAspect;
+import net.rezmason.ropes.GridNode;
+import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Aspect;
 
 using Lambda;
-using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.Pointers;
 

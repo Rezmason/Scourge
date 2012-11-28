@@ -3,7 +3,13 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.State;
+import net.rezmason.ropes.StateHistorian;
+import net.rezmason.ropes.StatePlanner;
+import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RuleFactory;
+import net.rezmason.ropes.Aspect;
 import net.rezmason.scourge.model.ScourgeConfigMaker;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
@@ -14,8 +20,8 @@ import net.rezmason.scourge.model.aspects.WinAspect;
 import net.rezmason.scourge.model.rules.DropPieceRule;
 
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.scourge.model.GridUtils;
-using net.rezmason.scourge.model.StatePlan;
+using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class GameTest
@@ -175,7 +181,7 @@ class GameTest
 
 		Assert.areEqual(configMaker.startingSwaps, state.players[0].at(numSwaps_));
 
-		var pickedPieces:Array<Int> = [];
+		var pickedPieces:Array<Null<Int>> = [];
 
 		for (ike in 0...configMaker.startingSwaps) {
 			swapAction.update();
@@ -270,7 +276,7 @@ class GameTest
 	}
 
 	private function makeState():Void {
-		basicRules = RuleFactory.makeBasicRules(configMaker.makeConfig(stateHistorian.history, stateHistorian.historyState));
+		basicRules = RuleFactory.makeBasicRules(ScourgeConfigMaker.ruleDefs, configMaker.makeConfig(stateHistorian.history, stateHistorian.historyState));
 		var basicRulesArray:Array<Rule> = [];
 		var demiurgicRulesArray:Array<Rule> = [];
 		var rules:Array<Rule> = [];

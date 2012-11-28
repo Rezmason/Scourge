@@ -3,17 +3,17 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.scourge.model.GridNode;
-import net.rezmason.scourge.model.ModelTypes;
+import net.rezmason.ropes.GridNode;
+import net.rezmason.ropes.ModelTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.rules.EatCellsRule;
 
-using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.ropes.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.scourge.model.StatePlan;
+using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class EatTest extends RuleTest

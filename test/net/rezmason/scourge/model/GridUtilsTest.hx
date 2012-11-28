@@ -3,9 +3,9 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.scourge.model.GridNode;
+import net.rezmason.ropes.GridNode;
 
-using net.rezmason.scourge.model.GridUtils;
+using net.rezmason.ropes.GridUtils;
 
 class GridUtilsTest {
 
