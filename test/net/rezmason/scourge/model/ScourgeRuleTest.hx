@@ -17,7 +17,7 @@ using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 
-class RuleTest
+class ScourgeRuleTest
 {
     var stateHistorian:StateHistorian;
     var history:StateHistory;

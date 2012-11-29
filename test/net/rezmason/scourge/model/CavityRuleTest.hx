@@ -15,7 +15,7 @@ using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
-class CavityRuleTest extends RuleTest
+class CavityRuleTest extends ScourgeRuleTest
 {
     #if TIME_TESTS
     var time:Float;
@@ -33,7 +33,7 @@ class CavityRuleTest extends RuleTest
     #end
 
     @Test
-    public function cavityRuleTest():Void {
+    public function cavityScourgeRuleTest():Void {
 
         var cavityRule:CavityRule = new CavityRule();
         makeState([cavityRule], 1, TestBoards.cavityCity);
@@ -71,7 +71,7 @@ class CavityRuleTest extends RuleTest
     }
 
     @Test
-    public function cavityRuleTest2():Void {
+    public function cavityScourgeRuleTest2():Void {
 
         var cavityRule:CavityRule = new CavityRule();
         makeState([cavityRule], 1, TestBoards.cavityCity);

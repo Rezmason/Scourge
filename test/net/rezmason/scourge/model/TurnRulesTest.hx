@@ -23,7 +23,7 @@ using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
-class TurnRulesTest extends RuleTest
+class TurnRulesTest extends ScourgeRuleTest
 {
     #if TIME_TESTS
     var time:Float;

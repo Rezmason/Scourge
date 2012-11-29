@@ -17,7 +17,7 @@ using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
-class BiteTest extends RuleTest
+class BiteRuleTest extends ScourgeRuleTest
 {
     private static var PIECE_SIZE:Int = 4;
 

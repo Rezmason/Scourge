@@ -12,7 +12,7 @@ import net.rezmason.scourge.model.rules.ReplenishRule;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
-class ReplenishRuleTest extends RuleTest
+class ReplenishRuleTest extends ScourgeRuleTest
 {
 
     #if TIME_TESTS

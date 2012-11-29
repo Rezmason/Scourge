@@ -14,7 +14,7 @@ using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
-class DecayRuleTest extends RuleTest
+class DecayRuleTest extends ScourgeRuleTest
 {
     #if TIME_TESTS
     var time:Float;
@@ -32,7 +32,7 @@ class DecayRuleTest extends RuleTest
     #end
 
     @Test
-    public function decayRuleTest():Void {
+    public function decayScourgeRuleTest():Void {
 
         var cfg:DecayConfig = {
             orthoOnly:true,
@@ -66,7 +66,7 @@ class DecayRuleTest extends RuleTest
     }
 
     @Test
-    public function decayDiagRuleTest():Void {
+    public function decayDiagScourgeRuleTest():Void {
 
         var cfg:DecayConfig = {
             orthoOnly:false,

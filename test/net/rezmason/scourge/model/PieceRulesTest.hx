@@ -17,7 +17,7 @@ using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
-class PieceRulesTest extends RuleTest
+class PieceRulesTest extends ScourgeRuleTest
 {
     private static var PIECE_SIZE:Int = 4;
 
@@ -44,7 +44,7 @@ class PieceRulesTest extends RuleTest
     // Y                    Y                   72
 
 	@Test
-	public function placePieceRuleTestOrtho():Void {
+	public function placePieceScourgeRuleTestOrtho():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -91,7 +91,7 @@ class PieceRulesTest extends RuleTest
 	}
 
     @Test
-    public function placePieceRuleTestOrthoNoFlipping():Void {
+    public function placePieceScourgeRuleTestOrthoNoFlipping():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -127,7 +127,7 @@ class PieceRulesTest extends RuleTest
     }
 
     @Test
-    public function placePieceRuleTestOrthoNoSpinning():Void {
+    public function placePieceScourgeRuleTestOrthoNoSpinning():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -163,7 +163,7 @@ class PieceRulesTest extends RuleTest
     }
 
     @Test
-    public function placePieceRuleTestOrthoNoSpinningOrFlipping():Void {
+    public function placePieceScourgeRuleTestOrthoNoSpinningOrFlipping():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -199,7 +199,7 @@ class PieceRulesTest extends RuleTest
     }
 
     @Test
-    public function placePieceRuleTestOrthoSelf():Void {
+    public function placePieceScourgeRuleTestOrthoSelf():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -235,7 +235,7 @@ class PieceRulesTest extends RuleTest
     }
 
     @Test
-    public function placePieceRuleTestOrthoAllowNowhere():Void {
+    public function placePieceScourgeRuleTestOrthoAllowNowhere():Void {
 
         var dropConfig:DropPieceConfig = {
             overlapSelf:false,
@@ -349,7 +349,7 @@ class PieceRulesTest extends RuleTest
     }
 
     @Test
-    public function placePieceRuleTestDiag():Void {
+    public function placePieceScourgeRuleTestDiag():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
@@ -385,7 +385,7 @@ class PieceRulesTest extends RuleTest
     }
 
     @Test
-    public function placePieceRuleTestOrthoDiag():Void {
+    public function placePieceScourgeRuleTestOrthoDiag():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"

@@ -21,22 +21,22 @@ Coordinator - connects players to the game
 IPlayer
 	TestPlayer
 	HumanPlayer
-		TextView
-			Interprets commands
-			Translates all other game events into human readable output
-
-			X X X X X X X X  • • •
-			X             X  •
-			X   + + + +   X
-			X   + Ω ¬ +   X
-			X   + ¬ ¬ +   X
-			X  [+]+ +  ◊ X
-			X             X
-			X X X X X X X X
-
-			¬  > Ω Î @ Δ ◊
-
 	LocalMachinePlayer
+
+TextView
+	Interprets commands
+	Translates all other game events into human readable output
+
+	X X X X X X X X  • • •
+	X             X  •
+	X   + + + +   X
+	X   + Ω ¬ +   X
+	X   + ¬ ¬ +   X
+	X  [+]+ +  ◊ X
+	X             X
+	X X X X X X X X
+
+	¬  > Ω Î @ Δ ◊
 
 PlayerFactory
 	Generates player lists from config
@@ -77,6 +77,12 @@ A.I. thoughts
 
 
 Later
+
+	Rule-Option Paradigm Entity System
+		Create tic tac toe example for ROPES
+		Create readme and license files for ROPES
+		Migrate tests to tic tac toe
+		Move ROPES to a haxe lib
 
 	Maybe turn nodes into aspects
 		Store their neighbors on them

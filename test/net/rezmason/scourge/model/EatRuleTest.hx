@@ -16,7 +16,7 @@ using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
-class EatTest extends RuleTest
+class EatRuleTest extends ScourgeRuleTest
 {
     #if TIME_TESTS
     var time:Float;
@@ -34,7 +34,7 @@ class EatTest extends RuleTest
     #end
 
     @Test
-    public function eatRuleTest():Void {
+    public function eatScourgeRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
@@ -73,7 +73,7 @@ class EatTest extends RuleTest
     }
 
     @Test
-    public function eatRecursivelyRuleTest():Void {
+    public function eatRecursivelyScourgeRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
@@ -109,7 +109,7 @@ class EatTest extends RuleTest
     }
 
     @Test
-    public function eatHeadAndBodyRuleTest():Void {
+    public function eatHeadAndBodyScourgeRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:true, orthoOnly:false};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
@@ -171,7 +171,7 @@ class EatTest extends RuleTest
     }
 
     @Test
-    public function eatOrthoRuleTest():Void {
+    public function eatOrthoScourgeRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:true};
         var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
         makeState([eatRule], 2, TestBoards.twoPlayerN);

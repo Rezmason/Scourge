@@ -17,7 +17,7 @@ using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
-class BoardRuleTest extends RuleTest {
+class BoardRuleTest extends ScourgeRuleTest {
 
     #if TIME_TESTS
     var time:Float;
