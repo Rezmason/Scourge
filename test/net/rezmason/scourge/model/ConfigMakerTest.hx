@@ -24,7 +24,7 @@ using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
-class GameTest
+class ConfigMakerTest
 {
 	var stateHistorian:StateHistorian;
     var history:StateHistory;
@@ -82,8 +82,8 @@ class GameTest
 	@Test
 	public function allActionsRegisteredTest():Void {
 		makeState();
-		for (action in ScourgeConfigMaker.actionList) Assert.isNotNull(combinedRules.get(action));
-		Assert.isNotNull(combinedRules.get(ScourgeConfigMaker.startAction));
+		for (action in configMaker.makeActionList()) Assert.isNotNull(combinedRules.get(action));
+		Assert.isNotNull(combinedRules.get(configMaker.makeStartAction()));
 	}
 
 	@Test
@@ -287,11 +287,11 @@ class GameTest
 			if (rule.demiurgic) demiurgicRulesArray.push(rule);
 			else basicRulesArray.push(rule);
 		}
-		combinedRules = RuleFactory.combineRules(ScourgeConfigMaker.combinedRuleCfg, basicRules);
+		combinedRules = RuleFactory.combineRules(configMaker.makeCombinedRuleCfg(), basicRules);
 		plan = new StatePlanner().planState(state, rules);
 		for (rule in demiurgicRulesArray) rule.prime(state, plan);
         for (rule in basicRulesArray) rule.prime(state, plan);
-        startAction = combinedRules.get(ScourgeConfigMaker.startAction);
+        startAction = combinedRules.get(configMaker.makeStartAction());
 	    biteAction = combinedRules.get("biteAction");
 	    swapAction = combinedRules.get("swapAction");
 	    quitAction = combinedRules.get("quitAction");

@@ -25,6 +25,7 @@ class ScourgeConfigMaker {
     public var eatHeads:Bool;
     public var eatRecursive:Bool;
     public var growGraphWithDrop:Bool;
+    public var includeCavities:Bool;
     public var omnidirectionalBite:Bool;
     public var orthoBiteOnly:Bool;
     public var orthoDecayOnly:Bool;
@@ -53,24 +54,17 @@ class ScourgeConfigMaker {
 
     public static var ruleDefs:Hash<Class<Rule>> = cast Siphon.getDefs("net.rezmason.scourge.model.rules", "src", "Rule");
 
-    public static var combinedRuleCfg(default, null):Dynamic<Array<String>> = {
-        cleanUp: ["DecayRule", "CavityRule", "KillHeadlessPlayerRule", "OneLivingPlayerRule"],
-        wrapUp: ["EndTurnRule", "ReplenishRule", "PickPieceRule"],
+    public function new():Void { reset(); }
+    public function makeDefaultActions():Array<String> { return ["dropAction", "quitAction"]; }
+    public function makeStartAction():String { return "startAction"; }
+    public function makeActionList():Array<String> {
 
-        startAction: ["cleanUp", "PickPieceRule"],
-        biteAction: ["BiteRule", "cleanUp"],
-        swapAction: ["SwapPieceRule", "PickPieceRule"],
-        quitAction: ["ForfeitRule", "cleanUp", "wrapUp"],
-        dropAction: ["DropPieceRule", "EatCellsRule", "cleanUp", "wrapUp", "SkipsExhaustedRule"],
-    }
+        var actionList:Array<String> = ["quitAction", "dropAction",];
 
-    public static var defaultAction(default, null):String = "dropAction";
+        if (maxSwaps > 0) actionList.push("swapAction");
+        if (maxBites > 0) actionList.push("biteAction");
 
-    public static var actionList(default, null):Array<String> = ["biteAction", "swapAction", "quitAction", "dropAction",];
-    public static var startAction:String = "startAction";
-
-    public function new():Void {
-        reset();
+        return actionList;
     }
 
     public function reset():Void {
@@ -86,6 +80,7 @@ class ScourgeConfigMaker {
         eatHeads = true;
         eatRecursive = true;
         growGraphWithDrop = false;
+        includeCavities = true;
         omnidirectionalBite = false;
         orthoBiteOnly = true;
         orthoDecayOnly = true;
@@ -116,7 +111,7 @@ class ScourgeConfigMaker {
     public function makeConfig(history:StateHistory, historyState:State):Dynamic {
         var buildCfg:BuildConfig = makeBuildConfig(history, historyState);
 
-        return {
+        var config:Dynamic = {
             BuildStateRule: makeBuildStateConfig(buildCfg),
             BuildPlayersRule: makeBuildPlayersConfig(buildCfg),
             BuildBoardRule: makeBuildBoardConfig(buildCfg),
@@ -124,18 +119,40 @@ class ScourgeConfigMaker {
             DecayRule: makeDecayConfig(),
             PickPieceRule: makePickPieceConfig(buildCfg),
             DropPieceRule: makeDropPieceConfig(),
-            BiteRule: makeBiteConfig(),
-            SwapPieceRule: makeSwapConfig(),
             ReplenishRule: makeReplenishConfig(buildCfg),
             SkipsExhaustedRule: makeSkipsExhaustedConfig(),
 
-            CavityRule: null,
             EndTurnRule: null,
             ForfeitRule: null,
             KillHeadlessPlayerRule: null,
             OneLivingPlayerRule: null,
         };
+
+        if (includeCavities) config.CavityRule = null;
+        if (maxSwaps > 0) config.SwapPieceRule = makeSwapConfig();
+        if (maxBites > 0) config.BiteRule = makeBiteConfig();
+
+        return config;
     }
+
+    public function makeCombinedRuleCfg():Dynamic<Array<String>> {
+        var config:Dynamic<Array<String>> = {
+            cleanUp: ["DecayRule", "KillHeadlessPlayerRule", "OneLivingPlayerRule"],
+            wrapUp: ["EndTurnRule", "ReplenishRule", "PickPieceRule"],
+
+            startAction: ["cleanUp", "PickPieceRule"],
+            quitAction: ["ForfeitRule", "cleanUp", "wrapUp"],
+            dropAction: ["DropPieceRule", "EatCellsRule", "cleanUp", "wrapUp", "SkipsExhaustedRule"],
+        }
+
+        if (includeCavities) config.cleanUp = ["DecayRule", "CavityRule", "KillHeadlessPlayerRule", "OneLivingPlayerRule"];
+        if (maxSwaps > 0) config.swapAction = ["SwapPieceRule", "PickPieceRule"];
+        if (maxBites > 0) config.biteAction = ["BiteRule", "cleanUp"];
+
+        return config;
+    }
+
+
 
     function makeBuildConfig(history:StateHistory, historyState:State):BuildConfig {
         return {
