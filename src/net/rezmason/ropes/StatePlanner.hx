@@ -1,7 +1,7 @@
 package net.rezmason.ropes;
 
 import net.rezmason.ropes.GridNode;
-import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Aspect;
 
 using Lambda;

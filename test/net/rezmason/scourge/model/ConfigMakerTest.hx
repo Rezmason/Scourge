@@ -3,7 +3,7 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;
-import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Types;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlanner;
@@ -94,7 +94,8 @@ class ConfigMakerTest
 		configMaker.initGrid = TestBoards.twoPlayerBullshit;
 		makeState();
 
-		//trace(state.spitBoard(plan));
+		VisualAssert.assert("floating zero square, stringy player one with no head", state.spitBoard(plan));
+
 		var num0Cells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), "").length;
 		var num1Cells:Int = ~/([^1])/g.replace(state.spitBoard(plan, false), "").length;
 
@@ -104,7 +105,8 @@ class ConfigMakerTest
 		startAction.update();
 		startAction.chooseOption();
 
-		//trace(state.spitBoard(plan));
+		VisualAssert.assert("big square player zero with cavity, no player one", state.spitBoard(plan));
+
 		var num0Cells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), "").length;
 		var num1Cells:Int = ~/([^1])/g.replace(state.spitBoard(plan, false), "").length;
 
@@ -140,15 +142,15 @@ class ConfigMakerTest
 		startAction.chooseOption();
 
 		Assert.areEqual(13, state.players[1].at(totalArea_));
-		//trace(state.spitBoard(plan));
-		//trace(state.aspects.at(currentPlayer_));
+
+		VisualAssert.assert("two player grab", state.spitBoard(plan));
 
 		biteAction.update();
 		biteAction.chooseOption(4); // bite
 
 		Assert.areEqual(6, state.players[1].at(totalArea_));
-		//trace(state.spitBoard(plan));
-		//trace(state.aspects.at(currentPlayer_));
+
+		VisualAssert.assert("player zero bit off player one's leg", state.spitBoard(plan));
 
 		// How about some skipping?
 		dropAction.update();
@@ -160,8 +162,8 @@ class ConfigMakerTest
 		biteAction.chooseOption(); // bite head
 
 		Assert.areEqual(0, state.players[1].at(totalArea_));
-		//trace(state.spitBoard(plan));
-		//trace(state.aspects.at(winner_));
+
+		VisualAssert.assert("player zero bit player one in the head: dead", state.spitBoard(plan));
 	}
 
 	@Test
@@ -229,12 +231,12 @@ class ConfigMakerTest
 
 		var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
 
-		//trace(state.spitBoard(plan));
+		VisualAssert.assert("two player grab", state.spitBoard(plan));
 
 		dropAction.update();
 		dropAction.chooseOption(35); // drop, eat
 
-		//trace(state.spitBoard(plan));
+		VisualAssert.assert("player zero dropped an L, ate player one's leg; small new cavity", state.spitBoard(plan));
 
 		dropAction.update();
 		dropAction.chooseOption(); // skip
@@ -268,7 +270,7 @@ class ConfigMakerTest
 		trace(bestOption);
 		*/
 
-		//trace(state.spitBoard(plan));
+		VisualAssert.assert("player zero dropped another L, ate player one's head and body; another cavity", state.spitBoard(plan));
 
 		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
 

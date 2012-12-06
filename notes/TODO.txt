@@ -1,27 +1,22 @@
-Game
-	Gets rules from rule factory
-	Has internal state historian
-	Has default command (for when time is up)
-	Generates save-states
-		Config
-		Command history
-		Goals
-	Broadcasts when goals are reached and when turns begin
-	Broadcasts players' commands to one another
-	Accepts commands and updates the state
-	Validates checksums
+PlayerFactory
+	Generates player lists from config
+
+IPlayer
+	TestPlayer - chooses the first available option, always
+	HumanPlayer
+	LocalMachinePlayer
+	NetPlayer
 
 Coordinator - connects players to the game
 	Has Game
 	Has list of Players
 		from PlayerFactory
 	Has timer
+	Command history
+		You can probably use another History object here
 	Communicates between game and players
-
-IPlayer
-	TestPlayer
-	HumanPlayer
-	LocalMachinePlayer
+	Includes player connection status
+	Event Broadcasting
 
 TextView
 	Interprets commands
@@ -29,7 +24,7 @@ TextView
 
 	X X X X X X X X  • • •
 	X             X  •
-	X   + + + +   X
+	X   + + +{+}  X
 	X   + Ω ¬ +   X
 	X   + ¬ ¬ +   X
 	X  [+]+ +  ◊ X
@@ -38,10 +33,9 @@ TextView
 
 	¬  > Ω Î @ Δ ◊
 
-PlayerFactory
-	Generates player lists from config
-
 GameView
+
+Checksums
 
 Rewrite the eat rule recursion property to be an Int of depth
 

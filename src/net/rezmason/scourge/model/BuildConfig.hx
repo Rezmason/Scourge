@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model;
 
-import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Types;
 import net.rezmason.ropes.State;
 
 typedef BuildConfig = {

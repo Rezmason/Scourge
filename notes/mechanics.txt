@@ -35,10 +35,15 @@ Game varieties
 			Ideally, powers are incomparable to one another
 				Otherwise, new powers will introduce power creep
 
-	Locomotion / organs
-		pick up a chunk of yourself and place it somewhere else on your body
-			Necessary for story mode
-		This allows players to sculpt themselves; creating organs could unlock abilities like voice chat, hints and powerups
+	Organs
+		Producing spatial patterns within your body
+			the presence of those patterns unlocks abilities like voice chat, hints and powerups
+
+	Locomotion
+		Necessary for story mode
+		Move your head to any part of your body
+			The rest of your body is then destroyed
+			But your abilities are reset as well
 
 	Domination / Local powerups
 		Player wins because they occupy a set of nodes

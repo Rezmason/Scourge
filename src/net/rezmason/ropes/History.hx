@@ -1,5 +1,7 @@
 package net.rezmason.ropes;
 
+import haxe.Serializer;
+
 class History<T> {
 
     public var length(default, null):Int;
@@ -108,5 +110,10 @@ class History<T> {
     public inline function set(index:Int, val:Null<T>):Null<T> {
         if (length == 0) throw "Invalid set : no data allocated";
         return array[index] = val;
+    }
+
+    public inline function getChecksum():Int {
+        var string:String = Serializer.run(array);
+        return -1;
     }
 }

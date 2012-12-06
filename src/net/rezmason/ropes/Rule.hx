@@ -7,7 +7,7 @@ import haxe.macro.Expr;
 using Lambda;
 #end
 
-import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Types;
 
 using net.rezmason.utils.Pointers;
 
@@ -143,9 +143,9 @@ using net.rezmason.utils.Pointers;
                     reqExpressions.push( macro $reqs.push($aspectExpr) );
                     ptrExpressions.push( macro $ptr = $lkp[$aspectExpr.id] );
 
-                    //neko.Lib.println(macro :net.rezmason.ropes.ModelTypes.AspectPtr);
+                    //neko.Lib.println(macro :net.rezmason.ropes.Types.AspectPtr);
 
-                    field.kind = FVar(macro :net.rezmason.ropes.ModelTypes.AspectPtr, null);
+                    field.kind = FVar(macro :net.rezmason.ropes.Types.AspectPtr, null);
 
                     msg += metaTag.name.charAt(0);
 

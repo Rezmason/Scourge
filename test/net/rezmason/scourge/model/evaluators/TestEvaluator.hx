@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.evaluators;
 
-import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Types;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;

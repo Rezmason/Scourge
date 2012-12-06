@@ -5,7 +5,7 @@ import VisualAssert;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.GridNode;
-import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Types;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
@@ -52,12 +52,8 @@ class BoardRuleTest extends ScourgeRuleTest {
             Assert.isNotNull(node.value.at(occupier_));
         }
 
-        #if VISUAL_TEST
-            trace("Should appear to be four integers, equally spaced and equally distant from the edges of a box");
-            trace(state.spitBoard(plan));
-        #else
-            Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, state.spitBoard(plan, false));
-        #end
+        VisualAssert.assert("Should appear to be four integers, equally spaced and equally distant from the edges of a box", state.spitBoard(plan));
+        Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, state.spitBoard(plan, false));
 
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
@@ -82,15 +78,9 @@ class BoardRuleTest extends ScourgeRuleTest {
 
     @Test
     public function configTest2():Void {
-
         makeState(null, 1, null, true);
-
-        #if VISUAL_TEST
-            trace("Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box");
-            trace(state.spitBoard(plan));
-        #else
-            Assert.areEqual(TestBoards.emptyPetri, state.spitBoard(plan, false));
-        #end
+        VisualAssert.assert("Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box", state.spitBoard(plan));
+        Assert.areEqual(TestBoards.emptyPetri, state.spitBoard(plan, false));
     }
 
     @Test

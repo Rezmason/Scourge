@@ -2,6 +2,8 @@ Scourge
 =======
 **( Single Celled Organisms Undergo Rapid Growth Enhancement )**
 
+[Quick link to the 2010 prototype](http://www.rezmason.net/scourge/?numPlayers=2)
+
 Scourge is a derivative of [Fungus](http://www.info-mac.org/viewtopic.php?t=4644), a game produced by [Ryan Koopmans](http://www.e-brains.com/) with [Jason Whong](http://jason.whong.org/) in 1992. Its core game mechanics are reminiscent of the rules of Go, Reversi, Tetris and Blokus. It is a fun and ruthless game that builds players' resolve and strains their friendships.
 
 Scourge is written in [Haxe](http://www.haxe.org/), a highly versatile language that can compile to many, many platforms.

@@ -1,6 +1,6 @@
 package net.rezmason.ropes;
 
-import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Types;
 
 using Lambda;
 using Reflect;

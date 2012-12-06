@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model;
 
 import net.rezmason.scourge.model.BuildConfig;
-import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.State;
 import net.rezmason.utils.Siphon;
@@ -55,7 +55,7 @@ class ScourgeConfigMaker {
     public static var ruleDefs:Hash<Class<Rule>> = cast Siphon.getDefs("net.rezmason.scourge.model.rules", "src", "Rule");
 
     public function new():Void { reset(); }
-    public function makeDefaultActions():Array<String> { return ["dropAction", "quitAction"]; }
+    public function makeDefaultActionList():Array<String> { return ["dropAction", "quitAction"]; }
     public function makeStartAction():String { return "startAction"; }
     public function makeActionList():Array<String> {
 

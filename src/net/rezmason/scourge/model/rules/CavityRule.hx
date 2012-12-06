@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
 //import net.rezmason.ropes.GridNode;
-import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;

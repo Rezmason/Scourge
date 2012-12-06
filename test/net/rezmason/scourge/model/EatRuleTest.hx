@@ -4,7 +4,7 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.ropes.GridNode;
-import net.rezmason.ropes.ModelTypes;
+import net.rezmason.ropes.Types;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
