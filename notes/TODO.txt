@@ -4,7 +4,6 @@ PlayerFactory
 IPlayer
 	TestPlayer - chooses the first available option, always
 	HumanPlayer
-	LocalMachinePlayer
 	NetPlayer
 
 Coordinator - connects players to the game
@@ -32,6 +31,8 @@ TextView
 	X X X X X X X X
 
 	¬  > Ω Î @ Δ ◊
+
+LocalMachinePlayer
 
 GameView
 

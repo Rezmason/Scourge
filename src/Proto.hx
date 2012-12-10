@@ -9,7 +9,7 @@ import flash.Lib;
 #else
 
 #end
-import net.rezmason.scourge.Common;
+import net.rezmason.scourge.proto.Common;
 
 class Proto {
 

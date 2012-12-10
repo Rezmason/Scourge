@@ -1,9 +1,11 @@
-package net.rezmason.scourge.model;
+package net.rezmason.scourge;
 
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;
 
+import net.rezmason.scourge.model.Game;
+import net.rezmason.scourge.model.ScourgeConfigMaker;
 
 class GameTest {
 

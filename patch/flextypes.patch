@@ -1,2 +1,3 @@
 mx.core.IFlexDisplayObject.blendMode : flash.display.BlendMode;
+mx.core.IFlexDisplayObject.filters : Array<flash.filters.BitmapFilter>;
 mx.core.IFlexDisplayObject.opaqueBackground : Null<UInt>;

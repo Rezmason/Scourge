@@ -167,7 +167,7 @@ class KTJob {
 	private function setupValues():Void {
 		var first:Dynamic = (from != null) ? from : target;
 		var last:Dynamic = (to != null) ? to : target;
-		var keys:Array<String> = (to != null ? to : from).fields();
+		var keys:Array<String> = Reflect.fields(to != null ? to : from);
 		if (keys == null || keys.length == 0) return;
 
 		var p:_KTProperty;

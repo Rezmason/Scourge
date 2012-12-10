@@ -1,4 +1,4 @@
-package net.rezmason.scourge;
+package net.rezmason.scourge.proto;
 
 class Common {
 	public static var MOST_BLOCKS_IN_PIECE:Int = 4;

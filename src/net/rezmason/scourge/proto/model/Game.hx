@@ -2,7 +2,7 @@ package net.rezmason.scourge.proto.model;
 
 import net.rezmason.scourge.proto.model.GridCellMap;
 
-import net.rezmason.scourge.Common;
+import net.rezmason.scourge.proto.Common;
 
 import net.rezmason.scourge.proto.Pieces;
 

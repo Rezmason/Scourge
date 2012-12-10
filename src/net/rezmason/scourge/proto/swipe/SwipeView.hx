@@ -12,7 +12,7 @@ import flash.geom.ColorTransform;
 import flash.geom.Point;
 
 import net.rezmason.scourge.proto.model.Game;
-import net.rezmason.scourge.Common;
+import net.rezmason.scourge.proto.Common;
 import net.rezmason.scourge.proto.swipe.ContentType;
 import net.rezmason.scourge.proto.swipe.Swipe;
 

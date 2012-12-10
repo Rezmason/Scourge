@@ -15,7 +15,7 @@ import flash.geom.Rectangle;
 import flash.ui.Keyboard;
 
 import net.rezmason.scourge.proto.model.Game;
-import net.rezmason.scourge.Common;
+import net.rezmason.scourge.proto.Common;
 
 import haxe.Timer;
 
