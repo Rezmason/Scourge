@@ -48,3 +48,29 @@ Game varieties
 	Domination / Local powerups
 		Player wins because they occupy a set of nodes
 		Abilities that require that the user inhabits a particular set of nodes
+
+		Sacrificial altars
+			A source of plot development and increased power of some sort
+			Requires a friend to sacrifice
+				(Though them dying is not always necessary)
+				Often this friend will be new to the game
+				You invite a friend to be your sacrifice on the altar
+					They get powers as well, once they start playing
+			A grid of nine domination points
+				"Signets"
+				Rules that specify which state changes to those domination points should occur and in what order
+			You and your friend play out an ancient battle
+				Your movement on the board should change the states of the signets
+					They validate that your retelling of the battle story is accurate
+				At the end of the play, the actors who are still alive are rewarded
+
+			Only you know the story– your friend doesn't know the ending
+				Maybe– MAYBE– you can trick a friend into dying on the board for the sacrifice
+
+			Why sacrificial altars?
+				The altars emphasize the importance of battles, honor and strategy
+				More importantly, it's a way for players to introduce their friends to the game
+					The stories focus on some core game mechanic as their theme
+						Biting or eating or dying
+					In essence, I can get players to teach new players how to play for free
+						And because it's another person– one you already trust– it'll be more engaging than any tutorial
