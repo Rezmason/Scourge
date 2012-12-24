@@ -10,7 +10,8 @@ import net.rezmason.ropes.StatePlanner;
 import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.RuleFactory;
 import net.rezmason.ropes.Aspect;
-import net.rezmason.scourge.model.ScourgeConfigMaker;
+import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PieceAspect;
@@ -24,14 +25,14 @@ using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Pointers;
 
-class ConfigMakerTest
+class ScourgeConfigFactoryTest
 {
 	var stateHistorian:StateHistorian;
     var history:StateHistory;
     var state:State;
     var historyState:State;
     var plan:StatePlan;
-    var configMaker:ScourgeConfigMaker;
+    var config:ScourgeConfig;
     var basicRules:Hash<Rule>;
     var combinedRules:Hash<Rule>;
 
@@ -47,7 +48,7 @@ class ConfigMakerTest
 
 	@BeforeClass
 	public function beforeClass():Void {
-		configMaker = new ScourgeConfigMaker();
+		config = ScourgeConfigFactory.makeDefaultConfig();
 		stateHistorian = new StateHistorian();
 
         history = stateHistorian.history;
@@ -58,11 +59,10 @@ class ConfigMakerTest
 	@AfterClass
 	public function afterClass():Void {
 		stateHistorian.reset();
-		configMaker.reset();
 
 		basicRules = null;
 		combinedRules = null;
-		configMaker = null;
+		config = null;
 		stateHistorian = null;
 		history = null;
         historyState = null;
@@ -72,7 +72,7 @@ class ConfigMakerTest
 
 	@Before
 	public function setup():Void {
-		configMaker.reset();
+		config = ScourgeConfigFactory.makeDefaultConfig();
 		stateHistorian.reset();
 
 		basicRules = null;
@@ -82,16 +82,16 @@ class ConfigMakerTest
 	@Test
 	public function allActionsRegisteredTest():Void {
 		makeState();
-		for (action in configMaker.makeActionList()) Assert.isNotNull(combinedRules.get(action));
-		Assert.isNotNull(combinedRules.get(configMaker.makeStartAction()));
+		for (action in ScourgeConfigFactory.makeActionList(config)) Assert.isNotNull(combinedRules.get(action));
+		Assert.isNotNull(combinedRules.get(ScourgeConfigFactory.makeStartAction()));
 	}
 
 	@Test
 	public function startActionTest():Void {
 		// decay, cavity, killHeadlessPlayer, oneLivingPlayer, pickPiece
 
-		configMaker.numPlayers = 2;
-		configMaker.initGrid = TestBoards.twoPlayerBullshit;
+		config.numPlayers = 2;
+		config.initGrid = TestBoards.twoPlayerBullshit;
 		makeState();
 
 		VisualAssert.assert("floating zero square, stringy player one with no head", state.spitBoard(plan));
@@ -129,9 +129,9 @@ class ConfigMakerTest
 	public function biteActionTest():Void {
 		// bite, decay, cavity, killHeadlessPlayer, oneLivingPlayer
 
-		configMaker.numPlayers = 2;
-		configMaker.startingBites = 5;
-		configMaker.initGrid = TestBoards.twoPlayerGrab;
+		config.numPlayers = 2;
+		config.startingBites = 5;
+		config.initGrid = TestBoards.twoPlayerGrab;
 		makeState();
 
 		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
@@ -170,9 +170,9 @@ class ConfigMakerTest
 	public function swapActionTest():Void {
 		// swapPiece, pickPiece
 
-		configMaker.pieceHatSize = 3;
-		configMaker.startingSwaps = 6;
-		configMaker.allowFlipping = true;
+		config.pieceHatSize = 3;
+		config.startingSwaps = 6;
+		config.allowFlipping = true;
 
 		makeState();
 		startAction.update();
@@ -181,19 +181,19 @@ class ConfigMakerTest
 		var numSwaps_:AspectPtr = plan.onPlayer(SwapAspect.NUM_SWAPS);
 		var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
 
-		Assert.areEqual(configMaker.startingSwaps, state.players[0].at(numSwaps_));
+		Assert.areEqual(config.startingSwaps, state.players[0].at(numSwaps_));
 
 		var pickedPieces:Array<Null<Int>> = [];
 
-		for (ike in 0...configMaker.startingSwaps) {
+		for (ike in 0...config.startingSwaps) {
 			swapAction.update();
 			swapAction.chooseOption();
 
 			var piece:Int = state.aspects.at(pieceTableID_);
 
-			Assert.areEqual(configMaker.pieceTableIDs[(ike + 1) % configMaker.pieceHatSize], state.aspects.at(pieceTableID_));
+			Assert.areEqual(config.pieceTableIDs[(ike + 1) % config.pieceHatSize], state.aspects.at(pieceTableID_));
 
-			var index:Int = ike % configMaker.pieceHatSize;
+			var index:Int = ike % config.pieceHatSize;
 			if (pickedPieces[index] == null) pickedPieces[index] = piece;
 			else Assert.areEqual(pickedPieces[index], piece);
 		}
@@ -205,7 +205,7 @@ class ConfigMakerTest
 	public function quitActionTest():Void {
 		// forfeit, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece
 
-		configMaker.numPlayers = 2;
+		config.numPlayers = 2;
 		makeState();
 		startAction.update();
 		startAction.chooseOption();
@@ -222,9 +222,9 @@ class ConfigMakerTest
 	public function dropActionTest():Void {
 		// dropPiece, eatCells, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
-		configMaker.numPlayers = 2;
-		configMaker.pieceTableIDs = [Pieces.getPieceIdBySizeAndIndex(4, 1)]; // "L/J block"
-		configMaker.initGrid = TestBoards.twoPlayerGrab;
+		config.numPlayers = 2;
+		config.pieceTableIDs = [Pieces.getPieceIdBySizeAndIndex(4, 1)]; // "L/J block"
+		config.initGrid = TestBoards.twoPlayerGrab;
 		makeState();
 		startAction.update();
 		startAction.chooseOption();
@@ -278,7 +278,8 @@ class ConfigMakerTest
 	}
 
 	private function makeState():Void {
-		basicRules = RuleFactory.makeBasicRules(ScourgeConfigMaker.ruleDefs, configMaker.makeConfig(stateHistorian.history, stateHistorian.historyState));
+		var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, stateHistorian.history, stateHistorian.historyState);
+		basicRules = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
 		var basicRulesArray:Array<Rule> = [];
 		var demiurgicRulesArray:Array<Rule> = [];
 		var rules:Array<Rule> = [];
@@ -289,11 +290,11 @@ class ConfigMakerTest
 			if (rule.demiurgic) demiurgicRulesArray.push(rule);
 			else basicRulesArray.push(rule);
 		}
-		combinedRules = RuleFactory.combineRules(configMaker.makeCombinedRuleCfg(), basicRules);
+		combinedRules = RuleFactory.combineRules(ScourgeConfigFactory.makeCombinedRuleCfg(config), basicRules);
 		plan = new StatePlanner().planState(state, rules);
 		for (rule in demiurgicRulesArray) rule.prime(state, plan);
         for (rule in basicRulesArray) rule.prime(state, plan);
-        startAction = combinedRules.get(configMaker.makeStartAction());
+        startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
 	    biteAction = combinedRules.get("biteAction");
 	    swapAction = combinedRules.get("swapAction");
 	    quitAction = combinedRules.get("quitAction");

@@ -74,3 +74,22 @@ Game varieties
 						Biting or eating or dying
 					In essence, I can get players to teach new players how to play for free
 						And because it's another person– one you already trust– it'll be more engaging than any tutorial
+						And it's in a scenario where the teaching player's skills are not rewarded
+
+	Baton
+		A system for transitioning between a turn-based game and an RTS game
+		Players who have a baton can act
+		Some actions involve passing the baton to other players
+			Turn-based game– one player has a baton
+			RTS game– every player has a baton
+
+		In both varieties of play, the baton is passed to the next player that doesn't have one
+
+		Turn-based game --> RTT : a rule that duplicates batons as they are passed
+
+		RTT --> Turn-based game : a rule that removes batons instead of passing them until only one is left
+
+		In Scourge, batons are most important during shifts from skirmishes to explorative gameplay
+			Game and Referee need to be changed to support batons
+				@player PlyAspect.HAS_BATON replaces PlyAspect.CURRENT_PLAYER
+					Lots of rules will need to change, too

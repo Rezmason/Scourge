@@ -1,5 +1,7 @@
 package net.rezmason.ropes;
 
+import haxe.Serializer;
+import haxe.Unserializer;
 import net.rezmason.ropes.Types;
 
 class StateHistorian {
@@ -26,6 +28,14 @@ class StateHistorian {
         for (ike in 0...state.players.length) readAspects(state.players[ike], historyState.players[ike]);
         for (ike in 0...state.nodes.length) readAspects(state.nodes[ike].value, historyState.nodes[ike].value);
         for (ike in 0...state.extras.length) readAspects(state.extras[ike], historyState.extras[ike]);
+    }
+
+    public function save():SavedState {
+        return {data:Serializer.run(state)};
+    }
+
+    public function load(savedState:SavedState) {
+        state = Unserializer.run(savedState.data);
     }
 
     public function reset():Void {

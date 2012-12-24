@@ -5,12 +5,14 @@ import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;
 
 import net.rezmason.scourge.model.Game;
-import net.rezmason.scourge.model.ScourgeConfigMaker;
+import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.model.ScourgeConfigFactory;
+
+import net.rezmason.scourge.controller.Referee;
 
 class GameTest {
 
 	var game:Game;
-	var configMaker:ScourgeConfigMaker;
 
 	public function new() {
 
@@ -18,25 +20,17 @@ class GameTest {
 
 	@BeforeClass
 	public function beforeClass():Void {
-		configMaker = new ScourgeConfigMaker();
 		game = new Game();
 	}
 
 	@AfterClass
 	public function afterClass():Void {
-		configMaker.reset();
-		game.end();
-	}
-
-	@Before
-	public function setup():Void {
-		configMaker.reset();
 		game.end();
 	}
 
 	@Test
 	public function allActionsRegisteredTest():Void {
-		game.begin(configMaker);
+		game.begin(ScourgeConfigFactory.makeDefaultConfig());
 		trace(game.checksum);
 	}
 }

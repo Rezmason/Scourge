@@ -27,15 +27,16 @@ class Game {
 
     public function new():Void { historian = new StateHistorian(); }
 
-    public function begin(configMaker:ScourgeConfigMaker):Int {
+    public function begin(config:ScourgeConfig, savedState:SavedState = null):Int {
 
-        end();
+        if (hasBegun)
+            throw "The game has already begun; it cannot begin again until you end it.";
 
         // Build the game from the config
 
-        var config:Dynamic = configMaker.makeConfig(historian.history, historian.historyState);
-        var basicRules:Hash<Rule> = RuleFactory.makeBasicRules(ScourgeConfigMaker.ruleDefs, config);
-        var combinedRules:Hash<Rule> = RuleFactory.combineRules(configMaker.makeCombinedRuleCfg(), basicRules);
+        var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, historian.history, historian.historyState);
+        var basicRules:Hash<Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
+        var combinedRules:Hash<Rule> = RuleFactory.combineRules(ScourgeConfigFactory.makeCombinedRuleCfg(config), basicRules);
 
         // Find the demiurgic rules
 
@@ -64,19 +65,27 @@ class Game {
 
         // Find the player actions
 
-        actionIDs = configMaker.makeActionList();
+        actionIDs = ScourgeConfigFactory.makeActionList(config);
         actions = [];
         for (actionID in actionIDs) actions.push(combinedRules.get(actionID));
 
         // Find the default actions
 
-        var defaultActionIDs:Array<String> = configMaker.makeDefaultActionList();
+        var defaultActionIDs:Array<String> = ScourgeConfigFactory.makeDefaultActionList();
         defaultActions = [];
         for (defaultActionID in defaultActionIDs) defaultActions.push(combinedRules.get(defaultActionID));
 
         // Find the start action and make it happen
 
-        var startAction = combinedRules.get(configMaker.makeStartAction());
+        if (savedState != null) {
+            historian.load(savedState);
+        } else {
+            var startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
+            startAction.update();
+            startAction.chooseOption();
+        }
+
+        var startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
         startAction.update();
         startAction.chooseOption();
 
@@ -85,7 +94,13 @@ class Game {
         return historian.history.revision;
     }
 
+    public function save():SavedState { return historian.save(); }
+
     public function end():Void {
+
+        if (!hasBegun)
+            throw "The game cannot end, because it hasn't begun.";
+
         historian.reset();
         actions = null;
         actionIDs = null;

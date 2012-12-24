@@ -1,21 +1,5 @@
-PlayerFactory
-	Generates player lists from config
-
-IPlayer
-	TestPlayer - chooses the first available option, always
-	HumanPlayer
-	NetPlayer
-
-Coordinator - connects players to the game
-	Has Game
-	Has list of Players
-		from PlayerFactory
-	Has timer
-	Command history
-		You can probably use another History object here
-	Communicates between game and players
-	Includes player connection status
-	Event Broadcasting
+TestPlayer
+HumanPlayer
 
 TextView
 	Interprets commands
@@ -30,11 +14,10 @@ TextView
 	X             X
 	X X X X X X X X
 
-	¬  > Ω Î @ Δ ◊
+	¬  > Ω Î @ Δ ◊ ¤
 
-LocalMachinePlayer
-
-GameView
+RemotePlayer
+MachinePlayer (local)
 
 Checksums
 
@@ -49,8 +32,11 @@ And then SPEED EVERYTHING UP
 	Take advantage of linked lists for storing sets of nodes
 	Also, haxe.List might be better than Array in some situations
 
-RemotePlayer
 ExternalPlayer
+Turn durations
+	Special aspect I suppose
+
+GameView
 
 Coarse evaluation
 	Number of nodes (filled and enclosed)
