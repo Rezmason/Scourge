@@ -127,12 +127,15 @@ class ScourgeConfigFactoryTest
 
 	@Test
 	public function biteActionTest():Void {
+
 		// bite, decay, cavity, killHeadlessPlayer, oneLivingPlayer
 
 		config.numPlayers = 2;
 		config.startingBites = 5;
 		config.initGrid = TestBoards.twoPlayerGrab;
 		makeState();
+
+		VisualAssert.assert("two player grab", state.spitBoard(plan));
 
 		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
 		var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
@@ -152,9 +155,14 @@ class ScourgeConfigFactoryTest
 
 		VisualAssert.assert("player zero bit off player one's leg", state.spitBoard(plan));
 
+		VisualAssert.assert("no difference", state.spitBoard(plan));
+
 		// How about some skipping?
 		dropAction.update();
 		dropAction.chooseOption(); // skip
+
+		VisualAssert.assert("no difference", state.spitBoard(plan));
+
 		dropAction.update();
 		dropAction.chooseOption(); // skip
 
@@ -281,18 +289,19 @@ class ScourgeConfigFactoryTest
 		var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, stateHistorian.history, stateHistorian.historyState);
 		basicRules = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
 		var basicRulesArray:Array<Rule> = [];
-		var demiurgicRulesArray:Array<Rule> = [];
+		var demiurgicRules:Hash<Rule> = new Hash<Rule>();
 		var rules:Array<Rule> = [];
 		for (key in basicRules.keys()) {
 			var rule:Rule = basicRules.get(key);
 			rules.push(rule);
 
-			if (rule.demiurgic) demiurgicRulesArray.push(rule);
+			if (rule.demiurgic) demiurgicRules.set(key, rule);
 			else basicRulesArray.push(rule);
 		}
+
 		combinedRules = RuleFactory.combineRules(ScourgeConfigFactory.makeCombinedRuleCfg(config), basicRules);
 		plan = new StatePlanner().planState(state, rules);
-		for (rule in demiurgicRulesArray) rule.prime(state, plan);
+		for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules.get(key).prime(state, plan);
         for (rule in basicRulesArray) rule.prime(state, plan);
         startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
 	    biteAction = combinedRules.get("biteAction");

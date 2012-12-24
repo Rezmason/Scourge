@@ -41,11 +41,14 @@ class Game {
         // Find the demiurgic rules
 
         var basicRulesArray:Array<Rule> = [];
-        var demiurgicRulesArray:Array<Rule> = [];
+        var demiurgicRules:Hash<Rule> = new Hash<Rule>();
         var rules:Array<Rule> = [];
-        for (rule in basicRules) {
+        for (key in basicRules.keys()) {
+            var rule:Rule = basicRules.get(key);
             rules.push(rule);
-            (rule.demiurgic ? demiurgicRulesArray : basicRulesArray).push(rule);
+
+            if (rule.demiurgic) demiurgicRules.set(key, rule);
+            else basicRulesArray.push(rule);
         }
 
         // Plan the state
@@ -55,7 +58,8 @@ class Game {
 
         // Prime the rules with the state and plan
 
-        for (rule in demiurgicRulesArray) rule.prime(state, plan); // demiurgic ones go first
+        // demiurgic ones go first
+        for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules.get(key).prime(state, plan);
         for (rule in basicRulesArray) rule.prime(state, plan);
 
         // Grab some aspect pointers so we can quickly evaluate the state

@@ -17,6 +17,7 @@ class ScourgeConfigFactory {
 
     public static function makeDefaultActionList():Array<String> { return ["dropAction", "quitAction"]; }
     public static function makeStartAction():String { return "startAction"; }
+    public static function makeDemiurgicRuleList():Array<String> { return ["BuildStateRule", "BuildPlayersRule", "BuildBoardRule"]; }
     public static function makeActionList(config:ScourgeConfig):Array<String> {
 
         var actionList:Array<String> = ["quitAction", "dropAction",];
@@ -88,6 +89,8 @@ class ScourgeConfigFactory {
             ForfeitRule: null,
             KillHeadlessPlayerRule: null,
             OneLivingPlayerRule: null,
+
+            //SpitBoardRule: null,
         };
 
         if (config.includeCavities) ruleConfig.CavityRule = null;
@@ -105,7 +108,7 @@ class ScourgeConfigFactory {
             startAction: ["cleanUp", "PickPieceRule"],
             quitAction: ["ForfeitRule", "cleanUp", "wrapUp"],
             dropAction: ["DropPieceRule", "EatCellsRule", "cleanUp", "wrapUp", "SkipsExhaustedRule"],
-        }
+        };
 
         if (config.includeCavities) combinedRuleConfig.cleanUp = ["DecayRule", "CavityRule", "KillHeadlessPlayerRule", "OneLivingPlayerRule"];
         if (config.maxSwaps > 0) combinedRuleConfig.swapAction = ["SwapPieceRule", "PickPieceRule"];

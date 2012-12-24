@@ -14,7 +14,7 @@ using net.rezmason.utils.Pointers;
 class EndTurnRule extends Rule {
 
     @player(BodyAspect.HEAD) var head_;
-    @player(FreshnessAspect.FRESHNESS) var freshness_;
+    @node(FreshnessAspect.FRESHNESS) var freshness_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
