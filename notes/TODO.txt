@@ -1,21 +1,32 @@
-TestPlayer
-HumanPlayer
-
 TextView
+
+	Scale text field up
+	get bounds of m char
+	Convert whole font to Array<BitmapData>
+
+	PrettyChar
+		Centered billboard
+		scale tween
+		color transform
+			tween
+
+
 	Interprets commands
 	Translates all other game events into human readable output
 
-	X X X X X X X X  • • •
-	X             X  •
-	X   + + +{+}  X
-	X   + Ω ¬ +   X
-	X   + ¬ ¬ +   X
-	X  [+]+ +  ◊ X
-	X             X
-	X X X X X X X X
+	¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤  • • •
+	¤             ¤  •
+	¤   + + +{+}  ¤
+	¤   + Ω ¬ +   ¤
+	¤   + ¬ ¬ +   ¤
+	¤  [+]+ +  ◊ ¤
+	¤             ¤
+	¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤
 
-	¬  > Ω Î @ Δ ◊ ¤
+	¬  > Ω Î @ Δ ◊ ¤ _ { } [ ] • ø
 
+TestPlayer
+HumanPlayer
 RemotePlayer
 MachinePlayer (local)
 

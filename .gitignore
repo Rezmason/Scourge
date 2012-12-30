@@ -5,3 +5,4 @@ TestSuite.hx
 junk
 tables/*.n
 tables/*.json
+bin
