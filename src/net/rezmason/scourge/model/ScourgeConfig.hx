@@ -38,5 +38,4 @@ typedef ScourgeConfig = {
     var maxBites:Int;
     var initGrid:String;
     var pieceTableIDs:Array<Int>;
-    var randomFunction:Void->Float;
 }

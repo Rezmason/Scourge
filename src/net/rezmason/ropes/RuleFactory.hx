@@ -1,6 +1,7 @@
 package net.rezmason.ropes;
 
 import net.rezmason.ropes.Types;
+import net.rezmason.utils.StringSort;
 
 using Lambda;
 using Reflect;
@@ -13,7 +14,9 @@ class RuleFactory {
         var rules:Hash<Rule> = new Hash<Rule>();
 
         if (cfg != null) {
-            for (field in cfg.fields()) {
+            var cfgFields:Array<String> = cfg.fields();
+            cfgFields.sort(StringSort.sort);
+            for (field in cfgFields) {
                 //var ruleDef:Class<Rule> = cast ruleDefs.get(field).resolveClass();
                 var ruleDef:Class<Rule> = ruleDefs.get(field);
                 if (ruleDef == null) {
@@ -35,6 +38,7 @@ class RuleFactory {
             function makeJointRule(field:String):JointRule {
                 var rules:Array<Rule> = [];
                 var ruleFields:Array<String> = cfg.field(field);
+                ruleFields.sort(StringSort.sort);
                 for (ruleField in ruleFields) {
                     if (ruleField == field) trace("Joint rules cannot contain themselves.");
                     else if (basicRules.exists(ruleField)) rules.push(basicRules.get(ruleField));
@@ -47,7 +51,9 @@ class RuleFactory {
                 return jointRule;
             }
 
-            for (field in cfg.fields()) {
+            var cfgFields:Array<String> = cfg.fields();
+            cfgFields.sort(StringSort.sort);
+            for (field in cfgFields) {
                 if (basicRules.exists(field)) trace("Basic rule already exists with name: " + field);
                 else if (!combinedRules.exists(field)) makeJointRule(field);
             }

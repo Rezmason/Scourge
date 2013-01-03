@@ -5,6 +5,7 @@
 -cp src
 -debug
 -resource tables/pieces.json@pieces
+-resource tables/serializedState.txt@serializedState
 #-D VISUAL_TEST
 #-D TIME_TESTS
 -D USE_POINTERS
@@ -23,6 +24,7 @@
 -cp src
 -debug
 -resource tables/pieces.json@pieces
+-resource tables/serializedState.txt@serializedState
 #-D VISUAL_TEST
 #-D TIME_TESTS
 -D USE_POINTERS
@@ -42,6 +44,7 @@
 -cp src
 -debug
 -resource tables/pieces.json@pieces
+-resource tables/serializedState.txt@serializedState
 #-D VISUAL_TEST
 #-D TIME_TESTS
 -D USE_POINTERS

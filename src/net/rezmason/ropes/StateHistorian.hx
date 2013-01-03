@@ -1,8 +1,8 @@
 package net.rezmason.ropes;
 
-import haxe.Serializer;
 import haxe.Unserializer;
 import net.rezmason.ropes.Types;
+import net.rezmason.utils.SafeSerializer;
 
 class StateHistorian {
 
@@ -31,7 +31,7 @@ class StateHistorian {
     }
 
     public function save():SavedState {
-        return {data:Serializer.run(state)};
+        return {data:SafeSerializer.run(state)};
     }
 
     public function load(savedState:SavedState) {

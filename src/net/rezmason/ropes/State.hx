@@ -2,6 +2,8 @@ package net.rezmason.ropes;
 
 import net.rezmason.ropes.Types;
 
+using net.rezmason.ropes.GridUtils;
+
 class State {
 
     public var aspects(default, null):AspectSet;
@@ -12,14 +14,28 @@ class State {
     public function new():Void {
         aspects = [];
         players = [];
-        nodes = [];
-        extras = [];
+        nodes   = [];
+        extras  = [];
     }
 
     public function wipe():Void {
         aspects.splice(0, aspects.length);
         players.splice(0, players.length);
-        nodes.splice(0, nodes.length);
-        extras.splice(0, extras.length);
+        nodes.splice  (0, nodes.length);
+        extras.splice (0, extras.length);
+    }
+
+    function hxSerialize(s:haxe.Serializer):Void {
+        s.serialize(aspects);
+        s.serialize(players);
+        s.serialize(s.serializeGrid(nodes));
+        s.serialize(extras);
+    }
+
+    function hxUnserialize(s:haxe.Unserializer):Void {
+        aspects = s.unserialize();
+        players = s.unserialize();
+        nodes   = s.unserializeGrid();
+        extras  = s.unserialize();
     }
 }

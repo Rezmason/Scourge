@@ -46,7 +46,7 @@ using net.rezmason.utils.Pointers;
 
         for (ike in 0...extraAspectRequirements.length) {
             var prop:AspectProperty = extraAspectRequirements[ike];
-            extraAspectLookup[prop.id] = ike.pointerArithmetic();
+            extraAspectLookup[prop.id] = ike.intToPointer();
             extraAspectTemplate[ike] = prop.initialValue;
         }
         __initPtrs();

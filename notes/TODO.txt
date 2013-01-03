@@ -1,3 +1,6 @@
+CavityRule bug
+	Damn it
+
 TextView
 
 	Scale text field up
@@ -24,6 +27,11 @@ TextView
 	¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤
 
 	¬  > Ω Î @ Δ ◊ ¤ _ { } [ ] • ø
+
+
+Save states and save testing
+	If the code for a rule changes, the games that used earlier versions of that rule are kind of botched
+		How do other games handle this?
 
 TestPlayer
 HumanPlayer

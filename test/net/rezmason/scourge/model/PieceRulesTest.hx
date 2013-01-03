@@ -77,7 +77,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         dropRule.chooseOption();
 
-        VisualAssert.assert("empty petri, L piece on bottom left extending up", state.spitBoard(plan));
+        VisualAssert.assert("empty petri, L piece on top left extending up", state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0

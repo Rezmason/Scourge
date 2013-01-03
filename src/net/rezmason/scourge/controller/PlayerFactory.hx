@@ -18,5 +18,6 @@ class PlayerFactory {
             case Machine: return new MachinePlayer(config);
             case Remote: return new RemotePlayer(config);
         }
+        return null;
     }
 }

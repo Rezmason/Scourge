@@ -40,7 +40,7 @@ class Pointers {
         #end
     }
 
-    public inline static function pointerArithmetic<T>(i:Int):Ptr<T> {
+    public inline static function intToPointer<T>(i:Int):Ptr<T> {
         #if USE_POINTERS return {_:i, t:null};
         #else return i;
         #end

@@ -1,8 +1,8 @@
 package net.rezmason.scourge.controller;
 
 import haxe.Timer;
-import haxe.Serializer;
 
+import net.rezmason.utils.SafeSerializer;
 import net.rezmason.ropes.Types;
 import net.rezmason.scourge.controller.Types;
 import net.rezmason.scourge.model.Game;
@@ -25,38 +25,37 @@ class Referee {
         allReady = false;
     }
 
-    public function beginGame(playerConfigs:Array<PlayerConfig>, gameConfig:ScourgeConfig):Void {
+    public function beginGame(playerConfigs:Array<PlayerConfig>, randomFunction:Void->Float, gameConfig:ScourgeConfig):Void {
         if (playerConfigs.length != gameConfig.numPlayers)
             throw "Player config specifies " + playerConfigs.length + " players: game config specifies " + gameConfig.numPlayers;
 
         log = [];
         this.gameConfig = gameConfig;
         players = PlayerFactory.makePlayers(playerConfigs);
-        game.begin(gameConfig);
+        game.begin(gameConfig, randomFunction);
 
-
-        refereeCall(Init(Serializer.run(gameConfig)));
+        refereeCall(Init(SafeSerializer.run(gameConfig)));
         refereeCall(Connect(handlePlayerEvent));
     }
 
-    public function resumeGame(playerConfigs:Array<PlayerConfig>, savedGame:SavedGame):Void {
+    public function resumeGame(playerConfigs:Array<PlayerConfig>, randomFunction:Void->Float, savedGame:SavedGame):Void {
         if (playerConfigs.length != savedGame.config.numPlayers)
             throw "Player config specifies " + playerConfigs.length + " players: saved game specifies " + savedGame.config.numPlayers;
 
         log = copyLog(savedGame.log);
         this.gameConfig = savedGame.config;
         players = PlayerFactory.makePlayers(playerConfigs);
-        game.begin(gameConfig, savedGame.state);
+        game.begin(gameConfig, randomFunction, savedGame.state);
 
-        refereeCall(Resume(Serializer.run(savedGame)));
+        refereeCall(Resume(SafeSerializer.run(savedGame)));
         refereeCall(Connect(handlePlayerEvent));
     }
 
     public function endGame():Void {
-        players = null;
         allReady = false;
         game.end();
         refereeCall(Disconnect);
+        players = null;
     }
 
     public function saveGame():SavedGame {

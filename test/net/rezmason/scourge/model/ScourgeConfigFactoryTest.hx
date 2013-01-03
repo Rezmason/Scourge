@@ -23,6 +23,7 @@ import net.rezmason.scourge.model.rules.DropPieceRule;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.StatePlan;
+using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;
 
 class ScourgeConfigFactoryTest
@@ -90,6 +91,8 @@ class ScourgeConfigFactoryTest
 	public function startActionTest():Void {
 		// decay, cavity, killHeadlessPlayer, oneLivingPlayer, pickPiece
 
+		trace("START");
+
 		config.numPlayers = 2;
 		config.initGrid = TestBoards.twoPlayerBullshit;
 		makeState();
@@ -106,6 +109,8 @@ class ScourgeConfigFactoryTest
 		startAction.chooseOption();
 
 		VisualAssert.assert("big square player zero with cavity, no player one", state.spitBoard(plan));
+
+		trace(state.spitBoard(plan));
 
 		var num0Cells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), "").length;
 		var num1Cells:Int = ~/([^1])/g.replace(state.spitBoard(plan, false), "").length;
@@ -176,6 +181,7 @@ class ScourgeConfigFactoryTest
 
 	@Test
 	public function swapActionTest():Void {
+
 		// swapPiece, pickPiece
 
 		config.pieceHatSize = 3;
@@ -211,6 +217,7 @@ class ScourgeConfigFactoryTest
 
 	@Test
 	public function quitActionTest():Void {
+
 		// forfeit, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece
 
 		config.numPlayers = 2;
@@ -228,6 +235,7 @@ class ScourgeConfigFactoryTest
 
 	@Test
 	public function dropActionTest():Void {
+
 		// dropPiece, eatCells, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
 		config.numPlayers = 2;
@@ -281,17 +289,16 @@ class ScourgeConfigFactoryTest
 		VisualAssert.assert("player zero dropped another L, ate player one's head and body; another cavity", state.spitBoard(plan));
 
 		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
-
 		Assert.areEqual(0, state.aspects.at(winner_));
 	}
 
 	private function makeState():Void {
-		var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, stateHistorian.history, stateHistorian.historyState);
+		var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, stateHistorian.history, stateHistorian.historyState);
 		basicRules = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
 		var basicRulesArray:Array<Rule> = [];
 		var demiurgicRules:Hash<Rule> = new Hash<Rule>();
 		var rules:Array<Rule> = [];
-		for (key in basicRules.keys()) {
+		for (key in basicRules.keys().a2z()) {
 			var rule:Rule = basicRules.get(key);
 			rules.push(rule);
 
@@ -300,6 +307,7 @@ class ScourgeConfigFactoryTest
 		}
 
 		combinedRules = RuleFactory.combineRules(ScourgeConfigFactory.makeCombinedRuleCfg(config), basicRules);
+
 		plan = new StatePlanner().planState(state, rules);
 		for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules.get(key).prime(state, plan);
         for (rule in basicRulesArray) rule.prime(state, plan);
@@ -309,5 +317,7 @@ class ScourgeConfigFactoryTest
 	    quitAction = combinedRules.get("quitAction");
 	    dropAction = combinedRules.get("dropAction");
     }
+
+    private function randomFunction():Float { return 0; }
 
 }

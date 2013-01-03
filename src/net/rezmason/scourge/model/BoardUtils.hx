@@ -61,7 +61,7 @@ class BoardUtils {
                         case (occupier != Aspect.NULL && isFilled == Aspect.FALSE): String.fromCharCode(ALPHABET + occupier);
                         case (occupier != Aspect.NULL): "" + occupier;
                         case (isFilled == Aspect.TRUE): "X";
-                        default: " ";
+                        case (isFilled == Aspect.FALSE && occupier == Aspect.NULL): " ";
                     }
                 }
             }

@@ -106,6 +106,24 @@ class EatCellsRule extends Rule {
 
         state.players[currentPlayer].mod(bodyFirst_, bodyNode.value.at(nodeID_));
         state.aspects.mod(maxFreshness_, maxFreshness);
+
+        // Clean up the bodyFirst and head pointers for opponent players
+        for (ike in 0...state.players.length) {
+            if (ike == currentPlayer) continue;
+            var player:AspectSet = state.players[ike];
+
+            var bodyFirst:Int = player.at(bodyFirst_);
+            if (bodyFirst != Aspect.NULL) {
+                bodyNode = state.nodes[bodyFirst];
+                if (bodyNode.value.at(occupier_) != ike) player.mod(bodyFirst_, Aspect.NULL);
+            }
+
+            var head:Int = player.at(head_);
+            if (head != Aspect.NULL) {
+                var headNode:BoardNode = state.nodes[head];
+                if (headNode.value.at(occupier_) != ike) player.mod(head_, Aspect.NULL);
+            }
+        }
     }
 
     function getBody(player:Int):Array<BoardNode> {

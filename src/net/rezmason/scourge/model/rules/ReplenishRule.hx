@@ -136,7 +136,7 @@ class ReplenishRule extends Rule {
             if (step == repCfg.period) {
                 // Time for action! Resolve the pointer and update values at that location
                 step = 0;
-                var ptr:AspectPtr = replenishable.at(repPropLookup_).pointerArithmetic();
+                var ptr:AspectPtr = replenishable.at(repPropLookup_).intToPointer();
                 updateFunc(repCfg, ptr); // TODO: Do this with fewer function calls (and iterations)
             }
             replenishable.mod(repStep_, step);

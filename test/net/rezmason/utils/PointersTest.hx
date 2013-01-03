@@ -41,7 +41,7 @@ class PointersTest {
 		arr1.mod(arr3[0].d(arr2), 3);
 		Assert.areEqual(3, arr1[4]);
 
-		var fancy:Ptr<Int> = 0.pointerArithmetic();
+		var fancy:Ptr<Int> = 0.intToPointer();
 
 		Assert.areEqual(arr1[0], fancy.d(arr1));
 

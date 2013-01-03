@@ -7,6 +7,7 @@ import net.rezmason.scourge.model.aspects.WinAspect;
 
 using Lambda;
 using net.rezmason.ropes.StatePlan;
+using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;
 
 class Game {
@@ -27,14 +28,14 @@ class Game {
 
     public function new():Void { historian = new StateHistorian(); }
 
-    public function begin(config:ScourgeConfig, savedState:SavedState = null):Int {
+    public function begin(config:ScourgeConfig, randomFunction:Void->Float, savedState:SavedState = null):Int {
 
         if (hasBegun)
             throw "The game has already begun; it cannot begin again until you end it.";
 
         // Build the game from the config
 
-        var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, historian.history, historian.historyState);
+        var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, historian.history, historian.historyState);
         var basicRules:Hash<Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
         var combinedRules:Hash<Rule> = RuleFactory.combineRules(ScourgeConfigFactory.makeCombinedRuleCfg(config), basicRules);
 
@@ -43,7 +44,7 @@ class Game {
         var basicRulesArray:Array<Rule> = [];
         var demiurgicRules:Hash<Rule> = new Hash<Rule>();
         var rules:Array<Rule> = [];
-        for (key in basicRules.keys()) {
+        for (key in basicRules.keys().a2z()) {
             var rule:Rule = basicRules.get(key);
             rules.push(rule);
 

@@ -1,5 +1,7 @@
 package net.rezmason.ropes;
 
+import haxe.Serializer;
+import haxe.Unserializer;
 import net.rezmason.ropes.GridNode;
 
 using Lambda;
@@ -62,6 +64,36 @@ class GridUtils {
                 }
             }
             node = newNodes.pop();
+        }
+
+        return nodes;
+    }
+
+    public inline static function serializeGrid<T>(s:Serializer, sourceList:Array<GridNode<T>>):Void {
+        var data:Array<Array<Dynamic>> = [];
+
+        for (ike in 0...sourceList.length) sourceList[ike].id = ike;
+        for (node in sourceList) {
+            var neighbors:Array<Null<Int>> = [];
+            for (ike in 0...node.neighbors.length)
+                if (node.neighbors[ike] != null) neighbors[ike] = node.neighbors[ike].id;
+            data.push([node.value, neighbors]);
+        }
+
+        s.serialize(data);
+    }
+
+    public inline static function unserializeGrid<T>(s:Unserializer):Array<GridNode<T>> {
+        var data:Array<Array<Dynamic>> = s.unserialize();
+
+        var nodes:Array<GridNode<T>> = [];
+
+        for (datum in data) nodes.push(new GridNode<T>(datum[0]));
+        for (ike in 0...nodes.length) {
+            var neighbors:Array<Null<Int>> = data[ike][1];
+            var node:GridNode<T> = nodes[ike];
+            for (ike in 0...neighbors.length)
+                if (neighbors[ike] != null) node.neighbors[ike] = nodes[neighbors[ike]];
         }
 
         return nodes;

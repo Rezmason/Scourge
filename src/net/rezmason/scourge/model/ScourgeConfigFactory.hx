@@ -67,11 +67,10 @@ class ScourgeConfigFactory {
             maxSkips:3,
             initGrid:null,
             pieceTableIDs:Pieces.getAllPieceIDsOfSize(4),
-            randomFunction:function() return 0,
         };
     }
 
-    public static function makeRuleConfig(config:ScourgeConfig, history:StateHistory, historyState:State):Dynamic {
+    public static function makeRuleConfig(config:ScourgeConfig, randomFunction:Void->Float, history:StateHistory, historyState:State):Dynamic {
         var buildCfg:BuildConfig = makeBuildConfig(history, historyState);
 
         var ruleConfig:Dynamic = {
@@ -80,7 +79,7 @@ class ScourgeConfigFactory {
             BuildBoardRule: makeBuildBoardConfig(config, buildCfg),
             EatCellsRule: makeEatCellsConfig(config),
             DecayRule: makeDecayConfig(config),
-            PickPieceRule: makePickPieceConfig(config, buildCfg),
+            PickPieceRule: makePickPieceConfig(config, buildCfg, randomFunction),
             DropPieceRule: makeDropPieceConfig(config),
             ReplenishRule: makeReplenishConfig(config, buildCfg),
             SkipsExhaustedRule: makeSkipsExhaustedConfig(config),
@@ -161,7 +160,7 @@ class ScourgeConfigFactory {
         };
     }
 
-    inline static function makePickPieceConfig(config:ScourgeConfig, buildCfg:BuildConfig) {
+    inline static function makePickPieceConfig(config:ScourgeConfig, buildCfg:BuildConfig, randomFunction:Void->Float) {
         return {
             buildCfg:buildCfg,
             pieceTableIDs:config.pieceTableIDs,
@@ -169,7 +168,7 @@ class ScourgeConfigFactory {
             allowRotating:config.allowRotating,
             allowAll:config.allowAllPieces,
             hatSize:config.pieceHatSize,
-            randomFunction:config.randomFunction,
+            randomFunction:randomFunction,
         };
     }
 

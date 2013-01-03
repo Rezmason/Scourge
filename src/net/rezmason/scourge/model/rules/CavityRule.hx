@@ -37,111 +37,99 @@ class CavityRule extends Rule {
 
     override public function chooseOption(choice:Int = 0):Void {
         super.chooseOption(choice);
-
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
+        for (ike in 0...state.players.length) remapCavities(ike, maxFreshness);
+        state.aspects.mod(maxFreshness_, maxFreshness);
+    }
 
-        // We update the cavities for each player's body
+    private function remapCavities(playerIndex:Int, maxFreshness:Int):Void {
+        var player:AspectSet = state.players[playerIndex];
 
-        for (ike in 0...state.players.length) {
-
-            var player:AspectSet = state.players[ike];
-
-            // We destroy the existing cavity list
-            var cavityFirst:Int = player.at(cavityFirst_);
-            var oldCavityNodes:Array<BoardNode> = [];
-            if (cavityFirst != Aspect.NULL) {
-                oldCavityNodes = state.nodes[cavityFirst].boardListToArray(state.nodes, bodyNext_);
-                for (node in oldCavityNodes) clearCavityCell(node, maxFreshness);
-            }
+        // We destroy the existing cavity list
+        var cavityFirst:Int = player.at(cavityFirst_);
+        var oldCavityNodes:Array<BoardNode> = [];
+        if (cavityFirst != Aspect.NULL) {
+            oldCavityNodes = state.nodes[cavityFirst].boardListToArray(state.nodes, bodyNext_);
+            for (node in oldCavityNodes) clearCavityCell(node, maxFreshness);
             player.mod(cavityFirst_, Aspect.NULL);
+        }
 
-            // Now for the fun part: finding all the cavity nodes.
+        // No one cares about your cavities if you're dead
+        if (player.at(head_) == Aspect.NULL) return;
 
-            var cavityNodes:Array<BoardNode> = [];
+        // Now for the fun part: finding all the cavity nodes.
 
-            if (player.at(head_) != Aspect.NULL) {
-                // We grab the player's body and head
+        var cavityNodes:Array<BoardNode> = [];
+        var body:Array<BoardNode> = state.nodes[player.at(bodyFirst_)].boardListToArray(state.nodes, bodyNext_);
+        var head:BoardNode = state.nodes[player.at(head_)];
 
-                var body:Array<BoardNode> = state.nodes[player.at(bodyFirst_)].boardListToArray(state.nodes, bodyNext_);
-                var head:BoardNode = state.nodes[player.at(head_)];
+        // We're going to search the board for ALL nodes UNTIL we have found all body nodes
+        // This takes advantage of the FILO search pattern of GridUtils.getGraph
 
-                // We're going to search the board for ALL nodes UNTIL we have found all body nodes
-                // This takes advantage of the FILO search pattern of GridUtils.getGraph
+        remainingNodes = body.length - 1;
+        var widePerimeter:Array<BoardNode> = head.getGraph(true, callback(isWithinPerimeter, playerIndex));
 
-                remainingNodes = body.length - 1;
-                var widePerimeter:Array<BoardNode> = head.getGraph(true, callback(isWithinPerimeter, ike));
+        // After reversing the search results, they are sorted in the order of most-outside to least-outside
+        widePerimeter.reverse();
 
-                // After reversing the search results, they are sorted in the order of most-outside to least-outside
-                widePerimeter.reverse();
+        var nodeIDs:IntHash<Bool> = new IntHash<Bool>();
+        for (node in widePerimeter) nodeIDs.set(node.value.at(nodeID_), true);
 
-                var nodeIDs:IntHash<Bool> = new IntHash<Bool>();
-                for (node in widePerimeter) nodeIDs.set(node.value.at(nodeID_), true);
+        var empties:Array<BoardNode> = [];
 
-                var empties:Array<BoardNode> = [];
+        // Searching from the outside in, we remove exposed empty nodes from the set
+        for (ike in 0...widePerimeter.length) {
 
-                // Searching from the outside in, we remove exposed empty nodes from the set
-                for (jen in 0...widePerimeter.length) {
+            var node:BoardNode = widePerimeter[ike];
 
-                    var node:BoardNode = widePerimeter[jen];
+            var occupier:Int = node.value.at(occupier_);
+            var isFilled:Int = node.value.at(isFilled_);
 
-                    var occupier:Int = node.value.at(occupier_);
-                    var isFilled:Int = node.value.at(isFilled_);
-
-                    // Dismiss filled nodes
-                    if (isFilled == Aspect.TRUE) {
-                        // remove enemy filled nodes from the nodeIDs
-                        if (occupier != ike) nodeIDs.remove(node.value.at(nodeID_));
-                    } else {
-                        empties.push(node);
-
-                        for (neighbor in node.orthoNeighbors()) {
-                            if (neighbor == null || !nodeIDs.exists(neighbor.value.at(nodeID_))) {
-                                widePerimeter[jen] = null;
-                                nodeIDs.remove(node.value.at(nodeID_));
-                                empties.pop();
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                // Of those cells, we repeatedly remove cells which are in fact still exposed
-                // TODO: use getGraph for this instead
-                var lastLength:Int = 0;
-                while (empties.length != lastLength) {
-                    lastLength = empties.length;
-                    var newEmpties:Array<BoardNode> = [];
-                    for (node in empties) {
-                        newEmpties.push(node);
-                        for (neighbor in node.orthoNeighbors()) {
-                            if (neighbor == null || !nodeIDs.exists(neighbor.value.at(nodeID_))) {
-                                nodeIDs.remove(node.value.at(nodeID_));
-                                newEmpties.pop();
-                                break;
-                            }
-                        }
-                    }
-                    empties = newEmpties;
-                }
-
-                // The cavities are the nodes that remain and are empty
-                cavityNodes = empties;
-            }
-
-            if (cavityNodes.length > 0) {
-                // Cavity nodes that haven't changed don't get freshened
-                for (node in cavityNodes) createCavity(ike, oldCavityNodes.has(node) ? 0 : maxFreshness, node);
-
-                cavityNodes.chainByAspect(nodeID_, cavityNext_, cavityPrev_);
-                player.mod(cavityFirst_, cavityNodes[0].value.at(nodeID_));
-
-                // Cavities affect the player's total area:
-                var totalArea:Int = player.at(totalArea_) + cavityNodes.length;
-                player.mod(totalArea_, totalArea);
+            // Dismiss filled nodes
+            if (isFilled == Aspect.TRUE) {
+                // remove enemy filled nodes from the nodeIDs
+                if (occupier != playerIndex) nodeIDs.remove(node.value.at(nodeID_));
+            } else {
+                empties.push(node);
             }
         }
 
-        state.aspects.mod(maxFreshness_, maxFreshness);
+        // Of those cells, we repeatedly remove cells which are in fact still exposed
+        // TODO: use getGraph for this instead
+        var lastLength:Int = 0;
+        while (empties.length != lastLength) {
+            lastLength = empties.length;
+            var newEmpties:Array<BoardNode> = [];
+            for (node in empties) {
+                newEmpties.push(node);
+                for (neighbor in node.orthoNeighbors()) {
+                    if (neighbor == null || !nodeIDs.exists(neighbor.value.at(nodeID_))) {
+                        nodeIDs.remove(node.value.at(nodeID_));
+                        newEmpties.pop();
+                        break;
+                    }
+                }
+            }
+            empties = newEmpties;
+        }
+
+        // The cavities are the nodes that remain and are empty
+        cavityNodes = empties;
+
+        if (cavityNodes.length > 0) {
+
+            trace(cavityNodes.length);
+
+            // Cavity nodes that haven't changed don't get freshened
+            for (node in cavityNodes) createCavity(playerIndex, oldCavityNodes.has(node) ? 0 : maxFreshness, node);
+
+            cavityNodes.chainByAspect(nodeID_, cavityNext_, cavityPrev_);
+            player.mod(cavityFirst_, cavityNodes[0].value.at(nodeID_));
+
+            // Cavities affect the player's total area:
+            var totalArea:Int = player.at(totalArea_) + cavityNodes.length;
+            player.mod(totalArea_, totalArea);
+        }
     }
 
     // This comparator doesn't actually compare aspect sets; it counts the number
