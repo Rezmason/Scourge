@@ -2,6 +2,7 @@ package net.rezmason.ropes;
 
 import net.rezmason.ropes.Aspect;
 
+using net.rezmason.utils.History;
 using net.rezmason.utils.Pointers;
 
 private typedef Atom = Null<Int>; // Our low-level value type

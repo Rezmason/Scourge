@@ -1,4 +1,4 @@
-package net.rezmason.ropes;
+package net.rezmason.utils;
 
 import haxe.Serializer;
 

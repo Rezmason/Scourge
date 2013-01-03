@@ -1,6 +1,3 @@
-Switch aspects from IDs to Strings
-	Base strings on package and aspect ID name
-
 TextView
 
 	Scale text field up

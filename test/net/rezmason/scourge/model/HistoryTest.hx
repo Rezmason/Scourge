@@ -3,7 +3,7 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.History;
+import net.rezmason.utils.History;
 
 using Lambda;
 
