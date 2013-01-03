@@ -3,6 +3,7 @@ package net.rezmason.ropes;
 import net.rezmason.ropes.GridNode;
 import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Aspect;
+import net.rezmason.utils.StringSort;
 
 using Lambda;
 using net.rezmason.ropes.GridUtils;
@@ -41,10 +42,13 @@ class StatePlanner {
     }
 
     inline function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet):Void {
+        requirements.sort(propSort);
         for (ike in 0...requirements.length) {
             var prop:AspectProperty = requirements[ike];
             lookup.set(prop.id, ike.intToPointer());
             template[ike] = prop.initialValue;
         }
     }
+
+    inline static function propSort(a:AspectProperty, b:AspectProperty):Int { return StringSort.sort(a.id, b.id); }
 }
