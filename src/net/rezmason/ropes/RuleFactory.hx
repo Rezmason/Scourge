@@ -38,7 +38,6 @@ class RuleFactory {
             function makeJointRule(field:String):JointRule {
                 var rules:Array<Rule> = [];
                 var ruleFields:Array<String> = cfg.field(field);
-                ruleFields.sort(StringSort.sort);
                 for (ruleField in ruleFields) {
                     if (ruleField == field) trace("Joint rules cannot contain themselves.");
                     else if (basicRules.exists(ruleField)) rules.push(basicRules.get(ruleField));

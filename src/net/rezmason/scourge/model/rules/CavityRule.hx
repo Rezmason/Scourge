@@ -16,15 +16,15 @@ using net.rezmason.utils.Pointers;
 class CavityRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
-    @node(BodyAspect.NODE_ID) var nodeID_;
     @node(BodyAspect.CAVITY_NEXT) var cavityNext_;
     @node(BodyAspect.CAVITY_PREV) var cavityPrev_;
+    @node(BodyAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
-    @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.CAVITY_FIRST) var cavityFirst_;
+    @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
