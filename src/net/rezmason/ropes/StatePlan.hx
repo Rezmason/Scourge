@@ -17,21 +17,21 @@ class StatePlan {
         playerAspectTemplate = [];
         nodeAspectTemplate = [];
 
-        stateAspectLookup = [];
-        playerAspectLookup = [];
-        nodeAspectLookup = [];
+        stateAspectLookup = new AspectLookup();
+        playerAspectLookup = new AspectLookup();
+        nodeAspectLookup = new AspectLookup();
     }
 
     public static inline function onState(plan:StatePlan, prop:AspectProperty):AspectPtr {
-        return plan.stateAspectLookup[prop.id];
+        return plan.stateAspectLookup.get(prop.id);
     }
 
     public static inline function onPlayer(plan:StatePlan, prop:AspectProperty):AspectPtr {
-        return plan.playerAspectLookup[prop.id];
+        return plan.playerAspectLookup.get(prop.id);
     }
 
     public static inline function onNode(plan:StatePlan, prop:AspectProperty):AspectPtr {
-        return plan.nodeAspectLookup[prop.id];
+        return plan.nodeAspectLookup.get(prop.id);
     }
 
 }

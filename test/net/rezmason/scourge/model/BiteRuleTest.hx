@@ -53,7 +53,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:IntHash<String> = new IntHash<String>();
+        var F_isForFreshness:Hash<String> = new Hash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
@@ -93,7 +93,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:IntHash<String> = new IntHash<String>();
+        var F_isForFreshness:Hash<String> = new Hash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
@@ -139,7 +139,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:IntHash<String> = new IntHash<String>();
+        var F_isForFreshness:Hash<String> = new Hash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
@@ -187,7 +187,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:IntHash<String> = new IntHash<String>();
+        var F_isForFreshness:Hash<String> = new Hash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
@@ -233,7 +233,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:IntHash<String> = new IntHash<String>();
+        var F_isForFreshness:Hash<String> = new Hash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
@@ -283,7 +283,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:IntHash<String> = new IntHash<String>();
+        var F_isForFreshness:Hash<String> = new Hash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
@@ -331,7 +331,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:IntHash<String> = new IntHash<String>();
+        var F_isForFreshness:Hash<String> = new Hash<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);

@@ -43,7 +43,7 @@ class StatePlanner {
     inline function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet):Void {
         for (ike in 0...requirements.length) {
             var prop:AspectProperty = requirements[ike];
-            lookup[prop.id] = ike.intToPointer();
+            lookup.set(prop.id, ike.intToPointer());
             template[ike] = prop.initialValue;
         }
     }

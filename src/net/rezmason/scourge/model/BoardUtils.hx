@@ -22,20 +22,20 @@ class BoardUtils {
         return state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n).run(Gr.s, south).run(Gr.e, east);
     }
 
-    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:IntHash<String> = null):String {
+    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:Hash<String> = null):String {
 
         if (state.nodes.length == 0) return "empty grid";
 
-        if (otherNodeAspects == null) otherNodeAspects = new IntHash<String>();
-        var otherAspectPtrs:IntHash<AspectPtr> = new IntHash<AspectPtr>();
-        for (id in otherNodeAspects.keys()) otherAspectPtrs.set(id, plan.nodeAspectLookup[id]);
+        if (otherNodeAspects == null) otherNodeAspects = new Hash<String>();
+        var otherAspectPtrs:Hash<AspectPtr> = new Hash<AspectPtr>();
+        for (id in otherNodeAspects.keys()) otherAspectPtrs.set(id, plan.nodeAspectLookup.get(id));
 
         var str:String = "";
 
         var grid:BoardNode = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n);
 
-        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var occupier_:AspectPtr = plan.nodeAspectLookup.get(OwnershipAspect.OCCUPIER.id);
+        var isFilled_:AspectPtr = plan.nodeAspectLookup.get(OwnershipAspect.IS_FILLED.id);
 
         for (row in grid.walk(Gr.s)) {
             str += "\n";

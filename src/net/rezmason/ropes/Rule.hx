@@ -34,7 +34,7 @@ using net.rezmason.utils.Pointers;
         nodeAspectRequirements = [];
         extraAspectRequirements = [];
         extraAspectTemplate = [];
-        extraAspectLookup = [];
+        extraAspectLookup = new AspectLookup();
         options = [];
         quantumOptions = [];
         __initReqs();
@@ -46,7 +46,7 @@ using net.rezmason.utils.Pointers;
 
         for (ike in 0...extraAspectRequirements.length) {
             var prop:AspectProperty = extraAspectRequirements[ike];
-            extraAspectLookup[prop.id] = ike.intToPointer();
+            extraAspectLookup.set(prop.id, ike.intToPointer());
             extraAspectTemplate[ike] = prop.initialValue;
         }
         __initPtrs();
@@ -94,10 +94,10 @@ using net.rezmason.utils.Pointers;
     }
 
     // Are these still necessary?
-    @final inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup[prop.id]; }
-    @final inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup[prop.id]; }
-    @final inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup[prop.id]; }
-    @final inline function extraPtr(prop:AspectProperty):AspectPtr { return extraAspectLookup[prop.id]; }
+    @final inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup.get(prop.id); }
+    @final inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup.get(prop.id); }
+    @final inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup.get(prop.id); }
+    @final inline function extraPtr(prop:AspectProperty):AspectPtr { return extraAspectLookup.get(prop.id); }
 
     #if macro
     private static var lkpSources:Hash<String> = {
@@ -141,7 +141,7 @@ using net.rezmason.utils.Pointers;
                     var lkp:Expr = Context.parse(lkpSources.get(metaTag.name) + "." + metaTag.name + "AspectLookup", pos);
 
                     reqExpressions.push( macro $reqs.push($aspectExpr) );
-                    ptrExpressions.push( macro $ptr = $lkp[$aspectExpr.id] );
+                    ptrExpressions.push( macro $ptr = $lkp.get($aspectExpr.id) );
 
                     //neko.Lib.println(macro :net.rezmason.ropes.Types.AspectPtr);
 

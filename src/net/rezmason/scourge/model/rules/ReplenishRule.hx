@@ -118,7 +118,7 @@ class ReplenishRule extends Rule {
 
         // We represent replenishables as extras
         var rep:AspectSet = buildExtra();
-        rep.mod(repPropLookup_, lookup[repCfg.prop.id].pointerToInt());
+        rep.mod(repPropLookup_, lookup.get(repCfg.prop.id).pointerToInt());
         rep.mod(repID_, state.extras.length);
 
         state.extras.push(rep);

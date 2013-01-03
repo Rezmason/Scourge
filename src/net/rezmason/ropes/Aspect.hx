@@ -7,14 +7,15 @@ import net.rezmason.ropes.Types;
 #end
 
 #if !macro @:autoBuild(net.rezmason.ropes.Aspect.build()) #end class Aspect {
-    private static var ids:Int = 0;
     public inline static var TRUE:Int = 1;
     public inline static var FALSE:Int = 0;
     public inline static var NULL:Int = -1;
 
     @:macro public static function build():Array<Field> {
 
-        var msg:String = "Building " + Context.getLocalClass().get().name + "  ";
+        var classType = Context.getLocalClass().get();
+
+        var msg:String = "Building " + classType.name + "  ";
 
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
@@ -37,8 +38,11 @@ import net.rezmason.ropes.Types;
                         default:
                     }
 
+                    var idConst = EConst(CString(classType.module + "::" + field.name.toUpperCase()));
+                    var idExpr:Expr = {expr:idConst, pos:pos};
+
                     metaTag.params = [];
-                    var expr:Expr = macro {id:Aspect.ids++, initialValue:$aspectExpr};
+                    var expr:Expr = macro {id:$idExpr, initialValue:$aspectExpr};
 
                     field.access = [AStatic, APublic];
                     field.kind = FVar(null, {pos:field.pos, expr:expr.expr});
