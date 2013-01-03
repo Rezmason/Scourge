@@ -118,8 +118,6 @@ class CavityRule extends Rule {
 
         if (cavityNodes.length > 0) {
 
-            trace(cavityNodes.length);
-
             // Cavity nodes that haven't changed don't get freshened
             for (node in cavityNodes) createCavity(playerIndex, oldCavityNodes.has(node) ? 0 : maxFreshness, node);
 

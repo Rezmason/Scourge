@@ -1,6 +1,3 @@
-CavityRule bug
-	Damn it
-
 TextView
 
 	Scale text field up

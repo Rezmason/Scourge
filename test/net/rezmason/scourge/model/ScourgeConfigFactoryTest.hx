@@ -91,8 +91,6 @@ class ScourgeConfigFactoryTest
 	public function startActionTest():Void {
 		// decay, cavity, killHeadlessPlayer, oneLivingPlayer, pickPiece
 
-		trace("START");
-
 		config.numPlayers = 2;
 		config.initGrid = TestBoards.twoPlayerBullshit;
 		makeState();
@@ -109,8 +107,6 @@ class ScourgeConfigFactoryTest
 		startAction.chooseOption();
 
 		VisualAssert.assert("big square player zero with cavity, no player one", state.spitBoard(plan));
-
-		trace(state.spitBoard(plan));
 
 		var num0Cells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), "").length;
 		var num1Cells:Int = ~/([^1])/g.replace(state.spitBoard(plan, false), "").length;
