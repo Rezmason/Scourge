@@ -37,7 +37,7 @@ enum GameEventType {
 
 enum RefereeActionType {
     AllReady;
-    Connect(handler:Player->GameEvent->Void);
+    Connect;
     Disconnect;
     Resume(savedState:String);
     Save;

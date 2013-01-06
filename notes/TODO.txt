@@ -1,9 +1,4 @@
-RefereeTest
-	Begin, end game
-	Begin, save, end, resume game
-
-Add @:final method detection to Rule code
-	If a function overrides a parent function that's marked as @:final, throw an error
+RefereeTest - make steps to ensure that the game is actually recovered
 
 Node directionality don't work the way you think they work
 	Consider a cube corner

@@ -33,11 +33,11 @@ class Referee {
 
         log = [];
         this.gameConfig = gameConfig;
-        players = PlayerFactory.makePlayers(playerConfigs);
+        players = PlayerFactory.makePlayers(playerConfigs, handlePlayerEvent);
         game.begin(gameConfig, randomFunction);
 
         refereeCall(Init(SafeSerializer.run(gameConfig)));
-        refereeCall(Connect(handlePlayerEvent));
+        refereeCall(Connect);
     }
 
     public function resumeGame(playerConfigs:Array<PlayerConfig>, randomFunction:Void->Float, savedGame:SavedGame):Void {
@@ -46,11 +46,11 @@ class Referee {
 
         log = copyLog(savedGame.log);
         this.gameConfig = savedGame.config;
-        players = PlayerFactory.makePlayers(playerConfigs);
+        players = PlayerFactory.makePlayers(playerConfigs, handlePlayerEvent);
         game.begin(gameConfig, randomFunction, savedGame.state);
 
         refereeCall(Resume(SafeSerializer.run(savedGame)));
-        refereeCall(Connect(handlePlayerEvent));
+        refereeCall(Connect);
     }
 
     public function endGame():Void {

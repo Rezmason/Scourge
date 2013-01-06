@@ -27,6 +27,14 @@ using net.rezmason.utils.Pointers;
     private var extraAspectTemplate:AspectSet;
     private var extraAspectLookup:AspectLookup;
 
+    private function _prime():Void {}
+    private function _update():Void {}
+    private function _chooseOption(choice:Int):Void {}
+    private function _chooseQuantumOption(choice:Int):Void {}
+
+    private function __initReqs():Void {}
+    private function __initPtrs():Void {}
+
     public function new():Void {
         demiurgic = false;
         stateAspectRequirements = [];
@@ -54,21 +62,12 @@ using net.rezmason.utils.Pointers;
         _prime();
     }
 
-    private function _prime():Void {}
-    private function _update():Void {}
-    private function _chooseOption(choice:Int):Void {}
-    private function _chooseQuantumOption(choice:Int):Void {}
-
-    private function __initReqs():Void {}
-    private function __initPtrs():Void {}
-
     @:final public function update():Void {
         #if ROPES_VERBOSE trace(myName() + " updating"); #end
         _update();
     }
 
     @:final public function chooseOption(choice:Int = -1):Void {
-
         var defaultChoice:Bool = choice == -1;
         if (defaultChoice) choice = 0;
 
@@ -132,7 +131,13 @@ using net.rezmason.utils.Pointers;
         hash;
     }
 
-    private static var restrictedFields:Array<String> = [ "__initReqs", "__initPointers", ];
+    private static var restrictedFields:Array<String> = [
+        "__initReqs", "__initPointers",
+        "prime",
+        "update",
+        "chooseOption",
+        "chooseQuantumOption",
+    ];
     #end
 
     @:macro public static function build():Array<Field> {

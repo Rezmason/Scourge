@@ -6,7 +6,7 @@ class Player {
 
     public var ready(default, null):Bool;
 
-    public function new(config:PlayerConfig):Void {}
+    public function new(config:PlayerConfig, handler:Player->GameEvent->Void):Void {}
 
     public function send(event:GameEvent):Void {}
 }

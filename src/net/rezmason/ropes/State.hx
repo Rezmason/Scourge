@@ -28,7 +28,7 @@ class State {
     function hxSerialize(s:haxe.Serializer):Void {
         s.serialize(aspects);
         s.serialize(players);
-        s.serialize(s.serializeGrid(nodes));
+        s.serializeGrid(nodes);
         s.serialize(extras);
     }
 
