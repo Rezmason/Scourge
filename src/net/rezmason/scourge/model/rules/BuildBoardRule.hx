@@ -53,7 +53,7 @@ class BuildBoardRule extends Rule {
         this.cfg = cfg;
     }
 
-    override public function init():Void {
+    override private function _prime():Void {
 
         nodeAspectTemplate = plan.nodeAspectTemplate.copy();
 

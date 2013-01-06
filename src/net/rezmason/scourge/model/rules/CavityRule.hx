@@ -35,9 +35,8 @@ class CavityRule extends Rule {
         options.push({optionID:0});
     }
 
-    override public function chooseOption(choice:Int = 0):Void {
-        super.chooseOption(choice);
-        var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
+    override private function _chooseOption(choice:Int):Void {
+                var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
         for (ike in 0...state.players.length) remapCavities(ike, maxFreshness);
         state.aspects.mod(maxFreshness_, maxFreshness);
     }

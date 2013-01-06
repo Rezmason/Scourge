@@ -52,7 +52,7 @@ class ReplenishRule extends Rule {
         options.push({optionID:0});
     }
 
-    override public function init():Void {
+    override private function _prime():Void {
 
         // As a meta-rule, ReplenishRule has a relatively complex init function.
 
@@ -103,8 +103,7 @@ class ReplenishRule extends Rule {
         }
     }
 
-    override public function chooseOption(choice:Int = 0):Void {
-        super.chooseOption(choice);
+    override private function _chooseOption(choice:Int):Void {
 
         updateReps(cfg.stateProperties, updateState);
         updateReps(cfg.playerProperties, updatePlayers);

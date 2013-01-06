@@ -56,7 +56,7 @@ import net.rezmason.ropes.Types;
 
         msg += "\n";
 
-        #if SCOURGE_VERBOSE
+        #if ROPES_VERBOSE
             neko.Lib.print(msg);
         #end
 

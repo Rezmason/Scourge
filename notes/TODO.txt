@@ -1,3 +1,28 @@
+RefereeTest
+	Begin, end game
+	Begin, save, end, resume game
+
+Add @:final method detection to Rule code
+	If a function overrides a parent function that's marked as @:final, throw an error
+
+Node directionality don't work the way you think they work
+	Consider a cube corner
+		Two faces of the cube that meet can share cardinality
+		But the face that connects them both cannot share cardinality with both
+
+	Revised walking/running
+		Specify your direction locally; that's your "heading"
+		if the current node and the next node share their direction, keep going in your heading
+		otherwise, adjust the heading by the offset represented by the current node's index in the next node's list of neighbors
+
+	Notion of "turning"
+		Depends on how you got to where you are. Heading is an important byproduct of walks that crease
+		Run should accept several directions and distances
+
+Somehow prevent the state from being modified except during chooseOption / chooseQuantumOption
+	Mutability would rock
+
+
 TextView
 
 	Scale text field up

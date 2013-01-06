@@ -20,6 +20,8 @@ class Referee {
     var log:Array<GameEvent>;
     var allReady:Bool;
 
+    public var gameBegun(getHasBegun, null):Bool;
+
     public function new():Void {
         game = new Game();
         allReady = false;
@@ -66,7 +68,7 @@ class Referee {
 
     private function handlePlayerEvent(player:Player, event:GameEvent):Void {
 
-        if (!game.hasBegun)
+        if (!gameBegun)
             throw "Game has not begun!";
 
         var playerIndex:Int = players.indexOf(player);
@@ -75,8 +77,6 @@ class Referee {
             throw "Player is not part of this game!";
 
         switch (event.type) {
-            case Chat(message):
-                event.type = Chat(cleanMessage(message));
             case PlayerAction(action, option):
                 if (game.currentPlayer != playerIndex)
                     throw "Player " + playerIndex + " cannot act at this time!";
@@ -119,7 +119,5 @@ class Referee {
         return Std.int(Date.now().getTime() / 1000);
     }
 
-    private inline static function cleanMessage(input:String):String {
-        return input;
-    }
+    private inline function getHasBegun():Bool { return game.hasBegun; }
 }

@@ -29,7 +29,6 @@ typedef SavedGame = {
 }
 
 enum GameEventType {
-    Chat(message:String);
     Error;
     PlayerAction(action:Int, option:Int);
     Ready;

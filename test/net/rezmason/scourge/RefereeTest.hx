@@ -27,18 +27,33 @@ class RefereeTest {
 
 	@AfterClass
 	public function afterClass():Void {
-		referee.endGame();
+
 	}
 
 	@Test
-	public function allActionsRegisteredTest():Void {
+	public function saveTest():Void {
 		var playerCfg = [{type:Test}, {type:Test}, {type:Test}, {type:Test}];
-		referee.beginGame(playerCfg, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
-		var referenceSaveGame:String = Resource.getString("serializedState");
-		var saveGame:String = referee.saveGame().state.data;
 
-		//trace(saveGame);
-		Assert.areEqual(referenceSaveGame, saveGame + "\n");
+		Assert.isFalse(referee.gameBegun);
+		referee.beginGame(playerCfg, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
+		Assert.isTrue(referee.gameBegun);
+
+		var referenceSaveGame:String = Resource.getString("serializedState");
+		var savedGame = referee.saveGame();
+		var data:String = savedGame.state.data;
+		//trace(data);
+		Assert.areEqual(referenceSaveGame, data + "\n");
+
+		referee.endGame();
+		Assert.isFalse(referee.gameBegun);
+
+		referee.resumeGame(playerCfg, randomFunction, savedGame);
+		Assert.isTrue(referee.gameBegun);
+
+		// Resumed game
+
+		referee.endGame();
+		Assert.isFalse(referee.gameBegun);
 	}
 
 	private function randomFunction():Float { return 0; }

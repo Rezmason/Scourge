@@ -56,11 +56,11 @@ class BiteRule extends Rule {
         this.cfg = cfg;
     }
 
-    override public function init():Void {
+    override private function _prime():Void {
         for (player in state.players) player.mod(numBites_, cfg.startingBites);
     }
 
-    override public function update():Void {
+    override private function _update():Void {
 
         biteOptions = [];
 
@@ -161,8 +161,7 @@ class BiteRule extends Rule {
         options = cast biteOptions;
     }
 
-    override public function chooseOption(choice:Int = 0):Void {
-        super.chooseOption(choice);
+    override private function _chooseOption(choice:Int):Void {
 
         var option:BiteOption = cast options[choice];
 

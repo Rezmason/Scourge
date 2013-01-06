@@ -18,8 +18,7 @@ class OneLivingPlayerRule extends Rule {
         options.push({optionID:0});
     }
 
-    override public function chooseOption(choice:Int = 0):Void {
-        super.chooseOption(choice);
+    override private function _chooseOption(choice:Int):Void {
 
         var playersWithHeads:Array<Int> = [];
         for (ike in 0...state.players.length) {

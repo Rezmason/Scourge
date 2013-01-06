@@ -19,7 +19,7 @@ class BuildPlayersRule extends Rule {
         this.cfg = cfg;
     }
 
-    override public function init():Void {
+    override private function _prime():Void {
 
         if (cfg.numPlayers < 1) throw "Invalid number of players in player config.";
 

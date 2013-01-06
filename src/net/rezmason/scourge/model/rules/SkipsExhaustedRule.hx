@@ -27,8 +27,7 @@ class SkipsExhaustedRule extends Rule {
         options.push({optionID:0});
     }
 
-    override public function chooseOption(choice:Int = 0):Void {
-        super.chooseOption(choice);
+    override private function _chooseOption(choice:Int):Void {
 
         var stalemate:Bool = true;
 

@@ -40,7 +40,7 @@ using net.rezmason.utils.Pointers;
         __initReqs();
     }
 
-    @final public function prime(state:State, plan:StatePlan):Void {
+    @:final public function prime(state:State, plan:StatePlan):Void {
         this.state = state;
         this.plan = plan;
 
@@ -50,27 +50,50 @@ using net.rezmason.utils.Pointers;
             extraAspectTemplate[ike] = prop.initialValue;
         }
         __initPtrs();
-        init();
+        #if ROPES_VERBOSE trace(myName() + " initializing"); #end
+        _prime();
     }
 
-    public function init():Void {}
+    private function _prime():Void {}
+    private function _update():Void {}
+    private function _chooseOption(choice:Int):Void {}
+    private function _chooseQuantumOption(choice:Int):Void {}
 
     private function __initReqs():Void {}
     private function __initPtrs():Void {}
 
-    // Note: Rules *should not* change the State during the update function.
-    public function update():Void {}
+    @:final public function update():Void {
+        #if ROPES_VERBOSE trace(myName() + " updating"); #end
+        _update();
+    }
 
-    public function chooseOption(choice:Int = 0):Void {
+    @:final public function chooseOption(choice:Int = -1):Void {
+
+        var defaultChoice:Bool = choice == -1;
+        if (defaultChoice) choice = 0;
+
         if (options == null || options.length < choice || options[choice] == null) {
             throw "Invalid choice index.";
         }
+        #if ROPES_VERBOSE
+            if (defaultChoice) trace(myName() + " choosing default option");
+            else trace(myName() + " choosing option " + choice);
+        #end
+        _chooseOption(choice);
     }
 
-    public function chooseQuantumOption(choice:Int):Void {
+    @:final public function chooseQuantumOption(choice:Int):Void {
         if (quantumOptions == null || quantumOptions.length < choice || quantumOptions[choice] == null) {
             throw "Invalid choice index.";
         }
+        #if ROPES_VERBOSE trace(myName() + "choosing quantum option " + choice); #end
+        _chooseQuantumOption(choice);
+    }
+
+    inline function myName():String {
+        var name:String = Type.getClassName(Type.getClass(this));
+        name = name.substr(name.lastIndexOf(".") + 1);
+        return name;
     }
 
     inline function buildAspectSet(template:AspectSet):AspectSet {
@@ -79,25 +102,25 @@ using net.rezmason.utils.Pointers;
         return aspects;
     }
 
-    @final inline function buildHistAspectSet(template:AspectSet, history:StateHistory):AspectSet {
+    @:final inline function buildHistAspectSet(template:AspectSet, history:StateHistory):AspectSet {
         var aspects:AspectSet = new AspectSet();
         for (val in template) aspects.push(history.alloc(val));
         return aspects;
     }
 
-    @final inline function buildExtra():AspectSet {
+    @:final inline function buildExtra():AspectSet {
         return buildAspectSet(extraAspectTemplate);
     }
 
-    @final inline function buildHistExtra(history:StateHistory):AspectSet {
+    @:final inline function buildHistExtra(history:StateHistory):AspectSet {
         return buildHistAspectSet(extraAspectTemplate, history);
     }
 
     // Are these still necessary?
-    @final inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup.get(prop.id); }
-    @final inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup.get(prop.id); }
-    @final inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup.get(prop.id); }
-    @final inline function extraPtr(prop:AspectProperty):AspectPtr { return extraAspectLookup.get(prop.id); }
+    @:final inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup.get(prop.id); }
+    @:final inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup.get(prop.id); }
+    @:final inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup.get(prop.id); }
+    @:final inline function extraPtr(prop:AspectProperty):AspectPtr { return extraAspectLookup.get(prop.id); }
 
     #if macro
     private static var lkpSources:Hash<String> = {
@@ -159,7 +182,7 @@ using net.rezmason.utils.Pointers;
         fields.push(overrider("__initReqs", reqExpressions, pos));
         fields.push(overrider("__initPtrs", ptrExpressions, pos));
 
-        #if SCOURGE_VERBOSE
+        #if ROPES_VERBOSE
             neko.Lib.print(msg);
         #end
 

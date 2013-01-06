@@ -25,7 +25,7 @@ class TestPieceRule extends Rule {
         this.cfg = cfg;
     }
 
-    override public function init():Void {
+    override public function _prime():Void {
         state.aspects.mod(pieceTableID_, cfg.pieceTableID);
         state.aspects.mod(pieceReflection_, cfg.reflection);
         state.aspects.mod(pieceRotation_, cfg.rotation);

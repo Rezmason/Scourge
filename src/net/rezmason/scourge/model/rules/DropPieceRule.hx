@@ -58,7 +58,7 @@ class DropPieceRule extends Rule {
         this.cfg = cfg;
     }
 
-    override public function update():Void {
+    override private function _update():Void {
 
         var dropOptions:Array<DropPieceOption> = [];
 
@@ -175,8 +175,7 @@ class DropPieceRule extends Rule {
         options = cast dropOptions;
     }
 
-    override public function chooseOption(choice:Int = 0):Void {
-        super.chooseOption(choice);
+    override private function _chooseOption(choice:Int):Void {
 
         var option:DropPieceOption = cast options[choice];
 

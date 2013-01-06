@@ -67,12 +67,12 @@ class PickPieceRule extends Rule {
 
     // All this for an overglorified random piece picker!
 
-    override public function init():Void {
+    override private function _prime():Void {
         buildPieceOptions();
         buildHat();
     }
 
-    override public function update():Void {
+    override private function _update():Void {
 
         if (cfg.allowAll) {
             // The simplest system; the player can use any provided piece at any time
@@ -95,8 +95,7 @@ class PickPieceRule extends Rule {
         }
     }
 
-    override public function chooseOption(choice:Int = 0):Void {
-        super.chooseOption(choice);
+    override private function _chooseOption(choice:Int):Void {
 
         var option:PickPieceOption = cast options[choice];
         if (cfg.allowAll) {
@@ -110,9 +109,8 @@ class PickPieceRule extends Rule {
         }
     }
 
-    override public function chooseQuantumOption(choice:Int):Void {
-        super.chooseQuantumOption(choice);
-        // The player's choice is selected
+    override private function _chooseQuantumOption(choice:Int):Void {
+                // The player's choice is selected
         var option:PickPieceOption = cast options[choice];
         if (remakeHat()) buildHat();
         pickOptionFromHat(option);

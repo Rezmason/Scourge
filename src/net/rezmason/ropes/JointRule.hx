@@ -17,28 +17,36 @@ class JointRule extends Rule {
         }
     }
 
-    override public function update():Void {
+    override private function _update():Void {
         rules[0].update();
         options = rules[0].options;
         quantumOptions = rules[0].quantumOptions;
     }
 
-    override public function chooseOption(choice:Int = 0):Void {
+    override private function _chooseOption(choice:Int):Void {
+        #if ROPES_VERBOSE trace("{"); #end
+
         rules[0].chooseOption(choice);
         for (ike in 1...rules.length) {
             var rule:Rule = rules[ike];
             rule.update();
             rule.chooseOption();
         }
+
+        #if ROPES_VERBOSE trace("}"); #end
     }
 
-    override public function chooseQuantumOption(choice:Int):Void {
+    override private function _chooseQuantumOption(choice:Int):Void {
+        #if ROPES_VERBOSE trace("{"); #end
+
         rules[0].chooseQuantumOption(choice);
         for (ike in 1...rules.length) {
             var rule:Rule = rules[ike];
             rule.update();
             rule.chooseOption();
         }
+
+        #if ROPES_VERBOSE trace("}"); #end
     }
 }
 
