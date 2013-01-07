@@ -20,7 +20,7 @@ class ScourgeConfigFactory {
     public static function makeDemiurgicRuleList():Array<String> { return ["BuildStateRule", "BuildPlayersRule", "BuildBoardRule"]; }
     public static function makeActionList(config:ScourgeConfig):Array<String> {
 
-        var actionList:Array<String> = ["quitAction", "dropAction",];
+        var actionList:Array<String> = ["quitAction", "dropAction", "pickPieceAction"];
 
         if (config.maxSwaps > 0) actionList.push("swapAction");
         if (config.maxBites > 0) actionList.push("biteAction");
@@ -102,15 +102,16 @@ class ScourgeConfigFactory {
     public static function makeCombinedRuleCfg(config:ScourgeConfig):Dynamic<Array<String>> {
         var combinedRuleConfig:Dynamic<Array<String>> = {
             cleanUp: ["DecayRule", "KillHeadlessPlayerRule", "OneLivingPlayerRule"],
-            wrapUp: ["EndTurnRule", "ReplenishRule", "PickPieceRule"],
+            wrapUp: ["EndTurnRule", "ReplenishRule"],
 
-            startAction: ["cleanUp", "PickPieceRule"],
+            pickPieceAction: ["PickPieceRule"],
+            startAction: ["cleanUp"],
             quitAction: ["ForfeitRule", "cleanUp", "wrapUp"],
             dropAction: ["DropPieceRule", "EatCellsRule", "cleanUp", "wrapUp", "SkipsExhaustedRule"],
         };
 
         if (config.includeCavities) combinedRuleConfig.cleanUp = ["DecayRule", "CavityRule", "KillHeadlessPlayerRule", "OneLivingPlayerRule"];
-        if (config.maxSwaps > 0) combinedRuleConfig.swapAction = ["SwapPieceRule", "PickPieceRule"];
+        if (config.maxSwaps > 0) combinedRuleConfig.swapAction = ["SwapPieceRule"];
         if (config.maxBites > 0) combinedRuleConfig.biteAction = ["BiteRule", "cleanUp"];
 
         return combinedRuleConfig;

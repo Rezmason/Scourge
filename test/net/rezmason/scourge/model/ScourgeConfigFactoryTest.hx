@@ -40,6 +40,7 @@ class ScourgeConfigFactoryTest
     var startAction:Rule;
     var biteAction:Rule;
     var swapAction:Rule;
+    var pickPieceAction:Rule;
     var quitAction:Rule;
     var dropAction:Rule;
 
@@ -188,6 +189,9 @@ class ScourgeConfigFactoryTest
 		startAction.update();
 		startAction.chooseOption();
 
+		pickPieceAction.update();
+		pickPieceAction.chooseOption();
+
 		var numSwaps_:AspectPtr = plan.onPlayer(SwapAspect.NUM_SWAPS);
 		var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
 
@@ -198,6 +202,8 @@ class ScourgeConfigFactoryTest
 		for (ike in 0...config.startingSwaps) {
 			swapAction.update();
 			swapAction.chooseOption();
+			pickPieceAction.update();
+			pickPieceAction.chooseOption();
 
 			var piece:Int = state.aspects.at(pieceTableID_);
 
@@ -245,16 +251,22 @@ class ScourgeConfigFactoryTest
 
 		VisualAssert.assert("two player grab", state.spitBoard(plan));
 
+		pickPieceAction.update();
+		pickPieceAction.chooseOption();
 		dropAction.update();
 		dropAction.chooseOption(35); // drop, eat
 
 		VisualAssert.assert("player zero dropped an L, ate player one's leg; small new cavity", state.spitBoard(plan));
 
+		pickPieceAction.update();
+		pickPieceAction.chooseOption();
 		dropAction.update();
 		dropAction.chooseOption(); // skip
 
 		var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
+		pickPieceAction.update();
+		pickPieceAction.chooseOption();
 		dropAction.update();
 		dropAction.chooseOption(32); // drop, eat, kill
 
@@ -310,6 +322,7 @@ class ScourgeConfigFactoryTest
         startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
 	    biteAction = combinedRules.get("biteAction");
 	    swapAction = combinedRules.get("swapAction");
+	    pickPieceAction = combinedRules.get("pickPieceAction");
 	    quitAction = combinedRules.get("quitAction");
 	    dropAction = combinedRules.get("dropAction");
     }

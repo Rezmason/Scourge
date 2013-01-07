@@ -29,7 +29,6 @@ typedef SavedGame = {
 }
 
 enum GameEventType {
-    Error;
     PlayerAction(action:Int, option:Int);
     Ready;
     RefereeAction(action:RefereeActionType);
@@ -42,4 +41,5 @@ enum RefereeActionType {
     Resume(savedState:String);
     Save;
     Init(config:String);
+    RandomFloats(floats:String);
 }

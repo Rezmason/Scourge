@@ -30,8 +30,12 @@ class RefereeTest {
 
 	}
 
+	//@AsyncTest
 	@Test
-	public function saveTest():Void {
+	public function saveTest(/*factory:AsyncFactory*/):Void {
+
+		//var handler = factory.createHandler(this, onSaveTestComplete, 300);
+
 		var playerCfg = [{type:Test}, {type:Test}, {type:Test}, {type:Test}];
 
 		Assert.isFalse(referee.gameBegun);
@@ -54,6 +58,10 @@ class RefereeTest {
 
 		referee.endGame();
 		Assert.isFalse(referee.gameBegun);
+	}
+
+	private function onSaveTestComplete():Void {
+
 	}
 
 	private function randomFunction():Float { return 0; }

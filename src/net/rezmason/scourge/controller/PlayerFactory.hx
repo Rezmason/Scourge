@@ -10,16 +10,24 @@ typedef PlayerHandler = Player->GameEvent->Void;
 class PlayerFactory {
 
     public static function makePlayers(playerConfigs:Array<PlayerConfig>, handler:PlayerHandler):Array<Player> {
-        return playerConfigs.map(callback(makePlayer, handler)).array();
-    }
+        var players:Array<Player> = [];
 
-    private inline static function makePlayer(handler:PlayerHandler, config:PlayerConfig):Player {
-        switch (config.type) {
-            case Test: return new TestPlayer(config, handler);
-            case Human: return new HumanPlayer(config, handler);
-            case Machine: return new MachinePlayer(config, handler);
-            case Remote: return new RemotePlayer(config, handler);
+        for (ike in 0...playerConfigs.length) {
+            var config:PlayerConfig = playerConfigs[ike];
+            if (config == null)
+                throw "Null player config.";
+
+            var playerType:Class<Player> = null;
+            switch (config.type) {
+                case Test: playerType = TestPlayer;
+                case Human: playerType = HumanPlayer;
+                case Machine: playerType = MachinePlayer;
+                case Remote: playerType = RemotePlayer;
+            }
+
+            players.push(Type.createInstance(playerType, [ike, config, handler]));
         }
-        return null;
+
+        return players;
     }
 }
