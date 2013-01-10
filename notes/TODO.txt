@@ -1,5 +1,3 @@
-RefereeTest - make steps to ensure that the game is actually recovered
-
 Node directionality don't work the way you think they work
 	Consider a cube corner
 		Two faces of the cube that meet can share cardinality

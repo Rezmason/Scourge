@@ -201,7 +201,7 @@ class DropPieceRule extends Rule {
             player.mod(numConsecutiveSkips_, player.at(numConsecutiveSkips_) + 1);
         }
 
-        state.aspects.mod(pieceTableID_, 0);
+        state.aspects.mod(pieceTableID_, Aspect.NULL);
     }
 
     inline function isFreeEdge(node:BoardNode):Bool {

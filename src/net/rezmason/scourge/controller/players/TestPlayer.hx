@@ -32,55 +32,74 @@ class TestPlayer extends Player {
                 play();
             case RefereeAction(action):
                 switch (action) {
-                    case AllReady:
-                        play();
+                    case AllReady: play();
                     case Connect: connect();
-                    case Disconnect: // Whatever
-                    case Resume(savedState): resume(savedState);
-                    case Save: // Whatever
-                    case Init(config): init(config);
-                    case RandomFloats(data): appendFloats(data);
+                    case Disconnect: disconnect();
+                    case Init(data): init(Unserializer.run(data));
+                    case RandomFloats(data): appendFloats(Unserializer.run(data));
+                    case Resume(data): resume(Unserializer.run(data));
+                    case Save:
                 }
-            case Ready: // Whatever!
+            case Ready:
         }
     }
 
-    private function init(config:String):Void {
-        trace("INIT " + index);
+    private function init(config:ScourgeConfig):Void {
+        //trace("INIT " + index);
+        game.begin(config, retrieveRandomFloat);
     }
 
-    private function resume(savedState:String):Void {
-        trace("RESUME " + index);
-
+    private function resume(savedGame:SavedGame):Void {
+        //trace("RESUME " + index);
+        game.begin(savedGame.config, retrieveRandomFloat, savedGame.state);
     }
 
     private function getReady():Void {
         ready = true;
-        handler(this, {type:Ready, timeIssued:now()});
+        volley(Ready);
     }
 
     private function connect():Void {
-        trace("CONNECT " + index);
-        getReady();
+        //trace("CONNECT " + index);
+        helper(getReady);
+    }
+
+    private function disconnect():Void {
+        //trace("DISCONNECT " + index);
+        if (game.hasBegun) game.end();
     }
 
     private function play():Void {
+        //trace("PLAY " + index);
         if (game.hasBegun) {
-            trace("PLAY " + index);
             if (game.winner >= 0) game.end(); // TEMPORARY
-            else if (game.currentPlayer == index) choose();
+            else if (game.currentPlayer == index) helper(choose);
         }
     }
 
-    private function appendFloats(input:String):Void {
-        floats = floats.concat(Unserializer.run(input));
+    private function appendFloats(moreFloats:Array<Float>):Void {
+        floats = floats.concat(moreFloats);
     }
 
-    private function generateRandomFloat():Float {
+    private function retrieveRandomFloat():Float {
         return floats.shift();
     }
 
     private function choose():Void {
-        trace("CHOOSE " + index);
+        //trace("CHOOSE " + index);
+
+        var dropIndex:Int = game.actionIDs.indexOf("dropAction");
+        var firstDropOption:Int = game.getOptions()[dropIndex].length - 1;
+
+        var pickPieceIndex:Int = game.actionIDs.indexOf("pickPieceAction");
+        var firstPickPieceOption:Int = game.getOptions()[pickPieceIndex].length - 1;
+
+        if (firstDropOption == 0 && firstPickPieceOption == 0) volley(PlayerAction(pickPieceIndex, firstPickPieceOption));
+        else if (firstDropOption > 0) volley(PlayerAction(dropIndex, firstDropOption));
+        else trace(["ERROR:", firstDropOption, firstPickPieceOption]);
+    }
+
+    private function volley(eventType:GameEventType):Void {
+        handler(this, {type:eventType, timeIssued:now()});
     }
 }

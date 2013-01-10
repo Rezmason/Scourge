@@ -12,9 +12,11 @@ import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.controller.Referee;
 import net.rezmason.scourge.controller.Types;
 
+using net.rezmason.scourge.model.BoardUtils;
 class RefereeTest {
 
 	var referee:Referee;
+	var playerCfgs:Array<PlayerConfig>;
 
 	public function new() {
 
@@ -30,38 +32,58 @@ class RefereeTest {
 
 	}
 
-	//@AsyncTest
 	@Test
-	public function saveTest(/*factory:AsyncFactory*/):Void {
+	public function saveTest():Void {
 
-		//var handler = factory.createHandler(this, onSaveTestComplete, 300);
+		var deferredCalls = [];
 
-		var playerCfg = [{type:Test}, {type:Test}, {type:Test}, {type:Test}];
+		function defer(func) {
+			deferredCalls.push(func);
+		}
+
+		playerCfgs = [{type:Test(defer)}, {type:Test(defer)}, {type:Test(defer)}, {type:Test(defer)}];
 
 		Assert.isFalse(referee.gameBegun);
-		referee.beginGame(playerCfg, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
+		referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
 		Assert.isTrue(referee.gameBegun);
 
-		var referenceSaveGame:String = Resource.getString("serializedState");
 		var savedGame = referee.saveGame();
 		var data:String = savedGame.state.data;
 		//trace(data);
-		Assert.areEqual(referenceSaveGame, data + "\n");
+		Assert.areEqual(Resource.getString("serializedState"), data + "\n");
+
+		for (ike in 0...10)
+		{
+			var oldDeferredCalls = deferredCalls;
+			deferredCalls = [];
+			var then = Timer.stamp();
+			//trace([ike, oldDeferredCalls.length, Std.int(then * 1000)]);
+
+			for (call in oldDeferredCalls) {
+				call();
+
+				var now = Timer.stamp();
+				//trace(Std.int((now - then) * 1000));
+				then = now;
+			}
+		}
+
+		savedGame = referee.saveGame();
+
+		var board = referee.spitBoard();
+
+		//trace(board);
 
 		referee.endGame();
 		Assert.isFalse(referee.gameBegun);
 
-		referee.resumeGame(playerCfg, randomFunction, savedGame);
+		referee.resumeGame(playerCfgs, randomFunction, savedGame);
 		Assert.isTrue(referee.gameBegun);
 
-		// Resumed game
+		Assert.areEqual(board, referee.spitBoard());
 
 		referee.endGame();
 		Assert.isFalse(referee.gameBegun);
-	}
-
-	private function onSaveTestComplete():Void {
-
 	}
 
 	private function randomFunction():Float { return 0; }

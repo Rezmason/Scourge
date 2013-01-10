@@ -24,12 +24,14 @@ class Referee {
     var allReady:Bool;
     var randGen:RandGen;
     var floats:Array<Float>;
+    var busy:Bool;
 
     public var gameBegun(getHasBegun, null):Bool;
 
     public function new():Void {
         game = new Game();
         allReady = false;
+        busy = false;
         floats = [];
     }
 
@@ -74,7 +76,14 @@ class Referee {
         return {state:game.save(), log:savedLog, config:gameConfig, timeSaved:UnixTime.now()};
     }
 
+    public function spitBoard():String {
+        return game.spitBoard();
+    }
+
     private function handlePlayerEvent(player:Player, event:GameEvent):Void {
+
+        if (busy)
+            throw "Players must not dispatch events synchronously!";
 
         if (!gameBegun)
             throw "Game has not begun!";
@@ -105,7 +114,12 @@ class Referee {
 
     private function broadcastAndLog(event:GameEvent):Void {
         log.push(event);
+        var wasBusy:Bool = busy;
+        //trace("BUSY: BROADCAST");
+        busy = true;
         for (player in players) player.send(event.copy());
+        busy = wasBusy;
+        //trace(busy ? "STILL BUSY" : "FREE");
     }
 
     private function refereeCall(action:RefereeActionType):Void {
@@ -114,9 +128,21 @@ class Referee {
 
     private function readyCheck():Void {
         if (allReady) return;
-        for (player in players) if (!player.ready) return;
+        var wasBusy:Bool = busy;
+        //trace("BUSY: READY CHECK");
+        busy = true;
         allReady = true;
-        refereeCall(AllReady);
+        for (player in players) {
+            if (!player.ready) {
+                allReady = false;
+                break;
+            }
+        }
+
+        if (allReady) refereeCall(AllReady);
+
+        busy = wasBusy;
+        //trace(busy ? "STILL BUSY" : "FREE");
     }
 
     private inline static function copyLog(source:Array<GameEvent>):Array<GameEvent> {
