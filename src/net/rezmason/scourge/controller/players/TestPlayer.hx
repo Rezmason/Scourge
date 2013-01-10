@@ -2,8 +2,21 @@ package net.rezmason.scourge.controller.players;
 
 import haxe.Unserializer;
 import net.rezmason.scourge.controller.Types;
+import net.rezmason.scourge.model.ScourgeConfig;
+
+using Lambda;
+using net.rezmason.scourge.model.BoardUtils;
+
+typedef TestHelper = (Void->Void)->Dynamic;
 
 class TestPlayer extends Player {
+
+    var helper:TestHelper;
+
+    public function new(index:Int, config:PlayerConfig, handler:Player->GameEvent->Void, helper:TestHelper):Void {
+        super(index, config, handler);
+        this.helper = helper;
+    }
 
     var floats:Array<Float>;
 

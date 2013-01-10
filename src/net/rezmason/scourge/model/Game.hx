@@ -7,6 +7,7 @@ import net.rezmason.scourge.model.aspects.WinAspect;
 
 using Lambda;
 using net.rezmason.ropes.StatePlan;
+using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;
 
@@ -17,6 +18,7 @@ class Game {
     public var currentPlayer(getCurrentPlayer, never):Int;
     public var winner(getWinner, never):Int;
     public var state(getState, null):State;
+    public var plan(default, null):StatePlan;
     public var hasBegun(getHasBegun, null):Bool;
     public var checksum(getChecksum, null):Int;
 
@@ -55,7 +57,7 @@ class Game {
         // Plan the state
 
         var state:State = historian.state;
-        var plan:StatePlan = new StatePlanner().planState(state, rules);
+        plan = new StatePlanner().planState(state, rules);
 
         // Prime the rules with the state and plan
 
@@ -156,6 +158,10 @@ class Game {
         historian.history.revert(revision);
         historian.read();
         updateAll();
+    }
+
+    public function spitBoard():String {
+        return state.spitBoard(plan);
     }
 
     private function pushHist():Int {

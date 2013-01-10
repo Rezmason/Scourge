@@ -19,13 +19,13 @@ class PlayerFactory {
 
             var playerType:Class<Player> = null;
             switch (config.type) {
-                case Test: playerType = TestPlayer;
+                case Test(helper): playerType = TestPlayer;
                 case Human: playerType = HumanPlayer;
                 case Machine: playerType = MachinePlayer;
                 case Remote: playerType = RemotePlayer;
             }
 
-            players.push(Type.createInstance(playerType, [ike, config, handler]));
+            players.push(Type.createInstance(playerType, [ike, config, handler].concat(Type.enumParameters(config.type))));
         }
 
         return players;
