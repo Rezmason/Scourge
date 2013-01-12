@@ -32,6 +32,17 @@ class RefereeTest {
 
 	}
 
+	@Ignore("Runs too slow on NekoVM") @Test
+	public function serializeTest():Void {
+		playerCfgs = [{type:Test(null)}, {type:Test(null)}, {type:Test(null)}, {type:Test(null)}];
+		referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
+
+		var savedGame = referee.saveGame();
+		var data:String = savedGame.state.data;
+		//trace(data);
+		Assert.areEqual(Resource.getString("serializedState"), data + "\n");
+	}
+
 	@Test
 	public function saveTest():Void {
 
@@ -46,11 +57,6 @@ class RefereeTest {
 		Assert.isFalse(referee.gameBegun);
 		referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
 		Assert.isTrue(referee.gameBegun);
-
-		var savedGame = referee.saveGame();
-		var data:String = savedGame.state.data;
-		//trace(data);
-		Assert.areEqual(Resource.getString("serializedState"), data + "\n");
 
 		for (ike in 0...10)
 		{
@@ -68,8 +74,7 @@ class RefereeTest {
 			}
 		}
 
-		savedGame = referee.saveGame();
-
+		var savedGame = referee.saveGame();
 		var board = referee.spitBoard();
 
 		//trace(board);

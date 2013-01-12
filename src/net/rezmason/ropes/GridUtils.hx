@@ -29,9 +29,16 @@ class GridUtils {
         return node;
     }
 
-    public inline static function attach<T> (node1:GridNode<T>, node2:GridNode<T>, direction:Int):GridNode<T> {
-        if (node1 != null) node1.neighbors[direction] = node2;
-        if (node2 != null) node2.neighbors[(direction + 4) % 8] = node1;
+    public inline static function attach<T> (node1:GridNode<T>, node2:GridNode<T>, directionForward:Int, directionBack:Int = -1):GridNode<T> {
+        if (node1 != null) {
+            node1.neighbors[directionForward] = node2;
+            node1.headingOffsets[directionForward] = 0;
+        }
+        if (node2 != null) {
+            if (directionBack == -1) directionBack = (directionForward + 4) % 8;
+            node2.neighbors[directionBack] = node1;
+            node1.headingOffsets[directionBack] = 0;
+        }
         return node2;
     }
 
@@ -77,7 +84,7 @@ class GridUtils {
             var neighbors:Array<Null<Int>> = [];
             for (ike in 0...node.neighbors.length)
                 if (node.neighbors[ike] != null) neighbors[ike] = node.neighbors[ike].id;
-            data.push([node.value, neighbors]);
+            data.push([node.value, neighbors, node.headingOffsets]);
         }
 
         s.serialize(data);
@@ -91,9 +98,12 @@ class GridUtils {
         for (datum in data) nodes.push(new GridNode<T>(datum[0]));
         for (ike in 0...nodes.length) {
             var neighbors:Array<Null<Int>> = data[ike][1];
+            var headingOffsets:Array<Null<Int>> = data[ike][2];
             var node:GridNode<T> = nodes[ike];
             for (ike in 0...neighbors.length)
                 if (neighbors[ike] != null) node.neighbors[ike] = nodes[neighbors[ike]];
+            for (ike in 0...headingOffsets.length)
+                node.headingOffsets[ike] = headingOffsets[ike];
         }
 
         return nodes;

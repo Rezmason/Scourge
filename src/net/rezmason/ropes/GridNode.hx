@@ -3,11 +3,13 @@ package net.rezmason.ropes;
 class GridNode<T> {
     public var value(default, null):T;
     public var neighbors(default, null):Array<GridNode<T>>;
+    public var headingOffsets(default, null):Array<Int>;
     public var id:Int;
 
     public function new(value:T):Void {
         this.value = value;
         neighbors = [];
+        headingOffsets = [];
         id = -1;
     }
 }

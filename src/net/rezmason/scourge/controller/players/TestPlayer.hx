@@ -61,7 +61,7 @@ class TestPlayer extends Player {
 
     private function connect():Void {
         //trace("CONNECT " + index);
-        helper(getReady);
+        delay(getReady);
     }
 
     private function disconnect():Void {
@@ -73,7 +73,7 @@ class TestPlayer extends Player {
         //trace("PLAY " + index);
         if (game.hasBegun) {
             if (game.winner >= 0) game.end(); // TEMPORARY
-            else if (game.currentPlayer == index) helper(choose);
+            else if (game.currentPlayer == index) delay(choose);
         }
     }
 
@@ -101,5 +101,9 @@ class TestPlayer extends Player {
 
     private function volley(eventType:GameEventType):Void {
         handler(this, {type:eventType, timeIssued:now()});
+    }
+
+    private inline function delay(func:Void->Void) {
+        if (func != null && helper != null) helper(func);
     }
 }

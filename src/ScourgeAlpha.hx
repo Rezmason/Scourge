@@ -19,8 +19,7 @@ class ScourgeAlpha {
 		canvas = new Sprite();
 		scene.addChild(canvas);
 
-		//thing1();
-		thing2();
+		thing1();
 
 	}
 

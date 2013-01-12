@@ -1,20 +1,4 @@
-Node directionality don't work the way you think they work
-	Consider a cube corner
-		Two faces of the cube that meet can share cardinality
-		But the face that connects them both cannot share cardinality with both
-
-	Revised walking/running
-		Specify your direction locally; that's your "heading"
-		if the current node and the next node share their direction, keep going in your heading
-		otherwise, adjust the heading by the offset represented by the current node's index in the next node's list of neighbors
-
-	Notion of "turning"
-		Depends on how you got to where you are. Heading is an important byproduct of walks that crease
-		Run should accept several directions and distances
-
-Somehow prevent the state from being modified except during chooseOption / chooseQuantumOption
-	Mutability would rock
-
+Register, lock and unlock aspect sets
 
 TextView
 
@@ -56,7 +40,15 @@ MachinePlayer (local)
 
 Checksums
 
-Rewrite the eat rule recursion property to be an Int of depth
+Implement noneuclidean walking and running
+
+	add() function should create heading data
+	walk() and run() functions should operate on heading data
+	heading data should be available after a walk
+	Turtle?
+
+Rewrite the eat rule recursion config property to be an Int of depth
+	Rather than being recursive or not recursive at all, let the user specify how many recursive steps to take
 
 And then SPEED EVERYTHING UP
 	Use timing output to find the bottlenecks
