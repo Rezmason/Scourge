@@ -3,6 +3,7 @@ package net.rezmason.scourge.model.rules;
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
+import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
 
@@ -15,6 +16,7 @@ typedef SkipsExhaustedConfig = {
 class SkipsExhaustedRule extends Rule {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
+    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @player(PlyAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
     @state(WinAspect.WINNER) var winner_;
 
@@ -34,7 +36,7 @@ class SkipsExhaustedRule extends Rule {
         if (state.aspects.at(winner_) != Aspect.NULL) {
             stalemate = false;
         } else {
-            for (player in state.players) {
+            for (player in eachPlayer()) {
                 if (player.at(numConsecutiveSkips_) < cfg.maxSkips) {
                     stalemate = false;
                     break;
@@ -46,10 +48,12 @@ class SkipsExhaustedRule extends Rule {
         var largestPlayers:Array<Int> = null;
 
         if (stalemate) {
-            for (ike in 0...state.players.length) {
-                var totalArea:Int = state.players[ike].at(totalArea_);
-                if (totalArea > largestArea) largestPlayers = [ike];
-                else if (totalArea == largestArea) largestPlayers.push(ike);
+            for (player in eachPlayer()) {
+                var playerID:Int = player.at(playerID_);
+                var totalArea:Int = player.at(totalArea_);
+
+                if (totalArea > largestArea) largestPlayers = [playerID];
+                else if (totalArea == largestArea) largestPlayers.push(playerID);
             }
 
             state.aspects.mod(winner_, largestPlayers.pop());

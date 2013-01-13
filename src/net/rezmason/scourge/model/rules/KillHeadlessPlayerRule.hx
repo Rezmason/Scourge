@@ -5,6 +5,7 @@ import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
+import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
@@ -22,6 +23,7 @@ class KillHeadlessPlayerRule extends Rule {
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
+    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
     public function new():Void {
@@ -35,21 +37,21 @@ class KillHeadlessPlayerRule extends Rule {
 
         // Check each player to see if their heads are no longer theirs
 
-        for (playerIndex in 0...state.players.length) {
-            var player:AspectSet = state.players[playerIndex];
+        for (player in eachPlayer()) {
+            var playerID:Int = player.at(playerID_);
 
             var head:Int = player.at(head_);
             var bodyFirst:Int = player.at(bodyFirst_);
 
             if (head != Aspect.NULL) {
-                var playerHead:BoardNode = state.nodes[head];
-                if (playerHead.value.at(occupier_) != playerIndex || playerHead.value.at(isFilled_) == Aspect.FALSE) {
+                var playerHead:BoardNode = getNode(head);
+                if (playerHead.value.at(occupier_) != playerID || playerHead.value.at(isFilled_) == Aspect.FALSE) {
 
                     // Destroy the head and body
 
                     player.mod(head_, Aspect.NULL);
-                    var bodyNode:BoardNode = state.nodes[bodyFirst];
-                    if (bodyNode != null && bodyNode.value.at(occupier_) == playerIndex) for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
+                    var bodyNode:BoardNode = getNode(bodyFirst);
+                    if (bodyNode != null && bodyNode.value.at(occupier_) == playerID) for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
                     player.mod(bodyFirst_, Aspect.NULL);
                 }
             }

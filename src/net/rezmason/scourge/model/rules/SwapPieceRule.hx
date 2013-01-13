@@ -29,21 +29,21 @@ class SwapPieceRule extends Rule {
     }
 
     override private function _prime():Void {
-        for (player in state.players) player.mod(numSwaps_, cfg.startingSwaps);
+        for (player in eachPlayer()) player.mod(numSwaps_, cfg.startingSwaps);
     }
 
     // This rule basically zaps the current player's piece and takes away a swap.
     override private function _update():Void {
         options = [];
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var numSwaps:Int = state.players[currentPlayer].at(numSwaps_);
+        var numSwaps:Int = getPlayer(currentPlayer).at(numSwaps_);
         if (numSwaps > 0 && state.aspects.at(pieceTableID_) != Aspect.NULL) options.push({optionID:0});
     }
 
     override private function _chooseOption(choice:Int):Void {
                 var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var numSwaps:Int = state.players[currentPlayer].at(numSwaps_);
-        state.players[currentPlayer].mod(numSwaps_, numSwaps - 1);
+        var numSwaps:Int = getPlayer(currentPlayer).at(numSwaps_);
+        getPlayer(currentPlayer).mod(numSwaps_, numSwaps - 1);
         state.aspects.mod(pieceTableID_, Aspect.NULL);
     }
 }

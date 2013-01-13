@@ -88,7 +88,7 @@ class PickPieceRule extends Rule {
             // Iterate over the hat's contents and incrlude the corresopnding quantum options
 
             var quantumPieceOptions:Array<PickPieceOption> = [];
-            var firstHatPiece:AspectSet = state.extras[state.aspects.at(pieceHatFirst_)];
+            var firstHatPiece:AspectSet = getExtra(state.aspects.at(pieceHatFirst_));
             var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
             for (piece in hatPieces) quantumPieceOptions.push(allOptions[piece.at(pieceOptionID_)]);
             quantumOptions = cast quantumPieceOptions;
@@ -166,8 +166,8 @@ class PickPieceRule extends Rule {
         // Create a hat extra for every option
         var allPieces:Array<AspectSet> = [];
         for (option in allOptions) {
-            extraAspectTemplate.mod(pieceID_, state.extras.length);
-            option.hatIndex = state.extras.length;
+            extraAspectTemplate.mod(pieceID_, numExtras());
+            option.hatIndex = numExtras();
             var piece:AspectSet = buildExtra();
             piece.mod(pieceOptionID_, option.optionID);
             allPieces.push(piece);
@@ -201,7 +201,7 @@ class PickPieceRule extends Rule {
 
     private function pickOptionFromHat(option:PickPieceOption = null):PickPieceOption {
 
-        var firstHatPiece:AspectSet = state.extras[state.aspects.at(pieceHatFirst_)];
+        var firstHatPiece:AspectSet = getExtra(state.aspects.at(pieceHatFirst_));
         var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
 
         // Because pieces are differently weighted, we need to use a binary search algo
@@ -222,7 +222,7 @@ class PickPieceRule extends Rule {
             pickedPiece = hatPieces[binarySearch(pick, weights)];
             option = allOptions[pickedPiece.at(pieceOptionID_)];
         } else {
-            pickedPiece = state.extras[option.hatIndex];
+            pickedPiece = getExtra(option.hatIndex);
         }
 
 
@@ -240,7 +240,7 @@ class PickPieceRule extends Rule {
     }
 
     private function buildHat():Void {
-        var firstPiece:AspectSet = state.extras[state.aspects.at(pieceFirst_)];
+        var firstPiece:AspectSet = getExtra(state.aspects.at(pieceFirst_));
         var allPieces:Array<AspectSet> = firstPiece.listToArray(state.extras, pieceNext_);
         allPieces.chainByAspect(pieceID_, pieceHatNext_, pieceHatPrev_);
         state.aspects.mod(pieceHatFirst_, firstPiece.at(pieceID_));

@@ -5,6 +5,7 @@ import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
+import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.BiteAspect;
@@ -37,7 +38,7 @@ class BiteRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(BodyAspect.NODE_ID) var nodeID_;
+    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
@@ -45,6 +46,7 @@ class BiteRule extends Rule {
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
+    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
@@ -57,7 +59,7 @@ class BiteRule extends Rule {
     }
 
     override private function _prime():Void {
-        for (player in state.players) player.mod(numBites_, cfg.startingBites);
+        for (player in eachPlayer()) player.mod(numBites_, cfg.startingBites);
     }
 
     override private function _update():Void {
@@ -68,12 +70,13 @@ class BiteRule extends Rule {
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
 
         var headIDs:Array<Int> = [];
-        for (player in state.players) headIDs.push(player.at(head_));
+        for (player in eachPlayer()) headIDs.push(player.at(head_));
 
-        if (state.players[currentPlayer].at(numBites_) > 0) {
+        var player = getPlayer(currentPlayer);
+        if (player.at(numBites_) > 0) {
 
-            var totalArea:Int = state.players[currentPlayer].at(totalArea_);
-            var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
+            var totalArea:Int = player.at(totalArea_);
+            var bodyNode:BoardNode = getNode(player.at(bodyFirst_));
             var body:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_);
             var frontNodes:Array<BoardNode> = body.filter(callback(isFront, headIDs)).array();
 
@@ -117,7 +120,7 @@ class BiteRule extends Rule {
                     if (cfg.omnidirectional) {
                         // Omnidirectional options are squiggly
                         for (bitNodeID in option.bitNodes) {
-                            var bitNode:BoardNode = state.nodes[bitNodeID];
+                            var bitNode:BoardNode = getNode(bitNodeID);
                             for (neighbor in neighborsFor(bitNode)) {
                                 if (isValidEnemy(headIDs, currentPlayer, neighbor) && !option.bitNodes.has(neighbor.value.at(nodeID_))) {
                                     newOptions.push(makeOption(option.targetNode, option.bitNodes.concat([neighbor.value.at(nodeID_)]), option));
@@ -126,9 +129,9 @@ class BiteRule extends Rule {
                         }
                     } else if (!cfg.baseReachOnThickness || option.bitNodes.length < option.thickness) {
                         // Straight options are a little easier to generate
-                        var firstBitNode:BoardNode = state.nodes[option.bitNodes[0]];
-                        var lastBitNode:BoardNode = state.nodes[option.bitNodes[option.bitNodes.length - 1]];
-                        var direction:Int = state.nodes[option.targetNode].neighbors.indexOf(firstBitNode);
+                        var firstBitNode:BoardNode = getNode(option.bitNodes[0]);
+                        var lastBitNode:BoardNode = getNode(option.bitNodes[option.bitNodes.length - 1]);
+                        var direction:Int = getNode(option.targetNode).neighbors.indexOf(firstBitNode);
                         var neighbor:BoardNode = lastBitNode.neighbors[direction];
                         if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
                             var nextOption:BiteOption = makeOption(option.targetNode, option.bitNodes.concat([neighbor.value.at(nodeID_)]), option);
@@ -169,36 +172,33 @@ class BiteRule extends Rule {
 
             // Grab data from the option
 
-            var node:BoardNode = state.nodes[option.targetNode];
+            var node:BoardNode = getNode(option.targetNode);
             var currentPlayer:Int = state.aspects.at(currentPlayer_);
 
             var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
-            var numBites:Int = state.players[currentPlayer].at(numBites_) - 1;
+            var numBites:Int = getPlayer(currentPlayer).at(numBites_) - 1;
 
             // Find the cells removed from each player
 
             var bitNodesByPlayer:Array<Array<BoardNode>> = [];
-            for (ike in 0...state.players.length) bitNodesByPlayer.push([]);
+            for (player in eachPlayer()) bitNodesByPlayer.push([]);
 
             for (bitNodeID in option.bitNodes) {
-                var bitNode:BoardNode = state.nodes[bitNodeID];
+                var bitNode:BoardNode = getNode(bitNodeID);
                 bitNodesByPlayer[bitNode.value.at(occupier_)].push(bitNode);
             }
 
             // Remove the appropriate cells from each player
 
-            for (ike in 0...state.players.length) {
-                var player:AspectSet = state.players[ike];
-                var bitNodes:Array<BoardNode> = bitNodesByPlayer[ike];
+            for (player in eachPlayer()) {
+                var bitNodes:Array<BoardNode> = bitNodesByPlayer[player.at(playerID_)];
                 var bodyFirst:Int = player.at(bodyFirst_);
-
                 for (node in bitNodes) bodyFirst = killCell(node, maxFreshness++, bodyFirst);
-
                 player.mod(bodyFirst_, bodyFirst);
             }
 
             state.aspects.mod(maxFreshness_, maxFreshness);
-            state.players[currentPlayer].mod(numBites_, numBites);
+            getPlayer(currentPlayer).mod(numBites_, numBites);
         }
     }
 

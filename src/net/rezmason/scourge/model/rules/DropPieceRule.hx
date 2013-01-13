@@ -7,6 +7,7 @@ import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
+import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
@@ -39,7 +40,7 @@ class DropPieceRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(BodyAspect.NODE_ID) var nodeID_;
+    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
@@ -81,7 +82,7 @@ class DropPieceRule extends Rule {
 
             // get current player head
             var currentPlayer:Int = state.aspects.at(currentPlayer_);
-            var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
+            var bodyNode:BoardNode = getNode(getPlayer(currentPlayer).at(bodyFirst_));
 
             // Find edge nodes of current player
             var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge).array();
@@ -180,16 +181,16 @@ class DropPieceRule extends Rule {
         var option:DropPieceOption = cast options[choice];
 
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var player:AspectSet = state.players[currentPlayer];
+        var player:AspectSet = getPlayer(currentPlayer);
 
         if (option.targetNode != Aspect.NULL) {
             var pieceGroup:PieceGroup = Pieces.getPieceById(state.aspects.at(pieceTableID_));
-            var node:BoardNode = state.nodes[option.targetNode];
+            var node:BoardNode = getNode(option.targetNode);
             var coords:Array<IntCoord> = pieceGroup[option.reflection][option.rotation][0];
             var homeCoord:IntCoord = option.coord;
             var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
-            var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
+            var bodyNode:BoardNode = getNode(getPlayer(currentPlayer).at(bodyFirst_));
 
             for (coord in coords) bodyNode = fillAndOccupyCell(walkNode(node, coord, homeCoord), currentPlayer, maxFreshness, bodyNode);
             player.mod(bodyFirst_, bodyNode.value.at(nodeID_));

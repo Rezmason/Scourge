@@ -118,7 +118,7 @@ class ReplenishRule extends Rule {
         // We represent replenishables as extras
         var rep:AspectSet = buildExtra();
         rep.mod(repPropLookup_, lookup.get(repCfg.prop.id).pointerToInt());
-        rep.mod(repID_, state.extras.length);
+        rep.mod(repID_, numExtras());
 
         state.extras.push(rep);
         cfg.buildCfg.historyState.extras.push(buildHistExtra(cfg.buildCfg.history));
@@ -129,7 +129,7 @@ class ReplenishRule extends Rule {
     private function updateReps(repCfgs:Array<ReplenishableConfig>, updateFunc:ReplenishableConfig->AspectPtr->Void):Void {
         // Each replenishable gets its iterator incremented
         for (repCfg in repCfgs) {
-            var replenishable:AspectSet = state.extras[repCfg.replenishableID];
+            var replenishable:AspectSet = getExtra(repCfg.replenishableID);
             var step:Int = replenishable.at(repStep_);
             step++;
             if (step == repCfg.period) {
@@ -152,7 +152,7 @@ class ReplenishRule extends Rule {
 
     // Update each player's aspect set
     private function updatePlayers(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
-        for (player in state.players) {
+        for (player in eachPlayer()) {
             var value:Int = player.at(ptr);
             value += repCfg.amount;
             if (value > repCfg.maxAmount) value = repCfg.maxAmount;
@@ -162,7 +162,7 @@ class ReplenishRule extends Rule {
 
     // Update each node's aspect set
     private function updateNodes(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
-        for (node in state.nodes) {
+        for (node in eachNode()) {
             var value:Int = node.value.at(ptr);
             value += repCfg.amount;
             if (value > repCfg.maxAmount) value = repCfg.maxAmount;

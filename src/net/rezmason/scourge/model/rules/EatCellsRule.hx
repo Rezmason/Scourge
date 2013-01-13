@@ -1,11 +1,12 @@
 package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
-import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.Types;
 import net.rezmason.scourge.model.aspects.BodyAspect;
-import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
+import net.rezmason.scourge.model.aspects.IdentityAspect;
+import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 
 using Lambda;
@@ -25,12 +26,13 @@ class EatCellsRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(BodyAspect.NODE_ID) var nodeID_;
+    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
+    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
@@ -45,15 +47,15 @@ class EatCellsRule extends Rule {
     override private function _chooseOption(choice:Int):Void {
 
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var head:Int = state.players[currentPlayer].at(head_);
-        var playerHead:BoardNode = state.nodes[head];
-        var bodyNode:BoardNode = state.nodes[state.players[currentPlayer].at(bodyFirst_)];
+        var head:Int = getPlayer(currentPlayer).at(head_);
+        var playerHead:BoardNode = getNode(head);
+        var bodyNode:BoardNode = getNode(getPlayer(currentPlayer).at(bodyFirst_));
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
         // List all the players' heads
 
         var headIndices:Array<Int> = [];
-        for (player in state.players) headIndices.push(player.at(head_));
+        for (player in eachPlayer()) headIndices.push(player.at(head_));
 
         // Find all fresh body nodes of the current player
 
@@ -78,8 +80,8 @@ class EatCellsRule extends Rule {
                         if (scoutOccupier == currentPlayer || eatenNodes.has(scout)) {
                             // Add nodes to the eaten region
                             for (pendingNode in pendingNodes) {
-                                var playerIndex:Int = headIndices.indexOf(pendingNode.value.at(nodeID_));
-                                if (playerIndex != -1 && cfg.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerIndex)); // body-from-head eating
+                                var playerID:Int = headIndices.indexOf(pendingNode.value.at(nodeID_));
+                                if (playerID != -1 && cfg.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
                                 else if (cfg.recursive && !newNodes.has(pendingNode)) newNodes.add(pendingNode); // recursive eating
 
                                 eatenNodes.push(pendingNode);
@@ -103,30 +105,30 @@ class EatCellsRule extends Rule {
         // Update cell in the eaten region
         for (node in eatenNodes) bodyNode = eatCell(node, currentPlayer, maxFreshness++, bodyNode);
 
-        state.players[currentPlayer].mod(bodyFirst_, bodyNode.value.at(nodeID_));
+        getPlayer(currentPlayer).mod(bodyFirst_, bodyNode.value.at(nodeID_));
         state.aspects.mod(maxFreshness_, maxFreshness);
 
         // Clean up the bodyFirst and head pointers for opponent players
-        for (ike in 0...state.players.length) {
-            if (ike == currentPlayer) continue;
-            var player:AspectSet = state.players[ike];
+        for (player in eachPlayer()) {
+            var playerID:Int = player.at(playerID_);
+            if (playerID == currentPlayer) continue;
 
             var bodyFirst:Int = player.at(bodyFirst_);
             if (bodyFirst != Aspect.NULL) {
-                bodyNode = state.nodes[bodyFirst];
-                if (bodyNode.value.at(occupier_) != ike) player.mod(bodyFirst_, Aspect.NULL);
+                bodyNode = getNode(bodyFirst);
+                if (bodyNode.value.at(occupier_) != playerID) player.mod(bodyFirst_, Aspect.NULL);
             }
 
             var head:Int = player.at(head_);
             if (head != Aspect.NULL) {
-                var headNode:BoardNode = state.nodes[head];
-                if (headNode.value.at(occupier_) != ike) player.mod(head_, Aspect.NULL);
+                var headNode:BoardNode = getNode(head);
+                if (headNode.value.at(occupier_) != playerID) player.mod(head_, Aspect.NULL);
             }
         }
     }
 
-    function getBody(player:Int):Array<BoardNode> {
-        var bodyNode:BoardNode = state.nodes[state.players[player].at(bodyFirst_)];
+    function getBody(playerID:Int):Array<BoardNode> {
+        var bodyNode:BoardNode = getNode(getPlayer(playerID).at(bodyFirst_));
         return bodyNode.boardListToArray(state.nodes, bodyNext_);
     }
 

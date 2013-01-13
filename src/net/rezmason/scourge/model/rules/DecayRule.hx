@@ -5,6 +5,7 @@ import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
+import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
@@ -21,7 +22,7 @@ class DecayRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(BodyAspect.NODE_ID) var nodeID_;
+    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
@@ -45,22 +46,22 @@ class DecayRule extends Rule {
         // Grab all the player heads
 
         var heads:Array<BoardNode> = [];
-        for (player in state.players) {
+        for (player in eachPlayer()) {
             var headIndex:Int = player.at(head_);
-            if (headIndex != Aspect.NULL) heads.push(state.nodes[headIndex]);
+            if (headIndex != Aspect.NULL) heads.push(getNode(headIndex));
         }
 
         // Use the heads as starting points for a flood fill of connected living cells
         var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(cfg.orthoOnly, isLivingBodyNeighbor);
 
         // Remove cells from player bodies
-        for (player in state.players) {
+        for (player in eachPlayer()) {
 
             var totalArea:Int = 0;
 
             var bodyFirst:Int = player.at(bodyFirst_);
             if (bodyFirst != Aspect.NULL) {
-                for (node in state.nodes[bodyFirst].iterate(state.nodes, bodyNext_)) {
+                for (node in getNode(bodyFirst).iterate(state.nodes, bodyNext_)) {
                     if (!livingBodyNeighbors.has(node)) bodyFirst = killCell(node, maxFreshness, bodyFirst);
                     else totalArea++;
                 }

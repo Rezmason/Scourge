@@ -8,6 +8,7 @@ import net.rezmason.ropes.Types;
 import net.rezmason.scourge.model.aspects.BiteAspect;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
+import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.rules.BiteRule;
 
@@ -352,7 +353,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
-        var nodeID_:AspectPtr = plan.onNode(BodyAspect.NODE_ID);
+        var nodeID_:AspectPtr = plan.onNode(IdentityAspect.NODE_ID);
         var cavityID:Int = cavity.value.at(nodeID_);
         for (option in options) {
             if (option.bitNodes.has(cavityID)) {

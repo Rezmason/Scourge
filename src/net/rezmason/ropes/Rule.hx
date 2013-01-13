@@ -121,6 +121,18 @@ using net.rezmason.utils.Pointers;
     @:final inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup.get(prop.id); }
     @:final inline function extraPtr(prop:AspectProperty):AspectPtr { return extraAspectLookup.get(prop.id); }
 
+    @:final inline function getNode(index:Int):BoardNode { return state.nodes[index]; }
+    @:final inline function getPlayer(index:Int):AspectSet { return state.players[index]; }
+    @:final inline function getExtra(index:Int):AspectSet { return state.extras[index]; }
+
+    @:final inline function eachNode():Iterator<BoardNode> { return state.nodes.iterator(); }
+    @:final inline function eachPlayer():Iterator<AspectSet> { return state.players.iterator(); }
+    @:final inline function eachExtra():Iterator<AspectSet> { return state.extras.iterator(); }
+
+    @:final inline function numNodes():Int { return state.nodes.length; }
+    @:final inline function numPlayers():Int { return state.players.length; }
+    @:final inline function numExtras():Int { return state.extras.length; }
+
     #if macro
     private static var lkpSources:Hash<String> = {
         var hash:Hash<String> = new Hash<String>();

@@ -36,8 +36,8 @@ class ForfeitRule extends Rule {
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var player:AspectSet = state.players[currentPlayer];
-        var bodyNode:BoardNode = state.nodes[player.at(bodyFirst_)];
+        var player:AspectSet = getPlayer(currentPlayer);
+        var bodyNode:BoardNode = getNode(player.at(bodyFirst_));
 
         // Clear the player's head and body
 

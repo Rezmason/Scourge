@@ -6,6 +6,7 @@ import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
+import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
@@ -18,7 +19,7 @@ class CavityRule extends Rule {
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.CAVITY_NEXT) var cavityNext_;
     @node(BodyAspect.CAVITY_PREV) var cavityPrev_;
-    @node(BodyAspect.NODE_ID) var nodeID_;
+    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
@@ -26,6 +27,7 @@ class CavityRule extends Rule {
     @player(BodyAspect.CAVITY_FIRST) var cavityFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
+    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
     var remainingNodes:Int;
@@ -37,18 +39,18 @@ class CavityRule extends Rule {
 
     override private function _chooseOption(choice:Int):Void {
                 var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
-        for (ike in 0...state.players.length) remapCavities(ike, maxFreshness);
+        for (player in eachPlayer()) remapCavities(player.at(playerID_), maxFreshness);
         state.aspects.mod(maxFreshness_, maxFreshness);
     }
 
-    private function remapCavities(playerIndex:Int, maxFreshness:Int):Void {
-        var player:AspectSet = state.players[playerIndex];
+    private function remapCavities(playerID:Int, maxFreshness:Int):Void {
+        var player:AspectSet = getPlayer(playerID);
 
         // We destroy the existing cavity list
         var cavityFirst:Int = player.at(cavityFirst_);
         var oldCavityNodes:Array<BoardNode> = [];
         if (cavityFirst != Aspect.NULL) {
-            oldCavityNodes = state.nodes[cavityFirst].boardListToArray(state.nodes, bodyNext_);
+            oldCavityNodes = getNode(cavityFirst).boardListToArray(state.nodes, bodyNext_);
             for (node in oldCavityNodes) clearCavityCell(node, maxFreshness);
             player.mod(cavityFirst_, Aspect.NULL);
         }
@@ -59,14 +61,14 @@ class CavityRule extends Rule {
         // Now for the fun part: finding all the cavity nodes.
 
         var cavityNodes:Array<BoardNode> = [];
-        var body:Array<BoardNode> = state.nodes[player.at(bodyFirst_)].boardListToArray(state.nodes, bodyNext_);
-        var head:BoardNode = state.nodes[player.at(head_)];
+        var body:Array<BoardNode> = getNode(player.at(bodyFirst_)).boardListToArray(state.nodes, bodyNext_);
+        var head:BoardNode = getNode(player.at(head_));
 
         // We're going to search the board for ALL nodes UNTIL we have found all body nodes
         // This takes advantage of the FILO search pattern of GridUtils.getGraph
 
         remainingNodes = body.length - 1;
-        var widePerimeter:Array<BoardNode> = head.getGraph(true, callback(isWithinPerimeter, playerIndex));
+        var widePerimeter:Array<BoardNode> = head.getGraph(true, callback(isWithinPerimeter, playerID));
 
         // After reversing the search results, they are sorted in the order of most-outside to least-outside
         widePerimeter.reverse();
@@ -87,7 +89,7 @@ class CavityRule extends Rule {
             // Dismiss filled nodes
             if (isFilled == Aspect.TRUE) {
                 // remove enemy filled nodes from the nodeIDs
-                if (occupier != playerIndex) nodeIDs.remove(node.value.at(nodeID_));
+                if (occupier != playerID) nodeIDs.remove(node.value.at(nodeID_));
             } else {
                 empties.push(node);
             }
@@ -118,7 +120,7 @@ class CavityRule extends Rule {
         if (cavityNodes.length > 0) {
 
             // Cavity nodes that haven't changed don't get freshened
-            for (node in cavityNodes) createCavity(playerIndex, oldCavityNodes.has(node) ? 0 : maxFreshness, node);
+            for (node in cavityNodes) createCavity(playerID, oldCavityNodes.has(node) ? 0 : maxFreshness, node);
 
             cavityNodes.chainByAspect(nodeID_, cavityNext_, cavityPrev_);
             player.mod(cavityFirst_, cavityNodes[0].value.at(nodeID_));

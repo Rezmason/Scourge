@@ -5,6 +5,7 @@ import net.rezmason.ropes.Types;
 import net.rezmason.ropes.GridNode;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
+import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 import Math.*;
@@ -41,11 +42,12 @@ class BuildBoardRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(BodyAspect.NODE_ID) var nodeID_;
+    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
+    @player(IdentityAspect.PLAYER_ID) var playerID_;
 
     public function new(cfg:BuildBoardConfig):Void {
         super();
@@ -60,7 +62,7 @@ class BuildBoardRule extends Rule {
         // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
         // Player 1's head is at a 45 degree angle
 
-        var numPlayers:Int = state.players.length;
+        var numPlayers:Int = numPlayers();
         var headAngle:Float = 2 / numPlayers;
         var boardRadius:Float = (numPlayers == 1) ? 0 : PLAYER_DIST / (2 * sin(PI * headAngle * 0.5));
 
@@ -133,7 +135,7 @@ class BuildBoardRule extends Rule {
 
     inline function makeNode():BoardNode {
         var node:BoardNode = new BoardNode(buildAspectSet(nodeAspectTemplate));
-        node.value.mod(nodeID_, state.nodes.length);
+        node.value.mod(nodeID_, numNodes());
         state.nodes.push(node);
 
         var histAspects:AspectSet = buildHistAspectSet(nodeAspectTemplate, cfg.buildCfg.history);
@@ -181,9 +183,9 @@ class BuildBoardRule extends Rule {
             if (plantHeads) {
                 head.value.mod(isFilled_, Aspect.TRUE);
                 head.value.mod(occupier_, ike);
-                state.players[ike].mod(head_, head.value.at(nodeID_));
+                getPlayer(ike).mod(head_, head.value.at(nodeID_));
             } else if (head.value.at(isFilled_) == Aspect.TRUE && head.value.at(occupier_) == ike) {
-                state.players[ike].mod(head_, head.value.at(nodeID_));
+                getPlayer(ike).mod(head_, head.value.at(nodeID_));
             }
         }
     }
@@ -236,9 +238,9 @@ class BuildBoardRule extends Rule {
     inline function populateGraphBodies():Void {
 
         var bodies:Array<Array<BoardNode>> = [];
-        for (ike in 0...state.players.length) bodies.push([]);
+        for (player in eachPlayer()) bodies.push([]);
 
-        for (node in state.nodes) {
+        for (node in eachNode()) {
             if (node.value.at(isFilled_) != Aspect.FALSE) {
                 var occupier:Int = node.value.at(occupier_);
                 if (occupier != Aspect.NULL) {
@@ -248,11 +250,11 @@ class BuildBoardRule extends Rule {
             }
         }
 
-        for (ike in 0...state.players.length) {
-            var body:Array<BoardNode> = bodies[ike];
+        for (player in eachPlayer()) {
+            var body:Array<BoardNode> = bodies[player.at(playerID_)];
             if (body.length > 0) {
                 var bodyFirstNode:BoardNode = body[0];
-                state.players[ike].mod(bodyFirst_, bodyFirstNode.value.at(nodeID_));
+                player.mod(bodyFirst_, bodyFirstNode.value.at(nodeID_));
                 body.chainByAspect(nodeID_, bodyNext_, bodyPrev_);
             }
         }

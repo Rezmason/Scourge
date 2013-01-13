@@ -32,7 +32,7 @@ class BuildStateRule extends Rule {
         for (ike in 0...aspects.length) state.aspects[ike] = aspects[ike];
 
         var historyState:State = cfg.buildCfg.historyState;
-        var aspects:AspectSet = buildHistAspectSet(plan.stateAspectTemplate, cfg.buildCfg.history);
+        aspects = buildHistAspectSet(plan.stateAspectTemplate, cfg.buildCfg.history);
         for (ike in 0...aspects.length) historyState.aspects[ike] = aspects[ike];
 
         state.aspects.mod(currentPlayer_, cfg.firstPlayer);
