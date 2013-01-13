@@ -9,35 +9,30 @@ import haxe.macro.Expr;
     typedef Ptr<T> = {
         var _(default, null):Null<Int>;
         var t(default, null):Null<T>;
+        var pSet(default, null):Int;
     }
-    using Lambda;
 #else
     typedef Ptr<T> = Int;
 #end
 
+typedef PtrSet = { var _(default, null):Int; }
+
 class Pointers {
 
+    static var ids:Int = 0;
+
     #if USE_POINTERS
-    public static var arrays:Array<Dynamic> = [];
     public static var locks:Array<Bool> = [];
     #end
 
     public #if !USE_POINTERS inline #end static function at<T>(a:Array<T>, p:Ptr<T>):T {
-        #if USE_POINTERS
-            if (p == null) throw "Null pointer";
-            var index:Int = arrays.indexOf(a);
-            //if (index == -1) throw "Array is not registered";
-            return a[p._];
+        #if USE_POINTERS if (p == null) throw "Null pointer"; return a[p._];
         #else return a[p];
         #end
     }
 
     public #if !USE_POINTERS inline #end static function d<T>(p:Ptr<T>, a:Array<T>):T {
-        #if USE_POINTERS
-            if (a == null) throw "Null array";
-            var index:Int = arrays.indexOf(a);
-            //if (index == -1) throw "Array is not registered";
-            return a[p._];
+        #if USE_POINTERS if (a == null) throw "Null array"; return a[p._];
         #else return a[p];
         #end
     }
@@ -45,25 +40,20 @@ class Pointers {
     public #if !USE_POINTERS inline #end static function mod<T>(a:Array<T>, p:Ptr<T>, v:T):T {
         #if USE_POINTERS
             if (p == null) throw "Null pointer";
-            var index:Int = arrays.indexOf(a);
-            //if (index == -1) throw "Array is not registered";
-            if (locks[index]) throw "Array is locked";
+            if (locks[p.pSet]) throw "Pointer is locked";
             return a[p._] = v;
         #else return a[p] = v;
         #end
     }
 
-    public #if !USE_POINTERS inline #end static function ptr<T>(a:Array<T>, i:Int):Ptr<T> {
-        #if USE_POINTERS
-            var index:Int = arrays.indexOf(a);
-            //if (index == -1) throw "Array is not registered";
-            return {_:i, t:null};
+    public #if !USE_POINTERS inline #end static function ptr<T>(a:Array<T>, i:Int, pSet:PtrSet):Ptr<T> {
+        #if USE_POINTERS return {_:i, t:null, pSet:pSet._};
         #else return i;
         #end
     }
 
-    public #if !USE_POINTERS inline #end static function intToPointer<T>(i:Int):Ptr<T> {
-        #if USE_POINTERS return {_:i, t:null};
+    public #if !USE_POINTERS inline #end static function intToPointer<T>(i:Int, pSet:PtrSet):Ptr<T> {
+        #if USE_POINTERS return {_:i, t:null, pSet:pSet._};
         #else return i;
         #end
     }
@@ -74,28 +64,15 @@ class Pointers {
         #end
     }
 
-    public #if !USE_POINTERS inline #end static function register<T>(a:Array<T>):Bool {
-        #if USE_POINTERS
-            if (arrays.has(a)) return false;
-            arrays.push(a);
-            locks.push(false);
-        #end
-        return true;
+    public #if !USE_POINTERS inline #end static function makeSet():PtrSet {
+        return {_:ids++};
     }
 
-    public #if !USE_POINTERS inline #end static function lock<T>(a:Array<T>):Void {
-        #if USE_POINTERS
-            var index:Int = arrays.indexOf(a);
-            //if (index == -1) throw "Array is not registered";
-            locks[index] = true;
-        #end
+    public #if !USE_POINTERS inline #end static function lock(pSet:PtrSet):Void {
+        #if USE_POINTERS locks[pSet._] = true; #end
     }
 
-    public #if !USE_POINTERS inline #end static function unlock<T>(a:Array<T>):Void {
-        #if USE_POINTERS
-            var index:Int = arrays.indexOf(a);
-            //if (index == -1) throw "Array is not registered";
-            locks[index] = false;
-        #end
+    public #if !USE_POINTERS inline #end static function unlock(pSet:PtrSet):Void {
+        #if USE_POINTERS locks[pSet._] = false; #end
     }
 }

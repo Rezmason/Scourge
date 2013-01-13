@@ -54,7 +54,7 @@ using net.rezmason.utils.Pointers;
 
         for (ike in 0...extraAspectRequirements.length) {
             var prop:AspectProperty = extraAspectRequirements[ike];
-            extraAspectLookup.set(prop.id, ike.intToPointer());
+            extraAspectLookup.set(prop.id, ike.intToPointer(state.key));
             extraAspectTemplate[ike] = prop.initialValue;
         }
         __initPtrs();
@@ -89,13 +89,13 @@ using net.rezmason.utils.Pointers;
         _chooseQuantumOption(choice);
     }
 
-    inline function myName():String {
+    @:final inline function myName():String {
         var name:String = Type.getClassName(Type.getClass(this));
         name = name.substr(name.lastIndexOf(".") + 1);
         return name;
     }
 
-    inline function buildAspectSet(template:AspectSet):AspectSet {
+    @:final inline function buildAspectSet(template:AspectSet):AspectSet {
         var aspects:AspectSet = new AspectSet();
         for (val in template) aspects.push(val);
         return aspects;

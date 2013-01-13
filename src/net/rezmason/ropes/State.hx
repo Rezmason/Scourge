@@ -3,6 +3,7 @@ package net.rezmason.ropes;
 import net.rezmason.ropes.Types;
 
 using net.rezmason.ropes.GridUtils;
+using net.rezmason.utils.Pointers;
 
 class State {
 
@@ -10,8 +11,12 @@ class State {
     public var players(default, null):Array<AspectSet>;
     public var nodes(default, null):Array<GridNode<AspectSet>>; // aka BoardNode
     public var extras(default, null):Array<AspectSet>;
+    public var key(default, null):PtrSet;
 
-    public function new():Void {
+    public function new(key:PtrSet):Void {
+
+        this.key = key;
+
         aspects = [];
         players = [];
         nodes   = [];

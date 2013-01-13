@@ -3,16 +3,19 @@ package net.rezmason.ropes;
 import haxe.Unserializer;
 import net.rezmason.ropes.Types;
 import net.rezmason.utils.SafeSerializer;
+import net.rezmason.utils.Pointers;
 
 class StateHistorian {
 
     public var state(default, null):State;
     public var historyState(default, null):State;
     public var history(default, null):StateHistory;
+    public var key(default, null):PtrSet;
 
     public function new():Void {
-        state = new State();
-        historyState = new State();
+        key = Pointers.makeSet();
+        state = new State(key);
+        historyState = new State(key);
         history = new StateHistory();
     }
 

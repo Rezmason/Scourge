@@ -87,14 +87,17 @@ class Game {
         if (savedState != null) {
             historian.load(savedState);
         } else {
+            historian.key.lock();
             var startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
             startAction.update();
+            historian.key.unlock();
             startAction.chooseOption();
         }
-
+        /*
         var startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
         startAction.update();
         startAction.chooseOption();
+        */
 
         updateAll();
 
@@ -169,7 +172,11 @@ class Game {
         return historian.history.commit();
     }
 
-    private function updateAll():Void { for (action in actions) action.update(); }
+    private function updateAll():Void {
+        historian.key.lock();
+        for (action in actions) action.update();
+        historian.key.unlock();
+    }
 
     private function getActionList():Array<String> { return actionIDs.copy(); }
 

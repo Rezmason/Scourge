@@ -23,7 +23,7 @@ class PointerHistoryTest {
     }
     #end
 
-	//@Test
+	@Ignore("Unused") @Test
 	public function historyTest1():Void
 	{
 		var history:PointerHistory<Int> = new PointerHistory<Int>();

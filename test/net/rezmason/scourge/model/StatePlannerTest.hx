@@ -38,14 +38,16 @@ class StatePlannerTest {
     @Test
     public function configTest1():Void {
 
+        var key:PtrSet = Pointers.makeSet();
+
         var history:StateHistory = new StateHistory();
-        var historyState:State = new State();
+        var historyState:State = new State(key);
 
         // make state config and generate state
         var planner:StatePlanner = new StatePlanner();
         var buildStateConfig:BuildStateConfig = {firstPlayer:0, buildCfg:{ history:history, historyState:historyState }};
         var rules:Array<Rule> = [null, new BuildStateRule(buildStateConfig), new TestRule()];
-        var state:State = new State();
+        var state:State = new State(key);
         var plan:StatePlan = planner.planState(state, rules);
 
         for (rule in rules) if (rule != null) rule.prime(state, plan);

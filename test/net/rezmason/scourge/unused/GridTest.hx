@@ -23,7 +23,7 @@ class GridTest {
     }
     #end
 
-    //@Test
+    @Ignore("Unused") @Test
     public function spitTest():Void {
         grid = new Grid<TestCell>(4, 3, gen);
 
@@ -44,7 +44,7 @@ class GridTest {
         grid = null;
     }
 
-    //@Test
+    @Ignore("Unused") @Test
     public function iteratorTest():Void {
         grid = new Grid<TestCell>(5, 3, gen);
 
@@ -107,7 +107,7 @@ class GridTest {
         grid = null;
     }
 
-    //@Test
+    @Ignore("Unused") @Test
     public function iteratorTest2():Void {
         grid = new Grid<TestCell>(20, 20, gen);
 

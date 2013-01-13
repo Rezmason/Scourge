@@ -34,18 +34,18 @@ class StatePlanner {
             nodeRequirements.absorb(rule.nodeAspectRequirements);
         }
 
-        planAspects(stateRequirements, plan.stateAspectLookup, plan.stateAspectTemplate);
-        planAspects(playerRequirements, plan.playerAspectLookup, plan.playerAspectTemplate);
-        planAspects(nodeRequirements, plan.nodeAspectLookup, plan.nodeAspectTemplate);
+        planAspects(stateRequirements, plan.stateAspectLookup, plan.stateAspectTemplate, state.key);
+        planAspects(playerRequirements, plan.playerAspectLookup, plan.playerAspectTemplate, state.key);
+        planAspects(nodeRequirements, plan.nodeAspectLookup, plan.nodeAspectTemplate, state.key);
 
         return plan;
     }
 
-    inline function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet):Void {
+    inline function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet, key:PtrSet):Void {
         requirements.sort(propSort);
         for (ike in 0...requirements.length) {
             var prop:AspectProperty = requirements[ike];
-            lookup.set(prop.id, ike.intToPointer());
+            lookup.set(prop.id, ike.intToPointer(key));
             template[ike] = prop.initialValue;
         }
     }
