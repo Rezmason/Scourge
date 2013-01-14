@@ -25,19 +25,22 @@ class Pointers {
     public static var locks:Array<Bool> = [];
     #end
 
-    public #if !USE_POINTERS inline #end static function at<T>(a:Array<T>, p:Ptr<T>):T {
+    #if !USE_POINTERS inline #end
+    public static function at<T>(a:Array<T>, p:Ptr<T>):T {
         #if USE_POINTERS if (p == null) throw "Null pointer"; return a[p._];
         #else return a[p];
         #end
     }
 
-    public #if !USE_POINTERS inline #end static function d<T>(p:Ptr<T>, a:Array<T>):T {
+    #if !USE_POINTERS inline #end
+    public static function d<T>(p:Ptr<T>, a:Array<T>):T {
         #if USE_POINTERS if (a == null) throw "Null array"; return a[p._];
         #else return a[p];
         #end
     }
 
-    public #if !USE_POINTERS inline #end static function mod<T>(a:Array<T>, p:Ptr<T>, v:T):T {
+    #if !USE_POINTERS inline #end
+    public static function mod<T>(a:Array<T>, p:Ptr<T>, v:T):T {
         #if USE_POINTERS
             if (p == null) throw "Null pointer";
             if (locks[p.pSet]) throw "Pointer is locked";
@@ -46,33 +49,39 @@ class Pointers {
         #end
     }
 
-    public #if !USE_POINTERS inline #end static function ptr<T>(a:Array<T>, i:Int, pSet:PtrSet):Ptr<T> {
+    #if !USE_POINTERS inline #end
+    public static function ptr<T>(a:Array<T>, i:Int, pSet:PtrSet):Ptr<T> {
         #if USE_POINTERS return {_:i, t:null, pSet:pSet._};
         #else return i;
         #end
     }
 
-    public #if !USE_POINTERS inline #end static function intToPointer<T>(i:Int, pSet:PtrSet):Ptr<T> {
+    #if !USE_POINTERS inline #end
+    public static function intToPointer<T>(i:Int, pSet:PtrSet):Ptr<T> {
         #if USE_POINTERS return {_:i, t:null, pSet:pSet._};
         #else return i;
         #end
     }
 
-    public #if !USE_POINTERS inline #end static function pointerToInt<T>(p:Ptr<T>):Int {
+    #if !USE_POINTERS inline #end
+    public static function pointerToInt<T>(p:Ptr<T>):Int {
         #if USE_POINTERS return p._;
         #else return p;
         #end
     }
 
-    public #if !USE_POINTERS inline #end static function makeSet():PtrSet {
+    #if !USE_POINTERS inline #end
+    public static function makeSet():PtrSet {
         return {_:ids++};
     }
 
-    public #if !USE_POINTERS inline #end static function lock(pSet:PtrSet):Void {
+    #if !USE_POINTERS inline #end
+    public static function lock(pSet:PtrSet):Void {
         #if USE_POINTERS locks[pSet._] = true; #end
     }
 
-    public #if !USE_POINTERS inline #end static function unlock(pSet:PtrSet):Void {
+    #if !USE_POINTERS inline #end
+    public static function unlock(pSet:PtrSet):Void {
         #if USE_POINTERS locks[pSet._] = false; #end
     }
 }
