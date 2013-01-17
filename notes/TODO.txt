@@ -1,4 +1,3 @@
-
 TextView
 
 	Scale text field up

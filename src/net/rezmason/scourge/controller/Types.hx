@@ -8,7 +8,7 @@ typedef PlayerConfig = {
 }
 
 enum PlayerType {
-    Test(helper:(Void->Void)->Dynamic);
+    Test(helper:(Void->Void)->Dynamic, annotate:Bool);
     Human;
     Machine;
     Remote;

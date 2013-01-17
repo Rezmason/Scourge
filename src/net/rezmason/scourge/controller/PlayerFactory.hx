@@ -19,7 +19,7 @@ class PlayerFactory {
 
             var playerType:Class<Player> = null;
             switch (config.type) {
-                case Test(helper): playerType = TestPlayer;
+                case Test(helper, annotate): playerType = TestPlayer;
                 case Human: playerType = HumanPlayer;
                 case Machine: playerType = MachinePlayer;
                 case Remote: playerType = RemotePlayer;

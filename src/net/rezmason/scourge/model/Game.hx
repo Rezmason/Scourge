@@ -6,6 +6,7 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
 
 using Lambda;
+using Reflect;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Alphabetizer;
@@ -30,7 +31,7 @@ class Game {
 
     public function new():Void { historian = new StateHistorian(); }
 
-    public function begin(config:ScourgeConfig, randomFunction:Void->Float, savedState:SavedState = null):Int {
+    public function begin(config:ScourgeConfig, randomFunction:Void->Float, annotateFunc:String->Dynamic = null, savedState:SavedState = null):Int {
 
         if (hasBegun)
             throw "The game has already begun; it cannot begin again until you end it.";
@@ -39,7 +40,11 @@ class Game {
 
         var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, historian.history, historian.historyState);
         var basicRules:Hash<Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
-        var combinedRules:Hash<Rule> = RuleFactory.combineRules(ScourgeConfigFactory.makeCombinedRuleCfg(config), basicRules);
+        var combinedConfig:Dynamic<Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
+
+        if (annotateFunc != null) addAnnotations(annotateFunc, basicRules, combinedConfig);
+
+        var combinedRules:Hash<Rule> = RuleFactory.combineRules(combinedConfig, basicRules);
 
         // Find the demiurgic rules
 
@@ -178,6 +183,23 @@ class Game {
         historian.key.unlock();
     }
 
+    private function addAnnotations(annotateFunc:String->Void, basicRules:Hash<Rule>, cfg:Dynamic<Array<String>>):Void {
+        var cfgFields:Array<String> = cfg.fields();
+        for (field in cfgFields) {
+            var ruleFields:Array<String> = cfg.field(field);
+            var lacedRuleFields:Array<String> = [];
+
+            for (ruleField in ruleFields) {
+                lacedRuleFields.push(ruleField);
+                var lacedField:String = "annotate_" + ruleField;
+                lacedRuleFields.push(lacedField);
+                basicRules.set(lacedField, new AnnotateRule(function() annotateFunc(ruleField)));
+            }
+
+            cfg.setField(field, lacedRuleFields);
+        }
+    }
+
     private function getActionList():Array<String> { return actionIDs.copy(); }
 
     private function getRevision():Int { return historian.history.revision; }
@@ -191,4 +213,10 @@ class Game {
     private function getHasBegun():Bool { return actions != null; }
 
     private function getChecksum():Int { return historian.history.getChecksum(); }
+}
+
+class AnnotateRule extends Rule {
+    var func:Void->Void;
+    public function new(func:Void->Void):Void { super(); this.func = func; options.push({optionID:0}); }
+    override public function _chooseOption(choice:Int):Void { func(); }
 }

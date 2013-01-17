@@ -33,13 +33,18 @@ class RuleFactory {
 
     public static function combineRules(cfg:Dynamic<Array<String>>, basicRules:Hash<Rule>):Hash<Rule> {
         var combinedRules:Hash<Rule> = new Hash<Rule>();
+
         if (cfg != null) {
 
+            var ruleStack:Array<String> = [];
+
             function makeJointRule(field:String):JointRule {
+                ruleStack.push(field);
                 var rules:Array<Rule> = [];
                 var ruleFields:Array<String> = cfg.field(field);
                 for (ruleField in ruleFields) {
-                    if (ruleField == field) trace("Joint rules cannot contain themselves.");
+                    if (ruleField == field) trace("Joint rule " + field + " cannot contain itself.");
+                    else if (ruleStack.has(ruleField)) trace("Cyclical joint rule definition: " + field + " and " + ruleField);
                     else if (basicRules.exists(ruleField)) rules.push(basicRules.get(ruleField));
                     else if (combinedRules.exists(ruleField)) rules.push(combinedRules.get(ruleField));
                     else if (cfg.hasField(ruleField)) rules.push(makeJointRule(ruleField));
@@ -47,6 +52,7 @@ class RuleFactory {
                 }
                 var jointRule:JointRule = new JointRule(rules);
                 combinedRules.set(field, jointRule);
+                ruleStack.pop();
                 return jointRule;
             }
 
@@ -60,3 +66,8 @@ class RuleFactory {
         return combinedRules;
     }
 }
+
+/*
+    Give each field a status: unbuilt, building, built
+    Populate a Hash<RuleConfigStatus> and check it
+*/
