@@ -214,9 +214,3 @@ class Game {
 
     private function getChecksum():Int { return historian.history.getChecksum(); }
 }
-
-class AnnotateRule extends Rule {
-    var func:Void->Void;
-    public function new(func:Void->Void):Void { super(); this.func = func; options.push({optionID:0}); }
-    override public function _chooseOption(choice:Int):Void { func(); }
-}
