@@ -1,6 +1,10 @@
 package net.rezmason.scourge.model;
 
-import net.rezmason.ropes.*;
+import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RuleFactory;
+import net.rezmason.ropes.State;
+import net.rezmason.ropes.StatePlanner;
+import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.Types;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;

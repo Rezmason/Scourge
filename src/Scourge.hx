@@ -5,6 +5,10 @@ import nme.events.Event;
 
 class Scourge {
 
+    public function new() {
+
+    }
+
     public static function main():Void {
         var params:Dynamic = Lib.current.loaderInfo.parameters;
 

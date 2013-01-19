@@ -1,7 +1,10 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.scourge.controller.Types;
-import net.rezmason.scourge.controller.players.*;
+import net.rezmason.scourge.controller.players.HumanPlayer;
+import net.rezmason.scourge.controller.players.MachinePlayer;
+import net.rezmason.scourge.controller.players.RemotePlayer;
+import net.rezmason.scourge.controller.players.TestPlayer;
 
 using Lambda;
 

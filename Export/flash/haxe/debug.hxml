@@ -1,0 +1,12 @@
+-main ApplicationMain 
+-lib nme
+-cp src
+-cp /Users/jeremy/bin/haxelib_lib/nme/3,5,4/
+-D nme_install_tool
+-D web
+-swf-version 11
+-swf9 Export/flash/bin/Scourge.swf
+-swf-header 800:600:30:0
+-cp Export/flash/haxe
+--no-inline
+-debug
