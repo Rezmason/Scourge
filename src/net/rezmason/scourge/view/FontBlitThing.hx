@@ -14,7 +14,17 @@ import nme.text.TextFormat;
 
 using Lambda;
 
+typedef Character = {
+    char:String,
+    ?bd:BitmapData,
+    ?bmp:Bitmap,
+    ?sp:Sprite,
+    dt:Float,
+}
+
 class FontBlitThing {
+
+    var charSymbols:Array<Array<Character>>;
 
     public function new(scene:Sprite, message:String, colors:Hash<Int>):Void {
 
@@ -87,7 +97,7 @@ class FontBlitThing {
 
         var container = new Sprite();
 
-        var charSymbols = [];
+        charSymbols = [];
 
         for (y in 0...Std.int(scene.stage.stageHeight / bounds.height)) {
             charSymbols[y] = [];
@@ -118,12 +128,10 @@ class FontBlitThing {
                 sprite.x = x * bounds.width  + sprite.width / 2;
                 sprite.y = y * bounds.height + sprite.height / 2;
 
-                var rand:Float = Math.random() * 0.7 + 0.3;
-                sprite.scaleX = sprite.scaleY = rand + 1;
-                sprite.alpha = 1 - 0.5 * rand;
+                var rand:Float = Math.random();
                 container.addChild(sprite);
 
-                charSymbols[y][x] = bmp;
+                charSymbols[y][x] = {char:char, bd:bmp.bitmapData, bmp:bmp, sp:sprite, dt:Math.random()};
             }
         }
 
@@ -143,13 +151,27 @@ class FontBlitThing {
             if (char == "\n") continue;
 
             tint(ct, colors.get(char), 0);
-            var bmp = charSymbols[y][x];
-            bmp.transform.colorTransform = ct;
-            bmp.bitmapData = charBitmaps.get(char);
-            bmp.smoothing = true;
+            var sym = charSymbols[y][x];
+            sym.bmp.transform.colorTransform = ct;
+            sym.bmp.bitmapData = charBitmaps.get(char);
+            sym.bmp.smoothing = true;
 
             x++;
         }
+
+        updateAll(null);
+        scene.addEventListener("enterFrame", updateAll);
+    }
+
+    function updateAll(_) {
+        for (row in charSymbols) for (sym in row) update(sym);
+    }
+
+    function update(sym:Character) {
+        sym.dt = (sym.dt + 0.05) % 1;
+        var amp:Float = Math.sin(sym.dt * Math.PI * 2);
+        sym.sp.scaleX = sym.sp.scaleY = amp * 0.3 + 1;
+        sym.sp.alpha = 1 - 0.5 * amp;
     }
 
     private function tint(ct:ColorTransform, color:Null<Int>, brightness:Float = 0):Void {
