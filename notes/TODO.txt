@@ -12,6 +12,11 @@ TextView
 
 
 	Interprets commands
+	Translates non-text input into text input
+		Clicking a node blinks its ID into the text input
+	"Bracket" format
+		bite [param 1] [param 2] [param 3]
+		interpreter converts this into bite 102 when entered
 	Translates all other game events into human readable output
 
 	¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤  • • •

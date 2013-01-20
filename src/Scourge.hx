@@ -10,7 +10,11 @@ class Scourge {
     }
 
     public static function main():Void {
-        var params:Dynamic = Lib.current.loaderInfo.parameters;
+        var params:Dynamic = null;
+
+        #if flash
+            Lib.current.loaderInfo.parameters;
+        #end
 
         var splash:Array<String> = [
             " SSSSS    CCCCC    OOOOO   UU   UU  RRRRRR    GGGGG    EEEEE ",
@@ -43,7 +47,37 @@ class Scourge {
         Lib.current.stage.align = StageAlign.TOP_LEFT;
         Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
 
-        new net.rezmason.scourge.view.TextThing(Lib.current, splash.join("\n") + "\n\n" + symbols.join("\n"), hash);
-        new net.rezmason.scourge.view.BoardThing(Lib.current, splash.join("\n") + "\n\n" + symbols.join("\n"), hash);
+        var str = ["{}lgÖ", symbols.join("\n"), splash.join("\n")].join("\n");
+
+        //new net.rezmason.scourge.view.TextThing(Lib.current, str, hash);
+        //new net.rezmason.scourge.view.BoardThing(Lib.current, str, hash);
+
+        var boardString =
+        "X X X X X X X X X X X X X X X X X X X X X X X X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X           1                     2           X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X           0                     3           X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X X X X X X X X X X X X X X X X X X X X X X X X";
+
+        new net.rezmason.scourge.view.FontBlitThing(Lib.current, str, hash);
     }
 }

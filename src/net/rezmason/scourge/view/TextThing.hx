@@ -22,8 +22,8 @@ class TextThing {
 
         var textField = new TextField();
         textField.antiAliasType = AntiAliasType.ADVANCED;
-        #if !js textField.thickness = 100; #end
-        textField.sharpness = -400;
+        #if flash textField.thickness = 100; #end
+        //textField.sharpness = -400;
         textField.defaultTextFormat = format;
         textField.selectable = false;
         textField.embedFonts = true;

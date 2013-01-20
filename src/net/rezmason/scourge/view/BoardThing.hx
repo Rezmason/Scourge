@@ -33,17 +33,19 @@ class BoardThing {
         }
 
         var x = 2.5;
-        var y = 5;
+        var y = 3;
 
-        var wid = 9.31;
-        var hgt = 17;
+        var wid = 9.33;
+        var hgt = 18;
+
+        var yOffset = 17;
 
         for (character in characters) {
             if (character.char == " ") continue;
             var color:Null<Int> = character.color;
             if (color == null) color = 0xFFFFFF;
             scene.graphics.beginFill(color, 0.5);
-            scene.graphics.drawRect(x + character.x * wid, y + character.y * hgt, wid, hgt);
+            scene.graphics.drawRect(x + character.x * wid, y + character.y * yOffset, wid, hgt);
             scene.graphics.endFill();
         }
 
