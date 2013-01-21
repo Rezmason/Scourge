@@ -99,25 +99,34 @@ class FontBlitThing {
 
         charSymbols = [];
 
-        for (y in 0...Std.int(scene.stage.stageHeight / bounds.height)) {
+        var numRows:Int = 34;
+        var numColumns:Int = 85;
+        var margin:Int = 5;
+
+        var letterWidth = (scene.stage.stageWidth - margin * 2) / numColumns;
+        var letterHeight = (scene.stage.stageHeight - margin * 2) / numRows;
+
+        for (y in 0...numRows) {
             charSymbols[y] = [];
-            for (x in 0...Std.int(scene.stage.stageWidth / bounds.width)) {
-                //var rand:Int = Std.random(message.length);
-                //var char:String = message.charAt(rand);
-                var char:String = " ";
+            for (x in 0...numColumns) {
+                var char:String = message.charAt(Std.random(message.length));
+
+                char = " ";
 
                 var bd = charBitmaps.get(char);
                 tint(ct, colors.get(char), y / 20);
 
                 var bmp = new Bitmap(bd);
                 bmp.smoothing = true;
-                bmp.scaleX = bmp.scaleY = 1 / mag;
-                bmp.x = -bmp.width / 2;
-                bmp.y = -bmp.height / 2;
+                bmp.width = letterWidth;
+                bmp.height = letterHeight;
+                bmp.x = -bounds.width / 2;
+                bmp.y = -bounds.height / 2;
                 bmp.transform.colorTransform = ct;
                 bmp.blendMode = BlendMode.ADD;
 
                 var sprite = new Sprite();
+
                 /*
                 sprite.graphics.beginFill(0xFF0000);
                 sprite.graphics.drawCircle(0, 0, 1);
@@ -125,8 +134,8 @@ class FontBlitThing {
                 */
 
                 sprite.addChild(bmp);
-                sprite.x = x * bounds.width  + sprite.width / 2;
-                sprite.y = y * bounds.height + sprite.height / 2;
+                sprite.x = x * letterWidth  + sprite.width / 2;
+                sprite.y = y * letterHeight + sprite.height / 2;
 
                 var rand:Float = Math.random();
                 container.addChild(sprite);
@@ -134,6 +143,8 @@ class FontBlitThing {
                 charSymbols[y][x] = {char:char, bd:bmp.bitmapData, bmp:bmp, sp:sprite, dt:Math.random()};
             }
         }
+
+        nme.Lib.trace([charSymbols[0].length, charSymbols.length]);
 
         scene.addChild(container);
         container.x = (scene.stage.stageWidth  - container.width ) / 2;
@@ -154,7 +165,10 @@ class FontBlitThing {
             var sym = charSymbols[y][x];
             sym.bmp.transform.colorTransform = ct;
             sym.bmp.bitmapData = charBitmaps.get(char);
+            sym.char = char;
             sym.bmp.smoothing = true;
+
+            //sym.dt = 0;
 
             x++;
         }
@@ -168,10 +182,11 @@ class FontBlitThing {
     }
 
     function update(sym:Character) {
-        sym.dt = (sym.dt + 0.05) % 1;
+        if (sym.char == " ") return;
+        sym.dt = (sym.dt + 0.02) % 1;
         var amp:Float = Math.sin(sym.dt * Math.PI * 2);
-        sym.sp.scaleX = sym.sp.scaleY = amp * 0.3 + 1;
-        sym.sp.alpha = 1 - 0.5 * amp;
+        sym.sp.scaleX = sym.sp.scaleY = amp * 0.3 + 1.2;
+        sym.sp.alpha = 1.3 + 0.4 * amp;
     }
 
     private function tint(ct:ColorTransform, color:Null<Int>, brightness:Float = 0):Void {
