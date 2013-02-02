@@ -45,7 +45,7 @@ class Scourge {
         Lib.trace(splash.join("\n"));
 
         Lib.current.stage.align = StageAlign.TOP_LEFT;
-        Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
+        Lib.current.stage.scaleMode = StageScaleMode.EXACT_FIT;
 
         var str = ["{}lgÖ", symbols.join("\n"), splash.join("\n")].join("\n");
 
