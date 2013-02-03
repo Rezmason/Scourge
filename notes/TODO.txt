@@ -1,9 +1,3 @@
-Signaler
-	msignal
-
-Roll your own entity system
-	Look into Ash
-
 Systems
 	Tween
 	Pulse

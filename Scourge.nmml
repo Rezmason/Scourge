@@ -5,7 +5,6 @@
 
 	<app title="Scourge" file="Scourge" main="Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" />
 
-
 	<set name="fullscreen" if="target_webos" />
 	<set name="fullscreen" if="target_ios" />
 	<set name="fullscreen" if="target_android" />
@@ -16,6 +15,9 @@
 	<set name="BUILD_DIR" value="Export" />
 
 	<classpath name="src" />
+
+	<haxedef name="haxeJSON" />
+	<compilerflag name="-debug" />
 
 	<haxelib name="nme" />
 	<!-- <haxelib name="actuate" /> -->

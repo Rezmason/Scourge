@@ -1,7 +1,10 @@
+import nme.Assets;
 import nme.Lib;
 import nme.display.StageAlign;
 import nme.display.StageScaleMode;
 import nme.events.Event;
+
+import net.rezmason.utils.FlatFont;
 
 class Scourge {
 
@@ -31,16 +34,16 @@ class Scourge {
             "' ' ' ' ' ' ' ' ' ' ' ' ' ' ' '",
         ];
 
-        var hash:Hash<Int> = new Hash<Int>();
+        var colors:Hash<Int> = new Hash<Int>();
 
-        hash.set("S", 0xFF0090);
-        hash.set("C", 0xFFC800);
-        hash.set("O", 0x30FF00);
-        hash.set("U", 0x00C0FF);
-        hash.set("R", 0xFF6000);
-        hash.set("G", 0xC000FF);
-        hash.set("E", 0x0030FF);
-        //hash.set(" ", 0x606060);
+        colors.set("S", 0xFF0090);
+        colors.set("C", 0xFFC800);
+        colors.set("O", 0x30FF00);
+        colors.set("U", 0x00C0FF);
+        colors.set("R", 0xFF6000);
+        colors.set("G", 0xC000FF);
+        colors.set("E", 0x0030FF);
+        //colors.set(" ", 0x606060);
 
         Lib.trace(splash.join("\n"));
 
@@ -48,9 +51,6 @@ class Scourge {
         Lib.current.stage.scaleMode = StageScaleMode.EXACT_FIT;
 
         var str = ["{}lgÖ", symbols.join("\n"), splash.join("\n")].join("\n");
-
-        //new net.rezmason.scourge.view.TextThing(Lib.current, str, hash);
-        //new net.rezmason.scourge.view.BoardThing(Lib.current, str, hash);
 
         var boardString =
         "X X X X X X X X X X X X X X X X X X X X X X X X\n" +
@@ -78,6 +78,15 @@ class Scourge {
         "X                                             X\n" +
         "X X X X X X X X X X X X X X X X X X X X X X X X";
 
-        new net.rezmason.scourge.view.FontBlitThing(Lib.current, str, hash);
+        var requiredString:String = [
+            str,
+            "abcdefghijklmnopqrstuvwxyz",
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            "0123456789"
+        ].join("");
+
+        var flatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), requiredString, 64, 64);
+        new net.rezmason.scourge.textview.TextBlitter(Lib.current, str, colors, flatFont);
+        //new net.rezmason.scourge.textview.TextView(Lib.current, str, colors, flatFont).start();
     }
 }
