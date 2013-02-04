@@ -30,8 +30,7 @@ class Scourge {
         ];
 
         var symbols:Array<String> = [
-            "¬  > Ω Î @ Δ ◊ ¤ _ { } [ ] • ø",
-            "' ' ' ' ' ' ' ' ' ' ' ' ' ' ' '",
+            "¬  > < Ω Î @ Δ ◊ ¤ _ { } [ ] • ø ( ) '",
         ];
 
         var colors:Hash<Int> = new Hash<Int>();
@@ -85,7 +84,7 @@ class Scourge {
             "0123456789"
         ].join("");
 
-        var flatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), requiredString, 64, 64);
+        var flatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), requiredString, 64, 64, 10);
         new net.rezmason.scourge.textview.TextBlitter(Lib.current, str, colors, flatFont);
         //new net.rezmason.scourge.textview.TextView(Lib.current, str, colors, flatFont).start();
     }

@@ -1,0 +1,75 @@
+How can the properties of the characters change?
+        brightness
+        color
+        inverse level
+        3D position
+        size
+        character
+        hoverable
+        clickable
+        vanishing point
+
+    Animation component
+        Stores tweens of other components
+
+    What are the characters used for?
+        3D views - board, polyominoes
+            Node
+                Head
+                Body
+                Cavity
+                Bite regions
+
+            Hover state
+                "bracketed" and brighter
+
+            Click state
+                "telegraphing" ID animation
+                    Char change
+                    Scale change
+                    Characters in ID of string are "dialed" onscreen in the char
+                    Brackets stay in place until done
+
+        Text view
+            All text is stored in rows and columns
+
+            Plain text
+                Plain or colored, nothing special
+            "Active text"
+                Brighter, z up
+            Input
+                Brackets
+                    Active bracket is z-up
+                Prompt blinks
+                Auto-fill text is gray
+            Button element
+                Same color, inversion, z and perspective projection
+                vanishing point is in middle of button
+            "Button states"
+                Up
+                    normal
+                Over
+                    white, z up
+                Down
+                    normal color, z down
+            If active text, input, or button elements doesn't fit on screen,
+                Flatten plain text
+                Swap non-plain text
+                Tween text up
+
+        2D polyomino view
+            Buttons for manipulating rotation & reflection
+            Buttons for choosable piece shortcuts
+            Plain text for available piece shortcuts
+            Gray text for unavailable piece shortcuts
+
+        Buttons can "telegraph" too, changing z instead of scale
+
+
+    Interprets commands
+    Translates non-text input into text input
+        Clicking a node blinks its ID into the text input
+    "Bracket" format
+        bite [param 1] [param 2] [param 3]
+        interpreter converts this into bite 102 when entered
+    Translates all other game events into human readable output

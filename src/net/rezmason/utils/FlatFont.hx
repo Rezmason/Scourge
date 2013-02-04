@@ -2,7 +2,9 @@ package net.rezmason.utils;
 
 import nme.display.BitmapData;
 import nme.display.BlendMode;
+import nme.display.Sprite;
 import nme.geom.Matrix;
+import nme.geom.Rectangle;
 import nme.text.AntiAliasType;
 import nme.text.Font;
 import nme.text.TextField;
@@ -56,10 +58,13 @@ class FlatFont {
 
     public inline function exportJSON():String { return jsonString; }
 
-    public static function flatten(font:Font, charString:String, charWidth:Int, charHeight:Int):FlatFont {
+    public static function flatten(font:Font, charString:String, charWidth:Int, charHeight:Int, spacing:Int):FlatFont {
 
         if (charWidth  < 0) charWidth  = 1;
         if (charHeight < 0) charHeight = 1;
+
+        var charXOffset:Int = charWidth  + spacing;
+        var charYOffset:Int = charHeight + spacing;
 
         var charCoordJSON:Dynamic = {};
         var requiredChars:Hash<Bool> = new Hash<Bool>();
@@ -72,13 +77,19 @@ class FlatFont {
             }
         }
 
-        var numColumns:Int = Std.int(Math.sqrt(numChars));
+        var numColumns:Int = Std.int(Math.sqrt(numChars)) + 1;
         var numRows:Int = Std.int(numChars / numColumns) + 1;
-        var bitmapData:BitmapData = new BitmapData(charWidth * numColumns, charHeight * numRows, true, 0x01FFFFFF);
+        var bitmapData:BitmapData = new BitmapData(
+            charXOffset * numColumns - spacing,
+            charYOffset * numRows    - spacing,
+            true, 0x01FFFFFF
+        );
         //bitmapData.fillRect(bitmapData.rect, 0xFFFFFFFF);
 
+        var sp:Sprite = new Sprite();
         var format = new TextFormat(font.fontName, 14, 0xFFFFFF);
         var textField = new TextField();
+        sp.addChild(textField);
         textField.antiAliasType = AntiAliasType.ADVANCED;
         #if flash textField.thickness = 100; #end
         //textField.sharpness = -400;
@@ -91,35 +102,40 @@ class FlatFont {
         textField.y = 0;
         textField.autoSize = TextFieldAutoSize.LEFT;
 
-        textField.text = "{";
-        var bounds = textField.getBounds(textField);
-        textField.text = "m";
-        bounds = bounds.union(textField.getBounds(textField));
-
-        bounds.top = Math.floor(bounds.top);
-        bounds.bottom = Math.ceil(bounds.bottom);
-        bounds.left = Math.floor(bounds.left);
-        bounds.right = Math.ceil(bounds.right);
-
-        bounds.right -= 1;
+        textField.text = " ";
+        var charBounds = textField.getCharBoundaries(0);
 
         var x:Int = 1;
         var y:Int = 0;
         var mat = new Matrix();
-        mat.scale(charWidth / bounds.width, charHeight / bounds.height);
+        mat.translate(-charBounds.x, -charBounds.y);
+        mat.scale(charWidth / charBounds.width, charHeight / charBounds.height);
+
+        var clipRect:Rectangle = new Rectangle(0, 0, charWidth, charHeight);
 
         for (char in requiredChars.keys().a2z()) {
 
+            var dx:Int = x * charXOffset;
+            var dy:Int = y * charYOffset;
+
+            clipRect.x = dx;
+            clipRect.y = dy;
+
+            //if ((x + y) % 2 == 1) bitmapData.fillRect(clipRect, 0xFFFF0000);
+
             textField.text = char;
-            mat.tx = bounds.left + x * charWidth;
-            mat.ty = bounds.top  + y * charHeight;
+            mat.tx += dx;
+            mat.ty += dy;
 
-            bitmapData.draw(textField, mat, null, BlendMode.ADD);
+            bitmapData.draw(sp, mat, null, BlendMode.NORMAL, clipRect, true);
 
-            Reflect.setField(charCoordJSON, char, {x: x * charWidth, y: y * charHeight});
+            Reflect.setField(charCoordJSON, char, {x: dx, y: dy});
+
+            mat.tx -= dx;
+            mat.ty -= dy;
 
             x++;
-            if (x * charWidth >= bitmapData.width) {
+            if (x >= numColumns) {
                 x = 0;
                 y++;
             }

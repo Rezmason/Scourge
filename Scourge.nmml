@@ -18,6 +18,7 @@
 
 	<haxedef name="haxeJSON" />
 	<compilerflag name="-debug" />
+	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 
 	<haxelib name="nme" />
 	<!-- <haxelib name="actuate" /> -->
