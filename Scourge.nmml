@@ -23,7 +23,8 @@
 	<haxelib name="nme" />
 	<!-- <haxelib name="actuate" /> -->
 
-	<assets path="assets" rename="assets" include="ProFontX.ttf" />
+	<!-- <assets path="assets" rename="assets" include="ProFontX.ttf" /> -->
+	<assets path="assets/flatfonts" rename="assets" />
 
 	<ndll name="std" />
 	<ndll name="regexp" />

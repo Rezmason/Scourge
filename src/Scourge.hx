@@ -4,6 +4,8 @@ import nme.display.StageAlign;
 import nme.display.StageScaleMode;
 import nme.events.Event;
 
+import com.moodycamel.PNGEncoder2;
+
 import net.rezmason.utils.FlatFont;
 
 class Scourge {
@@ -84,8 +86,28 @@ class Scourge {
             "0123456789"
         ].join("");
 
-        var flatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), requiredString, 64, 64, 10);
+        var flatFont = new FlatFont(Assets.getBitmapData("assets/profont_flat.png"), Assets.getText("assets/profont_flat.json"));
         new net.rezmason.scourge.textview.TextBlitter(Lib.current, str, colors, flatFont);
+
+        /*
+        var flatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), requiredString, 64, 64, 2);
+
+        var fileRef = null;
+        Lib.current.stage.addEventListener("click", function(_) {
+            var json = flatFont.exportJSON();
+            var pngBytes = PNGEncoder2.encode(flatFont.getBitmapDataClone());
+            fileRef = new flash.net.FileReference();
+
+            function savePNG(_) {
+                fileRef.removeEventListener("complete", savePNG);
+                fileRef.save(pngBytes, "profont_flat.png");
+            }
+
+            fileRef.addEventListener("complete", savePNG);
+            fileRef.save(json, "profont_flat.json");
+        });
+        */
+
         //new net.rezmason.scourge.textview.TextView(Lib.current, str, colors, flatFont).start();
     }
 }
