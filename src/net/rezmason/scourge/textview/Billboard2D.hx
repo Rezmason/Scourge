@@ -4,11 +4,15 @@ import nme.display.BitmapData;
 import nme.display.Shape;
 import nme.geom.Matrix;
 import nme.geom.Rectangle;
+import nme.geom.Transform;
 
 class Billboard2D extends Shape {
 
     public function new(bitmapData:BitmapData, mat:Matrix, rect:Rectangle):Void {
         super();
+        if (transform == null) {
+            transform = new Transform(this);
+        }
         update(bitmapData, mat, rect);
     }
 

@@ -11,6 +11,8 @@ import nme.text.TextField;
 import nme.text.TextFieldAutoSize;
 import nme.text.TextFormat;
 
+import haxe.Utf8;
+
 using Lambda;
 using haxe.JSON;
 using net.rezmason.utils.Alphabetizer;
@@ -28,25 +30,30 @@ class FlatFont {
     var bitmapData:BitmapData;
     public var charWidth(default, null):Int;
     public var charHeight(default, null):Int;
-    var charCoords:Hash<CharCoord>;
+    var charCoords:IntHash<CharCoord>;
     var jsonString:String;
 
     public function new(bitmapData:BitmapData, jsonString:String):Void {
         this.bitmapData = bitmapData;
         this.jsonString = jsonString;
-        charCoords = new Hash<CharCoord>();
+        charCoords = new IntHash<CharCoord>();
 
         var expandedJSON:FlatFontJSON = jsonString.parse();
         charWidth = expandedJSON.charWidth;
         charHeight = expandedJSON.charHeight;
         for (field in Reflect.fields(expandedJSON.charCoords)) {
-            charCoords.set(field, Reflect.field(expandedJSON.charCoords, field));
+            var code:Int = Std.parseInt(field.substr(1));
+            charCoords.set(code, Reflect.field(expandedJSON.charCoords, field));
         }
     }
 
     public inline function getCharMatrix(char:String):Matrix {
+        return getCharCodeMatrix(Utf8.charCodeAt(char, 0));
+    }
+
+    public inline function getCharCodeMatrix(code:Int):Matrix {
+        var charCoord:CharCoord = charCoords.get(code);
         var mat:Matrix = new Matrix();
-        var charCoord:CharCoord = charCoords.get(char);
         if (charCoord != null) {
             mat.tx = -charCoord.x;
             mat.ty = -charCoord.y;
@@ -58,6 +65,7 @@ class FlatFont {
 
     public inline function exportJSON():String { return jsonString; }
 
+    #if flash
     public static function flatten(font:Font, charString:String, charWidth:Int, charHeight:Int, spacing:Int):FlatFont {
 
         if (charWidth  < 0) charWidth  = 1;
@@ -129,7 +137,7 @@ class FlatFont {
 
             bitmapData.draw(sp, mat, null, BlendMode.NORMAL, clipRect, true);
 
-            Reflect.setField(charCoordJSON, char, {x: dx, y: dy});
+            Reflect.setField(charCoordJSON, "_" + char.charCodeAt(0), {x: dx, y: dy});
 
             mat.tx -= dx;
             mat.ty -= dy;
@@ -145,4 +153,5 @@ class FlatFont {
 
         return new FlatFont(bitmapData, json.stringify());
     }
+    #end
 }

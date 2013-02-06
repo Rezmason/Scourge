@@ -1,12 +1,17 @@
+package;
+
+import haxe.Utf8;
+
 import nme.Assets;
 import nme.Lib;
 import nme.display.StageAlign;
 import nme.display.StageScaleMode;
 import nme.events.Event;
 
-import com.moodycamel.PNGEncoder2;
-
 import net.rezmason.utils.FlatFont;
+import net.rezmason.utils.FatChar;
+
+import net.rezmason.scourge.textview.TestStrings;
 
 class Scourge {
 
@@ -15,87 +20,39 @@ class Scourge {
     }
 
     public static function main():Void {
-        var params:Dynamic = null;
 
-        #if flash
-            Lib.current.loaderInfo.parameters;
-        #end
+        Lib.trace("\n" + TestStrings.SPLASH);
 
-        var splash:Array<String> = [
-            " SSSSS    CCCCC    OOOOO   UU   UU  RRRRRR    GGGGG    EEEEE ",
-            "SS       CC   CC  OO   OO  UU   UU  RR   RR  GG       EE   EE",
-            "SSSSSSS  CC       OO   OO  UU   UU  RRRRRR   GG  GGG  EEEEEEE",
-            "     SS  CC   CC  OO   OO  UU   UU  RR   RR  GG   GG  EE     ",
-            " SSSSS    CCCCC    OOOOO    UUUUU   RR   RR   GGGGG    EEEEE ",
-            "",
-            "Single-Celled  Organisms  Undergo  Rapid  Growth  Enhancement",
-        ];
-
-        var symbols:Array<String> = [
-            "¬  > < Ω Î @ Δ ◊ ¤ _ { } [ ] • ø ( ) '",
-        ];
-
-        var colors:Hash<Int> = new Hash<Int>();
-
-        colors.set("S", 0xFF0090);
-        colors.set("C", 0xFFC800);
-        colors.set("O", 0x30FF00);
-        colors.set("U", 0x00C0FF);
-        colors.set("R", 0xFF6000);
-        colors.set("G", 0xC000FF);
-        colors.set("E", 0x0030FF);
-        //colors.set(" ", 0x606060);
-
-        Lib.trace(splash.join("\n"));
+        var colors:IntHash<Int> = new IntHash<Int>();
+        colors.set(FatChar.fromString("S")[0].code, 0xFF0090);
+        colors.set(FatChar.fromString("C")[0].code, 0xFFC800);
+        colors.set(FatChar.fromString("O")[0].code, 0x30FF00);
+        colors.set(FatChar.fromString("U")[0].code, 0x00C0FF);
+        colors.set(FatChar.fromString("R")[0].code, 0xFF6000);
+        colors.set(FatChar.fromString("G")[0].code, 0xC000FF);
+        colors.set(FatChar.fromString("E")[0].code, 0x0030FF);
 
         Lib.current.stage.align = StageAlign.TOP_LEFT;
         Lib.current.stage.scaleMode = StageScaleMode.EXACT_FIT;
 
-        var str = ["{}lgÖ", symbols.join("\n"), splash.join("\n")].join("\n");
-
-        var boardString =
-        "X X X X X X X X X X X X X X X X X X X X X X X X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X           1                     2           X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X           0                     3           X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X                                             X\n" +
-        "X X X X X X X X X X X X X X X X X X X X X X X X";
-
-        var requiredString:String = [
-            str,
-            "abcdefghijklmnopqrstuvwxyz",
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-            "0123456789"
-        ].join("");
+        var str = [TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n");
 
         var flatFont = new FlatFont(Assets.getBitmapData("assets/profont_flat.png"), Assets.getText("assets/profont_flat.json"));
-        new net.rezmason.scourge.textview.TextBlitter(Lib.current, str, colors, flatFont);
 
         /*
+
+        var requiredString:String = [
+            TestStrings.ALPHANUMERICS,
+            TestStrings.SYMBOLS,
+            TestStrings.WEIRD_SYMBOLS,
+        ].join("");
+
         var flatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), requiredString, 64, 64, 2);
 
         var fileRef = null;
         Lib.current.stage.addEventListener("click", function(_) {
             var json = flatFont.exportJSON();
-            var pngBytes = PNGEncoder2.encode(flatFont.getBitmapDataClone());
+            var pngBytes = com.moodycamel.PNGEncoder2.encode(flatFont.getBitmapDataClone());
             fileRef = new flash.net.FileReference();
 
             function savePNG(_) {
@@ -106,8 +63,9 @@ class Scourge {
             fileRef.addEventListener("complete", savePNG);
             fileRef.save(json, "profont_flat.json");
         });
-        */
+        /**/
 
         //new net.rezmason.scourge.textview.TextView(Lib.current, str, colors, flatFont).start();
+        new net.rezmason.scourge.textview.TextBlitter(Lib.current, str, colors, flatFont);
     }
 }
