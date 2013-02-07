@@ -1,5 +1,7 @@
 package net.rezmason.scourge.textview;
 
+import net.rezmason.utils.FatChar;
+
 class TestStrings {
 
     public inline static var SPLASH:String = [
@@ -47,4 +49,16 @@ class TestStrings {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
         "0123456789"
     ].join("");
+
+    public inline static var CHAR_COLORS:IntHash<Int> = {
+        var colors:IntHash<Int> = new IntHash<Int>();
+        colors.set(FatChar.fromString("S")[0].code, 0xFF0090);
+        colors.set(FatChar.fromString("C")[0].code, 0xFFC800);
+        colors.set(FatChar.fromString("O")[0].code, 0x30FF00);
+        colors.set(FatChar.fromString("U")[0].code, 0x00C0FF);
+        colors.set(FatChar.fromString("R")[0].code, 0xFF6000);
+        colors.set(FatChar.fromString("G")[0].code, 0xC000FF);
+        colors.set(FatChar.fromString("E")[0].code, 0x0030FF);
+        colors;
+    }
 }
