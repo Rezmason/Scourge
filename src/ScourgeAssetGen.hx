@@ -22,7 +22,7 @@ class ScourgeAssetGen {
             TestStrings.WEIRD_SYMBOLS,
         ].join("");
 
-        var flatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), requiredString, 64, 64, 2);
+        var flatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), 140, requiredString, 64, 64, 2);
         var fontBD:BitmapData = flatFont.getBitmapDataClone();
 
         var fileRef = null;

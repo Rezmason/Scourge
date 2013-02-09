@@ -18,7 +18,6 @@ class Billboard2D extends Shape {
 
     public function update(bitmapData:BitmapData, mat:Matrix, rect:Rectangle):Void {
         graphics.clear();
-        //graphics.lineStyle(0, 0xFFFFFF);
         graphics.beginBitmapFill(bitmapData, mat, false, true);
         graphics.drawRect(rect.x, rect.y, rect.width, rect.height);
         graphics.endFill();

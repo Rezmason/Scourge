@@ -66,8 +66,9 @@ class FlatFont {
     public inline function exportJSON():String { return jsonString; }
 
     #if flash
-    public static function flatten(font:Font, charString:String, charWidth:Int, charHeight:Int, spacing:Int):FlatFont {
+    public static function flatten(font:Font, fontSize:Int, charString:String, charWidth:Int, charHeight:Int, spacing:Int):FlatFont {
 
+        if (fontSize < 1) fontSize = 72;
         if (charWidth  < 0) charWidth  = 1;
         if (charHeight < 0) charHeight = 1;
 
@@ -90,12 +91,12 @@ class FlatFont {
         var bitmapData:BitmapData = new BitmapData(
             charXOffset * numColumns - spacing,
             charYOffset * numRows    - spacing,
-            true, 0x01FFFFFF
+            false, 0
         );
         //bitmapData.fillRect(bitmapData.rect, 0xFFFFFFFF);
 
         var sp:Sprite = new Sprite();
-        var format = new TextFormat(font.fontName, 14, 0xFFFFFF);
+        var format = new TextFormat(font.fontName, fontSize, 0xFFFFFF);
         var textField = new TextField();
         sp.addChild(textField);
         textField.antiAliasType = AntiAliasType.ADVANCED;

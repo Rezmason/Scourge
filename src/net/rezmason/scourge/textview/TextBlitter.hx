@@ -1,15 +1,24 @@
 package net.rezmason.scourge.textview;
 
 import nme.display.BitmapData;
-import nme.display.Bitmap;
-import nme.display.BlendMode;
 import nme.display.Sprite;
 import nme.geom.Rectangle;
 
-import haxe.Utf8;
-
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.FatChar;
+
+typedef Display = {charSprite:CharSprite};
+typedef Text = {code:Null<Int>, tx:Int, ty:Int};
+typedef Position = {x:Float, y:Float, z:Float};
+typedef Swell = {val:Float};
+typedef Projection = {cx:Float, cy:Float, fl:Float};
+
+typedef Thing = {
+    display:Display,
+    text:Text,
+    position:Position,
+    swell:Swell,
+}
 
 class TextBlitter {
 
@@ -17,8 +26,9 @@ class TextBlitter {
     var colors:IntHash<Int>;
     var fontBD:BitmapData;
     var flatFont:FlatFont;
-    var charDisplays:Array<Dynamic>;
+    var things:Array<Thing>;
     var scene:Sprite;
+    var projection:Projection;
 
     public function new(scene:Sprite, message:String, colors:IntHash<Int>, flatFont:FlatFont):Void {
 
@@ -29,9 +39,10 @@ class TextBlitter {
 
         //*
         buildText();
-        buildCharDisplays();
+        buildThings();
+        projection = {cx:Constants.VANISHING_POINT_X, cy:Constants.VANISHING_POINT_Y, fl:Constants.FOCAL_LENGTH};
         populateText(message);
-        populateCharDisplays();
+        populateThings();
         /**/
 
         /*
@@ -51,46 +62,31 @@ class TextBlitter {
         }
     }
 
-    function buildCharDisplays():Void {
+    function buildThings():Void {
 
-        var container = new Sprite();
         var charRect:Rectangle = new Rectangle();
         charRect.width  = flatFont.charWidth;
         charRect.height = flatFont.charHeight;
 
-        charDisplays = [];
-        for (y in 0...Constants.NUM_ROWS) {
-            for (x in 0...Constants.NUM_COLUMNS) {
-                var billboard:Billboard2D = new Billboard2D(fontBD, flatFont.getCharMatrix(" "), charRect);
-                billboard.width = Constants.LETTER_WIDTH;
-                billboard.height = Constants.LETTER_HEIGHT;
-                billboard.blendMode = BlendMode.ADD;
-                billboard.x = -billboard.width  * 0.5;
-                billboard.y = -billboard.height * 0.5;
+        things = [];
+        for (ty in 0...Constants.NUM_ROWS) {
+            for (tx in 0...Constants.NUM_COLUMNS) {
 
-                var sp = new Sprite();
+                var charSprite:CharSprite = new CharSprite(scene, fontBD, flatFont.getCharMatrix(" "), charRect);
 
-                /*
-                sp.graphics.beginFill(0xFF0000);
-                sp.graphics.drawCircle(0, 0, 1);
-                sp.graphics.endFill();
-                /**/
-
-                sp.addChild(billboard);
-                sp.x = (x + 0.5) * Constants.LETTER_WIDTH  + Constants.MARGIN;
-                sp.y = (y + 0.5) * Constants.LETTER_HEIGHT + Constants.MARGIN;
-
-                var rand:Float = Math.random();
-                container.addChild(sp);
-
-                charDisplays.push({
-                    text:{code:null, x:x, y:y},
-                    display:{bd:fontBD, billboard:billboard, sp:sp, rect:charRect},
+                things.push({
+                    text:{code:null, tx:tx, ty:ty},
+                    display:{charSprite:charSprite},
+                    position:{
+                        x:(tx + 0.5) * Constants.LETTER_WIDTH  + Constants.MARGIN,
+                        y:(ty + 0.5) * Constants.LETTER_HEIGHT + Constants.MARGIN,
+                        z:(Math.sin(tx * 0.2) * 0.5 + 0.5) * (Math.sin(ty * 0.3) * 0.5 + 0.5) * Constants.MAX_DEPTH,
+                        //z:Constants.MAX_DEPTH,
+                    },
+                    swell:{val: 0.6 + tx / Constants.NUM_COLUMNS},
                 });
             }
         }
-
-        scene.addChild(container);
     }
 
     function populateText(message:String):Void {
@@ -112,26 +108,23 @@ class TextBlitter {
         }
     }
 
-    function populateCharDisplays():Void {
-        for (charDisplay in charDisplays) {
-            var textComponent = charDisplay.text;
-            var display = charDisplay.display;
+    function populateThings():Void {
 
-            var code:Int = fatChars[textComponent.y][textComponent.x].code;
+        for (thing in things) {
+            var charSprite = thing.display.charSprite;
+            var pos = thing.position;
+            var text = thing.text;
+            var swell = thing.swell;
 
-            if (textComponent.code != code) {
-                textComponent.code = code;
+            var code:Int = fatChars[text.ty][text.tx].code;
+            text.code = code;
 
-                var ct = ColorUtils.tint(colors.get(code), 0.0);
-                #if neko
-                    display.billboard.nmeSetColorTransform(ct);
-                #else
-                    display.billboard.transform.colorTransform = ct;
-                #end
+            var color:Int = 0xFFFFFF;
+            if (colors.exists(code)) color = colors.get(code);
 
-                display.billboard.update(display.bd, flatFont.getCharCodeMatrix(code), display.rect);
-                textComponent.code = code;
-            }
+            charSprite.updatePosition(pos.x, pos.y, pos.z, projection.cx, projection.cy, projection.fl);
+            charSprite.updateText(flatFont.getCharCodeMatrix(code), color, 0.0);
+            charSprite.updateSwell(swell.val);
         }
     }
 }
