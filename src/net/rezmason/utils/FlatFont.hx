@@ -18,6 +18,7 @@ using haxe.JSON;
 using net.rezmason.utils.Alphabetizer;
 
 typedef CharCoord = {x:Int, y:Int};
+typedef UV = {u:Float, v:Float};
 
 typedef FlatFontJSON = {
     var charWidth:Int;
@@ -28,23 +29,37 @@ typedef FlatFontJSON = {
 class FlatFont {
 
     var bitmapData:BitmapData;
+    var charCoords:IntHash<CharCoord>;
+    var defaultCharCoord:CharCoord;
+    var jsonString:String;
+
     public var charWidth(default, null):Int;
     public var charHeight(default, null):Int;
-    var charCoords:IntHash<CharCoord>;
-    var jsonString:String;
+    public var bdWidth(default, null):Int;
+    public var bdHeight(default, null):Int;
+    public var rowFraction(default, null):Float;
+    public var columnFraction(default, null):Float;
 
     public function new(bitmapData:BitmapData, jsonString:String):Void {
         this.bitmapData = bitmapData;
+        bdWidth = bitmapData.width;
+        bdHeight = bitmapData.height;
+
         this.jsonString = jsonString;
         charCoords = new IntHash<CharCoord>();
 
         var expandedJSON:FlatFontJSON = jsonString.parse();
         charWidth = expandedJSON.charWidth;
         charHeight = expandedJSON.charHeight;
+        rowFraction = charHeight / bitmapData.height;
+        columnFraction = charWidth / bitmapData.width;
+
         for (field in Reflect.fields(expandedJSON.charCoords)) {
             var code:Int = Std.parseInt(field.substr(1));
             charCoords.set(code, Reflect.field(expandedJSON.charCoords, field));
         }
+
+        defaultCharCoord = {x:0, y:0};
     }
 
     public inline function getCharMatrix(char:String):Matrix {
@@ -59,6 +74,26 @@ class FlatFont {
             mat.ty = -charCoord.y;
         }
         return mat;
+    }
+
+    public inline function getCharUVs(char:String):Array<UV> {
+        return getCharCodeUVs(Utf8.charCodeAt(char, 0));
+    }
+
+    public inline function getCharCodeUVs(code:Int):Array<UV> {
+        var charCoord:CharCoord = charCoords.get(code);
+        if (charCoord == null) charCoord = defaultCharCoord;
+
+        var uvs:Array<UV> = [];
+        var u:Float = charCoord.x / bdWidth;
+        var v:Float = charCoord.y / bdHeight;
+
+        uvs.push({u:u                 , v:v              });
+        uvs.push({u:u + columnFraction, v:v              });
+        uvs.push({u:u + columnFraction, v:v + rowFraction});
+        uvs.push({u:u                 , v:v + rowFraction});
+
+        return uvs;
     }
 
     public inline function getBitmapDataClone():BitmapData { return bitmapData.clone(); }
