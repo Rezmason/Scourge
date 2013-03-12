@@ -123,11 +123,9 @@ class FlatFont {
 
         var numColumns:Int = Std.int(Math.sqrt(numChars)) + 1;
         var numRows:Int = Std.int(numChars / numColumns) + 1;
-        var bitmapData:BitmapData = new BitmapData(
-            charXOffset * numColumns - spacing,
-            charYOffset * numRows    - spacing,
-            false, 0
-        );
+
+        var width:Int = Std.int(Math.max(charXOffset * numColumns - spacing, charYOffset * numRows - spacing));
+        var bitmapData:BitmapData = new BitmapData(width, width, false, 0);
         //bitmapData.fillRect(bitmapData.rect, 0xFFFFFFFF);
 
         var sp:Sprite = new Sprite();

@@ -4,6 +4,7 @@ import nme.display.BlendMode;
 import nme.display.DisplayObject;
 import nme.display.Sprite;
 import nme.display.Stage;
+import nme.events.Event;
 import net.rezmason.utils.FlatFont;
 import nme.display.BitmapData;
 import nme.geom.ColorTransform;
@@ -24,6 +25,9 @@ class CharSpriteManager {
 
     public function new(stage:Stage, font:FlatFont, maxDarkness:Float):Void {
         this.stage = stage;
+
+        stage.addEventListener(Event.RESIZE, onResize);
+
         this.font = font;
         this.maxDarkness = maxDarkness;
 
@@ -44,6 +48,7 @@ class CharSpriteManager {
 
         var sprite:Sprite = new Sprite();
         scene.addChild(sprite);
+        onResize(null);
         sprite.blendMode = blendMode;
 
         var billboard:Billboard2D = new Billboard2D(fontBD, defaultMat, charRect);
@@ -86,6 +91,11 @@ class CharSpriteManager {
     public function updateSwell(charSprite:CharSprite, amount:Float):Void {
         charSprite.sprite.scaleX = amount;
         charSprite.sprite.scaleY = amount;
+    }
+
+    function onResize(event:Event):Void {
+        scene.scaleX = stage.stageWidth  / Constants.STAGE_WIDTH;
+        scene.scaleY = stage.stageHeight / Constants.STAGE_HEIGHT;
     }
 
     function setColorTransform(target:DisplayObject, ct:ColorTransform):Void {

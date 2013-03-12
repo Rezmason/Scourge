@@ -108,12 +108,14 @@
 	var duration = urlParam('duration');
 	if (duration < 0 || duration == "") duration = 0;
 
+	var swfURL = urlParam('swf');
+	if (swfURL == "") swfURL = 'scourge.swf';
+
 	var debug = (urlParam('debug').toLowerCase() == "true");
 	var mobile = (urlParam('mobile').toLowerCase() == "true" || isMobileBrowser());
 	var vars = {defaultGrid:defaultGrid, numPlayers:numPlayers, circular:circular, duration:duration};
-	var params = { scale:'noScale', salign:'lt', menu:'false', wmode:'direct', bgcolor:'ff00ff' };
+	var params = { scale:'noScale', salign:'lt', menu:'false', wmode:'direct', bgcolor:'000000' };
 	var attributes = { id:'scourge', name:'scourge' };
-	var swfURL = 'scourge.swf';
 	swfobject.embedSWF(swfURL, "flashContent", "100%", "100%", "11.0.0", null, vars, params, attributes );
 
 	</script>

@@ -1,75 +1,84 @@
-How can the properties of the characters change?
-        brightness
-        color
-        inverse level
-        3D position
-        size
-        character
-        hoverable
-        clickable
-        vanishing point
+CharEntity
+    interactiveIndex:Int
+    position: {x, y, z}
+    scale: Float
+    color: {r, g, b}
+    charCode: Int
+    videoInversion: Float
+    vanishingPointIndex: Int
 
-    Animation component
-        Stores tweens of other components
+Interaction
+    The game's hit area RARELY changes!
+        We can afford to copy the ENTIRE FRAME BUFFER to a BitmapData
+        FUCK YEAH! You know who's smart? You're smart.
+        Render the scene ONCE each time interaction changes
+            On mouse/finger up after a drag
+            On button click/tap
+            On first mouse move after a keystroke
+        Only color and draw the hoverable/clickable quads, of course
+            Create a large quad for the board's draggable hit area
+            Do a separate draw call for each ID
 
-    What are the characters used for?
-        3D views - board, polyominoes
-            Node
-                Head
-                Body
-                Cavity
-                Bite regions
+Spinning globe object
 
-            Hover state
-                "bracketed" and brighter
+What are the characters used for?
+    3D views - board, polyominoes
+        Node
+            Head
+            Body
+            Cavity
+            Bite regions
 
-            Click state
-                "telegraphing" ID animation
-                    Char change
-                    Scale change
-                    Characters in ID of string are "dialed" onscreen in the char
-                    Brackets stay in place until done
+        Hover state
+            "bracketed" and brighter
 
-        Text view
-            All text is stored in rows and columns
+        Click state
+            "telegraphing" ID animation
+                Char change
+                Scale change
+                Characters in ID of string are "dialed" onscreen in the char
+                Brackets stay in place until done
 
-            Plain text
-                Plain or colored, nothing special
-            "Active text"
-                Brighter, z up
-            Input
-                Brackets
-                    Active bracket is z-up
-                Prompt blinks
-                Auto-fill text is gray
-            Button element
-                Same color, inversion, z and perspective projection
-                vanishing point is in middle of button
-            "Button states"
-                Up
-                    normal
-                Over
-                    white, z up
-                Down
-                    normal color, z down
-            If active text, input, or button elements doesn't fit on screen,
-                Flatten plain text
-                Swap non-plain text
-                Tween text up
+    Text view
+        All text is stored in rows and columns
 
-        2D polyomino view
-            Buttons for manipulating rotation & reflection
-            Buttons for choosable piece shortcuts
-            Plain text for available piece shortcuts
-            Gray text for unavailable piece shortcuts
+        Plain text
+            Plain or colored, nothing special
+        "Active text"
+            Brighter, z up
+        Input
+            Brackets
+                Active bracket is z-up
+            Prompt blinks
+            Auto-fill text is gray
+        Button element
+            Same color, inversion, z and perspective projection
+            vanishing point is in middle of button
+        "Button states"
+            Up
+                normal
+            Over
+                white, z up
+            Down
+                normal color, z down
+        If active text, input, or button elements doesn't fit on screen,
+            Flatten plain text
+            Swap non-plain text
+            Tween text up
 
-        Buttons can "telegraph" too, changing z instead of scale
+    2D polyomino view
+        Buttons for manipulating rotation & reflection
+        Buttons for choosable piece shortcuts
+        Plain text for available piece shortcuts
+        Gray text for unavailable piece shortcuts
+
+    Buttons can "telegraph" too, changing z instead of scale
 
 
-    Interprets commands
-    Translates non-text input into text input
-        Clicking a node blinks its ID into the text input
-    "Bracket" format
-        bite [param 1] [param 2] [param 3]
-        interpreter converts this into bite 102 when entered
-    Translates all other game events into human readable output
+Interprets commands
+Translates non-text input into text input
+    Clicking a node blinks its ID into the text input
+"Bracket" format
+    bite [param 1] [param 2] [param 3]
+    interpreter converts this into bite 102 when entered
+Translates all other game events into human readable output
