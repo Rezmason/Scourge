@@ -31,6 +31,6 @@ If you have an interest in this project, please [contact me](mailto:jeremysachs@
 
 # Legal?
 
-The source for Scourge and Ropes is released under the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+The source for Scourge and the ROPES is released under the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 Scourge and the Ropes are trademarks of Jeremy Sachs. Blerp.
