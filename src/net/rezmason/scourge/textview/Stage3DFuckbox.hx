@@ -32,18 +32,28 @@ enum FuckMode {
     PRETTY;
 }
 
+typedef Model = {
+    var bufferSets:Array<BufferSet>;
+    var id:Int;
+    var matrix:Matrix3D;
+}
+
 typedef BufferSet = {
     var id:Int;
     var colors:VertexBuffer3D;
     var geom:VertexBuffer3D;
+    var ids:VertexBuffer3D;
     var indices:IndexBuffer3D;
 }
 
 class Stage3DFuckbox {
 
+    inline static var SPACE_WIDTH:Float = 2.0;
+    inline static var SPACE_HEIGHT:Float = 2.0;
     inline static var TEXTURE_SIZE:Int = 1024;
-    inline static var NUM_GEOM_FLOATS_PER_VERTEX:Int = 3; // XYZ
-    inline static var NUM_COLOR_FLOATS_PER_VERTEX:Int = 3 + 2 + 1; // RGB UV I
+    inline static var NUM_GEOM_FLOATS_PER_VERTEX:Int = 3 + 2 + 1; // X,Y,Z H,V S
+    inline static var NUM_COLOR_FLOATS_PER_VERTEX:Int = 3 + 2 + 1; // R,G,B U,V I
+    inline static var NUM_ID_FLOATS_PER_VERTEX:Int = 3; // ID, BUFFER_SET, GROUP
     inline static var NUM_VERTICES_PER_QUAD:Int = 4;
     inline static var NUM_TRIANGLES_PER_QUAD:Int = 2;
     inline static var NUM_INDICES_PER_TRIANGLE:Int = 3;
@@ -63,16 +73,15 @@ class Stage3DFuckbox {
     var projection:PerspectiveMatrix3D;
     var projections:Array<Matrix3D>;
     var cameraMat:Matrix3D;
+    var charMat:Matrix3D;
     var context:Context3D;
     var prettyProgram:Program3D;
     var mouseProgram:Program3D;
-    var bufferSets:Array<BufferSet>;
+    var models:Array<Model>;
     var texture:Texture;
 
     public function new(stage:Stage) {
         this.stage = stage;
-
-        stage.addEventListener(Event.RESIZE, configureBuffer);
 
         mouseBitmap = new Bitmap();
         mouseBitmap.scaleX = mouseBitmap.scaleY = 0.3;
@@ -89,7 +98,7 @@ class Stage3DFuckbox {
         stage3D.requestContext3D();
     }
 
-    function configureBuffer(?event:Event):Void {
+    function configureBuffer():Void {
         if (context != null) {
             context.configureBackBuffer(stage.stageWidth, stage.stageHeight, 16, true);
             if (mouseBD != null)
@@ -110,40 +119,55 @@ class Stage3DFuckbox {
 
         makeConstants();
         makeTexture();
-        makeBufferSets();
+        makeModels();
         makePrettyProgram();
         makeMouseProgram();
 
-        stage.addEventListener(Event.ENTER_FRAME, renderPretty);
-        stage.addEventListener(Event.ENTER_FRAME, update);
+        stage.addEventListener(Event.RESIZE, onResize);
+        stage.addEventListener(Event.ACTIVATE, onActivate);
+        stage.addEventListener(Event.DEACTIVATE, onDeactivate);
         stage.addEventListener(MouseEvent.CLICK, renderMouse);
         stage.addEventListener(MouseEvent.MOUSE_MOVE, checkMouse);
-        update();
-        renderMouse();
-        renderPretty();
+
+        onActivate();
     }
 
-    function makeBufferSets():Void {
+    function makeModels():Void {
 
-        bufferSets = [];
+        models = [];
+
+        var modelMat:Matrix3D = new Matrix3D();
+
+        models.push({
+            bufferSets:makeBufferSets(0),
+            id:0,
+            matrix:modelMat,
+        });
+    }
+
+    function makeBufferSets(groupId:Int):Array<BufferSet> {
+
+        var bufferSets:Array<BufferSet> = [];
 
         var charQuadChunk:Int = Std.int(BUFFER_SIZE / NUM_VERTICES_PER_QUAD);
 
         var remainingCharQuads:Int = Constants.NUM_CHARS;
         var startCharQuad:Int = 0;
 
-        var id:Int = 0;
+        var bufferId:Int = 0;
         while (startCharQuad < Constants.NUM_CHARS) {
             var len:Int = remainingCharQuads < charQuadChunk ? remainingCharQuads : charQuadChunk;
-            bufferSets.push(makeBufferSet(id, startCharQuad, len));
+            bufferSets.push(makeBufferSet(bufferId, groupId, startCharQuad, len));
 
             startCharQuad += charQuadChunk;
             remainingCharQuads -= charQuadChunk;
-            id++;
+            bufferId++;
         }
+
+        return bufferSets;
     }
 
-    function makeBufferSet(id:Int, startCharQuad:Int, numCharQuads:Int):BufferSet {
+    function makeBufferSet(bufferId:Int, groupId:Int, startCharQuad:Int, numCharQuads:Int):BufferSet {
 
         flash.Lib.trace(["!", startCharQuad]);
 
@@ -152,10 +176,12 @@ class Stage3DFuckbox {
 
         var geomBuffer:VertexBuffer3D = context.createVertexBuffer(numCharVertices, NUM_GEOM_FLOATS_PER_VERTEX);
         var colorBuffer:VertexBuffer3D = context.createVertexBuffer(numCharVertices, NUM_COLOR_FLOATS_PER_VERTEX);
+        var idBuffer:VertexBuffer3D = context.createVertexBuffer(numCharVertices, NUM_ID_FLOATS_PER_VERTEX);
         var indexBuffer:IndexBuffer3D = context.createIndexBuffer(numCharIndices);
 
         var geomVertices:Array<Float> = [];
         var colorVertices:Array<Float> = [];
+        var idVertices:Array<Float> = [];
         var indices:Array<UInt> = [];
 
         var numCharRows:Int = 9;
@@ -167,15 +193,10 @@ class Stage3DFuckbox {
         var cWid:Int = 64;
         var cHgt:Int = 64;
 
-        var SPACE_WIDTH:Float = 2.0;
-        var SPACE_HEIGHT:Float = 2.0;
-
         var offX:Float = (cWid + spacing) / wid;
         var offY:Float = (cHgt + spacing) / hgt;
         var fracX:Float = cWid / wid;
         var fracY:Float = cHgt / hgt;
-        var sizeX:Float = SPACE_WIDTH  / Constants.NUM_COLUMNS;
-        var sizeY:Float = SPACE_HEIGHT / Constants.NUM_ROWS;
 
         for (itr in 0...numCharQuads) {
 
@@ -184,46 +205,51 @@ class Stage3DFuckbox {
             var col:Int = charIndex % Constants.NUM_COLUMNS;
             var row:Int = Std.int(charIndex / Constants.NUM_COLUMNS);
 
-            var x:Float = SPACE_WIDTH  * (col / Constants.NUM_COLUMNS - 0.5);
-            var y:Float = SPACE_HEIGHT * (row / Constants.NUM_ROWS    - 0.5);
+            var x:Float = ((col + 0.5) / Constants.NUM_COLUMNS - 0.5);
+            var y:Float = ((row + 0.5) / Constants.NUM_ROWS    - 0.5);
             var z:Float = -1;
             z *= Math.cos(row / Constants.NUM_ROWS    * Math.PI * 2);
-            z *= Math.cos(col / Constants.NUM_COLUMNS * Math.PI * 4);
-            //z = row / Constants.NUM_ROWS;
+            z *= Math.cos(col / Constants.NUM_COLUMNS * Math.PI * 2);
             //z = 0;
 
             var r:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
             var g:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
             var b:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
 
+            //*
             r = row / Constants.NUM_ROWS;
             g = col / Constants.NUM_COLUMNS;
             b = Math.cos(r) * Math.cos(g) * 0.5;
+            /**/
 
             var u:Float = Std.random(numCharColumns) * offX;
             var v:Float = Std.random(numCharRows) * offY;
 
             var i:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
+            var s:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
 
-            /*
-            r = g = b = 1;
-            u = offX * 9;
-            v = offY * 7;
-            i = 1;
-            /**/
+            //i = 0;
+            s = 1;
 
             writeToArray(geomVertices, itr * NUM_VERTICES_PER_QUAD * NUM_GEOM_FLOATS_PER_VERTEX, [
-                x        , y        ,  z,
-                x        , y + sizeY,  z,
-                x + sizeX, y + sizeY,  z,
-                x + sizeX, y        ,  z,
+                x, y, z, 0, 0, s,
+                x, y, z, 0, 1, s,
+                x, y, z, 1, 1, s,
+                x, y, z, 1, 0, s,
             ]);
 
             writeToArray(colorVertices, itr * NUM_VERTICES_PER_QUAD * NUM_COLOR_FLOATS_PER_VERTEX, [
-                r,  g,  b, u        , v + fracY, i,
-                r,  g,  b, u        , v        , i,
-                r,  g,  b, u + fracX, v        , i,
-                r,  g,  b, u + fracX, v + fracY, i,
+                r, g, b, u        , v + fracY, i,
+                r, g, b, u        , v        , i,
+                r, g, b, u + fracX, v        , i,
+                r, g, b, u + fracX, v + fracY, i,
+            ]);
+
+            writeToArray(idVertices, itr * NUM_VERTICES_PER_QUAD * NUM_ID_FLOATS_PER_VERTEX, [
+                0, 0, 1,
+                0, 1, 0,
+                1, 1, 0,
+                1, 0, 0,
             ]);
 
             var firstIndex:Int = itr * NUM_VERTICES_PER_QUAD;
@@ -236,12 +262,14 @@ class Stage3DFuckbox {
 
         geomBuffer.uploadFromVector(Vector.ofArray(geomVertices), 0, numCharVertices);
         colorBuffer.uploadFromVector(Vector.ofArray(colorVertices), 0, numCharVertices);
+        idBuffer.uploadFromVector(Vector.ofArray(idVertices), 0, numCharVertices);
         indexBuffer.uploadFromVector(Vector.ofArray(indices), 0, numCharIndices);
 
         var bufferSet:BufferSet = {
-            id:id,
+            id:bufferId,
             colors:colorBuffer,
             geom:geomBuffer,
+            ids:idBuffer,
             indices:indexBuffer,
         };
 
@@ -257,50 +285,41 @@ class Stage3DFuckbox {
         var assembler:AGALMiniAssembler = new AGALMiniAssembler();
 
         var vertCode:String = [
-            "m44 vt0 va0 vc0",  // projected = mat.project(xyz)
+            "m44 vt1 va1 vc5",  // corner = quadMat.project(hv) * s
+            "mul vt1.xy vt1.xy va2.xx",
+            "m44 vt0 va0 vc9",  // projected = mat.project(xyz)
+            "m44 vt0 vt0 vc1",  // projected = mat.project(xyz)
+            "add vt0.xy vt0.xy vt1.xy",  // pos = corner.xy + projected
 
-            "mov v0 va1",        // f[0] = rgb
-            "mov v1 va2",        // f[1] = uv
-            "mov v2 va3",        // f[2] = i
-            "mov v3 vt0.zzzz",   // f[3] = projected.z
+            "mov v0 va3",        // f[0] = rgb
+            "mov v1 va4",        // f[1] = uv
+            "mov v2 va5",        // f[2] = i
+            "mov v3 vt0.zzzz",   // f[3] = pos.z
 
-            "max vt0.z vt0.z vc4.z",
+            "max vt0.z vt0.z vc0.z", // flatten the z that go beyond the frustum
 
-            "mov op vt0",  // outputPosition = projected
+            "mov op vt0",  // outputPosition = pos
         ].join("\n");
 
         var vertexShader:ByteArray = assembler.assemble("vertex", vertCode);
 
-        var textOptions:String = "<" + [
-            "2d",
-            "linear",
-            "miplinear", // nomip, miplinear
-            "repeat",
-        ].join(", ") + ">";
-
         var fragmentCode:String = [
 
-            "tex ft0 v1 fs0 " + textOptions,   // char = textures[0].colorAt(f[1])
+            "tex ft0 v1 fs0 <2d, linear, miplinear, repeat>",   // char = textures[0].colorAt(f[1])
 
             // brightness = (i >= brightThreshold) ? i - char : i + char
-            //*
             "sge ft1 fc1 v2.xxxx",    // isBright = (f[2] >= brightThreshold) ? 1 : 0     0 to 1
             "mul ft1 fc0 ft1",        // isBright *= brightMult                           0 to 2
             "mul ft1 ft0 ft1",        // isBright *= char                                 0 to 2*char
             "sub ft1 ft1 ft0",        // isBright -= brightSub                            -char to char
             "add ft1 ft1 v2.xxxx",    // brightness = f[2] + isBright
-            /**/
 
             // brightness *= (2 - z)
-            //*
             "sub ft0 fc0 v3",
             "sat ft0 ft0",
             "mul ft1 ft1 ft0",
-            /**/
 
-            //*
             "mul oc ft1 v0",          // outputColor = brightness * f[0]
-            /**/
 
         ].join("\n");
 
@@ -314,13 +333,21 @@ class Stage3DFuckbox {
         var assembler:AGALMiniAssembler = new AGALMiniAssembler();
 
         var vertCode:String = [
-            "m44 op va0 vc0",
+            "m44 vt1 va1 vc5",  // corner = quadMat.project(hv)
+
+            "m44 vt0 va0 vc9",  // projected = mat.project(xyz)
+            "m44 vt0 vt0 vc1",  // projected = mat.project(xyz)
+            "add vt0.xy vt0.xy vt1.xy",  // pos = corner.xy + projected
+
+            "mov v0 va6", // f[0] = id
+
+            "mov op vt0",  // outputPosition = pos
         ].join("\n");
 
         var vertexShader:ByteArray = assembler.assemble("vertex", vertCode);
 
         var fragmentCode:String = [
-            "mov oc fc2",
+            "mov oc v0",
         ].join("\n");
 
         var fragmentShader:ByteArray = assembler.assemble("fragment", fragmentCode);
@@ -329,7 +356,14 @@ class Stage3DFuckbox {
     }
 
     function makeConstants():Void {
-        cameraMat  = new Matrix3D();
+        cameraMat = new Matrix3D();
+        charMat = new Matrix3D();
+
+        var sizeX:Float = SPACE_WIDTH  / Constants.NUM_COLUMNS;
+        var sizeY:Float = SPACE_HEIGHT / Constants.NUM_ROWS;
+        charMat.appendScale      ( sizeX,        sizeY,       1);
+        charMat.appendTranslation(-sizeX * 0.5, -sizeY * 0.5, 0);
+
         projection = new PerspectiveMatrix3D();
 
         projection.perspectiveLH(2, 2, 1, 2);
@@ -354,7 +388,7 @@ class Stage3DFuckbox {
         var n:Float;
 
         n = 0.0;
-        context.setProgramConstantsFromVector(Context3DProgramType.VERTEX,   4, Vector.ofArray([n,n,n,n]), 1); // vc4 contains 0.0
+        context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 0, Vector.ofArray([n,n,n,n]), 1); // vc0 contains 0.0
 
         n = 2.0;
         context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.ofArray([n,n,n,n]), 1); // fc0 contains 2.0
@@ -393,18 +427,30 @@ class Stage3DFuckbox {
     }
 
     function update(?event:Event):Void {
-        //var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
-        //var numY:Float = (stage.mouseY / stage.stageHeight) * 2 - 1;
-        var numT:Float = (Timer.stamp() % 10) / 10;
 
+        var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
+        var numY:Float = (stage.mouseY / stage.stageHeight) * 2 - 1;
         //*
+        var numT:Float = (Timer.stamp() % 10) / 10;
 
         var cX:Float = 0.5 * Math.cos(numT * Math.PI * 2);
         var cY:Float = 0.5 * Math.sin(numT * Math.PI * 2);
+        var cZ:Float = 0.1 * Math.sin(numT * Math.PI * 2 * 5);
+        /**/
+
+        var modelMat:Matrix3D = models[0].matrix;
+        modelMat.identity();
+
+        //*
+        modelMat.appendRotation(numX * 360 - 180, Vector3D.Z_AXIS);
+        modelMat.appendRotation(numY * 360 - 180 + 90, Vector3D.X_AXIS);
+        modelMat.appendTranslation(0, 0, cZ);
+        /**/
 
         cameraMat.identity();
+        //cameraMat.appendScale(SPACE_WIDTH, SPACE_HEIGHT, 1); // Where does this belong?
         cameraMat.appendTranslation(0, 0, 1);
-        cameraMat.appendTranslation(cX, cY, 0);
+        //cameraMat.appendRotation(numX * 360 - 180, Vector3D.Z_AXIS);
         cameraMat.append(projection);
 
         //var vec:Vector3D = new Vector3D();
@@ -416,7 +462,8 @@ class Stage3DFuckbox {
 
     function renderPretty(?event:Event):Void {
 
-        context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, cameraMat, true); // vc0 contains the camera matrix
+        context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 1, cameraMat, true); // vc1 contains the camera matrix
+        context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 5, charMat, true); // vc5 contains the character matrix
 
         if (mode != PRETTY) {
             mode = PRETTY;
@@ -427,13 +474,21 @@ class Stage3DFuckbox {
 
         context.clear(0, 0, 0, 1);
 
-        for (bufferSet in bufferSets) {
-            context.setVertexBufferAt(0, bufferSet.geom,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
-            context.setVertexBufferAt(1, bufferSet.colors, 0, Context3DVertexBufferFormat.FLOAT_3); // va1 contains r,g,b
-            context.setVertexBufferAt(2, bufferSet.colors, 3, Context3DVertexBufferFormat.FLOAT_2); // va2 contains u,v
-            context.setVertexBufferAt(3, bufferSet.colors, 5, Context3DVertexBufferFormat.FLOAT_1); // va3 contains i
+        for (model in models) {
 
-            context.drawTriangles(bufferSet.indices);
+            context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, model.matrix, true); // vc9 contains the model's matrix
+
+            for (bufferSet in model.bufferSets) {
+                context.setVertexBufferAt(0, bufferSet.geom,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
+                context.setVertexBufferAt(1, bufferSet.geom,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
+                context.setVertexBufferAt(2, bufferSet.geom,  5, Context3DVertexBufferFormat.FLOAT_1); // va2 contains s
+                context.setVertexBufferAt(3, bufferSet.colors, 0, Context3DVertexBufferFormat.FLOAT_3); // va3 contains r,g,b
+                context.setVertexBufferAt(4, bufferSet.colors, 3, Context3DVertexBufferFormat.FLOAT_2); // va4 contains u,v
+                context.setVertexBufferAt(5, bufferSet.colors, 5, Context3DVertexBufferFormat.FLOAT_1); // va5 contains i
+                context.setVertexBufferAt(6, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va6 is empty
+
+                context.drawTriangles(bufferSet.indices);
+            }
         }
 
         context.present();
@@ -441,7 +496,8 @@ class Stage3DFuckbox {
 
     function renderMouse(?event:Event):Void {
 
-        context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, cameraMat, true); // vc0 contains the camera matrix
+        context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 1, cameraMat, true); // vc1 contains the camera matrix
+        context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 5, charMat, true); // vc5 contains the character matrix
 
         if (mode != MOUSE) {
             mode = MOUSE;
@@ -452,19 +508,21 @@ class Stage3DFuckbox {
 
         context.clear(0, 0, 0, 1);
 
-        var idVec:Vector<Float> = Vector.ofArray([0., 0., 0., 0.]);
+        for (model in models) {
 
-        for (bufferSet in bufferSets) {
+            context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, model.matrix, true); // vc9 contains the model's matrix
 
-            idVec[2] = (bufferSet.id + 1) / bufferSets.length;
+            for (bufferSet in model.bufferSets) {
 
-            context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 2, idVec, 1); // fc2 contains ID
-
-            context.setVertexBufferAt(0, bufferSet.geom,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
-            context.setVertexBufferAt(1, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va1 contains r,g,b
-            context.setVertexBufferAt(2, null, 3, Context3DVertexBufferFormat.FLOAT_2); // va2 contains u,v
-            context.setVertexBufferAt(3, null, 5, Context3DVertexBufferFormat.FLOAT_1); // va3 contains i
-            context.drawTriangles(bufferSet.indices);
+                context.setVertexBufferAt(0, bufferSet.geom,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
+                context.setVertexBufferAt(1, bufferSet.geom,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
+                context.setVertexBufferAt(2, null,  5, Context3DVertexBufferFormat.FLOAT_1); // va2 is empty
+                context.setVertexBufferAt(3, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va3 is empty
+                context.setVertexBufferAt(4, null, 3, Context3DVertexBufferFormat.FLOAT_2); // va4 is empty
+                context.setVertexBufferAt(5, null, 5, Context3DVertexBufferFormat.FLOAT_1); // va5 is empty
+                context.setVertexBufferAt(6, bufferSet.ids, 0, Context3DVertexBufferFormat.FLOAT_3); // va6 contains id
+                context.drawTriangles(bufferSet.indices);
+            }
         }
 
         context.drawToBitmapData(mouseBD);
@@ -475,5 +533,23 @@ class Stage3DFuckbox {
         mouseShape.y = stage.mouseY * mouseBitmap.scaleY;
 
         mouseShape.alpha = (mouseBD.getPixel(Std.int(stage.mouseX), Std.int(stage.mouseY)) > 0) ? 1 : 0.5;
+    }
+
+    function onResize(?event:Event):Void {
+        configureBuffer();
+        // defer a render
+    }
+
+    function onActivate(?event:Event):Void {
+        stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+    }
+
+    function onDeactivate(?event:Event):Void {
+        stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+    }
+
+    function onEnterFrame(?event:Event):Void {
+        update();
+        renderPretty();
     }
 }

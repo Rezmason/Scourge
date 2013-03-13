@@ -1,3 +1,6 @@
+Give projection matrix to group
+    Keep a default one around
+
 CharEntity
     interactiveIndex:Int
     position: {x, y, z}
