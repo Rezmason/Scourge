@@ -1,26 +1,53 @@
+Switch to vector from array
+
+The sooner I work with char entities, the better
+    Make char entities
+        They should really only contain arrays
+        using CharUtils will grant them more useful getters and setters
+    Write their contents to vectors
+        store their vertex address
+        store their index address
+        store their buffer index
+    Upload the vectors to the buffers
+
+    To swap two characters,
+        copy and swap their index addresses and buffer indices in local variables
+        Write their data to the new addresses
+        Give them their new addresses
+
+    Keep track of the min and max changed indices when you update a buffer
+        Only upload those portions from the vectors
+
+    CharEntity
+        renderIndex: Int
+        hidden: Bool
+        interactiveIndex: Int
+        position: {x, y, z}
+        scale: Float
+        color: {r, g, b}
+        charCode: Int
+        videoInversion: Float
+        vanishingPointIndex: Int
+
+
 Give projection matrix to group
     Keep a default one around
 
-CharEntity
-    interactiveIndex:Int
-    position: {x, y, z}
-    scale: Float
-    color: {r, g, b}
-    charCode: Int
-    videoInversion: Float
-    vanishingPointIndex: Int
+Scissor rect for board
+    Per object, really
+    We can do more complicated stuff later
 
-Interaction
-    The game's hit area RARELY changes!
-        We can afford to copy the ENTIRE FRAME BUFFER to a BitmapData
-        FUCK YEAH! You know who's smart? You're smart.
-        Render the scene ONCE each time interaction changes
-            On mouse/finger up after a drag
-            On button click/tap
-            On first mouse move after a keystroke
-        Only color and draw the hoverable/clickable quads, of course
-            Create a large quad for the board's draggable hit area
-            Do a separate draw call for each ID
+Animate things!
+    Per frame
+    Change something every five seconds
+
+Interaction update
+    Render the scene ONCE each time interaction changes
+        On mouse/finger up after a drag
+        On button click/tap
+        On first mouse move after a keystroke
+    Only color and draw the hoverable/clickable objects, of course
+        Create a large quad object for the board's draggable hit area
 
 Spinning globe object
 
