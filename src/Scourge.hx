@@ -29,7 +29,6 @@ class Scourge {
 
         var str = [TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n");
         var flatFont = new FlatFont(Assets.getBitmapData("assets/profont_flat.png"), Assets.getText("assets/profont_flat.json"));
-        //new net.rezmason.scourge.textview.TextBlitter(Lib.current.stage, str, TestStrings.CHAR_COLORS, flatFont);
-        new net.rezmason.scourge.textview.Stage3DFuckbox(Lib.current.stage, flatFont);
+        new net.rezmason.scourge.textview.TextDemo(Lib.current.stage, flatFont);
     }
 }

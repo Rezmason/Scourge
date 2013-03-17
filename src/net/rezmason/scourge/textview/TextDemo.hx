@@ -31,41 +31,11 @@ import nme.utils.Timer;
 import nme.Vector;
 
 import net.rezmason.utils.FlatFont;
+import net.rezmason.scourge.textview.RenderMode;
 
 using Lambda;
 
-enum FuckMode {
-    MOUSE;
-    PRETTY;
-}
-
-typedef FuckModel = {
-    var bufferSets:Array<BufferSet>;
-    var id:Int;
-    var matrix:Matrix3D;
-    var numChars:Int;
-    var numVisibleChars:Int;
-}
-
-typedef BufferSet = {
-    var id:Int;
-
-    var colorBuffer:VertexBuffer3D;
-    var geomBuffer:VertexBuffer3D;
-    var idBuffer:VertexBuffer3D;
-    var indexBuffer:IndexBuffer3D;
-
-    var colorVertices:Vector<Float>;
-    var geomVertices:Vector<Float>;
-    var idVertices:Vector<Float>;
-    var indices:Vector<UInt>;
-
-    var ids:Vector<Int>; // TEMP
-
-    var numQuads:Int;
-}
-
-class Stage3DFuckbox {
+class TextDemo {
 
     inline static var SPACE_WIDTH:Float = 2.0;
     inline static var SPACE_HEIGHT:Float = 2.0;
@@ -90,7 +60,7 @@ class Stage3DFuckbox {
     var stage:Stage;
     var stage3D:Stage3D;
 
-    var mode:FuckMode;
+    var mode:RenderMode;
 
     var mouseBD:BitmapData;
     var mouseBitmap:Bitmap;
@@ -98,11 +68,11 @@ class Stage3DFuckbox {
 
     var projection:PerspectiveMatrix3D;
     var cameraMat:Matrix3D;
-    var charMat:Matrix3D;
+    var glyphMat:Matrix3D;
     var context:Context3D;
     var prettyProgram:Program3D;
     var mouseProgram:Program3D;
-    var models:Array<FuckModel>;
+    var models:Array<Model>;
     var texture:Texture;
     var showHideTimer:Timer;
     var font:FlatFont;
@@ -126,7 +96,7 @@ class Stage3DFuckbox {
         stage3D.requestContext3D();
 
         showHideTimer = new Timer(1);
-        showHideTimer.run = hideSomeChars;
+        showHideTimer.run = hideSomeGlyphs;
     }
 
     function configureBuffer():Void {
@@ -150,7 +120,7 @@ class Stage3DFuckbox {
 
         makeConstants();
         makeTexture();
-        makeFuckModels();
+        makeModels();
         makePrettyProgram();
         makeMouseProgram();
 
@@ -163,78 +133,44 @@ class Stage3DFuckbox {
         onActivate();
     }
 
-    function makeFuckModels():Void {
+    function makeModels():Void {
 
         models = [];
 
         var modelMat:Matrix3D = new Matrix3D();
 
+        var glyphs:Array<Glyph> = makeGlyphs();
+
         models.push({
-            bufferSets:makeBufferSets(0),
+            segments:makeSegments(glyphs),
             id:0,
             matrix:modelMat,
-            numChars:Constants.NUM_CHARS,
-            numVisibleChars:Constants.NUM_CHARS,
+            numGlyphs:glyphs.length,
+            numVisibleGlyphs:glyphs.length,
+            glyphs:glyphs,
         });
     }
 
-    function makeBufferSets(groupId:Int):Array<BufferSet> {
+    function makeGlyphs():Array<Glyph> {
+        var glyphs:Array<Glyph> = [];
 
-        var bufferSets:Array<BufferSet> = [];
-
-        var remainingCharQuads:Int = Constants.NUM_CHARS;
-        var startCharQuad:Int = 0;
-
-        var bufferId:Int = 0;
-        while (startCharQuad < Constants.NUM_CHARS) {
-            var len:Int = Std.int(Math.min(remainingCharQuads, CHAR_QUAD_CHUNK));
-            bufferSets.push(makeBufferSet(bufferId, groupId, startCharQuad, len));
-
-            startCharQuad += CHAR_QUAD_CHUNK;
-            remainingCharQuads -= CHAR_QUAD_CHUNK;
-            bufferId++;
-        }
-
-        return bufferSets;
-    }
-
-    function makeBufferSet(bufferId:Int, groupId:Int, startCharQuad:Int, numCharQuads:Int):BufferSet {
-
-        var numCharVertices:Int = numCharQuads * NUM_VERTICES_PER_QUAD;
-        var numCharIndices:Int = numCharQuads * NUM_INDICES_PER_QUAD;
-
-        var geomBuffer:VertexBuffer3D = context.createVertexBuffer(numCharVertices, NUM_GEOM_FLOATS_PER_VERTEX);
-        var colorBuffer:VertexBuffer3D = context.createVertexBuffer(numCharVertices, NUM_COLOR_FLOATS_PER_VERTEX);
-        var idBuffer:VertexBuffer3D = context.createVertexBuffer(numCharVertices, NUM_ID_FLOATS_PER_VERTEX);
-        var indexBuffer:IndexBuffer3D = context.createIndexBuffer(numCharIndices);
-
-        var geomVertices:Vector<Float> = new Vector<Float>();
-        var colorVertices:Vector<Float> = new Vector<Float>();
-        var idVertices:Vector<Float> = new Vector<Float>();
-        var indices:Vector<UInt> = new Vector<UInt>();
-
-        var ids:Vector<Int> = new Vector<Int>(); // TEMP
-
-        var numCharRows:Int = 9;
-        var numCharColumns:Int = 10;
-
+        // TEMPORARY!!!
+        var numGlyphRows:Int = 9;
+        var numGlyphColumns:Int = 10;
         var wid:Int = TEXTURE_SIZE;
         var hgt:Int = TEXTURE_SIZE;
         var spacing:Int = 2;
         var cWid:Int = 64;
         var cHgt:Int = 64;
-
         var offX:Float = (cWid + spacing) / wid;
         var offY:Float = (cHgt + spacing) / hgt;
         var fracX:Float = cWid / wid;
         var fracY:Float = cHgt / hgt;
 
-        for (itr in 0...numCharQuads) {
+        for (ike in 0...Constants.NUM_CHARS) {
 
-            var charIndex:Int = itr + startCharQuad;
-
-            var col:Int = charIndex % Constants.NUM_COLUMNS;
-            var row:Int = Std.int(charIndex / Constants.NUM_COLUMNS);
+            var col:Int = ike % Constants.NUM_COLUMNS;
+            var row:Int = Std.int(ike / Constants.NUM_COLUMNS);
 
             var x:Float = ((col + 0.5) / Constants.NUM_COLUMNS - 0.5);
             var y:Float = ((row + 0.5) / Constants.NUM_ROWS    - 0.5);
@@ -255,8 +191,8 @@ class Stage3DFuckbox {
 
             //r = g = b = 1;
 
-            var u:Float = Std.random(numCharColumns) * offX;
-            var v:Float = Std.random(numCharRows) * offY;
+            var u:Float = Std.random(numGlyphColumns) * offX;
+            var v:Float = Std.random(numGlyphRows) * offY;
 
             var i:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
             var s:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
@@ -268,20 +204,78 @@ class Stage3DFuckbox {
             v = offY * 2;
             */
 
-            writeArrayToVector(geomVertices, itr * NUM_GEOM_FLOATS_PER_QUAD, [
+            var geom:Array<Float> = [
                 x, y, z, 0, 0, s,
                 x, y, z, 0, 1, s,
                 x, y, z, 1, 1, s,
                 x, y, z, 1, 0, s,
-            ], NUM_GEOM_FLOATS_PER_QUAD);
+            ];
 
-            writeArrayToVector(colorVertices, itr * NUM_COLOR_FLOATS_PER_QUAD, [
+            var color:Array<Float> = [
                 r, g, b, u        , v + fracY, i,
                 r, g, b, u        , v        , i,
                 r, g, b, u + fracX, v        , i,
                 r, g, b, u + fracX, v + fracY, i,
-            ], NUM_COLOR_FLOATS_PER_QUAD);
+            ];
 
+            glyphs.push({
+                renderIndex:-1,
+                renderSegmentIndex:-1,
+                charCode:-1,
+                color:color,
+                geom:geom,
+                hidden:false,
+                id:ike,
+            });
+        }
+        return glyphs;
+    }
+
+    function makeSegments(glyphs:Array<Glyph>):Array<BufferSegment> {
+
+        var segments:Array<BufferSegment> = [];
+
+        var remainingGlyphs:Int = Constants.NUM_CHARS;
+        var startGlyph:Int = 0;
+
+        var segmentId:Int = 0;
+        while (startGlyph < Constants.NUM_CHARS) {
+            var len:Int = Std.int(Math.min(remainingGlyphs, CHAR_QUAD_CHUNK));
+            segments.push(makeSegment(segmentId, glyphs, startGlyph, len));
+
+            startGlyph += CHAR_QUAD_CHUNK;
+            remainingGlyphs -= CHAR_QUAD_CHUNK;
+            segmentId++;
+        }
+
+        return segments;
+    }
+
+    function makeSegment(segmentId:Int, glyphs:Array<Glyph>, startGlyph:Int, numGlyphs:Int):BufferSegment {
+
+        var numGlyphVertices:Int = numGlyphs * NUM_VERTICES_PER_QUAD;
+        var numGlyphIndices:Int = numGlyphs * NUM_INDICES_PER_QUAD;
+
+        var geomBuffer:VertexBuffer3D = context.createVertexBuffer(numGlyphVertices, NUM_GEOM_FLOATS_PER_VERTEX);
+        var colorBuffer:VertexBuffer3D = context.createVertexBuffer(numGlyphVertices, NUM_COLOR_FLOATS_PER_VERTEX);
+        var idBuffer:VertexBuffer3D = context.createVertexBuffer(numGlyphVertices, NUM_ID_FLOATS_PER_VERTEX);
+        var indexBuffer:IndexBuffer3D = context.createIndexBuffer(numGlyphIndices);
+
+        var geomVertices:Vector<Float> = new Vector<Float>();
+        var colorVertices:Vector<Float> = new Vector<Float>();
+        var idVertices:Vector<Float> = new Vector<Float>();
+        var indices:Vector<UInt> = new Vector<UInt>();
+
+        var ids:Vector<Int> = new Vector<Int>(); // TEMP
+
+        for (itr in 0...numGlyphs) {
+
+            var glyphIndex:Int = itr + startGlyph;
+
+            var glyph:Glyph = glyphs[glyphIndex];
+
+            writeArrayToVector(geomVertices, itr * NUM_GEOM_FLOATS_PER_QUAD, glyph.geom, NUM_GEOM_FLOATS_PER_QUAD);
+            writeArrayToVector(colorVertices, itr * NUM_COLOR_FLOATS_PER_QUAD, glyph.color, NUM_COLOR_FLOATS_PER_QUAD);
             writeArrayToVector(idVertices, itr * NUM_ID_FLOATS_PER_QUAD, [
                 0, 0, 1,
                 0, 1, 0,
@@ -289,7 +283,7 @@ class Stage3DFuckbox {
                 1, 0, 0,
             ], NUM_ID_FLOATS_PER_QUAD);
 
-            writeArrayToVector(ids, itr, [charIndex], 1); // TEMP
+            writeArrayToVector(ids, itr, [glyph.id], 1); // TEMP
 
             var firstIndex:Int = itr * NUM_VERTICES_PER_QUAD;
 
@@ -297,10 +291,13 @@ class Stage3DFuckbox {
                 firstIndex + 0, firstIndex + 1, firstIndex + 2,
                 firstIndex + 0, firstIndex + 2, firstIndex + 3,
             ], NUM_INDICES_PER_QUAD);
+
+            glyph.renderIndex = itr;
+            glyph.renderSegmentIndex = segmentId;
         }
 
-        var bufferSet:BufferSet = {
-            id:bufferId,
+        var segment:BufferSegment = {
+            id:segmentId,
             colorBuffer:colorBuffer,
             geomBuffer:geomBuffer,
             idBuffer:idBuffer,
@@ -311,21 +308,21 @@ class Stage3DFuckbox {
             idVertices:idVertices,
             indices:indices,
 
-            numQuads:numCharQuads,
+            numQuads:numGlyphs,
 
             ids:ids, // TEMP
         };
 
-        updateBufferSet(bufferSet);
+        updateSegment(segment);
 
-        return bufferSet;
+        return segment;
     }
 
     inline function writeArrayToVector<T>(array:Vector<T>, startIndex:Int, items:Array<T>, numItems:Int):Void {
         for (ike in 0...items.length) array[startIndex + ike] = items[ike];
     }
 
-    inline function swapBetweenArrays<T>(src:Vector<T>, dest:Vector<T>, srcIndex:Int, destIndex:Int, numItems:Int):Void {
+    inline function swapBetweenVectors<T>(src:Vector<T>, dest:Vector<T>, srcIndex:Int, destIndex:Int, numItems:Int):Void {
         for (ike in 0...numItems) {
             var srcVal:T = src[srcIndex + ike];
             src[srcIndex + ike] = dest[destIndex + ike];
@@ -358,13 +355,13 @@ class Stage3DFuckbox {
 
         var fragmentCode:String = [
 
-            "tex ft0 v1 fs0 <2d, linear, miplinear, repeat>",   // char = textures[0].colorAt(f[1])
+            "tex ft0 v1 fs0 <2d, linear, miplinear, repeat>",   // glyph = textures[0].colorAt(f[1])
 
-            // brightness = (i >= brightThreshold) ? i - char : i + char
+            // brightness = (i >= brightThreshold) ? i - glyph : i + glyph
             "sge ft1 fc1 v2.xxxx",    // isBright = (f[2] >= brightThreshold) ? 1 : 0     0 to 1
             "mul ft1 fc0 ft1",        // isBright *= brightMult                           0 to 2
-            "mul ft1 ft0 ft1",        // isBright *= char                                 0 to 2*char
-            "sub ft1 ft1 ft0",        // isBright -= brightSub                            -char to char
+            "mul ft1 ft0 ft1",        // isBright *= glyph                                 0 to 2*glyph
+            "sub ft1 ft1 ft0",        // isBright -= brightSub                            -glyph to glyph
             "add ft1 ft1 v2.xxxx",    // brightness = f[2] + isBright
 
             // brightness *= (2 - z)
@@ -410,12 +407,12 @@ class Stage3DFuckbox {
 
     function makeConstants():Void {
         cameraMat = new Matrix3D();
-        charMat = new Matrix3D();
+        glyphMat = new Matrix3D();
 
         var sizeX:Float = SPACE_WIDTH  / Constants.NUM_COLUMNS;
         var sizeY:Float = SPACE_HEIGHT / Constants.NUM_ROWS;
-        charMat.appendScale      ( sizeX,        sizeY,       1);
-        charMat.appendTranslation(-sizeX * 0.5, -sizeY * 0.5, 0);
+        glyphMat.appendScale      ( sizeX,        sizeY,       1);
+        glyphMat.appendTranslation(-sizeX * 0.5, -sizeY * 0.5, 0);
 
         projection = new PerspectiveMatrix3D();
 
@@ -494,8 +491,8 @@ class Stage3DFuckbox {
         /**/
 
         //*
-        modelMat.appendRotation(numX * 360 - 180, Vector3D.Z_AXIS);
-        modelMat.appendRotation(numY * 360 - 180 + 90, Vector3D.X_AXIS);
+        modelMat.appendRotation(-numX * 360 - 180, Vector3D.Z_AXIS);
+        modelMat.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
         //modelMat.appendTranslation(0, 0, cZ);
 
         modelMat.appendTranslation(0, 0, 0.5);
@@ -518,10 +515,10 @@ class Stage3DFuckbox {
     function renderPretty(?event:Event):Void {
 
         context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 1, cameraMat, true); // vc1 contains the camera matrix
-        context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 5, charMat, true); // vc5 contains the character matrix
+        context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 5, glyphMat, true); // vc5 contains the character matrix
 
-        if (mode != PRETTY) {
-            mode = PRETTY;
+        if (mode != RENDER_FOR_SCREEN) {
+            mode = RENDER_FOR_SCREEN;
             context.setTextureAt(0, texture); // fs0 contains our texture
             context.setProgram(prettyProgram);
             context.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ONE);
@@ -531,24 +528,24 @@ class Stage3DFuckbox {
 
         for (model in models) {
 
-            var numVisibleTriangles:Int = model.numVisibleChars * NUM_TRIANGLES_PER_QUAD;
+            var numVisibleTriangles:Int = model.numVisibleGlyphs * NUM_TRIANGLES_PER_QUAD;
 
             context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, model.matrix, true); // vc9 contains the model's matrix
 
-            for (bufferSet in model.bufferSets) {
+            for (segment in model.segments) {
 
-                var len:Int = bufferSet.numQuads * NUM_TRIANGLES_PER_QUAD;
+                var len:Int = segment.numQuads * NUM_TRIANGLES_PER_QUAD;
                 if (len > numVisibleTriangles) len = numVisibleTriangles;
 
-                context.setVertexBufferAt(0, bufferSet.geomBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
-                context.setVertexBufferAt(1, bufferSet.geomBuffer,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
-                context.setVertexBufferAt(2, bufferSet.geomBuffer,  5, Context3DVertexBufferFormat.FLOAT_1); // va2 contains s
-                context.setVertexBufferAt(3, bufferSet.colorBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va3 contains r,g,b
-                context.setVertexBufferAt(4, bufferSet.colorBuffer, 3, Context3DVertexBufferFormat.FLOAT_2); // va4 contains u,v
-                context.setVertexBufferAt(5, bufferSet.colorBuffer, 5, Context3DVertexBufferFormat.FLOAT_1); // va5 contains i
+                context.setVertexBufferAt(0, segment.geomBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
+                context.setVertexBufferAt(1, segment.geomBuffer,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
+                context.setVertexBufferAt(2, segment.geomBuffer,  5, Context3DVertexBufferFormat.FLOAT_1); // va2 contains s
+                context.setVertexBufferAt(3, segment.colorBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va3 contains r,g,b
+                context.setVertexBufferAt(4, segment.colorBuffer, 3, Context3DVertexBufferFormat.FLOAT_2); // va4 contains u,v
+                context.setVertexBufferAt(5, segment.colorBuffer, 5, Context3DVertexBufferFormat.FLOAT_1); // va5 contains i
                 context.setVertexBufferAt(6, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va6 is empty
 
-                context.drawTriangles(bufferSet.indexBuffer, 0, len);
+                context.drawTriangles(segment.indexBuffer, 0, len);
 
                 numVisibleTriangles -= len;
                 if (numVisibleTriangles == 0) break;
@@ -561,10 +558,10 @@ class Stage3DFuckbox {
     function renderMouse(?event:Event):Void {
 
         context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 1, cameraMat, true); // vc1 contains the camera matrix
-        context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 5, charMat, true); // vc5 contains the character matrix
+        context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 5, glyphMat, true); // vc5 contains the character matrix
 
-        if (mode != MOUSE) {
-            mode = MOUSE;
+        if (mode != RENDER_FOR_MOUSE) {
+            mode = RENDER_FOR_MOUSE;
             context.setTextureAt(0, null); // fs0 is empty
             context.setProgram(mouseProgram);
             context.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ZERO);
@@ -574,24 +571,24 @@ class Stage3DFuckbox {
 
         for (model in models) {
 
-            var numVisibleTriangles:Int = model.numVisibleChars * NUM_TRIANGLES_PER_QUAD;
+            var numVisibleTriangles:Int = model.numVisibleGlyphs * NUM_TRIANGLES_PER_QUAD;
 
             context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, model.matrix, true); // vc9 contains the model's matrix
 
-            for (bufferSet in model.bufferSets) {
+            for (segment in model.segments) {
 
-                var len:Int = bufferSet.numQuads * NUM_TRIANGLES_PER_QUAD;
+                var len:Int = segment.numQuads * NUM_TRIANGLES_PER_QUAD;
                 if (len > numVisibleTriangles) len = numVisibleTriangles;
 
-                context.setVertexBufferAt(0, bufferSet.geomBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
-                context.setVertexBufferAt(1, bufferSet.geomBuffer,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
+                context.setVertexBufferAt(0, segment.geomBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
+                context.setVertexBufferAt(1, segment.geomBuffer,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
                 context.setVertexBufferAt(2, null,  5, Context3DVertexBufferFormat.FLOAT_1); // va2 is empty
                 context.setVertexBufferAt(3, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va3 is empty
                 context.setVertexBufferAt(4, null, 3, Context3DVertexBufferFormat.FLOAT_2); // va4 is empty
                 context.setVertexBufferAt(5, null, 5, Context3DVertexBufferFormat.FLOAT_1); // va5 is empty
-                context.setVertexBufferAt(6, bufferSet.idBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va6 contains id
+                context.setVertexBufferAt(6, segment.idBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va6 contains id
 
-                context.drawTriangles(bufferSet.indexBuffer, 0, len);
+                context.drawTriangles(segment.indexBuffer, 0, len);
 
                 numVisibleTriangles -= len;
                 if (numVisibleTriangles == 0) break;
@@ -626,32 +623,32 @@ class Stage3DFuckbox {
         renderPretty();
     }
 
-    function hideSomeChars():Void {
-        var model:FuckModel = models[0];
+    function hideSomeGlyphs():Void {
+        var model:Model = models[0];
         var indices:Array<Int> = [];
-        indices.push(model.bufferSets[0].ids.indexOf(model.numVisibleChars - 1)); // TEMP
-        toggleChars(model, indices, false);
-        if (model.numVisibleChars <= 0) {
-            showHideTimer.run = showSomeChars;
+        indices.push(model.segments[0].ids.indexOf(model.numVisibleGlyphs - 1)); // TEMP
+        toggleGlyphs(model, indices, false);
+        if (model.numVisibleGlyphs <= 0) {
+            showHideTimer.run = showSomeGlyphs;
         }
     }
 
-    function showSomeChars():Void {
-        var model:FuckModel = models[0];
+    function showSomeGlyphs():Void {
+        var model:Model = models[0];
         var indices:Array<Int> = [];
-        indices.push(model.bufferSets[0].ids.indexOf(model.numVisibleChars)); // TEMP
-        toggleChars(model, indices, true);
-        if (model.numVisibleChars >= model.numChars) {
-            showHideTimer.run = hideSomeChars;
+        indices.push(model.segments[0].ids.indexOf(model.numVisibleGlyphs)); // TEMP
+        toggleGlyphs(model, indices, true);
+        if (model.numVisibleGlyphs >= model.numGlyphs) {
+            showHideTimer.run = hideSomeGlyphs;
         }
     }
 
-    function toggleChars(model:FuckModel, indices:Array<Int>, visible:Bool):Void {
+    function toggleGlyphs(model:Model, indices:Array<Int>, visible:Bool):Void {
 
-        var numVisibleChars:Int = model.numVisibleChars;
+        var numVisibleGlyphs:Int = model.numVisibleGlyphs;
 
         var indicesToChange:Array<Int> = [];
-        for (index in indices) if (index >= numVisibleChars == visible) indicesToChange.push(index);
+        for (index in indices) if (index >= numVisibleGlyphs == visible) indicesToChange.push(index);
 
         var invalidBuffers:Array<Bool> = [];
 
@@ -661,34 +658,36 @@ class Stage3DFuckbox {
         for (index in indicesToChange) {
 
             var srcBufferIndex:Int = Std.int(index / CHAR_QUAD_CHUNK);
-            var srcBuffer:BufferSet = model.bufferSets[srcBufferIndex];
+            var srcBuffer:BufferSegment = model.segments[srcBufferIndex];
             var srcIndex:Int = index % CHAR_QUAD_CHUNK;
 
-            var destBufferIndex:Int = Std.int((numVisibleChars + offset) / CHAR_QUAD_CHUNK);
-            var destBuffer:BufferSet = model.bufferSets[destBufferIndex];
-            var destIndex:Int = (numVisibleChars + offset) % CHAR_QUAD_CHUNK;
+            var destBufferIndex:Int = Std.int((numVisibleGlyphs + offset) / CHAR_QUAD_CHUNK);
+            var destBuffer:BufferSegment = model.segments[destBufferIndex];
+            var destIndex:Int = (numVisibleGlyphs + offset) % CHAR_QUAD_CHUNK;
 
-            swapBetweenArrays(srcBuffer.indices, destBuffer.indices, srcIndex * NUM_INDICES_PER_QUAD,      destIndex * NUM_INDICES_PER_QUAD,      NUM_INDICES_PER_QUAD);
-            swapBetweenArrays(srcBuffer.ids, destBuffer.ids, srcIndex, destIndex, 1); // TEMP
+            swapBetweenVectors(srcBuffer.indices, destBuffer.indices, srcIndex * NUM_INDICES_PER_QUAD,      destIndex * NUM_INDICES_PER_QUAD,      NUM_INDICES_PER_QUAD);
+            swapBetweenVectors(srcBuffer.ids, destBuffer.ids, srcIndex, destIndex, 1); // TEMP
 
-            numVisibleChars += step;
+            numVisibleGlyphs += step;
             invalidBuffers[srcBufferIndex] = true;
             invalidBuffers[destBufferIndex] = true;
         }
 
-        for (ike in 0...invalidBuffers.length) if (invalidBuffers[ike]) updateBufferSet(model.bufferSets[ike]);
+        for (ike in 0...invalidBuffers.length) if (invalidBuffers[ike]) updateSegment(model.segments[ike]);
 
-        model.numVisibleChars = numVisibleChars;
+        model.numVisibleGlyphs = numVisibleGlyphs;
     }
 
-    function updateBufferSet(bufferSet:BufferSet):Void {
+    function updateSegment(segment:BufferSegment):Void {
 
-        var numCharVertices:Int = bufferSet.numQuads * NUM_VERTICES_PER_QUAD;
-        var numCharIndices:Int = bufferSet.numQuads * NUM_INDICES_PER_QUAD;
+        // EXPENSIVE! Use a flag system to indicate what's invalid in a segment
 
-        bufferSet.geomBuffer.uploadFromVector(bufferSet.geomVertices, 0, numCharVertices);
-        bufferSet.colorBuffer.uploadFromVector(bufferSet.colorVertices, 0, numCharVertices);
-        bufferSet.idBuffer.uploadFromVector(bufferSet.idVertices, 0, numCharVertices);
-        bufferSet.indexBuffer.uploadFromVector(bufferSet.indices, 0, numCharIndices);
+        var numGlyphVertices:Int = segment.numQuads * NUM_VERTICES_PER_QUAD;
+        var numGlyphIndices:Int = segment.numQuads * NUM_INDICES_PER_QUAD;
+
+        segment.geomBuffer.uploadFromVector(segment.geomVertices, 0, numGlyphVertices);
+        segment.colorBuffer.uploadFromVector(segment.colorVertices, 0, numGlyphVertices);
+        segment.idBuffer.uploadFromVector(segment.idVertices, 0, numGlyphVertices);
+        segment.indexBuffer.uploadFromVector(segment.indices, 0, numGlyphIndices);
     }
 }
