@@ -1,13 +1,19 @@
 package net.rezmason.scourge.textview;
 
 import nme.geom.Matrix3D;
+import net.rezmason.utils.FatChar;
 
-typedef Glyph = {
-    var id:Int;
-    var geom:Array<Float>;
-    var color:Array<Float>;
-    var renderIndex:Int;
-    var renderSegmentIndex:Int;
-    var hidden:Bool;
-    var charCode:Int;
+class Glyph {
+    public var id:Int;
+    public var geom:Array<Float>;
+    public var color:Array<Float>;
+    /*
+    public var renderIndex:Int;
+    public var renderSegmentIndex:Int;
+    */
+    public var index:Int;
+    public var visible:Bool;
+    public var fatChar:FatChar;
+
+    public function new():Void {}
 }

@@ -2,12 +2,18 @@ package net.rezmason.scourge.textview;
 
 import nme.geom.Matrix3D;
 
-typedef Model = {
-    var segments:Array<BufferSegment>;
-    var id:Int;
-    var matrix:Matrix3D;
-    var numGlyphs:Int;
-    var numVisibleGlyphs:Int;
+class Model {
+    public var segments:Array<BufferSegment>;
+    public var id:Int;
+    public var matrix:Matrix3D;
+    public var numGlyphs:Int;
+    public var numVisibleGlyphs:Int;
 
-    var glyphs:Array<Glyph>;
+    public var glyphs:Array<Glyph>;
+
+    // TEMPORARY
+    public var visibleGlyphs:Array<Glyph>;
+    public var hiddenGlyphs:Array<Glyph>;
+
+    public function new():Void {}
 }

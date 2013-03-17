@@ -4,20 +4,20 @@ import nme.display3D.IndexBuffer3D;
 import nme.display3D.VertexBuffer3D;
 import nme.Vector;
 
-typedef BufferSegment = {
-    var id:Int;
+class BufferSegment {
+    public var id:Int;
 
-    var colorBuffer:VertexBuffer3D;
-    var geomBuffer:VertexBuffer3D;
-    var idBuffer:VertexBuffer3D;
-    var indexBuffer:IndexBuffer3D;
+    public var colorBuffer:VertexBuffer3D;
+    public var geomBuffer:VertexBuffer3D;
+    public var idBuffer:VertexBuffer3D;
+    public var indexBuffer:IndexBuffer3D;
 
-    var colorVertices:Vector<Float>;
-    var geomVertices:Vector<Float>;
-    var idVertices:Vector<Float>;
-    var indices:Vector<UInt>;
+    public var colorVertices:Vector<Float>;
+    public var geomVertices:Vector<Float>;
+    public var idVertices:Vector<Float>;
+    public var indices:Vector<UInt>;
 
-    var ids:Vector<Int>; // TEMP
+    public var numGlyphs:Int;
 
-    var numQuads:Int;
+    public function new():Void {}
 }
