@@ -1,14 +1,3 @@
-Texture object
-
-Model object: flesh it out
-    Initialize its projection matrix
-        But then use ITS matrix, not the main one
-    Extend for 3D model
-    Scissor rect
-        Try to get it working
-    Texture
-
-
 Buffer updates are costly and inefficient
     Keep track of the min and max changed indices when you update a buffer
         Only upload those portions from the vectors
@@ -18,10 +7,10 @@ Animate things!
     Change something on the characters per frame
     Change something every five seconds
 
-Spinning globe object
+Globe-cube object
 
 Interaction
-    Give each glyph an interaction ID
+    Make sure interaction IDs work
 
     Render the scene ONCE each time interaction changes
         On mouse/finger up after a drag

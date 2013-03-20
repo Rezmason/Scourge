@@ -5,7 +5,6 @@ import com.adobe.utils.PerspectiveMatrix3D;
 import haxe.Timer;
 import nme.display.Bitmap;
 import nme.display.BitmapData;
-import nme.display.BitmapDataChannel;
 import nme.display.Shape;
 import nme.display.Stage3D;
 import nme.display.Stage;
@@ -13,24 +12,16 @@ import nme.display3D.Context3D;
 import nme.display3D.Context3DBlendFactor;
 import nme.display3D.Context3DCompareMode;
 import nme.display3D.Context3DProgramType;
-import nme.display3D.Context3DTextureFormat;
 import nme.display3D.Context3DVertexBufferFormat;
-import nme.display3D.IndexBuffer3D;
 import nme.display3D.Program3D;
-import nme.display3D.textures.Texture;
-import nme.display3D.VertexBuffer3D;
 import nme.events.Event;
 import nme.events.MouseEvent;
-import nme.filters.BitmapFilterQuality;
-import nme.filters.GlowFilter;
 import nme.geom.Matrix3D;
-import nme.geom.Matrix;
+import nme.geom.Rectangle;
 import nme.geom.Vector3D;
 import nme.utils.ByteArray;
-import nme.utils.Timer;
 import nme.Vector;
 
-import net.rezmason.utils.FatChar;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.scourge.textview.RenderMode;
 
@@ -41,22 +32,6 @@ class TextDemo {
 
     inline static var SPACE_WIDTH:Float = 2.0;
     inline static var SPACE_HEIGHT:Float = 2.0;
-
-    inline static var NUM_GEOM_FLOATS_PER_VERTEX:Int = 3 + 2 + 1; // X,Y,Z H,V S
-    inline static var NUM_COLOR_FLOATS_PER_VERTEX:Int = 3 + 2 + 1; // R,G,B U,V I
-    inline static var NUM_ID_FLOATS_PER_VERTEX:Int = 3; // ID_0, ID_1, ID_2
-
-    inline static var NUM_VERTICES_PER_QUAD:Int = 4;
-    inline static var NUM_GEOM_FLOATS_PER_QUAD:Int = NUM_GEOM_FLOATS_PER_VERTEX * NUM_VERTICES_PER_QUAD;
-    inline static var NUM_COLOR_FLOATS_PER_QUAD:Int = NUM_COLOR_FLOATS_PER_VERTEX * NUM_VERTICES_PER_QUAD;
-    inline static var NUM_ID_FLOATS_PER_QUAD:Int = NUM_ID_FLOATS_PER_VERTEX * NUM_VERTICES_PER_QUAD;
-
-    inline static var NUM_TRIANGLES_PER_QUAD:Int = 2;
-    inline static var NUM_INDICES_PER_TRIANGLE:Int = 3;
-    inline static var NUM_INDICES_PER_QUAD:Int = NUM_TRIANGLES_PER_QUAD * NUM_INDICES_PER_TRIANGLE;
-    inline static var COLOR_RANGE:Int = 6;
-    inline static var BUFFER_SIZE:Int = 0xFFFF;
-    inline static var CHAR_QUAD_CHUNK:Int = Std.int(BUFFER_SIZE / NUM_VERTICES_PER_QUAD);
 
     var stage:Stage;
     var stage3D:Stage3D;
@@ -74,9 +49,6 @@ class TextDemo {
     var prettyProgram:Program3D;
     var mouseProgram:Program3D;
     var models:Array<Model>;
-    var texture:Texture;
-    var textureScaleX:Float;
-    var textureScaleY:Float;
     var showHideFunc:Void->Void;
     var font:FlatFont;
 
@@ -120,9 +92,14 @@ class TextDemo {
         configureBuffer();
         context.setDepthTest(false, Context3DCompareMode.LESS);
 
+        var modelMat:Matrix3D = new Matrix3D();
+        var modelScissorRect:Rectangle = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
+        var model:Model = new TestModel(0, context, font);
+        model.matrix = modelMat;
+        model.scissorRectangle = modelScissorRect;
+        models = [model];
+
         makeConstants();
-        makeTexture();
-        makeModels();
         makePrettyProgram();
         makeMouseProgram();
 
@@ -133,187 +110,6 @@ class TextDemo {
         stage.addEventListener(MouseEvent.MOUSE_MOVE, checkMouse);
 
         onActivate();
-    }
-
-    function makeModels():Void {
-        models = [];
-        var modelMat:Matrix3D = new Matrix3D();
-        var glyphs:Array<Glyph> = makeGlyphs();
-        var model:Model = new Model();
-
-        model.segments = makeSegments(glyphs);
-        model.id = 0;
-        model.matrix = modelMat;
-        model.numGlyphs = glyphs.length;
-        model.numVisibleGlyphs = glyphs.length;
-        model.glyphs = glyphs;
-
-        models.push(model);
-    }
-
-    function makeGlyphs():Array<Glyph> {
-        var glyphs:Array<Glyph> = [];
-
-        for (ike in 0...Constants.NUM_CHARS) {
-
-            var col:Int = ike % Constants.NUM_COLUMNS;
-            var row:Int = Std.int(ike / Constants.NUM_COLUMNS);
-
-            var x:Float = ((col + 0.5) / Constants.NUM_COLUMNS - 0.5);
-            var y:Float = ((row + 0.5) / Constants.NUM_ROWS    - 0.5);
-            var z:Float = -1;
-            z *= Math.cos(row / Constants.NUM_ROWS    * Math.PI * 2);
-            z *= Math.cos(col / Constants.NUM_COLUMNS * Math.PI * 2);
-            //z = 0;
-
-            var r:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
-            var g:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
-            var b:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
-
-            //*
-            r = row / Constants.NUM_ROWS;
-            g = col / Constants.NUM_COLUMNS;
-            b = Math.cos(r) * Math.cos(g) * 0.5;
-            /**/
-
-            //r = g = b = 1;
-
-            var charCode:Int = 65 + (ike % 26);
-            var fatChar:FatChar = new FatChar(charCode);
-            var charUV = font.getCharCodeUVs(charCode);
-
-            var i:Float = 0.2;
-            var s:Float = 1;
-
-            var geom:Array<Float> = [
-                x, y, z, 0, 0, s,
-                x, y, z, 0, 1, s,
-                x, y, z, 1, 1, s,
-                x, y, z, 1, 0, s,
-            ];
-
-            var color:Array<Float> = [
-                r, g, b, charUV[3].u * textureScaleX, charUV[3].v * textureScaleY, i,
-                r, g, b, charUV[0].u * textureScaleX, charUV[0].v * textureScaleY, i,
-                r, g, b, charUV[1].u * textureScaleX, charUV[1].v * textureScaleY, i,
-                r, g, b, charUV[2].u * textureScaleX, charUV[2].v * textureScaleY, i,
-            ];
-
-            var glyph:Glyph = new Glyph();
-            //glyph.renderIndex = -1;
-            //glyph.renderSegmentIndex = -1;
-            glyph.index = ike;
-            glyph.fatChar = fatChar;
-            glyph.color = color;
-            glyph.geom = geom;
-            glyph.visible = true;
-            glyph.id = ike;
-
-            glyphs.push(glyph);
-        }
-        return glyphs;
-    }
-
-    function makeSegments(glyphs:Array<Glyph>):Array<BufferSegment> {
-
-        var segments:Array<BufferSegment> = [];
-
-        var remainingGlyphs:Int = Constants.NUM_CHARS;
-        var startGlyph:Int = 0;
-
-        var segmentId:Int = 0;
-        while (startGlyph < Constants.NUM_CHARS) {
-            var len:Int = Std.int(Math.min(remainingGlyphs, CHAR_QUAD_CHUNK));
-            segments.push(makeSegment(segmentId, glyphs, startGlyph, len));
-
-            startGlyph += CHAR_QUAD_CHUNK;
-            remainingGlyphs -= CHAR_QUAD_CHUNK;
-            segmentId++;
-        }
-
-        return segments;
-    }
-
-    function makeSegment(segmentId:Int, glyphs:Array<Glyph>, startGlyph:Int, numGlyphs:Int):BufferSegment {
-
-        var numGlyphVertices:Int = numGlyphs * NUM_VERTICES_PER_QUAD;
-        var numGlyphIndices:Int = numGlyphs * NUM_INDICES_PER_QUAD;
-
-        var geomBuffer:VertexBuffer3D = context.createVertexBuffer(numGlyphVertices, NUM_GEOM_FLOATS_PER_VERTEX);
-        var colorBuffer:VertexBuffer3D = context.createVertexBuffer(numGlyphVertices, NUM_COLOR_FLOATS_PER_VERTEX);
-        var idBuffer:VertexBuffer3D = context.createVertexBuffer(numGlyphVertices, NUM_ID_FLOATS_PER_VERTEX);
-        var indexBuffer:IndexBuffer3D = context.createIndexBuffer(numGlyphIndices);
-
-        var geomVertices:Vector<Float> = new Vector<Float>();
-        var colorVertices:Vector<Float> = new Vector<Float>();
-        var idVertices:Vector<Float> = new Vector<Float>();
-        var indices:Vector<UInt> = new Vector<UInt>();
-
-        for (itr in 0...numGlyphs) {
-
-            var glyphIndex:Int = itr + startGlyph;
-
-            var glyph:Glyph = glyphs[glyphIndex];
-
-            writeArrayToVector(geomVertices, itr * NUM_GEOM_FLOATS_PER_QUAD, glyph.geom, NUM_GEOM_FLOATS_PER_QUAD);
-            writeArrayToVector(colorVertices, itr * NUM_COLOR_FLOATS_PER_QUAD, glyph.color, NUM_COLOR_FLOATS_PER_QUAD);
-
-            var glyphID:Int = glyph.id + 1;
-            var glyphR:Float = ((glyphID >> 16) & 0xFF) / 0xFF;
-            var glyphG:Float = ((glyphID >>  8) & 0xFF) / 0xFF;
-            var glyphB:Float = ((glyphID >>  0) & 0xFF) / 0xFF;
-
-            writeArrayToVector(idVertices, itr * NUM_ID_FLOATS_PER_QUAD, [
-                glyphR, glyphG, glyphB,
-                glyphR, glyphG, glyphB,
-                glyphR, glyphG, glyphB,
-                glyphR, glyphG, glyphB,
-            ], NUM_ID_FLOATS_PER_QUAD);
-
-            insertGlyph(indices, itr, itr);
-
-            //glyph.renderIndex = itr;
-            //glyph.renderSegmentIndex = segmentId;
-        }
-
-        var segment:BufferSegment = new BufferSegment();
-        segment.id = segmentId;
-        segment.colorBuffer = colorBuffer;
-        segment.geomBuffer = geomBuffer;
-        segment.idBuffer = idBuffer;
-        segment.indexBuffer = indexBuffer;
-
-        segment.colorVertices = colorVertices;
-        segment.geomVertices = geomVertices;
-        segment.idVertices = idVertices;
-        segment.indices = indices;
-
-        segment.numGlyphs = numGlyphs;
-
-        updateSegment(segment);
-
-        return segment;
-    }
-
-    inline function insertGlyph(indices:Vector<UInt>, glyphIndex:Int, addressIndex:Int):Void {
-        var firstIndex:Int = glyphIndex * NUM_VERTICES_PER_QUAD;
-
-        writeArrayToVector(indices, addressIndex * NUM_INDICES_PER_QUAD, [
-            firstIndex + 0, firstIndex + 1, firstIndex + 2,
-            firstIndex + 0, firstIndex + 2, firstIndex + 3,
-        ], NUM_INDICES_PER_QUAD);
-    }
-
-    inline function writeArrayToVector<T>(array:Vector<T>, startIndex:Int, items:Array<T>, numItems:Int):Void {
-        for (ike in 0...items.length) array[startIndex + ike] = items[ike];
-    }
-
-    inline function swapBetweenVectors<T>(src:Vector<T>, dst:Vector<T>, srcRenderIndex:Int, dstRenderIndex:Int, numItems:Int):Void {
-        for (ike in 0...numItems) {
-            var srcVal:T = src[srcRenderIndex + ike];
-            src[srcRenderIndex + ike] = dst[dstRenderIndex + ike];
-            dst[dstRenderIndex + ike] = srcVal;
-        }
     }
 
     function makePrettyProgram():Void {
@@ -416,59 +212,6 @@ class TextDemo {
         context.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 1, Vector.ofArray([n,n,n,n]), 1); // fc1 contains 0.3
     }
 
-    function makeTexture():Void {
-
-        var src:BitmapData = font.getBitmapDataClone();
-
-        var width:Int = largestPowerOfTwo(src.width);
-        var height:Int = largestPowerOfTwo(src.height);
-
-        textureScaleX = src.width  / width;
-        textureScaleY = src.height / height;
-
-        texture = context.createTexture(width, width, Context3DTextureFormat.BGRA, false);
-
-        var bmd:BitmapData = new BitmapData(width, width, true, 0x0);
-        //bmd.copyPixels(src, src.rect, bmd.rect.topLeft);
-        bmd.fillRect(bmd.rect, 0xFFFFFFFF);
-        bmd.copyChannel(src, src.rect, bmd.rect.topLeft, BitmapDataChannel.RED, BitmapDataChannel.ALPHA);
-        //*
-        bmd.applyFilter(bmd, bmd.rect, bmd.rect.topLeft,
-            new GlowFilter(
-                0xFF000000,
-                1.0,
-                5,
-                5,
-                1,
-                BitmapFilterQuality.HIGH,
-                true
-            )
-        );
-        /**/
-        //stage.addChild(new Bitmap(bmd));
-
-        var miplevel:Int = 0;
-        while (width > 0) {
-            texture.uploadFromBitmapData(getResizedBitmapData(bmd, width, false), miplevel);
-            miplevel++;
-            width = Std.int(width / 2);
-        }
-    }
-
-    inline function largestPowerOfTwo(input:Int):Int {
-        var output:Int = 1;
-        while (output < input) output = output * 2;
-        return output;
-    }
-
-    function getResizedBitmapData(bmp:BitmapData, width:UInt, smoothing:Bool):BitmapData {
-        var bmpData:BitmapData = new BitmapData(width, width, bmp.transparent, 0x00FFFFFF);
-        var mat:Matrix = new Matrix();
-        mat.scale(width / bmp.width, width / bmp.width);
-        bmpData.draw(bmp, mat, null, null, null, smoothing);
-        return bmpData;
-    }
-
     function update(?event:Event):Void {
 
         var modelMat:Matrix3D = models[0].matrix;
@@ -486,8 +229,8 @@ class TextDemo {
         /**/
 
         //*
-        //modelMat.appendRotation(-numX * 360 - 180, Vector3D.Z_AXIS);
-        //modelMat.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
+        modelMat.appendRotation(-numX * 360 - 180, Vector3D.Z_AXIS);
+        modelMat.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
         modelMat.appendTranslation(0, 0, cZ);
 
         modelMat.appendTranslation(0, 0, 1);
@@ -514,7 +257,6 @@ class TextDemo {
 
         if (mode != RENDER_FOR_SCREEN) {
             mode = RENDER_FOR_SCREEN;
-            context.setTextureAt(0, texture); // fs0 contains our texture
             context.setProgram(prettyProgram);
             context.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ONE);
         }
@@ -523,13 +265,18 @@ class TextDemo {
 
         for (model in models) {
 
-            var numVisibleTriangles:Int = model.numVisibleGlyphs * NUM_TRIANGLES_PER_QUAD;
+            if (model.numGlyphs == 0) continue;
+
+            context.setTextureAt(0, model.texture); // fs0 contains our texture
+            context.setScissorRectangle(model.scissorRectangle);
+
+            var numVisibleTriangles:Int = model.numVisibleGlyphs * Almanac.NUM_TRIANGLES_PER_QUAD;
 
             context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, model.matrix, true); // vc9 contains the model's matrix
 
             for (segment in model.segments) {
 
-                var len:Int = segment.numGlyphs * NUM_TRIANGLES_PER_QUAD;
+                var len:Int = segment.numGlyphs * Almanac.NUM_TRIANGLES_PER_QUAD;
                 if (len > numVisibleTriangles) len = numVisibleTriangles;
 
                 context.setVertexBufferAt(0, segment.geomBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
@@ -566,13 +313,17 @@ class TextDemo {
 
         for (model in models) {
 
-            var numVisibleTriangles:Int = model.numVisibleGlyphs * NUM_TRIANGLES_PER_QUAD;
+            if (model.numGlyphs == 0) continue;
+
+            context.setScissorRectangle(model.scissorRectangle);
+
+            var numVisibleTriangles:Int = model.numVisibleGlyphs * Almanac.NUM_TRIANGLES_PER_QUAD;
 
             context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, model.matrix, true); // vc9 contains the model's matrix
 
             for (segment in model.segments) {
 
-                var len:Int = segment.numGlyphs * NUM_TRIANGLES_PER_QUAD;
+                var len:Int = segment.numGlyphs * Almanac.NUM_TRIANGLES_PER_QUAD;
                 if (len > numVisibleTriangles) len = numVisibleTriangles;
 
                 context.setVertexBufferAt(0, segment.geomBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
@@ -607,6 +358,8 @@ class TextDemo {
 
     function onActivate(?event:Event):Void {
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+        update();
+        renderMouse();
     }
 
     function onDeactivate(?event:Event):Void {
@@ -616,91 +369,18 @@ class TextDemo {
     function onEnterFrame(?event:Event):Void {
         //if (showHideFunc != null) showHideFunc();
         update();
-        renderMouse();
         renderPretty();
     }
 
     function hideSomeGlyphs():Void {
         var model:Model = models[0];
-        toggleGlyphs(model, model.glyphs.slice(0, 200), false);
+        model.toggleGlyphs(model.glyphs.slice(0, 200), false);
         if (model.numVisibleGlyphs <= 0) showHideFunc = showSomeGlyphs;
     }
 
     function showSomeGlyphs():Void {
         var model:Model = models[0];
-        toggleGlyphs(model, model.glyphs.slice(model.numVisibleGlyphs, model.numVisibleGlyphs + 200), true);
+        model.toggleGlyphs(model.glyphs.slice(model.numVisibleGlyphs, model.numVisibleGlyphs + 200), true);
         if (model.numVisibleGlyphs >= model.numGlyphs) showHideFunc = hideSomeGlyphs;
-    }
-
-    function toggleGlyphs(model:Model, glyphs:Array<Glyph>, visible:Bool):Void {
-
-        var numVisibleGlyphs:Int = model.numVisibleGlyphs;
-
-        var glyphsToChange:Array<Glyph> = [];
-        var glyphIDsToChange:IntHash<Bool> = new IntHash<Bool>();
-        for (glyph in glyphs) {
-            if (glyph != null && glyph.visible == !visible && !glyphIDsToChange.exists(glyph.id)) {
-                glyphsToChange.push(glyph);
-                glyphIDsToChange.set(glyph.id, true);
-            }
-        }
-
-        var invalidSegments:Array<Bool> = [];
-
-        var step:Int = visible ? 1 : -1;
-        var offset:Int = visible ? 0 : -1;
-
-        for (srcGlyph in glyphsToChange) {
-
-            var dstGlyph:Glyph = model.glyphs[numVisibleGlyphs + offset];
-
-            var srcIndex:Int = srcGlyph.index;
-            var srcSegmentIndex:Int = Std.int(srcIndex / CHAR_QUAD_CHUNK);
-            var srcSegment:BufferSegment = model.segments[srcSegmentIndex];
-            var srcRenderIndex:Int = srcIndex % CHAR_QUAD_CHUNK;
-
-            var dstIndex:Int = dstGlyph.index;
-            var dstSegmentIndex:Int = Std.int(dstIndex / CHAR_QUAD_CHUNK);
-            var dstSegment:BufferSegment = model.segments[dstSegmentIndex];
-            var dstRenderIndex:Int = dstIndex % CHAR_QUAD_CHUNK;
-
-            //swapBetweenVectors(srcSegment.indices, dstSegment.indices, srcRenderIndex * NUM_INDICES_PER_QUAD, dstRenderIndex * NUM_INDICES_PER_QUAD, NUM_INDICES_PER_QUAD);
-            insertGlyph(srcSegment.indices, dstGlyph.id, srcRenderIndex);
-            insertGlyph(dstSegment.indices, srcGlyph.id, dstRenderIndex);
-
-            srcGlyph.index = dstIndex;
-            dstGlyph.index = srcIndex;
-            model.glyphs[dstIndex] = srcGlyph;
-            model.glyphs[srcIndex] = dstGlyph;
-
-            srcGlyph.visible = visible;
-
-            invalidSegments[srcSegmentIndex] = true;
-            invalidSegments[dstSegmentIndex] = true;
-
-            numVisibleGlyphs += step;
-        }
-
-        for (ike in 0...invalidSegments.length) {
-            if (invalidSegments[ike]) {
-                updateSegment(model.segments[ike]);
-            }
-        }
-
-        model.numVisibleGlyphs = numVisibleGlyphs;
-        //flash.Lib.trace(numVisibleGlyphs);
-    }
-
-    function updateSegment(segment:BufferSegment):Void {
-
-        // EXPENSIVE! Use a flag system to indicate what's invalid in a segment
-
-        var numGlyphVertices:Int = segment.numGlyphs * NUM_VERTICES_PER_QUAD;
-        var numGlyphIndices:Int = segment.numGlyphs * NUM_INDICES_PER_QUAD;
-
-        segment.geomBuffer.uploadFromVector(segment.geomVertices, 0, numGlyphVertices);
-        segment.colorBuffer.uploadFromVector(segment.colorVertices, 0, numGlyphVertices);
-        segment.idBuffer.uploadFromVector(segment.idVertices, 0, numGlyphVertices);
-        segment.indexBuffer.uploadFromVector(segment.indices, 0, numGlyphIndices);
     }
 }
