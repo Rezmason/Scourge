@@ -41,7 +41,6 @@ class TextDemo {
 
     inline static var SPACE_WIDTH:Float = 2.0;
     inline static var SPACE_HEIGHT:Float = 2.0;
-    inline static var TEXTURE_SIZE:Int = 1024;
 
     inline static var NUM_GEOM_FLOATS_PER_VERTEX:Int = 3 + 2 + 1; // X,Y,Z H,V S
     inline static var NUM_COLOR_FLOATS_PER_VERTEX:Int = 3 + 2 + 1; // R,G,B U,V I
@@ -76,6 +75,8 @@ class TextDemo {
     var mouseProgram:Program3D;
     var models:Array<Model>;
     var texture:Texture;
+    var textureScaleX:Float;
+    var textureScaleY:Float;
     var showHideFunc:Void->Void;
     var font:FlatFont;
 
@@ -84,7 +85,7 @@ class TextDemo {
         this.font = font;
 
         mouseBitmap = new Bitmap();
-        mouseBitmap.scaleX = mouseBitmap.scaleY = 0.15;
+        mouseBitmap.scaleX = mouseBitmap.scaleY = 0.2;
         stage.addChild(mouseBitmap);
         mouseShape = new Shape();
         mouseShape.graphics.beginFill(0xFFFFFF);
@@ -147,28 +148,11 @@ class TextDemo {
         model.numVisibleGlyphs = glyphs.length;
         model.glyphs = glyphs;
 
-        // TEMPORARY
-        model.visibleGlyphs = glyphs.copy();
-        model.hiddenGlyphs = [];
-
         models.push(model);
     }
 
     function makeGlyphs():Array<Glyph> {
         var glyphs:Array<Glyph> = [];
-
-        // TEMPORARY!!!
-        var numGlyphRows:Int = 9;
-        var numGlyphColumns:Int = 10;
-        var wid:Int = TEXTURE_SIZE;
-        var hgt:Int = TEXTURE_SIZE;
-        var spacing:Int = 2;
-        var cWid:Int = 64;
-        var cHgt:Int = 64;
-        var offX:Float = (cWid + spacing) / wid;
-        var offY:Float = (cHgt + spacing) / hgt;
-        var fracX:Float = cWid / wid;
-        var fracY:Float = cHgt / hgt;
 
         for (ike in 0...Constants.NUM_CHARS) {
 
@@ -194,21 +178,9 @@ class TextDemo {
 
             //r = g = b = 1;
 
-            var u:Float = Std.random(numGlyphColumns) * offX;
-            var v:Float = Std.random(numGlyphRows) * offY;
-
             var charCode:Int = 65 + (ike % 26);
             var fatChar:FatChar = new FatChar(charCode);
-            //flash.Lib.trace([charCode, String.fromCharCode(charCode)]);
             var charUV = font.getCharCodeUVs(charCode);
-            /*
-            u = charUV[0].u;
-            v = charUV[0].v;
-            fracX = charUV[2].u - charUV[0].u;
-            fracY = charUV[2].v - charUV[0].v;
-            */
-            u = (ike % numGlyphColumns) * offX;
-            v = 2 * offY;
 
             var i:Float = 0.2;
             var s:Float = 1;
@@ -221,10 +193,10 @@ class TextDemo {
             ];
 
             var color:Array<Float> = [
-                r, g, b, u        , v + fracY, i,
-                r, g, b, u        , v        , i,
-                r, g, b, u + fracX, v        , i,
-                r, g, b, u + fracX, v + fracY, i,
+                r, g, b, charUV[3].u * textureScaleX, charUV[3].v * textureScaleY, i,
+                r, g, b, charUV[0].u * textureScaleX, charUV[0].v * textureScaleY, i,
+                r, g, b, charUV[1].u * textureScaleX, charUV[1].v * textureScaleY, i,
+                r, g, b, charUV[2].u * textureScaleX, charUV[2].v * textureScaleY, i,
             ];
 
             var glyph:Glyph = new Glyph();
@@ -285,11 +257,17 @@ class TextDemo {
 
             writeArrayToVector(geomVertices, itr * NUM_GEOM_FLOATS_PER_QUAD, glyph.geom, NUM_GEOM_FLOATS_PER_QUAD);
             writeArrayToVector(colorVertices, itr * NUM_COLOR_FLOATS_PER_QUAD, glyph.color, NUM_COLOR_FLOATS_PER_QUAD);
+
+            var glyphID:Int = glyph.id + 1;
+            var glyphR:Float = ((glyphID >> 16) & 0xFF) / 0xFF;
+            var glyphG:Float = ((glyphID >>  8) & 0xFF) / 0xFF;
+            var glyphB:Float = ((glyphID >>  0) & 0xFF) / 0xFF;
+
             writeArrayToVector(idVertices, itr * NUM_ID_FLOATS_PER_QUAD, [
-                0, 0, 1,
-                0, 1, 0,
-                1, 1, 0,
-                1, 0, 0,
+                glyphR, glyphG, glyphB,
+                glyphR, glyphG, glyphB,
+                glyphR, glyphG, glyphB,
+                glyphR, glyphG, glyphB,
             ], NUM_ID_FLOATS_PER_QUAD);
 
             insertGlyph(indices, itr, itr);
@@ -349,10 +327,10 @@ class TextDemo {
             "m44 vt0 vt0 vc1",  // projected = mat.project(xyz)
             "add vt0.xy vt0.xy vt1.xy",  // pos = corner.xy + projected
 
-            "mov v0 va3",        // f[0] = rgb
-            "mov v1 va4",        // f[1] = uv
-            "mov v2 va5",        // f[2] = i
-            "mov v3 vt0.zzzz",   // f[3] = pos.z
+            "mov v0 va3",        // fInput[0] = rgba
+            "mov v1 va4",        // fInput[1] = uv
+            "mov v2 va5",        // fInput[2] = i
+            "mov v3 vt0.zzzz",   // fInput[3] = pos.z
 
             "max vt0.z vt0.z vc0.z", // flatten the z that go beyond the frustum
 
@@ -363,21 +341,21 @@ class TextDemo {
 
         var fragmentCode:String = [
 
-            "tex ft0 v1 fs0 <2d, linear, miplinear, repeat>",   // glyph = textures[0].colorAt(f[1])
+            "tex ft0 v1 fs0 <2d, linear, miplinear, repeat>",   // glyph = textures[0].colorAt(fInput[1])
 
             // brightness = (i >= brightThreshold) ? i - glyph : i + glyph
-            "sge ft1 fc1 v2.xxxx",    // isBright = (f[2] >= brightThreshold) ? 1 : 0     0 to 1
+            "sge ft1 fc1 v2.xxxx",    // isBright = (fInput[2] >= brightThreshold) ? 1 : 0     0 to 1
             "mul ft1 fc0 ft1",        // isBright *= brightMult                           0 to 2
             "mul ft1 ft0 ft1",        // isBright *= glyph                                 0 to 2*glyph
             "sub ft1 ft1 ft0",        // isBright -= brightSub                            -glyph to glyph
-            "add ft1 ft1 v2.xxxx",    // brightness = f[2] + isBright
+            "add ft1 ft1 v2.xxxx",    // brightness = fInput[2] + isBright
 
             // brightness *= (2 - z)
             "sub ft0 fc0 v3",
             "sat ft0 ft0",
             "mul ft1 ft1 ft0",
 
-            "mul oc ft1 v0",          // outputColor = brightness * f[0]
+            "mul oc ft1 v0",          // outputColor = brightness * fInput[0]
 
         ].join("\n");
 
@@ -439,20 +417,22 @@ class TextDemo {
     }
 
     function makeTexture():Void {
-        texture = context.createTexture(TEXTURE_SIZE, TEXTURE_SIZE, Context3DTextureFormat.BGRA, false);
 
-        // MIPMAP GENERATION
         var src:BitmapData = font.getBitmapDataClone();
 
-        var width:Int = 1;
-        while (width < src.width) {
-            width = width * 2;
-        }
+        var width:Int = largestPowerOfTwo(src.width);
+        var height:Int = largestPowerOfTwo(src.height);
+
+        textureScaleX = src.width  / width;
+        textureScaleY = src.height / height;
+
+        texture = context.createTexture(width, width, Context3DTextureFormat.BGRA, false);
 
         var bmd:BitmapData = new BitmapData(width, width, true, 0x0);
         //bmd.copyPixels(src, src.rect, bmd.rect.topLeft);
         bmd.fillRect(bmd.rect, 0xFFFFFFFF);
         bmd.copyChannel(src, src.rect, bmd.rect.topLeft, BitmapDataChannel.RED, BitmapDataChannel.ALPHA);
+        //*
         bmd.applyFilter(bmd, bmd.rect, bmd.rect.topLeft,
             new GlowFilter(
                 0xFF000000,
@@ -464,6 +444,7 @@ class TextDemo {
                 true
             )
         );
+        /**/
         //stage.addChild(new Bitmap(bmd));
 
         var miplevel:Int = 0;
@@ -472,6 +453,12 @@ class TextDemo {
             miplevel++;
             width = Std.int(width / 2);
         }
+    }
+
+    inline function largestPowerOfTwo(input:Int):Int {
+        var output:Int = 1;
+        while (output < input) output = output * 2;
+        return output;
     }
 
     function getResizedBitmapData(bmp:BitmapData, width:UInt, smoothing:Bool):BitmapData {
@@ -499,11 +486,11 @@ class TextDemo {
         /**/
 
         //*
-        modelMat.appendRotation(-numX * 360 - 180, Vector3D.Z_AXIS);
-        modelMat.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
-        //modelMat.appendTranslation(0, 0, cZ);
+        //modelMat.appendRotation(-numX * 360 - 180, Vector3D.Z_AXIS);
+        //modelMat.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
+        modelMat.appendTranslation(0, 0, cZ);
 
-        modelMat.appendTranslation(0, 0, 0.5);
+        modelMat.appendTranslation(0, 0, 1);
 
         /**/
 
@@ -627,26 +614,21 @@ class TextDemo {
     }
 
     function onEnterFrame(?event:Event):Void {
-        if (showHideFunc != null) showHideFunc();
+        //if (showHideFunc != null) showHideFunc();
         update();
+        renderMouse();
         renderPretty();
     }
 
     function hideSomeGlyphs():Void {
         var model:Model = models[0];
-        var glyphs:Array<Glyph> = [];
-        for (ike in 0...100) glyphs.push(model.visibleGlyphs[Std.random(model.visibleGlyphs.length)]);
-        //glyphs = model.visibleGlyphs.slice(0, 1);
-        toggleGlyphs(model, glyphs, false);
+        toggleGlyphs(model, model.glyphs.slice(0, 200), false);
         if (model.numVisibleGlyphs <= 0) showHideFunc = showSomeGlyphs;
     }
 
     function showSomeGlyphs():Void {
         var model:Model = models[0];
-        var glyphs:Array<Glyph> = [];
-        for (ike in 0...100) glyphs.push(model.hiddenGlyphs[Std.random(model.hiddenGlyphs.length)]);
-        //glyphs = model.hiddenGlyphs.slice(0, 1);
-        toggleGlyphs(model, glyphs, true);
+        toggleGlyphs(model, model.glyphs.slice(model.numVisibleGlyphs, model.numVisibleGlyphs + 200), true);
         if (model.numVisibleGlyphs >= model.numGlyphs) showHideFunc = hideSomeGlyphs;
     }
 
@@ -693,19 +675,20 @@ class TextDemo {
 
             srcGlyph.visible = visible;
 
-            var oldArray:Array<Glyph> = visible ? model.hiddenGlyphs  : model.visibleGlyphs;
-            var newArray:Array<Glyph> = visible ? model.visibleGlyphs : model.hiddenGlyphs;
-            oldArray.splice(oldArray.indexOf(srcGlyph), 1);
-            newArray.push(srcGlyph);
-
-            numVisibleGlyphs += step;
             invalidSegments[srcSegmentIndex] = true;
             invalidSegments[dstSegmentIndex] = true;
+
+            numVisibleGlyphs += step;
         }
 
-        for (ike in 0...invalidSegments.length) if (invalidSegments[ike]) updateSegment(model.segments[ike]);
+        for (ike in 0...invalidSegments.length) {
+            if (invalidSegments[ike]) {
+                updateSegment(model.segments[ike]);
+            }
+        }
 
         model.numVisibleGlyphs = numVisibleGlyphs;
+        //flash.Lib.trace(numVisibleGlyphs);
     }
 
     function updateSegment(segment:BufferSegment):Void {

@@ -11,9 +11,5 @@ class Model {
 
     public var glyphs:Array<Glyph>;
 
-    // TEMPORARY
-    public var visibleGlyphs:Array<Glyph>;
-    public var hiddenGlyphs:Array<Glyph>;
-
     public function new():Void {}
 }

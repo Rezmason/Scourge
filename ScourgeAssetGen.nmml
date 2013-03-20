@@ -18,8 +18,8 @@
 	<haxelib name="nme" />
 
 	<assets path="assets" rename="assets" include="ProFontX.ttf" />
-	<assets path="assets/miso" rename="assets" include="miso.ttf" />
-	<assets path="assets" rename="assets" include="ocraextended.ttf" />
+	<!-- <assets path="assets/miso" rename="assets" include="miso.ttf" /> -->
+	<!-- <assets path="assets" rename="assets" include="ocraextended.ttf" /> -->
 
 	<ndll name="std" />
 	<ndll name="regexp" />

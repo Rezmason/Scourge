@@ -1,22 +1,28 @@
-Fix FlatFont UVs
+Texture object
+
+Model object: flesh it out
+    Initialize its projection matrix
+        But then use ITS matrix, not the main one
+    Extend for 3D model
+    Scissor rect
+        Try to get it working
+    Texture
+
 
 Buffer updates are costly and inefficient
     Keep track of the min and max changed indices when you update a buffer
         Only upload those portions from the vectors
     Flag the buffer updates, so that buffers that don't have to be updated won't be.
 
-Give projection matrix to group
-    Keep a default one around
-
-Scissor rect for board
-    Per object, really
-    We can do more complicated stuff later
-
 Animate things!
-    Per frame
+    Change something on the characters per frame
     Change something every five seconds
 
-Interaction update
+Spinning globe object
+
+Interaction
+    Give each glyph an interaction ID
+
     Render the scene ONCE each time interaction changes
         On mouse/finger up after a drag
         On button click/tap
@@ -24,9 +30,7 @@ Interaction update
     Only color and draw the hoverable/clickable objects, of course
         Create a large quad object for the board's draggable hit area
 
-Spinning globe object
-
-What are the characters used for?
+What do the glyphs depict?
     3D views - board, polyominoes
         Node
             Head

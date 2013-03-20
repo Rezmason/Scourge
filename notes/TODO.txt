@@ -5,6 +5,7 @@ Finalize ROPES classes
 Save states and save testing
 	If the code for a rule changes, the games that used earlier versions of that rule are kind of botched
 		How do other games handle this?
+			http://www.altdevblogaday.com/2011/07/09/synchronous-rts-engines-and-a-tale-of-desyncs
 
 TestPlayer
 HumanPlayer

@@ -106,6 +106,7 @@ class FlatFont {
         if (fontSize < 1) fontSize = 72;
         if (charWidth  < 0) charWidth  = 1;
         if (charHeight < 0) charHeight = 1;
+        if (spacing < 0) spacing = 0;
 
         var charXOffset:Int = charWidth  + spacing;
         var charYOffset:Int = charHeight + spacing;
@@ -124,7 +125,7 @@ class FlatFont {
         var numColumns:Int = Std.int(Math.sqrt(numChars)) + 1;
         var numRows:Int = Std.int(numChars / numColumns) + 1;
 
-        var width:Int = Std.int(Math.max(charXOffset * numColumns - spacing, charYOffset * numRows - spacing));
+        var width:Int = Std.int(Math.max(charXOffset * numColumns, charYOffset * numRows)) + spacing;
         var bitmapData:BitmapData = new BitmapData(width, width, false, 0);
         //bitmapData.fillRect(bitmapData.rect, 0xFFFFFFFF);
 
@@ -157,8 +158,8 @@ class FlatFont {
 
         for (char in requiredChars.keys().a2z()) {
 
-            var dx:Int = x * charXOffset;
-            var dy:Int = y * charYOffset;
+            var dx:Int = x * charXOffset + spacing;
+            var dy:Int = y * charYOffset + spacing;
 
             clipRect.x = dx;
             clipRect.y = dy;
