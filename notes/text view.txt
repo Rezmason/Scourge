@@ -1,7 +1,14 @@
-Buffer updates are costly and inefficient
-    Keep track of the min and max changed indices when you update a buffer
-        Only upload those portions from the vectors
-    Flag the buffer updates, so that buffers that don't have to be updated won't be.
+Stop passing context around
+    Make utilities and a utility factory instead
+
+Make it easier to add glyphs
+    GlyphUtils seems cumbersome if we're relying so much on FlatFont and GlyphTexture
+Make a utility for drawing
+    Pretty and Mouse go in there
+Make a utility for as many things as you can
+    These utilities will be the cross-platform API
+
+Figure out the width/height stuff
 
 Animate things!
     Change something on the characters per frame

@@ -19,7 +19,6 @@ class TestModel extends Model {
             var z:Float = -1;
             z *= Math.cos(row / Constants.NUM_ROWS    * Math.PI * 2);
             z *= Math.cos(col / Constants.NUM_COLUMNS * Math.PI * 2);
-            //z = 0;
 
             var r:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
             var g:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
@@ -31,14 +30,13 @@ class TestModel extends Model {
             b = Math.cos(r) * Math.cos(g) * 0.5;
             /**/
 
-            //r = g = b = 1;
-
             var charCode:Int = 65 + (ike % 26);
-            var fatChar:FatChar = new FatChar(charCode);
-            var charUV = font.getCharCodeUVs(charCode);
 
             var i:Float = 0.2;
             var s:Float = 1;
+
+            var fatChar:FatChar = new FatChar(charCode);
+            var charUV = font.getCharCodeUVs(charCode);
 
             var geom:Array<Float> = [
                 x, y, z, 0, 0, s,
@@ -55,12 +53,9 @@ class TestModel extends Model {
             ];
 
             var glyph:Glyph = new Glyph();
-            //glyph.renderIndex = -1;
-            //glyph.renderSegmentIndex = -1;
-            glyph.index = ike;
             glyph.fatChar = fatChar;
             glyph.color = color;
-            glyph.geom = geom;
+            glyph.shape = geom;
             glyph.visible = true;
             glyph.id = ike;
 

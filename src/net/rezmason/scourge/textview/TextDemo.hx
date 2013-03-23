@@ -58,13 +58,15 @@ class TextDemo {
 
         mouseBitmap = new Bitmap();
         mouseBitmap.scaleX = mouseBitmap.scaleY = 0.2;
-        stage.addChild(mouseBitmap);
         mouseShape = new Shape();
         mouseShape.graphics.beginFill(0xFFFFFF);
         mouseShape.graphics.lineTo(0, 20);
         mouseShape.graphics.lineTo(10, 16);
         mouseShape.graphics.endFill();
+        /*
+        stage.addChild(mouseBitmap);
         stage.addChild(mouseShape);
+        */
 
         stage3D = stage.stage3Ds[0];
         stage3D.addEventListener(Event.CONTEXT3D_CREATE, onCreate);
@@ -94,7 +96,10 @@ class TextDemo {
 
         var modelMat:Matrix3D = new Matrix3D();
         var modelScissorRect:Rectangle = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
-        var model:Model = new TestModel(0, context, font);
+        var model:Model = null;
+        //model = new AlphabetModel(0, context, font);
+        model = new TestModel(0, context, font); // TEMPORARY
+        //model = new FlatModel(0, context, font); // TEMPORARY
         model.matrix = modelMat;
         model.scissorRectangle = modelScissorRect;
         models = [model];
@@ -171,7 +176,7 @@ class TextDemo {
             "m44 vt0 vt0 vc1",  // projected = mat.project(xyz)
             "add vt0.xy vt0.xy vt1.xy",  // pos = corner.xy + projected
 
-            "mov v0 va6", // f[0] = id
+            "mov v0 va6", // f[0] = paint
 
             "mov op vt0",  // outputPosition = pos
         ].join("\n");
@@ -233,7 +238,7 @@ class TextDemo {
         modelMat.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
         modelMat.appendTranslation(0, 0, cZ);
 
-        modelMat.appendTranslation(0, 0, 1);
+        modelMat.appendTranslation(0, 0, 0.5);
 
         /**/
 
@@ -270,27 +275,22 @@ class TextDemo {
             context.setTextureAt(0, model.texture); // fs0 contains our texture
             context.setScissorRectangle(model.scissorRectangle);
 
-            var numVisibleTriangles:Int = model.numVisibleGlyphs * Almanac.NUM_TRIANGLES_PER_QUAD;
-
             context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, model.matrix, true); // vc9 contains the model's matrix
 
-            for (segment in model.segments) {
+            for (ike in 0...model.numSegments) {
 
-                var len:Int = segment.numGlyphs * Almanac.NUM_TRIANGLES_PER_QUAD;
-                if (len > numVisibleTriangles) len = numVisibleTriangles;
+                var segment = model.segments[ike];
+                var len:Int = segment.numVisibleGlyphs * Almanac.NUM_TRIANGLES_PER_GLYPH;
 
-                context.setVertexBufferAt(0, segment.geomBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
-                context.setVertexBufferAt(1, segment.geomBuffer,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
-                context.setVertexBufferAt(2, segment.geomBuffer,  5, Context3DVertexBufferFormat.FLOAT_1); // va2 contains s
+                context.setVertexBufferAt(0, segment.shapeBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
+                context.setVertexBufferAt(1, segment.shapeBuffer,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
+                context.setVertexBufferAt(2, segment.shapeBuffer,  5, Context3DVertexBufferFormat.FLOAT_1); // va2 contains s
                 context.setVertexBufferAt(3, segment.colorBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va3 contains r,g,b
                 context.setVertexBufferAt(4, segment.colorBuffer, 3, Context3DVertexBufferFormat.FLOAT_2); // va4 contains u,v
                 context.setVertexBufferAt(5, segment.colorBuffer, 5, Context3DVertexBufferFormat.FLOAT_1); // va5 contains i
                 context.setVertexBufferAt(6, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va6 is empty
 
                 context.drawTriangles(segment.indexBuffer, 0, len);
-
-                numVisibleTriangles -= len;
-                if (numVisibleTriangles == 0) break;
             }
         }
 
@@ -317,22 +317,22 @@ class TextDemo {
 
             context.setScissorRectangle(model.scissorRectangle);
 
-            var numVisibleTriangles:Int = model.numVisibleGlyphs * Almanac.NUM_TRIANGLES_PER_QUAD;
+            var numVisibleTriangles:Int = model.numVisibleGlyphs * Almanac.NUM_TRIANGLES_PER_GLYPH;
 
             context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, model.matrix, true); // vc9 contains the model's matrix
 
             for (segment in model.segments) {
 
-                var len:Int = segment.numGlyphs * Almanac.NUM_TRIANGLES_PER_QUAD;
+                var len:Int = segment.numGlyphs * Almanac.NUM_TRIANGLES_PER_GLYPH;
                 if (len > numVisibleTriangles) len = numVisibleTriangles;
 
-                context.setVertexBufferAt(0, segment.geomBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
-                context.setVertexBufferAt(1, segment.geomBuffer,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
+                context.setVertexBufferAt(0, segment.shapeBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
+                context.setVertexBufferAt(1, segment.shapeBuffer,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
                 context.setVertexBufferAt(2, null,  5, Context3DVertexBufferFormat.FLOAT_1); // va2 is empty
                 context.setVertexBufferAt(3, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va3 is empty
                 context.setVertexBufferAt(4, null, 3, Context3DVertexBufferFormat.FLOAT_2); // va4 is empty
                 context.setVertexBufferAt(5, null, 5, Context3DVertexBufferFormat.FLOAT_1); // va5 is empty
-                context.setVertexBufferAt(6, segment.idBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va6 contains id
+                context.setVertexBufferAt(6, segment.paintBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va6 contains paint
 
                 context.drawTriangles(segment.indexBuffer, 0, len);
 
@@ -358,7 +358,7 @@ class TextDemo {
 
     function onActivate(?event:Event):Void {
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-        update();
+        onEnterFrame();
         renderMouse();
     }
 
@@ -367,20 +367,24 @@ class TextDemo {
     }
 
     function onEnterFrame(?event:Event):Void {
-        //if (showHideFunc != null) showHideFunc();
+        if (showHideFunc != null) showHideFunc();
         update();
         renderPretty();
     }
 
     function hideSomeGlyphs():Void {
         var model:Model = models[0];
-        model.toggleGlyphs(model.glyphs.slice(0, 200), false);
+        var _glyphs:Array<Glyph> = [];
+        for (ike in 0...1000) _glyphs.push(model.glyphs[Std.random(model.numGlyphs)]);
+        model.toggleGlyphs(_glyphs, false);
         if (model.numVisibleGlyphs <= 0) showHideFunc = showSomeGlyphs;
     }
 
     function showSomeGlyphs():Void {
         var model:Model = models[0];
-        model.toggleGlyphs(model.glyphs.slice(model.numVisibleGlyphs, model.numVisibleGlyphs + 200), true);
+        var _glyphs:Array<Glyph> = [];
+        for (ike in 0...1000) _glyphs.push(model.glyphs[Std.random(model.numGlyphs)]);
+        model.toggleGlyphs(_glyphs, true);
         if (model.numVisibleGlyphs >= model.numGlyphs) showHideFunc = hideSomeGlyphs;
     }
 }
