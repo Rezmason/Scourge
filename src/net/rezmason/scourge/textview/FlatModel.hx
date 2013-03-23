@@ -24,11 +24,11 @@ class FlatModel extends Model {
             var i:Float = 0.2;
             var s:Float = 1;
 
-            var geom:Array<Float> = [
-                x, y, z, 0, 0, s,
-                x, y, z, 0, 1, s,
-                x, y, z, 1, 1, s,
-                x, y, z, 1, 0, s,
+            var shape:Array<Float> = [
+                x, y, z, 0, 0, s, p,
+                x, y, z, 0, 1, s, p,
+                x, y, z, 1, 1, s, p,
+                x, y, z, 1, 0, s, p,
             ];
 
             var color:Array<Float> = [
@@ -41,7 +41,7 @@ class FlatModel extends Model {
             var glyph:Glyph = new Glyph();
             glyph.fatChar = fatChar;
             glyph.color = color;
-            glyph.shape = geom;
+            glyph.shape = shape;
             glyph.visible = true;
             glyph.id = ike;
 

@@ -10,11 +10,11 @@ class AlphabetModel extends Model {
         for (ike in 0...26) {
 
             var x:Float = (ike + 0.5) / 26 - 0.5;
-            var geom:Array<Float> = [
-                x, 0, 0, 0, 0, 3,
-                x, 0, 0, 0, 1, 3,
-                x, 0, 0, 1, 1, 3,
-                x, 0, 0, 1, 0, 3,
+            var shape:Array<Float> = [
+                x, 0, 0, 0, 0, 3, 0,
+                x, 0, 0, 0, 1, 3, 0,
+                x, 0, 0, 1, 1, 3, 0,
+                x, 0, 0, 1, 0, 3, 0,
             ];
 
             var charCode:Int = 65 + ike;
@@ -31,7 +31,7 @@ class AlphabetModel extends Model {
             var glyph:Glyph = new Glyph();
             glyph.fatChar = fatChar;
             glyph.color = color;
-            glyph.shape = geom;
+            glyph.shape = shape;
             glyph.visible = true;
             glyph.id = ike;
 

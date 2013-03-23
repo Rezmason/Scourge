@@ -6,7 +6,7 @@ class Almanac {
     public inline static var NUM_INDICES_PER_TRIANGLE:Int = 3;
     public inline static var NUM_INDICES_PER_GLYPH:Int = NUM_TRIANGLES_PER_GLYPH * NUM_INDICES_PER_TRIANGLE;
 
-    public inline static var NUM_SHAPE_FLOATS_PER_VERTEX:Int = 3 + 2 + 1; // X,Y,Z H,V S
+    public inline static var NUM_SHAPE_FLOATS_PER_VERTEX:Int = 3 + 2 + 1 + 1; // X,Y,Z H,V S P
     public inline static var NUM_COLOR_FLOATS_PER_VERTEX:Int = 3 + 2 + 1; // R,G,B U,V I
     public inline static var NUM_PAINT_FLOATS_PER_VERTEX:Int = 3; // PAINT_0, PAINT_1, PAINT_2
 

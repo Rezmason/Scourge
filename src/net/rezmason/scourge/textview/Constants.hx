@@ -3,7 +3,7 @@ package net.rezmason.scourge.textview;
 class Constants {
     public static inline var STAGE_WIDTH:Int = 800;
     public static inline var STAGE_HEIGHT:Int = 600;
-    public static inline var SCALE:Int = 1;
+    public static inline var SCALE:Int = 2;
     public static inline var NUM_ROWS:Int = 35 * SCALE; // 35
     public static inline var NUM_COLUMNS:Int = 85 * SCALE; // 85
     public static inline var NUM_CHARS:Int = NUM_ROWS * NUM_COLUMNS;

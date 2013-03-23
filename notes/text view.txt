@@ -10,6 +10,10 @@ Make a utility for as many things as you can
 
 Figure out the width/height stuff
 
+Encapsulate stuff
+    Some vars/methods don't need to be public
+    And some don't need to exist
+
 Animate things!
     Change something on the characters per frame
     Change something every five seconds

@@ -1,4 +1,6 @@
 TextView (see file)
+	Renderer
+	View elements
 
 Finalize ROPES classes
 

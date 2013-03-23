@@ -63,10 +63,10 @@ class TextDemo {
         mouseShape.graphics.lineTo(0, 20);
         mouseShape.graphics.lineTo(10, 16);
         mouseShape.graphics.endFill();
-        /*
+        //*
         stage.addChild(mouseBitmap);
         stage.addChild(mouseShape);
-        */
+        /**/
 
         stage3D = stage.stage3Ds[0];
         stage3D.addEventListener(Event.CONTEXT3D_CREATE, onCreate);
@@ -122,15 +122,17 @@ class TextDemo {
         var assembler:AGALMiniAssembler = new AGALMiniAssembler();
 
         var vertCode:String = [
-            "m44 vt1 va1 vc5",  // corner = glyphMat.project(hv) * s
-            "mul vt1.xy vt1.xy va2.xx",
-            "m44 vt0 va0 vc9",  // projected = mat.project(xyz)
-            "m44 vt0 vt0 vc1",  // projected = mat.project(xyz)
+            "m44 vt1 va1 vc5",  // corner = glyphMat.project(hv)
+            "mul vt1.xy vt1.xy va2.xx", // corner *= s
+
+            "m44 vt0 va0 vc9",  // pos = modelMat.project(xyz)
+            "add vt0.z vt0.z va3.x", // pos.z += p
+            "m44 vt0 vt0 vc1",  // pos = cameraMat.project(pos)
             "add vt0.xy vt0.xy vt1.xy",  // pos = corner.xy + projected
 
-            "mov v0 va3",        // fInput[0] = rgba
-            "mov v1 va4",        // fInput[1] = uv
-            "mov v2 va5",        // fInput[2] = i
+            "mov v0 va4",        // fInput[0] = rgba
+            "mov v1 va5",        // fInput[1] = uv
+            "mov v2 va6",        // fInput[2] = i
             "mov v3 vt0.zzzz",   // fInput[3] = pos.z
 
             "max vt0.z vt0.z vc0.z", // flatten the z that go beyond the frustum
@@ -172,11 +174,11 @@ class TextDemo {
         var vertCode:String = [
             "m44 vt1 va1 vc5",  // corner = glyphMat.project(hv)
 
-            "m44 vt0 va0 vc9",  // projected = mat.project(xyz)
-            "m44 vt0 vt0 vc1",  // projected = mat.project(xyz)
+            "m44 vt0 va0 vc9",  // pos = modelMat.project(xyz)
+            "m44 vt0 vt0 vc1",  // pos = cameraMat.project(pos)
             "add vt0.xy vt0.xy vt1.xy",  // pos = corner.xy + projected
 
-            "mov v0 va6", // f[0] = paint
+            "mov v0 va7", // f[0] = paint
 
             "mov op vt0",  // outputPosition = pos
         ].join("\n");
@@ -236,7 +238,7 @@ class TextDemo {
         //*
         modelMat.appendRotation(-numX * 360 - 180, Vector3D.Z_AXIS);
         modelMat.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
-        modelMat.appendTranslation(0, 0, cZ);
+        //modelMat.appendTranslation(0, 0, cZ);
 
         modelMat.appendTranslation(0, 0, 0.5);
 
@@ -285,10 +287,11 @@ class TextDemo {
                 context.setVertexBufferAt(0, segment.shapeBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
                 context.setVertexBufferAt(1, segment.shapeBuffer,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
                 context.setVertexBufferAt(2, segment.shapeBuffer,  5, Context3DVertexBufferFormat.FLOAT_1); // va2 contains s
-                context.setVertexBufferAt(3, segment.colorBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va3 contains r,g,b
-                context.setVertexBufferAt(4, segment.colorBuffer, 3, Context3DVertexBufferFormat.FLOAT_2); // va4 contains u,v
-                context.setVertexBufferAt(5, segment.colorBuffer, 5, Context3DVertexBufferFormat.FLOAT_1); // va5 contains i
-                context.setVertexBufferAt(6, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va6 is empty
+                context.setVertexBufferAt(3, segment.shapeBuffer,  6, Context3DVertexBufferFormat.FLOAT_1); // va3 contains p
+                context.setVertexBufferAt(4, segment.colorBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va4 contains r,g,b
+                context.setVertexBufferAt(5, segment.colorBuffer, 3, Context3DVertexBufferFormat.FLOAT_2); // va5 contains u,v
+                context.setVertexBufferAt(6, segment.colorBuffer, 5, Context3DVertexBufferFormat.FLOAT_1); // va6 contains i
+                context.setVertexBufferAt(7, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va7 is empty
 
                 context.drawTriangles(segment.indexBuffer, 0, len);
             }
@@ -329,10 +332,11 @@ class TextDemo {
                 context.setVertexBufferAt(0, segment.shapeBuffer,  0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
                 context.setVertexBufferAt(1, segment.shapeBuffer,  3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
                 context.setVertexBufferAt(2, null,  5, Context3DVertexBufferFormat.FLOAT_1); // va2 is empty
-                context.setVertexBufferAt(3, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va3 is empty
-                context.setVertexBufferAt(4, null, 3, Context3DVertexBufferFormat.FLOAT_2); // va4 is empty
-                context.setVertexBufferAt(5, null, 5, Context3DVertexBufferFormat.FLOAT_1); // va5 is empty
-                context.setVertexBufferAt(6, segment.paintBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va6 contains paint
+                context.setVertexBufferAt(3, null,  6, Context3DVertexBufferFormat.FLOAT_1); // va3 is empty
+                context.setVertexBufferAt(4, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va4 is empty
+                context.setVertexBufferAt(5, null, 3, Context3DVertexBufferFormat.FLOAT_2); // va5 is empty
+                context.setVertexBufferAt(6, null, 5, Context3DVertexBufferFormat.FLOAT_1); // va6 is empty
+                context.setVertexBufferAt(7, segment.paintBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va7 contains paint
 
                 context.drawTriangles(segment.indexBuffer, 0, len);
 
@@ -367,7 +371,7 @@ class TextDemo {
     }
 
     function onEnterFrame(?event:Event):Void {
-        if (showHideFunc != null) showHideFunc();
+        //if (showHideFunc != null) showHideFunc();
         update();
         renderPretty();
     }
