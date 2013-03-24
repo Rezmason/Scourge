@@ -27,7 +27,7 @@ typedef BiteConfig = {
     var startingBites:Int;
 }
 
-typedef BiteOption = {>Option,
+typedef BiteMove = {>Move,
     var targetNode:Int;
     var bitNodes:Array<Int>;
     var thickness:Int;
@@ -51,7 +51,7 @@ class BiteRule extends Rule {
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var cfg:BiteConfig;
-    private var biteOptions:Array<BiteOption>;
+    private var biteMoves:Array<BiteMove>;
 
     public function new(cfg:BiteConfig):Void {
         super();
@@ -64,7 +64,7 @@ class BiteRule extends Rule {
 
     override private function _update():Void {
 
-        biteOptions = [];
+        biteMoves = [];
 
         // get current player head
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
@@ -78,15 +78,15 @@ class BiteRule extends Rule {
             var totalArea:Int = player.at(totalArea_);
             var bodyNode:BoardNode = getNode(player.at(bodyFirst_));
             var body:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_);
-            var frontNodes:Array<BoardNode> = body.filter(callback(isFront, headIDs)).array();
+            var frontNodes:Array<BoardNode> = body.filter(isFront.bind(headIDs)).array();
 
             // Grab the valid bites from immediate neighbors
 
-            var newOptions:Array<BiteOption> = [];
+            var newMoves:Array<BiteMove> = [];
             for (node in frontNodes) {
                 for (neighbor in neighborsFor(node)) {
                     if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
-                        var option:BiteOption = makeOption(node.value.at(nodeID_), [neighbor.value.at(nodeID_)]);
+                        var move:BiteMove = generateMove(node.value.at(nodeID_), [neighbor.value.at(nodeID_)]);
                         if (!cfg.omnidirectional && cfg.baseReachOnThickness) {
                             // The baseReachOnThickness config param uses this data to determine how far to extend a bite
                             var backwards:Int = (node.neighbors.indexOf(neighbor) + 4) % 8;
@@ -95,14 +95,14 @@ class BiteRule extends Rule {
                                 if (innerNode.value.at(occupier_) == currentPlayer) depth++;
                                 else break;
                             }
-                            option.thickness = depth;
+                            move.thickness = depth;
                         }
-                        newOptions.push(option);
+                        newMoves.push(move);
                     }
                 }
             }
-            for (ike in 0...newOptions.length) newOptions[ike].optionID = ike;
-            biteOptions = newOptions.copy();
+            for (ike in 0...newMoves.length) newMoves[ike].id = ike;
+            biteMoves = newMoves.copy();
 
             // Extend the existing valid bites
 
@@ -111,68 +111,68 @@ class BiteRule extends Rule {
             var reach:Int = Std.int(cfg.minReach + growthPercent * (cfg.maxReach - cfg.minReach));
             if (cfg.baseReachOnThickness) reach = cfg.maxReach;
 
-            // We find options by taking existing options and extending them until there's nothing left to extend
-            while (reachItr < reach && newOptions.length > 0) {
-                var oldOptions:Array<BiteOption> = newOptions;
-                newOptions = [];
+            // We find moves by taking existing moves and extending them until there's nothing left to extend
+            while (reachItr < reach && newMoves.length > 0) {
+                var oldMoves:Array<BiteMove> = newMoves;
+                newMoves = [];
 
-                for (option in oldOptions) {
+                for (move in oldMoves) {
                     if (cfg.omnidirectional) {
-                        // Omnidirectional options are squiggly
-                        for (bitNodeID in option.bitNodes) {
+                        // Omnidirectional moves are squiggly
+                        for (bitNodeID in move.bitNodes) {
                             var bitNode:BoardNode = getNode(bitNodeID);
                             for (neighbor in neighborsFor(bitNode)) {
-                                if (isValidEnemy(headIDs, currentPlayer, neighbor) && !option.bitNodes.has(neighbor.value.at(nodeID_))) {
-                                    newOptions.push(makeOption(option.targetNode, option.bitNodes.concat([neighbor.value.at(nodeID_)]), option));
+                                if (isValidEnemy(headIDs, currentPlayer, neighbor) && !move.bitNodes.has(neighbor.value.at(nodeID_))) {
+                                    newMoves.push(generateMove(move.targetNode, move.bitNodes.concat([neighbor.value.at(nodeID_)]), move));
                                 }
                             }
                         }
-                    } else if (!cfg.baseReachOnThickness || option.bitNodes.length < option.thickness) {
-                        // Straight options are a little easier to generate
-                        var firstBitNode:BoardNode = getNode(option.bitNodes[0]);
-                        var lastBitNode:BoardNode = getNode(option.bitNodes[option.bitNodes.length - 1]);
-                        var direction:Int = getNode(option.targetNode).neighbors.indexOf(firstBitNode);
+                    } else if (!cfg.baseReachOnThickness || move.bitNodes.length < move.thickness) {
+                        // Straight moves are a little easier to generate
+                        var firstBitNode:BoardNode = getNode(move.bitNodes[0]);
+                        var lastBitNode:BoardNode = getNode(move.bitNodes[move.bitNodes.length - 1]);
+                        var direction:Int = getNode(move.targetNode).neighbors.indexOf(firstBitNode);
                         var neighbor:BoardNode = lastBitNode.neighbors[direction];
                         if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
-                            var nextOption:BiteOption = makeOption(option.targetNode, option.bitNodes.concat([neighbor.value.at(nodeID_)]), option);
-                            nextOption.thickness = option.thickness;
-                            newOptions.push(nextOption);
+                            var nextMove:BiteMove = generateMove(move.targetNode, move.bitNodes.concat([neighbor.value.at(nodeID_)]), move);
+                            nextMove.thickness = move.thickness;
+                            newMoves.push(nextMove);
                         }
                     }
                 }
 
-                for (ike in 0...newOptions.length) newOptions[ike].optionID = ike + biteOptions.length;
-                biteOptions = biteOptions.concat(newOptions);
+                for (ike in 0...newMoves.length) newMoves[ike].id = ike + biteMoves.length;
+                biteMoves = biteMoves.concat(newMoves);
 
                 reachItr++;
             }
         }
 
-        // We find all options that represent the same action and mark the duplicates
+        // We find all moves that represent the same action and mark the duplicates
         // (This helps AI players)
-        for (ike in 0...biteOptions.length) {
-            var biteOption:BiteOption = biteOptions[ike];
-            if (biteOption.duplicate) continue;
-            for (jen in ike + 1...biteOptions.length) {
-                if (biteOptions[jen].duplicate) continue;
-                biteOptions[jen].duplicate = optionsAreEqual(biteOption, biteOptions[jen]);
+        for (ike in 0...biteMoves.length) {
+            var biteMove:BiteMove = biteMoves[ike];
+            if (biteMove.duplicate) continue;
+            for (jen in ike + 1...biteMoves.length) {
+                if (biteMoves[jen].duplicate) continue;
+                biteMoves[jen].duplicate = movesAreEqual(biteMove, biteMoves[jen]);
             }
         }
 
-        //trace("\n" + biteOptions.join("\n"));
+        //trace("\n" + biteMoves.join("\n"));
 
-        options = cast biteOptions;
+        moves = cast biteMoves;
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
 
-        var option:BiteOption = cast options[choice];
+        var move:BiteMove = cast moves[choice];
 
-        if (option.targetNode != Aspect.NULL) {
+        if (move.targetNode != Aspect.NULL) {
 
-            // Grab data from the option
+            // Grab data from the move
 
-            var node:BoardNode = getNode(option.targetNode);
+            var node:BoardNode = getNode(move.targetNode);
             var currentPlayer:Int = state.aspects.at(currentPlayer_);
 
             var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
@@ -183,7 +183,7 @@ class BiteRule extends Rule {
             var bitNodesByPlayer:Array<Array<BoardNode>> = [];
             for (player in eachPlayer()) bitNodesByPlayer.push([]);
 
-            for (bitNodeID in option.bitNodes) {
+            for (bitNodeID in move.bitNodes) {
                 var bitNode:BoardNode = getNode(bitNodeID);
                 bitNodesByPlayer[bitNode.value.at(occupier_)].push(bitNode);
             }
@@ -204,7 +204,7 @@ class BiteRule extends Rule {
 
     // "front" as in "battle front". Areas where the current player touches other players
     inline function isFront(headIDs:Array<Int>, node:BoardNode):Bool {
-        return neighborsFor(node).exists(callback(isValidEnemy, headIDs, node.value.at(occupier_)));
+        return neighborsFor(node).exists(isValidEnemy.bind(headIDs, node.value.at(occupier_)));
     }
 
     // Depending on the config, enemy nodes of different kinds can be bitten
@@ -218,24 +218,24 @@ class BiteRule extends Rule {
         return val;
     }
 
-    inline function makeOption(targetNodeID:Int, bitNodes:Array<Int>, relatedOption:BiteOption = null):BiteOption {
-        var option:BiteOption = {
-            optionID:-1,
+    inline function generateMove(targetNodeID:Int, bitNodes:Array<Int>, relatedMove:BiteMove = null):BiteMove {
+        var move:BiteMove = {
+            id:-1,
             targetNode:targetNodeID,
             bitNodes:bitNodes,
-            relatedOptionID:(relatedOption == null ? null : relatedOption.optionID),
+            relatedID:(relatedMove == null ? null : relatedMove.id),
             thickness:1,
             duplicate:false,
         };
 
-        return option;
+        return move;
     }
 
-    // compares the bit nodes of two options; if they're the same, then the options have the same consequence
-    inline function optionsAreEqual(option1:BiteOption, option2:BiteOption):Bool {
+    // compares the bit nodes of two moves; if they're the same, then the moves have the same consequence
+    inline function movesAreEqual(move1:BiteMove, move2:BiteMove):Bool {
         var val:Bool = true;
-        if (option1.bitNodes.length != option2.bitNodes.length) val = false;
-        else for (bitNode in option1.bitNodes) if (!option2.bitNodes.has(bitNode)) { val = false; break; }
+        if (move1.bitNodes.length != move2.bitNodes.length) val = false;
+        else for (bitNode in move1.bitNodes) if (!move2.bitNodes.has(bitNode)) { val = false; break; }
         return val;
     }
 

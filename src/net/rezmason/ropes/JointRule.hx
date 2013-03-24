@@ -19,31 +19,31 @@ class JointRule extends Rule {
 
     override private function _update():Void {
         rules[0].update();
-        options = rules[0].options;
-        quantumOptions = rules[0].quantumOptions;
+        moves = rules[0].moves;
+        quantumMoves = rules[0].quantumMoves;
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
         #if ROPES_VERBOSE trace("{"); #end
 
-        rules[0].chooseOption(choice);
+        rules[0].chooseMove(choice);
         for (ike in 1...rules.length) {
             var rule:Rule = rules[ike];
             rule.update();
-            rule.chooseOption();
+            rule.chooseMove();
         }
 
         #if ROPES_VERBOSE trace("}"); #end
     }
 
-    override private function _chooseQuantumOption(choice:Int):Void {
+    override private function _chooseQuantumMove(choice:Int):Void {
         #if ROPES_VERBOSE trace("{"); #end
 
-        rules[0].chooseQuantumOption(choice);
+        rules[0].chooseQuantumMove(choice);
         for (ike in 1...rules.length) {
             var rule:Rule = rules[ike];
             rule.update();
-            rule.chooseOption();
+            rule.chooseMove();
         }
 
         #if ROPES_VERBOSE trace("}"); #end

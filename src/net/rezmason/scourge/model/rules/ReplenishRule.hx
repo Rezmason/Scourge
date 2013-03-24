@@ -49,7 +49,7 @@ class ReplenishRule extends Rule {
         for (rProp in cfg.playerProperties) playerAspectRequirements.push(rProp.prop);
         for (rProp in cfg.nodeProperties) nodeAspectRequirements.push(rProp.prop);
 
-        options.push({optionID:0});
+        moves.push({id:0});
     }
 
     override private function _prime():Void {
@@ -103,7 +103,7 @@ class ReplenishRule extends Rule {
         }
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
 
         updateReps(cfg.stateProperties, updateState);
         updateReps(cfg.playerProperties, updatePlayers);

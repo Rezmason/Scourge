@@ -20,10 +20,10 @@ class EndTurnRule extends Rule {
 
     public function new():Void {
         super();
-        options.push({optionID:0});
+        moves.push({id:0});
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
 
         // Get current player
 

@@ -1,5 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
+import haxe.ds.IntMap;
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.GridNode;
 import net.rezmason.ropes.Types;
@@ -27,7 +28,7 @@ typedef DropPieceConfig = {
     public var diagOnly:Bool;
 }
 
-typedef DropPieceOption = {>Option,
+typedef DropPieceMove = {>Move,
     var targetNode:Int;
     var addedNodes:Array<Int>;
     var rotation:Int;
@@ -61,21 +62,21 @@ class DropPieceRule extends Rule {
 
     override private function _update():Void {
 
-        var dropOptions:Array<DropPieceOption> = [];
+        var dropMoves:Array<DropPieceMove> = [];
 
         // This allows the place-piece function to behave like a skip function
         // Setting this to false also forces players to forfeit if they can't place a piece
         if (cfg.allowNowhere) {
-            var nowhereOption:DropPieceOption = {
+            var nowhereMove:DropPieceMove = {
                 targetNode:Aspect.NULL,
                 coord:null,
                 rotation:0,
                 reflection:0,
-                optionID:0,
+                id:0,
                 duplicate:false,
                 addedNodes:[],
             };
-            dropOptions.push(cast nowhereOption);
+            dropMoves.push(cast nowhereMove);
         }
 
         if (state.aspects.at(pieceTableID_) != Aspect.NULL) {
@@ -106,7 +107,7 @@ class DropPieceRule extends Rule {
                     if (!cfg.allowRotating && rotationIndex != allowedRotationIndex) continue;
                     var rotation:Piece = reflection[rotationIndex];
 
-                    var coordCache:IntHash<Array<IntCoord>> = new IntHash<Array<IntCoord>>();
+                    var coordCache:IntMap<Array<IntCoord>> = new IntMap<Array<IntCoord>>();
 
                     // For each edge node,
                     for (node in edgeNodes) {
@@ -146,12 +147,12 @@ class DropPieceRule extends Rule {
                                 }
 
                                 if (valid) {
-                                    dropOptions.push({
+                                    dropMoves.push({
                                         targetNode:nodeID,
                                         coord:homeCoord,
                                         rotation:rotationIndex,
                                         reflection:reflectionIndex,
-                                        optionID:dropOptions.length,
+                                        id:dropMoves.length,
                                         addedNodes:addedNodes,
                                         duplicate:false,
                                     });
@@ -163,31 +164,31 @@ class DropPieceRule extends Rule {
             }
         }
 
-        // We find and mark duplicate options, to help AI players
-        for (ike in 0...dropOptions.length) {
-            var dropOption:DropPieceOption = dropOptions[ike];
-            if (dropOption.duplicate) continue;
-            for (jen in ike + 1...dropOptions.length) {
-                if (dropOptions[jen].duplicate) continue;
-                dropOptions[jen].duplicate = optionsAreEqual(dropOption, dropOptions[jen]);
+        // We find and mark duplicate moves, to help AI players
+        for (ike in 0...dropMoves.length) {
+            var dropMove:DropPieceMove = dropMoves[ike];
+            if (dropMove.duplicate) continue;
+            for (jen in ike + 1...dropMoves.length) {
+                if (dropMoves[jen].duplicate) continue;
+                dropMoves[jen].duplicate = movesAreEqual(dropMove, dropMoves[jen]);
             }
         }
 
-        options = cast dropOptions;
+        moves = cast dropMoves;
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
 
-        var option:DropPieceOption = cast options[choice];
+        var move:DropPieceMove = cast moves[choice];
 
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var player:AspectSet = getPlayer(currentPlayer);
 
-        if (option.targetNode != Aspect.NULL) {
+        if (move.targetNode != Aspect.NULL) {
             var pieceGroup:PieceGroup = Pieces.getPieceById(state.aspects.at(pieceTableID_));
-            var node:BoardNode = getNode(option.targetNode);
-            var coords:Array<IntCoord> = pieceGroup[option.reflection][option.rotation][0];
-            var homeCoord:IntCoord = option.coord;
+            var node:BoardNode = getNode(move.targetNode);
+            var coords:Array<IntCoord> = pieceGroup[move.reflection][move.rotation][0];
+            var homeCoord:IntCoord = move.coord;
             var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 
             var bodyNode:BoardNode = getNode(getPlayer(currentPlayer).at(bodyFirst_));
@@ -213,11 +214,11 @@ class DropPieceRule extends Rule {
         return node.value.at(isFilled_) == Aspect.FALSE;
     }
 
-    inline function optionsAreEqual(option1:DropPieceOption, option2:DropPieceOption):Bool {
+    inline function movesAreEqual(move1:DropPieceMove, move2:DropPieceMove):Bool {
         var val:Bool = true;
-        //if (option1.targetNode != option2.targetNode) val = false;
-        if (option1.addedNodes.length != option2.addedNodes.length) val = false;
-        else for (addedNode in option1.addedNodes) if (!option2.addedNodes.has(addedNode)) { val = false; break; }
+        //if (move1.targetNode != move2.targetNode) val = false;
+        if (move1.addedNodes.length != move2.addedNodes.length) val = false;
+        else for (addedNode in move1.addedNodes) if (!move2.addedNodes.has(addedNode)) { val = false; break; }
         return val;
     }
 

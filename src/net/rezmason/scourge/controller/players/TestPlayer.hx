@@ -30,7 +30,7 @@ class TestPlayer extends Player {
     override private function processEvent(event:GameEvent):Void {
         switch (event.type) {
             case PlayerAction(action, option):
-                if (game.hasBegun) game.chooseOption(action, option);
+                if (game.hasBegun) game.chooseMove(action, option);
                 play();
             case RefereeAction(action):
                 switch (action) {
@@ -91,14 +91,14 @@ class TestPlayer extends Player {
         //trace("CHOOSE " + index);
 
         var dropIndex:Int = game.actionIDs.indexOf("dropAction");
-        var firstDropOption:Int = game.getOptions()[dropIndex].length - 1;
+        var firstDropMove:Int = game.getMoves()[dropIndex].length - 1;
 
         var pickPieceIndex:Int = game.actionIDs.indexOf("pickPieceAction");
-        var firstPickPieceOption:Int = game.getOptions()[pickPieceIndex].length - 1;
+        var firstPickPieceMove:Int = game.getMoves()[pickPieceIndex].length - 1;
 
-        if (firstDropOption == 0 && firstPickPieceOption == 0) volley(PlayerAction(pickPieceIndex, firstPickPieceOption));
-        else if (firstDropOption > 0) volley(PlayerAction(dropIndex, firstDropOption));
-        else trace(["ERROR:", firstDropOption, firstPickPieceOption]);
+        if (firstDropMove == 0 && firstPickPieceMove == 0) volley(PlayerAction(pickPieceIndex, firstPickPieceMove));
+        else if (firstDropMove > 0) volley(PlayerAction(dropIndex, firstDropMove));
+        else trace('ERROR: $firstDropMove $firstPickPieceMove');
     }
 
     private function volley(eventType:GameEventType):Void {
@@ -111,7 +111,6 @@ class TestPlayer extends Player {
 
     private function handleAnnotation(sender:String):Void
     {
-        var str:String = [game.currentPlayer, ":", sender].join(" ") + "\n" + game.spitBoard();
-        trace(str);
+        trace('${game.currentPlayer} : $sender \n ${game.spitBoard()}');
     }
 }

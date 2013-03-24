@@ -99,7 +99,7 @@ class ReplenishRuleTest extends ScourgeRuleTest
                 Assert.areEqual(expectedValues3[index3], node.value.at(nodeValue3_));
             }
 
-            replenishRule.chooseOption();
+            replenishRule.chooseMove();
         }
     }
 }

@@ -17,10 +17,10 @@ class OneLivingPlayerRule extends Rule {
     // This rule discovers whether there is only one remaining player, and makes that player the winner
     public function new():Void {
         super();
-        options.push({optionID:0});
+        moves.push({id:0});
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
 
         var playersWithHeads:Array<Int> = [];
         for (player in eachPlayer()) {

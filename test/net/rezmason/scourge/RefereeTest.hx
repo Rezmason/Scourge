@@ -63,7 +63,7 @@ class RefereeTest {
 			var oldDeferredCalls = deferredCalls;
 			deferredCalls = [];
 			var then = Timer.stamp();
-			//trace([ike, oldDeferredCalls.length, Std.int(then * 1000)]);
+			//trace('$ike ${oldDeferredCalls.length} ${Std.int(then * 1000)}');
 
 			for (call in oldDeferredCalls) {
 				call();

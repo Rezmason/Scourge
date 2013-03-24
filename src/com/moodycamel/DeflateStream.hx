@@ -148,7 +148,7 @@ class DeflateStream
 	private static inline var MAX_CODE_LENGTH_CODE_LENGTH : Int = 7;
 
 	// The code lengths are written in a funny order to maximize their compressability
-	private static inline var CODE_LENGTH_ORDER = [ 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 ];
+	private static inline function CODE_LENGTH_ORDER() return [ 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 ];
 
 	private static inline var EOB = 256;		// End of block symbol
 
@@ -393,7 +393,7 @@ class DeflateStream
 
 		// Make sure there's enough room in the output
 		var mem = ApplicationDomain.currentDomain.domainMemory;
-		if (_maxOutputBufferSize(len) > mem.length - currentAddr) {
+		if (_maxOutputBufferSize(len) > cast (mem.length, Int) - currentAddr) {
 			mem.length = _maxOutputBufferSize(len) + currentAddr;
 			Memory.select(mem);
 		}
@@ -1207,7 +1207,7 @@ class DeflateStream
 		writeBits(codeLengthCodes - 4, 4);
 
 		// Write code lengths of code length code
-		for (rank in CODE_LENGTH_ORDER) {
+		for (rank in CODE_LENGTH_ORDER()) {
 			writeBits(Memory.getUI16(scratchAddr + CODE_LENGTH_OFFSET + rank * 4), 3);
 		}
 

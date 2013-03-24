@@ -1,8 +1,10 @@
 package net.rezmason.utils;
 
-class IntHashUtils {
+import haxe.ds.IntMap;
 
-    public inline static function absorb<T>(a:IntHash<T>, b:IntHash<T>):Void {
+class IntMapUtils {
+
+    public inline static function absorb<T>(a:IntMap<T>, b:IntMap<T>):Void {
         if (a == null) throw "You can't absorb into a null hash.";
         if (b != null)
         {

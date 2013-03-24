@@ -1,15 +1,17 @@
 package net.rezmason.scourge.unused;
 
-typedef Diff<T> = IntHash<Change<T>>;
+import haxe.ds.IntMap;
 
 using Lambda;
+
+typedef Diff<T> = IntMap<Change<T>>;
 
 class PointerHistory<T> {
 
     private var diffs:Array<Diff<T>>;
     private var firstDiff:Diff<T>;
     private var pointers:Array<Pointer<T>>;
-    private var oldValues:IntHash<T>;
+    private var oldValues:IntMap<T>;
 
     public var revision(default, null):Int;
 
@@ -28,7 +30,7 @@ class PointerHistory<T> {
         revision = 0;
 
         pointers.splice(0, pointers.length);
-        oldValues = new IntHash<T>();
+        oldValues = new IntMap<T>();
     }
 
     public function reset():Void {
@@ -48,7 +50,7 @@ class PointerHistory<T> {
         #end
 
         var combinedChanges:Diff<T> = new Diff<T>();
-        var combinedChangeRevs:IntHash<Int> = new IntHash<Int>();
+        var combinedChangeRevs:IntMap<Int> = new IntMap<Int>();
         while (revision > goalRev) {
             var diff:Diff<T> = diffs[revision];
             for (change in diff) {

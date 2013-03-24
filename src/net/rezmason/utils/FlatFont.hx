@@ -11,6 +11,8 @@ import nme.text.TextField;
 import nme.text.TextFieldAutoSize;
 import nme.text.TextFormat;
 
+import haxe.ds.IntMap;
+import haxe.ds.StringMap;
 import haxe.Utf8;
 
 using Lambda;
@@ -29,7 +31,7 @@ typedef FlatFontJSON = {
 class FlatFont {
 
     var bitmapData:BitmapData;
-    var charCoords:IntHash<CharCoord>;
+    var charCoords:IntMap<CharCoord>;
     var defaultCharCoord:CharCoord;
     var jsonString:String;
 
@@ -46,7 +48,7 @@ class FlatFont {
         bdHeight = bitmapData.height;
 
         this.jsonString = jsonString;
-        charCoords = new IntHash<CharCoord>();
+        charCoords = new IntMap<CharCoord>();
 
         var expandedJSON:FlatFontJSON = jsonString.parse();
         charWidth = expandedJSON.charWidth;
@@ -100,6 +102,12 @@ class FlatFont {
 
     public inline function exportJSON():String { return jsonString; }
 
+    inline static function largestPowerOfTwo(input:Int):Int {
+        var output:Int = 1;
+        while (output < input) output = output * 2;
+        return output;
+    }
+
     #if flash
     public static function flatten(font:Font, fontSize:Int, charString:String, charWidth:Int, charHeight:Int, spacing:Int):FlatFont {
 
@@ -112,7 +120,7 @@ class FlatFont {
         var charYOffset:Int = charHeight + spacing;
 
         var charCoordJSON:Dynamic = {};
-        var requiredChars:Hash<Bool> = new Hash<Bool>();
+        var requiredChars:StringMap<Bool> = new StringMap<Bool>();
         var numChars:Int = 1;
 
         for (char in charString.split("")) {
@@ -125,8 +133,8 @@ class FlatFont {
         var numColumns:Int = Std.int(Math.sqrt(numChars)) + 1;
         var numRows:Int = Std.int(numChars / numColumns) + 1;
 
-        var width:Int = Std.int(Math.max(charXOffset * numColumns, charYOffset * numRows)) + spacing;
-        var bitmapData:BitmapData = new BitmapData(width, width, false, 0);
+        var width:Int = largestPowerOfTwo(Std.int(Math.max(charXOffset * numColumns, charYOffset * numRows)) + spacing);
+        var bitmapData:BitmapData = new BitmapData(width, width, true, 0x0);
         //bitmapData.fillRect(bitmapData.rect, 0xFFFFFFFF);
 
         var sp:Sprite = new Sprite();

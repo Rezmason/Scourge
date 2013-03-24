@@ -18,14 +18,14 @@ using net.rezmason.utils.Pointers;
 
 class Game {
 
-    public var actionIDs(getActionList, null):Array<String>;
-    public var revision(getRevision, never):Int;
-    public var currentPlayer(getCurrentPlayer, never):Int;
-    public var winner(getWinner, never):Int;
-    public var state(getState, null):State;
+    public var actionIDs(get, null):Array<String>;
+    public var revision(get, never):Int;
+    public var currentPlayer(get, never):Int;
+    public var winner(get, never):Int;
+    public var state(get, null):State;
     public var plan(default, null):StatePlan;
-    public var hasBegun(getHasBegun, null):Bool;
-    public var checksum(getChecksum, null):Int;
+    public var hasBegun(get, null):Bool;
+    public var checksum(get, null):Int;
 
     var historian:StateHistorian;
     var actions:Array<Rule>;
@@ -35,7 +35,7 @@ class Game {
 
     public function new():Void { historian = new StateHistorian(); }
 
-    public function begin(config:ScourgeConfig, randomFunction:Void->Float, annotateFunc:String->Dynamic = null, savedState:SavedState = null):Int {
+    public function begin(config:ScourgeConfig, randomFunction:Void->Float, annotateFunc:String->Void = null, savedState:SavedState = null):Int {
 
         if (hasBegun)
             throw "The game has already begun; it cannot begin again until you end it.";
@@ -43,17 +43,17 @@ class Game {
         // Build the game from the config
 
         var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, historian.history, historian.historyState);
-        var basicRules:Hash<Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
+        var basicRules:StringMap<Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
         var combinedConfig:Dynamic<Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
 
         if (annotateFunc != null) addAnnotations(annotateFunc, basicRules, combinedConfig);
 
-        var combinedRules:Hash<Rule> = RuleFactory.combineRules(combinedConfig, basicRules);
+        var combinedRules:StringMap<Rule> = RuleFactory.combineRules(combinedConfig, basicRules);
 
         // Find the demiurgic rules
 
         var basicRulesArray:Array<Rule> = [];
-        var demiurgicRules:Hash<Rule> = new Hash<Rule>();
+        var demiurgicRules:StringMap<Rule> = new StringMap<Rule>();
         var rules:Array<Rule> = [];
         for (key in basicRules.keys().a2z()) {
             var rule:Rule = basicRules.get(key);
@@ -100,12 +100,12 @@ class Game {
             var startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
             startAction.update();
             historian.key.unlock();
-            startAction.chooseOption();
+            startAction.chooseMove();
         }
         /*
         var startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
         startAction.update();
-        startAction.chooseOption();
+        startAction.chooseMove();
         */
 
         updateAll();
@@ -127,38 +127,38 @@ class Game {
 
     public function forget():Void { historian.history.forget(); }
 
-    public function getOptions():Array<Array<Option>> {
-        var allOptions:Array<Array<Option>> = [];
-        for (action in actions) allOptions.push(action.options);
-        return allOptions;
+    public function getMoves():Array<Array<Move>> {
+        var allMoves:Array<Array<Move>> = [];
+        for (action in actions) allMoves.push(action.moves);
+        return allMoves;
     }
 
-    public function getQuantumOptions():Array<Array<Option>> {
-        var allQuantumOptions:Array<Array<Option>> = [];
-        for (action in actions) allQuantumOptions.push(action.quantumOptions);
-        return allQuantumOptions;
+    public function getQuantumMoves():Array<Array<Move>> {
+        var allQuantumMoves:Array<Array<Move>> = [];
+        for (action in actions) allQuantumMoves.push(action.quantumMoves);
+        return allQuantumMoves;
     }
 
-    public function chooseOption(actionIndex:Int, optionIndex:Int = 0, isQuantum:Bool = false):Int {
+    public function chooseMove(actionIndex:Int, moveIndex:Int = 0, isQuantum:Bool = false):Int {
         if (actionIndex < 0 || actionIndex > actionIDs.length - 1)
             throw "Invalid action";
 
         var action:Rule = actions[actionIndex];
 
-        if (optionIndex < 0 || optionIndex > action.options.length - 1)
-            throw "Invalid option for action " + actionIDs[actionIndex];
+        if (moveIndex < 0 || moveIndex > action.moves.length - 1)
+            throw "Invalid move for action " + actionIDs[actionIndex];
 
-        if (isQuantum) action.chooseQuantumOption(optionIndex);
-        else action.chooseOption(optionIndex);
+        if (isQuantum) action.chooseQuantumMove(moveIndex);
+        else action.chooseMove(moveIndex);
 
         updateAll();
         return pushHist();
     }
 
-    public function chooseDefaultOption():Int {
+    public function chooseDefaultMove():Int {
         for (action in defaultActions) {
-            if (action.options.length > 0) {
-                action.chooseOption();
+            if (action.moves.length > 0) {
+                action.chooseMove();
                 break;
             }
         }
@@ -187,7 +187,7 @@ class Game {
         historian.key.unlock();
     }
 
-    private function addAnnotations(annotateFunc:String->Void, basicRules:Hash<Rule>, cfg:Dynamic<Array<String>>):Void {
+    private function addAnnotations(annotateFunc:String->Void, basicRules:StringMap<Rule>, cfg:Dynamic<Array<String>>):Void {
         var cfgFields:Array<String> = cfg.fields();
         for (field in cfgFields) {
             var ruleFields:Array<String> = cfg.field(field);
@@ -204,17 +204,17 @@ class Game {
         }
     }
 
-    private function getActionList():Array<String> { return actionIDs.copy(); }
+    private function get_actionIDs():Array<String> { return actionIDs.copy(); }
 
-    private function getRevision():Int { return historian.history.revision; }
+    private function get_revision():Int { return historian.history.revision; }
 
-    private function getCurrentPlayer():Int { return historian.state.aspects.at(currentPlayer_); }
+    private function get_currentPlayer():Int { return historian.state.aspects.at(currentPlayer_); }
 
-    private function getWinner():Int { return historian.state.aspects.at(winner_); }
+    private function get_winner():Int { return historian.state.aspects.at(winner_); }
 
-    private function getState():State { return historian.state; }
+    private function get_state():State { return historian.state; }
 
-    private function getHasBegun():Bool { return actions != null; }
+    private function get_hasBegun():Bool { return actions != null; }
 
-    private function getChecksum():Int { return historian.history.getChecksum(); }
+    private function get_checksum():Int { return historian.history.getChecksum(); }
 }

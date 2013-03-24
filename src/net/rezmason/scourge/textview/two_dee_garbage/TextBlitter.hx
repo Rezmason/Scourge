@@ -1,5 +1,6 @@
 package net.rezmason.scourge.textview;
 
+import haxe.ds.IntMap;
 //import nme.display.Bitmap;
 import nme.display.Stage;
 
@@ -22,13 +23,13 @@ typedef Thing = {
 class TextBlitter {
 
     var fatChars:Array<Array<FatChar>>;
-    var colors:IntHash<Int>;
+    var colors:IntMap<Int>;
     var flatFont:FlatFont;
     var things:Array<Thing>;
     var projection:Projection;
     var charSpriteManager:CharSpriteManager;
 
-    public function new(stage:Stage, message:String, colors:IntHash<Int>, flatFont:FlatFont):Void {
+    public function new(stage:Stage, message:String, colors:IntMap<Int>, flatFont:FlatFont):Void {
 
         this.colors = colors;
         charSpriteManager = new CharSpriteManager(stage, flatFont, 0.8);
@@ -50,9 +51,9 @@ class TextBlitter {
     function buildText():Void {
         fatChars = [];
         var dummy:FatChar = new FatChar();
-        for (y in 0...Constants.NUM_ROWS) {
+        for (y in 0...Constants.ROWS) {
             fatChars[y] = [];
-            for (x in 0...Constants.NUM_COLUMNS) {
+            for (x in 0...Constants.COLUMNS) {
                 fatChars[y][x] = dummy;
             }
         }
@@ -61,8 +62,8 @@ class TextBlitter {
     function buildThings():Void {
 
         things = [];
-        for (ty in 0...Constants.NUM_ROWS) {
-            for (tx in 0...Constants.NUM_COLUMNS) {
+        for (ty in 0...Constants.ROWS) {
+            for (tx in 0...Constants.COLUMNS) {
 
                 var charSprite:CharSprite = charSpriteManager.createCharSprite();
 
@@ -75,7 +76,7 @@ class TextBlitter {
                         z:(Math.sin(tx * 0.2) * 0.5 + 0.5) * (Math.sin(ty * 0.3) * 0.5 + 0.5) * Constants.MAX_DEPTH,
                         //z:Constants.MAX_DEPTH,
                     },
-                    swell:{val: 1.0 + tx / Constants.NUM_COLUMNS},
+                    swell:{val: 1.0 + tx / Constants.COLUMNS},
                 });
             }
         }

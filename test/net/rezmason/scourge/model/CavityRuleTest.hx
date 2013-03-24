@@ -49,7 +49,7 @@ class CavityRuleTest extends ScourgeRuleTest
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
-        cavityRule.chooseOption();
+        cavityRule.chooseMove();
 
         VisualAssert.assert("cavity city (all cavities filled)", state.spitBoard(plan));
 
@@ -100,7 +100,7 @@ class CavityRuleTest extends ScourgeRuleTest
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
-        cavityRule.chooseOption();
+        cavityRule.chooseMove();
 
         VisualAssert.assert("cavity city (all cavities filled) with broken moat", state.spitBoard(plan));
 

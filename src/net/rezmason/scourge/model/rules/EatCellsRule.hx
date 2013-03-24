@@ -41,10 +41,10 @@ class EatCellsRule extends Rule {
     public function new(cfg:EatCellsConfig):Void {
         super();
         this.cfg = cfg;
-        options.push({optionID:0});
+        moves.push({id:0});
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
 
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var head:Int = getPlayer(currentPlayer).at(head_);

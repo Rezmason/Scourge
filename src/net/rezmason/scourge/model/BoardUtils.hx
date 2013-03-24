@@ -14,7 +14,7 @@ using net.rezmason.utils.Pointers;
 
 class BoardUtils {
 
-    private inline static var ALPHABET:Int = "a".charCodeAt(0);
+    private inline static function ALPHABET():Int { return "a".charCodeAt(0); }
 
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
@@ -22,12 +22,12 @@ class BoardUtils {
         return state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n).run(Gr.s, south).run(Gr.e, east);
     }
 
-    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:Hash<String> = null):String {
+    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:StringMap<String> = null):String {
 
         if (state.nodes.length == 0) return "empty grid";
 
-        if (otherNodeAspects == null) otherNodeAspects = new Hash<String>();
-        var otherAspectPtrs:Hash<AspectPtr> = new Hash<AspectPtr>();
+        if (otherNodeAspects == null) otherNodeAspects = new StringMap<String>();
+        var otherAspectPtrs:StringMap<AspectPtr> = new StringMap<AspectPtr>();
         for (id in otherNodeAspects.keys()) otherAspectPtrs.set(id, plan.nodeAspectLookup.get(id));
 
         var str:String = "";
@@ -56,13 +56,11 @@ class BoardUtils {
                     var occupier:Null<Int> = column.value.at(occupier_);
                     var isFilled:Null<Int> = column.value.at(isFilled_);
 
-                    str += switch (true) {
-                        case (occupier == null): "n";
-                        case (occupier != Aspect.NULL && isFilled == Aspect.FALSE): String.fromCharCode(ALPHABET + occupier);
-                        case (occupier != Aspect.NULL): "" + occupier;
-                        case (isFilled == Aspect.TRUE): "X";
-                        case (isFilled == Aspect.FALSE && occupier == Aspect.NULL): " ";
-                    }
+                    if (occupier == null) str += "n";
+                    else if (occupier != Aspect.NULL && isFilled == Aspect.FALSE) str += String.fromCharCode(ALPHABET() + occupier);
+                    else if (occupier != Aspect.NULL) str += "" + occupier;
+                    else if (isFilled == Aspect.TRUE) str += "X";
+                    else if (isFilled == Aspect.FALSE && occupier == Aspect.NULL) str += " ";
                 }
             }
         }

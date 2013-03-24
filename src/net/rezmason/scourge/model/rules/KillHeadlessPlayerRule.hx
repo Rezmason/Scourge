@@ -28,10 +28,10 @@ class KillHeadlessPlayerRule extends Rule {
 
     public function new():Void {
         super();
-        options.push({optionID:0});
+        moves.push({id:0});
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
 
         var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
 

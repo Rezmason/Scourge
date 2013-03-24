@@ -54,7 +54,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:Hash<String> = new Hash<String>();
+        var F_isForFreshness:StringMap<String> = new StringMap<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
@@ -63,11 +63,11 @@ class BiteRuleTest extends ScourgeRuleTest
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
-        var options:Array<BiteOption> = cast biteRule.options;
-        Assert.areEqual(9, options.length);
+        var moves:Array<BiteMove> = cast biteRule.moves;
+        Assert.areEqual(9, moves.length);
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
-        biteRule.chooseOption();
+        biteRule.chooseMove();
 
         VisualAssert.assert("two player bite, bite taken up top", state.spitBoard(plan, true, F_isForFreshness));
 
@@ -94,7 +94,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:Hash<String> = new Hash<String>();
+        var F_isForFreshness:StringMap<String> = new StringMap<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
@@ -103,14 +103,14 @@ class BiteRuleTest extends ScourgeRuleTest
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
-        var options:Array<BiteOption> = cast biteRule.options;
-        Assert.areEqual(17, options.length);
+        var moves:Array<BiteMove> = cast biteRule.moves;
+        Assert.areEqual(17, moves.length);
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
-        for (option in options) {
-            if (option.bitNodes.length == biteConfig.maxReach) {
-                biteRule.chooseOption(option.optionID);
+        for (move in moves) {
+            if (move.bitNodes.length == biteConfig.maxReach) {
+                biteRule.chooseMove(move.id);
                 break;
             }
         }
@@ -140,7 +140,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:Hash<String> = new Hash<String>();
+        var F_isForFreshness:StringMap<String> = new StringMap<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
@@ -149,16 +149,16 @@ class BiteRuleTest extends ScourgeRuleTest
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
-        var options:Array<BiteOption> = cast biteRule.options;
-        Assert.areEqual(45, options.length);
+        var moves:Array<BiteMove> = cast biteRule.moves;
+        Assert.areEqual(45, moves.length);
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
         stateHistorian.write();
 
-        for (option in options) {
-            if (option.bitNodes.length == biteConfig.maxReach) {
-                biteRule.chooseOption(option.optionID);
+        for (move in moves) {
+            if (move.bitNodes.length == biteConfig.maxReach) {
+                biteRule.chooseMove(move.id);
                 break;
             }
         }
@@ -188,7 +188,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:Hash<String> = new Hash<String>();
+        var F_isForFreshness:StringMap<String> = new StringMap<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
@@ -197,14 +197,14 @@ class BiteRuleTest extends ScourgeRuleTest
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
-        var options:Array<BiteOption> = cast biteRule.options;
-        Assert.areEqual(28, options.length);
+        var moves:Array<BiteMove> = cast biteRule.moves;
+        Assert.areEqual(28, moves.length);
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
-        for (option in options) {
-            if (option.bitNodes.length == biteConfig.maxReach) {
-                biteRule.chooseOption(option.optionID);
+        for (move in moves) {
+            if (move.bitNodes.length == biteConfig.maxReach) {
+                biteRule.chooseMove(move.id);
                 break;
             }
         }
@@ -234,7 +234,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:Hash<String> = new Hash<String>();
+        var F_isForFreshness:StringMap<String> = new StringMap<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
@@ -246,14 +246,14 @@ class BiteRuleTest extends ScourgeRuleTest
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
-        var options:Array<BiteOption> = cast biteRule.options;
-        Assert.areEqual(10, options.length);
+        var moves:Array<BiteMove> = cast biteRule.moves;
+        Assert.areEqual(10, moves.length);
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
-        for (option in options) {
-            if (option.bitNodes.has(enemyHeadID)) {
-                biteRule.chooseOption(option.optionID);
+        for (move in moves) {
+            if (move.bitNodes.has(enemyHeadID)) {
+                biteRule.chooseMove(move.id);
                 break;
             }
         }
@@ -284,7 +284,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:Hash<String> = new Hash<String>();
+        var F_isForFreshness:StringMap<String> = new StringMap<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         VisualAssert.assert("two player bite", state.spitBoard(plan, true, F_isForFreshness));
@@ -293,19 +293,19 @@ class BiteRuleTest extends ScourgeRuleTest
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
-        var options:Array<BiteOption> = cast biteRule.options;
-        Assert.areEqual(20, options.length);
+        var moves:Array<BiteMove> = cast biteRule.moves;
+        Assert.areEqual(20, moves.length);
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
         var numBitNodes:Int = 0;
-        var thickestOptionID:Int = -1;
-        for (option in options) {
-            if (numBitNodes < option.bitNodes.length) {
-                numBitNodes = option.bitNodes.length;
-                thickestOptionID = option.optionID;
+        var thickestMoveID:Int = -1;
+        for (move in moves) {
+            if (numBitNodes < move.bitNodes.length) {
+                numBitNodes = move.bitNodes.length;
+                thickestMoveID = move.id;
             }
         }
-        biteRule.chooseOption(thickestOptionID);
+        biteRule.chooseMove(thickestMoveID);
 
         VisualAssert.assert("two player bite, deep bite right through the middle", state.spitBoard(plan, true, F_isForFreshness));
 
@@ -332,7 +332,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var F_isForFreshness:Hash<String> = new Hash<String>();
+        var F_isForFreshness:StringMap<String> = new StringMap<String>();
         F_isForFreshness.set(FreshnessAspect.FRESHNESS.id, "F");
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
@@ -348,16 +348,16 @@ class BiteRuleTest extends ScourgeRuleTest
         state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
 
         biteRule.update();
-        var options:Array<BiteOption> = cast biteRule.options;
-        Assert.areEqual(9 + 6, options.length);
+        var moves:Array<BiteMove> = cast biteRule.moves;
+        Assert.areEqual(9 + 6, moves.length);
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
         var nodeID_:AspectPtr = plan.onNode(IdentityAspect.NODE_ID);
         var cavityID:Int = cavity.value.at(nodeID_);
-        for (option in options) {
-            if (option.bitNodes.has(cavityID)) {
-                biteRule.chooseOption(option.optionID);
+        for (move in moves) {
+            if (move.bitNodes.has(cavityID)) {
+                biteRule.chooseMove(move.id);
                 break;
             }
         }

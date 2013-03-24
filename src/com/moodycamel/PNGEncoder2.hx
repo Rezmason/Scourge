@@ -64,16 +64,16 @@ class PNGEncoder2 extends EventDispatcher
 	public static var level : CompressionLevel;
 
 	// Provide both HaXe and AS3 properties to access the PNG result for reading
-	@:protected private inline function getPng() return __impl.png
-	@:protected public var png(getPng, null) : ByteArray;
-	@:getter(png) private function flGetPng() return getPng()
+	@:protected public var png(get, null) : ByteArray;
+	@:protected private inline function get_png() return __impl.png;
+	@:getter(png) private function flGetPng() return get_png();
 
 	// Provide both HaXe and AS3 properties to access the target FPS (read/write)
-	@:protected private inline function getTargetFPS() return __impl.targetFPS
-	@:protected private inline function setTargetFPS(fps : Int) return __impl.targetFPS = fps
-	@:protected public var targetFPS(getTargetFPS, setTargetFPS) : Int;
-	@:getter(targetFPS) private function flGetTargetFPS() return getTargetFPS()
-	@:setter(targetFPS) private function flSetTargetFPS(fps : Int) setTargetFPS(fps)
+	@:protected public var targetFPS(get, set) : Int;
+	@:protected private inline function get_targetFPS() return __impl.targetFPS;
+	@:protected private inline function set_targetFPS(fps : Int) return __impl.targetFPS = fps;
+	@:getter(targetFPS) private function flGetTargetFPS() return get_targetFPS();
+	@:setter(targetFPS) private function flSetTargetFPS(fps : Int) set_targetFPS(fps);
 
 
 	/**

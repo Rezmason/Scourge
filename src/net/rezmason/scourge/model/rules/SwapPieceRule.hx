@@ -34,13 +34,13 @@ class SwapPieceRule extends Rule {
 
     // This rule basically zaps the current player's piece and takes away a swap.
     override private function _update():Void {
-        options = [];
+        moves = [];
         var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var numSwaps:Int = getPlayer(currentPlayer).at(numSwaps_);
-        if (numSwaps > 0 && state.aspects.at(pieceTableID_) != Aspect.NULL) options.push({optionID:0});
+        if (numSwaps > 0 && state.aspects.at(pieceTableID_) != Aspect.NULL) moves.push({id:0});
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
                 var currentPlayer:Int = state.aspects.at(currentPlayer_);
         var numSwaps:Int = getPlayer(currentPlayer).at(numSwaps_);
         getPlayer(currentPlayer).mod(numSwaps_, numSwaps - 1);

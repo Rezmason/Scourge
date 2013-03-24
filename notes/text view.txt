@@ -1,24 +1,11 @@
-Stop passing context around
-    Make utilities and a utility factory instead
-
-Make it easier to add glyphs
-    GlyphUtils seems cumbersome if we're relying so much on FlatFont and GlyphTexture
-Make a utility for drawing
-    Pretty and Mouse go in there
-Make a utility for as many things as you can
-    These utilities will be the cross-platform API
-
-Figure out the width/height stuff
-
-Encapsulate stuff
-    Some vars/methods don't need to be public
-    And some don't need to exist
-
 Animate things!
     Change something on the characters per frame
     Change something every five seconds
 
 Globe-cube object
+
+Make it easier to add glyphs
+    GlyphUtils seems cumbersome if we're relying so much on FlatFont and GlyphTexture
 
 Interaction
     Make sure interaction IDs work
@@ -29,6 +16,9 @@ Interaction
         On first mouse move after a keystroke
     Only color and draw the hoverable/clickable objects, of course
         Create a large quad object for the board's draggable hit area
+
+Hey, this game is a Roguelike!
+    Figure out what solutions they have to lots of these problems
 
 What do the glyphs depict?
     3D views - board, polyominoes

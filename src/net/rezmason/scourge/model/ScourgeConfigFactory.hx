@@ -13,7 +13,7 @@ typedef ReplenishableConfig = { prop:AspectProperty, amount:Int, period:Int, max
 
 class ScourgeConfigFactory {
 
-    public static var ruleDefs:Hash<Class<Rule>> = cast Siphon.getDefs("net.rezmason.scourge.model.rules", "src", "Rule");
+    public static var ruleDefs:StringMap<Class<Rule>> = cast Siphon.getDefs("net.rezmason.scourge.model.rules", "src", "Rule");
 
     public static function makeDefaultActionList():Array<String> { return ["dropAction", "quitAction"]; }
     public static function makeStartAction():String { return "startAction"; }

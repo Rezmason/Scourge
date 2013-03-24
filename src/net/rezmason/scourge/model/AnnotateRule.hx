@@ -6,9 +6,9 @@ using net.rezmason.utils.Pointers;
 class AnnotateRule extends Rule {
     var func:Void->Void;
 
-    public function new(func:Void->Void):Void { super(); this.func = func; options.push({optionID:0}); }
+    public function new(func:Void->Void):Void { super(); this.func = func; moves.push({id:0}); }
 
-    override public function _chooseOption(choice:Int):Void {
+    override public function _chooseMove(choice:Int):Void {
         state.key.lock();
         func();
         state.key.unlock();

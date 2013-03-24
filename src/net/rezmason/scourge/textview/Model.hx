@@ -1,39 +1,32 @@
 package net.rezmason.scourge.textview;
 
-import nme.display3D.Context3D;
-import nme.display3D.textures.Texture;
-import nme.display3D.IndexBuffer3D;
-import nme.display3D.VertexBuffer3D;
+import haxe.ds.IntMap;
 import nme.geom.Matrix3D;
 import nme.geom.Rectangle;
 import nme.Vector;
 
-import net.rezmason.utils.FlatFont;
+import net.rezmason.scourge.textview.utils.BufferUtil;
+import net.rezmason.scourge.textview.utils.Types;
 
 class Model {
-    public var segments:Array<ModelSegment>;
+    public var segments(default, null):Array<ModelSegment>;
     public var id:Int;
     public var matrix:Matrix3D;
     public var numGlyphs(default, null):Int;
     public var numVisibleGlyphs(default, null):Int;
-    public var texture(default, null):Texture;
+    public var glyphTexture(default, null):GlyphTexture;
     public var scissorRectangle:Rectangle;
     public var numSegments(default, null):Int;
-    var glyphTexture:GlyphTexture;
 
     public var glyphs:Array<Glyph>;
 
-    var font:FlatFont;
+    var bufferUtil:BufferUtil;
 
-    var context:Context3D;
-
-    public function new(id:Int, context:Context3D, font:FlatFont):Void {
+    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
         this.id = id;
-        this.context = context;
-        this.font = font;
+        this.bufferUtil = bufferUtil;
 
-        glyphTexture = new GlyphTexture(context, font.getBitmapDataClone());
-        texture = glyphTexture.texture;
+        this.glyphTexture = glyphTexture;
         makeGlyphs();
         numGlyphs = glyphs.length;
         numVisibleGlyphs = glyphs.length;
@@ -58,7 +51,7 @@ class Model {
         var segmentID:Int = 0;
         while (startGlyph < numGlyphs) {
             var len:Int = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
-            segments.push(new ModelSegment(context, segmentID, glyphs.slice(startGlyph, startGlyph + len)));
+            segments.push(new ModelSegment(bufferUtil, segmentID, glyphs.slice(startGlyph, startGlyph + len)));
             startGlyph += Almanac.BUFFER_CHUNK;
             remainingGlyphs -= Almanac.BUFFER_CHUNK;
             segmentID++;
@@ -73,7 +66,7 @@ class Model {
         // Disregard duplicate glyphs, or glyphs whose visibility state doesn't need changing
 
         var glyphsBySegment:Array<Array<Glyph>> = [];
-        var glyphIDs:IntHash<Bool> = new IntHash<Bool>();
+        var glyphIDs:IntMap<Bool> = new IntMap<Bool>();
 
         for (segment in segments) glyphsBySegment.push([]);
         for (glyph in _glyphs) {

@@ -26,7 +26,7 @@ class Referee {
     var floats:Array<Float>;
     var busy:Bool;
 
-    public var gameBegun(getHasBegun, null):Bool;
+    public var gameBegun(get, null):Bool;
 
     public function new():Void {
         game = new Game();
@@ -101,11 +101,11 @@ class Referee {
                 if (game.currentPlayer != playerIndex)
                     throw "Player " + playerIndex + " cannot act at this time!";
                 clearFloats();
-                game.chooseOption(action, option);
+                game.chooseMove(action, option);
                 if (game.winner >= 0) game.end(); // TEMPORARY
                 refereeCall(getFloatsAction());
                 broadcastAndLog(event);
-            case RefereeAction(action):
+            case RefereeAction(_):
                 throw "Player's can't send referee calls!";
             case Ready:
                 readyCheck();
@@ -163,5 +163,5 @@ class Referee {
         return RandomFloats(SafeSerializer.run(floats));
     }
 
-    private inline function getHasBegun():Bool { return game.hasBegun; }
+    private inline function get_gameBegun():Bool { return game.hasBegun; }
 }

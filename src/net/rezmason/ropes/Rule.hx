@@ -17,8 +17,8 @@ using net.rezmason.utils.Pointers;
     var plan:StatePlan;
 
     public var demiurgic(default, null):Bool;
-    public var options(default, null):Array<Option>;
-    public var quantumOptions(default, null):Array<Option>;
+    public var moves(default, null):Array<Move>;
+    public var quantumMoves(default, null):Array<Move>;
     public var stateAspectRequirements(default, null):AspectRequirements;
     public var playerAspectRequirements(default, null):AspectRequirements;
     public var nodeAspectRequirements(default, null):AspectRequirements;
@@ -29,8 +29,8 @@ using net.rezmason.utils.Pointers;
 
     private function _prime():Void {}
     private function _update():Void {}
-    private function _chooseOption(choice:Int):Void {}
-    private function _chooseQuantumOption(choice:Int):Void {}
+    private function _chooseMove(choice:Int):Void {}
+    private function _chooseQuantumMove(choice:Int):Void {}
 
     private function __initReqs():Void {}
     private function __initPtrs():Void {}
@@ -43,8 +43,8 @@ using net.rezmason.utils.Pointers;
         extraAspectRequirements = [];
         extraAspectTemplate = [];
         extraAspectLookup = new AspectLookup();
-        options = [];
-        quantumOptions = [];
+        moves = [];
+        quantumMoves = [];
         __initReqs();
     }
 
@@ -67,26 +67,26 @@ using net.rezmason.utils.Pointers;
         _update();
     }
 
-    @:final public function chooseOption(choice:Int = -1):Void {
+    @:final public function chooseMove(choice:Int = -1):Void {
         var defaultChoice:Bool = choice == -1;
         if (defaultChoice) choice = 0;
 
-        if (options == null || options.length < choice || options[choice] == null) {
+        if (moves == null || moves.length < choice || moves[choice] == null) {
             throw "Invalid choice index.";
         }
         #if ROPES_VERBOSE
-            if (defaultChoice) trace(myName() + " choosing default option");
-            else trace(myName() + " choosing option " + choice);
+            if (defaultChoice) trace(myName() + " choosing default move");
+            else trace(myName() + " choosing move " + choice);
         #end
-        _chooseOption(choice);
+        _chooseMove(choice);
     }
 
-    @:final public function chooseQuantumOption(choice:Int):Void {
-        if (quantumOptions == null || quantumOptions.length < choice || quantumOptions[choice] == null) {
+    @:final public function chooseQuantumMove(choice:Int):Void {
+        if (quantumMoves == null || quantumMoves.length < choice || quantumMoves[choice] == null) {
             throw "Invalid choice index.";
         }
-        #if ROPES_VERBOSE trace(myName() + "choosing quantum option " + choice); #end
-        _chooseQuantumOption(choice);
+        #if ROPES_VERBOSE trace(myName() + "choosing quantum move " + choice); #end
+        _chooseQuantumMove(choice);
     }
 
     @:final inline function myName():String {
@@ -134,8 +134,8 @@ using net.rezmason.utils.Pointers;
     @:final inline function numExtras():Int { return state.extras.length; }
 
     #if macro
-    private static var lkpSources:Hash<String> = {
-        var hash:Hash<String> = new Hash<String>();
+    private static var lkpSources:StringMap<String> = {
+        var hash:StringMap<String> = new StringMap<String>();
         hash.set("state",  "plan");
         hash.set("player", "plan");
         hash.set("node",   "plan");
@@ -147,20 +147,20 @@ using net.rezmason.utils.Pointers;
         "__initReqs", "__initPointers",
         "prime",
         "update",
-        "chooseOption",
-        "chooseQuantumOption",
+        "chooseMove",
+        "chooseQuantumMove",
     ];
     #end
 
-    @:macro public static function build():Array<Field> {
+    macro public static function build():Array<Field> {
 
         var msg:String = "Building " + Context.getLocalClass().get().name + "  ";
 
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
 
-        var reqExpressions:Array<Expr> = [];
-        var ptrExpressions:Array<Expr> = [];
+        var declarations:Array<Expr> = [];
+        var assignments:Array<Expr> = [];
 
         for (field in fields) {
 
@@ -170,24 +170,21 @@ using net.rezmason.utils.Pointers;
 
             for (metaTag in field.meta) {
                 if (lkpSources.exists(metaTag.name)) {
-
-                    var aspectExpr:Expr = metaTag.params[0];
+                    var kind:String = metaTag.name;
+                    var name:String = field.name;
+                    var aspect:Expr = metaTag.params[0];
                     metaTag.params = [];
 
-                    field.access.remove(AStatic);
+                    var kindLookup:String = kind + "AspectLookup";
+                    var kindRequirements:String = kind + "AspectRequirements";
 
-                    var reqs:Expr = Context.parse(metaTag.name + "AspectRequirements", pos);
-                    var ptr:Expr = Context.parse(field.name, pos);
-                    var lkp:Expr = Context.parse(lkpSources.get(metaTag.name) + "." + metaTag.name + "AspectLookup", pos);
-
-                    reqExpressions.push( macro $reqs.push($aspectExpr) );
-                    ptrExpressions.push( macro $ptr = $lkp.get($aspectExpr.id) );
-
-                    //neko.Lib.println(macro :net.rezmason.ropes.Types.AspectPtr);
+                    declarations.push(macro $i{kindRequirements}.push($aspect));
+                    assignments.push(macro $i{name} = $p{[lkpSources.get(kind), kindLookup]}.get($aspect.id));
 
                     field.kind = FVar(macro :net.rezmason.ropes.Types.AspectPtr, null);
+                    field.access.remove(AStatic);
 
-                    msg += metaTag.name.charAt(0);
+                    msg += kind.charAt(0);
 
                     break;
                 }
@@ -196,8 +193,8 @@ using net.rezmason.utils.Pointers;
 
         msg += "\n";
 
-        fields.push(overrider("__initReqs", reqExpressions, pos));
-        fields.push(overrider("__initPtrs", ptrExpressions, pos));
+        fields.push(overrider("__initReqs", declarations, pos));
+        fields.push(overrider("__initPtrs", assignments, pos));
 
         #if ROPES_VERBOSE
             neko.Lib.print(msg);
@@ -208,7 +205,7 @@ using net.rezmason.utils.Pointers;
 
     #if macro
     private inline static function overrider(name:String, expressions:Array<Expr>, pos:Position):Field {
-        var func:Function = {params:[], args:[], ret:null, expr:{pos:pos, expr:EBlock(expressions)}};
+        var func:Function = {params:[], args:[], ret:null, expr:macro $b{expressions}};
         return { name:name, access:[APrivate, AOverride], kind:FFun(func), pos:pos };
     }
     #end

@@ -1,5 +1,6 @@
 package net.rezmason.ropes;
 
+import haxe.ds.ArraySort;
 import net.rezmason.ropes.Types;
 import net.rezmason.utils.StringSort;
 
@@ -9,13 +10,13 @@ using Type;
 
 class RuleFactory {
 
-    public static function makeBasicRules(ruleDefs:Hash<Class<Rule>>, cfg:Dynamic):Hash<Rule> {
+    public static function makeBasicRules(ruleDefs:StringMap<Class<Rule>>, cfg:Dynamic):StringMap<Rule> {
 
-        var rules:Hash<Rule> = new Hash<Rule>();
+        var rules:StringMap<Rule> = new StringMap<Rule>();
 
         if (cfg != null) {
             var cfgFields:Array<String> = cfg.fields();
-            cfgFields.sort(StringSort.sort);
+            ArraySort.sort(cfgFields, StringSort.sort);
             for (field in cfgFields) {
                 //var ruleDef:Class<Rule> = cast ruleDefs.get(field).resolveClass();
                 var ruleDef:Class<Rule> = ruleDefs.get(field);
@@ -31,8 +32,8 @@ class RuleFactory {
         return rules;
     }
 
-    public static function combineRules(cfg:Dynamic<Array<String>>, basicRules:Hash<Rule>):Hash<Rule> {
-        var combinedRules:Hash<Rule> = new Hash<Rule>();
+    public static function combineRules(cfg:Dynamic<Array<String>>, basicRules:StringMap<Rule>):StringMap<Rule> {
+        var combinedRules:StringMap<Rule> = new StringMap<Rule>();
 
         if (cfg != null) {
 
@@ -57,7 +58,7 @@ class RuleFactory {
             }
 
             var cfgFields:Array<String> = cfg.fields();
-            cfgFields.sort(StringSort.sort);
+            ArraySort.sort(cfgFields, StringSort.sort);
             for (field in cfgFields) {
                 if (basicRules.exists(field)) trace("Basic rule already exists with name: " + field);
                 else if (!combinedRules.exists(field)) makeJointRule(field);
@@ -69,5 +70,5 @@ class RuleFactory {
 
 /*
     Give each field a status: unbuilt, building, built
-    Populate a Hash<RuleConfigStatus> and check it
+    Populate a StringMap<RuleConfigStatus> and check it
 */

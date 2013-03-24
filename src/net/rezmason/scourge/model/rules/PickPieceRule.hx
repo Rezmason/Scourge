@@ -20,7 +20,7 @@ typedef PickPieceConfig = {
     public var randomFunction:Void->Float; // Source of random numbers
 }
 
-typedef PickPieceOption = {>Option,
+typedef PickPieceMove = {>Move,
     var hatIndex:Int;
     var pieceTableID:Int;
     var rotation:Int;
@@ -33,8 +33,8 @@ class PickPieceRule extends Rule {
 
     private var cfg:PickPieceConfig;
 
-    private var allOptions:Array<PickPieceOption>;
-    private var pickOption:Option;
+    private var allMoves:Array<PickPieceMove>;
+    private var pickMove:Move;
 
     // This rule is surprisingly complex
 
@@ -45,7 +45,7 @@ class PickPieceRule extends Rule {
     @extra(PieceAspect.PIECE_NEXT) var pieceNext_;
     @extra(PieceAspect.PIECE_PREV) var piecePrev_;
 
-    @extra(PieceAspect.PIECE_OPTION_ID) var pieceOptionID_;
+    @extra(PieceAspect.PIECE_OPTION_ID) var pieceMoveID_;
 
     @state(PieceAspect.PIECES_PICKED) var piecesPicked_;
     @state(PieceAspect.PIECE_FIRST) var pieceFirst_;
@@ -66,7 +66,7 @@ class PickPieceRule extends Rule {
     // All this for an overglorified random piece picker!
 
     override private function _prime():Void {
-        buildPieceOptions();
+        buildPieceMoves();
         buildHat();
     }
 
@@ -74,54 +74,54 @@ class PickPieceRule extends Rule {
 
         if (cfg.allowAll) {
             // The simplest system; the player can use any provided piece at any time
-            options = cast allOptions.copy();
-            quantumOptions = [];
+            moves = cast allMoves.copy();
+            quantumMoves = [];
         } else if (remakeHat()) {
-            // The hat's been refilled; all piece options are available as quantum options
-            options = [pickOption];
-            quantumOptions = cast allOptions.copy();
+            // The hat's been refilled; all piece moves are available as quantum moves
+            moves = [pickMove];
+            quantumMoves = cast allMoves.copy();
         } else if (state.aspects.at(pieceTableID_) == Aspect.NULL) {
-            options = [pickOption];
+            moves = [pickMove];
 
-            // Iterate over the hat's contents and incrlude the corresopnding quantum options
+            // Iterate over the hat's contents and incrlude the corresopnding quantum moves
 
-            var quantumPieceOptions:Array<PickPieceOption> = [];
+            var quantumPieceMoves:Array<PickPieceMove> = [];
             var firstHatPiece:AspectSet = getExtra(state.aspects.at(pieceHatFirst_));
             var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
-            for (piece in hatPieces) quantumPieceOptions.push(allOptions[piece.at(pieceOptionID_)]);
-            quantumOptions = cast quantumPieceOptions;
+            for (piece in hatPieces) quantumPieceMoves.push(allMoves[piece.at(pieceMoveID_)]);
+            quantumMoves = cast quantumPieceMoves;
         }
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
 
-        var option:PickPieceOption = cast options[choice];
+        var move:PickPieceMove = cast moves[choice];
         if (cfg.allowAll) {
             // The player's choice is selected
-            setPiece(option.pieceTableID, option.reflection, option.rotation);
+            setPiece(move.pieceTableID, move.reflection, move.rotation);
         } else {
             // A selection is made randomly
             if (remakeHat()) buildHat();
-            option = pickOptionFromHat();
-            setPiece(option.pieceTableID, option.reflection, option.rotation);
+            move = pickMoveFromHat();
+            setPiece(move.pieceTableID, move.reflection, move.rotation);
         }
     }
 
-    override private function _chooseQuantumOption(choice:Int):Void {
+    override private function _chooseQuantumMove(choice:Int):Void {
                 // The player's choice is selected
-        var option:PickPieceOption = cast options[choice];
+        var move:PickPieceMove = cast moves[choice];
         if (remakeHat()) buildHat();
-        pickOptionFromHat(option);
-        setPiece(option.pieceTableID, option.reflection, option.rotation);
+        pickMoveFromHat(move);
+        setPiece(move.pieceTableID, move.reflection, move.rotation);
     }
 
-    private function buildPieceOptions():Void {
+    private function buildPieceMoves():Void {
 
-        // Every option has to be made before the game begins. These options
+        // Every move has to be made before the game begins. These moves
         // are reused throughout the game to represent the hat's contents.
 
-        allOptions = [];
-        pickOption = {optionID:0};
+        allMoves = [];
+        pickMove = {id:0};
 
         // We create the table of piece frequencies from the config
 
@@ -131,7 +131,7 @@ class PickPieceRule extends Rule {
             pieceFrequencies[pieceTableID]++;
         }
 
-        // Create an option for every element being picked randomly
+        // Create an move for every element being picked randomly
 
         for (pieceTableID in 0...pieceFrequencies.length) {
             var freq:Null<Int> = pieceFrequencies[pieceTableID];
@@ -140,34 +140,34 @@ class PickPieceRule extends Rule {
             var piece:PieceGroup = Pieces.getPieceById(pieceTableID);
 
             // A piece that can't be flipped or rotated has its multiple symmetries
-            // added to the hat, and so it has more options
+            // added to the hat, and so it has more moves
 
             if (cfg.allowFlipping) {
                 if (cfg.allowRotating) {
-                    makeOption(pieceTableID, 0, 0, freq);
+                    generateMove(pieceTableID, 0, 0, freq);
                 } else {
                     var spinWeight:Int = Std.int(piece[0].length / 4);
-                    for (rotation in 0...piece[0].length) makeOption(pieceTableID, 0, rotation, freq * spinWeight);
+                    for (rotation in 0...piece[0].length) generateMove(pieceTableID, 0, rotation, freq * spinWeight);
                 }
             } else {
                 for (flip in 0...piece.length) {
                     if (cfg.allowRotating) {
-                        makeOption(pieceTableID, flip, 0, freq);
+                        generateMove(pieceTableID, flip, 0, freq);
                     } else {
                         var spinWeight:Int = Std.int(piece[flip].length / 4);
-                        for (rotation in 0...piece[flip].length) makeOption(pieceTableID, flip, rotation, freq * spinWeight);
+                        for (rotation in 0...piece[flip].length) generateMove(pieceTableID, flip, rotation, freq * spinWeight);
                     }
                 }
             }
         }
 
-        // Create a hat extra for every option
+        // Create a hat extra for every move
         var allPieces:Array<AspectSet> = [];
-        for (option in allOptions) {
+        for (move in allMoves) {
             extraAspectTemplate.mod(pieceID_, numExtras());
-            option.hatIndex = numExtras();
+            move.hatIndex = numExtras();
             var piece:AspectSet = buildExtra();
-            piece.mod(pieceOptionID_, option.optionID);
+            piece.mod(pieceMoveID_, move.id);
             allPieces.push(piece);
             state.extras.push(piece);
             cfg.buildCfg.historyState.extras.push(buildHistExtra(cfg.buildCfg.history));
@@ -177,18 +177,18 @@ class PickPieceRule extends Rule {
         state.aspects.mod(pieceFirst_, allPieces[0].at(pieceID_));
     }
 
-    private function makeOption(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):PickPieceOption {
-        var option:PickPieceOption = {
+    private function generateMove(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):PickPieceMove {
+        var move:PickPieceMove = {
             pieceTableID:pieceTableID,
             rotation:rotation,
             reflection:reflection,
             weight:weight,
-            relatedOptionID:0,
-            optionID:allOptions.length,
+            relatedID:0,
+            id:allMoves.length,
             hatIndex:0,
         };
-        allOptions.push(option);
-        return option;
+        allMoves.push(move);
+        return move;
     }
 
     private function setPiece(pieceTableID:Int, reflection:Int, rotation:Int):Void {
@@ -197,7 +197,7 @@ class PickPieceRule extends Rule {
         state.aspects.mod(pieceRotation_, rotation);
     }
 
-    private function pickOptionFromHat(option:PickPieceOption = null):PickPieceOption {
+    private function pickMoveFromHat(move:PickPieceMove = null):PickPieceMove {
 
         var firstHatPiece:AspectSet = getExtra(state.aspects.at(pieceHatFirst_));
         var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
@@ -211,16 +211,16 @@ class PickPieceRule extends Rule {
         var weights:Array<Float> = [];
         for (piece in hatPieces) {
             weights.push(maxWeight);
-            maxWeight += allOptions[piece.at(pieceOptionID_)].weight;
+            maxWeight += allMoves[piece.at(pieceMoveID_)].weight;
         }
 
         var pickedPiece:AspectSet = null;
-        if (option == null) {
+        if (move == null) {
             var pick:Float = cfg.randomFunction() * maxWeight;
             pickedPiece = hatPieces[binarySearch(pick, weights)];
-            option = allOptions[pickedPiece.at(pieceOptionID_)];
+            move = allMoves[pickedPiece.at(pieceMoveID_)];
         } else {
-            pickedPiece = getExtra(option.hatIndex);
+            pickedPiece = getExtra(move.hatIndex);
         }
 
 
@@ -234,7 +234,7 @@ class PickPieceRule extends Rule {
             else state.aspects.mod(pieceHatFirst_, firstHatPiece.at(pieceID_));
         }
 
-        return option;
+        return move;
     }
 
     private function buildHat():Void {

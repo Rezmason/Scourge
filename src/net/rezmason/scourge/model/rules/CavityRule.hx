@@ -1,5 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
+import haxe.ds.IntMap;
 import net.rezmason.ropes.Aspect;
 //import net.rezmason.ropes.GridNode;
 import net.rezmason.ropes.Types;
@@ -34,10 +35,10 @@ class CavityRule extends Rule {
 
     public function new():Void {
         super();
-        options.push({optionID:0});
+        moves.push({id:0});
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
                 var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
         for (player in eachPlayer()) remapCavities(player.at(playerID_), maxFreshness);
         state.aspects.mod(maxFreshness_, maxFreshness);
@@ -68,12 +69,12 @@ class CavityRule extends Rule {
         // This takes advantage of the FILO search pattern of GridUtils.getGraph
 
         remainingNodes = body.length - 1;
-        var widePerimeter:Array<BoardNode> = head.getGraph(true, callback(isWithinPerimeter, playerID));
+        var widePerimeter:Array<BoardNode> = head.getGraph(true, isWithinPerimeter.bind(playerID));
 
         // After reversing the search results, they are sorted in the order of most-outside to least-outside
         widePerimeter.reverse();
 
-        var nodeIDs:IntHash<Bool> = new IntHash<Bool>();
+        var nodeIDs:IntMap<Bool> = new IntMap<Bool>();
         for (node in widePerimeter) nodeIDs.set(node.value.at(nodeID_), true);
 
         var empties:Array<BoardNode> = [];

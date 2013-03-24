@@ -4,29 +4,33 @@ import net.rezmason.utils.FatChar;
 
 class TestModel extends Model {
 
-    public inline static var COLOR_RANGE:Int = 6;
+    inline static var COLOR_RANGE:Int = 6;
+
+    inline static var COLUMNS:Int = 50;
+    inline static var ROWS:Int = 50;
+    inline static var TOTAL_CHARS:Int = COLUMNS * ROWS;
 
     override function makeGlyphs():Void {
         super.makeGlyphs();
 
-        for (ike in 0...Constants.NUM_CHARS) {
+        for (ike in 0...TOTAL_CHARS) {
 
-            var col:Int = ike % Constants.NUM_COLUMNS;
-            var row:Int = Std.int(ike / Constants.NUM_COLUMNS);
+            var col:Int = ike % COLUMNS;
+            var row:Int = Std.int(ike / COLUMNS);
 
-            var x:Float = ((col + 0.5) / Constants.NUM_COLUMNS - 0.5);
-            var y:Float = ((row + 0.5) / Constants.NUM_ROWS    - 0.5);
-            var z:Float = -1;
-            z *= Math.cos(row / Constants.NUM_ROWS    * Math.PI * 2);
-            z *= Math.cos(col / Constants.NUM_COLUMNS * Math.PI * 2);
+            var x:Float = ((col + 0.5) / COLUMNS - 0.5);
+            var y:Float = ((row + 0.5) / ROWS    - 0.5);
+            var z:Float = -0.5;
+            z *= Math.cos(row / ROWS    * Math.PI * 2);
+            z *= Math.cos(col / COLUMNS * Math.PI * 2);
 
             var r:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
             var g:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
             var b:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
 
             //*
-            r = row / Constants.NUM_ROWS;
-            g = col / Constants.NUM_COLUMNS;
+            r = row / ROWS;
+            g = col / COLUMNS;
             b = Math.cos(r) * Math.cos(g) * 0.5;
             /**/
 
@@ -37,7 +41,7 @@ class TestModel extends Model {
             var p:Float = 0;
 
             var fatChar:FatChar = new FatChar(charCode);
-            var charUV = font.getCharCodeUVs(charCode);
+            var charUV = glyphTexture.font.getCharCodeUVs(charCode);
 
             var shape:Array<Float> = [
                 x, y, z, 0, 0, s, p,
@@ -47,10 +51,10 @@ class TestModel extends Model {
             ];
 
             var color:Array<Float> = [
-                r, g, b, charUV[3].u * glyphTexture.scaleX, charUV[3].v * glyphTexture.scaleY, i,
-                r, g, b, charUV[0].u * glyphTexture.scaleX, charUV[0].v * glyphTexture.scaleY, i,
-                r, g, b, charUV[1].u * glyphTexture.scaleX, charUV[1].v * glyphTexture.scaleY, i,
-                r, g, b, charUV[2].u * glyphTexture.scaleX, charUV[2].v * glyphTexture.scaleY, i,
+                r, g, b, charUV[3].u, charUV[3].v, i,
+                r, g, b, charUV[0].u, charUV[0].v, i,
+                r, g, b, charUV[1].u, charUV[1].v, i,
+                r, g, b, charUV[2].u, charUV[2].v, i,
             ];
 
             var glyph:Glyph = new Glyph();

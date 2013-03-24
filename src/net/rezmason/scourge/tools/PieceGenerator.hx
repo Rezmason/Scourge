@@ -1,10 +1,11 @@
 package net.rezmason.scourge.tools;
 
 import net.rezmason.scourge.model.PieceTypes;
-typedef Pattern = Array<Array<Bool>>;
-typedef PatternFunction = Int->Void;
 
 using Lambda;
+
+typedef Pattern = Array<Array<Bool>>;
+typedef PatternFunction = Int->Void;
 
 class PieceGenerator {
 

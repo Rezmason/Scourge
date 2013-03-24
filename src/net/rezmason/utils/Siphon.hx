@@ -8,12 +8,13 @@ import sys.FileSystem;
 
 class Siphon {
 
-    @:macro public static function getDefs(pkg:String = null, base:String = null, filterPattern:String = null) {
+    macro public static function getDefs(pkg:String = null, base:String = null, filterPattern:String = null) {
 
         var filter:EReg = null;
         if (filterPattern != null) filter = new EReg(filterPattern, "");
 
         if (pkg == null) pkg = "";
+        var pkgArray:Array<String> = pkg.split(".");
 
         var pos:Position = Context.currentPos();
 
@@ -22,10 +23,9 @@ class Siphon {
             base = posString.substr(0, posString.indexOf("/"));
         }
 
-        var path:String = base + "/" + pkg.split(".").join("/");
-        if (pkg.length > 0) pkg += ".";
+        var path:String = base + "/" + pkgArray.join("/");
 
-        var decExpr:Expr = macro var hash:Hash<Class<Dynamic>> = new Hash<Class<Dynamic>>();
+        var decExpr:Expr = macro var hash:StringMap<Class<Dynamic>> = new StringMap<Class<Dynamic>>();
         var retExpr:Expr = macro hash;
 
         var setExprs:Array<Expr> = [];
@@ -34,21 +34,14 @@ class Siphon {
         for (file in files) {
             var clazz:String = file;
             var hxIndex:Int = clazz.indexOf(".hx");
-            if (hxIndex == -1) continue;
-            clazz = clazz.substring(0, hxIndex);
-
-            if (filter != null && !filter.match(clazz)) continue;
-
-            var inf = {min:setExprs.length, max:setExprs.length, file:pkg + clazz};
-            var clazzDef:Expr = Context.parse(pkg + clazz, Context.makePosition(inf));
-            //trace(clazzDef); // EField(EField(EField(EConst(CIdent("path")), "to"), "my"), "Class")
-
-            var expr:Expr = macro hash.set($(clazz), cast $clazzDef );
-            setExprs.push(expr);
+            if (hxIndex > -1) {
+                clazz = clazz.substring(0, hxIndex);
+                if (filter == null || filter.match(clazz)) {
+                    setExprs.push(macro hash.set($v{clazz}, cast $p{pkgArray.concat([clazz])}));
+                }
+            }
         }
 
-        var block:Array<Expr> = [decExpr].concat(setExprs).concat([retExpr]);
-
-        return {expr:EBlock(block), pos:pos};
+        return macro $b{[decExpr].concat(setExprs).concat([retExpr])};
     }
 }

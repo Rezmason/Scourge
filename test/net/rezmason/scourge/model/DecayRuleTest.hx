@@ -46,7 +46,7 @@ class DecayRuleTest extends ScourgeRuleTest
 
         VisualAssert.assert("Loose petri", state.spitBoard(plan));
 
-        decayRule.chooseOption();
+        decayRule.chooseMove();
 
         VisualAssert.assert("Empty petri, disconnected region gone", state.spitBoard(plan));
 
@@ -89,7 +89,7 @@ class DecayRuleTest extends ScourgeRuleTest
 
         VisualAssert.assert("Loose petri", state.spitBoard(plan));
 
-        decayRule.chooseOption();
+        decayRule.chooseMove();
 
         VisualAssert.assert("Empty petri, disconnected region gone", state.spitBoard(plan));
 

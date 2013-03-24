@@ -11,7 +11,7 @@ import net.rezmason.ropes.Types;
     public inline static var FALSE:Int = 0;
     public inline static var NULL:Int = -1;
 
-    @:macro public static function build():Array<Field> {
+    macro public static function build():Array<Field> {
 
         var classType = Context.getLocalClass().get();
 
@@ -25,28 +25,19 @@ import net.rezmason.ropes.Types;
             for (metaTag in field.meta) {
                 if (metaTag.name == "aspect") {
 
-                    var aspectExpr:Expr = metaTag.params[0];
+                    var aspect:Expr = metaTag.params[0];
+                    metaTag.params = [];
 
                     // Turn some literal values into Aspect consts
-                    switch (aspectExpr.expr) {
-                        case EConst(c):
-                            switch (c) {
-                                case CIdent(s):
-                                    aspectExpr = Context.parse("Aspect." + s.toUpperCase(), field.pos);
-                                default:
-                            }
-                        default:
+                    switch (aspect.expr) {
+                        case EConst(CIdent(s)):
+                            aspect = macro $p{["Aspect", s.toUpperCase()]};
+                        case _:
                     }
 
-                    var idConst = EConst(CString(classType.module + "::" + field.name.toUpperCase()));
-                    var idExpr:Expr = {expr:idConst, pos:pos};
-
-                    metaTag.params = [];
-                    var expr:Expr = macro {id:$idExpr, initialValue:$aspectExpr};
-
+                    var id:Expr = macro $v{classType.module + "::" + field.name.toUpperCase()};
                     field.access = [AStatic, APublic];
-                    field.kind = FVar(null, {pos:field.pos, expr:expr.expr});
-
+                    field.kind = FVar(null, macro {id:$id, initialValue:$aspect});
                     msg += metaTag.name.charAt(0);
 
                     break;

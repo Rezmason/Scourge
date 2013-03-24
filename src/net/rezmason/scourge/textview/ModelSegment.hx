@@ -1,31 +1,32 @@
 package net.rezmason.scourge.textview;
 
-import nme.display3D.Context3D;
 import nme.display3D.IndexBuffer3D;
 import nme.display3D.VertexBuffer3D;
 import nme.Vector;
 
+import net.rezmason.scourge.textview.utils.BufferUtil;
+
 class ModelSegment {
 
-    public var id:Int;
+    public var id(default, null):Int;
 
-    public var colorBuffer:VertexBuffer3D;
-    public var shapeBuffer:VertexBuffer3D;
-    public var paintBuffer:VertexBuffer3D;
-    public var indexBuffer:IndexBuffer3D;
+    public var colorBuffer(default, null):VertexBuffer3D;
+    public var shapeBuffer(default, null):VertexBuffer3D;
+    public var paintBuffer(default, null):VertexBuffer3D;
+    public var indexBuffer(default, null):IndexBuffer3D;
 
-    public var colorVertices:Vector<Float>;
-    public var shapeVertices:Vector<Float>;
-    public var paintVertices:Vector<Float>;
-    public var indices:Vector<UInt>;
+    public var colorVertices(default, null):Vector<Float>;
+    public var shapeVertices(default, null):Vector<Float>;
+    public var paintVertices(default, null):Vector<Float>;
+    public var indices(default, null):Vector<UInt>;
 
-    public var startGlyph:Int;
-    public var numGlyphs:Int;
-    public var numVisibleGlyphs:Int;
+    public var startGlyph(default, null):Int;
+    public var numGlyphs(default, null):Int;
+    public var numVisibleGlyphs(default, null):Int;
 
-    public var glyphs:Array<Glyph>;
+    public var glyphs(default, null):Array<Glyph>;
 
-    public function new(context:Context3D, segmentID:Int, glyphs:Array<Glyph>):Void {
+    public function new(bufferUtil:BufferUtil, segmentID:Int, glyphs:Array<Glyph>):Void {
         id = segmentID;
         this.glyphs = glyphs;
         numGlyphs = glyphs.length;
@@ -33,20 +34,20 @@ class ModelSegment {
 
         if (numGlyphs == 0) return;
 
-        createBuffers(context);
+        createBuffers(bufferUtil);
         createVectors();
         populateVectors();
         update();
     }
 
-    inline function createBuffers(context:Context3D):Void {
-        var numGlyphVertices:Int = numGlyphs * Almanac.NUM_VERTICES_PER_GLYPH;
-        var numGlyphIndices:Int = numGlyphs * Almanac.NUM_INDICES_PER_GLYPH;
+    inline function createBuffers(bufferUtil:BufferUtil):Void {
+        var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
+        var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
 
-        shapeBuffer = context.createVertexBuffer(numGlyphVertices, Almanac.NUM_SHAPE_FLOATS_PER_VERTEX);
-        colorBuffer = context.createVertexBuffer(numGlyphVertices, Almanac.NUM_COLOR_FLOATS_PER_VERTEX);
-        paintBuffer = context.createVertexBuffer(numGlyphVertices, Almanac.NUM_PAINT_FLOATS_PER_VERTEX);
-        indexBuffer = context.createIndexBuffer(numGlyphIndices);
+        shapeBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.SHAPE_FLOATS_PER_VERTEX);
+        colorBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX);
+        paintBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.PAINT_FLOATS_PER_VERTEX);
+        indexBuffer = bufferUtil.createIndexBuffer(numGlyphIndices);
     }
 
     inline function createVectors():Void {
@@ -60,8 +61,8 @@ class ModelSegment {
         for (ike in 0...numGlyphs) {
             var glyph:Glyph = glyphs[ike];
 
-            writeArrayToVector(shapeVertices, ike * Almanac.NUM_SHAPE_FLOATS_PER_GLYPH, glyph.shape, Almanac.NUM_SHAPE_FLOATS_PER_GLYPH);
-            writeArrayToVector(colorVertices, ike * Almanac.NUM_COLOR_FLOATS_PER_GLYPH, glyph.color, Almanac.NUM_COLOR_FLOATS_PER_GLYPH);
+            writeArrayToVector(shapeVertices, ike * Almanac.SHAPE_FLOATS_PER_GLYPH, glyph.shape, Almanac.SHAPE_FLOATS_PER_GLYPH);
+            writeArrayToVector(colorVertices, ike * Almanac.COLOR_FLOATS_PER_GLYPH, glyph.color, Almanac.COLOR_FLOATS_PER_GLYPH);
 
             // TODO: Move to GlyphUtils.setID()
 
@@ -70,12 +71,12 @@ class ModelSegment {
             var glyphG:Float = ((glyphID >>  8) & 0xFF) / 0xFF;
             var glyphB:Float = ((glyphID >>  0) & 0xFF) / 0xFF;
 
-            writeArrayToVector(paintVertices, ike * Almanac.NUM_PAINT_FLOATS_PER_GLYPH, [
+            writeArrayToVector(paintVertices, ike * Almanac.PAINT_FLOATS_PER_GLYPH, [
                 glyphR, glyphG, glyphB,
                 glyphR, glyphG, glyphB,
                 glyphR, glyphG, glyphB,
                 glyphR, glyphG, glyphB,
-            ], Almanac.NUM_PAINT_FLOATS_PER_GLYPH);
+            ], Almanac.PAINT_FLOATS_PER_GLYPH);
 
             glyph.vertexAddress = ike;
 
@@ -85,8 +86,8 @@ class ModelSegment {
 
     public function update():Void {
         if (numGlyphs > 0) {
-            var numGlyphVertices:Int = numGlyphs * Almanac.NUM_VERTICES_PER_GLYPH;
-            var numGlyphIndices:Int = numGlyphs * Almanac.NUM_INDICES_PER_GLYPH;
+            var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
+            var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
             shapeBuffer.uploadFromVector(shapeVertices, 0, numGlyphVertices);
             colorBuffer.uploadFromVector(colorVertices, 0, numGlyphVertices);
             paintBuffer.uploadFromVector(paintVertices, 0, numGlyphVertices);
@@ -118,12 +119,12 @@ class ModelSegment {
     }
 
     inline function insertGlyph(glyph:Glyph, indexAddress:Int):Void {
-        var firstVertIndex:Int = glyph.vertexAddress * Almanac.NUM_VERTICES_PER_GLYPH;
+        var firstVertIndex:Int = glyph.vertexAddress * Almanac.VERTICES_PER_GLYPH;
 
-        writeArrayToVector(indices, indexAddress * Almanac.NUM_INDICES_PER_GLYPH, [
+        writeArrayToVector(indices, indexAddress * Almanac.INDICES_PER_GLYPH, [
             firstVertIndex + 0, firstVertIndex + 1, firstVertIndex + 2,
             firstVertIndex + 0, firstVertIndex + 2, firstVertIndex + 3,
-        ], Almanac.NUM_INDICES_PER_GLYPH);
+        ], Almanac.INDICES_PER_GLYPH);
 
         glyphs[indexAddress] = glyph;
         glyph.indexAddress = indexAddress;

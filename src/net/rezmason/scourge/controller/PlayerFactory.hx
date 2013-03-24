@@ -22,13 +22,15 @@ class PlayerFactory {
 
             var playerType:Class<Player> = null;
             switch (config.type) {
-                case Test(helper, annotate): playerType = TestPlayer;
+                case Test(_, _): playerType = TestPlayer;
                 case Human: playerType = HumanPlayer;
                 case Machine: playerType = MachinePlayer;
                 case Remote: playerType = RemotePlayer;
             }
 
-            players.push(Type.createInstance(playerType, [ike, config, handler].concat(Type.enumParameters(config.type))));
+            var args:Array<Dynamic> = [ike, config, handler];
+            args = args.concat(Type.enumParameters(config.type));
+            players.push(Type.createInstance(playerType, args));
         }
 
         return players;

@@ -62,13 +62,13 @@ class TurnRulesTest extends ScourgeRuleTest
 
 
         endTurnRule.update();
-        var options:Array<Option> = endTurnRule.options;
-        Assert.isNotNull(options);
-        Assert.areEqual(1, options.length);
+        var moves:Array<Move> = endTurnRule.moves;
+        Assert.isNotNull(moves);
+        Assert.areEqual(1, moves.length);
 
         while (expectedCurrentPlayer < 10) {
             expectedCurrentPlayer++;
-            endTurnRule.chooseOption();
+            endTurnRule.chooseMove();
             currentPlayer = state.aspects.at(currentPlayer_);
             Assert.areEqual(expectedCurrentPlayer % 3, currentPlayer);
         }
@@ -93,13 +93,13 @@ class TurnRulesTest extends ScourgeRuleTest
         var playerHead:BoardNode = state.nodes[head];
 
         forfeitRule.update();
-        var options:Array<Option> = forfeitRule.options;
-        Assert.isNotNull(options);
-        Assert.areEqual(1, options.length);
+        var moves:Array<Move> = forfeitRule.moves;
+        Assert.isNotNull(moves);
+        Assert.areEqual(1, moves.length);
 
         VisualAssert.assert("player 0 is alive", state.spitBoard(plan));
 
-        forfeitRule.chooseOption();
+        forfeitRule.chooseMove();
 
         VisualAssert.assert("player 0 is dead and gone", state.spitBoard(plan));
 
@@ -138,11 +138,11 @@ class TurnRulesTest extends ScourgeRuleTest
         playerHead.value.mod(occupier_, 1);
 
         killHeadlessPlayerRule.update();
-        var options:Array<Option> = killHeadlessPlayerRule.options;
-        Assert.isNotNull(options);
-        Assert.areEqual(1, options.length);
+        var moves:Array<Move> = killHeadlessPlayerRule.moves;
+        Assert.isNotNull(moves);
+        Assert.areEqual(1, moves.length);
 
-        killHeadlessPlayerRule.chooseOption();
+        killHeadlessPlayerRule.chooseMove();
 
         head = state.players[currentPlayer].at(head_);
         Assert.areEqual(Aspect.NULL, head);
@@ -170,7 +170,7 @@ class TurnRulesTest extends ScourgeRuleTest
         }
 
         skipsExhaustedRule.update();
-        skipsExhaustedRule.chooseOption();
+        skipsExhaustedRule.chooseMove();
         Assert.areEqual(Aspect.NULL, state.aspects.at(winner_));
 
         // Have each player skip one more time, then check for a winner
@@ -182,7 +182,7 @@ class TurnRulesTest extends ScourgeRuleTest
         }
 
         skipsExhaustedRule.update();
-        skipsExhaustedRule.chooseOption();
+        skipsExhaustedRule.chooseMove();
         Assert.areEqual(3, state.aspects.at(winner_));
     }
 
@@ -207,7 +207,7 @@ class TurnRulesTest extends ScourgeRuleTest
         // update and check for a winner
 
         oneLivingPlayerRule.update();
-        oneLivingPlayerRule.chooseOption();
+        oneLivingPlayerRule.chooseMove();
         Assert.areEqual(1, state.aspects.at(winner_));
     }
 }

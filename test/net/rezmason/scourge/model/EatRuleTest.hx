@@ -54,13 +54,13 @@ class EatRuleTest extends ScourgeRuleTest
         Assert.areEqual(25, numCells);
 
         eatRule.update();
-        Assert.areEqual(1, eatRule.options.length);
+        Assert.areEqual(1, eatRule.moves.length);
 
         // straight up eating
 
         VisualAssert.assert("two player grab", state.spitBoard(plan));
 
-        eatRule.chooseOption();
+        eatRule.chooseMove();
 
         VisualAssert.assert("two player grab, vertical portions of horseshoe arm eaten", state.spitBoard(plan));
 
@@ -96,7 +96,7 @@ class EatRuleTest extends ScourgeRuleTest
 
         VisualAssert.assert("two player grab", state.spitBoard(plan));
 
-        eatRule.chooseOption();
+        eatRule.chooseMove();
 
         VisualAssert.assert("two player grab, horseshoe arms eaten", state.spitBoard(plan));
 
@@ -128,7 +128,7 @@ class EatRuleTest extends ScourgeRuleTest
 
         VisualAssert.assert("two player grab", state.spitBoard(plan));
 
-        eatRule.chooseOption();
+        eatRule.chooseMove();
 
         VisualAssert.assert("two player grab, player one eaten", state.spitBoard(plan));
 
@@ -155,7 +155,7 @@ class EatRuleTest extends ScourgeRuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
         Assert.areEqual(25, numCells);
 
-        eatRule.chooseOption();
+        eatRule.chooseMove();
 
         VisualAssert.assert("two player grab, player one head eaten and body killed", state.spitBoard(plan));
 
@@ -190,13 +190,13 @@ class EatRuleTest extends ScourgeRuleTest
         Assert.areEqual(76, numCells);
 
         eatRule.update();
-        Assert.areEqual(1, eatRule.options.length);
+        Assert.areEqual(1, eatRule.moves.length);
 
         // straight up eating
 
         VisualAssert.assert("two player N", state.spitBoard(plan));
 
-        eatRule.chooseOption();
+        eatRule.chooseMove();
 
         VisualAssert.assert("two player N, left descender eaten", state.spitBoard(plan));
 

@@ -26,10 +26,10 @@ class SkipsExhaustedRule extends Rule {
     public function new(cfg:SkipsExhaustedConfig):Void {
         super();
         this.cfg = cfg;
-        options.push({optionID:0});
+        moves.push({id:0});
     }
 
-    override private function _chooseOption(choice:Int):Void {
+    override private function _chooseMove(choice:Int):Void {
 
         var stalemate:Bool = true;
 
