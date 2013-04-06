@@ -8,6 +8,8 @@ Scourge is a derivative of [Fungus](http://www.info-mac.org/viewtopic.php?t=4644
 
 Scourge is written in [Haxe](http://www.haxe.org/), a highly versatile language that can compile to many, many platforms.
 
+**NOTE: Scourge is currently built with Haxe 3 RC and Git-hosted haxelibs. Consequently it may be difficult to configure your build environment to build both Scourge and Haxe 2 projects easily.**
+
 Scourge is written on top of a framework called the ROPES, which I'm developing simultaneously. While the ROPES primarily must support Scourge, it is designed to support the development of all sorts of turn-based games. At some point after Scourge is up and running, the ROPES will receive the attention it needs to stand alone as a separate project.
 
 # Project Goals
