@@ -2,10 +2,10 @@ Animate things!
     Change something on the characters per frame
     Change something every five seconds
 
-Globe-cube object
+Put origin in top left
 
-Make it easier to add glyphs
-    GlyphUtils seems cumbersome if we're relying so much on FlatFont and GlyphTexture
+UI object
+Globe-cube object
 
 Interaction
     Make sure interaction IDs work

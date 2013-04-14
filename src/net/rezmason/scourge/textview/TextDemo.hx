@@ -1,5 +1,7 @@
 package net.rezmason.scourge.textview;
 
+import haxe.ds.StringMap;
+
 import com.adobe.utils.PerspectiveMatrix3D;
 import haxe.Timer;
 import nme.display.Stage;
@@ -11,6 +13,8 @@ import nme.geom.Vector3D;
 
 import net.rezmason.utils.FlatFont;
 import net.rezmason.scourge.textview.utils.UtilitySet;
+
+using net.rezmason.scourge.textview.GlyphUtils;
 
 class TextDemo {
 
@@ -27,21 +31,21 @@ class TextDemo {
     var projection:PerspectiveMatrix3D;
     var utils:UtilitySet;
     var scene:Scene;
+    var fonts:StringMap<FlatFont>;
+    var fontTextures:StringMap<GlyphTexture>;
     var showHideFunc:Void->Void;
-    var font:FlatFont;
-    var glyphTexture:GlyphTexture;
     var prettyStyle:Style;
     var mouseStyle:Style;
 
-    public function new(stage:Stage, font:FlatFont):Void {
+    public function new(stage:Stage, fonts:StringMap<FlatFont>):Void {
         this.stage = stage;
-        this.font = font;
+        this.fonts = fonts;
         showHideFunc = hideSomeGlyphs;
         utils = new UtilitySet(stage.stage3Ds[0], onCreate);
     }
 
     function onCreate():Void {
-        glyphTexture = new FoggyGlyphTexture(utils.textureUtil, font, FONT_SIZE);
+        makeFontTextures();
         renderer = new Renderer(utils.drawUtil);
         stage.addChild(renderer.mouseView);
         prettyStyle = new PrettyStyle(utils.programUtil);
@@ -59,6 +63,14 @@ class TextDemo {
         stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
     }
 
+    function makeFontTextures():Void {
+        fontTextures = new StringMap<GlyphTexture>();
+
+        for (key in fonts.keys()) {
+            fontTextures.set(key, new FoggyGlyphTexture(utils.textureUtil, fonts.get(key), FONT_SIZE));
+        }
+    }
+
     function makeScene():Void {
 
         scene = new Scene();
@@ -67,7 +79,7 @@ class TextDemo {
         projection.perspectiveLH(2, 2, 1, 2);
         //projection.orthoLH(2, 2, 1, 2);
 
-        var model:Model = new TestModel(0, utils.bufferUtil, glyphTexture);
+        var model:Model = new TestModel(0, utils.bufferUtil, fontTextures.get("full"));
         model.matrix = new Matrix3D();
         //model.scissorRectangle = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
         scene.models.push(model);
@@ -95,6 +107,18 @@ class TextDemo {
         //vec.x += numX;
         //vec.y += -numY;
         //scene.cameraMat.copyColumnFrom(2, vec);
+
+
+        var t:Float = Timer.stamp() * 4;
+
+        for (glyph in model.glyphs) {
+            var p:Float = (Math.cos(t * 1 + glyph.get_x() * 10) * 0.5 + 1) * 0.1;
+            var s:Float = (Math.cos(t * 2 + glyph.get_x() * 20) * 0.5 + 1) * 1.0;
+            glyph.set_p(p);
+            glyph.set_s(s);
+        }
+
+        model.update();
     }
 
     function spinModel(model:Model, numX:Float, numY:Float):Void {

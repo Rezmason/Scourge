@@ -6,7 +6,10 @@ import nme.Assets;
 import nme.Lib;
 import nme.display.Bitmap;
 import nme.display.BitmapData;
+import nme.display.Sprite;
 import nme.events.Event;
+
+import flash.net.FileReference;
 
 import net.rezmason.utils.FlatFont;
 
@@ -20,26 +23,41 @@ class ScourgeAssetGen {
             TestStrings.ALPHANUMERICS,
             TestStrings.SYMBOLS,
             TestStrings.WEIRD_SYMBOLS,
+            TestStrings.BOX_SYMBOLS,
         ].join("");
 
-        var flatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), 140, requiredString, 48, 48, 2);
-        var fontBD:BitmapData = flatFont.getBitmapDataClone();
+        var font1:FlatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), 140, requiredString, 48, 48, 2);
+        var font2:FlatFont = FlatFont.flatten(Assets.getFont("assets/SourceCodePro-Semibold.ttf"), 140, requiredString, 48, 48, 2);
+        var font3:FlatFont = FlatFont.combine(font1, [font2]);
+
+        deploy(font1, "profont");
+        deploy(font2, "source");
+        deploy(font3, "full");
+    }
+
+    static function deploy(font:FlatFont, id:String):Void {
+        var fontBD:BitmapData = font.getBitmapDataClone();
+
+        var sprite:Sprite = new Sprite();
+        sprite.addChild(new Bitmap(fontBD));
 
         var fileRef = null;
-        Lib.current.stage.addEventListener("click", function(_) {
-            var json = flatFont.exportJSON();
+        sprite.addEventListener("click", function(_) {
+            var json = font.exportJSON();
             var pngBytes = com.moodycamel.PNGEncoder2.encode(fontBD);
-            fileRef = new flash.net.FileReference();
+            fileRef = new FileReference();
 
             function savePNG(_) {
                 fileRef.removeEventListener("complete", savePNG);
-                fileRef.save(pngBytes, "profont_flat.png");
+                fileRef.save(pngBytes, id + "_flat.png");
+                Lib.current.removeChild(sprite);
             }
 
             fileRef.addEventListener("complete", savePNG);
-            fileRef.save(json, "profont_flat.json");
+            fileRef.save(json, id + "_flat.json");
+
         });
 
-        Lib.current.addChild(new Bitmap(fontBD));
+        Lib.current.addChild(sprite);
     }
 }

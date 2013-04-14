@@ -22,6 +22,8 @@ class FoggyGlyphTexture extends GlyphTexture {
             )
         );
 
+        //bmd = src.clone();
+
         return bmd;
     }
 }

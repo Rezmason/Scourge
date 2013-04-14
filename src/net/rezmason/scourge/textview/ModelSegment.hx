@@ -26,8 +26,11 @@ class ModelSegment {
 
     public var glyphs(default, null):Array<Glyph>;
 
+    public var dirty(default, null):Bool;
+
     public function new(bufferUtil:BufferUtil, segmentID:Int, glyphs:Array<Glyph>):Void {
         id = segmentID;
+        dirty = true;
         this.glyphs = glyphs;
         numGlyphs = glyphs.length;
         numVisibleGlyphs = numGlyphs;
@@ -36,7 +39,7 @@ class ModelSegment {
 
         createBuffers(bufferUtil);
         createVectors();
-        populateVectors();
+        populateVectors(true);
         update();
     }
 
@@ -57,34 +60,28 @@ class ModelSegment {
         indices = new Vector<UInt>();
     }
 
-    inline function populateVectors():Void {
+    public inline function populateVectors(insert:Bool = false):Void {
         for (ike in 0...numGlyphs) {
             var glyph:Glyph = glyphs[ike];
+            if (insert || glyph.dirty) {
+                writeArrayToVector(shapeVertices, ike * Almanac.SHAPE_FLOATS_PER_GLYPH, glyph.shape, Almanac.SHAPE_FLOATS_PER_GLYPH);
+                writeArrayToVector(colorVertices, ike * Almanac.COLOR_FLOATS_PER_GLYPH, glyph.color, Almanac.COLOR_FLOATS_PER_GLYPH);
+                writeArrayToVector(paintVertices, ike * Almanac.PAINT_FLOATS_PER_GLYPH, glyph.paint, Almanac.PAINT_FLOATS_PER_GLYPH);
 
-            writeArrayToVector(shapeVertices, ike * Almanac.SHAPE_FLOATS_PER_GLYPH, glyph.shape, Almanac.SHAPE_FLOATS_PER_GLYPH);
-            writeArrayToVector(colorVertices, ike * Almanac.COLOR_FLOATS_PER_GLYPH, glyph.color, Almanac.COLOR_FLOATS_PER_GLYPH);
+                glyph.vertexAddress = ike;
+                glyph.dirty = false;
 
-            // TODO: Move to GlyphUtils.setID()
+                if (insert) insertGlyph(glyph, ike);
 
-            var glyphID:Int = glyph.id + 1;
-            var glyphR:Float = ((glyphID >> 16) & 0xFF) / 0xFF;
-            var glyphG:Float = ((glyphID >>  8) & 0xFF) / 0xFF;
-            var glyphB:Float = ((glyphID >>  0) & 0xFF) / 0xFF;
-
-            writeArrayToVector(paintVertices, ike * Almanac.PAINT_FLOATS_PER_GLYPH, [
-                glyphR, glyphG, glyphB,
-                glyphR, glyphG, glyphB,
-                glyphR, glyphG, glyphB,
-                glyphR, glyphG, glyphB,
-            ], Almanac.PAINT_FLOATS_PER_GLYPH);
-
-            glyph.vertexAddress = ike;
-
-            insertGlyph(glyph, ike);
+                dirty = true;
+            }
         }
     }
 
     public function update():Void {
+        if (!dirty) return;
+        dirty = false;
+
         if (numGlyphs > 0) {
             var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
             var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
@@ -102,6 +99,9 @@ class ModelSegment {
         var diff:Int = 0;
 
         for (srcGlyph in _glyphs) {
+
+            if (!dirty && srcGlyph.visible != visible) dirty = true;
+
             srcGlyph.visible = visible;
 
             var dstGlyph:Glyph = glyphs[numVisibleGlyphs + offset];

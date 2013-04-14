@@ -9,6 +9,12 @@ Save states and save testing
 		How do other games handle this?
 			http://www.altdevblogaday.com/2011/07/09/synchronous-rts-engines-and-a-tale-of-desyncs
 
+GDC articles
+	http://www.gamasutra.com/view/news/189266/The_technique_LucasArts_used_to_design_its_classic_adventure_games.php
+	http://www.gamasutra.com/view/news/189251/7_practical_tips_for_making_a_moral_game.php
+	http://www.gamasutra.com/view/news/189345/How_to_use_live_events_to_promote_your_game.php
+	http://www.gamasutra.com/view/news/189353/Designing_without_a_pitch__An_FTL_postmortem.php
+
 TestPlayer
 HumanPlayer
 RemotePlayer

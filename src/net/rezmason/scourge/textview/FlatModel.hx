@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview;
 
-import net.rezmason.utils.FatChar;
+using net.rezmason.scourge.textview.GlyphUtils;
 
 class FlatModel extends Model {
 
@@ -8,6 +8,11 @@ class FlatModel extends Model {
         super.makeGlyphs();
 
         for (ike in 0...Constants.TOTAL_CHARS) {
+
+            var glyph:Glyph = new Glyph();
+            glyph.visible = true;
+            glyph.id = ike;
+            glyphs.push(glyph);
 
             var col:Int = ike % Constants.COLUMNS;
             var row:Int = Std.int(ike / Constants.COLUMNS);
@@ -18,35 +23,16 @@ class FlatModel extends Model {
             z = 0;
 
             var charCode:Int = 65 + (ike % 26);
-            var fatChar:FatChar = new FatChar(charCode);
-            var charUV = glyphTexture.font.getCharCodeUVs(charCode);
 
             var i:Float = 0.2;
             var s:Float = 1;
             var p:Float = 0;
 
-            var shape:Array<Float> = [
-                x, y, z, 0, 0, s, p,
-                x, y, z, 0, 1, s, p,
-                x, y, z, 1, 1, s, p,
-                x, y, z, 1, 0, s, p,
-            ];
-
-            var color:Array<Float> = [
-                1, 1, 1, charUV[3].u, charUV[3].v, i,
-                1, 1, 1, charUV[0].u, charUV[0].v, i,
-                1, 1, 1, charUV[1].u, charUV[1].v, i,
-                1, 1, 1, charUV[2].u, charUV[2].v, i,
-            ];
-
-            var glyph:Glyph = new Glyph();
-            glyph.fatChar = fatChar;
-            glyph.color = color;
-            glyph.shape = shape;
-            glyph.visible = true;
-            glyph.id = ike;
-
-            glyphs.push(glyph);
+            glyph.makeCorners();
+            glyph.set_shape(x, y, z, s, p);
+            glyph.set_color(1, 1, 1, i);
+            glyph.set_char(charCode, glyphTexture.font);
+            glyph.set_paint(ike);
         }
     }
 }

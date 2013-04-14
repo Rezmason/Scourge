@@ -17,6 +17,7 @@ class TestStrings {
 
     public inline static var SYMBOLS:String = "()<>@[]_{}#$*";
     public inline static var WEIRD_SYMBOLS:String = "¤¬ÎøΔΩ•◊";
+    public inline static var BOX_SYMBOLS:String = "─│┌┐└┘├┤┬┴┼";
 
     public inline static var BOARD:String =
         "X X X X X X X X X X X X X X X X X X X X X X X X" +

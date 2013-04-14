@@ -26,12 +26,14 @@ typedef FlatFontJSON = {
     var charWidth:Int;
     var charHeight:Int;
     var charCoords:Dynamic;
+    var missingChars:Dynamic;
 };
 
 class FlatFont {
 
     var bitmapData:BitmapData;
     var charCoords:IntMap<CharCoord>;
+    var missingChars:Array<Int>;
     var defaultCharCoord:CharCoord;
     var jsonString:String;
 
@@ -49,6 +51,7 @@ class FlatFont {
 
         this.jsonString = jsonString;
         charCoords = new IntMap<CharCoord>();
+        missingChars = [];
 
         var expandedJSON:FlatFontJSON = jsonString.parse();
         charWidth = expandedJSON.charWidth;
@@ -60,6 +63,8 @@ class FlatFont {
             var code:Int = Std.parseInt(field.substr(1));
             charCoords.set(code, Reflect.field(expandedJSON.charCoords, field));
         }
+
+        missingChars = expandedJSON.missingChars;
 
         defaultCharCoord = {x:0, y:0};
     }
@@ -120,6 +125,7 @@ class FlatFont {
         var charYOffset:Int = charHeight + spacing;
 
         var charCoordJSON:Dynamic = {};
+        var missingChars:Array<Int> = [];
         var requiredChars:StringMap<Bool> = new StringMap<Bool>();
         var numChars:Int = 1;
 
@@ -168,6 +174,7 @@ class FlatFont {
 
             var dx:Int = x * charXOffset + spacing;
             var dy:Int = y * charYOffset + spacing;
+            var charCode:Int = char.charCodeAt(0);
 
             clipRect.x = dx;
             clipRect.y = dy;
@@ -175,12 +182,15 @@ class FlatFont {
             //if ((x + y) % 2 == 1) bitmapData.fillRect(clipRect, 0xFFFF0000);
 
             textField.text = char;
+
+            if (textField.getCharBoundaries(0) == null) missingChars.push(charCode);
+
             mat.tx += dx;
             mat.ty += dy;
 
             bitmapData.draw(sp, mat, null, BlendMode.NORMAL, clipRect, true);
 
-            Reflect.setField(charCoordJSON, "_" + char.charCodeAt(0), {x: dx, y: dy});
+            Reflect.setField(charCoordJSON, "_" + charCode, {x: dx, y: dy});
 
             mat.tx -= dx;
             mat.ty -= dy;
@@ -192,7 +202,58 @@ class FlatFont {
             }
         }
 
-        var json:FlatFontJSON = {charWidth:charWidth, charHeight:charHeight, charCoords:charCoordJSON};
+        var json:FlatFontJSON = {charWidth:charWidth, charHeight:charHeight, charCoords:charCoordJSON, missingChars:missingChars};
+
+        return new FlatFont(bitmapData, json.stringify());
+    }
+    #end
+
+    #if flash
+    public static function combine(flatFont:FlatFont, otherFlatFonts:Array<FlatFont>):FlatFont {
+
+        var otherBDs:Array<BitmapData> = [];
+        for (otherFlatFont in otherFlatFonts) otherBDs.push(otherFlatFont.getBitmapDataClone());
+
+        var copyMat:Matrix = new Matrix();
+        var clipRect:Rectangle = new Rectangle(0, 0, flatFont.charWidth, flatFont.charHeight);
+        var bitmapData:BitmapData = flatFont.getBitmapDataClone();
+        var missingChars:Array<Int> = [];
+
+        for (char in flatFont.missingChars) {
+            var stillMissing:Bool = true;
+            for (ike in 0...otherFlatFonts.length) {
+                var otherFlatFont:FlatFont = otherFlatFonts[ike];
+
+                if (!otherFlatFont.missingChars.has(char)) {
+
+                    var dstMat:Matrix = flatFont.getCharCodeMatrix(char);
+                    var srcMat:Matrix = otherFlatFont.getCharCodeMatrix(char);
+                    var otherBD:BitmapData = otherBDs[ike];
+
+                    // Copy the character from the other font bitmap to the cloned font bitmap
+                    copyMat.identity();
+                    copyMat.concat(srcMat);
+                    copyMat.invert();
+                    copyMat.concat(dstMat);
+
+                    clipRect.x = -dstMat.tx;
+                    clipRect.y = -dstMat.ty;
+                    bitmapData.draw(otherBD, copyMat, null, BlendMode.NORMAL, clipRect, true);
+
+                    stillMissing = false;
+                    break;
+                }
+            }
+
+            if (stillMissing) missingChars.push(char);
+        }
+
+        var json:FlatFontJSON = {
+            charWidth:flatFont.charWidth,
+            charHeight:flatFont.charHeight,
+            charCoords:flatFont.jsonString.parse().charCoords,
+            missingChars:missingChars
+        };
 
         return new FlatFont(bitmapData, json.stringify());
     }

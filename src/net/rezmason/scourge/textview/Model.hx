@@ -27,6 +27,7 @@ class Model {
         this.bufferUtil = bufferUtil;
 
         this.glyphTexture = glyphTexture;
+        init();
         makeGlyphs();
         numGlyphs = glyphs.length;
         numVisibleGlyphs = glyphs.length;
@@ -35,6 +36,10 @@ class Model {
 
         matrix = new Matrix3D();
         scissorRectangle = new Rectangle();
+    }
+
+    function init():Void {
+
     }
 
     function makeGlyphs():Void {
@@ -84,10 +89,17 @@ class Model {
         //spitGlyphs();
     }
 
+    public function update():Void {
+        for (segment in segments) {
+            segment.populateVectors();
+            segment.update();
+        }
+    }
+
     inline function spitGlyphs():Void {
         var str:String = "";
         for (glyph in glyphs) {
-            var char:String = glyph.fatChar.string;
+            var char:String = String.fromCharCode(glyph.charCode);
             if (!glyph.visible) char = char.toLowerCase();
             str += char;
         }
