@@ -1,10 +1,5 @@
-Animate things!
-    Change something on the characters per frame
-    Change something every five seconds
-
-Put origin in top left
-
 UI object
+    Character size, ratio and layout?
 Globe-cube object
 
 Interaction

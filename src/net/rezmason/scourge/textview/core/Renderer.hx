@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.core;
 
 import net.rezmason.scourge.textview.utils.DrawUtil;
 
@@ -35,13 +35,13 @@ class Renderer {
 
         drawUtil.clear(style.backgroundColor);
 
-        for (model in scene.models) {
-            if (model.numGlyphs == 0) continue;
-            drawUtil.setScissorRectangle(model.scissorRectangle);
-            style.setMatrices(scene.cameraMat, model.matrix);
-            style.setGlyphTexture(model.glyphTexture, aspectRatio);
+        for (body in scene.bodies) {
+            if (body.numGlyphs == 0) continue;
+            drawUtil.setScissorRectangle(body.scissorRectangle);
+            style.setMatrices(scene.cameraMat, body.matrix);
+            style.setGlyphTexture(body.glyphTexture, aspectRatio);
 
-            for (segment in model.segments) {
+            for (segment in body.segments) {
                 style.setSegment(segment);
                 drawUtil.drawTriangles(segment.indexBuffer, 0, segment.numVisibleGlyphs * Almanac.TRIANGLES_PER_GLYPH);
             }

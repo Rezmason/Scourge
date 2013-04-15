@@ -21,6 +21,7 @@ class ScourgeAssetGen {
 
         var requiredString:String = [
             TestStrings.ALPHANUMERICS,
+            TestStrings.PUNCTUATION,
             TestStrings.SYMBOLS,
             TestStrings.WEIRD_SYMBOLS,
             TestStrings.BOX_SYMBOLS,

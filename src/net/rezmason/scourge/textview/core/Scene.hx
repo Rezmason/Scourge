@@ -1,15 +1,15 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.core;
 
 import nme.geom.Matrix3D;
 
 class Scene {
 
     public var cameraMat(default, null):Matrix3D;
-    public var models(default, null):Array<Model>;
+    public var bodies(default, null):Array<Body>;
 
     public function new():Void {
         cameraMat = new Matrix3D();
-        models = [];
+        bodies = [];
     }
 }
 

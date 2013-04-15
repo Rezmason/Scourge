@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.core;
 
 import haxe.ds.IntMap;
 import nme.geom.Matrix3D;
@@ -8,8 +8,8 @@ import nme.Vector;
 import net.rezmason.scourge.textview.utils.BufferUtil;
 import net.rezmason.scourge.textview.utils.Types;
 
-class Model {
-    public var segments(default, null):Array<ModelSegment>;
+class Body {
+    public var segments(default, null):Array<BodySegment>;
     public var id:Int;
     public var matrix:Matrix3D;
     public var numGlyphs(default, null):Int;
@@ -56,7 +56,7 @@ class Model {
         var segmentID:Int = 0;
         while (startGlyph < numGlyphs) {
             var len:Int = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
-            segments.push(new ModelSegment(bufferUtil, segmentID, glyphs.slice(startGlyph, startGlyph + len)));
+            segments.push(new BodySegment(bufferUtil, segmentID, glyphs.slice(startGlyph, startGlyph + len)));
             startGlyph += Almanac.BUFFER_CHUNK;
             remainingGlyphs -= Almanac.BUFFER_CHUNK;
             segmentID++;

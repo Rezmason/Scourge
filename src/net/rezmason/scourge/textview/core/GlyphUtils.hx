@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.core;
 
 import net.rezmason.utils.FatChar;
 import net.rezmason.utils.FlatFont;

@@ -1,10 +1,14 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.styles;
 
 import nme.display3D.Context3DBlendFactor;
 import nme.display3D.Context3DCompareMode;
 import nme.display3D.Context3DProgramType;
 import nme.display3D.Context3DVertexBufferFormat;
 import nme.geom.Matrix3D;
+
+import net.rezmason.scourge.textview.core.BodySegment;
+import net.rezmason.scourge.textview.core.GlyphTexture;
+import net.rezmason.scourge.textview.core.Style;
 
 class MouseStyle extends Style {
 
@@ -31,7 +35,7 @@ class MouseStyle extends Style {
         return [
             "m44 vt1 va1 vc5",  // corner = glyphMat.project(hv)
 
-            "m44 vt0 va0 vc9",  // pos = modelMat.project(xyz)
+            "m44 vt0 va0 vc9",  // pos = bodyMat.project(xyz)
             "m44 vt0 vt0 vc1",  // pos = cameraMat.project(pos)
             "add vt0.xy vt0.xy vt1.xy",  // pos = corner.xy + projected
 
@@ -52,12 +56,12 @@ class MouseStyle extends Style {
         programUtil.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 5, glyphMat, true); // vc5 contains the character matrix
     }
 
-    override public function setMatrices(cameraMat:Matrix3D, modelMat:Matrix3D):Void {
+    override public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void {
         programUtil.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 1, cameraMat, true); // vc1 contains the camera matrix
-        programUtil.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, modelMat, true); // vc9 contains the model's matrix
+        programUtil.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, bodyMat, true); // vc9 contains the body's matrix
     }
 
-    override public function setSegment(segment:ModelSegment):Void {
+    override public function setSegment(segment:BodySegment):Void {
         programUtil.setVertexBufferAt(0, segment.shapeBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
         programUtil.setVertexBufferAt(1, segment.shapeBuffer, 3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
         programUtil.setVertexBufferAt(2, segment.paintBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va2 contains paint

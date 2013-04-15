@@ -17,7 +17,7 @@ class TestStrings {
 
     public inline static var SYMBOLS:String = "()<>@[]_{}#$*";
     public inline static var WEIRD_SYMBOLS:String = "¤¬ÎøΔΩ•◊";
-    public inline static var BOX_SYMBOLS:String = "─│┌┐└┘├┤┬┴┼";
+    public inline static var BOX_SYMBOLS:String = "   ─ ┘└┴ ┐┌┬│┤├┼";
 
     public inline static var BOARD:String =
         "X X X X X X X X X X X X X X X X X X X X X X X X" +
@@ -51,6 +51,8 @@ class TestStrings {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
         "0123456789" +
         "";
+
+    public inline static var PUNCTUATION:String = "\"?!.,;:-'~/";
 
     public inline static function CHAR_COLORS():IntMap<Int> {
         var colors:IntMap<Int> = new IntMap<Int>();

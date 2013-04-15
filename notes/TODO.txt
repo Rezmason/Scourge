@@ -1,5 +1,4 @@
 TextView (see file)
-	Renderer
 	View elements
 
 Finalize ROPES classes
@@ -19,6 +18,9 @@ TestPlayer
 HumanPlayer
 RemotePlayer
 MachinePlayer (local)
+
+Make renderer cross-platform
+	Oh boy...
 
 Checksums
 

@@ -5,6 +5,8 @@ import nme.display.BitmapDataChannel;
 import nme.filters.BitmapFilterQuality;
 import nme.filters.GlowFilter;
 
+import net.rezmason.scourge.textview.core.GlyphTexture;
+
 class FoggyGlyphTexture extends GlyphTexture {
 
     override function customize(src:BitmapData):BitmapData {

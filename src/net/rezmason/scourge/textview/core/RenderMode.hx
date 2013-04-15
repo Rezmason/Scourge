@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.core;
 
 enum RenderMode {
     MOUSE;

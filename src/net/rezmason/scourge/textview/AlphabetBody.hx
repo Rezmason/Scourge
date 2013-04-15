@@ -1,8 +1,11 @@
 package net.rezmason.scourge.textview;
 
-using net.rezmason.scourge.textview.GlyphUtils;
+using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class AlphabetModel extends Model {
+import net.rezmason.scourge.textview.core.Glyph;
+import net.rezmason.scourge.textview.core.Body;
+
+class AlphabetBody extends Body {
 
     inline static var CHARS:String =
         TestStrings.ALPHANUMERICS +

@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.core;
 
 import nme.display3D.IndexBuffer3D;
 import nme.display3D.VertexBuffer3D;
@@ -6,7 +6,7 @@ import nme.Vector;
 
 import net.rezmason.scourge.textview.utils.BufferUtil;
 
-class ModelSegment {
+class BodySegment {
 
     public var id(default, null):Int;
 

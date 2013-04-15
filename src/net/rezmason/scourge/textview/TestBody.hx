@@ -2,24 +2,24 @@ package net.rezmason.scourge.textview;
 
 import net.rezmason.utils.FatChar;
 
-using net.rezmason.scourge.textview.GlyphUtils;
+import net.rezmason.scourge.textview.core.Glyph;
+import net.rezmason.scourge.textview.core.Body;
 
-class TestModel extends Model {
+using net.rezmason.scourge.textview.core.GlyphUtils;
+
+class TestBody extends Body {
 
     inline static var COLOR_RANGE:Int = 6;
     inline static var CHARS:String =
         TestStrings.ALPHANUMERICS +
-        TestStrings.SYMBOLS +
-        TestStrings.WEIRD_SYMBOLS +
-        TestStrings.BOX_SYMBOLS +
     "";
 
     override function makeGlyphs():Void {
 
         super.makeGlyphs();
 
-        var numCols:Int = 50;
-        var numRows:Int = 50;
+        var numCols:Int = 10;
+        var numRows:Int = 10;
         var totalChars:Int = numCols * numRows;
 
         for (ike in 0...totalChars) {
@@ -49,8 +49,12 @@ class TestModel extends Model {
             b = Math.cos(r) * Math.cos(g) * 0.5;
             /**/
 
+            r *= 0.6;
+            g *= 0.6;
+            b *= 0.6;
+
             var i:Float = 0.2;
-            var s:Float = 1;
+            var s:Float = 2;
             var p:Float = 0;
 
             var charCode:Int = CHARS.charCodeAt(ike % CHARS.length);

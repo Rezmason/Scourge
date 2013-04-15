@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.core;
 
 import nme.geom.Matrix3D;
 import net.rezmason.utils.FatChar;

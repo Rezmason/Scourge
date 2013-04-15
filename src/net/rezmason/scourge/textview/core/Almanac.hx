@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.core;
 
 class Almanac {
     public inline static var VERTICES_PER_GLYPH:Int = 4;

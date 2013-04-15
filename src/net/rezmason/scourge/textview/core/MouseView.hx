@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.core;
 
 import nme.display.Bitmap;
 import nme.display.BitmapData;

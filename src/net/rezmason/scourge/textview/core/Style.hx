@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.core;
 
 import com.adobe.utils.AGALMiniAssembler;
 import nme.display3D.Program3D;
@@ -29,7 +29,7 @@ class Style {
         program.upload(vertexShader, fragmentShader);
     }
 
-    public function setMatrices(cameraMat:Matrix3D, modelMat:Matrix3D):Void { }
+    public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void { }
     public function activate():Void { }
     public function deactivate():Void { }
 
@@ -43,7 +43,7 @@ class Style {
         glyphMat.appendScale(glyphMag, glyphMag, 1);
     }
 
-    public function setSegment(segment:ModelSegment):Void { }
+    public function setSegment(segment:BodySegment):Void { }
     function init():Void { }
     function makeVertexShader():String { return ""; }
     function makeFragmentShader():String { return ""; }
