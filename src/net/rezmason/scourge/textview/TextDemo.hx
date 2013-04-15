@@ -31,7 +31,8 @@ class TextDemo {
 
     var projection:PerspectiveMatrix3D;
     var utils:UtilitySet;
-    var scene:Scene;
+    var bodies:Array<Body>;
+    var camera:Matrix3D;
     var fonts:StringMap<FlatFont>;
     var fontTextures:StringMap<GlyphTexture>;
     var showHideFunc:Void->Void;
@@ -74,26 +75,29 @@ class TextDemo {
 
     function makeScene():Void {
 
-        scene = new Scene();
+        bodies = [];
+        camera = new Matrix3D();
         projection = new PerspectiveMatrix3D();
 
         projection.perspectiveLH(2, 2, 1, 2);
         //projection.orthoLH(2, 2, 1, 2);
 
         var testBody:Body = new TestBody(0, utils.bufferUtil, fontTextures.get("full"));
-        testBody.matrix = new Matrix3D();
+        testBody.camera = camera;
+        testBody.transform = new Matrix3D();
         //testBody.scissorRectangle = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
-        scene.bodies.push(testBody);
+        bodies.push(testBody);
 
         var uiBody:Body = new UIBody(0, utils.bufferUtil, fontTextures.get("full"));
-        uiBody.matrix = new Matrix3D();
+        testBody.camera = camera;
+        uiBody.transform = new Matrix3D();
         //uiBody.scissorRectangle = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
-        scene.bodies.push(uiBody);
+        bodies.push(uiBody);
     }
 
     function update(?event:Event):Void {
 
-        var testBody:Body = scene.bodies[0];
+        var testBody:Body = bodies[0];
 
         //*
         var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
@@ -104,17 +108,17 @@ class TextDemo {
         var cY:Float = 0.5 * Math.sin(numT * Math.PI * 2);
         var cZ:Float = 0.1 * Math.sin(numT * Math.PI * 2 * 5);
 
-        var bodyMat:Matrix3D = testBody.matrix;
+        var bodyMat:Matrix3D = testBody.transform;
         bodyMat.identity();
         spinBody(testBody, numX, numY);
         //bodyMat.appendTranslation(cX, cY, cZ);
         bodyMat.appendTranslation(0, 0, 0.5);
 
         //var vec:Vector3D = new Vector3D();
-        //scene.cameraMat.copyColumnTo(2, vec);
+        //camera.copyColumnTo(2, vec);
         //vec.x += numX;
         //vec.y += -numY;
-        //scene.cameraMat.copyColumnFrom(2, vec);
+        //camera.copyColumnFrom(2, vec);
 
 
         var t:Float = Timer.stamp() * 4;
@@ -131,12 +135,12 @@ class TextDemo {
     }
 
     function spinBody(body:Body, numX:Float, numY:Float):Void {
-        body.matrix.appendRotation(-numX * 360 - 180     , Vector3D.Z_AXIS);
-        body.matrix.appendRotation( numY * 360 - 180 + 90, Vector3D.X_AXIS);
+        body.transform.appendRotation(-numX * 360 - 180     , Vector3D.Z_AXIS);
+        body.transform.appendRotation( numY * 360 - 180 + 90, Vector3D.X_AXIS);
     }
 
     function onClick(?event:Event):Void {
-        renderer.render(scene, mouseStyle, RenderMode.MOUSE);
+        renderer.render(bodies, mouseStyle, RenderMode.MOUSE);
     }
 
     function onMouseMove(?event:Event):Void {
@@ -146,16 +150,18 @@ class TextDemo {
     function onResize(?event:Event):Void {
         var aspectRatio:Float = stage.stageWidth / stage.stageHeight;
 
-        scene.cameraMat.identity();
-        scene.cameraMat.appendScale(1, -1, 1);
-        scene.cameraMat.appendScale(SPACE_WIDTH, SPACE_HEIGHT, 1);
+        camera.identity();
+        camera.appendScale(1, -1, 1);
+        camera.appendScale(SPACE_WIDTH, SPACE_HEIGHT, 1);
+        //*
         if (aspectRatio < 1) {
-            scene.cameraMat.appendScale(1, aspectRatio, 1);
+            camera.appendScale(1, aspectRatio, 1);
         } else {
-            scene.cameraMat.appendScale(1 / aspectRatio, 1, 1);
+            camera.appendScale(1 / aspectRatio, 1, 1);
         }
-        scene.cameraMat.appendTranslation(0, 0, 1);
-        scene.cameraMat.append(projection);
+        /**/
+        camera.appendTranslation(0, 0, 1);
+        camera.append(projection);
 
         renderer.setSize(stage.stageWidth, stage.stageHeight);
     }
@@ -164,7 +170,7 @@ class TextDemo {
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         onResize();
         onEnterFrame();
-        renderer.render(scene, mouseStyle, RenderMode.MOUSE);
+        renderer.render(bodies, mouseStyle, RenderMode.MOUSE);
     }
 
     function onDeactivate(?event:Event):Void {
@@ -174,11 +180,11 @@ class TextDemo {
     function onEnterFrame(?event:Event):Void {
         //if (showHideFunc != null) showHideFunc();
         update();
-        renderer.render(scene, prettyStyle, RenderMode.SCREEN);
+        renderer.render(bodies, prettyStyle, RenderMode.SCREEN);
     }
 
     function hideSomeGlyphs():Void {
-        var body:Body = scene.bodies[0];
+        var body:Body = bodies[0];
         var _glyphs:Array<Glyph> = [];
         for (ike in 0...1000) _glyphs.push(body.glyphs[Std.random(body.numGlyphs)]);
         body.toggleGlyphs(_glyphs, false);
@@ -186,7 +192,7 @@ class TextDemo {
     }
 
     function showSomeGlyphs():Void {
-        var body:Body = scene.bodies[0];
+        var body:Body = bodies[0];
         var _glyphs:Array<Glyph> = [];
         for (ike in 0...1000) _glyphs.push(body.glyphs[Std.random(body.numGlyphs)]);
         body.toggleGlyphs(_glyphs, true);

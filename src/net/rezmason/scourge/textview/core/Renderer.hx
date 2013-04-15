@@ -25,7 +25,7 @@ class Renderer {
         aspectRatio = width / height;
     }
 
-    public function render(scene:Scene, style:Style, mode:RenderMode):Void {
+    public function render(bodies:Array<Body>, style:Style, mode:RenderMode, clear:Bool = true):Void {
 
         if (activeStyle != style) {
             if (activeStyle != null) activeStyle.deactivate();
@@ -35,10 +35,10 @@ class Renderer {
 
         drawUtil.clear(style.backgroundColor);
 
-        for (body in scene.bodies) {
+        for (body in bodies) {
             if (body.numGlyphs == 0) continue;
             drawUtil.setScissorRectangle(body.scissorRectangle);
-            style.setMatrices(scene.cameraMat, body.matrix);
+            style.setMatrices(body.camera, body.transform);
             style.setGlyphTexture(body.glyphTexture, aspectRatio);
 
             for (segment in body.segments) {

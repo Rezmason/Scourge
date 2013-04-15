@@ -11,7 +11,8 @@ import net.rezmason.scourge.textview.utils.Types;
 class Body {
     public var segments(default, null):Array<BodySegment>;
     public var id:Int;
-    public var matrix:Matrix3D;
+    public var transform:Matrix3D;
+    public var camera:Matrix3D;
     public var numGlyphs(default, null):Int;
     public var numVisibleGlyphs(default, null):Int;
     public var glyphTexture(default, null):GlyphTexture;
@@ -34,7 +35,8 @@ class Body {
         makeSegments();
         numSegments = segments.length;
 
-        matrix = new Matrix3D();
+        transform = new Matrix3D();
+        camera = new Matrix3D();
         scissorRectangle = new Rectangle();
     }
 

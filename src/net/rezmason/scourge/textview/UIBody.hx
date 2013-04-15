@@ -68,7 +68,7 @@ class UIBody extends Body {
                 glyph.id = row * numCols + col;
                 glyphs.push(glyph);
 
-                var x:Float = ((col + 0.5) / numCols - 0.5) * 4 / 3;
+                var x:Float = ((col + 0.5) / numCols - 0.5);
                 var y:Float = ((row + 0.5) / numRows - 0.5);
                 var z:Float = -1;
                 z = 0;
@@ -87,7 +87,7 @@ class UIBody extends Body {
                 var charCode:Int = char.charCodeAt(0);
 
                 var i:Float = 0;
-                var s:Float = 0.81;
+                var s:Float = 1;
                 var p:Float = 0;
 
                 glyph.makeCorners();
