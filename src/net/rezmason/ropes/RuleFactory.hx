@@ -1,6 +1,7 @@
 package net.rezmason.ropes;
 
 import haxe.ds.ArraySort;
+import haxe.ds.StringMap;
 import net.rezmason.ropes.Types;
 import net.rezmason.utils.StringSort;
 

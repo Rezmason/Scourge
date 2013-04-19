@@ -111,6 +111,6 @@ class TestPlayer extends Player {
 
     private function handleAnnotation(sender:String):Void
     {
-        trace('${game.currentPlayer} : $sender \n ${game.spitBoard()}');
+        //trace('${game.currentPlayer} : $sender \n ${game.spitBoard()}');
     }
 }

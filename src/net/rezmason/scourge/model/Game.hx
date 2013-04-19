@@ -43,17 +43,17 @@ class Game {
         // Build the game from the config
 
         var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, historian.history, historian.historyState);
-        var basicRules:StringMap<Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
+        var basicRules:Map<String, Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
         var combinedConfig:Dynamic<Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
 
         if (annotateFunc != null) addAnnotations(annotateFunc, basicRules, combinedConfig);
 
-        var combinedRules:StringMap<Rule> = RuleFactory.combineRules(combinedConfig, basicRules);
+        var combinedRules:Map<String, Rule> = RuleFactory.combineRules(combinedConfig, basicRules);
 
         // Find the demiurgic rules
 
         var basicRulesArray:Array<Rule> = [];
-        var demiurgicRules:StringMap<Rule> = new StringMap<Rule>();
+        var demiurgicRules:Map<String, Rule> = new Map<String, Rule>();
         var rules:Array<Rule> = [];
         for (key in basicRules.keys().a2z()) {
             var rule:Rule = basicRules.get(key);
@@ -65,7 +65,6 @@ class Game {
 
         // Plan the state
 
-        var state:State = historian.state;
         plan = new StatePlanner().planState(state, rules);
 
         // Prime the rules with the state and plan
@@ -187,7 +186,7 @@ class Game {
         historian.key.unlock();
     }
 
-    private function addAnnotations(annotateFunc:String->Void, basicRules:StringMap<Rule>, cfg:Dynamic<Array<String>>):Void {
+    private function addAnnotations(annotateFunc:String->Void, basicRules:Map<String, Rule>, cfg:Dynamic<Array<String>>):Void {
         var cfgFields:Array<String> = cfg.fields();
         for (field in cfgFields) {
             var ruleFields:Array<String> = cfg.field(field);

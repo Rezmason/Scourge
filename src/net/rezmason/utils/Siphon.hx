@@ -8,40 +8,33 @@ import sys.FileSystem;
 
 class Siphon {
 
-    macro public static function getDefs(pkg:String = null, base:String = null, filterPattern:String = null) {
+    macro public static function getDefs(pkg:String = null, base:String = null, classFilter:String = null) {
 
-        var filter:EReg = null;
-        if (filterPattern != null) filter = new EReg(filterPattern, "");
+        var exprs:Array<Expr> = [];
 
+        // The default package is the top-level package
         if (pkg == null) pkg = "";
         var pkgArray:Array<String> = pkg.split(".");
 
-        var pos:Position = Context.currentPos();
+        // The default base is the source folder of the Siphon file
+        if (base == null) base = Context.getPosInfos(Context.currentPos()).file;
+        var path:String = base.split("/")[0] + "/" + pkgArray.join("/");
 
-        if (base == null) {
-            var posString:String = Context.getPosInfos(pos).file;
-            base = posString.substr(0, posString.indexOf("/"));
-        }
+        // The default regex matches all file names
+        if (classFilter == null) classFilter = "";
+        var classEReg:EReg = new EReg(classFilter, "");
 
-        var path:String = base + "/" + pkgArray.join("/");
+        // Here are the .hx files in the specified source folder and package that match the specified filter
+        var files:Array<String> = FileSystem.readDirectory(path).filter(classEReg.match).filter(~/\.hx$/.match);
 
-        var decExpr:Expr = macro var hash:StringMap<Class<Dynamic>> = new StringMap<Class<Dynamic>>();
-        var retExpr:Expr = macro hash;
-
-        var setExprs:Array<Expr> = [];
-
-        var files:Array<String> = FileSystem.readDirectory(path);
+        // We assume that there is one class in each file, with the same name as the file
+        // We also assume that none of the classes have the same name– they're in the same package, after all
         for (file in files) {
-            var clazz:String = file;
-            var hxIndex:Int = clazz.indexOf(".hx");
-            if (hxIndex > -1) {
-                clazz = clazz.substring(0, hxIndex);
-                if (filter == null || filter.match(clazz)) {
-                    setExprs.push(macro hash.set($v{clazz}, cast $p{pkgArray.concat([clazz])}));
-                }
-            }
+            var clazz:String = file.split(".")[0];
+            var keyValueExpr:Expr = macro $v{clazz} => cast($p{pkgArray.concat([clazz])}, Class<Dynamic>);
+            exprs.push(keyValueExpr);
         }
 
-        return macro $b{[decExpr].concat(setExprs).concat([retExpr])};
+        return macro [$a{exprs}];
     }
 }

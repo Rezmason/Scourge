@@ -134,14 +134,12 @@ using net.rezmason.utils.Pointers;
     @:final inline function numExtras():Int { return state.extras.length; }
 
     #if macro
-    private static var lkpSources:StringMap<String> = {
-        var hash:StringMap<String> = new StringMap<String>();
-        hash.set("state",  "plan");
-        hash.set("player", "plan");
-        hash.set("node",   "plan");
-        hash.set("extra",  "this");
-        hash;
-    }
+    private static var lkpSources:Map<String, String> = [
+        "state"=>"plan",
+        "player"=>"plan",
+        "node"=>"plan",
+        "extra"=>"this",
+    ];
 
     private static var restrictedFields:Array<String> = [
         "__initReqs", "__initPointers",

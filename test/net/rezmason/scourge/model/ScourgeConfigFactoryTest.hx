@@ -1,5 +1,7 @@
 package net.rezmason.scourge.model;
 
+import haxe.ds.StringMap;
+
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;

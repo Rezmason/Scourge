@@ -39,6 +39,7 @@ class StateHistorian {
 
     public function load(savedState:SavedState) {
         state = Unserializer.run(savedState.data);
+        state.key = key;
     }
 
     public function reset():Void {

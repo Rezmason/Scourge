@@ -1,5 +1,7 @@
 package net.rezmason.scourge.model;
 
+import haxe.ds.StringMap;
+
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.Types;
 import net.rezmason.ropes.GridNode;
@@ -28,7 +30,7 @@ class BoardUtils {
 
         if (otherNodeAspects == null) otherNodeAspects = new StringMap<String>();
         var otherAspectPtrs:StringMap<AspectPtr> = new StringMap<AspectPtr>();
-        for (id in otherNodeAspects.keys()) otherAspectPtrs.set(id, plan.nodeAspectLookup.get(id));
+        for (id in otherNodeAspects.keys()) otherAspectPtrs.set(id, plan.nodeAspectLookup.get(otherNodeAspects.get(id)));
 
         var str:String = "";
 

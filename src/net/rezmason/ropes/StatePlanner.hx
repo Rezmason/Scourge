@@ -42,7 +42,7 @@ class StatePlanner {
         return plan;
     }
 
-    inline function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet, key:PtrSet):Void {
+    function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet, key:PtrSet):Void {
         ArraySort.sort(requirements, propSort);
         for (ike in 0...requirements.length) {
             var prop:AspectProperty = requirements[ike];
