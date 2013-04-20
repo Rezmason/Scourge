@@ -21,9 +21,6 @@ typedef View = {rect:Rectangle, body:Body};
 
 class TextDemo {
 
-    inline static var FONT_SIZE:Float = 0.04;
-    inline static var FONT_RATIO:Float = 35 / 17;
-
     var stage:Stage;
 
     var renderer:Renderer;
@@ -69,7 +66,7 @@ class TextDemo {
         fontTextures = new StringMap<GlyphTexture>();
 
         for (key in fonts.keys()) {
-            fontTextures.set(key, new GlyphTexture(utils.textureUtil, fonts.get(key), FONT_SIZE, FONT_RATIO));
+            fontTextures.set(key, new GlyphTexture(utils.textureUtil, fonts.get(key)));
         }
     }
 

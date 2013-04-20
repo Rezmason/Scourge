@@ -11,18 +11,15 @@ class Renderer {
 
     var drawUtil:DrawUtil;
     var activeStyle:Style;
-    var aspectRatio:Float;
 
     public function new(drawUtil:DrawUtil) {
         this.drawUtil = drawUtil;
         mouseView = new MouseView(0.2);
-        aspectRatio = 1;
     }
 
     public function setSize(width:Int, height:Int):Void {
         drawUtil.resize(width, height);
         mouseView.configure(width, height);
-        aspectRatio = width / height;
     }
 
     public function render(bodies:Array<Body>, style:Style, mode:RenderMode, clear:Bool = true):Void {
@@ -39,7 +36,7 @@ class Renderer {
             if (body.numGlyphs == 0) continue;
             drawUtil.setScissorRectangle(body.scissorRectangle);
             style.setMatrices(body.camera, body.transform);
-            style.setGlyphTexture(body.glyphTexture, aspectRatio);
+            style.setGlyphTexture(body.glyphTexture, body.glyphTransform);
 
             for (segment in body.segments) {
                 style.setSegment(segment);

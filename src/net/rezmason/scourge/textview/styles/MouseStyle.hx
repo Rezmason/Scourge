@@ -51,8 +51,8 @@ class MouseStyle extends Style {
         ].join("\n");
     }
 
-    override public function setGlyphTexture(glyphTexture:GlyphTexture, aspectRatio:Float):Void {
-        super.setGlyphTexture(glyphTexture, aspectRatio);
+    override public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
+        super.setGlyphTexture(glyphTexture, glyphTransform);
         programUtil.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 5, glyphMat, true); // vc5 contains the character matrix
     }
 

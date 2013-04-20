@@ -33,13 +33,9 @@ class Style {
     public function activate():Void { }
     public function deactivate():Void { }
 
-    public function setGlyphTexture(glyphTexture:GlyphTexture, aspectRatio:Float):Void {
+    public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
         glyphMat.copyFrom(glyphTexture.matrix);
-        if (aspectRatio < 1) {
-            glyphMat.appendScale(1, aspectRatio, 1);
-        } else {
-            glyphMat.appendScale(1 / aspectRatio, 1, 1);
-        }
+        glyphMat.append(glyphTransform);
         glyphMat.appendScale(glyphMag, glyphMag, 1);
     }
 

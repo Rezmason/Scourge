@@ -89,7 +89,7 @@ class UIBody extends Body {
 
                 glyph.makeCorners();
                 glyph.set_shape(x, y, 0, 1, 0);
-                glyph.set_color(id % 2, 0, (id + 1) % 2, char == " " ? 0.1 : 0);
+                glyph.set_color(id % 2, 0, (id + 1) % 2, 1);
                 glyph.set_char(charCode, glyphTexture.font);
                 glyph.set_paint(glyph.id);
             }
@@ -98,6 +98,18 @@ class UIBody extends Body {
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
         super.adjustLayout(stageWidth, stageHeight, rect);
+
+
+        glyphTransform.identity();
+
+        var screenSize:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
+        var screenRatio:Float = stageHeight / stageWidth;
+        var rectSize:Float = Math.min(rect.width * stageWidth, rect.height * stageHeight) / screenSize;
+
+        var glyphWidth:Float = rectSize * 0.04;
+
+        glyphTransform.appendScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio / screenRatio, 1);
+
 
         transform.identity();
         transform.appendScale(1, -1, 1);

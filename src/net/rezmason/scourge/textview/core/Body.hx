@@ -13,6 +13,7 @@ class Body {
     public var id:Int;
     public var transform:Matrix3D;
     public var camera:Matrix3D;
+    public var glyphTransform:Matrix3D;
     public var numGlyphs(default, null):Int;
     public var numVisibleGlyphs(default, null):Int;
     public var glyphTexture(default, null):GlyphTexture;
@@ -37,6 +38,8 @@ class Body {
 
         transform = new Matrix3D();
         camera = new Matrix3D();
+        glyphTransform = new Matrix3D();
+        glyphTransform.appendScale(0.0001, 0.0001, 1); // Prevents blowouts
         scissorRectangle = new Rectangle();
     }
 
@@ -88,12 +91,12 @@ class Body {
     }
 
     public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
+
         scissorRectangle.x = rect.x * stageWidth;
         scissorRectangle.y = rect.y * stageHeight;
         scissorRectangle.width  = rect.width  * stageWidth;
         scissorRectangle.height = rect.height * stageHeight;
 
-        // transform camera to rect
         rect = rect.clone();
         rect.offset(-0.5, -0.5);
         rect.x *= 2;

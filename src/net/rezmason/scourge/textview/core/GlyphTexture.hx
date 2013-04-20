@@ -14,14 +14,12 @@ class GlyphTexture {
     public var matrix(default, null):Matrix3D;
     public var aspectRatio(default, null):Float;
 
-    public function new(textureUtil:TextureUtil, font:FlatFont, size:Float, aspectRatio:Float = 1):Void {
+    public function new(textureUtil:TextureUtil, font:FlatFont):Void {
         this.font = font;
         texture = textureUtil.createTexture(customize(font.getBitmapDataClone()));
 
         matrix = new Matrix3D();
         matrix.appendTranslation(-0.5, -0.5, 0);
-        this.aspectRatio = font.charHeight / font.charWidth * aspectRatio;
-        matrix.appendScale(size, size * this.aspectRatio, 1);
     }
 
     function customize(src:BitmapData):BitmapData { return src; }

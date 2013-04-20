@@ -77,10 +77,20 @@ class TestBody extends Body {
     override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
         super.adjustLayout(stageWidth, stageHeight, rect);
 
+        glyphTransform.identity();
+
+        var screenSize:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
+        var screenRatio:Float = stageHeight / stageWidth;
+        var rectSize:Float = Math.min(rect.width * stageWidth, rect.height * stageHeight) / screenSize;
+
+        var glyphWidth:Float = rectSize * 0.04;
+
+        glyphTransform.appendScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio / screenRatio, 1);
+
         var letterbox:Matrix3D = new Matrix3D();
-        var aspectRatio:Float = stageWidth / stageHeight * rect.width / rect.height;
-        if (aspectRatio < 1) letterbox.appendScale(1, aspectRatio, 1);
-        else letterbox.appendScale(1 / aspectRatio, 1, 1);
+        var boxRatio:Float = (rect.width / rect.height) / screenRatio;
+        if (boxRatio < 1) letterbox.appendScale(1, boxRatio, 1);
+        else letterbox.appendScale(1 / boxRatio, 1, 1);
         camera.prepend(letterbox);
 
         camera.appendTranslation(0, 0, 1);

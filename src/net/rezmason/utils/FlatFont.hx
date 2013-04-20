@@ -23,8 +23,9 @@ typedef CharCoord = {x:Int, y:Int};
 typedef UV = {u:Float, v:Float};
 
 typedef FlatFontJSON = {
-    var charWidth:Int;
-    var charHeight:Int;
+    var glyphWidth:Int;
+    var glyphHeight:Int;
+    var glyphRatio:Float;
     var charCoords:Dynamic;
     var missingChars:Dynamic;
 };
@@ -37,8 +38,9 @@ class FlatFont {
     var defaultCharCoord:CharCoord;
     var jsonString:String;
 
-    public var charWidth(default, null):Int;
-    public var charHeight(default, null):Int;
+    public var glyphWidth(default, null):Int;
+    public var glyphHeight(default, null):Int;
+    public var glyphRatio(default, null):Float;
     public var bdWidth(default, null):Int;
     public var bdHeight(default, null):Int;
     public var rowFraction(default, null):Float;
@@ -54,10 +56,11 @@ class FlatFont {
         missingChars = [];
 
         var expandedJSON:FlatFontJSON = jsonString.parse();
-        charWidth = expandedJSON.charWidth;
-        charHeight = expandedJSON.charHeight;
-        rowFraction = charHeight / bitmapData.height;
-        columnFraction = charWidth / bitmapData.width;
+        glyphWidth = expandedJSON.glyphWidth;
+        glyphHeight = expandedJSON.glyphHeight;
+        glyphRatio = expandedJSON.glyphRatio;
+        rowFraction = glyphHeight / bitmapData.height;
+        columnFraction = glyphWidth / bitmapData.width;
 
         for (field in Reflect.fields(expandedJSON.charCoords)) {
             var code:Int = Std.parseInt(field.substr(1));
@@ -114,15 +117,15 @@ class FlatFont {
     }
 
     #if flash
-    public static function flatten(font:Font, fontSize:Int, charString:String, charWidth:Int, charHeight:Int, spacing:Int):FlatFont {
+    public static function flatten(font:Font, fontSize:Int, charString:String, glyphWidth:Int, glyphHeight:Int, spacing:Int):FlatFont {
 
         if (fontSize < 1) fontSize = 72;
-        if (charWidth  < 0) charWidth  = 1;
-        if (charHeight < 0) charHeight = 1;
+        if (glyphWidth  < 0) glyphWidth  = 1;
+        if (glyphHeight < 0) glyphHeight = 1;
         if (spacing < 0) spacing = 0;
 
-        var charXOffset:Int = charWidth  + spacing;
-        var charYOffset:Int = charHeight + spacing;
+        var charXOffset:Int = glyphWidth  + spacing;
+        var charYOffset:Int = glyphHeight + spacing;
 
         var charCoordJSON:Dynamic = {};
         var missingChars:Array<Int> = [];
@@ -161,14 +164,15 @@ class FlatFont {
 
         textField.text = " ";
         var charBounds = textField.getCharBoundaries(0);
+        var glyphRatio:Float = charBounds.height / charBounds.width;
 
         var x:Int = 1;
         var y:Int = 0;
         var mat = new Matrix();
         mat.translate(-charBounds.x, -charBounds.y);
-        mat.scale(charWidth / charBounds.width, charHeight / charBounds.height);
+        mat.scale(glyphWidth / charBounds.width, glyphHeight / charBounds.height);
 
-        var clipRect:Rectangle = new Rectangle(0, 0, charWidth, charHeight);
+        var clipRect:Rectangle = new Rectangle(0, 0, glyphWidth, glyphHeight);
 
         for (char in requiredChars.keys().a2z()) {
 
@@ -202,7 +206,13 @@ class FlatFont {
             }
         }
 
-        var json:FlatFontJSON = {charWidth:charWidth, charHeight:charHeight, charCoords:charCoordJSON, missingChars:missingChars};
+        var json:FlatFontJSON = {
+            glyphWidth:glyphWidth,
+            glyphHeight:glyphHeight,
+            glyphRatio:glyphRatio,
+            charCoords:charCoordJSON,
+            missingChars:missingChars
+        };
 
         return new FlatFont(bitmapData, json.stringify());
     }
@@ -215,7 +225,7 @@ class FlatFont {
         for (otherFlatFont in otherFlatFonts) otherBDs.push(otherFlatFont.getBitmapDataClone());
 
         var copyMat:Matrix = new Matrix();
-        var clipRect:Rectangle = new Rectangle(0, 0, flatFont.charWidth, flatFont.charHeight);
+        var clipRect:Rectangle = new Rectangle(0, 0, flatFont.glyphWidth, flatFont.glyphHeight);
         var bitmapData:BitmapData = flatFont.getBitmapDataClone();
         var missingChars:Array<Int> = [];
 
@@ -249,8 +259,9 @@ class FlatFont {
         }
 
         var json:FlatFontJSON = {
-            charWidth:flatFont.charWidth,
-            charHeight:flatFont.charHeight,
+            glyphWidth:flatFont.glyphWidth,
+            glyphHeight:flatFont.glyphHeight,
+            glyphRatio:flatFont.glyphRatio,
             charCoords:flatFont.jsonString.parse().charCoords,
             missingChars:missingChars
         };
