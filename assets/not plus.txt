@@ -1,0 +1,99 @@
+RM: When will Haxe have => ?
+RM: Like, by default?
+
+MS: Doubt it will ever have =>
+MS: NC is very resistant
+
+RM: What about !+ ?
+
+MS: What the fuck is !+
+
+RM: Booleancrement.
+
+MS: I have never in my life heard of that
+MS: !+true //false?
+MS: Oh
+MS: wait
+MS: 10 !+ true //11?
+
+RM: No, trace(!+false); // not 11
+
+MS: .. what?
+MS: that makes no sense at all
+
+RM: What do you mean?
+
+MS: Give a real world example
+
+RM: var n:Booleint = !+false;
+    trace(n != 11); // true
+RM: It's not eleven.
+RM: What's ambiguous about that?
+
+MS: That has absolutely no use case at all
+MS: Zero
+
+RM: :-/
+RM: Last time I checked, there's roughly 2^32 - 1 integers that aren't eleven.
+RM: AS3 already has this built in. if (val) expands to whether or not val == 0.
+
+MS: Haxe does not do that on purpose
+
+RM: Right, because it needs Booleints.
+
+MS: No it doesn't
+MS: if statements must always evaluate to a bool in haxe
+
+RM: Look.
+
+MS: For === safety
+
+RM: What's the size of a Boolean?
+RM: It's one bit, right? Optimally?
+
+MS: No
+MS: It's one byte
+
+RM: Fine.
+
+MS: at least for as3 afaik
+
+RM: Now, if you have an integer,
+RM: and it *isn't eleven,*
+RM: wouldn't you benefit from storing an Int in a single byte?
+
+MS: Are  you talking about a whole number, or an int
+MS: an int is a whole number of a certain number of bits
+MS: int is most commonly associated with 32 bits
+
+RM: Right, but most of those bits represent which number the value *is*.
+RM: How about the ones that represent which number it *isn't*?
+
+MS: Yes.. not all the bits are set, I have no clue where you're going with this
+
+RM: Off the deep end.
+RM: I'm just joshing you, dude. (rofl)
+
+MS: I can never tell if you're being serious
+
+RM: It's a typo of != and I do it all the time.
+
+MS: I need to drink.. a lot now
+
+RM: How much?
+RM: Not eleven?
+RM: In a similar vein, Jon Kisor and I are going to do a spike sooner or later during which we'll investigate puns, write a formal description of "pun" and apply the concept to programming.
+
+MS: I'm never talking to you again
+MS: My mind can't take it anymore
+
+RM: I believe that that is impossible.
+RM: Or an amazing achievement.
+
+MS: I can't fucking believe I just got trolled
+
+RM: :D Booleancrement!
+RM: Hey, have you heard of the xx operator?
+RM: trace(val xx); // poop
+RM: It's called excrement.
+

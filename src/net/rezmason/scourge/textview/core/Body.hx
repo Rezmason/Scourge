@@ -91,7 +91,6 @@ class Body {
     }
 
     public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
-
         scissorRectangle.x = rect.x * stageWidth;
         scissorRectangle.y = rect.y * stageHeight;
         scissorRectangle.width  = rect.width  * stageWidth;
@@ -105,8 +104,8 @@ class Body {
         rect.height *= 2;
 
         camera.identity();
-        camera.appendTranslation((rect.left + rect.right) * 0.5, (rect.top + rect.bottom) * -0.5, 0);
         camera.appendScale(rect.width, rect.height, 1);
+        camera.appendTranslation((rect.left + rect.right) * 0.5, (rect.top + rect.bottom) * -0.5, 0);
     }
 
     public function update():Void {

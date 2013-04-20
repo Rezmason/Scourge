@@ -6,13 +6,13 @@ import net.rezmason.utils.FatChar;
 class TestStrings {
 
     public inline static var SPLASH:String =
-        " SSSSS    CCCCC    OOOOO   UU   UU  RRRRRR    GGGGG    EEEEE " +
-        "SS       CC   CC  OO   OO  UU   UU  RR   RR  GG       EE   EE" +
-        "SSSSSSS  CC       OO   OO  UU   UU  RRRRRR   GG  GGG  EEEEEEE" +
-        "     SS  CC   CC  OO   OO  UU   UU  RR   RR  GG   GG  EE     " +
-        " SSSSS    CCCCC    OOOOO    UUUUU   RR   RR   GGGGG    EEEEE " +
-        "" +
-        "Single-Celled  Organisms  Undergo  Rapid  Growth  Enhancement" +
+        " SSSSS    CCCCC    OOOOO   UU   UU  RRRRRR    GGGGG    EEEEE " + "\n" +
+        "SS       CC   CC  OO   OO  UU   UU  RR   RR  GG       EE   EE" + "\n" +
+        "SSSSSSS  CC       OO   OO  UU   UU  RRRRRR   GG  GGG  EEEEEEE" + "\n" +
+        "     SS  CC   CC  OO   OO  UU   UU  RR   RR  GG   GG  EE     " + "\n" +
+        " SSSSS    CCCCC    OOOOO    UUUUU   RR   RR   GGGGG    EEEEE " + "\n" +
+        "                                                             " + "\n" +
+        "Single-Celled  Organisms  Undergo  Rapid  Growth  Enhancement" + "\n" +
     "\n";
 
     public inline static var SYMBOLS:String = "()<>@[]_{}#$*";

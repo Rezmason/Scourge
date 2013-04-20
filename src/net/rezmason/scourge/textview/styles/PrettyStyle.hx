@@ -55,7 +55,7 @@ class PrettyStyle extends Style {
     override function makeFragmentShader():String {
         return [
 
-            "tex ft0 v1 fs0 <2d, linear, miplinear, repeat>",   // glyph = textures[0].colorAt(fInput[1])
+            "tex ft0 v1 fs0 <2d, linear, miplinear, clamp>",   // glyph = textures[0].colorAt(fInput[1])
 
             // brightness = (i >= brightThreshold) ? i - glyph : i + glyph
             "sge ft1 fc0.yyyy v2.xxxx",    // isBright = (fInput[2] >= brightThreshold) ? 1 : 0     0 to 1

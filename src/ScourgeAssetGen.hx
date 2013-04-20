@@ -27,8 +27,8 @@ class ScourgeAssetGen {
             TestStrings.BOX_SYMBOLS,
         ].join("");
 
-        var font1:FlatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), 140, requiredString, 48, 48, 2);
-        var font2:FlatFont = FlatFont.flatten(Assets.getFont("assets/SourceCodePro-Semibold.ttf"), 140, requiredString, 48, 48, 2);
+        var font1:FlatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), 140, requiredString, 48, 48, 1);
+        var font2:FlatFont = FlatFont.flatten(Assets.getFont("assets/SourceCodePro-Semibold.ttf"), 140, requiredString, 48, 48, 1);
         var font3:FlatFont = FlatFont.combine(font1, [font2]);
 
         deploy(font1, "profont");

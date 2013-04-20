@@ -25,8 +25,8 @@ class TestBody extends Body {
         projection = new PerspectiveMatrix3D();
         projection.perspectiveLH(2, 2, 1, 2);
 
-        var numCols:Int = 20;
-        var numRows:Int = 20;
+        var numCols:Int = 30;
+        var numRows:Int = 30;
         var totalChars:Int = numCols * numRows;
 
         for (ike in 0...totalChars) {
@@ -83,7 +83,7 @@ class TestBody extends Body {
         var screenRatio:Float = stageHeight / stageWidth;
         var rectSize:Float = Math.min(rect.width * stageWidth, rect.height * stageHeight) / screenSize;
 
-        var glyphWidth:Float = rectSize * 0.04;
+        var glyphWidth:Float = rectSize * 0.03;
 
         glyphTransform.appendScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio / screenRatio, 1);
 

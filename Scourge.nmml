@@ -33,6 +33,7 @@
 	<!-- <haxelib name="actuate" /> -->
 
 	<assets path="assets/flatfonts" rename="assets" />
+	<assets path="assets" include="not plus.txt" />
 
 	<ndll name="std" />
 	<ndll name="regexp" />

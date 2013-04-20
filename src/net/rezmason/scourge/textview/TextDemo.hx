@@ -77,18 +77,17 @@ class TextDemo {
 
         testBody = new TestBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(testBody);
-        views.push({body:testBody, rect:new Rectangle(0.5, 0, 0.5, 1)});
+        views.push({body:testBody, rect:new Rectangle(0, 0, 1, 0.5)});
 
         uiBody = new UIBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(uiBody);
-        views.push({body:uiBody, rect:new Rectangle(0, 0, 0.5, 1)});
+        views.push({body:uiBody, rect:new Rectangle(0, 0.5, 1, 0.5)});
     }
 
     function update(?event:Event):Void {
 
-        var testBody:Body = bodies[0];
-
         //*
+        var testBody:Body = bodies[0];
         var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
         var numY:Float = (stage.mouseY / stage.stageHeight) * 2 - 1;
         var numT:Float = (Timer.stamp() % 10) / 10;
@@ -111,9 +110,13 @@ class TextDemo {
             glyph.set_p(p);
             glyph.set_s(s);
         }
-        /**/
 
         testBody.update();
+        /**/
+
+        views[0].rect.bottom = views[1].rect.top  = stage.mouseY / stage.stageHeight;
+
+        for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
     }
 
     function spinBody(body:Body, numX:Float, numY:Float):Void {

@@ -94,14 +94,17 @@ class FlatFont {
         var charCoord:CharCoord = charCoords.get(code);
         if (charCoord == null) charCoord = defaultCharCoord;
 
+        var bumpU:Float = 0.5 / bdWidth;
+        var bumpV:Float = 0.5 / bdHeight;
+
         var uvs:Array<UV> = [];
         var u:Float = charCoord.x / bdWidth;
         var v:Float = charCoord.y / bdHeight;
 
-        uvs.push({u:u                 , v:v              });
-        uvs.push({u:u + columnFraction, v:v              });
-        uvs.push({u:u + columnFraction, v:v + rowFraction});
-        uvs.push({u:u                 , v:v + rowFraction});
+        uvs.push({u:u                  + bumpU, v:v               + bumpV});
+        uvs.push({u:u + columnFraction - bumpU, v:v               + bumpV});
+        uvs.push({u:u + columnFraction - bumpU, v:v + rowFraction - bumpV});
+        uvs.push({u:u                  + bumpU, v:v + rowFraction - bumpV});
 
         return uvs;
     }
@@ -151,8 +154,7 @@ class FlatFont {
         var textField = new TextField();
         sp.addChild(textField);
         textField.antiAliasType = AntiAliasType.ADVANCED;
-        #if flash textField.thickness = 100; #end
-        //textField.sharpness = -400;
+        textField.thickness = 100;
         textField.defaultTextFormat = format;
         textField.selectable = false;
         textField.embedFonts = true;
