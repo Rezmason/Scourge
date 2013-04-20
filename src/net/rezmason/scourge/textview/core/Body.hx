@@ -28,8 +28,8 @@ class Body {
         this.bufferUtil = bufferUtil;
 
         this.glyphTexture = glyphTexture;
+        glyphs = [];
         init();
-        makeGlyphs();
         numGlyphs = glyphs.length;
         numVisibleGlyphs = glyphs.length;
         makeSegments();
@@ -42,10 +42,6 @@ class Body {
 
     function init():Void {
 
-    }
-
-    function makeGlyphs():Void {
-        glyphs = [];
     }
 
     function makeSegments():Void {
@@ -89,6 +85,25 @@ class Body {
         }
 
         //spitGlyphs();
+    }
+
+    public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
+        scissorRectangle.x = rect.x * stageWidth;
+        scissorRectangle.y = rect.y * stageHeight;
+        scissorRectangle.width  = rect.width  * stageWidth;
+        scissorRectangle.height = rect.height * stageHeight;
+
+        // transform camera to rect
+        rect = rect.clone();
+        rect.offset(-0.5, -0.5);
+        rect.x *= 2;
+        rect.y *= 2;
+        rect.width *= 2;
+        rect.height *= 2;
+
+        camera.identity();
+        camera.appendTranslation((rect.left + rect.right) * 0.5, (rect.top + rect.bottom) * -0.5, 0);
+        camera.appendScale(rect.width, rect.height, 1);
     }
 
     public function update():Void {

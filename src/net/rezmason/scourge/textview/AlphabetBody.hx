@@ -14,8 +14,7 @@ class AlphabetBody extends Body {
         TestStrings.BOX_SYMBOLS +
     "";
 
-    override function makeGlyphs():Void {
-        super.makeGlyphs();
+    override function init():Void {
 
         var totalChars:Int = CHARS.length;
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));

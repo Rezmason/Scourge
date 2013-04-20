@@ -1,7 +1,11 @@
 package net.rezmason.scourge.textview;
 
-import net.rezmason.utils.FatChar;
+import com.adobe.utils.PerspectiveMatrix3D;
+import nme.geom.Matrix3D;
+import nme.geom.Rectangle;
+import nme.geom.Vector3D;
 
+import net.rezmason.utils.FatChar;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
 
@@ -9,17 +13,20 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class TestBody extends Body {
 
+    var projection:PerspectiveMatrix3D;
+
     inline static var COLOR_RANGE:Int = 6;
     inline static var CHARS:String =
         TestStrings.ALPHANUMERICS +
     "";
 
-    override function makeGlyphs():Void {
+    override function init():Void {
 
-        super.makeGlyphs();
+        projection = new PerspectiveMatrix3D();
+        projection.perspectiveLH(2, 2, 1, 2);
 
-        var numCols:Int = 10;
-        var numRows:Int = 10;
+        var numCols:Int = 20;
+        var numRows:Int = 20;
         var totalChars:Int = numCols * numRows;
 
         for (ike in 0...totalChars) {
@@ -33,10 +40,10 @@ class TestBody extends Body {
             var row:Int = Std.int(ike / numCols);
 
             var x:Float = (col + 0.5) / numCols - 0.5;
-            var y:Float = (row + 0.5) / numRows    - 0.5;
+            var y:Float = (row + 0.5) / numRows - 0.5;
             var z:Float = -0.5;
 
-            z *= Math.cos(row / numRows    * Math.PI * 2);
+            z *= Math.cos(row / numRows * Math.PI * 2);
             z *= Math.cos(col / numCols * Math.PI * 2);
 
             var r:Float = Std.random(COLOR_RANGE) / (COLOR_RANGE - 1);
@@ -65,5 +72,32 @@ class TestBody extends Body {
             glyph.set_char(charCode, glyphTexture.font);
             glyph.set_paint(ike);
         }
+    }
+
+    override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
+        super.adjustLayout(stageWidth, stageHeight, rect);
+
+        var letterbox:Matrix3D = new Matrix3D();
+        var aspectRatio:Float = stageWidth / stageHeight * rect.width / rect.height;
+        if (aspectRatio < 1) letterbox.appendScale(1, aspectRatio, 1);
+        else letterbox.appendScale(1 / aspectRatio, 1, 1);
+        camera.prepend(letterbox);
+
+        camera.appendTranslation(0, 0, 1);
+
+        rect = rect.clone();
+        rect.offset(-0.5, -0.5);
+        rect.x *= 2;
+        rect.y *= 2;
+        rect.width *= 2;
+        rect.height *= 2;
+
+        camera.append(projection);
+
+        var vec:Vector3D = new Vector3D();
+        camera.copyColumnTo(2, vec);
+        vec.x += (rect.left + rect.right) *  0.5;
+        vec.y += (rect.top + rect.bottom) * -0.5;
+        camera.copyColumnFrom(2, vec);
     }
 }

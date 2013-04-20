@@ -2,7 +2,6 @@ package net.rezmason.scourge.textview;
 
 import haxe.ds.StringMap;
 
-import com.adobe.utils.PerspectiveMatrix3D;
 import haxe.Timer;
 import nme.display.Stage;
 import nme.events.Event;
@@ -18,10 +17,10 @@ import net.rezmason.scourge.textview.utils.UtilitySet;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
+typedef View = {rect:Rectangle, body:Body};
+
 class TextDemo {
 
-    inline static var SPACE_WIDTH:Float = 2.0;
-    inline static var SPACE_HEIGHT:Float = 2.0;
     inline static var FONT_SIZE:Float = 0.04;
     inline static var FONT_RATIO:Float = 35 / 17;
 
@@ -29,10 +28,11 @@ class TextDemo {
 
     var renderer:Renderer;
 
-    var projection:PerspectiveMatrix3D;
     var utils:UtilitySet;
+    var testBody:Body;
+    var uiBody:Body;
     var bodies:Array<Body>;
-    var camera:Matrix3D;
+    var views:Array<View>;
     var fonts:StringMap<FlatFont>;
     var fontTextures:StringMap<GlyphTexture>;
     var showHideFunc:Void->Void;
@@ -76,23 +76,15 @@ class TextDemo {
     function makeScene():Void {
 
         bodies = [];
-        camera = new Matrix3D();
-        projection = new PerspectiveMatrix3D();
+        views = [];
 
-        projection.perspectiveLH(2, 2, 1, 2);
-        //projection.orthoLH(2, 2, 1, 2);
-
-        var testBody:Body = new TestBody(0, utils.bufferUtil, fontTextures.get("full"));
-        testBody.camera = camera;
-        testBody.transform = new Matrix3D();
-        //testBody.scissorRectangle = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
+        testBody = new TestBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(testBody);
+        views.push({body:testBody, rect:new Rectangle(0.5, 0, 0.5, 1)});
 
-        var uiBody:Body = new UIBody(0, utils.bufferUtil, fontTextures.get("full"));
-        testBody.camera = camera;
-        uiBody.transform = new Matrix3D();
-        //uiBody.scissorRectangle = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
+        uiBody = new UIBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(uiBody);
+        views.push({body:uiBody, rect:new Rectangle(0, 0, 0.5, 1)});
     }
 
     function update(?event:Event):Void {
@@ -114,13 +106,6 @@ class TextDemo {
         //bodyMat.appendTranslation(cX, cY, cZ);
         bodyMat.appendTranslation(0, 0, 0.5);
 
-        //var vec:Vector3D = new Vector3D();
-        //camera.copyColumnTo(2, vec);
-        //vec.x += numX;
-        //vec.y += -numY;
-        //camera.copyColumnFrom(2, vec);
-
-
         var t:Float = Timer.stamp() * 4;
 
         for (glyph in testBody.glyphs) {
@@ -136,7 +121,7 @@ class TextDemo {
 
     function spinBody(body:Body, numX:Float, numY:Float):Void {
         body.transform.appendRotation(-numX * 360 - 180     , Vector3D.Z_AXIS);
-        body.transform.appendRotation( numY * 360 - 180 + 90, Vector3D.X_AXIS);
+        body.transform.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
     }
 
     function onClick(?event:Event):Void {
@@ -148,21 +133,7 @@ class TextDemo {
     }
 
     function onResize(?event:Event):Void {
-        var aspectRatio:Float = stage.stageWidth / stage.stageHeight;
-
-        camera.identity();
-        camera.appendScale(1, -1, 1);
-        camera.appendScale(SPACE_WIDTH, SPACE_HEIGHT, 1);
-        //*
-        if (aspectRatio < 1) {
-            camera.appendScale(1, aspectRatio, 1);
-        } else {
-            camera.appendScale(1 / aspectRatio, 1, 1);
-        }
-        /**/
-        camera.appendTranslation(0, 0, 1);
-        camera.append(projection);
-
+        for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
         renderer.setSize(stage.stageWidth, stage.stageHeight);
     }
 

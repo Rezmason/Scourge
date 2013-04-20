@@ -1,5 +1,7 @@
 package net.rezmason.scourge.textview;
 
+import nme.geom.Rectangle;
+
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 
@@ -7,78 +9,77 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class UIBody extends Body {
 
+    inline static var NUM_ROWS:Int = 35;
+    inline static var NUM_COLS:Int = 85;
+
+    inline static function inputString():String {
+        return [
+            'TL                                                                                 TR',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß                  ',
+            '                  ß                                               ß                  ',
+            '                  ß  We knew  the world  would not  be the same.  ß                  ',
+            '                  ß  Few  people  laughed,  few   people  cried,  ß                  ',
+            '                  ß  most people were  silent.  I remembered the  ß                  ',
+            '                  ß  line   from   the   Hindu   scripture,  the  ß                  ',
+            '                  ß  Bhagavad-Gita. Vishnu is trying to persuade  ß                  ',
+            '                  ß  the Prince  that he should do his duty  and  ß                  ',
+            '                  ß  to  impress him  takes on  his  multi-armed  ß                  ',
+            '                  ß  form  and says,  "Now  I am  become  Death,  ß                  ',
+            '                  ß  the destroyer of worlds."  I suppose we all  ß                  ',
+            '                  ß  thought that, one way or another.            ß                  ',
+            '                  ß                                               ß                  ',
+            '                  ß                                               ß                  ',
+            '                  ß                          -Robert Oppenheimer  ß                  ',
+            '                  ß                                               ß                  ',
+            '                  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß                  ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            '                                                                                     ',
+            'BL                                                                                 BR',
+        ].join("\n");
+    }
+
     inline static var BOX_SIGIL:String = "ß";
 
-    override function makeGlyphs():Void {
-
-        var str:String =
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                   ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß                   \n' +
-            '                   ß                                               ß                   \n' +
-            '                   ß  We knew  the world  would not  be the same.  ß                   \n' +
-            '                   ß  Few  people  laughed,  few   people  cried,  ß                   \n' +
-            '                   ß  most people were  silent.  I remembered the  ß                   \n' +
-            '                   ß  line   from   the   Hindu   scripture,  the  ß                   \n' +
-            '                   ß  Bhagavad-Gita. Vishnu is trying to persuade  ß                   \n' +
-            '                   ß  the Prince  that he should do his duty  and  ß                   \n' +
-            '                   ß  to  impress him  takes on  his  multi-armed  ß                   \n' +
-            '                   ß  form  and says,  "Now  I am  become  Death,  ß                   \n' +
-            '                   ß  the destroyer of worlds."  I suppose we all  ß                   \n' +
-            '                   ß  thought that, one way or another.            ß                   \n' +
-            '                   ß                                               ß                   \n' +
-            '                   ß                                               ß                   \n' +
-            '                   ß                          -Robert Oppenheimer  ß                   \n' +
-            '                   ß                                               ß                   \n' +
-            '                   ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß                   \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '                                                                                       \n' +
-            '';
+    override function init():Void {
 
         var strMatrix:Array<Array<String>> = [];
-        for (line in str.split("\n")) {
+        for (line in inputString().split("\n")) {
             strMatrix.push(line.split(""));
         }
 
-        super.makeGlyphs();
+        for (row in 0...NUM_ROWS) {
+            for (col in 0...NUM_COLS) {
 
-        var numRows:Int = 35;
-        var numCols:Int = 85;
-        var totalChars:Int = numCols * numRows;
-
-        for (row in 0...numRows) {
-            for (col in 0...numCols) {
+                var id:Int = row * NUM_COLS + col;
 
                 var glyph:Glyph = new Glyph();
                 glyph.visible = true;
-                glyph.id = row * numCols + col;
+                glyph.id = id;
                 glyphs.push(glyph);
 
-                var x:Float = ((col + 0.5) / numCols - 0.5);
-                var y:Float = ((row + 0.5) / numRows - 0.5);
-                var z:Float = -1;
-                z = 0;
+                var x:Float = ((col + 0.5) / NUM_COLS - 0.5);
+                var y:Float = ((row + 0.5) / NUM_ROWS - 0.5);
 
                 var char:String = strMatrix[row][col];
                 if (char == BOX_SIGIL) {
                     var left  :Int = (col > 0        && strMatrix[row][col - 1] == BOX_SIGIL) ? 1 : 0;
-                    var right :Int = (col <= numCols && strMatrix[row][col + 1] == BOX_SIGIL) ? 1 : 0;
+                    var right :Int = (col <= NUM_COLS && strMatrix[row][col + 1] == BOX_SIGIL) ? 1 : 0;
                     var top   :Int = (row > 0        && strMatrix[row - 1][col] == BOX_SIGIL) ? 1 : 0;
-                    var bottom:Int = (row <= numRows && strMatrix[row + 1][col] == BOX_SIGIL) ? 1 : 0;
+                    var bottom:Int = (row <= NUM_ROWS && strMatrix[row + 1][col] == BOX_SIGIL) ? 1 : 0;
 
                     var flag:Int = (left << 0) | (right << 1) | (top << 2) | (bottom << 3);
                     char = TestStrings.BOX_SYMBOLS.charAt(flag);
@@ -86,16 +87,19 @@ class UIBody extends Body {
 
                 var charCode:Int = char.charCodeAt(0);
 
-                var i:Float = 0;
-                var s:Float = 1;
-                var p:Float = 0;
-
                 glyph.makeCorners();
-                glyph.set_shape(x, y, z, s, p);
-                glyph.set_color(1, 1, 1, i);
+                glyph.set_shape(x, y, 0, 1, 0);
+                glyph.set_color(id % 2, 0, (id + 1) % 2, char == " " ? 0.1 : 0);
                 glyph.set_char(charCode, glyphTexture.font);
                 glyph.set_paint(glyph.id);
             }
         }
+    }
+
+    override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
+        super.adjustLayout(stageWidth, stageHeight, rect);
+
+        transform.identity();
+        transform.appendScale(1, -1, 1);
     }
 }

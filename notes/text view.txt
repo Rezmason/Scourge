@@ -1,3 +1,6 @@
+Layout should be handled by UI layer
+    Bodies should internally handle their transform, glyph transform, camera and scissor rectangle
+
 UI object
     Character size, ratio and layout?
 Globe-cube object
