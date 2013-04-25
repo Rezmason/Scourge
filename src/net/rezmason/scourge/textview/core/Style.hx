@@ -3,12 +3,16 @@ package net.rezmason.scourge.textview.core;
 import com.adobe.utils.AGALMiniAssembler;
 import nme.display3D.Program3D;
 import nme.geom.Matrix3D;
+import nme.geom.Vector3D;
 import nme.utils.ByteArray;
 
 import net.rezmason.scourge.textview.utils.ProgramUtil;
 import net.rezmason.scourge.textview.utils.Types;
 
 class Style {
+
+    inline static var MAG_LIMIT:Float = 0.7;
+    static var unitVec:Vector3D = new Vector3D(1, 0, 0);
 
     public var program(default, null):Program3D;
     public var backgroundColor(default, null):Int;
@@ -37,6 +41,9 @@ class Style {
         glyphMat.copyFrom(glyphTexture.matrix);
         glyphMat.append(glyphTransform);
         glyphMat.appendScale(glyphMag, glyphMag, 1);
+
+        // mag fuse
+        if (glyphMat.transformVector(unitVec).length > MAG_LIMIT) throw "You blew the mag fuse!";
     }
 
     public function setSegment(segment:BodySegment):Void { }

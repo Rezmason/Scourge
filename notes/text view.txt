@@ -1,20 +1,3 @@
-UI object
-    Character size, ratio and layout?
-Globe-cube object
-
-Interaction
-    Make sure interaction IDs work
-
-    Render the scene ONCE each time interaction changes
-        On mouse/finger up after a drag
-        On button click/tap
-        On first mouse move after a keystroke
-    Only color and draw the hoverable/clickable objects, of course
-        Create a large quad object for the board's draggable hit area
-
-Hey, this game is a Roguelike!
-    Figure out what solutions they have to lots of these problems
-
 What do the glyphs depict?
     3D views - board, polyominoes
         Node

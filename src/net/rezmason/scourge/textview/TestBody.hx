@@ -77,6 +77,12 @@ class TestBody extends Body {
     override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
         super.adjustLayout(stageWidth, stageHeight, rect);
 
+        rect = rect.clone();
+        if (stageWidth  == 0) stageWidth  = 1;
+        if (stageHeight == 0) stageHeight = 1;
+        if (rect.width  == 0) rect.width  = 1 / stageWidth;
+        if (rect.height == 0) rect.height = 1 / stageHeight;
+
         glyphTransform.identity();
 
         var screenSize:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
@@ -95,7 +101,6 @@ class TestBody extends Body {
 
         camera.appendTranslation(0, 0, 1);
 
-        rect = rect.clone();
         rect.offset(-0.5, -0.5);
         rect.x *= 2;
         rect.y *= 2;

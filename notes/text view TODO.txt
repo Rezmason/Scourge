@@ -1,0 +1,18 @@
+UI object
+    Populate with string
+        Handle line endings
+    Scrolling
+        Recycle glyphs
+            You only need one more row
+        Y offset
+            Goes into transform matrix
+
+Interaction
+    Make sure interaction IDs work
+
+    Render the scene ONCE each time interaction changes
+        On mouse/finger up after a drag
+        On button click/tap
+        On first mouse move after a keystroke
+    Only color and draw the hoverable/clickable objects, of course
+        Create a large quad object for the board's draggable hit area

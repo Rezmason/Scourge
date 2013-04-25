@@ -34,13 +34,13 @@ class Scourge {
         for (name in ["source", "profont", "full"]) fonts.set(name, makeFont(name));
 
         //var str = [TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n");
-        var str = Assets.getText("not plus.txt");
-        new net.rezmason.scourge.textview.TextDemo(Lib.current.stage, fonts);
+        var str = Assets.getText("assets/not plus.txt");
+        new net.rezmason.scourge.textview.TextDemo(Lib.current.stage, fonts, str);
     }
 
     static function makeFont(id:String):FlatFont
     {
-        var path:String = "assets/" + id + "_flat";
+        var path:String = "assets/flatfonts/" + id + "_flat";
         return new FlatFont(Assets.getBitmapData(path + ".png"), Assets.getText(path + ".json"));
     }
 }

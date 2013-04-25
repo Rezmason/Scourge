@@ -35,10 +35,12 @@ class TextDemo {
     var showHideFunc:Void->Void;
     var prettyStyle:Style;
     var mouseStyle:Style;
+    var text:String;
 
-    public function new(stage:Stage, fonts:StringMap<FlatFont>):Void {
+    public function new(stage:Stage, fonts:StringMap<FlatFont>, text:String):Void {
         this.stage = stage;
         this.fonts = fonts;
+        this.text = text;
         showHideFunc = hideSomeGlyphs;
         utils = new UtilitySet(stage.stage3Ds[0], onCreate);
     }
@@ -77,11 +79,11 @@ class TextDemo {
 
         testBody = new TestBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(testBody);
-        views.push({body:testBody, rect:new Rectangle(0, 0, 1, 0.5)});
+        views.push({body:testBody, rect:new Rectangle(0, 0, 0.5, 1)});
 
         uiBody = new UIBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(uiBody);
-        views.push({body:uiBody, rect:new Rectangle(0, 0.5, 1, 0.5)});
+        views.push({body:uiBody, rect:new Rectangle(0.5, 0, 0.5, 1)});
     }
 
     function update(?event:Event):Void {
@@ -114,9 +116,13 @@ class TextDemo {
         testBody.update();
         /**/
 
-        views[0].rect.bottom = views[1].rect.top  = stage.mouseY / stage.stageHeight;
+        //*
+        var divider:Float = stage.mouseX / stage.stageWidth;
+        views[0].rect.right = divider;
+        views[1].rect.left  = divider;
 
         for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
+        /**/
     }
 
     function spinBody(body:Body, numX:Float, numY:Float):Void {
@@ -159,6 +165,7 @@ class TextDemo {
         var _glyphs:Array<Glyph> = [];
         for (ike in 0...1000) _glyphs.push(body.glyphs[Std.random(body.numGlyphs)]);
         body.toggleGlyphs(_glyphs, false);
+        body.update();
         if (body.numVisibleGlyphs <= 0) showHideFunc = showSomeGlyphs;
     }
 
@@ -167,6 +174,7 @@ class TextDemo {
         var _glyphs:Array<Glyph> = [];
         for (ike in 0...1000) _glyphs.push(body.glyphs[Std.random(body.numGlyphs)]);
         body.toggleGlyphs(_glyphs, true);
+        body.update();
         if (body.numVisibleGlyphs >= body.numGlyphs) showHideFunc = hideSomeGlyphs;
     }
 }

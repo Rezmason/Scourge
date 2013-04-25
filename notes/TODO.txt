@@ -1,5 +1,8 @@
 TextView (see file)
 	View elements
+Console
+Board view
+Piece view
 
 Finalize ROPES classes
 
@@ -18,6 +21,9 @@ TestPlayer
 HumanPlayer
 RemotePlayer
 MachinePlayer (local)
+
+Hey, this game is a Roguelike!
+    Figure out what solutions they have to UI challenges
 
 Make renderer cross-platform
 	Oh boy...

@@ -76,7 +76,7 @@ class Body {
 
         for (segment in segments) glyphsBySegment.push([]);
         for (glyph in _glyphs) {
-            if (glyph != null && glyph.visible == !visible && !glyphIDs.exists(glyph.id)) {
+            if (glyph != null && !glyphIDs.exists(glyph.id)) {
                 glyphsBySegment[Std.int(glyph.id / Almanac.BUFFER_CHUNK)].push(glyph);
                 glyphIDs.set(glyph.id, true);
             }
@@ -84,19 +84,24 @@ class Body {
 
         for (ike in 0...numSegments) {
             numVisibleGlyphs += segments[ike].toggleGlyphs(glyphsBySegment[ike], visible);
-            segments[ike].update();
         }
 
         //spitGlyphs();
     }
 
     public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
+
+        rect = rect.clone();
+        if (stageWidth  == 0) stageWidth  = 1;
+        if (stageHeight == 0) stageHeight = 1;
+        if (rect.width  == 0) rect.width  = 1 / stageWidth;
+        if (rect.height == 0) rect.height = 1 / stageHeight;
+
         scissorRectangle.x = rect.x * stageWidth;
         scissorRectangle.y = rect.y * stageHeight;
         scissorRectangle.width  = rect.width  * stageWidth;
         scissorRectangle.height = rect.height * stageHeight;
 
-        rect = rect.clone();
         rect.offset(-0.5, -0.5);
         rect.x *= 2;
         rect.y *= 2;
