@@ -11,14 +11,19 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 class UIBody extends Body {
 
     var text:String;
+    var textDocument:Array<Array<String>>;
     /*
     inline static var BOX_SIGIL:String = "ß";
     inline static var LINE_SIGIL:String = "¬";
     */
-    inline static var GLYPH_WIDTH_IN_INCHES :Float = 18 / 72;
-    inline static var GLYPH_HEIGHT_IN_INCHES:Float = 24 / 72;
+    inline static var GLYPH_WIDTH_IN_INCHES :Float = 18 / 72 / 2;
+    inline static var GLYPH_HEIGHT_IN_INCHES:Float = 28 / 72 / 2;
     var glyphWidthInPixels :Float;
     var glyphHeightInPixels:Float;
+
+    var numRows:Int;
+    var numCols:Int;
+    var numGlyphsInLayout:Int;
 
     override function init():Void {
 
@@ -66,7 +71,7 @@ class UIBody extends Body {
 
             glyph.makeCorners();
             glyph.set_shape(x, y, 0, 1, 0);
-            glyph.set_color(1, 1, 1, 0);
+            glyph.set_color(1, 1, 1, 1);
             glyph.set_char(charCode, glyphTexture.font);
             glyph.set_paint(glyph.id);
         }
@@ -87,9 +92,9 @@ class UIBody extends Body {
         var rectWidthInPixels :Float = rect.width  * stageWidth;
         var rectHeightInPixels:Float = rect.height * stageHeight;
 
-        var numRows:Int = Std.int(rectHeightInPixels / glyphHeightInPixels);
-        var numCols:Int = Std.int(rectWidthInPixels  / glyphWidthInPixels );
-        var numGlyphsInLayout:Int = numRows * numCols;
+        numRows = Std.int(rectHeightInPixels / glyphHeightInPixels);
+        numCols = Std.int(rectWidthInPixels  / glyphWidthInPixels );
+        numGlyphsInLayout = numRows * numCols;
 
         var glyphWidth :Float = rectWidthInPixels  / stageWidth  / numCols;
         var glyphHeight:Float = rectHeightInPixels / stageHeight / numRows;
@@ -120,6 +125,39 @@ class UIBody extends Body {
     }
 
     public function updateText(text:String):Void {
+        if (text == null) text = "";
         this.text = text;
+
+        textDocument = text.split("\n").map(function(a) return a.split(""));
+
+        var row:Int = 0;
+        var col:Int = 0;
+
+        var blank:Int = " ".charCodeAt(0);
+
+        for (paragraph in textDocument) {
+            for (letter in paragraph) {
+                var glyph:Glyph = glyphs[row * numCols + col];
+                var charCode:Int = letter.charCodeAt(0);
+                glyph.set_char(charCode, glyphTexture.font);
+                col++;
+
+                if (col >= numCols) {
+                    row++;
+                    col = 0;
+                    if (row >= numRows) break;
+                }
+            }
+
+            if (row >= numRows) break;
+            for (ike in col...numCols) glyphs[row * numCols + ike].set_char(blank, glyphTexture.font);
+
+            row++;
+            col = 0;
+
+            if (row >= numRows) break;
+        }
+
+        for (ike in row...numRows) for (jen in 0...numCols) glyphs[ike * numCols + jen].set_char(blank, glyphTexture.font);
     }
 }

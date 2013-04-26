@@ -25,6 +25,7 @@ class BodySegment {
     public var numVisibleGlyphs(default, null):Int;
 
     public var glyphs(default, null):Array<Glyph>;
+    var glyphsByIndex:Array<Glyph>;
 
     public var dirty(default, null):Bool;
 
@@ -32,6 +33,7 @@ class BodySegment {
         id = segmentID;
         dirty = true;
         this.glyphs = glyphs;
+        glyphsByIndex = [];
         numGlyphs = glyphs.length;
         numVisibleGlyphs = numGlyphs;
 
@@ -103,20 +105,17 @@ class BodySegment {
 
         for (srcGlyph in glyphsToToggle) {
 
-            if (srcGlyph.visible == visible) {
-                continue;
-            }
+            if (srcGlyph == null || srcGlyph.visible == visible) continue;
+
+            var srcIndexAddress:Int = srcGlyph.indexAddress;
+            if (glyphsByIndex[srcIndexAddress] != srcGlyph) continue;
+            var dstIndexAddress:Int = numVisibleGlyphs + offset;
 
             dirty = true;
-
             srcGlyph.visible = visible;
-
-
-            var dstGlyph:Glyph = glyphs[numVisibleGlyphs + offset];
+            var dstGlyph:Glyph = glyphsByIndex[dstIndexAddress];
 
             if (srcGlyph != dstGlyph) {
-                var srcIndexAddress:Int = srcGlyph.indexAddress;
-                var dstIndexAddress:Int = dstGlyph.indexAddress;
                 insertGlyph(dstGlyph, srcIndexAddress);
                 insertGlyph(srcGlyph, dstIndexAddress);
             }
@@ -136,6 +135,7 @@ class BodySegment {
             firstVertIndex + 0, firstVertIndex + 2, firstVertIndex + 3,
         ], Almanac.INDICES_PER_GLYPH);
 
+        glyphsByIndex[indexAddress] = glyph;
         glyph.indexAddress = indexAddress;
     }
 

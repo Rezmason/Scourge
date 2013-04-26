@@ -37,11 +37,7 @@ What do the glyphs depict?
             Over
                 white, z up
             Down
-                normal color, z down
-        If active text, input, or button elements doesn't fit on screen,
-            Flatten plain text
-            Swap non-plain text
-            Tween text up
+                normal color, z Down
 
     2D polyomino view
         Buttons for manipulating rotation & reflection

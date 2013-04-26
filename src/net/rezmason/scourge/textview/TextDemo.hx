@@ -27,7 +27,7 @@ class TextDemo {
 
     var utils:UtilitySet;
     var testBody:Body;
-    var uiBody:Body;
+    var uiBody:UIBody;
     var bodies:Array<Body>;
     var views:Array<View>;
     var fonts:StringMap<FlatFont>;
@@ -84,6 +84,8 @@ class TextDemo {
         uiBody = new UIBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(uiBody);
         views.push({body:uiBody, rect:new Rectangle(0.5, 0, 0.5, 1)});
+
+        uiBody.updateText(text);
     }
 
     function update(?event:Event):Void {

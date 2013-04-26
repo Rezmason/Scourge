@@ -65,27 +65,8 @@ class Body {
     }
 
     public function toggleGlyphs(_glyphs:Array<Glyph>, visible:Bool):Void {
-
         if (_glyphs == null || _glyphs.length == 0) return;
-
-        // Sort the glyphs by segment, and update the segments
-        // Disregard duplicate glyphs, or glyphs whose visibility state doesn't need changing
-
-        var glyphsBySegment:Array<Array<Glyph>> = [];
-        var glyphIDs:IntMap<Bool> = new IntMap<Bool>();
-
-        for (segment in segments) glyphsBySegment.push([]);
-        for (glyph in _glyphs) {
-            if (glyph != null && !glyphIDs.exists(glyph.id)) {
-                glyphsBySegment[Std.int(glyph.id / Almanac.BUFFER_CHUNK)].push(glyph);
-                glyphIDs.set(glyph.id, true);
-            }
-        }
-
-        for (ike in 0...numSegments) {
-            numVisibleGlyphs += segments[ike].toggleGlyphs(glyphsBySegment[ike], visible);
-        }
-
+        for (ike in 0...numSegments) numVisibleGlyphs += segments[ike].toggleGlyphs(_glyphs, visible);
         //spitGlyphs();
     }
 

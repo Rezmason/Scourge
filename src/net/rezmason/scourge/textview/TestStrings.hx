@@ -15,7 +15,7 @@ class TestStrings {
         "Single-Celled  Organisms  Undergo  Rapid  Growth  Enhancement" + "\n" +
     "\n";
 
-    public inline static var SYMBOLS:String = "()<>@[]_{}#$*";
+    public inline static var SYMBOLS:String = "()<>@[]_{}#$*+-=";
     public inline static var WEIRD_SYMBOLS:String = "¤¬ÎøΔΩ•◊";
     public inline static var BOX_SYMBOLS:String = "   ─ ┘└┴ ┐┌┬│┤├┼";
 

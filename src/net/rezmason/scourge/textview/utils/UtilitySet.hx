@@ -1,12 +1,8 @@
 package net.rezmason.scourge.textview.utils;
 
-import nme.display.BitmapData;
 import nme.display.Stage3D;
 import nme.display3D.Context3D;
-import nme.display3D.Context3DTextureFormat;
-import nme.display3D.textures.Texture;
 import nme.events.Event;
-import nme.geom.Matrix;
 
 class UtilitySet {
 

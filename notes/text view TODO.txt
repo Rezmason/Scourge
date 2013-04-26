@@ -1,14 +1,36 @@
 UI object
-    Populate with string
-        Handle line endings
+    Create string buffer
+        Text shouldn't go straight into the glyphs
+
+    Escape characters
+
+        \e[R;G;Bm
+
+        Inline button
+            Temporary: invert, red, pop out
+        Inline field
+            Temporary: invert, blue, pop in
+        Inline text
+        color index
+            Temporary: off-white, red, green, yellow, blue, magenta, cyan, white
+
+    Specify colors
+
+    Whoops! Forgot the perspective projection.
+
     Scrolling
         Recycle glyphs
             You only need one more row
         Y offset
             Goes into transform matrix
+        Reset scroll position to bottom when text is updated.
+
+Board object
 
 Interaction
     Make sure interaction IDs work
+
+    Mouse interaction model: Roll over, roll out, mouse down, mouse up, mouse up out
 
     Render the scene ONCE each time interaction changes
         On mouse/finger up after a drag
