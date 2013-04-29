@@ -7,34 +7,49 @@ import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
+using StringTools;
 
 class UIBody extends Body {
 
+    inline static var esc:String = String.fromCharCode(27);
+    inline static var ease:Float = 0.5;
+
     var text:String;
-    var textDocument:Array<Array<String>>;
+    var page:Array<String>;
     /*
     inline static var BOX_SIGIL:String = "ß";
     inline static var LINE_SIGIL:String = "¬";
     */
-    inline static var GLYPH_WIDTH_IN_INCHES :Float = 18 / 72 / 2;
-    inline static var GLYPH_HEIGHT_IN_INCHES:Float = 28 / 72 / 2;
+
+    inline static var NATIVE_DPI:Float = 72;
+    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 24;
     var glyphWidthInPixels :Float;
     var glyphHeightInPixels:Float;
+
+    var scrollFraction:Float;
+    var scrollY:Float;
+    var scroll:Float;
+    var scrollGoal:Float;
+    var smoothScrolling:Bool;
 
     var numRows:Int;
     var numCols:Int;
     var numGlyphsInLayout:Int;
 
     override function init():Void {
-
-        var dpi:Float = Capabilities.screenDPI;
-        glyphWidthInPixels  = GLYPH_WIDTH_IN_INCHES  * dpi;
-        glyphHeightInPixels = GLYPH_HEIGHT_IN_INCHES * dpi;
+        glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * Capabilities.screenDPI / NATIVE_DPI;
+        glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
 
         var numGlyphColumns:Int = Std.int(Capabilities.screenResolutionX / glyphWidthInPixels);
         var numGlyphRows:Int = Std.int(Capabilities.screenResolutionY / glyphHeightInPixels);
 
         var numGlyphs:Int = numGlyphRows * numGlyphColumns;
+        var blank:Int = " ".charCodeAt(0);
+
+        scrollY = 0;
+        scroll = 0;
+        scrollGoal = 0;
+        smoothScrolling = false;
 
         //var sigils:EReg = ~/[ß¬]/;
 
@@ -67,18 +82,15 @@ class UIBody extends Body {
             var charCode:Int = char.charCodeAt(0);
             */
 
-            var charCode:Int = (id % 26) + 65;
-
             glyph.makeCorners();
             glyph.set_shape(x, y, 0, 1, 0);
-            glyph.set_color(1, 1, 1, 1);
-            glyph.set_char(charCode, glyphTexture.font);
+            glyph.set_color(1, 1, 1, 0);
+            glyph.set_char(blank, glyphTexture.font);
             glyph.set_paint(glyph.id);
         }
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
-
         super.adjustLayout(stageWidth, stageHeight, rect);
 
         rect = rect.clone();
@@ -92,34 +104,34 @@ class UIBody extends Body {
         var rectWidthInPixels :Float = rect.width  * stageWidth;
         var rectHeightInPixels:Float = rect.height * stageHeight;
 
-        numRows = Std.int(rectHeightInPixels / glyphHeightInPixels);
+        numRows = Std.int(rectHeightInPixels / glyphHeightInPixels) + 1;
+        var numRowsForLayout:Int = numRows - 1;
         numCols = Std.int(rectWidthInPixels  / glyphWidthInPixels );
         numGlyphsInLayout = numRows * numCols;
 
+        scrollFraction = 1 / (numRows - 1);
+
         var glyphWidth :Float = rectWidthInPixels  / stageWidth  / numCols;
-        var glyphHeight:Float = rectHeightInPixels / stageHeight / numRows;
+        var glyphHeight:Float = rectHeightInPixels / stageHeight / numRowsForLayout;
 
         glyphTransform.appendScale(glyphWidth * 2, glyphHeight * 2, 1);
 
         transform.identity();
         transform.appendScale(1, -1, 1);
 
-        for (ike in 0...numGlyphsInLayout) {
-            var glyph:Glyph = glyphs[ike];
-            var col:Int = glyph.id % numCols;
-            var row:Int = Std.int((glyph.id - col) / numCols);
-            var x:Float = ((col + 0.5) / numCols - 0.5);
-            var y:Float = ((row + 0.5) / numRows - 0.5);
-            /*
-            if (row >= numRows) glyph.set_color(1, 0, 0, 1);
-            else glyph.set_color(1, 1, 0, 1);
-            */
-            glyph.set_shape(x, y, 0, 1, 0);
+        var id:Int = 0;
+        for (row in 0...numRows) {
+            for (col in 0...numCols) {
+                var x:Float = ((col + 0.5) / numCols - 0.5);
+                var y:Float = ((row + 0.5) / numRowsForLayout - 0.5);
+                glyphs[id++].set_shape(x, y, 0, 1, 0);
+            }
         }
 
         toggleGlyphs(glyphs.slice(0, numGlyphsInLayout), true);
         toggleGlyphs(glyphs.slice(numGlyphsInLayout), false);
 
+        //page = null;
         updateText(text);
         update();
     }
@@ -128,36 +140,69 @@ class UIBody extends Body {
         if (text == null) text = "";
         this.text = text;
 
-        textDocument = text.split("\n").map(function(a) return a.split(""));
+        if (numGlyphsInLayout == 0) return;
 
-        var row:Int = 0;
-        var col:Int = 0;
+        var fullLine:EReg = new EReg('(.{$numCols})', 'g');
+        var token:String = "__TOKEN__";
+        var blankParagraph:String = "".rpad(" ", numCols);
 
-        var blank:Int = " ".charCodeAt(0);
+        function padLine(s) return StringTools.rpad(s, " ", numCols);
+        function wrapLines(s) return fullLine.replace(s, '$1$token').split(token).map(padLine).join(token);
 
-        for (paragraph in textDocument) {
-            for (letter in paragraph) {
-                var glyph:Glyph = glyphs[row * numCols + col];
-                var charCode:Int = letter.charCodeAt(0);
-                glyph.set_char(charCode, glyphTexture.font);
-                col++;
+        page = text.split("\n").map(wrapLines).join(token).split(token);
+        while (page.length < numRows) page.push(blankParagraph);
 
-                if (col >= numCols) {
-                    row++;
-                    col = 0;
-                    if (row >= numRows) break;
+        scrollChars(1, false);
+    }
+
+    function setScroll(pos:Float):Void {
+        var scrollStart:Int = Std.int(pos);
+        var escapeSequence:EReg = new EReg('^$esc\\[[^m]*m', '');
+        var id:Int = 0;
+        for (line in page.slice(scrollStart, scrollStart + numRows)) {
+            var itr:Int = 0;
+            while (itr < numCols) {
+                if (escapeSequence.match(line.substr(itr, 20))) {
+                    var seq:String = escapeSequence.matched(0);
+                    itr += seq.length;
+                    seq = seq.substr(2).substr(0, -1);
+                    trace(seq);
+                    // TODO: interpret sequence
+                } else {
+                    var glyph:Glyph = glyphs[id++];
+                    glyph.set_char(line.charCodeAt(itr++), glyphTexture.font);
+                    // TODO: style glyph
                 }
             }
-
-            if (row >= numRows) break;
-            for (ike in col...numCols) glyphs[row * numCols + ike].set_char(blank, glyphTexture.font);
-
-            row++;
-            col = 0;
-
-            if (row >= numRows) break;
         }
 
-        for (ike in row...numRows) for (jen in 0...numCols) glyphs[ike * numCols + jen].set_char(blank, glyphTexture.font);
+        transform.appendTranslation(0, -scrollY, 0);
+        scrollY = (pos % 1) * scrollFraction;
+        transform.appendTranslation(0, scrollY, 0);
+    }
+
+    public function scrollChars(ratio:Float, smoothScrolling:Bool = true):Void {
+        var pos:Float = (page.length - (numRows - 1)) * (1 - Math.max(0, Math.min(1, ratio)));
+
+        this.smoothScrolling = smoothScrolling;
+
+        if (smoothScrolling) scrollGoal = Std.int(pos);
+        else setScroll(pos);
+    }
+
+    override public function update():Void {
+        if (smoothScrolling) {
+            if (Math.abs(scrollGoal - scroll) < 0.0001) {
+                scroll = scrollGoal;
+                smoothScrolling = false;
+
+            } else {
+                scroll = scroll * ease + scrollGoal * (1 - ease);
+            }
+
+            setScroll(scroll);
+        }
+
+        super.update();
     }
 }

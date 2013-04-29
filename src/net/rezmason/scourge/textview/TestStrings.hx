@@ -5,6 +5,8 @@ import net.rezmason.utils.FatChar;
 
 class TestStrings {
 
+    inline static var e = String.fromCharCode(27);
+
     public inline static var SPLASH:String =
         " SSSSS    CCCCC    OOOOO   UU   UU  RRRRRR    GGGGG    EEEEE " + "\n" +
         "SS       CC   CC  OO   OO  UU   UU  RR   RR  GG       EE   EE" + "\n" +
@@ -15,35 +17,35 @@ class TestStrings {
         "Single-Celled  Organisms  Undergo  Rapid  Growth  Enhancement" + "\n" +
     "\n";
 
-    public inline static var SYMBOLS:String = "()<>@[]_{}#$*+-=";
+    public inline static var SYMBOLS:String = "<>[]{}-=!@#$%^*()_+";
     public inline static var WEIRD_SYMBOLS:String = "¤¬ÎøΔΩ•◊";
     public inline static var BOX_SYMBOLS:String = "   ─ ┘└┴ ┐┌┬│┤├┼";
 
     public inline static var BOARD:String =
-        "X X X X X X X X X X X X X X X X X X X X X X X X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X           1                     2           X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X           0                     3           X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X                                             X" +
-        "X X X X X X X X X X X X X X X X X X X X X X X X" +
+        "X X X X X X X X X X X X X X X X X X X X X X X X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X           1                     2           X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X           0                     3           X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X                                             X\n" +
+        "X X X X X X X X X X X X X X X X X X X X X X X X\n" +
     "\n";
 
     public inline static var ALPHANUMERICS:String =
@@ -52,7 +54,7 @@ class TestStrings {
         "0123456789" +
         "";
 
-    public inline static var PUNCTUATION:String = "\"?!.,;:-'~/";
+    public inline static var PUNCTUATION:String = "\"?!.,;:-'~/&";
 
     public inline static function CHAR_COLORS():IntMap<Int> {
         var colors:IntMap<Int> = new IntMap<Int>();

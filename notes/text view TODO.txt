@@ -1,29 +1,18 @@
 UI object
-    Create string buffer
-        Text shouldn't go straight into the glyphs
+    Perspective projection you nitwit
 
     Escape characters
 
-        \e[R;G;Bm
+        Ask friends for input
 
-        Inline button
+        Inline button with ID
             Temporary: invert, red, pop out
-        Inline field
+        Inline field with ID
             Temporary: invert, blue, pop in
         Inline text
         color index
-            Temporary: off-white, red, green, yellow, blue, magenta, cyan, white
-
-    Specify colors
-
-    Whoops! Forgot the perspective projection.
-
-    Scrolling
-        Recycle glyphs
-            You only need one more row
-        Y offset
-            Goes into transform matrix
-        Reset scroll position to bottom when text is updated.
+            For now: grey, red, green, yellow, blue, magenta, cyan, white
+            Specify colors next
 
 Board object
 

@@ -79,11 +79,15 @@ class TextDemo {
 
         testBody = new TestBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(testBody);
-        views.push({body:testBody, rect:new Rectangle(0, 0, 0.5, 1)});
+        views.push({body:testBody, rect:new Rectangle(0, 0, 1, 1)});
 
         uiBody = new UIBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(uiBody);
-        views.push({body:uiBody, rect:new Rectangle(0.5, 0, 0.5, 1)});
+
+        var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
+        uiRect.inflate(-0.025, -0.025);
+
+        views.push({body:uiBody, rect:uiRect});
 
         uiBody.updateText(text);
     }
@@ -118,13 +122,16 @@ class TextDemo {
         testBody.update();
         /**/
 
-        //*
+        /*
         var divider:Float = stage.mouseX / stage.stageWidth;
         views[0].rect.right = divider;
         views[1].rect.left  = divider;
 
         for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
         /**/
+
+        uiBody.scrollChars(1 - stage.mouseY / stage.stageHeight);
+        uiBody.update();
     }
 
     function spinBody(body:Body, numX:Float, numY:Float):Void {
