@@ -1,9 +1,7 @@
 UI object
     Perspective projection you nitwit
 
-    Escape characters
-
-        Ask friends for input
+    Inline text styling and components
 
         Inline button with ID
             Temporary: invert, red, pop out

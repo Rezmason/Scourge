@@ -5,8 +5,6 @@ import net.rezmason.utils.FatChar;
 
 class TestStrings {
 
-    inline static var e = String.fromCharCode(27);
-
     public inline static var SPLASH:String =
         " SSSSS    CCCCC    OOOOO   UU   UU  RRRRRR    GGGGG    EEEEE " + "\n" +
         "SS       CC   CC  OO   OO  UU   UU  RR   RR  GG       EE   EE" + "\n" +

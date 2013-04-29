@@ -1,5 +1,7 @@
 package net.rezmason.scourge.textview;
 
+import haxe.ds.StringMap;
+
 import nme.geom.Rectangle;
 import nme.system.Capabilities;
 
@@ -11,7 +13,6 @@ using StringTools;
 
 class UIBody extends Body {
 
-    inline static var esc:String = String.fromCharCode(27);
     inline static var ease:Float = 0.5;
 
     var text:String;
@@ -104,12 +105,13 @@ class UIBody extends Body {
         var rectWidthInPixels :Float = rect.width  * stageWidth;
         var rectHeightInPixels:Float = rect.height * stageHeight;
 
-        numRows = Std.int(rectHeightInPixels / glyphHeightInPixels) + 1;
-        var numRowsForLayout:Int = numRows - 1;
+        numRows = Std.int(rectHeightInPixels / glyphHeightInPixels);
+        var numRowsForLayout:Int = numRows;
+        numRows++;
         numCols = Std.int(rectWidthInPixels  / glyphWidthInPixels );
         numGlyphsInLayout = numRows * numCols;
 
-        scrollFraction = 1 / (numRows - 1);
+        scrollFraction = 1 / numRowsForLayout;
 
         var glyphWidth :Float = rectWidthInPixels  / stageWidth  / numCols;
         var glyphHeight:Float = rectHeightInPixels / stageHeight / numRowsForLayout;
@@ -157,27 +159,22 @@ class UIBody extends Body {
 
     function setScroll(pos:Float):Void {
         var scrollStart:Int = Std.int(pos);
-        var escapeSequence:EReg = new EReg('^$esc\\[[^m]*m', '');
         var id:Int = 0;
+
         for (line in page.slice(scrollStart, scrollStart + numRows)) {
             var itr:Int = 0;
             while (itr < numCols) {
-                if (escapeSequence.match(line.substr(itr, 20))) {
-                    var seq:String = escapeSequence.matched(0);
-                    itr += seq.length;
-                    seq = seq.substr(2).substr(0, -1);
-                    trace(seq);
+                if (false) {
                     // TODO: interpret sequence
                 } else {
                     var glyph:Glyph = glyphs[id++];
                     glyph.set_char(line.charCodeAt(itr++), glyphTexture.font);
-                    // TODO: style glyph
                 }
             }
         }
 
         transform.appendTranslation(0, -scrollY, 0);
-        scrollY = (pos % 1) * scrollFraction;
+        scrollY = (pos - scrollStart) * scrollFraction;
         transform.appendTranslation(0, scrollY, 0);
     }
 
