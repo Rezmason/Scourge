@@ -88,8 +88,13 @@ class TextDemo {
         uiRect.inflate(-0.025, -0.025);
 
         views.push({body:uiBody, rect:uiRect});
-
         uiBody.updateText(text);
+
+        /*
+        var alphabetBody:Body = new AlphabetBody(0, utils.bufferUtil, fontTextures.get("full"));
+        bodies.push(alphabetBody);
+        views.push({body:alphabetBody, rect:new Rectangle(0, 0, 1, 1)});
+        */
     }
 
     function update(?event:Event):Void {
@@ -130,8 +135,10 @@ class TextDemo {
         for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
         /**/
 
+        //*
         uiBody.scrollChars(1 - stage.mouseY / stage.stageHeight);
         uiBody.update();
+        /**/
     }
 
     function spinBody(body:Body, numX:Float, numY:Float):Void {

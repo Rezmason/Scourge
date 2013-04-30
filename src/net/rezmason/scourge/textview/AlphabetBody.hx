@@ -1,5 +1,9 @@
 package net.rezmason.scourge.textview;
 
+import nme.geom.Matrix3D;
+import nme.geom.Rectangle;
+import nme.geom.Vector3D;
+
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
 import net.rezmason.scourge.textview.core.Glyph;
@@ -20,36 +24,34 @@ class AlphabetBody extends Body {
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));
         var numCols:Int = Std.int(Math.ceil(totalChars / numRows));
 
-        for (ike in 0...totalChars) {
+        for (id in 0...totalChars) {
 
             var glyph:Glyph = new Glyph();
             glyph.visible = true;
-            glyph.id = ike;
+            glyph.id = id;
             glyphs.push(glyph);
 
-            var col:Int = ike % numCols;
-            var row:Int = Std.int(ike / numCols);
+            var col:Int = id % numCols;
+            var row:Int = Std.int(id / numCols);
 
             var x:Float = ((col + 0.5) / numCols - 0.5);
             var y:Float = ((row + 0.5) / numRows    - 0.5);
-            var z:Float = -1;
-            z = 0;
 
-            var i:Float = 0.2;
-            var s:Float = 4;
-            var p:Float = 0;
-
-            var charCode:Int = CHARS.charCodeAt(ike % CHARS.length);
-
-            var r:Float = Math.random() * 0.6 + 0.4;
-            var g:Float = Math.random() * 0.6 + 0.4;
-            var b:Float = Math.random() * 0.6 + 0.4;
+            var charCode:Int = CHARS.charCodeAt(id % CHARS.length);
 
             glyph.makeCorners();
-            glyph.set_shape(x, y, z, s, p);
-            glyph.set_color(r, g, b, i);
+            glyph.set_shape(x, y, 0, 1, 0);
+            glyph.set_color(1, 1, 1);
+            glyph.set_i(0.2);
             glyph.set_char(charCode, glyphTexture.font);
-            glyph.set_paint(ike);
+            glyph.set_paint(id);
         }
+    }
+
+    override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
+        super.adjustLayout(stageWidth, stageHeight, rect);
+
+        glyphTransform.identity();
+        glyphTransform.appendScale(0.05, 0.05 * stageWidth / stageHeight, 1);
     }
 }

@@ -2,7 +2,10 @@ package net.rezmason.scourge.textview;
 
 import haxe.ds.StringMap;
 
+import com.adobe.utils.PerspectiveMatrix3D;
+import nme.geom.Matrix3D;
 import nme.geom.Rectangle;
+import nme.geom.Vector3D;
 import nme.system.Capabilities;
 
 import net.rezmason.scourge.textview.core.Body;
@@ -13,10 +16,11 @@ using StringTools;
 
 class UIBody extends Body {
 
-    inline static var ease:Float = 0.5;
+    inline static var ease:Float = 0.6;
 
     var text:String;
     var page:Array<String>;
+    var projection:PerspectiveMatrix3D;
     /*
     inline static var BOX_SIGIL:String = "ß";
     inline static var LINE_SIGIL:String = "¬";
@@ -26,9 +30,9 @@ class UIBody extends Body {
     inline static var GLYPH_HEIGHT_IN_POINTS:Float = 24;
     var glyphWidthInPixels :Float;
     var glyphHeightInPixels:Float;
+    var baseTransform:Matrix3D;
 
     var scrollFraction:Float;
-    var scrollY:Float;
     var scroll:Float;
     var scrollGoal:Float;
     var smoothScrolling:Bool;
@@ -38,6 +42,12 @@ class UIBody extends Body {
     var numGlyphsInLayout:Int;
 
     override function init():Void {
+
+        projection = new PerspectiveMatrix3D();
+        projection.perspectiveLH(2, 2, 1, 2);
+
+        baseTransform = new Matrix3D();
+
         glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * Capabilities.screenDPI / NATIVE_DPI;
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
 
@@ -47,7 +57,6 @@ class UIBody extends Body {
         var numGlyphs:Int = numGlyphRows * numGlyphColumns;
         var blank:Int = " ".charCodeAt(0);
 
-        scrollY = 0;
         scroll = 0;
         scrollGoal = 0;
         smoothScrolling = false;
@@ -85,7 +94,8 @@ class UIBody extends Body {
 
             glyph.makeCorners();
             glyph.set_shape(x, y, 0, 1, 0);
-            glyph.set_color(1, 1, 1, 0);
+            glyph.set_color(1, 1, 1);
+            glyph.set_i(0);
             glyph.set_char(blank, glyphTexture.font);
             glyph.set_paint(glyph.id);
         }
@@ -94,14 +104,16 @@ class UIBody extends Body {
     override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
         super.adjustLayout(stageWidth, stageHeight, rect);
 
+        // sanitize the rect
         rect = rect.clone();
         if (stageWidth  == 0) stageWidth  = 1;
         if (stageHeight == 0) stageHeight = 1;
         if (rect.width  == 0) rect.width  = 1 / stageWidth;
         if (rect.height == 0) rect.height = 1 / stageHeight;
 
-        glyphTransform.identity();
+        var screenRatio:Float = stageWidth / stageHeight;
 
+        // set the glyph transform and rearrange the characters
         var rectWidthInPixels :Float = rect.width  * stageWidth;
         var rectHeightInPixels:Float = rect.height * stageHeight;
 
@@ -109,31 +121,51 @@ class UIBody extends Body {
         var numRowsForLayout:Int = numRows;
         numRows++;
         numCols = Std.int(rectWidthInPixels  / glyphWidthInPixels );
-        numGlyphsInLayout = numRows * numCols;
 
         scrollFraction = 1 / numRowsForLayout;
 
         var glyphWidth :Float = rectWidthInPixels  / stageWidth  / numCols;
         var glyphHeight:Float = rectHeightInPixels / stageHeight / numRowsForLayout;
 
+        glyphTransform.identity();
         glyphTransform.appendScale(glyphWidth * 2, glyphHeight * 2, 1);
 
-        transform.identity();
-        transform.appendScale(1, -1, 1);
+        baseTransform.identity();
+        baseTransform.appendScale(1, -1, 1);
 
         var id:Int = 0;
         for (row in 0...numRows) {
             for (col in 0...numCols) {
                 var x:Float = ((col + 0.5) / numCols - 0.5);
                 var y:Float = ((row + 0.5) / numRowsForLayout - 0.5);
-                glyphs[id++].set_shape(x, y, 0, 1, 0);
+                var glyph:Glyph = glyphs[id++];
+                glyph.set_pos(x, y, 0);
             }
         }
 
+        numGlyphsInLayout = numRows * numCols;
         toggleGlyphs(glyphs.slice(0, numGlyphsInLayout), true);
         toggleGlyphs(glyphs.slice(numGlyphsInLayout), false);
 
-        //page = null;
+        // prepend the letterbox
+        /*
+        var letterbox:Matrix3D = new Matrix3D();
+        var boxRatio:Float = (rect.width / rect.height) / screenRatio;
+        if (boxRatio < 1) letterbox.appendScale(1, boxRatio, 1);
+        else letterbox.appendScale(1 / boxRatio, 1, 1);
+        camera.prepend(letterbox);
+        */
+
+        camera.appendTranslation(0, 0, 1); // Set the camera back one unit
+        camera.append(projection); // Apply perspective
+
+        // offset the vanishing point to the rectangle's center
+        var vec:Vector3D = new Vector3D();
+        camera.copyColumnTo(2, vec);
+        vec.x += (rect.left + rect.right  - 1);
+        vec.y -= (rect.top  + rect.bottom - 1);
+        camera.copyColumnFrom(2, vec);
+
         updateText(text);
         update();
     }
@@ -173,9 +205,9 @@ class UIBody extends Body {
             }
         }
 
-        transform.appendTranslation(0, -scrollY, 0);
-        scrollY = (pos - scrollStart) * scrollFraction;
-        transform.appendTranslation(0, scrollY, 0);
+        transform.identity();
+        transform.append(baseTransform);
+        transform.appendTranslation(0, (pos - scrollStart) * scrollFraction, 0);
     }
 
     public function scrollChars(ratio:Float, smoothScrolling:Bool = true):Void {
