@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.styles;
+package net.rezmason.scourge.textview.rendermethods;
 
 import nme.display3D.Context3DBlendFactor;
 import nme.display3D.Context3DCompareMode;
@@ -8,9 +8,9 @@ import nme.geom.Matrix3D;
 
 import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
-import net.rezmason.scourge.textview.core.Style;
+import net.rezmason.scourge.textview.core.RenderMethod;
 
-class MouseStyle extends Style {
+class MouseMethod extends RenderMethod {
 
     inline static var FAT_FINGERS:Float = 2;
 

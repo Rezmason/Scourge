@@ -1,5 +1,3 @@
-Scissor should be optional
-
 UI object
 
     Inline text styling and components

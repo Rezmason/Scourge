@@ -1,13 +1,11 @@
 package net.rezmason.scourge.textview;
 
-import nme.geom.Matrix3D;
 import nme.geom.Rectangle;
-import nme.geom.Vector3D;
-
-using net.rezmason.scourge.textview.core.GlyphUtils;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
+
+using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class AlphabetBody extends Body {
 
@@ -50,8 +48,6 @@ class AlphabetBody extends Body {
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
         super.adjustLayout(stageWidth, stageHeight, rect);
-
-        glyphTransform.identity();
-        glyphTransform.appendScale(0.05, 0.05 * stageWidth / stageHeight, 1);
+        setGlyphScale(0.05, 0.05 * stageWidth / stageHeight);
     }
 }

@@ -1,12 +1,14 @@
 package net.rezmason.scourge.textview.core;
 
-import haxe.ds.IntMap;
+import com.adobe.utils.PerspectiveMatrix3D;
+//import haxe.ds.IntMap;
 import nme.geom.Matrix3D;
 import nme.geom.Rectangle;
-import nme.Vector;
+import nme.geom.Vector3D;
+//import nme.Vector;
 
 import net.rezmason.scourge.textview.utils.BufferUtil;
-import net.rezmason.scourge.textview.utils.Types;
+//import net.rezmason.scourge.textview.utils.Types;
 
 class Body {
     public var segments(default, null):Array<BodySegment>;
@@ -17,8 +19,12 @@ class Body {
     public var numGlyphs(default, null):Int;
     public var numVisibleGlyphs(default, null):Int;
     public var glyphTexture(default, null):GlyphTexture;
-    public var scissorRectangle:Rectangle;
+    public var scissorRectangle(default, null):Rectangle;
     public var numSegments(default, null):Int;
+    public var crop:Bool;
+    public var letterbox:Bool;
+
+    var projection:PerspectiveMatrix3D;
 
     public var glyphs:Array<Glyph>;
 
@@ -27,9 +33,14 @@ class Body {
     public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
         this.id = id;
         this.bufferUtil = bufferUtil;
-
+        crop = true;
+        letterbox = true;
         this.glyphTexture = glyphTexture;
         glyphs = [];
+
+        projection = new PerspectiveMatrix3D();
+        projection.perspectiveLH(2, 2, 1, 2);
+
         init();
         numGlyphs = glyphs.length;
         numVisibleGlyphs = glyphs.length;
@@ -72,26 +83,35 @@ class Body {
 
     public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
 
-        rect = rect.clone();
-        if (stageWidth  == 0) stageWidth  = 1;
-        if (stageHeight == 0) stageHeight = 1;
-        if (rect.width  == 0) rect.width  = 1 / stageWidth;
-        if (rect.height == 0) rect.height = 1 / stageHeight;
+        rect = sanitizeLayoutRect(stageWidth, stageHeight, rect);
 
-        scissorRectangle.x = rect.x * stageWidth;
-        scissorRectangle.y = rect.y * stageHeight;
-        scissorRectangle.width  = rect.width  * stageWidth;
-        scissorRectangle.height = rect.height * stageHeight;
+        if (crop) {
+            scissorRectangle.x = rect.x * stageWidth;
+            scissorRectangle.y = rect.y * stageHeight;
+            scissorRectangle.width  = rect.width  * stageWidth;
+            scissorRectangle.height = rect.height * stageHeight;
+        } else {
+            scissorRectangle.x = 0;
+            scissorRectangle.y = 0;
+            scissorRectangle.width  = stageWidth;
+            scissorRectangle.height = stageHeight;
+        }
 
-        rect.offset(-0.5, -0.5);
-        rect.x *= 2;
-        rect.y *= 2;
-        rect.width *= 2;
-        rect.height *= 2;
+        var cameraRect:Rectangle = rect.clone();
+        cameraRect.offset(-0.5, -0.5);
+        cameraRect.x *= 2;
+        cameraRect.y *= 2;
+        cameraRect.width *= 2;
+        cameraRect.height *= 2;
 
         camera.identity();
-        camera.appendScale(rect.width, rect.height, 1);
-        camera.appendTranslation((rect.left + rect.right) * 0.5, (rect.top + rect.bottom) * -0.5, 0);
+        camera.appendScale(cameraRect.width, cameraRect.height, 1);
+        camera.appendTranslation((cameraRect.left + cameraRect.right) * 0.5, (cameraRect.top + cameraRect.bottom) * -0.5, 0);
+
+        camera.appendTranslation(0, 0, 1); // Set the camera back one unit
+        camera.append(projection); // Apply perspective
+        adjustVP(rect);
+        if (letterbox) applyLetterbox(rect, stageWidth, stageHeight);
     }
 
     public function update():Void {
@@ -109,5 +129,36 @@ class Body {
             str += char;
         }
         trace(str);
+    }
+
+    inline function sanitizeLayoutRect(stageWidth:Float, stageHeight:Float, rect:Rectangle):Rectangle {
+        rect = rect.clone();
+        if (stageWidth  == 0) stageWidth  = 1;
+        if (stageHeight == 0) stageHeight = 1;
+        if (rect.width  == 0) rect.width  = 1 / stageWidth;
+        if (rect.height == 0) rect.height = 1 / stageHeight;
+        return rect;
+    }
+
+    inline function adjustVP(rect:Rectangle):Void {
+        // offset the vanishing point to the rectangle's center
+        var vec:Vector3D = new Vector3D();
+        camera.copyColumnTo(2, vec);
+        vec.x += (rect.left + rect.right  - 1);
+        vec.y -= (rect.top  + rect.bottom - 1);
+        camera.copyColumnFrom(2, vec);
+    }
+
+    inline function applyLetterbox(rect:Rectangle, stageWidth:Float, stageHeight:Float):Void {
+        var letterbox:Matrix3D = new Matrix3D();
+        var boxRatio:Float = (rect.width / rect.height) * stageWidth / stageHeight;
+        if (boxRatio < 1) letterbox.appendScale(1, boxRatio, 1);
+        else letterbox.appendScale(1 / boxRatio, 1, 1);
+        camera.prepend(letterbox);
+    }
+
+    inline function setGlyphScale(sX:Float, sY:Float):Void {
+        glyphTransform.identity();
+        glyphTransform.appendScale(sX, sY, 1);
     }
 }

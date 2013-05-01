@@ -10,7 +10,7 @@ class Renderer {
     public var mouseView(default, null):MouseView;
 
     var drawUtil:DrawUtil;
-    var activeStyle:Style;
+    var activeMethod:RenderMethod;
 
     public function new(drawUtil:DrawUtil) {
         this.drawUtil = drawUtil;
@@ -22,29 +22,29 @@ class Renderer {
         mouseView.configure(width, height);
     }
 
-    public function render(bodies:Array<Body>, style:Style, mode:RenderMode, clear:Bool = true):Void {
+    public function render(bodies:Array<Body>, method:RenderMethod, dest:RenderDestination, clear:Bool = true):Void {
 
-        if (activeStyle != style) {
-            if (activeStyle != null) activeStyle.deactivate();
-            activeStyle = style;
-            activeStyle.activate();
+        if (activeMethod != method) {
+            if (activeMethod != null) activeMethod.deactivate();
+            activeMethod = method;
+            activeMethod.activate();
         }
 
-        drawUtil.clear(style.backgroundColor);
+        drawUtil.clear(method.backgroundColor);
 
         for (body in bodies) {
             if (body.numGlyphs == 0) continue;
             drawUtil.setScissorRectangle(body.scissorRectangle);
-            style.setMatrices(body.camera, body.transform);
-            style.setGlyphTexture(body.glyphTexture, body.glyphTransform);
+            method.setMatrices(body.camera, body.transform);
+            method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
 
             for (segment in body.segments) {
-                style.setSegment(segment);
+                method.setSegment(segment);
                 drawUtil.drawTriangles(segment.indexBuffer, 0, segment.numVisibleGlyphs * Almanac.TRIANGLES_PER_GLYPH);
             }
         }
 
-        switch (mode) {
+        switch (dest) {
             case SCREEN: drawUtil.present();
             case MOUSE:  drawUtil.drawToBitmapData(mouseView.bitmapData);
         }

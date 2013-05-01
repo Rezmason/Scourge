@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-enum RenderMode {
+enum RenderDestination {
     MOUSE;
     SCREEN;
 }

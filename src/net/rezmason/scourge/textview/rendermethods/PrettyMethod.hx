@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.styles;
+package net.rezmason.scourge.textview.rendermethods;
 
 import nme.display3D.Context3DBlendFactor;
 import nme.display3D.Context3DCompareMode;
@@ -9,9 +9,9 @@ import nme.Vector;
 
 import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
-import net.rezmason.scourge.textview.core.Style;
+import net.rezmason.scourge.textview.core.RenderMethod;
 
-class PrettyStyle extends Style {
+class PrettyMethod extends RenderMethod {
 
     override public function activate():Void {
         programUtil.setProgram(program);

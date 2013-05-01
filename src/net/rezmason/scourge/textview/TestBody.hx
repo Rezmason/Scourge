@@ -1,11 +1,7 @@
 package net.rezmason.scourge.textview;
 
-import com.adobe.utils.PerspectiveMatrix3D;
-import nme.geom.Matrix3D;
 import nme.geom.Rectangle;
-import nme.geom.Vector3D;
 
-import net.rezmason.utils.FatChar;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
 
@@ -13,17 +9,12 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class TestBody extends Body {
 
-    var projection:PerspectiveMatrix3D;
-
     inline static var COLOR_RANGE:Int = 6;
     inline static var CHARS:String =
         TestStrings.ALPHANUMERICS +
     "";
 
     override function init():Void {
-
-        projection = new PerspectiveMatrix3D();
-        projection.perspectiveLH(2, 2, 1, 2);
 
         var numCols:Int = 30;
         var numRows:Int = 30;
@@ -78,38 +69,11 @@ class TestBody extends Body {
     override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
         super.adjustLayout(stageWidth, stageHeight, rect);
 
-        // sanitize the rect
-        rect = rect.clone();
-        if (stageWidth  == 0) stageWidth  = 1;
-        if (stageHeight == 0) stageHeight = 1;
-        if (rect.width  == 0) rect.width  = 1 / stageWidth;
-        if (rect.height == 0) rect.height = 1 / stageHeight;
+        rect = sanitizeLayoutRect(stageWidth, stageHeight, rect);
 
-        var screenRatio:Float = stageWidth / stageHeight;
-
-        // set the glyph transform
         var screenSize:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
         var rectSize:Float = Math.min(rect.width * stageWidth, rect.height * stageHeight) / screenSize;
         var glyphWidth:Float = rectSize * 0.03;
-
-        glyphTransform.identity();
-        glyphTransform.appendScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * screenRatio, 1);
-
-        // prepend the letterbox
-        var letterbox:Matrix3D = new Matrix3D();
-        var boxRatio:Float = (rect.width / rect.height) * screenRatio;
-        if (boxRatio < 1) letterbox.appendScale(1, boxRatio, 1);
-        else letterbox.appendScale(1 / boxRatio, 1, 1);
-        camera.prepend(letterbox);
-
-        camera.appendTranslation(0, 0, 1); // Set the camera back one unit
-        camera.append(projection); // Apply perspective
-
-        // offset the vanishing point to the rectangle's center
-        var vec:Vector3D = new Vector3D();
-        camera.copyColumnTo(2, vec);
-        vec.x += (rect.left + rect.right  - 1);
-        vec.y -= (rect.top  + rect.bottom - 1);
-        camera.copyColumnFrom(2, vec);
+        setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
 }

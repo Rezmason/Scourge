@@ -12,7 +12,7 @@ import nme.geom.Vector3D;
 
 import net.rezmason.utils.FlatFont;
 import net.rezmason.scourge.textview.core.*;
-import net.rezmason.scourge.textview.styles.*;
+import net.rezmason.scourge.textview.rendermethods.*;
 import net.rezmason.scourge.textview.utils.UtilitySet;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
@@ -33,8 +33,8 @@ class TextDemo {
     var fonts:StringMap<FlatFont>;
     var fontTextures:StringMap<GlyphTexture>;
     var showHideFunc:Void->Void;
-    var prettyStyle:Style;
-    var mouseStyle:Style;
+    var prettyMethod:RenderMethod;
+    var mouseMethod:RenderMethod;
     var text:String;
 
     public function new(stage:Stage, fonts:StringMap<FlatFont>, text:String):Void {
@@ -49,8 +49,8 @@ class TextDemo {
         makeFontTextures();
         renderer = new Renderer(utils.drawUtil);
         stage.addChild(renderer.mouseView);
-        prettyStyle = new PrettyStyle(utils.programUtil);
-        mouseStyle = new MouseStyle(utils.programUtil);
+        prettyMethod = new PrettyMethod(utils.programUtil);
+        mouseMethod = new MouseMethod(utils.programUtil);
         makeScene();
         addListeners();
         onActivate();
@@ -94,7 +94,7 @@ class TextDemo {
         var alphabetBody:Body = new AlphabetBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(alphabetBody);
         views.push({body:alphabetBody, rect:new Rectangle(0, 0, 1, 1)});
-        */
+        /**/
     }
 
     function update(?event:Event):Void {
@@ -127,7 +127,7 @@ class TextDemo {
         testBody.update();
         /**/
 
-        /*
+        //*
         var divider:Float = stage.mouseX / stage.stageWidth;
         views[0].rect.right = divider;
         views[1].rect.left  = divider;
@@ -135,10 +135,10 @@ class TextDemo {
         for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
         /**/
 
-        //*
+        /*
         uiBody.scrollChars(1 - stage.mouseY / stage.stageHeight);
-        uiBody.update();
         /**/
+        uiBody.update();
     }
 
     function spinBody(body:Body, numX:Float, numY:Float):Void {
@@ -147,7 +147,7 @@ class TextDemo {
     }
 
     function onClick(?event:Event):Void {
-        renderer.render(bodies, mouseStyle, RenderMode.MOUSE);
+        renderer.render(bodies, mouseMethod, RenderDestination.MOUSE);
     }
 
     function onMouseMove(?event:Event):Void {
@@ -163,7 +163,7 @@ class TextDemo {
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         onResize();
         onEnterFrame();
-        renderer.render(bodies, mouseStyle, RenderMode.MOUSE);
+        renderer.render(bodies, mouseMethod, RenderDestination.MOUSE);
     }
 
     function onDeactivate(?event:Event):Void {
@@ -173,7 +173,7 @@ class TextDemo {
     function onEnterFrame(?event:Event):Void {
         //if (showHideFunc != null) showHideFunc();
         update();
-        renderer.render(bodies, prettyStyle, RenderMode.SCREEN);
+        renderer.render(bodies, prettyMethod, RenderDestination.SCREEN);
     }
 
     function hideSomeGlyphs():Void {

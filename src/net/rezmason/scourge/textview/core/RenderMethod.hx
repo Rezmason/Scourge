@@ -9,7 +9,7 @@ import nme.utils.ByteArray;
 import net.rezmason.scourge.textview.utils.ProgramUtil;
 import net.rezmason.scourge.textview.utils.Types;
 
-class Style {
+class RenderMethod {
 
     inline static var MAG_LIMIT:Float = 0.7;
     static var unitVec:Vector3D = new Vector3D(1, 0, 0);

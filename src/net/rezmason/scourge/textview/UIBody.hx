@@ -1,11 +1,7 @@
 package net.rezmason.scourge.textview;
 
-import haxe.ds.StringMap;
-
-import com.adobe.utils.PerspectiveMatrix3D;
 import nme.geom.Matrix3D;
 import nme.geom.Rectangle;
-import nme.geom.Vector3D;
 import nme.system.Capabilities;
 
 import net.rezmason.scourge.textview.core.Body;
@@ -20,7 +16,7 @@ class UIBody extends Body {
 
     var text:String;
     var page:Array<String>;
-    var projection:PerspectiveMatrix3D;
+
     /*
     inline static var BOX_SIGIL:String = "ß";
     inline static var LINE_SIGIL:String = "¬";
@@ -39,14 +35,15 @@ class UIBody extends Body {
 
     var numRows:Int;
     var numCols:Int;
+    var numRowsForLayout:Int;
     var numGlyphsInLayout:Int;
 
     override function init():Void {
 
-        projection = new PerspectiveMatrix3D();
-        projection.perspectiveLH(2, 2, 1, 2);
-
         baseTransform = new Matrix3D();
+        baseTransform.appendScale(1, -1, 1);
+
+        letterbox = false;
 
         glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * Capabilities.screenDPI / NATIVE_DPI;
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
@@ -103,71 +100,17 @@ class UIBody extends Body {
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
         super.adjustLayout(stageWidth, stageHeight, rect);
+        rect = sanitizeLayoutRect(stageWidth, stageHeight, rect);
 
-        // sanitize the rect
-        rect = rect.clone();
-        if (stageWidth  == 0) stageWidth  = 1;
-        if (stageHeight == 0) stageHeight = 1;
-        if (rect.width  == 0) rect.width  = 1 / stageWidth;
-        if (rect.height == 0) rect.height = 1 / stageHeight;
-
-        var screenRatio:Float = stageWidth / stageHeight;
-
-        // set the glyph transform and rearrange the characters
-        var rectWidthInPixels :Float = rect.width  * stageWidth;
-        var rectHeightInPixels:Float = rect.height * stageHeight;
-
-        numRows = Std.int(rectHeightInPixels / glyphHeightInPixels);
-        var numRowsForLayout:Int = numRows;
+        numRows = Std.int(rect.height * stageHeight / glyphHeightInPixels);
+        numRowsForLayout = numRows;
         numRows++;
-        numCols = Std.int(rectWidthInPixels  / glyphWidthInPixels );
-
+        numCols = Std.int(rect.width  * stageWidth  / glyphWidthInPixels );
         scrollFraction = 1 / numRowsForLayout;
+        setGlyphScale(rect.width / numCols * 2, rect.height / numRowsForLayout * 2);
 
-        var glyphWidth :Float = rectWidthInPixels  / stageWidth  / numCols;
-        var glyphHeight:Float = rectHeightInPixels / stageHeight / numRowsForLayout;
-
-        glyphTransform.identity();
-        glyphTransform.appendScale(glyphWidth * 2, glyphHeight * 2, 1);
-
-        baseTransform.identity();
-        baseTransform.appendScale(1, -1, 1);
-
-        var id:Int = 0;
-        for (row in 0...numRows) {
-            for (col in 0...numCols) {
-                var x:Float = ((col + 0.5) / numCols - 0.5);
-                var y:Float = ((row + 0.5) / numRowsForLayout - 0.5);
-                var glyph:Glyph = glyphs[id++];
-                glyph.set_pos(x, y, 0);
-            }
-        }
-
-        numGlyphsInLayout = numRows * numCols;
-        toggleGlyphs(glyphs.slice(0, numGlyphsInLayout), true);
-        toggleGlyphs(glyphs.slice(numGlyphsInLayout), false);
-
-        // prepend the letterbox
-        /*
-        var letterbox:Matrix3D = new Matrix3D();
-        var boxRatio:Float = (rect.width / rect.height) / screenRatio;
-        if (boxRatio < 1) letterbox.appendScale(1, boxRatio, 1);
-        else letterbox.appendScale(1 / boxRatio, 1, 1);
-        camera.prepend(letterbox);
-        */
-
-        camera.appendTranslation(0, 0, 1); // Set the camera back one unit
-        camera.append(projection); // Apply perspective
-
-        // offset the vanishing point to the rectangle's center
-        var vec:Vector3D = new Vector3D();
-        camera.copyColumnTo(2, vec);
-        vec.x += (rect.left + rect.right  - 1);
-        vec.y -= (rect.top  + rect.bottom - 1);
-        camera.copyColumnFrom(2, vec);
-
+        reorderGlyphs();
         updateText(text);
-        update();
     }
 
     public function updateText(text:String):Void {
@@ -224,7 +167,6 @@ class UIBody extends Body {
             if (Math.abs(scrollGoal - scroll) < 0.0001) {
                 scroll = scrollGoal;
                 smoothScrolling = false;
-
             } else {
                 scroll = scroll * ease + scrollGoal * (1 - ease);
             }
@@ -233,5 +175,21 @@ class UIBody extends Body {
         }
 
         super.update();
+    }
+
+    inline function reorderGlyphs():Void {
+        var id:Int = 0;
+        for (row in 0...numRows) {
+            for (col in 0...numCols) {
+                var x:Float = ((col + 0.5) / numCols - 0.5);
+                var y:Float = ((row + 0.5) / numRowsForLayout - 0.5);
+                var glyph:Glyph = glyphs[id++];
+                glyph.set_pos(x, y, 0);
+            }
+        }
+
+        numGlyphsInLayout = numRows * numCols;
+        toggleGlyphs(glyphs.slice(0, numGlyphsInLayout), true);
+        toggleGlyphs(glyphs.slice(numGlyphsInLayout), false);
     }
 }
