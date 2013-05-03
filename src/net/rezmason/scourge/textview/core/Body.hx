@@ -1,14 +1,11 @@
 package net.rezmason.scourge.textview.core;
 
-import com.adobe.utils.PerspectiveMatrix3D;
-//import haxe.ds.IntMap;
 import nme.geom.Matrix3D;
 import nme.geom.Rectangle;
 import nme.geom.Vector3D;
-//import nme.Vector;
+import nme.Vector;
 
 import net.rezmason.scourge.textview.utils.BufferUtil;
-//import net.rezmason.scourge.textview.utils.Types;
 
 class Body {
     public var segments(default, null):Array<BodySegment>;
@@ -24,7 +21,7 @@ class Body {
     public var crop:Bool;
     public var letterbox:Bool;
 
-    var projection:PerspectiveMatrix3D;
+    var projection:Matrix3D;
 
     public var glyphs:Array<Glyph>;
 
@@ -38,8 +35,7 @@ class Body {
         this.glyphTexture = glyphTexture;
         glyphs = [];
 
-        projection = new PerspectiveMatrix3D();
-        projection.perspectiveLH(2, 2, 1, 2);
+        projection = makeProjection();
 
         init();
         numGlyphs = glyphs.length;
@@ -141,12 +137,10 @@ class Body {
     }
 
     inline function adjustVP(rect:Rectangle):Void {
-        // offset the vanishing point to the rectangle's center
-        var vec:Vector3D = new Vector3D();
-        camera.copyColumnTo(2, vec);
-        vec.x += (rect.left + rect.right  - 1);
-        vec.y -= (rect.top  + rect.bottom - 1);
-        camera.copyColumnFrom(2, vec);
+        var rawData:Vector<Float> = camera.rawData;
+        rawData[8] += (rect.left + rect.right  - 1);
+        rawData[9] -= (rect.top  + rect.bottom - 1);
+        camera.rawData = rawData;
     }
 
     inline function applyLetterbox(rect:Rectangle, stageWidth:Float, stageHeight:Float):Void {
@@ -160,5 +154,16 @@ class Body {
     inline function setGlyphScale(sX:Float, sY:Float):Void {
         glyphTransform.identity();
         glyphTransform.appendScale(sX, sY, 1);
+    }
+
+    inline function makeProjection():Matrix3D {
+        var mat:Matrix3D = new Matrix3D();
+        var rawData:Vector<Float> = mat.rawData;
+        rawData[10] =  2;
+        rawData[11] =  1;
+        rawData[14] = -2;
+        rawData[15] =  0;
+        mat.rawData = rawData;
+        return mat;
     }
 }

@@ -1,18 +1,12 @@
 UI object
 
-    Inline text styling and components
-        Glyph styles
-            There aren't many of them in a body, so they can afford to be complicated
-            They must represent each stylistic trait of a glyph
-
-        {{prop:-1234.5, name:"NAME"}}
-        {{NAME}} = reference to NAME
-            {{}} is the default, naturally
-
-        These can be defined at the top of the document and then used by name
+    Clean it up and encapsulate some of its contents
+        And the function names are horrendous
 
     Button style
     Field style
+
+
 
 Unify test body, UI body, alphabet body with Body
     Lots of similarities once again

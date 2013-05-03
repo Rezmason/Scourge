@@ -42,7 +42,8 @@ class TextDemo {
         this.fonts = fonts;
         this.text = text;
         showHideFunc = hideSomeGlyphs;
-        utils = new UtilitySet(stage.stage3Ds[0], onCreate);
+
+        utils = new UtilitySet(stage, onCreate);
     }
 
     function onCreate():Void {
@@ -127,7 +128,7 @@ class TextDemo {
         testBody.update();
         /**/
 
-        //*
+        /*
         var divider:Float = stage.mouseX / stage.stageWidth;
         views[0].rect.right = divider;
         views[1].rect.left  = divider;
@@ -135,7 +136,7 @@ class TextDemo {
         for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
         /**/
 
-        /*
+        //*
         uiBody.scrollChars(1 - stage.mouseY / stage.stageHeight);
         /**/
         uiBody.update();

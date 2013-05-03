@@ -1,3 +1,30 @@
+Inline text styling and components
+
+        Glyph styles
+            There aren't many of them in a body, so they can afford to be complicated
+            They must represent each stylistic trait of a glyph
+
+        Approach
+            First, extract all the style tags
+                Index is unimportant– their index will just be their order in the array
+            Turn the style tags into styles
+                Reference styles should be resolved into references
+                    Defaults to {}
+
+            Then, transform the string to turn style tags into just §'s
+                Simplifies the regex considerably
+            Include the §'s in the line
+                Pad the line to numCols + the number of §s.
+            The § is only one char, so it's trivial to detect when going through a line
+                When a § is reached, it's interpreted
+                Use the current style to transform chars
+
+        §{prop:-1234.5, name:"NAME", basis:"BASIS_NAME"}
+        §{NAME} = reference to NAME
+            §{} is the default, naturally
+
+        Generally define these at the top of the document and then use them by name
+
 What do the glyphs depict?
     3D views - board, polyominoes
         Node

@@ -1,10 +1,11 @@
 package net.rezmason.scourge.textview.core;
 
-import com.adobe.utils.AGALMiniAssembler;
+import nme.display3D.Context3DProgramType;
 import nme.display3D.Program3D;
+import nme.display3D.shaders.Shader;
+import nme.display3D.shaders.ShaderUtils;
 import nme.geom.Matrix3D;
 import nme.geom.Vector3D;
-import nme.utils.ByteArray;
 
 import net.rezmason.scourge.textview.utils.ProgramUtil;
 import net.rezmason.scourge.textview.utils.Types;
@@ -27,9 +28,10 @@ class RenderMethod {
         backgroundColor = 0x0;
         glyphMat = new Matrix3D();
         init();
-        var assembler:AGALMiniAssembler = new AGALMiniAssembler();
-        var vertexShader:ByteArray = assembler.assemble("vertex", makeVertexShader());
-        var fragmentShader:ByteArray = assembler.assemble("fragment", makeFragmentShader());
+
+        var vertexShader:Shader = ShaderUtils.createShader(Context3DProgramType.VERTEX, makeVertexShader());
+        var fragmentShader:Shader = ShaderUtils.createShader(Context3DProgramType.FRAGMENT, makeFragmentShader());
+
         program.upload(vertexShader, fragmentShader);
     }
 
@@ -38,7 +40,8 @@ class RenderMethod {
     public function deactivate():Void { }
 
     public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
-        glyphMat.copyFrom(glyphTexture.matrix);
+        glyphMat.identity();
+        glyphMat.append(glyphTexture.matrix);
         glyphMat.append(glyphTransform);
         glyphMat.appendScale(glyphMag, glyphMag, 1);
 

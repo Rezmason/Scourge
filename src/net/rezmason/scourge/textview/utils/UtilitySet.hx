@@ -1,5 +1,6 @@
 package net.rezmason.scourge.textview.utils;
 
+import nme.display.Stage;
 import nme.display.Stage3D;
 import nme.display3D.Context3D;
 import nme.events.Event;
@@ -15,9 +16,14 @@ class UtilitySet {
     public var programUtil(default, null):ProgramUtil;
     public var bufferUtil(default, null):BufferUtil;
 
-    public function new(stage3D:Stage3D, cbk:Void->Void):Void {
+    public function new(stage:Stage, cbk:Void->Void):Void {
         this.cbk = cbk;
-        this.stage3D = stage3D;
+
+        #if flash
+            stage3D = stage.stage3Ds[0];
+        #else
+            stage3D = new Stage3D();
+        #end
 
         if (stage3D.context3D != null) {
             onCreate();

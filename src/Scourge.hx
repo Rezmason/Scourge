@@ -34,7 +34,8 @@ class Scourge {
         for (name in ["source", "profont", "full"]) fonts.set(name, makeFont(name));
 
         //var str = [TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n");
-        var str = Assets.getText("assets/not plus.txt");
+        //var str = Assets.getText("assets/not plus.txt");
+        var str = TestStrings.STYLED_TEXT;
         new net.rezmason.scourge.textview.TextDemo(Lib.current.stage, fonts, str);
     }
 

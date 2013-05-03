@@ -15,6 +15,18 @@ class TestStrings {
         "Single-Celled  Organisms  Undergo  Rapid  Growth  Enhancement" + "\n" +
     "\n";
 
+    public inline static var STYLED_TEXT:String =
+    "§{r:1,g :-0.,b:  0  name:test}" +
+    "§{                                                   name:test2}" +
+    "§{r:0,                 , basis:test                  name:test3}" +
+    "§{g:1,                 , basis:test5}" +
+    "§{}" +
+    "This is a §{test}test§{}.\n" +
+    "§{}\n" +
+    "This is another §{test2}test§{}.\n" +
+    "§{g:1,  p:0.05               , basis:test,,}This is a third test!";
+
+
     public inline static var SYMBOLS:String = "<>[]{}-=!@#$%^*()_+";
     public inline static var WEIRD_SYMBOLS:String = "¤¬ÎøΔΩ•◊";
     public inline static var BOX_SYMBOLS:String = "   ─ ┘└┴ ┐┌┬│┤├┼";
