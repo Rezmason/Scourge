@@ -26,7 +26,6 @@ class TestStrings {
     "This is another §{test2}test§{}.\n" +
     "§{g:1,  p:0.05               , basis:test,,}This is a third test!";
 
-
     public inline static var SYMBOLS:String = "<>[]{}-=!@#$%^*()_+";
     public inline static var WEIRD_SYMBOLS:String = "¤¬ÎøΔΩ•◊";
     public inline static var BOX_SYMBOLS:String = "   ─ ┘└┴ ┐┌┬│┤├┼";
@@ -64,7 +63,7 @@ class TestStrings {
         "0123456789" +
         "";
 
-    public inline static var PUNCTUATION:String = "\"?!.,;:-'~/&";
+    public inline static var PUNCTUATION:String = "\"?!.,;:-'~/\\`|&";
 
     public inline static function CHAR_COLORS():IntMap<Int> {
         var colors:IntMap<Int> = new IntMap<Int>();

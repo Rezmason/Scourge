@@ -1,7 +1,18 @@
 UI object
 
-    Clean it up and encapsulate some of its contents
-        And the function names are horrendous
+    Maybe isolate scrolling behavior
+
+    Style tags should support ranges for animation
+        a:[0.5, 1]
+        Animation code uses minimum range length
+
+    Style tags should support mouse states
+        MouseStyle extends Style
+            µ{up:upBasis, over:overBasis, down:downBasis}
+        InputStyle extends Style
+            «{hint:hintBasis, valid:validBasis, invalid:invalidBasis}
+
+    Styles should be polled for text interaction
 
     Button style
     Field style

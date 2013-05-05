@@ -1,7 +1,5 @@
 package net.rezmason.scourge.textview;
 
-import haxe.ds.StringMap;
-
 import nme.geom.Matrix3D;
 import nme.geom.Rectangle;
 import nme.system.Capabilities;
@@ -9,39 +7,21 @@ import nme.system.Capabilities;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 
+import net.rezmason.scourge.textview.styles.Style;
+import net.rezmason.scourge.textview.styles.StyleSet;
+
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using StringTools;
-using Reflect;
-using Lambda;
-
-typedef Style = {
-    @:optional var name:String;
-    @:optional var basis:String;
-
-    @:optional var r:Float;
-    @:optional var g:Float;
-    @:optional var b:Float;
-    @:optional var i:Float;
-    @:optional var s:Float;
-    @:optional var p:Float;
-}
 
 class UIBody extends Body {
 
     inline static var ease:Float = 0.6;
 
-    static var whitespaceReg:EReg = ~/([,\s]+)/g;
-    static var colonReg:EReg = ~/\s*:\s*/g;
-    static var styleTagsReg:EReg = ~/§\{[^\}]*\}/g;
-
-    var styleIDs:Int;
-    var orderedStyles:Array<Style>;
+    var styleSet:StyleSet;
 
     var text:String;
     var page:Array<String>;
     var lineStyleIndices:Array<Int>;
-
-    var defaultStyle:Style;
 
     /*
     inline static var BOX_SIGIL:String = "ß";
@@ -49,7 +29,7 @@ class UIBody extends Body {
     */
 
     inline static var NATIVE_DPI:Float = 72;
-    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 18;
+    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 24;
     var glyphWidthInPixels :Float;
     var glyphHeightInPixels:Float;
     var baseTransform:Matrix3D;
@@ -66,7 +46,7 @@ class UIBody extends Body {
 
     override function init():Void {
 
-        defaultStyle = { name:"", r:1, g:1, b:1, i:0, s:1, p:0, };
+        styleSet = new StyleSet();
 
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
@@ -147,137 +127,32 @@ class UIBody extends Body {
 
         if (numGlyphsInLayout == 0) return;
 
-        var styledLineReg:EReg = new EReg('((.§*){$numCols})', 'g');
-        var lineToken:String = "ª÷º";
+        text = styleSet.extractFromText(text);
+
+        var styleSigil:String = StyleSet.SIGIL;
+        var styledLineReg:EReg = new EReg('(([^$styleSigil]$styleSigil*){${numCols}})', 'g');
+        var lineToken:String = "÷";
         var blankParagraph:String = "".rpad(" ", numCols);
 
-        orderedStyles = [defaultStyle].concat(extractOrderedStyles(text));
+        function padLine(s) return StringTools.rpad(s, " ", numCols + s.split(styleSigil).length - 1);
 
-        text = styleTagsReg.replace(text, "§");
-
-        function padLine(s) return StringTools.rpad(s, " ", numCols + s.split("§").length - 1);
-        function wrapLines(s) return styledLineReg.replace(s, '$1$lineToken').split(lineToken).map(padLine).join(lineToken);
+        function wrapLines(s) {
+            var sp = styledLineReg.replace(s, '$1$lineToken');
+            if (sp.endsWith(lineToken)) sp = sp.substr(0, sp.length - 1);
+            return sp.split(lineToken).map(padLine).join(lineToken);
+        }
 
         page = text.split("\n").map(wrapLines).join(lineToken).split(lineToken);
         while (page.length < numRows) page.push(blankParagraph);
 
+        var lineStyleIndex:Int = 0;
         lineStyleIndices = [0];
-        for (line in page) lineStyleIndices.push(line.split("§").length - 1);
+        for (line in page) {
+            lineStyleIndex += line.split(styleSigil).length - 1;
+            lineStyleIndices.push(lineStyleIndex);
+        }
 
         scrollChars(1, false);
-    }
-
-    function extractOrderedStyles(input:String):Array<Style> {
-
-        // Find the tags in the input string
-
-        var tags:Array<Array<String>> = [];
-        for (str in input.split("§{")) {
-            if (str.length == 0) continue;
-            var tagEndIndex:Int = str.indexOf("}");
-            if (tagEndIndex == -1) throw 'You left a style tag open, friend: ( $str )';
-            tags.push(cleanTag(str.substr(0, tagEndIndex)));
-        }
-
-        // Interpret the tags– they are either declarations or references to existing, named declarations
-
-        styleIDs = 0;
-        var stylesByIndex:Array<Style> = [];
-        var styles:Array<Style> = [];
-        var stylesByID:StringMap<Style> = new StringMap<Style>();
-
-        // Find (and remove) declarative tags and create styles from them
-
-        for (ike in 0...tags.length) {
-            var tag:Array<String> = tags[ike];
-            if (tag.length > 1 || tag[0].indexOf(":") != -1) {
-                var style:Style = makeStyle(tag);
-                stylesByIndex[ike] = style;
-                styles.push(style);
-                if (style.name != null) stylesByID.set(style.name, style);
-
-                tags[ike] = null;
-            }
-        }
-
-        stylesByID.set("", defaultStyle);
-
-        // styles inherit from their basis styles (no multiple inheritence)
-
-        for (style in styles) {
-            var topStyle:Style = style;
-            var dependencyStack:Array<String> = [];
-            while (true) {
-                dependencyStack.push(topStyle.name);
-
-                if (topStyle.basis == null) break;
-                if (dependencyStack.has(topStyle.basis)) throw 'Cyclical style dependency, pal: ( $dependencyStack )';
-
-                topStyle = stylesByID.get(topStyle.basis);
-                if (topStyle == null) break;
-            }
-
-            while (dependencyStack.length > 0) {
-                topStyle = stylesByID.get(dependencyStack.pop());
-
-                if (topStyle != null) {
-                    inheritStyle(topStyle, stylesByID.get(topStyle.basis));
-                    topStyle.deleteField("basis");
-                }
-            }
-        }
-
-        // All styles inherit from the default style
-
-        for (style in styles) inheritStyle(style, defaultStyle);
-
-        // Resolve remaining tags, which are reference tags
-
-        for (ike in 0...tags.length) {
-            var tag:Array<String> = tags[ike];
-            if (tag != null) {
-                var style:Style = stylesByID.get(tag[0]);
-                if (style == null) style = defaultStyle;
-                stylesByIndex[ike] = style;
-            }
-        }
-
-        return stylesByIndex;
-    }
-
-    inline function cleanTag(tagString:String):Array<String> {
-        tagString = whitespaceReg.replace(tagString, " ");
-        tagString = colonReg.replace(tagString, ":");
-        tagString = StringTools.trim(tagString);
-
-        return tagString.split(" ");
-    }
-
-    inline function makeStyle (tag:Array<String>):Style {
-        var style:Style = {};
-        for (attribute in tag) {
-            var elements:Array<String> = attribute.split(":");
-            var key:String = elements[0];
-            var value:String = elements[1];
-
-            switch (key) {
-                case "name": style.name = value;
-                case "basis": style.basis = value;
-                default:
-                    style.setField(key, Std.parseFloat(value));
-            }
-        }
-
-        if (style.name == null) style.name = "style" + styleIDs++;
-
-        return style;
-    }
-
-    inline function inheritStyle(style:Style, parentStyle:Style):Void {
-        for (field in parentStyle.fields()) {
-            if (field == "name" || field == "basis") continue;
-            if (style.field(field) == null) style.setField(field, parentStyle.field(field));
-        }
     }
 
     function setScroll(pos:Float):Void {
@@ -285,24 +160,24 @@ class UIBody extends Body {
         var id:Int = 0;
         var pageSegment:Array<String> = page.slice(scrollStart, scrollStart + numRows);
         var styleIndex:Int = lineStyleIndices[scrollStart];
-        var currentStyle:Style = orderedStyles[styleIndex];
+
+        styleSet.removeAllGlyphs();
+
+        var currentStyle:Style = styleSet.getStyleByIndex(styleIndex);
         for (line in pageSegment) {
             var index:Int = 0;
-            while (index < line.length) {
+            for (index in 0...line.length) {
                 if (line.charAt(index) == "§") {
-                    currentStyle = orderedStyles[++styleIndex];
-                    if (currentStyle == null) currentStyle = defaultStyle;
+                    currentStyle = styleSet.getStyleByIndex(++styleIndex);
                 } else {
                     var glyph:Glyph = glyphs[id++];
                     glyph.set_char(line.charCodeAt(index), glyphTexture.font);
-                    glyph.set_color(currentStyle.r, currentStyle.g, currentStyle.b);
-                    glyph.set_i(currentStyle.i);
-                    glyph.set_s(currentStyle.s);
-                    glyph.set_p(currentStyle.p);
+                    currentStyle.addGlyph(glyph);
                 }
-                index++;
             }
         }
+
+        styleSet.updateGlyphs(true);
 
         transform.identity();
         transform.append(baseTransform);
@@ -320,6 +195,7 @@ class UIBody extends Body {
 
     override public function update():Void {
         updateScroll();
+        styleSet.updateGlyphs();
         super.update();
     }
 

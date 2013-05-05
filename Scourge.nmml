@@ -34,6 +34,8 @@
 
 	<assets path="assets/flatfonts" />
 	<assets path="assets" include="not plus.txt"/>
+	<assets path="assets" include="enterprise.txt"/>
+	<assets path="assets" include="acid2.txt"/>
 
 	<ndll name="std" />
 	<ndll name="regexp" />

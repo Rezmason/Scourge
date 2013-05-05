@@ -80,7 +80,7 @@ class TextDemo {
 
         testBody = new TestBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(testBody);
-        views.push({body:testBody, rect:new Rectangle(0, 0, 1, 1)});
+        views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
 
         uiBody = new UIBody(0, utils.bufferUtil, fontTextures.get("full"));
         bodies.push(uiBody);
@@ -117,7 +117,9 @@ class TextDemo {
         bodyMat.appendTranslation(0, 0, 0.5);
 
         var t:Float = Timer.stamp() * 4;
+        /**/
 
+        /*
         for (glyph in testBody.glyphs) {
             var p:Float = (Math.cos(t * 1 + glyph.get_x() * 10) * 0.5 + 1) * 0.1;
             var s:Float = (Math.cos(t * 2 + glyph.get_x() * 20) * 0.5 + 1) * 2.0;
@@ -125,8 +127,9 @@ class TextDemo {
             glyph.set_s(s);
         }
 
-        testBody.update();
         /**/
+
+        testBody.update();
 
         /*
         var divider:Float = stage.mouseX / stage.stageWidth;
