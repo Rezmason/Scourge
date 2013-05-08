@@ -23,6 +23,7 @@
 
 	<haxedef name="haxeJSON" />
 	<haxedef name="advanced-telemetry" if="flash"/>
+	<!-- <haxedef name="dce" value="no" if="flash"/> -->
 	<compilerflag name="-debug" />
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 

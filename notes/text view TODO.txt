@@ -1,26 +1,22 @@
 UI object
 
-    Maybe isolate scrolling behavior
-
-    Style tags should support ranges for animation
-        a:[0.5, 1]
-        Animation code uses minimum range length
+    Animation style tags
+        ∂{frameBases:[a/b/c], period:1}
+            option - d
 
     Style tags should support mouse states
         MouseStyle extends Style
             µ{up:upBasis, over:overBasis, down:downBasis}
+                option - m
         InputStyle extends Style
             «{hint:hintBasis, valid:validBasis, invalid:invalidBasis}
+                option - \
+
+    Drive scrolling with an animation object
 
     Styles should be polled for text interaction
-
-    Button style
-    Field style
-
-
-
-Unify test body, UI body, alphabet body with Body
-    Lots of similarities once again
+        Button style
+        Field style
 
 Board object
 

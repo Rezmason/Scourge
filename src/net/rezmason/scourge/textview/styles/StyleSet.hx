@@ -52,8 +52,8 @@ class StyleSet {
         for (style in allStyles) style.removeAllGlyphs();
     }
 
-    public function updateGlyphs(?fullUpdate:Bool):Void {
-        for (style in allStyles) style.updateGlyphs(fullUpdate);
+    public function updateGlyphs(delta:Float):Void {
+        for (style in allStyles) style.updateGlyphs(delta);
     }
 
     inline function extractTags(input:String):Array<Array<String>> {

@@ -34,7 +34,7 @@ class MouseView extends Sprite {
 
     public function configure(width:Int, height:Int):Void {
         if (bitmapData != null) bitmapData.dispose();
-        bitmapData = new BitmapData(stage.stageWidth, stage.stageHeight, false, 0x0);
+        bitmapData = new BitmapData(width, height, false, 0x0);
         bitmap.bitmapData = bitmapData;
     }
 

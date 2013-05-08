@@ -2,13 +2,14 @@ package net.rezmason.scourge.textview;
 
 import haxe.ds.StringMap;
 
-import haxe.Timer;
 import nme.display.Stage;
 import nme.events.Event;
 import nme.events.MouseEvent;
+import nme.events.TimerEvent;
 import nme.geom.Matrix3D;
 import nme.geom.Rectangle;
 import nme.geom.Vector3D;
+import nme.utils.Timer;
 
 import net.rezmason.utils.FlatFont;
 import net.rezmason.scourge.textview.core.*;
@@ -17,6 +18,7 @@ import net.rezmason.scourge.textview.utils.UtilitySet;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
+typedef HaxeTimer = haxe.Timer;
 typedef View = {rect:Rectangle, body:Body};
 
 class TextDemo {
@@ -26,22 +28,24 @@ class TextDemo {
     var renderer:Renderer;
 
     var utils:UtilitySet;
-    var testBody:Body;
+    var testBody:TestBody;
     var uiBody:UIBody;
     var bodies:Array<Body>;
     var views:Array<View>;
     var fonts:StringMap<FlatFont>;
     var fontTextures:StringMap<GlyphTexture>;
-    var showHideFunc:Void->Void;
+    //var showHideFunc:Void->Void;
     var prettyMethod:RenderMethod;
     var mouseMethod:RenderMethod;
     var text:String;
+    var updateTimer:Timer;
+    var lastTimeStamp:Float;
 
     public function new(stage:Stage, fonts:StringMap<FlatFont>, text:String):Void {
         this.stage = stage;
         this.fonts = fonts;
         this.text = text;
-        showHideFunc = hideSomeGlyphs;
+        //showHideFunc = hideSomeGlyphs;
 
         utils = new UtilitySet(stage, onCreate);
     }
@@ -49,9 +53,10 @@ class TextDemo {
     function onCreate():Void {
         makeFontTextures();
         renderer = new Renderer(utils.drawUtil);
-        stage.addChild(renderer.mouseView);
+        //stage.addChild(renderer.mouseView);
         prettyMethod = new PrettyMethod(utils.programUtil);
         mouseMethod = new MouseMethod(utils.programUtil);
+        updateTimer = new Timer(1000 / 30);
         makeScene();
         addListeners();
         onActivate();
@@ -98,38 +103,19 @@ class TextDemo {
         /**/
     }
 
-    function update(?event:Event):Void {
+    function update(delta:Float):Void {
 
         //*
         var testBody:Body = bodies[0];
         var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
         var numY:Float = (stage.mouseY / stage.stageHeight) * 2 - 1;
-        var numT:Float = (Timer.stamp() % 10) / 10;
-
-        var cX:Float = 0.5 * Math.cos(numT * Math.PI * 2);
-        var cY:Float = 0.5 * Math.sin(numT * Math.PI * 2);
-        var cZ:Float = 0.1 * Math.sin(numT * Math.PI * 2 * 5);
-
         var bodyMat:Matrix3D = testBody.transform;
         bodyMat.identity();
         spinBody(testBody, numX, numY);
-        //bodyMat.appendTranslation(cX, cY, cZ);
         bodyMat.appendTranslation(0, 0, 0.5);
-
-        var t:Float = Timer.stamp() * 4;
         /**/
 
-        /*
-        for (glyph in testBody.glyphs) {
-            var p:Float = (Math.cos(t * 1 + glyph.get_x() * 10) * 0.5 + 1) * 0.1;
-            var s:Float = (Math.cos(t * 2 + glyph.get_x() * 20) * 0.5 + 1) * 2.0;
-            glyph.set_p(p);
-            glyph.set_s(s);
-        }
-
-        /**/
-
-        testBody.update();
+        testBody.update(delta);
 
         /*
         var divider:Float = stage.mouseX / stage.stageWidth;
@@ -140,9 +126,9 @@ class TextDemo {
         /**/
 
         //*
-        uiBody.scrollChars(1 - stage.mouseY / stage.stageHeight);
+        uiBody.scrollText(1 - stage.mouseY / stage.stageHeight);
         /**/
-        uiBody.update();
+        uiBody.update(delta);
     }
 
     function spinBody(body:Body, numX:Float, numY:Float):Void {
@@ -165,21 +151,33 @@ class TextDemo {
 
     function onActivate(?event:Event):Void {
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+        updateTimer.addEventListener(TimerEvent.TIMER, onTimer);
+        lastTimeStamp = HaxeTimer.stamp();
+        updateTimer.start();
         onResize();
+        onTimer();
         onEnterFrame();
         renderer.render(bodies, mouseMethod, RenderDestination.MOUSE);
     }
 
     function onDeactivate(?event:Event):Void {
+        updateTimer.removeEventListener(TimerEvent.TIMER, onTimer);
+        updateTimer.stop();
         stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
     function onEnterFrame(?event:Event):Void {
-        //if (showHideFunc != null) showHideFunc();
-        update();
         renderer.render(bodies, prettyMethod, RenderDestination.SCREEN);
     }
 
+    function onTimer(?event:Event):Void {
+        //if (showHideFunc != null) showHideFunc();
+        var timeStamp:Float = HaxeTimer.stamp();
+        update(timeStamp - lastTimeStamp);
+        lastTimeStamp = timeStamp;
+    }
+
+    /*
     function hideSomeGlyphs():Void {
         var body:Body = bodies[0];
         var _glyphs:Array<Glyph> = [];
@@ -197,4 +195,5 @@ class TextDemo {
         body.update();
         if (body.numVisibleGlyphs >= body.numGlyphs) showHideFunc = hideSomeGlyphs;
     }
+    */
 }

@@ -130,16 +130,21 @@ class BodySegment {
     inline function insertGlyph(glyph:Glyph, indexAddress:Int):Void {
         var firstVertIndex:Int = glyph.vertexAddress * Almanac.VERTICES_PER_GLYPH;
 
-        writeArrayToVector(indices, indexAddress * Almanac.INDICES_PER_GLYPH, [
-            firstVertIndex + 0, firstVertIndex + 1, firstVertIndex + 2,
-            firstVertIndex + 0, firstVertIndex + 2, firstVertIndex + 3,
-        ], Almanac.INDICES_PER_GLYPH);
+        var vec:Vector<UInt> = new Vector<UInt>();
+        vec.push(firstVertIndex + 0);
+        vec.push(firstVertIndex + 1);
+        vec.push(firstVertIndex + 2);
+        vec.push(firstVertIndex + 0);
+        vec.push(firstVertIndex + 2);
+        vec.push(firstVertIndex + 3);
+
+        writeArrayToVector(indices, indexAddress * Almanac.INDICES_PER_GLYPH, vec, Almanac.INDICES_PER_GLYPH);
 
         glyphsByIndex[indexAddress] = glyph;
         glyph.indexAddress = indexAddress;
     }
 
-    inline function writeArrayToVector<T>(array:Vector<T>, startIndex:Int, items:Array<T>, numItems:Int):Void {
+    inline function writeArrayToVector<T>(array:Vector<T>, startIndex:Int, items:Vector<T>, numItems:Int):Void {
         for (ike in 0...items.length) array[startIndex + ike] = items[ike];
     }
 }

@@ -110,7 +110,7 @@ class Body {
         if (letterbox) applyLetterbox(rect, stageWidth, stageHeight);
     }
 
-    public function update():Void {
+    public function update(delta:Float):Void {
         for (segment in segments) {
             segment.populateVectors();
             segment.update();

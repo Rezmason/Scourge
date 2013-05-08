@@ -8,21 +8,23 @@ using Type;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class Style {
-
-    public var name:String;
-    public var basis:String;
-
+class BasicStyle {
     var r:Float;
     var g:Float;
     var b:Float;
     var i:Float;
     var s:Float;
     var p:Float;
+}
+
+class Style extends BasicStyle {
+
+    public var name:String;
+    public var basis:String;
 
     var glyphs:Array<Glyph>;
 
-    static var styleFields:Array<String> = Style.getInstanceFields();
+    static var styleFields:Array<String> = BasicStyle.getInstanceFields();
 
     public function new(?name:String):Void {
         r = g = b = i = s = p = Math.NaN;
@@ -38,7 +40,7 @@ class Style {
         glyphs.splice(0, glyphs.length);
     }
 
-    public function updateGlyphs(?fullUpdate:Bool):Void {
+    public function updateGlyphs(delta:Float):Void {
         for (glyph in glyphs) {
             glyph.set_color(r, g, b);
             glyph.set_i(i);
@@ -46,6 +48,8 @@ class Style {
             glyph.set_p(p);
         }
     }
+
+    public function toString():String return '§ $name $r $g $b $i $s $p';
 
     public static function create(tag:Array<String>):Style {
         var style:Style = new Style();
@@ -55,13 +59,10 @@ class Style {
             var key:String = elements[0];
             var value:String = elements[1];
 
-            if (!styleFields.has(key)) continue;
-
             switch (key) {
                 case "name": style.name = value;
                 case "basis": style.basis = value;
-                default:
-                    style.setField(key, Std.parseFloat(value));
+                default: if (styleFields.has(key)) style.setField(key, Std.parseFloat(value));
             }
         }
 
@@ -76,6 +77,4 @@ class Style {
             if (Math.isNaN(style.field(field))) style.setField(field, parentStyle.field(field));
         }
     }
-
-    public function toString():String return '§ $name $r $g $b $i $s $p';
 }
