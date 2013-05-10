@@ -20,7 +20,7 @@ class SwipeButton extends SwipeBox {
 
 	private var background:Shape;
 	public var clickCallback(default, null):Void->Void;
-	public var content(default, setContent):ContentType;
+	public var content(default, set):ContentType;
 	private var contentDO:DisplayObject;
 	private var container:Sprite;
 
@@ -45,11 +45,11 @@ class SwipeButton extends SwipeBox {
 		adjustContainer();
 	}
 
-	override private function getBox():Rectangle {
+	override private function get_box():Rectangle {
 		return new Rectangle(x, y, background.width, background.height);
 	}
 
-	override private function setBox(value:Rectangle):Rectangle {
+	override private function set_box(value:Rectangle):Rectangle {
 		x = value.x;
 		y = value.y;
 		resize(value.width, value.height);
@@ -64,7 +64,7 @@ class SwipeButton extends SwipeBox {
 		background.transform.colorTransform = PLAIN_CT;
 	}
 
-	private function setContent(val:ContentType):ContentType {
+	private function set_content(val:ContentType):ContentType {
 		if (container.numChildren > 0) container.removeChildAt(0);
 
 		if (val == null) {

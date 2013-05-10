@@ -20,8 +20,8 @@ class Bar extends SwipeBox {
 	private var tween:{value:Float};
 	private var tweenJob:KTJob;
 	private var swipe:Swipe;
-	public var autoLiftChildren(default, setAutoLiftChildren):Bool;
-	public var contents(getContents, setContents):Array<SwipeBox>;
+	public var autoLiftChildren(default, set):Bool;
+	public var contents(get, set):Array<SwipeBox>;
 	private var _contents:Array<SwipeBox>;
 
 	public function new():Void {
@@ -117,7 +117,7 @@ class Bar extends SwipeBox {
 		for (child in _contents) originalRects.push(child.box);
 	}
 
-	private function setAutoLiftChildren(value:Bool):Bool {
+	private function set_autoLiftChildren(value:Bool):Bool {
 		if (value == autoLiftChildren) return value;
 		autoLiftChildren = value;
 		if (value) {
@@ -138,9 +138,9 @@ class Bar extends SwipeBox {
 		liftChild(cast target);
 	}
 
-	private function getContents():Array<SwipeBox> { return _contents == null ? null : _contents.copy(); }
+	private function get_contents():Array<SwipeBox> { return _contents == null ? null : _contents.copy(); }
 
-	private function setContents(value:Array<SwipeBox>):Array<SwipeBox> {
+	private function set_contents(value:Array<SwipeBox>):Array<SwipeBox> {
 		if (value != _contents) {
 			if (_contents != null) for (child in _contents) removeChild(child);
 			_contents = value;

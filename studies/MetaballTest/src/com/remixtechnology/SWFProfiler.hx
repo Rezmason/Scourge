@@ -11,16 +11,16 @@
  *
  * Initialize without optional parameter: SWFProfiler.init();
  * Will disable the Inspector function.
- *  
+ *
  * To Enable the Inspector function, pass an object as the starting point to trace from.
  * SWFProfiler.init(this);
- * 
+ *
  * in the inspector textinput, use standard dot notation starting from the object passed
  *  "field" or "object.field" or "object.object.field"
  *
  * the value of the field will display in the inspector value box (right half) if it exists
  * the text in the inspector textinput will turn red if the field/object does not exist
- * 
+ *
  */
 
 package com.remixtechnology;
@@ -67,7 +67,7 @@ class SWFProfiler {
     private static var content : ProfilerContent;
     private static var ci : ContextMenuItem;
     private static var gc_ci: ContextMenuItem;
-    
+
     public static inline function init(?main = null) : Void {
         if(!inited){
             inited = true;
@@ -86,7 +86,7 @@ class SWFProfiler {
             gc_ci.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT, select_gc_ci, false, 0, true);
             cm.customItems = [ci,gc_ci];
             flash.Lib.current.contextMenu = cm;
-        
+
             start();
         }
     }
@@ -129,7 +129,7 @@ class SWFProfiler {
         return (currentTime - itvTime);
     }
 
-    
+
     private static inline function select_ci(_) : Void {
         if(!displayed) {
             show();
@@ -157,19 +157,19 @@ class SWFProfiler {
         stage.removeEventListener(Event.RESIZE, resize);
         stage.removeChild(content);
     }
-    
+
     private static inline function resize(e:Event) : Void {
         content.update(runningTime, minFps, maxFps, minMem, maxMem, currentFps, currentMem, averageFps, fpsList, memList, history);
     }
-    
+
     private static inline function frameLoop(_) : Void {
         currentTime = Std.int(Timer.stamp());
         frameCount++;
         totalCount++;
-        
+
         if(intervalTime >= 1) {
             currentFps = frameCount;
-            
+
             if(displayed) {
                 updateDisplay();
             } else {
@@ -177,15 +177,15 @@ class SWFProfiler {
             }
             fpsList.push(currentFps);
             memList.push(currentMem);
-            
+
             if(fpsList.length > history) fpsList.shift();
             if(memList.length > history) memList.shift();
-            
+
             itvTime = currentTime;
             frameCount = 0;
         }
     }
-    
+
     private static inline function updateDisplay() : Void {
         updateMinMax();
         content.update(runningTime, minFps, maxFps, minMem, maxMem, currentFps, currentMem, averageFps, fpsList, memList, history);
@@ -193,7 +193,7 @@ class SWFProfiler {
 
     private static inline function updateMinMax() : Void {
         maxFps = Std.int(Math.max(currentFps, maxFps));
-            
+
         minMem = Math.min(currentMem, minMem);
         maxMem = Math.max(currentMem, maxMem);
     }
@@ -218,9 +218,9 @@ class ProfilerContent extends Sprite {
     private var infoTxtBx : TextField;
     private var inspectLabel : TextField;
     private var inspectInputTxt : TextField;
-    private static inline var exists_tf : TextFormat = new TextFormat("_sans", 9, 0x99CCFF);
-    private static inline var undefined_tf : TextFormat = new TextFormat("_sans", 9, 0xFF88AA);
-    private static inline var tf : TextFormat = new TextFormat("_sans", 9, 0xCCCCCC);
+    private static inline function exists_tf():TextFormat return new TextFormat("_sans", 9, 0x99CCFF);
+    private static inline function undefined_tf():TextFormat return new TextFormat("_sans", 9, 0xFF88AA);
+    private static inline function tf():TextFormat return new TextFormat("_sans", 9, 0xCCCCCC);
     private var box : Shape;
     private var fps : Shape;
     private var mb : Shape;
@@ -233,58 +233,58 @@ class ProfilerContent extends Sprite {
         mb = new Shape();
         box = new Shape();
         main = _main;
-        
+
         //this.mouseChildren = (main==null)?false:true; // not necessary
         this.mouseEnabled = false;
-            
+
         fps.x = 65;
-        fps.y = 45;    
+        fps.y = 45;
         mb.x = 65;
         mb.y = 90;
         boxHeight = (main==null)?100:120;
-            
+
         minFpsTxtBx = new TextField();
         minFpsTxtBx.autoSize = TextFieldAutoSize.RIGHT;
-        minFpsTxtBx.defaultTextFormat = tf;
+        minFpsTxtBx.defaultTextFormat = tf();
         minFpsTxtBx.x = 60;
         minFpsTxtBx.y = 37;
         minFpsTxtBx.mouseEnabled = false;
-            
+
         maxFpsTxtBx = new TextField();
         maxFpsTxtBx.autoSize = TextFieldAutoSize.RIGHT;
-        maxFpsTxtBx.defaultTextFormat = tf;
+        maxFpsTxtBx.defaultTextFormat = tf();
         maxFpsTxtBx.x = 60;
         maxFpsTxtBx.y = 5;
         maxFpsTxtBx.mouseEnabled = false;
-        
+
         fpsLabel = new TextField();
         fpsLabel.autoSize = TextFieldAutoSize.RIGHT;
-        fpsLabel.defaultTextFormat = tf;
+        fpsLabel.defaultTextFormat = tf();
         fpsLabel.x = 50;
         fpsLabel.y = 16;
         fpsLabel.mouseEnabled = false;
-        
+
         minMemTxtBx = new TextField();
         minMemTxtBx.autoSize = TextFieldAutoSize.RIGHT;
-        minMemTxtBx.defaultTextFormat = tf;
+        minMemTxtBx.defaultTextFormat = tf();
         minMemTxtBx.x = 60;
         minMemTxtBx.y = 83;
         minMemTxtBx.mouseEnabled = false;
-        
+
         maxMemTxtBx = new TextField();
         maxMemTxtBx.autoSize = TextFieldAutoSize.RIGHT;
-        maxMemTxtBx.defaultTextFormat = tf;
+        maxMemTxtBx.defaultTextFormat = tf();
         maxMemTxtBx.x = 60;
         maxMemTxtBx.y = 50;
         maxMemTxtBx.mouseEnabled = false;
-        
+
         memLabel = new TextField();
         memLabel.autoSize = TextFieldAutoSize.RIGHT;
-        memLabel.defaultTextFormat = tf;
+        memLabel.defaultTextFormat = tf();
         memLabel.x = 55;
         memLabel.y = 66;
         memLabel.mouseEnabled = false;
-        
+
         addChild(box);
         addChild(fpsLabel);
         addChild(minFpsTxtBx);
@@ -294,7 +294,7 @@ class ProfilerContent extends Sprite {
         addChild(maxMemTxtBx);
         addChild(fps);
         addChild(mb);
-        
+
         if(main != null){
             infoTxtBx = new TextField();
             infoTxtBx.autoSize = TextFieldAutoSize.LEFT;
@@ -302,30 +302,30 @@ class ProfilerContent extends Sprite {
             infoTxtBx.y = 98;
             infoTxtBx.x = 290;
             infoTxtBx.mouseEnabled = false;
-            
+
             inspectLabel = new TextField();
             inspectLabel.autoSize = TextFieldAutoSize.LEFT;
-            inspectLabel.defaultTextFormat = tf;
+            inspectLabel.defaultTextFormat = tf();
             inspectLabel.text = "Inspect Object :";
             inspectLabel.x = 7;
             inspectLabel.y = 98;
             inspectLabel.mouseEnabled = false;
-        
+
             inspectInputTxt = new TextField();
             inspectInputTxt.type = flash.text.TextFieldType.INPUT;
-            inspectInputTxt.defaultTextFormat = exists_tf;
+            inspectInputTxt.defaultTextFormat = exists_tf();
             inspectInputTxt.text = "stage.frameRate";
             inspectInputTxt.x = 80;
             inspectInputTxt.y = 98;
             inspectInputTxt.width = 200;
             inspectInputTxt.height = 18;
             inspectInputTxt.mouseEnabled = true;
-    
+
             addChild(infoTxtBx);
             addChild(inspectLabel);
             addChild(inspectInputTxt);
         }
-        
+
         this.addEventListener(Event.ADDED_TO_STAGE, added, false, 0, true);
         this.addEventListener(Event.REMOVED_FROM_STAGE, removed, false, 0, true);
     }
@@ -337,15 +337,15 @@ class ProfilerContent extends Sprite {
             minMemTxtBx.text = Std.string(minMem);
             maxMemTxtBx.text = Std.string(maxMem);
         }
-        
+
         fpsLabel.text = Std.int(currentFps) + " FPS\n" + Std.int(averageFps) + " Avg";
         memLabel.text = currentMem + " Mb";
-        
+
         if(main != null) updateInspector();
-        
+
         var vec : Graphics = fps.graphics;
         vec.clear();
-            
+
         var i : Int = 0;
         var len : Int = fpsList.length;
         var height : Int = 35;
@@ -353,10 +353,10 @@ class ProfilerContent extends Sprite {
         var inc : Float = width / (history - 1);
         var rateRange : Float = maxFps - minFps;
         var value : Float;
-            
+
         for(i in 0...len) {
             value = (fpsList[i] - minFps) / rateRange;
-            vec.lineStyle(1, 
+            vec.lineStyle(1,
                 if(value<=.7){
                     FPS_LINE_COLOR_LOW;
                 }else if(value>=.9){
@@ -370,16 +370,16 @@ class ProfilerContent extends Sprite {
                 vec.lineTo(width- (len-1-i) * inc, -value * height);
             }
         }
-            
+
         vec = mb.graphics;
         vec.clear();
-            
+
         i = 0;
         len = memList.length;
         rateRange = maxMem - minMem;
         for(i in 0...len) {
             value = (memList[i] - minMem) / rateRange;
-            vec.lineStyle(1, 
+            vec.lineStyle(1,
                 if(value<=.6){
                     MEM_LINE_COLOR_LOW;
                 }else if(value>=.95){
@@ -394,27 +394,27 @@ class ProfilerContent extends Sprite {
             }
         }
     }
-    
+
     private inline function updateInspector(  ):Void
     {
         var obj:Dynamic = main;
         var obj_ar:Array<String> = inspectInputTxt.text.split(".");
-        
+
         if(inspectInputTxt.text.lastIndexOf(".") > 0){
             for(i in 0...obj_ar.length){
                 if(Reflect.hasField(obj, obj_ar[i])){
                     if(i < obj_ar.length-1){
-                        inspectInputTxt.defaultTextFormat = exists_tf;
+                        inspectInputTxt.defaultTextFormat = exists_tf();
                         obj = Reflect.field(obj, obj_ar[i]);
                     }else{
                         if(Reflect.hasField(obj, obj_ar[i])){
-                            inspectInputTxt.defaultTextFormat = exists_tf;
+                            inspectInputTxt.defaultTextFormat = exists_tf();
                             infoTxtBx.text = Reflect.field(obj, obj_ar[i]);
                         }
                     }
                     inspectInputTxt.text = inspectInputTxt.text;
                 }else{
-                    inspectInputTxt.defaultTextFormat = undefined_tf;
+                    inspectInputTxt.defaultTextFormat = undefined_tf();
                     infoTxtBx.text = "";
                     inspectInputTxt.text = inspectInputTxt.text;
                     break;
@@ -423,16 +423,16 @@ class ProfilerContent extends Sprite {
         }else{
             if(Reflect.hasField(main,inspectInputTxt.text)){
                 infoTxtBx.text = Reflect.field(main, inspectInputTxt.text);
-                inspectInputTxt.defaultTextFormat = exists_tf;
+                inspectInputTxt.defaultTextFormat = exists_tf();
             }else{
-                inspectInputTxt.defaultTextFormat = undefined_tf;
+                inspectInputTxt.defaultTextFormat = undefined_tf();
                 infoTxtBx.text = "";
             }
             inspectInputTxt.text = inspectInputTxt.text;
         }
-            
+
     }
-    
+
     private inline function added(e : Event) : Void {
         resize();
         stage.addEventListener(Event.RESIZE, resize, false, 0, true);
@@ -445,21 +445,21 @@ class ProfilerContent extends Sprite {
     private inline function resize(e : Event = null) : Void {
         var vec : Graphics = box.graphics;
         vec.clear();
-        
+
         vec.beginFill(0x000000, 0.7);
         vec.drawRect(0, 0, stage.stageWidth, boxHeight);
         vec.lineStyle(1, 0xFFFFFF, 0.5);
-            
+
         vec.moveTo(65, 45);
         vec.lineTo(65, 10);
         vec.moveTo(65, 45);
         vec.lineTo(stage.stageWidth - 15, 45);
-            
+
         vec.moveTo(65, 90);
         vec.lineTo(65, 55);
         vec.moveTo(65, 90);
         vec.lineTo(stage.stageWidth - 15, 90);
-            
+
         vec.endFill();
     }
 }

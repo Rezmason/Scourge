@@ -5,7 +5,7 @@ import flash.geom.Rectangle;
 
 class SwipeBox extends Sprite {
 
-	public var box(getBox, setBox):Rectangle;
+	public var box(get, set):Rectangle;
 	public var unitHeight(default, null):Int;
 
 	public function new(?__unitHeight:Int = 1):Void {
@@ -17,11 +17,11 @@ class SwipeBox extends Sprite {
 
 	}
 
-	private function getBox():Rectangle {
+	private function get_box():Rectangle {
 		return new Rectangle();
 	}
 
-	private function setBox(val:Rectangle):Rectangle {
+	private function set_box(val:Rectangle):Rectangle {
 		return val;
 	}
 }

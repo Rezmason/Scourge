@@ -207,22 +207,21 @@ class Well extends Sprite {
 
 	private function hint(event:MouseEvent):Void {
 		var over:Bool = event.type == MouseEvent.ROLL_OVER;
-		switch (event.currentTarget) {
-			case rotateLeftButton: rotateHint(true, over);
-			case rotateRightButton: rotateHint(false, over);
-			case biteButton: biteHint(over);
-			case swapButton: swapHint(over);
-		}
+		if (false) false;
+		else if (event.currentTarget == rotateLeftButton) rotateHint(true, over);
+		else if (event.currentTarget == rotateRightButton) rotateHint(false, over);
+		else if (event.currentTarget == biteButton) biteHint(over);
+		else if (event.currentTarget == swapButton) swapHint(over);
 	}
 
 	private function click(event:MouseEvent):Void {
-		switch (event.currentTarget) {
-			case rotateLeftButton: rotatePiece(true);
-			case rotateRightButton: rotatePiece(false);
-			case biteButton: toggleBite();
-			case swapButton: swapPiece();
-		}
+		if (false) false;
+		else if (event.currentTarget == rotateLeftButton) rotatePiece(true);
+		else if (event.currentTarget == rotateRightButton) rotatePiece(false);
+		else if (event.currentTarget == biteButton) toggleBite();
+		else if (event.currentTarget == swapButton) swapPiece();
 	}
+
 	private static function offsetCT(ct:ColorTransform, mult:Float):ColorTransform {
 		var red:Int = Std.int(ct.redMultiplier * 0xFF * mult);
 		var green:Int = Std.int(ct.greenMultiplier * 0xFF * mult);

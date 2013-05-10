@@ -273,9 +273,11 @@ class SwipeView {
 		var down:Bool = event.type == KeyboardEvent.KEY_DOWN;
 		var wasDown:Bool = keyList[event.keyCode];
 		if (down != wasDown) {
+			/*
 			switch (event.keyCode) {
 
 			}
+			*/
 		}
 
 		keyList[event.keyCode] = (event.type == KeyboardEvent.KEY_DOWN);

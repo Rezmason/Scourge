@@ -25,11 +25,11 @@ class SwipeSpacer extends SwipeBox {
 		background.clear().drawBox(0x0, 0., 0, 0, _width, _height);
 	}
 
-	override private function getBox():Rectangle {
+	override private function get_box():Rectangle {
 		return new Rectangle(x, y, _width, _height);
 	}
 
-	override private function setBox(value:Rectangle):Rectangle {
+	override private function set_box(value:Rectangle):Rectangle {
 		x = value.x;
 		y = value.y;
 		resize(value.width, value.height);

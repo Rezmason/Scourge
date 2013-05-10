@@ -24,7 +24,7 @@ typedef Container = DisplayObjectContainer;
 
 class FastDraw {
 
-	private inline static var DEGREES_TO_RADIANS:Float = Math.PI / 180;
+	private inline static function DEGREES_TO_RADIANS():Float return Math.PI / 180;
 
 	public static inline function clear(dad:GraphicsDad):GraphicsDad {
 		dad.graphics.clear();
@@ -46,7 +46,7 @@ class FastDraw {
 		if (width * height != 0 && !Math.isNaN(width * height)) {
 			var graphics:Graphics = dad.graphics;
 			var mat:Matrix = new Matrix();
-			mat.createGradientBox(width, height, angle * DEGREES_TO_RADIANS);
+			mat.createGradientBox(width, height, angle * DEGREES_TO_RADIANS());
 			graphics.beginGradientFill(GradientType.LINEAR, colors, alphas, ratios, mat);
 			graphics.drawRect(x, y, width, height);
 			graphics.endFill();

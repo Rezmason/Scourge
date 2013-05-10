@@ -218,9 +218,9 @@ class ProfilerContent extends Sprite {
     private var infoTxtBx : TextField;
     private var inspectLabel : TextField;
     private var inspectInputTxt : TextField;
-    private static inline var exists_tf : TextFormat = new TextFormat("_sans", 9, 0x99CCFF);
-    private static inline var undefined_tf : TextFormat = new TextFormat("_sans", 9, 0xFF88AA);
-    private static inline var tf : TextFormat = new TextFormat("_sans", 9, 0xCCCCCC);
+    private static inline function exists_tf():TextFormat return new TextFormat("_sans", 9, 0x99CCFF);
+    private static inline function undefined_tf():TextFormat return new TextFormat("_sans", 9, 0xFF88AA);
+    private static inline function tf():TextFormat return new TextFormat("_sans", 9, 0xCCCCCC);
     private var box : Shape;
     private var fps : Shape;
     private var mb : Shape;
@@ -245,42 +245,42 @@ class ProfilerContent extends Sprite {
 
         minFpsTxtBx = new TextField();
         minFpsTxtBx.autoSize = TextFieldAutoSize.RIGHT;
-        minFpsTxtBx.defaultTextFormat = tf;
+        minFpsTxtBx.defaultTextFormat = tf();
         minFpsTxtBx.x = 60;
         minFpsTxtBx.y = 37;
         minFpsTxtBx.mouseEnabled = false;
 
         maxFpsTxtBx = new TextField();
         maxFpsTxtBx.autoSize = TextFieldAutoSize.RIGHT;
-        maxFpsTxtBx.defaultTextFormat = tf;
+        maxFpsTxtBx.defaultTextFormat = tf();
         maxFpsTxtBx.x = 60;
         maxFpsTxtBx.y = 5;
         maxFpsTxtBx.mouseEnabled = false;
 
         fpsLabel = new TextField();
         fpsLabel.autoSize = TextFieldAutoSize.RIGHT;
-        fpsLabel.defaultTextFormat = tf;
+        fpsLabel.defaultTextFormat = tf();
         fpsLabel.x = 50;
         fpsLabel.y = 16;
         fpsLabel.mouseEnabled = false;
 
         minMemTxtBx = new TextField();
         minMemTxtBx.autoSize = TextFieldAutoSize.RIGHT;
-        minMemTxtBx.defaultTextFormat = tf;
+        minMemTxtBx.defaultTextFormat = tf();
         minMemTxtBx.x = 60;
         minMemTxtBx.y = 83;
         minMemTxtBx.mouseEnabled = false;
 
         maxMemTxtBx = new TextField();
         maxMemTxtBx.autoSize = TextFieldAutoSize.RIGHT;
-        maxMemTxtBx.defaultTextFormat = tf;
+        maxMemTxtBx.defaultTextFormat = tf();
         maxMemTxtBx.x = 60;
         maxMemTxtBx.y = 50;
         maxMemTxtBx.mouseEnabled = false;
 
         memLabel = new TextField();
         memLabel.autoSize = TextFieldAutoSize.RIGHT;
-        memLabel.defaultTextFormat = tf;
+        memLabel.defaultTextFormat = tf();
         memLabel.x = 55;
         memLabel.y = 66;
         memLabel.mouseEnabled = false;
@@ -305,7 +305,7 @@ class ProfilerContent extends Sprite {
 
             inspectLabel = new TextField();
             inspectLabel.autoSize = TextFieldAutoSize.LEFT;
-            inspectLabel.defaultTextFormat = tf;
+            inspectLabel.defaultTextFormat = tf();
             inspectLabel.text = "Inspect Object :";
             inspectLabel.x = 7;
             inspectLabel.y = 98;
@@ -313,7 +313,7 @@ class ProfilerContent extends Sprite {
 
             inspectInputTxt = new TextField();
             inspectInputTxt.type = flash.text.TextFieldType.INPUT;
-            inspectInputTxt.defaultTextFormat = exists_tf;
+            inspectInputTxt.defaultTextFormat = exists_tf();
             inspectInputTxt.text = "stage.frameRate";
             inspectInputTxt.x = 80;
             inspectInputTxt.y = 98;
@@ -404,17 +404,17 @@ class ProfilerContent extends Sprite {
             for(i in 0...obj_ar.length){
                 if(Reflect.hasField(obj, obj_ar[i])){
                     if(i < obj_ar.length-1){
-                        inspectInputTxt.defaultTextFormat = exists_tf;
+                        inspectInputTxt.defaultTextFormat = exists_tf();
                         obj = Reflect.field(obj, obj_ar[i]);
                     }else{
                         if(Reflect.hasField(obj, obj_ar[i])){
-                            inspectInputTxt.defaultTextFormat = exists_tf;
+                            inspectInputTxt.defaultTextFormat = exists_tf();
                             infoTxtBx.text = Reflect.field(obj, obj_ar[i]);
                         }
                     }
                     inspectInputTxt.text = inspectInputTxt.text;
                 }else{
-                    inspectInputTxt.defaultTextFormat = undefined_tf;
+                    inspectInputTxt.defaultTextFormat = undefined_tf();
                     infoTxtBx.text = "";
                     inspectInputTxt.text = inspectInputTxt.text;
                     break;
@@ -423,9 +423,9 @@ class ProfilerContent extends Sprite {
         }else{
             if(Reflect.hasField(main,inspectInputTxt.text)){
                 infoTxtBx.text = Reflect.field(main, inspectInputTxt.text);
-                inspectInputTxt.defaultTextFormat = exists_tf;
+                inspectInputTxt.defaultTextFormat = exists_tf();
             }else{
-                inspectInputTxt.defaultTextFormat = undefined_tf;
+                inspectInputTxt.defaultTextFormat = undefined_tf();
                 infoTxtBx.text = "";
             }
             inspectInputTxt.text = inspectInputTxt.text;

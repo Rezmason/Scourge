@@ -1,4 +1,4 @@
--swf9 deploy-flash/scourge.swf
+-swf deploy/scourge.swf
 -main Proto
 -debug
 --flash-strict
@@ -16,7 +16,7 @@
 
 --next
 
--swf9 deploy-flash/metaballtest.swf
+-swf deploy/metaballtest.swf
 -main metaball.Main
 -swf-version 11
 -swf-header 600:600:120:000000

@@ -162,7 +162,7 @@ class Main {
 		2, 2, 1, 1,
 	];
 
-	private inline static var TWO_PI:Float = 2 * Math.PI;
+	private inline static function TWO_PI():Float return 2 * Math.PI;
 
 	private static var vesicles:Array<CleanVesicle>;
 
@@ -335,7 +335,7 @@ class Main {
 	}
 
 	private static function sineCycle(val:Float):Float {
-		return 0.5 * (1 - Math.cos(val * TWO_PI));
+		return 0.5 * (1 - Math.cos(val * TWO_PI()));
 	}
 
 	private static function linearCycle(val:Float):Float {
@@ -344,9 +344,9 @@ class Main {
 
 	private static function pulseCycle(val:Float):Float {
 		if (val < 0.125) {
-			return 0.25 + 0.25 * Math.cos(TWO_PI * (val - 0.125) * 4);
+			return 0.25 + 0.25 * Math.cos(TWO_PI() * (val - 0.125) * 4);
 		} else if (val < 0.5) {
-			return 0.25 + 0.25 * Math.cos(TWO_PI * (val - 0.125) * 4 / 3);
+			return 0.25 + 0.25 * Math.cos(TWO_PI() * (val - 0.125) * 4 / 3);
 		} else {
 			return 0;
 		}

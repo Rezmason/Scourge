@@ -22,7 +22,7 @@ using Type;
 
 class GUIFactory {
 
-	private inline static var DEGREES_TO_RADIANS:Float = Math.PI / 180;
+	private inline static function DEGREES_TO_RADIANS():Float return Math.PI / 180;
 
 	public static var MISO_FONT:String = "miso";
 	private static var __miso:Font = null;
@@ -44,9 +44,9 @@ class GUIFactory {
 	}
 
 	public inline static function wireUp(target:IEventDispatcher, ?onRollOver:Dynamic, ?onRollOut:Dynamic, ?onClick:Dynamic):Void {
-		if (onRollOver) target.addEventListener(MouseEvent.ROLL_OVER, onRollOver);
-		if (onRollOut) target.addEventListener(MouseEvent.ROLL_OUT, onRollOut);
-		if (onClick) target.addEventListener(MouseEvent.CLICK, onClick);
+		if (onRollOver != null) target.addEventListener(MouseEvent.ROLL_OVER, onRollOver);
+		if (onRollOut != null) target.addEventListener(MouseEvent.ROLL_OUT, onRollOut);
+		if (onClick != null) target.addEventListener(MouseEvent.CLICK, onClick);
 	}
 
 	public inline static function makeHead(size:Float):Shape {
@@ -94,7 +94,7 @@ class GUIFactory {
 	public inline static function drawSolidPoly(shp:Shape, color:Int, alpha:Float, sides:Int, centerX:Float, centerY:Float, radius:Float, ?angle:Float = 0, ?cornerRadius:Float = 0):Shape {
 		var points:Array<Float> = []; // x, y, angle
 		var corners:Array<Float> = []; // x, y, angle
-		angle = angle * DEGREES_TO_RADIANS;
+		angle = angle * DEGREES_TO_RADIANS();
 
 		// get all the corners
 		for (ike in 0...sides) {
@@ -205,8 +205,8 @@ class GUIFactory {
 		segs = Std.int(arc * 0.02222 + 1);
 		segAngle = arc / segs;
 
-		theta = -segAngle * DEGREES_TO_RADIANS;
-		angle = -startAngle * DEGREES_TO_RADIANS;
+		theta = -segAngle * DEGREES_TO_RADIANS();
+		angle = -startAngle * DEGREES_TO_RADIANS();
 
 		ax = -Math.cos(angle) * rad;
 		ay = -Math.sin(angle) * rad;
