@@ -12,7 +12,7 @@ import net.rezmason.scourge.textview.utils.Types;
 
 class RenderMethod {
 
-    inline static var MAG_LIMIT:Float = 0.7;
+    inline static var GLYPH_MAG_LIMIT:Float = 0.7;
     static var unitVec:Vector3D = new Vector3D(1, 0, 0);
 
     public var program(default, null):Program3D;
@@ -45,8 +45,9 @@ class RenderMethod {
         glyphMat.append(glyphTransform);
         glyphMat.appendScale(glyphMag, glyphMag, 1);
 
-        // mag fuse
-        if (glyphMat.transformVector(unitVec).length > MAG_LIMIT) throw "You blew the mag fuse!";
+        #if debug
+            if (glyphMat.transformVector(unitVec).length > GLYPH_MAG_LIMIT) throw "You blew the glyph mag fuse!";
+        #end
     }
 
     public function setSegment(segment:BodySegment):Void { }

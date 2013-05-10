@@ -10,6 +10,27 @@ import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.RenderMethod;
 
+class PointShader extends hxsl.Shader {
+
+    static var SRC = {
+        var input : {
+            pos : Float2,
+        };
+        var tuv : Float2;
+        function vertex( mproj : Matrix, delta : Float4, size : Float2 ) {
+            var p = delta * mproj;
+            p.xy += input.pos.xy * size * p.z;
+            out = p;
+            tuv = input.pos;
+        }
+        function fragment( color : Color ) {
+            kill( 1 - (tuv.x * tuv.x + tuv.y * tuv.y) );
+            out = color;
+        }
+    }
+
+}
+
 class MouseMethod extends RenderMethod {
 
     inline static var FAT_FINGERS:Float = 2;

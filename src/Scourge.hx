@@ -2,8 +2,6 @@ package;
 
 import haxe.Utf8;
 
-import haxe.ds.StringMap;
-
 import nme.Assets;
 import nme.Lib;
 import nme.display.StageAlign;
@@ -29,9 +27,9 @@ class Scourge {
         //Lib.current.stage.quality = StageQuality.HIGH_16X16_LINEAR;
         Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
 
-        var fonts:StringMap<FlatFont> = new StringMap<FlatFont>();
+        var fonts = new Map();
 
-        for (name in ["source", "profont", "full"]) fonts.set(name, makeFont(name));
+        for (name in ["source", "profont", "full"]) fonts[name] = makeFont(name);
 
         //var str = [TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n");
         //var str = Assets.getText("assets/not plus.txt");

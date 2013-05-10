@@ -1,7 +1,5 @@
 package net.rezmason.scourge.textview;
 
-import haxe.ds.StringMap;
-
 import nme.display.Stage;
 import nme.events.Event;
 import nme.events.MouseEvent;
@@ -32,8 +30,8 @@ class TextDemo {
     var uiBody:UIBody;
     var bodies:Array<Body>;
     var views:Array<View>;
-    var fonts:StringMap<FlatFont>;
-    var fontTextures:StringMap<GlyphTexture>;
+    var fonts:Map<String, FlatFont>;
+    var fontTextures:Map<String, GlyphTexture>;
     //var showHideFunc:Void->Void;
     var prettyMethod:RenderMethod;
     var mouseMethod:RenderMethod;
@@ -41,7 +39,7 @@ class TextDemo {
     var updateTimer:Timer;
     var lastTimeStamp:Float;
 
-    public function new(stage:Stage, fonts:StringMap<FlatFont>, text:String):Void {
+    public function new(stage:Stage, fonts:Map<String, FlatFont>, text:String):Void {
         this.stage = stage;
         this.fonts = fonts;
         this.text = text;
@@ -71,10 +69,10 @@ class TextDemo {
     }
 
     function makeFontTextures():Void {
-        fontTextures = new StringMap<GlyphTexture>();
+        fontTextures = new Map();
 
         for (key in fonts.keys()) {
-            fontTextures.set(key, new GlyphTexture(utils.textureUtil, fonts.get(key)));
+            fontTextures[key] = new GlyphTexture(utils.textureUtil, fonts[key]);
         }
     }
 
@@ -83,11 +81,11 @@ class TextDemo {
         bodies = [];
         views = [];
 
-        testBody = new TestBody(0, utils.bufferUtil, fontTextures.get("full"));
+        testBody = new TestBody(0, utils.bufferUtil, fontTextures["full"]);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
 
-        uiBody = new UIBody(0, utils.bufferUtil, fontTextures.get("full"));
+        uiBody = new UIBody(0, utils.bufferUtil, fontTextures["full"]);
         bodies.push(uiBody);
 
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
@@ -97,7 +95,7 @@ class TextDemo {
         uiBody.updateText(text);
 
         /*
-        var alphabetBody:Body = new AlphabetBody(0, utils.bufferUtil, fontTextures.get("full"));
+        var alphabetBody:Body = new AlphabetBody(0, utils.bufferUtil, fontTextures["full"]);
         bodies.push(alphabetBody);
         views.push({body:alphabetBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/

@@ -41,7 +41,9 @@ class TestBody extends Body {
 
             var hue:Float = (theta + _z * dTheta * 2) / (Math.PI * 2);
             hues.push(hue);
-            //var rgb:RGB = hsv2rgb(hue);
+            /*
+            var rgb:RGB = hsv2rgb(hue);
+            /**/
 
             var i:Float = 0.2;
             var s:Float = 2;
@@ -66,7 +68,7 @@ class TestBody extends Body {
             r = rgb.r;
             g = rgb.g;
             b = rgb.b;
-            */
+            /**/
 
             glyph.set_shape(x, y, z, s, p);
             glyph.set_color(r, g, b);
@@ -168,5 +170,5 @@ class TestBody extends Body {
 
         return rgb;
     }
-    */
+    /**/
 }

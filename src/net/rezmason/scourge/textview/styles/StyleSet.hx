@@ -1,7 +1,5 @@
 package net.rezmason.scourge.textview.styles;
 
-import haxe.ds.StringMap;
-
 using Lambda;
 
 class StyleSet {
@@ -32,8 +30,8 @@ class StyleSet {
         allStyles = [];
 
         var tags:Array<Array<String>> = extractTags(input);
-        var stylesByID:StringMap<Style> = convertDeclarativeTags(tags);
-        stylesByID.set("", defaultStyle);
+        var stylesByID:Map<String, Style> = convertDeclarativeTags(tags);
+        stylesByID[""] = defaultStyle;
         resolveStyleDependencies(stylesByID);
         convertReferenceTags(tags, stylesByID);
 
@@ -72,8 +70,8 @@ class StyleSet {
         return tags;
     }
 
-    inline function convertDeclarativeTags(tags:Array<Array<String>>):StringMap<Style> {
-        var stylesByID:StringMap<Style> = new StringMap<Style>();
+    inline function convertDeclarativeTags(tags:Array<Array<String>>):Map<String, Style> {
+        var stylesByID:Map<String, Style> = new Map();
 
         for (ike in 0...tags.length) {
             var tag:Array<String> = tags[ike];
@@ -83,7 +81,7 @@ class StyleSet {
                 if (style.name == null) style.name = "style" + styleIDs++;
                 stylesByIndex[ike] = style;
                 allStyles.push(style);
-                stylesByID.set(style.name, style);
+                stylesByID[style.name] = style;
 
                 tags[ike] = null;
             }
@@ -92,7 +90,7 @@ class StyleSet {
         return stylesByID;
     }
 
-    inline function resolveStyleDependencies(stylesByID:StringMap<Style>):Void {
+    inline function resolveStyleDependencies(stylesByID:Map<String, Style>):Void {
         for (style in allStyles) {
             var topStyle:Style = style;
             var dependencyStack:Array<String> = [];
@@ -104,15 +102,15 @@ class StyleSet {
                     throw 'Cyclical style dependency, pal: ( $dependencyStack )';
                 }
 
-                topStyle = stylesByID.get(topStyle.basis);
+                topStyle = stylesByID[topStyle.basis];
                 if (topStyle == null) break;
             }
 
             while (dependencyStack.length > 0) {
-                topStyle = stylesByID.get(dependencyStack.pop());
+                topStyle = stylesByID[dependencyStack.pop()];
 
                 if (topStyle != null) {
-                    Style.inherit(topStyle, stylesByID.get(topStyle.basis));
+                    Style.inherit(topStyle, stylesByID[topStyle.basis]);
                     topStyle.basis = null;
                 }
             }
@@ -122,11 +120,11 @@ class StyleSet {
         allStyles.push(defaultStyle);
     }
 
-    inline function convertReferenceTags(tags:Array<Array<String>>, stylesByID:StringMap<Style>):Void {
+    inline function convertReferenceTags(tags:Array<Array<String>>, stylesByID:Map<String, Style>):Void {
         for (ike in 0...tags.length) {
             var tag:Array<String> = tags[ike];
             if (tag != null) {
-                var style:Style = stylesByID.get(tag[0]);
+                var style:Style = stylesByID[tag[0]];
                 if (style == null) style = defaultStyle;
                 stylesByIndex[ike] = style;
             }

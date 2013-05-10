@@ -1,6 +1,5 @@
 package net.rezmason.scourge.textview;
 
-import haxe.ds.IntMap;
 import net.rezmason.utils.FatChar;
 
 class TestStrings {
@@ -65,15 +64,15 @@ class TestStrings {
 
     public inline static var PUNCTUATION:String = "\"?!.,;:-'~/\\`|&";
 
-    public inline static function CHAR_COLORS():IntMap<Int> {
-        var colors:IntMap<Int> = new IntMap<Int>();
-        colors.set(FatChar.fromString("S")[0].code, 0xFF0090);
-        colors.set(FatChar.fromString("C")[0].code, 0xFFC800);
-        colors.set(FatChar.fromString("O")[0].code, 0x30FF00);
-        colors.set(FatChar.fromString("U")[0].code, 0x00C0FF);
-        colors.set(FatChar.fromString("R")[0].code, 0xFF6000);
-        colors.set(FatChar.fromString("G")[0].code, 0xC000FF);
-        colors.set(FatChar.fromString("E")[0].code, 0x0030FF);
-        return colors;
+    public inline static function CHAR_COLORS():Map<Int, Int> {
+        return [
+            FatChar.fromString("S")[0].code => 0xFF0090,
+            FatChar.fromString("C")[0].code => 0xFFC800,
+            FatChar.fromString("O")[0].code => 0x30FF00,
+            FatChar.fromString("U")[0].code => 0x00C0FF,
+            FatChar.fromString("R")[0].code => 0xFF6000,
+            FatChar.fromString("G")[0].code => 0xC000FF,
+            FatChar.fromString("E")[0].code => 0x0030FF,
+        ];
     }
 }

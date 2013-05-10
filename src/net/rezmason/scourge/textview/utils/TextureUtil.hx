@@ -12,7 +12,9 @@ class TextureUtil extends Util {
         var texture:Texture = context.createTexture(size, size, Context3DTextureFormat.BGRA, false);
         var lev:Int = 0;
         while (size > 0) {
-            texture.uploadFromBitmapData(getResizedBitmapData(src, size), lev);
+            var bmp:BitmapData = getResizedBitmapData(src, size);
+            texture.uploadFromBitmapData(bmp, lev);
+            bmp.dispose();
             lev++;
             size = Std.int(size / 2);
         }
