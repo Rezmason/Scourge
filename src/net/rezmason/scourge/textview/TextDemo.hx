@@ -86,6 +86,7 @@ class TextDemo {
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
 
         uiBody = new UIBody(0, utils.bufferUtil, fontTextures["full"]);
+        uiBody.crop = false;
         bodies.push(uiBody);
 
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);

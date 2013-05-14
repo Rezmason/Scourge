@@ -1,16 +1,15 @@
 UI object
 
     Animation style tags
-        ∂{frameBases:[a/b/c], period:1}
-            option - d
-
-    Style tags should support mouse states
-        MouseStyle extends Style
-            µ{up:upBasis, over:overBasis, down:downBasis}
-                option - m
-        InputStyle extends Style
-            «{hint:hintBasis, valid:validBasis, invalid:invalidBasis}
-                option - \
+        ∂{frames:[a,b,c], period:1}
+        Make the acid2 cheeks blush
+    MouseStyle extends Style
+        µ{up:upBasis, over:overBasis, down:downBasis}
+        Make the acid2 eyes into buttons that trace "left" and "right"
+    InputStyle extends Style
+        «{hint:hintBasis, valid:validBasis, invalid:invalidBasis}
+        Make the acid2 "Hello World!" a field
+            Hitting enter should trace the field's contents
 
     Drive scrolling with an animation object
 

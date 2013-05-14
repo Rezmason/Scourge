@@ -1,14 +1,17 @@
 package net.rezmason.scourge.textview.styles;
 
+using haxe.JSON;
 using Lambda;
+using Type;
 
 class StyleSet {
 
     public inline static var SIGIL:String = "§";
 
-    static var whitespaceReg:EReg = ~/([,\s]+)/g;
-    static var colonReg:EReg = ~/\s*:\s*/g;
-    static var styleTagsReg:EReg = ~/§\{[^\}]*\}/g;
+    static var stringReg:EReg = ~/([^,\s:\\"\[\]]+)/g;
+    static var styleTagsReg:EReg = ~/[§∂«µ]\{[^\}]*\}/g;
+
+    var styleTypes:Map<String, Class<Style>>;
 
     var styleIDs:Int;
     var stylesByIndex:Array<Style>;
@@ -18,7 +21,13 @@ class StyleSet {
     var cleanStyle:Style;
 
     public function new():Void {
-        cleanStyle = Style.create(["r:1", "g:1", "b:1", "i:0", "s:1", "p:0"]);
+        cleanStyle = new Style("", null, {r:1, g:1, b:1, i:0, s:1, p:0});
+
+        styleTypes = new Map();
+        styleTypes.set("§", Style);
+        styleTypes.set("∂", AnimatedStyle);
+        styleTypes.set("«", InputStyle);
+        styleTypes.set("µ", ButtonStyle);
     }
 
     public function extractFromText(input:String, defaultStyle:Style = null):String {
@@ -29,11 +38,15 @@ class StyleSet {
         stylesByIndex = [];
         allStyles = [];
 
-        var tags:Array<Array<String>> = extractTags(input);
+        var tags:Array<StyleTag> = extractTags(input);
         var stylesByID:Map<String, Style> = convertDeclarativeTags(tags);
-        stylesByID[""] = defaultStyle;
+        stylesByID[defaultStyle.name] = defaultStyle;
         resolveStyleDependencies(stylesByID);
+        for (style in allStyles) style.flatten();
+        allStyles.push(defaultStyle);
         convertReferenceTags(tags, stylesByID);
+
+        //for (style in allStyles) trace(style);
 
         stylesByIndex.unshift(defaultStyle);
 
@@ -54,36 +67,31 @@ class StyleSet {
         for (style in allStyles) style.updateGlyphs(delta);
     }
 
-    inline function extractTags(input:String):Array<Array<String>> {
-        var tags:Array<Array<String>> = [];
+    inline function extractTags(input:String):Array<StyleTag> {
+        var tags:Array<StyleTag> = [];
 
-        var styleStrings:Array<String> = input.split('${SIGIL}{');
-        if (styleStrings.length > 1) {
-            for (str in styleStrings) {
-                if (str.length == 0) continue;
-                var tagEndIndex:Int = str.indexOf("}");
-                if (tagEndIndex == -1) throw 'You left a style tag open, friend: ( $str )';
-                tags.push(cleanTag(str.substr(0, tagEndIndex)));
-            }
+        while(styleTagsReg.match(input)) {
+            var pos = styleTagsReg.matchedPos();
+            tags.push(parseTag(input.substr(pos.pos, pos.len)));
+            input = input.substr(pos.pos + pos.len);
         }
 
         return tags;
     }
 
-    inline function convertDeclarativeTags(tags:Array<Array<String>>):Map<String, Style> {
+    inline function convertDeclarativeTags(tags:Array<StyleTag>):Map<String, Style> {
         var stylesByID:Map<String, Style> = new Map();
 
         for (ike in 0...tags.length) {
-            var tag:Array<String> = tags[ike];
-            if (tag.length > 1 || tag[0].indexOf(":") != -1) {
-                var style:Style = Style.create(tag);
-
-                if (style.name == null) style.name = "style" + styleIDs++;
-                stylesByIndex[ike] = style;
-                allStyles.push(style);
-                stylesByID[style.name] = style;
-
-                tags[ike] = null;
+            switch (tags[ike]) {
+                case DeclTag(s, dec):
+                    var name:String = dec.name;
+                    if (name == null) name = "style" + styleIDs++;
+                    var style:Style = styleTypes[s].createInstance([name, dec.basis, dec]);
+                    allStyles.push(style);
+                    stylesByID[name] = style;
+                    stylesByIndex[ike] = style;
+                case _:
             }
         }
 
@@ -91,51 +99,59 @@ class StyleSet {
     }
 
     inline function resolveStyleDependencies(stylesByID:Map<String, Style>):Void {
-        for (style in allStyles) {
-            var topStyle:Style = style;
+        for (topStyle in allStyles) {
+            var style:Style = topStyle;
             var dependencyStack:Array<String> = [];
             while (true) {
-                dependencyStack.push(topStyle.name);
+                dependencyStack.push(style.name);
 
-                if (topStyle.basis == null) break;
-                if (dependencyStack.has(topStyle.basis)) {
+                if (style.basis == null) break;
+                if (dependencyStack.has(style.basis)) {
                     throw 'Cyclical style dependency, pal: ( $dependencyStack )';
                 }
 
-                topStyle = stylesByID[topStyle.basis];
-                if (topStyle == null) break;
+                style = stylesByID[style.basis];
+                if (style == null) break;
             }
 
             while (dependencyStack.length > 0) {
-                topStyle = stylesByID[dependencyStack.pop()];
-
-                if (topStyle != null) {
-                    Style.inherit(topStyle, stylesByID[topStyle.basis]);
-                    topStyle.basis = null;
-                }
+                style = stylesByID[dependencyStack.pop()];
+                style.inherit(stylesByID[style.basis]);
             }
         }
 
-        for (style in allStyles) Style.inherit(style, defaultStyle);
-        allStyles.push(defaultStyle);
+        // Some styles have more complex dependencies. We resolve them here.
+        for (style in allStyles) style.connectBases(stylesByID);
     }
 
-    inline function convertReferenceTags(tags:Array<Array<String>>, stylesByID:Map<String, Style>):Void {
+    inline function convertReferenceTags(tags:Array<StyleTag>, stylesByID:Map<String, Style>):Void {
         for (ike in 0...tags.length) {
-            var tag:Array<String> = tags[ike];
-            if (tag != null) {
-                var style:Style = stylesByID[tag[0]];
-                if (style == null) style = defaultStyle;
-                stylesByIndex[ike] = style;
+            switch (tags[ike]) {
+                case RefTag(s, ref):
+                    var style:Style = stylesByID[ref];
+                    if (style == null) style = defaultStyle;
+                    stylesByIndex[ike] = style;
+                case _:
             }
         }
     }
 
-    inline function cleanTag(tagString:String):Array<String> {
-        tagString = whitespaceReg.replace(tagString, " ");
-        tagString = colonReg.replace(tagString, ":");
-        tagString = StringTools.trim(tagString);
+    inline function parseTag(tagString:String):StyleTag {
 
-        return tagString.split(" ");
+        // Stringly typed – clean this up
+
+        var sigil:String = tagString.charAt(0);
+        tagString = tagString.substr(2).substr(0, -1); // Remove leading '§{' and trailing '}'
+
+        var tag:StyleTag = null;
+
+        if (tagString.indexOf(":") == -1) {
+            tag = RefTag(sigil, tagString);
+        } else {
+            var json:String = "{" + stringReg.replace(tagString, '"$1"') + "}";
+            tag = DeclTag(sigil, json.parse());
+        }
+
+        return tag;
     }
 }

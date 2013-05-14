@@ -15,15 +15,19 @@ class TestStrings {
     "\n";
 
     public inline static var STYLED_TEXT:String =
-    "§{r:1,g :-0.,b:  0  name:test}" +
+    "§{r:1,g :-0.,b:  0,  name:test}" +
     "§{                                                   name:test2}" +
-    "§{r:0,                 , basis:test                  name:test3}" +
-    "§{g:1,                 , basis:test5}" +
+    "§{r:0,                  basis:test,                  name:test3}" +
+    "§{g:1,                  basis:test5}" +
+    "§{name:anim1, r:1, g:0, b:0, p:-0.01}" +
+    "§{name:anim2, r:1, g:1, b:0, p:-0.02}" +
+    "§{name:anim3, r:1, g:1, b:1, p:-0.03}" +
     "§{}" +
     "This is a §{test}test§{}.\n" +
     "§{}\n" +
+    "∂{period:2, frames:[anim1,anim2,anim3]}eeeeee§{}\n" +
     "This is another §{test2}test§{}.\n" +
-    "§{g:1,  p:0.05               , basis:test,,}This is a third test!";
+    "§{g:1,  p:0.05               , basis:test}This is a third test!";
 
     public inline static var SYMBOLS:String = "<>[]{}-=!@#$%^*()_+";
     public inline static var WEIRD_SYMBOLS:String = "¤¬ÎøΔΩ•◊";
