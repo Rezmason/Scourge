@@ -1,4 +1,4 @@
-§{name:w,i:1}§{name:b,basis:w,r:0,g:0,b:0}§{name:y,basis:w,b:0}§{name:g,r:0,b:0}§{name:n,basis:y,s:3}§{name:i,basis:g,s:1.8}§{w}
+§{name:w,i:1}§{name:b,basis:w,r:0,g:0,b:0}§{name:y,basis:w,b:0}§{name:p,basis:w,b:0.2,g:0.6}§{name:g,r:0,b:0}§{name:n,basis:y,s:3}§{name:i,basis:g,s:1.8}∂{name:bl, frames:[y,p], period:3}§{w}
 §{w}
 §{w}            Hello World!
 §{w}
@@ -10,8 +10,8 @@
 §{w}    §{b},,§{y}                         §{b},,§{w}    §{w}
 §{w}    §{b},,§{y}                         §{b},,§{w}    §{w}
 §{w}    §{b},,§{y}           §{b}   §{y}           §{b},,§{w}    §{w}
-§{w}    §{b},,§{y}           §{b} §{n}§{b} §{y}           §{b},,§{w}    §{w}
-§{w}    §{b},,§{y}           §{b}   §{y}           §{b},,§{w}    §{w}
+§{w}    §{b},,§{y}   ∂{bl}   §{y}     §{b} §{n}§{b} §{y}     ∂{bl}   §{y}   §{b},,§{w}    §{w}
+§{w}    §{b},,§{y}   ∂{bl}   §{y}     §{b}   §{y}     ∂{bl}   §{y}   §{b},,§{w}    §{w}
 §{w}    §{b},,§{y}                         §{b},,§{w}    §{w}
 §{w}      §{b},,§{y}  §{b},,§{y}             §{b},,§{y}  §{b},,§{w}      §{w}
 §{w}      §{b},,§{y}    §{b},,,,,,,,,,,,,§{y}    §{b},,§{w}      §{w}

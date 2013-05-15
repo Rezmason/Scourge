@@ -1,12 +1,9 @@
 package net.rezmason.scourge.textview.styles;
 
-//import net.rezmason.scourge.textview.core.Glyph;
-
 import net.kawa.tween.easing.*;
 
 using Reflect;
 using Type;
-//using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class AnimatedStyle extends Style {
 
@@ -52,19 +49,12 @@ class AnimatedStyle extends Style {
 
         if (timeline != null) {
             time = (time + delta) % period;
-            var percent:Float = time / period;
 
-            // Which keyframes does this percent fall between?
-            var percentPerTween:Float = 1 / frameStyles.length;
-
-            var playhead:Float = percent * frameStyles.length;
+            var playhead:Float = time / period * frameStyles.length;
 
             var fromIndex:Int = Std.int(Math.floor(playhead));
-            var toIndex:Int = Std.int(Math.ceil(playhead));
-            if (toIndex == frameStyles.length) toIndex = 0;
-            var ratio:Float = playhead % 1;
-
-            ratio = easeFunc(ratio);
+            var toIndex:Int = Std.int(Math.ceil(playhead) % frameStyles.length);
+            var ratio:Float = easeFunc((playhead + phase) % 1);
 
             for (key in timeline.keys()) {
                 var fieldValues:Array<Float> = timeline[key];
@@ -96,6 +86,9 @@ class AnimatedStyle extends Style {
 
         if (period == null) period = 1;
         if (phase  == null) phase  = 0;
+
+        period = Math.abs(period);
+        phase = ((phase % period) + period) % period;
 
         timeline = new Map();
         var timelineEmpty:Bool = true;

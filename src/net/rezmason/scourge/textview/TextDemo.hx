@@ -51,7 +51,7 @@ class TextDemo {
     function onCreate():Void {
         makeFontTextures();
         renderer = new Renderer(utils.drawUtil);
-        //stage.addChild(renderer.mouseView);
+        stage.addChild(renderer.mouseView);
         prettyMethod = new PrettyMethod(utils.programUtil);
         mouseMethod = new MouseMethod(utils.programUtil);
         updateTimer = new Timer(1000 / 30);
@@ -81,10 +81,13 @@ class TextDemo {
         bodies = [];
         views = [];
 
+        /*
         testBody = new TestBody(0, utils.bufferUtil, fontTextures["full"]);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
+        /**/
 
+        /*
         uiBody = new UIBody(0, utils.bufferUtil, fontTextures["full"]);
         uiBody.crop = false;
         bodies.push(uiBody);
@@ -94,17 +97,22 @@ class TextDemo {
 
         views.push({body:uiBody, rect:uiRect});
         uiBody.updateText(text);
+        /**/
 
         /*
         var alphabetBody:Body = new AlphabetBody(0, utils.bufferUtil, fontTextures["full"]);
         bodies.push(alphabetBody);
         views.push({body:alphabetBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
+
+        var splashBody:Body = new SplashBody(0, utils.bufferUtil, fontTextures["full"]);
+        bodies.push(splashBody);
+        views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
     }
 
     function update(delta:Float):Void {
 
-        //*
+        /*
         var testBody:Body = bodies[0];
         var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
         var numY:Float = (stage.mouseY / stage.stageHeight) * 2 - 1;
@@ -114,7 +122,20 @@ class TextDemo {
         bodyMat.appendTranslation(0, 0, 0.5);
         /**/
 
-        testBody.update(delta);
+        //testBody.update(delta);
+
+        //*
+        var splashBody:Body = bodies[0];
+        var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
+        var numY:Float = (stage.mouseY / stage.stageHeight) * 2 - 1;
+        var bodyMat:Matrix3D = splashBody.transform;
+        bodyMat.identity();
+        spinBody(splashBody, 0, 0.5);
+        spinBody(splashBody, numX * -0.04, 0.08);
+        bodyMat.appendTranslation(0, 0.5, 0.5);
+        /**/
+
+        splashBody.update(delta);
 
         /*
         var divider:Float = stage.mouseX / stage.stageWidth;
@@ -124,10 +145,8 @@ class TextDemo {
         for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
         /**/
 
-        //*
-        uiBody.scrollText(1 - stage.mouseY / stage.stageHeight);
-        /**/
-        uiBody.update(delta);
+        // uiBody.scrollText(1 - stage.mouseY / stage.stageHeight);
+        // uiBody.update(delta);
     }
 
     function spinBody(body:Body, numX:Float, numY:Float):Void {

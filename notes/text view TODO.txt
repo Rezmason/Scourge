@@ -1,17 +1,22 @@
+Basic interaction
+    Use the red paint channel to symbolize body ID
+    When up ID changes, broadcast change to bodies involved
+    When down ID changes, broadcast change to bodies involved
+
 UI object
 
-    Animation style tags
-        ∂{frames:[a,b,c], period:1}
-        Make the acid2 cheeks blush
-    MouseStyle extends Style
+    ButtonStyle extends AnimatedStyle
         µ{up:upBasis, over:overBasis, down:downBasis}
+        Ignore phase and frames
+        Period now refers to the time it takes to transition from one state to another
         Make the acid2 eyes into buttons that trace "left" and "right"
-    InputStyle extends Style
+    InputStyle extends Animated
         «{hint:hintBasis, valid:validBasis, invalid:invalidBasis}
         Make the acid2 "Hello World!" a field
             Hitting enter should trace the field's contents
 
-    Drive scrolling with an animation object
+    Allow styles to be preserved, instead of remaking them
+        Reference styles only
 
     Styles should be polled for text interaction
         Button style
@@ -19,14 +24,7 @@ UI object
 
 Board object
 
-Interaction
-    Make sure interaction IDs work
-
-    Mouse interaction model: Roll over, roll out, mouse down, mouse up, mouse up out
-
-    Render the scene ONCE each time interaction changes
-        On mouse/finger up after a drag
-        On button click/tap
-        On first mouse move after a keystroke
-    Only color and draw the hoverable/clickable objects, of course
-        Create a large quad object for the board's draggable hit area
+Render the scene ONCE each time interaction changes
+    On mouse/finger up after a drag (once there's no inertia)
+    On button click/tap
+    On first mouse move after a keystroke

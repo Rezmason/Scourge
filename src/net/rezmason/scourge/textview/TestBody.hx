@@ -2,7 +2,6 @@ package net.rezmason.scourge.textview;
 
 import nme.geom.Rectangle;
 
-import net.rezmason.scourge.textview.core.Almanac;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 
@@ -101,9 +100,6 @@ class TestBody extends Body {
 
     override public function update(delta:Float):Void {
         time += delta;
-
-        var str:String = "";
-        var step:Int = Almanac.SHAPE_FLOATS_PER_VERTEX;
 
         for (ike in 0...glyphs.length) {
             var glyph:Glyph = glyphs[ike];
