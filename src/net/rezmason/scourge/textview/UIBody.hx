@@ -121,7 +121,7 @@ class UIBody extends Body {
         function wrapLines(s) {
             // Splits a line into an array of lines whose length, ignoring sigils, is numCols
             var sp = styledLineReg.replace(s, '$1$LINE_TOKEN');
-            if (sp.endsWith(LINE_TOKEN)) sp = sp.substr(0, sp.length - 1);
+            if (sp.endsWith(LINE_TOKEN)) sp = sp.substr(0, sp.length - LINE_TOKEN.length);
             return sp.split(LINE_TOKEN).map(padLine).join(LINE_TOKEN);
         }
 
