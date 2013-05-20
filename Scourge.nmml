@@ -24,7 +24,6 @@
 	<!-- <haxeflag name="-D" value="dump=pretty" /> -->
 
 	<haxedef name="haxeJSON" />
-	<haxedef name="rezmason" />
 	<haxedef name="advanced-telemetry" if="flash"/>
 	<!-- <haxedef name="dce" value="no" if="flash"/> -->
 	<compilerflag name="-debug" />

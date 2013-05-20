@@ -8,23 +8,17 @@ import nme.geom.Rectangle;
 import nme.utils.ByteArray;
 import nme.Vector;
 
-typedef MouseTarget = {
-    var bodyID:Int;
-    var glyphID:Int;
-    var rawID:Int;
-}
-
 class MouseSystem {
 
-    static var NULL_TARGET:MouseTarget = {bodyID:-1, glyphID:-1, rawID:-1};
+    inline static var NULL_ID:Int = -1;
 
     public var bitmapData(default, null):BitmapData;
     public var view(get, null):Sprite;
     var _view:MouseView;
 
     var interact:Int->Int->Interaction->Void;
-    var mouseHoverTarget:MouseTarget;
-    var mousePressTarget:MouseTarget;
+    var hoverRawID:Int;
+    var pressRawID:Int;
     var pixRect:Rectangle;
     var pixBytes:ByteArray;
 
@@ -36,8 +30,8 @@ class MouseSystem {
         target.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         target.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 
-        mouseHoverTarget = NULL_TARGET;
-        mousePressTarget = NULL_TARGET;
+        hoverRawID = NULL_ID;
+        pressRawID = NULL_ID;
 
         pixRect = new Rectangle(0, 0, 3, 3);
         pixBytes = new ByteArray();
@@ -49,9 +43,9 @@ class MouseSystem {
         _view.bitmap.bitmapData = bitmapData;
     }
 
-    function getMouseTarget(x:Float, y:Float):MouseTarget {
+    function getRawID(x:Float, y:Float):Int {
 
-        if (bitmapData == null) return NULL_TARGET;
+        if (bitmapData == null) return NULL_ID;
 
         pixRect.x = Std.int(x) - 1;
         pixRect.y = Std.int(y) - 1;
@@ -61,43 +55,40 @@ class MouseSystem {
         pixBytes.position = 0;
 
         var rawID:UInt = pixBytes.readUnsignedInt();
-        while (pixBytes.bytesAvailable > 0) if (pixBytes.readUnsignedInt() != rawID) return NULL_TARGET;
+        while (pixBytes.bytesAvailable > 0) if (pixBytes.readUnsignedInt() != rawID) return NULL_ID;
 
         _view.update(x, y, rawID);
 
-        return {
-            rawID: rawID,
-            bodyID: rawID >> 16 & 0xFF,
-            glyphID: rawID & 0xFFFF
-        };
+        return rawID;
     }
 
     function onMouseMove(event:MouseEvent):Void {
-        var target:MouseTarget = getMouseTarget(event.stageX, event.stageY);
-        if (target.rawID == mouseHoverTarget.rawID) {
-            sendInteraction(target, MOVE);
+        var rawID:Int = getRawID(event.stageX, event.stageY);
+        if (rawID == hoverRawID) {
+            sendInteraction(rawID, MOVE);
         } else {
-            sendInteraction(mouseHoverTarget, EXIT);
-            mouseHoverTarget = target;
-            sendInteraction(mouseHoverTarget, ENTER);
+            sendInteraction(hoverRawID, EXIT);
+            hoverRawID = rawID;
+            sendInteraction(hoverRawID, ENTER);
         }
     }
 
     function onMouseDown(event:MouseEvent):Void {
-        var target:MouseTarget = getMouseTarget(event.stageX, event.stageY);
-        mousePressTarget = target;
-        sendInteraction(mousePressTarget, DOWN);
+        pressRawID = getRawID(event.stageX, event.stageY);
+        sendInteraction(pressRawID, DOWN);
     }
 
     function onMouseUp(event:MouseEvent):Void {
-        var target:MouseTarget = getMouseTarget(event.stageX, event.stageY);
-        sendInteraction(target, UP);
-        sendInteraction(mousePressTarget, target.rawID == mousePressTarget.rawID ? CLICK : DROP);
-        mousePressTarget = null;
+        var rawID:Int = getRawID(event.stageX, event.stageY);
+        sendInteraction(rawID, UP);
+        sendInteraction(pressRawID, rawID == pressRawID ? CLICK : DROP);
+        pressRawID = NULL_ID;
     }
 
-    inline function sendInteraction(target:MouseTarget, interaction:Interaction):Void {
-        if (target.bodyID >= 0) interact(target.bodyID, target.glyphID, interaction);
+    inline function sendInteraction(rawID:Int, interaction:Interaction):Void {
+        var bodyID:Int = rawID >> 16 & 0xFF;
+        var glyphID:Int = rawID & 0xFFFF;
+        if (bodyID >= 0) interact(bodyID, glyphID, interaction);
     }
 
     function get_view():Sprite {

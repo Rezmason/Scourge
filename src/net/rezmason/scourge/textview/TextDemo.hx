@@ -109,9 +109,11 @@ class TextDemo {
         views.push({body:alphabetBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
 
+        //*
         splashBody = new SplashBody(_id++, utils.bufferUtil, fontTextures["full"]);
         bodies.push(splashBody);
         views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
+        /**/
     }
 
     function update(delta:Float):Void {
@@ -119,20 +121,26 @@ class TextDemo {
         var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
         var numY:Float = (stage.mouseY / stage.stageHeight) * 2 - 1;
 
-        //*
-        var bodyMat:Matrix3D = testBody.transform;
-        bodyMat.identity();
-        spinBody(testBody, numX, numY);
-        bodyMat.appendTranslation(0, 0, 0.5);
-        /**/
+        var bodyMat:Matrix3D;
 
-        //*
-        bodyMat = splashBody.transform;
-        bodyMat.identity();
-        spinBody(splashBody, 0, 0.5);
-        spinBody(splashBody, numX * -0.04, 0.08);
-        bodyMat.appendTranslation(0, 0.5, 0.5);
-        /**/
+        if (testBody != null) {
+            bodyMat = testBody.transform;
+            bodyMat.identity();
+            spinBody(testBody, numX, numY);
+            bodyMat.appendTranslation(0, 0, 0.5);
+        }
+
+        if (splashBody != null) {
+            bodyMat = splashBody.transform;
+            bodyMat.identity();
+            spinBody(splashBody, 0, 0.5);
+            spinBody(splashBody, numX * -0.04, 0.08);
+            bodyMat.appendTranslation(0, 0.5, 0.5);
+        }
+
+        if (uiBody != null) {
+            uiBody.scrollText(1 - stage.mouseY / stage.stageHeight);
+        }
 
         /*
         var divider:Float = stage.mouseX / stage.stageWidth;
@@ -141,8 +149,6 @@ class TextDemo {
 
         for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
         /**/
-
-        uiBody.scrollText(1 - stage.mouseY / stage.stageHeight);
 
         for (body in bodies) body.update(delta);
     }
