@@ -62,12 +62,12 @@ class UIBody extends Body {
         scrollGoal = 0;
         smoothScrolling = false;
 
-        for (id in 0...numGlyphs) {
+        for (glyphID in 0...numGlyphs) {
             var glyph:Glyph = new Glyph();
             glyph.visible = true;
-            glyph.id = id;
+            glyph.id = glyphID;
             glyph.prime();
-            glyph.set_paint(glyph.id);
+            glyph.set_paint(glyph.id | id << 16);
             glyphs.push(glyph);
         }
     }

@@ -4,6 +4,7 @@ import nme.geom.Rectangle;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
+import net.rezmason.scourge.textview.core.Interaction;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -22,32 +23,48 @@ class AlphabetBody extends Body {
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));
         var numCols:Int = Std.int(Math.ceil(totalChars / numRows));
 
-        for (id in 0...totalChars) {
+        for (ike in 0...totalChars) {
 
             var glyph:Glyph = new Glyph();
             glyph.visible = true;
-            glyph.id = id;
+            glyph.id = ike;
+            glyph.prime();
             glyphs.push(glyph);
 
-            var col:Int = id % numCols;
-            var row:Int = Std.int(id / numCols);
+            var col:Int = ike % numCols;
+            var row:Int = Std.int(ike / numCols);
 
             var x:Float = ((col + 0.5) / numCols - 0.5);
             var y:Float = ((row + 0.5) / numRows    - 0.5);
 
-            var charCode:Int = CHARS.charCodeAt(id % CHARS.length);
+            var charCode:Int = CHARS.charCodeAt(ike % CHARS.length);
 
-            glyph.makeCorners();
             glyph.set_shape(x, y, 0, 1, 0);
             glyph.set_color(1, 1, 1);
             glyph.set_i(0.2);
             glyph.set_char(charCode, glyphTexture.font);
-            glyph.set_paint(id);
+            glyph.set_paint(glyph.id | id << 16);
         }
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
         super.adjustLayout(stageWidth, stageHeight, rect);
         setGlyphScale(0.05, 0.05 * stageWidth / stageHeight);
+
+        transform.identity();
+        transform.appendScale(1, -1, 1);
+    }
+
+    override public function interact(id:Int, interaction:Interaction):Void {
+
+        var glyph:Glyph = glyphs[id];
+        switch (interaction) {
+            case ENTER: glyph.set_s(2);
+            case EXIT: glyph.set_s(1);
+            case DOWN: glyph.set_i(1);
+            case UP, DROP: glyph.set_i(0);
+            case CLICK: glyph.set_b(1 - glyph.get_b());
+            case _:
+        }
     }
 }

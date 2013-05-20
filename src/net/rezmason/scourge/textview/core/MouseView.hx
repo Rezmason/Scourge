@@ -1,15 +1,13 @@
 package net.rezmason.scourge.textview.core;
 
 import nme.display.Bitmap;
-import nme.display.BitmapData;
 import nme.display.Shape;
 import nme.display.Sprite;
 import nme.text.TextField;
 
 
 class MouseView extends Sprite {
-    public var bitmapData(default, null):BitmapData;
-    var bitmap:Bitmap;
+    public var bitmap(default, null):Bitmap;
     var cursor:Shape;
     var textField:TextField;
 
@@ -32,19 +30,9 @@ class MouseView extends Sprite {
         addChild(textField);
     }
 
-    public function configure(width:Int, height:Int):Void {
-        if (bitmapData != null) bitmapData.dispose();
-        bitmapData = new BitmapData(width, height, false, 0x0);
-        bitmap.bitmapData = bitmapData;
-    }
-
-    public function update(x:Float, y:Float):Void {
-        if (bitmapData == null) return;
-
+    public function update(x:Float, y:Float, val:Int):Void {
         cursor.x = x * bitmap.scaleX;
         cursor.y = y * bitmap.scaleY;
-
-        var val:Int = bitmapData.getPixel(Std.int(x), Std.int(y));
 
         if (val != 0xFFFFFF) {
             cursor.alpha = 1;
@@ -53,6 +41,7 @@ class MouseView extends Sprite {
         } else {
             cursor.alpha = 0.5;
             textField.text = "---";
+            val = -1;
         }
     }
 

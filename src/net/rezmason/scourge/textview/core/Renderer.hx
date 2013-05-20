@@ -7,19 +7,17 @@ class Renderer {
     inline static var SPACE_WIDTH:Float = 2.0;
     inline static var SPACE_HEIGHT:Float = 2.0;
 
-    public var mouseView(default, null):MouseView;
-
+    var mouseSystem:MouseSystem;
     var drawUtil:DrawUtil;
     var activeMethod:RenderMethod;
 
-    public function new(drawUtil:DrawUtil) {
+    public function new(drawUtil:DrawUtil, mouseSystem:MouseSystem) {
         this.drawUtil = drawUtil;
-        mouseView = new MouseView(0.2);
+        this.mouseSystem = mouseSystem;
     }
 
     public function setSize(width:Int, height:Int):Void {
         drawUtil.resize(width, height);
-        mouseView.configure(width, height);
     }
 
     public function render(bodies:Array<Body>, method:RenderMethod, dest:RenderDestination, clear:Bool = true):Void {
@@ -46,7 +44,7 @@ class Renderer {
 
         switch (dest) {
             case SCREEN: drawUtil.present();
-            case MOUSE:  drawUtil.drawToBitmapData(mouseView.bitmapData);
+            case MOUSE:  drawUtil.drawToBitmapData(mouseSystem.bitmapData);
         }
     }
 }

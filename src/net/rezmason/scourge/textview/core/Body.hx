@@ -9,7 +9,7 @@ import net.rezmason.scourge.textview.utils.BufferUtil;
 
 class Body {
     public var segments(default, null):Array<BodySegment>;
-    public var id:Int;
+    public var id(default, null):Int;
     public var transform:Matrix3D;
     public var camera:Matrix3D;
     public var glyphTransform:Matrix3D;
@@ -117,6 +117,10 @@ class Body {
         }
     }
 
+    public function interact(id:Int, interaction:Interaction):Void {
+
+    }
+
     inline function spitGlyphs():Void {
         var str:String = "";
         for (glyph in glyphs) {
@@ -166,4 +170,5 @@ class Body {
         mat.rawData = rawData;
         return mat;
     }
+
 }

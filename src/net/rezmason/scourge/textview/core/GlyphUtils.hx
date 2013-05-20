@@ -99,14 +99,12 @@ class GlyphUtils {
 
     // Paint
 
-    public inline static function get_paint(gl:G) { return gl._paint - 1; }
+    public inline static function get_paint(gl:G) { return gl._paint; }
 
-    public inline static function set_paint(gl:G, val) {
+    public inline static function set_paint(gl:G, val:Int) {
         mark(gl);
 
         if (get_paint(gl) != val) {
-
-            val = val + 1;
 
             var paintR = ((val >> 16) & 0xFF) / 0xFF;
             var paintG = ((val >>  8) & 0xFF) / 0xFF;

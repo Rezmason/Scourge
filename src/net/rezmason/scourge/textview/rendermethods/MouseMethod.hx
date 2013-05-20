@@ -10,6 +10,7 @@ import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.RenderMethod;
 
+/*
 class PointShader extends hxsl.Shader {
 
     static var SRC = {
@@ -30,6 +31,7 @@ class PointShader extends hxsl.Shader {
     }
 
 }
+*/
 
 class MouseMethod extends RenderMethod {
 

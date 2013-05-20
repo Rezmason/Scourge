@@ -73,7 +73,7 @@ class TestBody extends Body {
             glyph.set_color(r, g, b);
             glyph.set_i(i);
             glyph.set_char(charCode, glyphTexture.font);
-            glyph.set_paint(ike);
+            glyph.set_paint(glyph.id | id << 16);
 
             _z -= dZ;
             theta += dTheta;

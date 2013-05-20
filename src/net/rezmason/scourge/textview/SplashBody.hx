@@ -50,7 +50,7 @@ class SplashBody extends Body {
 
         glyphTowers = [];
 
-        var id:Int = 0;
+        var glyphID:Int = 0;
         for (row in 0...numRows) {
 
             var thickness:Int = (row == numRows - 1) ? 2 : 3;
@@ -78,7 +78,7 @@ class SplashBody extends Body {
                 for (ike in 0...thickness) {
                     var glyph:Glyph = new Glyph();
                     glyph.visible = true;
-                    glyph.id = id;
+                    glyph.id = glyphID;
                     glyph.prime();
                     glyphs.push(glyph);
                     glyphTower.push(glyph);
@@ -87,8 +87,8 @@ class SplashBody extends Body {
                     glyph.set_color(r, g, b);
                     glyph.set_i(0);
                     glyph.set_char(charCode, glyphTexture.font);
-                    glyph.set_paint(id);
-                    id++;
+                    glyph.set_paint(glyph.id | id << 16);
+                    glyphID++;
 
                     z -= 0.03;
                     s *= 1.4;

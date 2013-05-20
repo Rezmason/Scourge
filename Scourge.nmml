@@ -19,16 +19,19 @@
 	<classpath name="src" />
 
 	<!-- <haxeflag name="-swf-lib" value="flash_libs/glsl2agal.swf" if="flash" /> -->
-    <haxeflag name="-swf-lib" value="flash_libs/agalminiassembler.swf" if="flash" />
+	<haxeflag name="-swf-lib" value="flash_libs/agalminiassembler.swf" if="flash" />
+
+	<!-- <haxeflag name="-D" value="dump=pretty" /> -->
 
 	<haxedef name="haxeJSON" />
+	<haxedef name="rezmason" />
 	<haxedef name="advanced-telemetry" if="flash"/>
 	<!-- <haxedef name="dce" value="no" if="flash"/> -->
 	<compilerflag name="-debug" />
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 
 	<haxelib name="nme" />
-	<haxelib name="hxsl" />
+	<!-- <haxelib name="hxsl" /> -->
 
 	<debug />
 	<!-- <haxelib name="actuate" /> -->

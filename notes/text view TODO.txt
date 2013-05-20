@@ -1,9 +1,9 @@
-Basic interaction
-    Use the red paint channel to symbolize body ID
-    When up ID changes, broadcast change to bodies involved
-    When down ID changes, broadcast change to bodies involved
-
 UI object
+
+    Base paint on style ID
+
+    Scroll fade
+        Text on the edges of a scroll region should pop backwards
 
     ButtonStyle extends AnimatedStyle
         µ{up:upBasis, over:overBasis, down:downBasis}

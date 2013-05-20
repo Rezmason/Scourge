@@ -24,10 +24,12 @@ class TextDemo {
     var stage:Stage;
 
     var renderer:Renderer;
+    var mouseSystem:MouseSystem;
 
     var utils:UtilitySet;
     var testBody:TestBody;
     var uiBody:UIBody;
+    var splashBody:Body;
     var bodies:Array<Body>;
     var views:Array<View>;
     var fonts:Map<String, FlatFont>;
@@ -50,8 +52,9 @@ class TextDemo {
 
     function onCreate():Void {
         makeFontTextures();
-        renderer = new Renderer(utils.drawUtil);
-        stage.addChild(renderer.mouseView);
+        mouseSystem = new MouseSystem(stage, interact);
+        stage.addChild(mouseSystem.view);
+        renderer = new Renderer(utils.drawUtil, mouseSystem);
         prettyMethod = new PrettyMethod(utils.programUtil);
         mouseMethod = new MouseMethod(utils.programUtil);
         updateTimer = new Timer(1000 / 30);
@@ -64,8 +67,8 @@ class TextDemo {
         stage.addEventListener(Event.RESIZE, onResize);
         stage.addEventListener(Event.ACTIVATE, onActivate);
         stage.addEventListener(Event.DEACTIVATE, onDeactivate);
-        stage.addEventListener(MouseEvent.CLICK, onClick);
-        stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+
+        mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
     function makeFontTextures():Void {
@@ -79,63 +82,57 @@ class TextDemo {
     function makeScene():Void {
 
         bodies = [];
+        var _id:Int = 0;
         views = [];
 
-        /*
-        testBody = new TestBody(0, utils.bufferUtil, fontTextures["full"]);
+        //*
+        testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"]);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
         /**/
 
-        /*
-        uiBody = new UIBody(0, utils.bufferUtil, fontTextures["full"]);
+        //*
+        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures["full"]);
         uiBody.crop = false;
         bodies.push(uiBody);
 
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
-        uiRect.inflate(-0.025, -0.025);
+        //uiRect.inflate(-0.025, -0.1);
 
         views.push({body:uiBody, rect:uiRect});
         uiBody.updateText(text);
         /**/
 
-        /*
-        var alphabetBody:Body = new AlphabetBody(0, utils.bufferUtil, fontTextures["full"]);
+        //*
+        var alphabetBody:Body = new AlphabetBody(_id++, utils.bufferUtil, fontTextures["full"]);
         bodies.push(alphabetBody);
         views.push({body:alphabetBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
 
-        var splashBody:Body = new SplashBody(0, utils.bufferUtil, fontTextures["full"]);
+        splashBody = new SplashBody(_id++, utils.bufferUtil, fontTextures["full"]);
         bodies.push(splashBody);
         views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
     }
 
     function update(delta:Float):Void {
 
-        /*
-        var testBody:Body = bodies[0];
         var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
         var numY:Float = (stage.mouseY / stage.stageHeight) * 2 - 1;
+
+        //*
         var bodyMat:Matrix3D = testBody.transform;
         bodyMat.identity();
         spinBody(testBody, numX, numY);
         bodyMat.appendTranslation(0, 0, 0.5);
         /**/
 
-        //testBody.update(delta);
-
         //*
-        var splashBody:Body = bodies[0];
-        var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
-        var numY:Float = (stage.mouseY / stage.stageHeight) * 2 - 1;
-        var bodyMat:Matrix3D = splashBody.transform;
+        bodyMat = splashBody.transform;
         bodyMat.identity();
         spinBody(splashBody, 0, 0.5);
         spinBody(splashBody, numX * -0.04, 0.08);
         bodyMat.appendTranslation(0, 0.5, 0.5);
         /**/
-
-        splashBody.update(delta);
 
         /*
         var divider:Float = stage.mouseX / stage.stageWidth;
@@ -145,8 +142,9 @@ class TextDemo {
         for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
         /**/
 
-        // uiBody.scrollText(1 - stage.mouseY / stage.stageHeight);
-        // uiBody.update(delta);
+        uiBody.scrollText(1 - stage.mouseY / stage.stageHeight);
+
+        for (body in bodies) body.update(delta);
     }
 
     function spinBody(body:Body, numX:Float, numY:Float):Void {
@@ -154,16 +152,17 @@ class TextDemo {
         body.transform.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
     }
 
-    function onClick(?event:Event):Void {
-        renderer.render(bodies, mouseMethod, RenderDestination.MOUSE);
+    function interact(bodyID:Int, glyphID:Int, interaction:Interaction):Void {
+        if (bodyID < bodies.length) bodies[bodyID].interact(glyphID, interaction);
     }
 
-    function onMouseMove(?event:Event):Void {
-        renderer.mouseView.update(stage.mouseX, stage.mouseY);
+    function onMouseViewClick(?event:Event):Void {
+        renderer.render(bodies, mouseMethod, RenderDestination.MOUSE);
     }
 
     function onResize(?event:Event):Void {
         for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
+        mouseSystem.setSize(stage.stageWidth, stage.stageHeight);
         renderer.setSize(stage.stageWidth, stage.stageHeight);
     }
 
