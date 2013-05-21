@@ -8,6 +8,8 @@ import nme.geom.Rectangle;
 import nme.utils.ByteArray;
 import nme.Vector;
 
+typedef InteractFunction = Int->Int->Float->Float->Interaction->Void;
+
 class MouseSystem {
 
     inline static var NULL_ID:Int = -1;
@@ -16,13 +18,13 @@ class MouseSystem {
     public var view(get, null):Sprite;
     var _view:MouseView;
 
-    var interact:Int->Int->Interaction->Void;
+    var interact:InteractFunction;
     var hoverRawID:Int;
     var pressRawID:Int;
     var pixRect:Rectangle;
     var pixBytes:ByteArray;
 
-    public function new(target:EventDispatcher, interact:Int->Int->Interaction->Void):Void {
+    public function new(target:EventDispatcher, interact:InteractFunction):Void {
         _view = new MouseView(0.2);
         this.interact = interact;
 
@@ -65,30 +67,30 @@ class MouseSystem {
     function onMouseMove(event:MouseEvent):Void {
         var rawID:Int = getRawID(event.stageX, event.stageY);
         if (rawID == hoverRawID) {
-            sendInteraction(rawID, MOVE);
+            sendInteraction(rawID, event, MOVE);
         } else {
-            sendInteraction(hoverRawID, EXIT);
+            sendInteraction(hoverRawID, event, EXIT);
             hoverRawID = rawID;
-            sendInteraction(hoverRawID, ENTER);
+            sendInteraction(hoverRawID, event, ENTER);
         }
     }
 
     function onMouseDown(event:MouseEvent):Void {
         pressRawID = getRawID(event.stageX, event.stageY);
-        sendInteraction(pressRawID, DOWN);
+        sendInteraction(pressRawID, event, DOWN);
     }
 
     function onMouseUp(event:MouseEvent):Void {
         var rawID:Int = getRawID(event.stageX, event.stageY);
-        sendInteraction(rawID, UP);
-        sendInteraction(pressRawID, rawID == pressRawID ? CLICK : DROP);
+        sendInteraction(rawID, event, UP);
+        sendInteraction(pressRawID, event, rawID == pressRawID ? CLICK : DROP);
         pressRawID = NULL_ID;
     }
 
-    inline function sendInteraction(rawID:Int, interaction:Interaction):Void {
+    inline function sendInteraction(rawID:Int, event:MouseEvent, interaction:Interaction):Void {
         var bodyID:Int = rawID >> 16 & 0xFF;
         var glyphID:Int = rawID & 0xFFFF;
-        if (bodyID >= 0) interact(bodyID, glyphID, interaction);
+        if (bodyID >= 0) interact(bodyID, glyphID, event.stageX, event.stageY, interaction);
     }
 
     function get_view():Sprite {

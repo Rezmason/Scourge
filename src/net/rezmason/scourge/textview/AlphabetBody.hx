@@ -55,7 +55,7 @@ class AlphabetBody extends Body {
         transform.appendScale(1, -1, 1);
     }
 
-    override public function interact(id:Int, interaction:Interaction):Void {
+    override public function interact(id:Int, x:Float, y:Float, interaction:Interaction):Void {
 
         var glyph:Glyph = glyphs[id];
         switch (interaction) {

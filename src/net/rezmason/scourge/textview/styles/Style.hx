@@ -13,15 +13,18 @@ class Style {
     public var basis(default, null):String;
 
     var glyphs:Array<Glyph>;
+    var mouseID:Int;
 
     static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 's', 'p'];
 
-    public function new(?name:String, ?basis:String, ?initValues:Dynamic):Void {
+    public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
         values = new Map();
         if (initValues == null) initValues = {};
         for (field in styleFields) values.set(field, initValues.field(field));
         this.name = name;
         this.basis = basis;
+        if (mouseID == null) mouseID = 0;
+        this.mouseID = mouseID;
         glyphs = [];
     }
 
@@ -30,6 +33,9 @@ class Style {
     public function removeAllGlyphs():Void glyphs.splice(0, glyphs.length);
 
     public function updateGlyphs(delta:Float):Void {
+
+        if (glyphs.length == 0) return;
+
         var r:Float = values['r'];
         var g:Float = values['g'];
         var b:Float = values['b'];
@@ -37,11 +43,14 @@ class Style {
         var s:Float = values['s'];
         var p:Float = values['p'];
 
+        var paint:Int = (glyphs[0].get_paint() & 0xFF0000) | (mouseID & 0xFFFF);
+
         for (glyph in glyphs) {
             glyph.set_color(r, g, b);
             glyph.set_i(i);
             glyph.set_s(s);
             glyph.set_p(p);
+            glyph.set_paint(paint);
         }
     }
 

@@ -1,10 +1,5 @@
 UI object
 
-    Base paint on style ID
-
-    Scroll fade
-        Text on the edges of a scroll region should pop backwards
-
     ButtonStyle extends AnimatedStyle
         µ{up:upBasis, over:overBasis, down:downBasis}
         Ignore phase and frames
@@ -18,9 +13,14 @@ UI object
     Allow styles to be preserved, instead of remaking them
         Reference styles only
 
-    Styles should be polled for text interaction
-        Button style
-        Field style
+Keyboard interaction
+    Just another Interaction type
+
+Solidify text update behavior
+        If the user was at the bottom, the text should scroll to the new bottom
+        Otherwise, if the new text is the result of interaction, scroll to the new bottom
+        Otherwise, stay the fuck put
+            I think this will happen no matter what?
 
 Board object
 

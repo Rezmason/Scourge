@@ -85,7 +85,7 @@ class TextDemo {
         var _id:Int = 0;
         views = [];
 
-        //*
+        /*
         testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"]);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
@@ -93,23 +93,22 @@ class TextDemo {
 
         //*
         uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures["full"]);
-        uiBody.crop = false;
         bodies.push(uiBody);
 
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
-        //uiRect.inflate(-0.025, -0.1);
+        uiRect.inflate(-0.025, -0.1);
 
         views.push({body:uiBody, rect:uiRect});
         uiBody.updateText(text);
         /**/
 
-        //*
+        /*
         var alphabetBody:Body = new AlphabetBody(_id++, utils.bufferUtil, fontTextures["full"]);
         bodies.push(alphabetBody);
         views.push({body:alphabetBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
 
-        //*
+        /*
         splashBody = new SplashBody(_id++, utils.bufferUtil, fontTextures["full"]);
         bodies.push(splashBody);
         views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
@@ -138,9 +137,7 @@ class TextDemo {
             bodyMat.appendTranslation(0, 0.5, 0.5);
         }
 
-        if (uiBody != null) {
-            uiBody.scrollText(1 - stage.mouseY / stage.stageHeight);
-        }
+        //if (uiBody != null) uiBody.scrollTextToRatio(stage.mouseY / stage.stageHeight);
 
         /*
         var divider:Float = stage.mouseX / stage.stageWidth;
@@ -158,8 +155,12 @@ class TextDemo {
         body.transform.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
     }
 
-    function interact(bodyID:Int, glyphID:Int, interaction:Interaction):Void {
-        if (bodyID < bodies.length) bodies[bodyID].interact(glyphID, interaction);
+    function interact(bodyID:Int, glyphID:Int, stageX:Float, stageY:Float, interaction:Interaction):Void {
+        if (bodyID >= bodies.length) return;
+        var view:View = views[bodyID];
+        var x:Float = (stageX / stage.stageWidth  - view.rect.x) / view.rect.width;
+        var y:Float = (stageY / stage.stageHeight - view.rect.y) / view.rect.height;
+        view.body.interact(glyphID, x, y, interaction);
     }
 
     function onMouseViewClick(?event:Event):Void {
