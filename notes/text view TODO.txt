@@ -1,5 +1,20 @@
 UI object
 
+    Snappy scrollin'
+        (if dragging)
+            If dragEnd < 0,
+                dragEnd = spring(-dragEnd)
+            else if dragEnd > max,
+                dragEnd = max + spring(dragEnd - max)
+
+        (Move min, max to ratio call again)
+
+        (when let go)
+            if dragEnd < 0,
+                scroll to 0
+            else if dragEnd > max,
+                scroll to max
+
     ButtonStyle extends AnimatedStyle
         µ{up:upBasis, over:overBasis, down:downBasis}
         Ignore phase and frames
@@ -16,15 +31,30 @@ UI object
 Keyboard interaction
     Just another Interaction type
 
-Solidify text update behavior
+Back to UI object
+    Solidify text update behavior
         If the user was at the bottom, the text should scroll to the new bottom
         Otherwise, if the new text is the result of interaction, scroll to the new bottom
         Otherwise, stay the fuck put
             I think this will happen no matter what?
 
 Board object
+    Move rotation logic into TestBody before cloning
+        Click'n'drag
+    Mock State
+    Nodes to glyphs
+    Instant text changes (for UI, for instance)
+    Throb map
+    Creeping text
+    Dialer
+        Dispatches interactions
+
+
 
 Render the scene ONCE each time interaction changes
     On mouse/finger up after a drag (once there's no inertia)
     On button click/tap
     On first mouse move after a keystroke
+
+Multiple font support?
+    Context3D.setSamplerStateAt

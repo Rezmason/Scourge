@@ -155,12 +155,12 @@ class TextDemo {
         body.transform.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
     }
 
-    function interact(bodyID:Int, glyphID:Int, stageX:Float, stageY:Float, interaction:Interaction):Void {
+    function interact(bodyID:Int, glyphID:Int, interaction:Interaction, stageX:Float, stageY:Float/*, delta:Float*/):Void {
         if (bodyID >= bodies.length) return;
         var view:View = views[bodyID];
         var x:Float = (stageX / stage.stageWidth  - view.rect.x) / view.rect.width;
         var y:Float = (stageY / stage.stageHeight - view.rect.y) / view.rect.height;
-        view.body.interact(glyphID, x, y, interaction);
+        view.body.interact(glyphID, interaction, x, y/*, delta*/);
     }
 
     function onMouseViewClick(?event:Event):Void {

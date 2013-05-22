@@ -9,4 +9,6 @@ enum Interaction {
 
     CLICK;
     DROP;
+
+    //WHEEL;
 }

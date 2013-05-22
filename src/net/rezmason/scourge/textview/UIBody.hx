@@ -204,6 +204,7 @@ class UIBody extends Body {
         for (col in 0...numCols) {
             glyph = glyphs[col];
             glyph.set_color(glyph.get_r() * (1 - offset), glyph.get_g() * (1 - offset), glyph.get_b() * (1 - offset));
+
             glyph = glyphs[lastRow + col];
             glyph.set_color(glyph.get_r() * offset, glyph.get_g() * offset, glyph.get_b() * offset);
         }
@@ -220,7 +221,7 @@ class UIBody extends Body {
         }
     }
 
-    override public function interact(id:Int, x:Float, y:Float, interaction:Interaction):Void {
+    override public function interact(id:Int, interaction:Interaction, x:Float, y:Float):Void {
         if (dragging) {
             switch (interaction) {
                 case DROP, CLICK: dragging = false;

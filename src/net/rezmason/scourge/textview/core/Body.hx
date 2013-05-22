@@ -117,7 +117,7 @@ class Body {
         }
     }
 
-    public function interact(id:Int, x:Float, y:Float, interaction:Interaction):Void {
+    public function interact(id:Int, interaction:Interaction, x:Float, y:Float/*, delta:Float*/):Void {
 
     }
 

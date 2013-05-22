@@ -5,6 +5,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<link rel="shortcut icon" href="/favicon.ico">
 	<script type="text/javascript" src="js/swfobject.js"></script>
+	<script type="text/javascript" src="js/swfmacmousewheel2.js"></script>
 	<script type="text/javascript">
 
 	function urlParam(name) {
@@ -117,6 +118,7 @@
 	var params = { scale:'noScale', salign:'lt', menu:'false', wmode:'direct', bgcolor:'000000' };
 	var attributes = { id:'scourge', name:'scourge' };
 	swfobject.embedSWF(swfURL, "flashContent", "100%", "100%", "11.0.0", null, vars, params, attributes );
+	swfmacmousewheel.registerObject(attributes.id);
 
 	</script>
 	<style type="text/css" media="screen">

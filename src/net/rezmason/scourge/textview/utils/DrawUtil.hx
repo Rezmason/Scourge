@@ -7,7 +7,7 @@ import nme.geom.Rectangle;
 class DrawUtil extends Util {
 
     public function resize(width:Int, height:Int):Void {
-        context.configureBackBuffer(width, height, 16, true);
+        context.configureBackBuffer(width, height, 2, true);
     }
 
     public function clear(color:Int = 0x0, alpha:Float = 1):Void {

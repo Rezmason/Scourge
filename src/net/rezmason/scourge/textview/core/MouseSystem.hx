@@ -7,8 +7,9 @@ import nme.events.MouseEvent;
 import nme.geom.Rectangle;
 import nme.utils.ByteArray;
 import nme.Vector;
+import nme.external.ExternalInterface;
 
-typedef InteractFunction = Int->Int->Float->Float->Interaction->Void;
+typedef InteractFunction = Int->Int->Interaction->Float->Float/*->Float*/->Void;
 
 class MouseSystem {
 
@@ -23,6 +24,7 @@ class MouseSystem {
     var pressRawID:Int;
     var pixRect:Rectangle;
     var pixBytes:ByteArray;
+    var lastMoveEvent:MouseEvent;
 
     public function new(target:EventDispatcher, interact:InteractFunction):Void {
         _view = new MouseView(0.2);
@@ -31,12 +33,19 @@ class MouseSystem {
         target.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         target.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         target.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+        //target.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 
         hoverRawID = NULL_ID;
         pressRawID = NULL_ID;
 
         pixRect = new Rectangle(0, 0, 3, 3);
         pixBytes = new ByteArray();
+
+        /*
+        #if flash
+            if (ExternalInterface.available) ExternalInterface.addCallback('externalMouseEvent', onExternalWheel);
+        #end
+        */
     }
 
     public function setSize(width:Int, height:Int):Void {
@@ -73,8 +82,21 @@ class MouseSystem {
             hoverRawID = rawID;
             sendInteraction(hoverRawID, event, ENTER);
         }
+
+        lastMoveEvent = event;
+    }
+    /*
+    function onMouseWheel(event:MouseEvent):Void {
+        sendInteraction(getRawID(event.stageX, event.stageY), event, WHEEL);
     }
 
+    function onExternalWheel(delta:Float):Void {
+        if (lastMoveEvent != null) {
+            lastMoveEvent.delta = Std.int(delta);
+            onMouseWheel(lastMoveEvent);
+        }
+    }
+    */
     function onMouseDown(event:MouseEvent):Void {
         pressRawID = getRawID(event.stageX, event.stageY);
         sendInteraction(pressRawID, event, DOWN);
@@ -90,7 +112,7 @@ class MouseSystem {
     inline function sendInteraction(rawID:Int, event:MouseEvent, interaction:Interaction):Void {
         var bodyID:Int = rawID >> 16 & 0xFF;
         var glyphID:Int = rawID & 0xFFFF;
-        if (bodyID >= 0) interact(bodyID, glyphID, event.stageX, event.stageY, interaction);
+        if (bodyID >= 0) interact(bodyID, glyphID, interaction, event.stageX, event.stageY/*, event.delta*/);
     }
 
     function get_view():Sprite {
