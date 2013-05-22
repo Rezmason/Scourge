@@ -38,6 +38,8 @@ Back to UI object
         Otherwise, stay the fuck put
             I think this will happen no matter what?
 
+    Scroll indicator (looks like meterstick)
+
 Board object
     Move rotation logic into TestBody before cloning
         Click'n'drag

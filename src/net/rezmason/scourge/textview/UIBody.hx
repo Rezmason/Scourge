@@ -241,5 +241,5 @@ class UIBody extends Body {
 
     inline function get_numLines():Int { return page.length; }
 
-    inline function get_numScrollPositions():Int { return page.length - numRows; }
+    inline function get_numScrollPositions():Int { return page.length - numRows + 1; }
 }
