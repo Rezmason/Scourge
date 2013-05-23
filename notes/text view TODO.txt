@@ -1,27 +1,12 @@
 UI object
 
-    Snappy scrollin'
-        (if dragging)
-            If dragEnd < 0,
-                dragEnd = spring(-dragEnd)
-            else if dragEnd > max,
-                dragEnd = max + spring(dragEnd - max)
+    Have AnimatedStyle extend DynamicStyle
 
-        (Move min, max to ratio call again)
-
-        (when let go)
-            if dragEnd < 0,
-                scroll to 0
-            else if dragEnd > max,
-                scroll to max
-
-    ButtonStyle extends AnimatedStyle
-        µ{up:upBasis, over:overBasis, down:downBasis}
-        Ignore phase and frames
-        Period now refers to the time it takes to transition from one state to another
+    ButtonStyle extends DynamicStyle
+        µ{up:upBasis, over:overBasis, down:downBasis, transitionSpeed:1}
         Make the acid2 eyes into buttons that trace "left" and "right"
-    InputStyle extends Animated
-        «{hint:hintBasis, valid:validBasis, invalid:invalidBasis}
+    InputStyle extends DynamicStyle
+        «{hint:hintBasis, valid:validBasis, invalid:invalidBasis, transitionSpeed:1}
         Make the acid2 "Hello World!" a field
             Hitting enter should trace the field's contents
 

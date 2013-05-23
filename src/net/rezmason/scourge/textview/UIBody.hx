@@ -47,6 +47,7 @@ class UIBody extends Body {
 
     public var numLines(get, null):Int;
     public var numScrollPositions(get, null):Int;
+    public var bottomPos(get, null):Float;
 
     override function init():Void {
 
@@ -102,7 +103,7 @@ class UIBody extends Body {
 
     public function glideTextToPos(pos:Float):Void {
         gliding = true;
-        glideGoal = Std.int(Math.max(0, Math.min(numScrollPositions - 1, pos)));
+        glideGoal = Math.round(Math.max(0, Math.min(bottomPos, pos)));
     }
 
     public function updateText(text:String):Void {
@@ -143,7 +144,7 @@ class UIBody extends Body {
             lineStyleIndices.push(lineStyleIndex);
         }
 
-        if (Math.isNaN(currentScrollPos)) setScrollPos(numScrollPositions - 1);
+        if (Math.isNaN(currentScrollPos)) setScrollPos(bottomPos);
     }
 
     inline function reorderGlyphs():Void {
@@ -198,7 +199,7 @@ class UIBody extends Body {
     }
 
     inline function taperScrollEdges():Void {
-        var offset:Float = currentScrollPos % 1;
+        var offset:Float = ((currentScrollPos % 1) + 1) % 1;
         var lastRow:Int = (numRows - 1) * numCols;
         var glyph:Glyph;
         for (col in 0...numCols) {
@@ -212,20 +213,19 @@ class UIBody extends Body {
 
     inline function updateGlide():Void {
         if (gliding) {
-            if (Math.abs(glideGoal - currentScrollPos) < 0.0001) {
-                setScrollPos(glideGoal);
-                gliding = false;
-            } else {
-                setScrollPos(currentScrollPos * glideEase + glideGoal * (1 - glideEase));
-            }
+            gliding = Math.abs(glideGoal - currentScrollPos) > 0.0001;
+            if (gliding) setScrollPos(currentScrollPos * glideEase + glideGoal * (1 - glideEase));
+            else setScrollPos(glideGoal);
         }
     }
 
     override public function interact(id:Int, interaction:Interaction, x:Float, y:Float):Void {
         if (dragging) {
             switch (interaction) {
-                case DROP, CLICK: dragging = false;
-                case ENTER, EXIT, MOVE: glideTextToPos(dragStartPos + (dragStartY - y) * numRowsForLayout);
+                case DROP, CLICK:
+                    dragging = false;
+                case ENTER, EXIT, MOVE:
+                    glideTextToPos(dragStartPos + (dragStartY - y) * numRowsForLayout);
                 case _:
             }
         } else if (id == 0) {
@@ -242,4 +242,5 @@ class UIBody extends Body {
     inline function get_numLines():Int { return page.length; }
 
     inline function get_numScrollPositions():Int { return page.length - numRows + 1; }
+    inline function get_bottomPos():Float { return numScrollPositions - 1; }
 }
