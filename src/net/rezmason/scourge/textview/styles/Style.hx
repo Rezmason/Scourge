@@ -2,7 +2,6 @@ package net.rezmason.scourge.textview.styles;
 
 import net.rezmason.scourge.textview.core.Glyph;
 
-using Reflect;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class Style {
@@ -20,7 +19,7 @@ class Style {
     public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
         values = new Map();
         if (initValues == null) initValues = {};
-        for (field in styleFields) values.set(field, initValues.field(field));
+        for (field in styleFields) values.set(field, Reflect.field(initValues, field));
         this.name = name;
         this.basis = basis;
         if (mouseID == null) mouseID = 0;
