@@ -13,7 +13,7 @@ class StyleSet {
 
     var styleTypes:Map<String, Class<Style>>;
 
-    var styleIDs:Int;
+    var styleMouseID:Int;
     var stylesByIndex:Array<Style>;
     var allStyles:Array<Style>;
 
@@ -34,7 +34,7 @@ class StyleSet {
         if (defaultStyle == null) defaultStyle = cleanStyle;
         defaultStyle.removeAllGlyphs();
         this.defaultStyle = defaultStyle;
-        styleIDs = 0;
+        styleMouseID = 0;
         stylesByIndex = [];
         allStyles = [];
 
@@ -57,6 +57,10 @@ class StyleSet {
         var style:Style = stylesByIndex[index];
         if (style == null) style = defaultStyle;
         return style;
+    }
+
+    public function getStyleByMouseID(id:Int):Style {
+        return allStyles[id];
     }
 
     public function removeAllGlyphs():Void {
@@ -86,11 +90,12 @@ class StyleSet {
             switch (tags[ike]) {
                 case DeclTag(s, dec):
                     var name:String = dec.name;
-                    if (name == null) name = "style" + styleIDs++;
-                    var style:Style = styleTypes[s].createInstance([name, dec.basis, dec]);
+                    if (name == null) name = "style" + styleMouseID;
+                    var style:Style = styleTypes[s].createInstance([name, dec.basis, dec, styleMouseID]);
                     allStyles.push(style);
                     stylesByID[name] = style;
                     stylesByIndex[ike] = style;
+                    styleMouseID++;
                 case _:
             }
         }
@@ -137,21 +142,11 @@ class StyleSet {
     }
 
     inline function parseTag(tagString:String):StyleTag {
-
-        // Stringly typed – clean this up
-
         var sigil:String = tagString.charAt(0);
         tagString = tagString.substr(2).substr(0, -1); // Remove leading '§{' and trailing '}'
-
         var tag:StyleTag = null;
-
-        if (tagString.indexOf(":") == -1) {
-            tag = RefTag(sigil, tagString);
-        } else {
-            var json:String = "{" + stringReg.replace(tagString, '"$1"') + "}";
-            tag = DeclTag(sigil, json.parse());
-        }
-
+        if (tagString.indexOf(":") == -1) tag = RefTag(sigil, tagString); // Tags with no declared properties are obviously references
+        else tag = DeclTag(sigil, ("{" + stringReg.replace(tagString, '"$1"') + "}").parse()); // Turn the string into JSON and parse it
         return tag;
     }
 }

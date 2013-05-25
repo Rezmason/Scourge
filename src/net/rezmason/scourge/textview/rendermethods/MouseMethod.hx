@@ -35,7 +35,7 @@ class PointShader extends hxsl.Shader {
 
 class MouseMethod extends RenderMethod {
 
-    inline static var FAT_FINGERS:Float = 2;
+    //inline static var FAT_FINGERS:Float = 2; // TODO: Fat finger support needs to wait till we can z-order buttons
 
     override public function activate():Void {
         programUtil.setProgram(program);
@@ -51,7 +51,7 @@ class MouseMethod extends RenderMethod {
 
     override function init():Void {
         backgroundColor = 0xFFFFFF;
-        glyphMag = FAT_FINGERS;
+        //glyphMag = FAT_FINGERS;
     }
 
     override function makeVertexShader():String {

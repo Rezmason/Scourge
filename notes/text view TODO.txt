@@ -1,17 +1,20 @@
+PreloadSWF=/SDKs/TheMiner_v1.3.10_Pro/SWFs/TheMiner_en_v1_3_10.swf
+
 UI object
 
-    Have AnimatedStyle extend DynamicStyle
+    Update mouse map when UIBody stops scrolling
 
-    ButtonStyle extends DynamicStyle
-        µ{up:upBasis, over:overBasis, down:downBasis, transitionSpeed:1}
-        Make the acid2 eyes into buttons that trace "left" and "right"
+    Have Style flatten rgbisp to an Array<Float>
+    Make DynamicStyle states into an Array<Array<Float>>
+
     InputStyle extends DynamicStyle
-        «{hint:hintBasis, valid:validBasis, invalid:invalidBasis, transitionSpeed:1}
+        «
+        hint, valid, invalid, transitionSpeed
         Make the acid2 "Hello World!" a field
             Hitting enter should trace the field's contents
 
-    Allow styles to be preserved, instead of remaking them
-        Reference styles only
+    Allow declared styles to be preserved, instead of remaking them
+        This hopefully fixes the bug where animations pause or reset when you drag around the text
 
 Keyboard interaction
     Just another Interaction type

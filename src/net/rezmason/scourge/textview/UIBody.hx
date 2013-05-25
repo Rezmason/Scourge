@@ -235,7 +235,9 @@ class UIBody extends Body {
                 dragStartPos = currentScrollPos;
             }
         } else {
-            // buttons and text fields!
+            var targetStyle:Style = styleSet.getStyleByMouseID(id);
+            targetStyle.interact(interaction);
+            if (interaction == CLICK) trace('${targetStyle.name} clicked!');
         }
     }
 

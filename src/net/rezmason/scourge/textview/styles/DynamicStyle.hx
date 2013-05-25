@@ -1,25 +1,35 @@
 package net.rezmason.scourge.textview.styles;
 
-import net.kawa.tween.easing.*;
-
 class DynamicStyle extends Style {
 
     var stateStyles:Array<Style>;
     var states:Map<String, Array<Float>>;
-    var easeFunc:Float->Float;
 
-    public function new(?name:String, ?basis:String, ?initValues:Dynamic):Void {
+    public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
         stateStyles = [];
-        easeFunc = Quad.easeInOut;
-        super(name, basis, initValues);
+        super(name, basis, initValues, mouseID);
     }
 
     private function connectStates(bases:Map<String, Style>, stateNames:Array<String>):Void {
-        for (ike in 0...stateNames.length) {
-            var stateStyle:Style = new Style('${name}_$ike');
-            stateStyle.inherit(bases[stateNames[ike]]);
-            stateStyle.inherit(bases[""]);
-            stateStyles.push(stateStyle);
+        if (stateNames.length > 0) {
+            for (ike in 0...stateNames.length) {
+                var stateStyle:Style = new Style('${name}_$ike');
+                if (stateNames[ike] == null || bases[stateNames[ike]] == null) stateStyle.inherit(this);
+                else stateStyle.inherit(bases[stateNames[ike]]);
+                stateStyle.inherit(bases[""]);
+                stateStyles.push(stateStyle);
+            }
+        } else {
+            inherit(bases[""]);
+        }
+    }
+
+    private function interpolateGlyphs(fromIndex:Int, toIndex:Int, ratio:Float):Void {
+        if (states != null) {
+            for (key in states.keys()) {
+                var fieldValues:Array<Float> = states[key];
+                values.set(key, fieldValues[fromIndex] * (1 - ratio) + fieldValues[toIndex] * ratio);
+            }
         }
     }
 
@@ -33,7 +43,7 @@ class DynamicStyle extends Style {
             var fieldValues:Array<Float> = [];
             var firstValue:Null<Float> = null;
 
-            if (values[field] == null) {
+            if (values[field] == null && stateStyles.length > 0) {
                 firstValue = stateStyles[0].values[field];
                 for (stateStyle in stateStyles) {
                     if (!doesFieldChange && firstValue != stateStyle.values[field]) doesFieldChange = true;

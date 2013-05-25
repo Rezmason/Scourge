@@ -1,12 +1,14 @@
 package net.rezmason.scourge.textview.styles;
 
+import haxe.ds.StringMap;
 import net.rezmason.scourge.textview.core.Glyph;
+import net.rezmason.scourge.textview.core.Interaction;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class Style {
 
-    var values:Map<String, Null<Float>>;
+    var values:Map<String, Dynamic>;
 
     public var name(default, null):String;
     public var basis(default, null):String;
@@ -17,14 +19,19 @@ class Style {
     static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 's', 'p'];
 
     public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
-        values = new Map();
+        values = new StringMap<Dynamic>();
         if (initValues == null) initValues = {};
         for (field in styleFields) values.set(field, Reflect.field(initValues, field));
         this.name = name;
         this.basis = basis;
-        if (mouseID == null) mouseID = 0;
-        this.mouseID = mouseID;
+        this.mouseID = 0;
         glyphs = [];
+    }
+
+    public function copy():Style {
+        var dupe:Style = new Style('${name}_copy');
+        dupe.inherit(this);
+        return dupe;
     }
 
     public function addGlyph(glyph:Glyph):Void glyphs.push(glyph);
@@ -53,6 +60,10 @@ class Style {
         }
     }
 
+    public function interact(interaction:Interaction):Void {
+
+    }
+
     public function toString():String {
         var str:String =  '§ name:$name';
         for (key in values.keys()) str += ', $key:${values[key]}';
@@ -60,9 +71,13 @@ class Style {
     }
 
     public function inherit(parent:Style):Void {
+        inheritWithFields(parent, styleFields);
+        if (parent != null && basis == parent.name) basis = parent.basis;
+    }
+
+    function inheritWithFields(parent:Style, fields:Array<String>):Void {
         if (parent == null) return;
-        for (field in styleFields) if (values[field] == null) values.set(field, parent.values[field]);
-        if (basis == parent.name) basis = parent.basis;
+        for (field in fields) if (values[field] == null) values.set(field, parent.values[field]);
     }
 
     public function connectBases(bases:Map<String, Style>):Void {
