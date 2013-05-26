@@ -144,7 +144,7 @@ class UIBody extends Body {
             lineStyleIndices.push(lineStyleIndex);
         }
 
-        if (Math.isNaN(currentScrollPos)) setScrollPos(bottomPos);
+        setScrollPos(Math.isNaN(currentScrollPos) ? bottomPos : currentScrollPos);
     }
 
     inline function reorderGlyphs():Void {
@@ -213,9 +213,13 @@ class UIBody extends Body {
 
     inline function updateGlide():Void {
         if (gliding) {
-            gliding = Math.abs(glideGoal - currentScrollPos) > 0.0001;
-            if (gliding) setScrollPos(currentScrollPos * glideEase + glideGoal * (1 - glideEase));
-            else setScrollPos(glideGoal);
+            gliding = Math.abs(glideGoal - currentScrollPos) > 0.001;
+            if (gliding) {
+                setScrollPos(currentScrollPos * glideEase + glideGoal * (1 - glideEase));
+            } else {
+                setScrollPos(glideGoal);
+                redrawHitAreas();
+            }
         }
     }
 

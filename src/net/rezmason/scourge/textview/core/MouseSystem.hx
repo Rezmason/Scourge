@@ -27,7 +27,8 @@ class MouseSystem {
     var lastMoveEvent:MouseEvent;
 
     public function new(target:EventDispatcher, interact:InteractFunction):Void {
-        _view = new MouseView(0.2);
+        _view = new MouseView(0.2, 40);
+        // _view = new MouseView(1.0, 40, 0.5);
         this.interact = interact;
 
         target.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);

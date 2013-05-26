@@ -3,7 +3,7 @@ package net.rezmason.scourge.textview.styles;
 class DynamicStyle extends Style {
 
     var stateStyles:Array<Style>;
-    var states:Map<String, Array<Float>>;
+    var states:Array<Array<Float>>;
 
     public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
         stateStyles = [];
@@ -24,18 +24,17 @@ class DynamicStyle extends Style {
         }
     }
 
-    private function interpolateGlyphs(fromIndex:Int, toIndex:Int, ratio:Float):Void {
-        if (states != null) {
-            for (key in states.keys()) {
-                var fieldValues:Array<Float> = states[key];
-                values.set(key, fieldValues[fromIndex] * (1 - ratio) + fieldValues[toIndex] * ratio);
-            }
+    private function interpolateGlyphs(state1:Int, state2:Int, ratio:Float):Void {
+        if (states == null) return;
+        for (ike in 0...states.length) {
+            var fieldValues:Array<Float> = states[ike];
+            if (fieldValues != null) basics[ike] = fieldValues[state1] * (1 - ratio) + fieldValues[state2] * ratio;
         }
     }
 
     override public function flatten():Void {
 
-        states = new Map();
+        states = [];
         var hasNoStates:Bool = true;
 
         for (field in Style.styleFields) {
@@ -52,13 +51,16 @@ class DynamicStyle extends Style {
             }
 
             if (doesFieldChange) {
-                states.set(field, fieldValues);
+                states.push(fieldValues);
                 hasNoStates = false;
             } else if (values[field] == null) {
+                states.push(null);
                 values.set(field, firstValue);
             }
         }
 
         if (hasNoStates) states = null;
+
+        super.flatten();
     }
 }

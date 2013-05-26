@@ -3,6 +3,7 @@ package net.rezmason.scourge.textview.core;
 import nme.display.Bitmap;
 import nme.display.Shape;
 import nme.display.Sprite;
+import nme.geom.ColorTransform;
 import nme.text.TextField;
 
 
@@ -11,11 +12,13 @@ class MouseView extends Sprite {
     var cursor:Shape;
     var textField:TextField;
 
-    public function new(size:Float):Void {
+    public function new(size:Float, mag:Float = 1, alpha:Float = 1):Void {
         super();
 
         bitmap = new Bitmap();
         bitmap.scaleX = bitmap.scaleY = size;
+        bitmap.transform.colorTransform = new ColorTransform(mag, mag, mag);
+        this.alpha = alpha;
         cursor = new Shape();
         cursor.graphics.beginFill(0xFF0000);
         cursor.graphics.lineTo(0, 20);

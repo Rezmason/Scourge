@@ -21,15 +21,17 @@ class Body {
     public var crop:Bool;
     public var letterbox:Bool;
 
+    var redrawHitAreas:Void->Void;
     var projection:Matrix3D;
 
     public var glyphs:Array<Glyph>;
 
     var bufferUtil:BufferUtil;
 
-    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
         this.id = id;
         this.bufferUtil = bufferUtil;
+        this.redrawHitAreas = redrawHitAreas;
         crop = true;
         letterbox = true;
         this.glyphTexture = glyphTexture;

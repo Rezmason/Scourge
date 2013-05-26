@@ -2,10 +2,15 @@ PreloadSWF=/SDKs/TheMiner_v1.3.10_Pro/SWFs/TheMiner_en_v1_3_10.swf
 
 UI object
 
-    Update mouse map when UIBody stops scrolling
+    Allow declared styles to be preserved, instead of remaking them
+        This hopefully fixes the bug where animations pause or reset when you drag around the text
 
-    Have Style flatten rgbisp to an Array<Float>
-    Make DynamicStyle states into an Array<Array<Float>>
+    Defer text changes until after dragging
+
+Keyboard interaction
+    Just another Interaction type
+
+Back to UI object
 
     InputStyle extends DynamicStyle
         «
@@ -13,19 +18,12 @@ UI object
         Make the acid2 "Hello World!" a field
             Hitting enter should trace the field's contents
 
-    Allow declared styles to be preserved, instead of remaking them
-        This hopefully fixes the bug where animations pause or reset when you drag around the text
-
-Keyboard interaction
-    Just another Interaction type
-
-Back to UI object
     Solidify text update behavior
-        If the user was at the bottom, the text should scroll to the new bottom
-        Otherwise, if the new text is the result of interaction, scroll to the new bottom
-        Otherwise, stay the fuck put
-            I think this will happen no matter what?
-
+        If:
+            the user WAS at the bottom, or
+            the user IS past the bottom, or
+            the new text IS the result of interaction,
+        -scroll to the new bottom
     Scroll indicator (looks like meterstick)
 
 Board object

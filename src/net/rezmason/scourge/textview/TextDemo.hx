@@ -22,6 +22,7 @@ typedef View = {rect:Rectangle, body:Body};
 class TextDemo {
 
     var stage:Stage;
+    var active:Bool;
 
     var renderer:Renderer;
     var mouseSystem:MouseSystem;
@@ -42,6 +43,7 @@ class TextDemo {
     var lastTimeStamp:Float;
 
     public function new(stage:Stage, fonts:Map<String, FlatFont>, text:String):Void {
+        active = false;
         this.stage = stage;
         this.fonts = fonts;
         this.text = text;
@@ -86,13 +88,13 @@ class TextDemo {
         views = [];
 
         /*
-        testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"]);
+        testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
         /**/
 
         //*
-        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures["full"]);
+        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(uiBody);
 
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
@@ -103,13 +105,13 @@ class TextDemo {
         /**/
 
         /*
-        var alphabetBody:Body = new AlphabetBody(_id++, utils.bufferUtil, fontTextures["full"]);
+        var alphabetBody:Body = new AlphabetBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(alphabetBody);
         views.push({body:alphabetBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
 
         /*
-        splashBody = new SplashBody(_id++, utils.bufferUtil, fontTextures["full"]);
+        splashBody = new SplashBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(splashBody);
         views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
@@ -163,8 +165,13 @@ class TextDemo {
         view.body.interact(glyphID, interaction, x, y/*, delta*/);
     }
 
-    function onMouseViewClick(?event:Event):Void {
+    function redrawHitAreas():Void {
+        update(0);
         renderer.render(bodies, mouseMethod, RenderDestination.MOUSE);
+    }
+
+    function onMouseViewClick(?event:Event):Void {
+        redrawHitAreas();
     }
 
     function onResize(?event:Event):Void {
@@ -174,6 +181,9 @@ class TextDemo {
     }
 
     function onActivate(?event:Event):Void {
+        if (active) return;
+        active = true;
+
         stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         updateTimer.addEventListener(TimerEvent.TIMER, onTimer);
         lastTimeStamp = HaxeTimer.stamp();
@@ -185,6 +195,9 @@ class TextDemo {
     }
 
     function onDeactivate(?event:Event):Void {
+        if (!active) return;
+        active = false;
+
         updateTimer.removeEventListener(TimerEvent.TIMER, onTimer);
         updateTimer.stop();
         stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);

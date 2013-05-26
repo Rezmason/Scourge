@@ -10,6 +10,8 @@ class Style {
 
     var values:Map<String, Dynamic>;
 
+    var basics:Array<Float>;
+
     public var name(default, null):String;
     public var basis(default, null):String;
 
@@ -42,12 +44,12 @@ class Style {
 
         if (glyphs.length == 0) return;
 
-        var r:Float = values['r'];
-        var g:Float = values['g'];
-        var b:Float = values['b'];
-        var i:Float = values['i'];
-        var s:Float = values['s'];
-        var p:Float = values['p'];
+        var r:Float = basics[0];
+        var g:Float = basics[1];
+        var b:Float = basics[2];
+        var i:Float = basics[3];
+        var s:Float = basics[4];
+        var p:Float = basics[5];
 
         var paint:Int = (glyphs[0].get_paint() & 0xFF0000) | (mouseID & 0xFFFF);
 
@@ -85,6 +87,7 @@ class Style {
     }
 
     public function flatten():Void {
-
+        basics = [];
+        for (field in styleFields) basics.push(values[field]);
     }
 }
