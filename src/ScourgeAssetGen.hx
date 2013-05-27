@@ -2,12 +2,16 @@ package;
 
 import haxe.Utf8;
 
-import nme.Assets;
-import nme.Lib;
-import nme.display.Bitmap;
-import nme.display.BitmapData;
-import nme.display.Sprite;
-import nme.events.Event;
+import haxe.io.BytesOutput;
+import haxe.io.Bytes;
+import format.png.Tools;
+import format.png.Writer;
+import openfl.Assets;
+import flash.Lib;
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.Sprite;
+import flash.events.Event;
 
 import flash.net.FileReference;
 
@@ -45,12 +49,17 @@ class ScourgeAssetGen {
         var fileRef = null;
         sprite.addEventListener("click", function(_) {
             var json = font.exportJSON();
-            var pngBytes = com.moodycamel.PNGEncoder2.encode(fontBD);
+
+            var bytesOutput:BytesOutput = new BytesOutput();
+            var writer:Writer = new Writer(bytesOutput);
+            var data = Tools.build32BE(fontBD.width, fontBD.height, Bytes.ofData(fontBD.getPixels(fontBD.rect)));
+            writer.write(data);
+
             fileRef = new FileReference();
 
             function savePNG(_) {
                 fileRef.removeEventListener("complete", savePNG);
-                fileRef.save(pngBytes, id + "_flat.png");
+                fileRef.save(bytesOutput.getBytes().getData(), id + "_flat.png");
                 Lib.current.removeChild(sprite);
             }
 
