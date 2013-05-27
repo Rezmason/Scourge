@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview;
 
-import nme.geom.Rectangle;
+import flash.geom.Rectangle;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;

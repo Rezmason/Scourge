@@ -1,13 +1,13 @@
 package net.rezmason.scourge.textview;
 
-import nme.display.Stage;
-import nme.events.Event;
-import nme.events.MouseEvent;
-import nme.events.TimerEvent;
-import nme.geom.Matrix3D;
-import nme.geom.Rectangle;
-import nme.geom.Vector3D;
-import nme.utils.Timer;
+import flash.display.Stage;
+import flash.events.Event;
+import flash.events.MouseEvent;
+import flash.events.TimerEvent;
+import flash.geom.Matrix3D;
+import flash.geom.Rectangle;
+import flash.geom.Vector3D;
+import flash.utils.Timer;
 
 import net.rezmason.utils.FlatFont;
 import net.rezmason.scourge.textview.core.*;

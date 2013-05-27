@@ -1,9 +1,9 @@
 package net.rezmason.scourge.textview.core;
 
-import nme.geom.Matrix3D;
-import nme.geom.Rectangle;
-import nme.geom.Vector3D;
-import nme.Vector;
+import flash.geom.Matrix3D;
+import flash.geom.Rectangle;
+import flash.geom.Vector3D;
+import flash.Vector;
 
 import net.rezmason.scourge.textview.utils.BufferUtil;
 

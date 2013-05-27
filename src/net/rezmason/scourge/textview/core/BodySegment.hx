@@ -1,8 +1,8 @@
 package net.rezmason.scourge.textview.core;
 
-import nme.display3D.IndexBuffer3D;
-import nme.display3D.VertexBuffer3D;
-import nme.Vector;
+import flash.display3D.IndexBuffer3D;
+import flash.display3D.VertexBuffer3D;
+import flash.Vector;
 
 import net.rezmason.scourge.textview.utils.BufferUtil;
 

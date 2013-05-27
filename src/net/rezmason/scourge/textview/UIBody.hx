@@ -1,8 +1,8 @@
 package net.rezmason.scourge.textview;
 
-import nme.geom.Matrix3D;
-import nme.geom.Rectangle;
-import nme.system.Capabilities;
+import flash.geom.Matrix3D;
+import flash.geom.Rectangle;
+import flash.system.Capabilities;
 
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;

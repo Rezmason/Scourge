@@ -1,7 +1,7 @@
 package net.rezmason.scourge.textview.utils;
 
-import nme.display3D.IndexBuffer3D;
-import nme.display3D.VertexBuffer3D;
+import flash.display3D.IndexBuffer3D;
+import flash.display3D.VertexBuffer3D;
 
 class BufferUtil extends Util {
 

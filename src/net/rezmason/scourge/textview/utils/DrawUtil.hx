@@ -1,8 +1,8 @@
 package net.rezmason.scourge.textview.utils;
 
-import nme.display.BitmapData;
-import nme.display3D.IndexBuffer3D;
-import nme.geom.Rectangle;
+import flash.display.BitmapData;
+import flash.display3D.IndexBuffer3D;
+import flash.geom.Rectangle;
 
 class DrawUtil extends Util {
 

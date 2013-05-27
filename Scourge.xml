@@ -5,6 +5,7 @@
 
 	<app title="Scourge" file="Scourge" main="Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="11.4"/>
 
+	<set name="fullscreen" if="html5" />
 	<set name="fullscreen" if="target_webos" />
 	<set name="fullscreen" if="target_ios" />
 	<set name="fullscreen" if="target_android" />
@@ -26,7 +27,7 @@
 	<haxedef name="haxeJSON" />
 	<haxedef name="advanced-telemetry" if="flash"/>
 	<!-- <haxedef name="dce" value="no" if="flash"/> -->
-	<compilerflag name="-debug" />
+	<!-- <compilerflag name="-debug" /> -->
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 
 	<haxelib name="nme" />

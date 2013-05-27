@@ -1,9 +1,9 @@
 package net.rezmason.scourge.textview.utils;
 
-import nme.display.BitmapData;
-import nme.display3D.Context3DTextureFormat;
-import nme.display3D.textures.Texture;
-import nme.geom.Matrix;
+import flash.display.BitmapData;
+import flash.display3D.Context3DTextureFormat;
+import flash.display3D.textures.Texture;
+import flash.geom.Matrix;
 
 class TextureUtil extends Util {
 

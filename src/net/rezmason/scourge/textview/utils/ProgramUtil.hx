@@ -1,15 +1,15 @@
 package net.rezmason.scourge.textview.utils;
 
-import nme.display3D.Context3DBlendFactor;
-import nme.display3D.Context3DCompareMode;
-import nme.display3D.Context3DProgramType;
-import nme.display3D.Context3DVertexBufferFormat;
-import nme.display3D.Program3D;
-import nme.display3D.textures.TextureBase;
-import nme.display3D.VertexBuffer3D;
-import nme.geom.Matrix3D;
-import nme.utils.ByteArray;
-import nme.Vector;
+import flash.display3D.Context3DBlendFactor;
+import flash.display3D.Context3DCompareMode;
+import flash.display3D.Context3DProgramType;
+import flash.display3D.Context3DVertexBufferFormat;
+import flash.display3D.Program3D;
+import flash.display3D.textures.TextureBase;
+import flash.display3D.VertexBuffer3D;
+import flash.geom.Matrix3D;
+import flash.utils.ByteArray;
+import flash.Vector;
 
 class ProgramUtil extends Util {
 

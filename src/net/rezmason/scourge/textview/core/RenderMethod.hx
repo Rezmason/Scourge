@@ -1,11 +1,11 @@
 package net.rezmason.scourge.textview.core;
 
-import nme.display3D.Context3DProgramType;
-import nme.display3D.Program3D;
-import nme.display3D.shaders.Shader;
-import nme.display3D.shaders.ShaderUtils;
-import nme.geom.Matrix3D;
-import nme.geom.Vector3D;
+import flash.display3D.Context3DProgramType;
+import flash.display3D.Program3D;
+import flash.display3D.shaders.Shader;
+import flash.display3D.shaders.ShaderUtils;
+import flash.geom.Matrix3D;
+import flash.geom.Vector3D;
 
 import net.rezmason.scourge.textview.utils.ProgramUtil;
 import net.rezmason.scourge.textview.utils.Types;

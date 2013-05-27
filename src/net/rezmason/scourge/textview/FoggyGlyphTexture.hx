@@ -1,9 +1,9 @@
 package net.rezmason.scourge.textview;
 
-import nme.display.BitmapData;
-import nme.display.BitmapDataChannel;
-import nme.filters.BitmapFilterQuality;
-import nme.filters.GlowFilter;
+import flash.display.BitmapData;
+import flash.display.BitmapDataChannel;
+import flash.filters.BitmapFilterQuality;
+import flash.filters.GlowFilter;
 
 import net.rezmason.scourge.textview.core.GlyphTexture;
 

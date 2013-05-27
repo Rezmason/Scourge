@@ -1,11 +1,11 @@
 package net.rezmason.scourge.textview.rendermethods;
 
-import nme.display3D.Context3DBlendFactor;
-import nme.display3D.Context3DCompareMode;
-import nme.display3D.Context3DProgramType;
-import nme.display3D.Context3DVertexBufferFormat;
-import nme.geom.Matrix3D;
-import nme.Vector;
+import flash.display3D.Context3DBlendFactor;
+import flash.display3D.Context3DCompareMode;
+import flash.display3D.Context3DProgramType;
+import flash.display3D.Context3DVertexBufferFormat;
+import flash.geom.Matrix3D;
+import flash.Vector;
 
 import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;

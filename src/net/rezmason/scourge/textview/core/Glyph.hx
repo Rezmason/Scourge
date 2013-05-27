@@ -1,8 +1,8 @@
 package net.rezmason.scourge.textview.core;
 
-import nme.geom.Matrix3D;
+import flash.geom.Matrix3D;
 import net.rezmason.utils.FatChar;
-import nme.Vector;
+import flash.Vector;
 
 class Glyph {
     public var id:Int;

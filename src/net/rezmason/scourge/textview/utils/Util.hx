@@ -1,23 +1,23 @@
 package net.rezmason.scourge.textview.utils;
 
-import nme.display3D.Context3D;
+import flash.display3D.Context3D;
 
 /**
  *
  *  Here's the full list of Flash-dependent types of these utils:
  *
- *  nme.display.Stage3D;
- *  nme.display3D.Context3D;
- *  nme.display3D.Context3DBlendFactor;
- *  nme.display3D.Context3DCompareMode;
- *  nme.display3D.Context3DProgramType;
- *  nme.display3D.Context3DTextureFormat;
- *  nme.display3D.Context3DVertexBufferFormat;
- *  nme.display3D.IndexBuffer3D;
- *  nme.display3D.Program3D;
- *  nme.display3D.textures.Texture;
- *  nme.display3D.textures.TextureBase;
- *  nme.display3D.VertexBuffer3D;
+ *  flash.display.Stage3D;
+ *  flash.display3D.Context3D;
+ *  flash.display3D.Context3DBlendFactor;
+ *  flash.display3D.Context3DCompareMode;
+ *  flash.display3D.Context3DProgramType;
+ *  flash.display3D.Context3DTextureFormat;
+ *  flash.display3D.Context3DVertexBufferFormat;
+ *  flash.display3D.IndexBuffer3D;
+ *  flash.display3D.Program3D;
+ *  flash.display3D.textures.Texture;
+ *  flash.display3D.textures.TextureBase;
+ *  flash.display3D.VertexBuffer3D;
  **/
 
 class Util {

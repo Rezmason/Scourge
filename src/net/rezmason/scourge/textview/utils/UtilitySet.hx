@@ -1,9 +1,9 @@
 package net.rezmason.scourge.textview.utils;
 
-import nme.display.Stage;
-import nme.display.Stage3D;
-import nme.display3D.Context3D;
-import nme.events.Event;
+import flash.display.Stage;
+import flash.display.Stage3D;
+import flash.display3D.Context3D;
+import flash.events.Event;
 
 class UtilitySet {
 

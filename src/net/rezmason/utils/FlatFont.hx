@@ -1,15 +1,15 @@
 package net.rezmason.utils;
 
-import nme.display.BitmapData;
-import nme.display.BlendMode;
-import nme.display.Sprite;
-import nme.geom.Matrix;
-import nme.geom.Rectangle;
-import nme.text.AntiAliasType;
-import nme.text.Font;
-import nme.text.TextField;
-import nme.text.TextFieldAutoSize;
-import nme.text.TextFormat;
+import flash.display.BitmapData;
+import flash.display.BlendMode;
+import flash.display.Sprite;
+import flash.geom.Matrix;
+import flash.geom.Rectangle;
+import flash.text.AntiAliasType;
+import flash.text.Font;
+import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
+import flash.text.TextFormat;
 
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;

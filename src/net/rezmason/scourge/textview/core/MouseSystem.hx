@@ -1,13 +1,13 @@
 package net.rezmason.scourge.textview.core;
 
-import nme.display.BitmapData;
-import nme.display.Sprite;
-import nme.events.EventDispatcher;
-import nme.events.MouseEvent;
-import nme.geom.Rectangle;
-import nme.utils.ByteArray;
-import nme.Vector;
-import nme.external.ExternalInterface;
+import flash.display.BitmapData;
+import flash.display.Sprite;
+import flash.events.EventDispatcher;
+import flash.events.MouseEvent;
+import flash.geom.Rectangle;
+import flash.utils.ByteArray;
+import flash.Vector;
+import flash.external.ExternalInterface;
 
 typedef InteractFunction = Int->Int->Interaction->Float->Float/*->Float*/->Void;
 
