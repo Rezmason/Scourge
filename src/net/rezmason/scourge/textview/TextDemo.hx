@@ -35,7 +35,6 @@ class TextDemo {
     var views:Array<View>;
     var fonts:Map<String, FlatFont>;
     var fontTextures:Map<String, GlyphTexture>;
-    //var showHideFunc:Void->Void;
     var prettyMethod:RenderMethod;
     var mouseMethod:RenderMethod;
     var text:String;
@@ -47,7 +46,6 @@ class TextDemo {
         this.stage = stage;
         this.fonts = fonts;
         this.text = text;
-        //showHideFunc = hideSomeGlyphs;
 
         utils = new UtilitySet(stage, onCreate);
     }
@@ -208,29 +206,8 @@ class TextDemo {
     }
 
     function onTimer(?event:Event):Void {
-        //if (showHideFunc != null) showHideFunc();
         var timeStamp:Float = HaxeTimer.stamp();
         update(timeStamp - lastTimeStamp);
         lastTimeStamp = timeStamp;
     }
-
-    /*
-    function hideSomeGlyphs():Void {
-        var body:Body = bodies[0];
-        var _glyphs:Array<Glyph> = [];
-        for (ike in 0...1000) _glyphs.push(body.glyphs[Std.random(body.numGlyphs)]);
-        body.toggleGlyphs(_glyphs, false);
-        body.update();
-        if (body.numVisibleGlyphs <= 0) showHideFunc = showSomeGlyphs;
-    }
-
-    function showSomeGlyphs():Void {
-        var body:Body = bodies[0];
-        var _glyphs:Array<Glyph> = [];
-        for (ike in 0...1000) _glyphs.push(body.glyphs[Std.random(body.numGlyphs)]);
-        body.toggleGlyphs(_glyphs, true);
-        body.update();
-        if (body.numVisibleGlyphs >= body.numGlyphs) showHideFunc = hideSomeGlyphs;
-    }
-    */
 }

@@ -30,7 +30,7 @@
 	<!-- <compilerflag name="-debug" /> -->
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 
-	<haxelib name="nme" />
+	<haxelib name="openfl" />
 	<!-- <haxelib name="hxsl" /> -->
 
 	<debug />

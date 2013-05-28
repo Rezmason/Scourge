@@ -1,17 +1,19 @@
 TextView (see file)
-	View elements
+    View elements
 
 Talk to Granick about nme.Vector abstract and BodySegment
 
 Once munit's on haxelib:
-	Use array access for maps in unit tests and models
-    	Remember, you have to use Map constructor. Forget StringMap and IntMap!
-    	Hunt down any other ~/\.(g|s)et\(/g matches
+    Use array access for maps in unit tests and models
+        Remember, you have to use Map constructor. Forget StringMap and IntMap!
+        Hunt down any other ~/\.(g|s)et\(/g matches
+    Switch Pointers to Abstracts?
+        There's operator overloading.
 
 hxsl
-	Modify RenderMethod a little to be based on hxsl.Shader
-	Modify ProgramUtil to use hxsl Shader
-		Change into ShaderUtil
+    Modify RenderMethod a little to be based on hxsl.Shader
+    Modify ProgramUtil to use hxsl Shader
+    Change into ShaderUtil
 
 Console
 Board view
@@ -20,15 +22,15 @@ Piece view
 Finalize ROPES classes
 
 Save states and save testing
-	If the code for a rule changes, the games that used earlier versions of that rule are kind of botched
-		How do other games handle this?
-			http://www.altdevblogaday.com/2011/07/09/synchronous-rts-engines-and-a-tale-of-desyncs
+    If the code for a rule changes, the games that used earlier versions of that rule are kind of botched
+    How do other games handle this?
+    http://www.altdevblogaday.com/2011/07/09/synchronous-rts-engines-and-a-tale-of-desyncs
 
 GDC articles
-	http://www.gamasutra.com/view/news/189266/The_technique_LucasArts_used_to_design_its_classic_adventure_games.php
-	http://www.gamasutra.com/view/news/189251/7_practical_tips_for_making_a_moral_game.php
-	http://www.gamasutra.com/view/news/189345/How_to_use_live_events_to_promote_your_game.php
-	http://www.gamasutra.com/view/news/189353/Designing_without_a_pitch__An_FTL_postmortem.php
+    http://www.gamasutra.com/view/news/189266/The_technique_LucasArts_used_to_design_its_classic_adventure_games.php
+    http://www.gamasutra.com/view/news/189251/7_practical_tips_for_making_a_moral_game.php
+    http://www.gamasutra.com/view/news/189345/How_to_use_live_events_to_promote_your_game.php
+    http://www.gamasutra.com/view/news/189353/Designing_without_a_pitch__An_FTL_postmortem.php
 
 TestPlayer
 HumanPlayer
@@ -39,115 +41,115 @@ Hey, this game is a Roguelike!
     Figure out what solutions they have to UI challenges
 
 Make renderer cross-platform
-	Oh boy...
+    Oh boy...
 
 Checksums
 
 Implement noneuclidean walking and running
 
-	add() function should create heading data
-	walk() and run() functions should operate on heading data
-	heading data should be available after a walk
-	Turtle?
+    add() function should create heading data
+    walk() and run() functions should operate on heading data
+    heading data should be available after a walk
+    Turtle?
 
 Rewrite the eat rule recursion config property to be an Int of depth
-	Rather than being recursive or not recursive at all, let the user specify how many recursive steps to take
+    Rather than being recursive or not recursive at all, let the user specify how many recursive steps to take
 
 And then SPEED EVERYTHING UP
-	Use timing output to find the bottlenecks
-	Lambda.has is expensive - switch to using tables of ids
-	Store useful information, like edges, distance and connectedness values
-		Rules that take advantage of these values would expand a graph from an affected square
-		Just make sure to update this information when it changes
-	Take advantage of linked lists for storing sets of nodes
-	Also, haxe.List might be better than Array in some situations
+    Use timing output to find the bottlenecks
+    Lambda.has is expensive - switch to using tables of ids
+    Store useful information, like edges, distance and connectedness values
+    Rules that take advantage of these values would expand a graph from an affected square
+    Just make sure to update this information when it changes
+    Take advantage of linked lists for storing sets of nodes
+    Also, haxe.List might be better than Array in some situations
 
 ExternalPlayer
 Turn durations
-	Special aspect I suppose
+    Special aspect I suppose
 
 GameView
 
 Coarse evaluation
-	Number of nodes (filled and enclosed)
-	Attribute count (bites and swaps) times attribute range
-	Percentage of nodes that are outer edges!
-	Number of nodes
+    Number of nodes (filled and enclosed)
+    Attribute count (bites and swaps) times attribute range
+    Percentage of nodes that are outer edges!
+    Number of nodes
 
 
 A.I. thoughts
-	Shannon Type B
-		Identify and prune the moves that are just fucking stupid
-			Sort by coarse evaluation
-			Only consider the top N possibilities
-	Alpha-Beta pruning
-		Is this even possible?
-	Fretting
-		aka "Permanent brain"
-		Players technically aren't limited to their turn in order to evaluate the board
+    Shannon Type B
+    Identify and prune the moves that are just fucking stupid
+    Sort by coarse evaluation
+    Only consider the top N possibilities
+    Alpha-Beta pruning
+    Is this even possible?
+    Fretting
+    aka "Permanent brain"
+    Players technically aren't limited to their turn in order to evaluate the board
 
 
 Later
 
-	Rule-Option Paradigm Entity System
-		Create tic tac toe example for ROPES
-		Create readme and license files for ROPES
-		Migrate tests to tic tac toe
-		Move ROPES to a haxe lib
+    Rule-Option Paradigm Entity System
+    Create tic tac toe example for ROPES
+    Create readme and license files for ROPES
+    Migrate tests to tic tac toe
+    Move ROPES to a haxe lib
 
-	Maybe turn nodes into aspects
-		Store their neighbors on them
+    Maybe turn nodes into aspects
+    Store their neighbors on them
 
-	Level Editing
-		Just a bunch of rules, aha
+    Level Editing
+    Just a bunch of rules, aha
 
-	Infinite board
-		Expand board when placing a piece
-		Tough?
+    Infinite board
+    Expand board when placing a piece
+    Tough?
 
-	Destination goal rule
-	Allow goal rules to apply to specific players
+    Destination goal rule
+    Allow goal rules to apply to specific players
 
 
 New UI
 
-	Switch back to MISO font
-	Data indicators
+    Switch back to MISO font
+    Data indicators
 
-	Icons
-	Color Transform
+    Icons
+    Color Transform
 
-	Game board
+    Game board
 
-		Slime
-			Hoo boy
+    Slime
+    Hoo boy
 
-		Piece
-			Piece Panning
-		Bites
-			Bite panning
-		Bite tracks
+    Piece
+    Piece Panning
+    Bites
+    Bite panning
+    Bite tracks
 
-		Player info
-			hover for mouse
-			Press for touch
+    Player info
+    hover for mouse
+    Press for touch
 
-	Touch mode
-		Swipe gesture instead of click for auto expand
-		Press instead of hover for hint
-	Mouse mode
-		Board doesn't zoom for chop
-		No swiping at all?
+    Touch mode
+    Swipe gesture instead of click for auto expand
+    Press instead of hover for hint
+    Mouse mode
+    Board doesn't zoom for chop
+    No swiping at all?
 
 Texture synthesis
-	Dots
-	Stripes
-	Put them on an environmental map
-	Use a shader to map the texture onto a blob! :-)
+    Dots
+    Stripes
+    Put them on an environmental map
+    Use a shader to map the texture onto a blob! :-)
 
 http://code.google.com/p/hxgk/
 
 Game starts as a primer
-	History of game states and commands allows player to better understand how games progress
+    History of game states and commands allows player to better understand how games progress
 
 Contact Jason Whong?
