@@ -1,18 +1,19 @@
 package net.rezmason.scourge.textview.utils;
 
-import flash.display3D.Context3DBlendFactor;
-import flash.display3D.Context3DCompareMode;
-import flash.display3D.Context3DProgramType;
-import flash.display3D.Context3DVertexBufferFormat;
-import flash.display3D.Program3D;
-import flash.display3D.textures.TextureBase;
-import flash.display3D.VertexBuffer3D;
+// import flash.display3D.Context3DBlendFactor;
+// import flash.display3D.Context3DCompareMode;
+// import flash.display3D.Context3DProgramType;
+// import flash.display3D.Context3DVertexBufferFormat;
+// import flash.display3D.Program3D;
+// import flash.display3D.textures.TextureBase;
+// import flash.display3D.VertexBuffer3D;
 import flash.geom.Matrix3D;
 import flash.utils.ByteArray;
 import flash.Vector;
 
 class ProgramUtil extends Util {
 
+    /*
     public function createProgram():Program3D {
         return context.createProgram();
     }
@@ -48,4 +49,5 @@ class ProgramUtil extends Util {
     public function setVertexBufferAt(index:Int, buffer:VertexBuffer3D, ?bufferOffset:Int, ?format:Context3DVertexBufferFormat):Void {
         context.setVertexBufferAt(index, buffer, bufferOffset, format);
     }
+    */
 }

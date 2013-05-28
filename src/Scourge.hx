@@ -37,7 +37,7 @@ class Scourge {
         var str = Assets.getText("assets/acid2.txt");
         //var str = TestStrings.STYLED_TEXT;
 
-        //new net.rezmason.scourge.textview.TextDemo(Lib.current.stage, fonts, str);
+        // new net.rezmason.scourge.textview.TextDemo(Lib.current.stage, fonts, str);
         new net.rezmason.scourge.textview.WebGLFuckBox(Lib.current.stage, fonts, str);
     }
 

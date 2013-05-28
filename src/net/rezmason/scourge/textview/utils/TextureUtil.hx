@@ -1,12 +1,13 @@
 package net.rezmason.scourge.textview.utils;
 
 import flash.display.BitmapData;
-import flash.display3D.Context3DTextureFormat;
-import flash.display3D.textures.Texture;
+// import flash.display3D.Context3DTextureFormat;
+// import flash.display3D.textures.Texture;
 import flash.geom.Matrix;
 
 class TextureUtil extends Util {
 
+    /*
     public function createTexture(src:BitmapData):Texture {
         var size:Int = src.width;
         var texture:Texture = context.createTexture(size, size, Context3DTextureFormat.BGRA, false);
@@ -21,6 +22,7 @@ class TextureUtil extends Util {
 
         return texture;
     }
+    */
 
     inline function getResizedBitmapData(bmp:BitmapData, width:UInt):BitmapData {
         var mat:Matrix = new Matrix();

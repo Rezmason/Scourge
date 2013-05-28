@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.utils;
 
-import flash.display3D.Context3D;
+import openfl.display.OpenGLView;
 
 /**
  *
@@ -21,6 +21,6 @@ import flash.display3D.Context3D;
  **/
 
 class Util {
-    var context:Context3D;
-    public function new(context:Context3D):Void { this.context = context; }
+    var view:OpenGLView;
+    public function new(view:OpenGLView):Void { this.view = view; }
 }

@@ -11,7 +11,7 @@ import flash.geom.Vector3D;
 import flash.utils.Timer;
 import net.rezmason.scourge.textview.core.*;
 // import net.rezmason.scourge.textview.rendermethods.*;
-// import net.rezmason.scourge.textview.utils.UtilitySet;
+import net.rezmason.scourge.textview.utils.UtilitySet;
 import net.rezmason.utils.FlatFont;
 
 import openfl.display.OpenGLView;
@@ -21,6 +21,8 @@ import openfl.gl.GLProgram;
 import openfl.gl.GLShader;
 import openfl.gl.GLUniformLocation;
 import openfl.utils.Float32Array;
+
+import net.rezmason.scourge.textview.nmedemo.NMEDemo;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -44,7 +46,7 @@ class WebGLFuckBox {
     var vertexBuffer:GLBuffer;
     var view:OpenGLView;
 
-    // var utils:UtilitySet;
+    var utils:UtilitySet;
     // var bodies:Array<Body>;
     // var views:Array<View>;
     // var fontTextures:Map<String, GlyphTexture>;
@@ -64,8 +66,7 @@ class WebGLFuckBox {
         this.fonts = fonts;
         this.text = text;
 
-        //utils = new UtilitySet(stage, onCreate);
-        onCreate(); // !
+        utils = new UtilitySet(stage, onCreate);
     }
 
     function onCreate():Void {
@@ -128,25 +129,7 @@ class WebGLFuckBox {
         views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
 
-        if (OpenGLView.isSupported) {
-            view = new OpenGLView();
-            createProgram();
-
-            var vertices:Array<Float> = [
-                100, 100, 0,
-                -100, 100, 0,
-                100, -100, 0,
-                -100, -100, 0
-            ];
-
-            vertexBuffer = GL.createBuffer();
-            GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-            GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(cast vertices), GL.STATIC_DRAW);
-            view.render = renderView;
-            stage.addChild(view);
-        } else {
-            trace("OpenGLView isn't supported.");
-        }
+        new NMEDemo(stage);
     }
 
     function addListeners():Void {
@@ -157,61 +140,11 @@ class WebGLFuckBox {
         // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
-    function createProgram():Void {
-        var vertexShaderSource:String =
-        "
-            attribute vec3 vertexPosition;
-            uniform mat4 modelViewMatrix;
-            uniform mat4 projectionMatrix;
-            void main(void) {
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(vertexPosition, 1.0);
-            }
-        ";
-
-        var vertexShader:GLShader = GL.createShader(GL.VERTEX_SHADER);
-
-        GL.shaderSource(vertexShader, vertexShaderSource);
-        GL.compileShader(vertexShader);
-
-        if (GL.getShaderParameter(vertexShader, GL.COMPILE_STATUS) == 0) {
-            throw "Error compiling vertex shader";
-        }
-
-        var fragmentShaderSource:String =
-        "
-            void main(void) {
-                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-            }
-        ";
-
-        var fragmentShader:GLShader = GL.createShader(GL.FRAGMENT_SHADER);
-
-        GL.shaderSource(fragmentShader, fragmentShaderSource);
-        GL.compileShader(fragmentShader);
-
-        if (GL.getShaderParameter(fragmentShader, GL.COMPILE_STATUS) == 0) {
-            throw "Error compiling fragment shader";
-        }
-
-        shaderProgram = GL.createProgram();
-        GL.attachShader(shaderProgram, vertexShader);
-        GL.attachShader(shaderProgram, fragmentShader);
-        GL.linkProgram(shaderProgram);
-
-        if (GL.getProgramParameter(shaderProgram, GL.LINK_STATUS) == 0) {
-            throw "Unable to initialize the shader program.";
-        }
-
-        GL.useProgram(shaderProgram);
-        vertexAttribute = GL.getAttribLocation(shaderProgram, "vertexPosition");
-        GL.enableVertexAttribArray(vertexAttribute);
-    }
-
     function renderView(rect:Rectangle):Void {
         if (this.rect == null || !rect.equals(this.rect)) {
             this.rect = rect;
             onResize();
-            doStuff();
+            onEnterFrame();
         }
     }
 
@@ -315,29 +248,5 @@ class WebGLFuckBox {
 
     function onEnterFrame(?event:Event):Void {
         // renderer.render(bodies, prettyMethod, RenderDestination.SCREEN);
-        doStuff();
     }
-
-    function doStuff():Void {
-
-        GL.viewport(Std.int(rect.x), Std.int(rect.y), Std.int(rect.width), Std.int(rect.height));
-        GL.clearColor(0, 0, 0, 1.0);
-        GL.clear(GL.COLOR_BUFFER_BIT);
-
-        var positionX:Float = rect.width / 2;
-        var positionY:Float = rect.height / 2;
-        var projectionMatrix:Matrix3D = Matrix3D.createOrtho(0, rect.width, rect.height, 0, 1000, -1000);
-        var modelViewMatrix:Matrix3D = Matrix3D.create2D(positionX, positionY, 1, 0);
-
-        GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-        GL.vertexAttribPointer(vertexAttribute, 3, GL.FLOAT, false, 0, 0);
-
-        var projectionMatrixUniform:GLUniformLocation = GL.getUniformLocation(shaderProgram, "projectionMatrix");
-        var modelViewMatrixUniform:GLUniformLocation = GL.getUniformLocation(shaderProgram, "modelViewMatrix");
-
-        GL.uniformMatrix3D(projectionMatrixUniform, false, projectionMatrix);
-        GL.uniformMatrix3D(modelViewMatrixUniform, false, modelViewMatrix);
-        GL.drawArrays(GL.TRIANGLE_STRIP, 0, 4);
-    }
-
 }

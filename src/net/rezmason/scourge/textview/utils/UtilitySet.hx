@@ -1,15 +1,9 @@
 package net.rezmason.scourge.textview.utils;
 
 import flash.display.Stage;
-import flash.display.Stage3D;
-import flash.display3D.Context3D;
-import flash.events.Event;
+import openfl.display.OpenGLView;
 
 class UtilitySet {
-
-    var stage3D:Stage3D;
-    var context:Context3D;
-    var cbk:Void->Void;
 
     public var textureUtil(default, null):TextureUtil;
     public var drawUtil(default, null):DrawUtil;
@@ -17,35 +11,23 @@ class UtilitySet {
     public var bufferUtil(default, null):BufferUtil;
 
     public function new(stage:Stage, cbk:Void->Void):Void {
-        this.cbk = cbk;
 
-        #if flash
-            stage3D = stage.stage3Ds[0];
-        #else
-            stage3D = new Stage3D();
-        #end
+        var view:OpenGLView;
 
-        if (stage3D.context3D != null) {
-            onCreate();
+        if (OpenGLView.isSupported) {
+            view = new OpenGLView();
+            stage.addChildAt(view, 0);
+
+            textureUtil = new TextureUtil(view);
+            drawUtil = new DrawUtil(view);
+            programUtil = new ProgramUtil(view);
+            bufferUtil = new BufferUtil(view);
+
+            cbk();
+
         } else {
-            stage3D.addEventListener(Event.CONTEXT3D_CREATE, onCreate);
-            stage3D.requestContext3D();
+            trace("OpenGLView isn't supported.");
         }
-    }
-
-    function onCreate(?event:Event):Void {
-        stage3D.removeEventListener(Event.CONTEXT3D_CREATE, onCreate);
-        context = stage3D.context3D;
-
-        var cbk:Void->Void = this.cbk;
-        this.cbk = null;
-
-        textureUtil = new TextureUtil(context);
-        drawUtil = new DrawUtil(context);
-        programUtil = new ProgramUtil(context);
-        bufferUtil = new BufferUtil(context);
-
-        cbk();
     }
 
 }

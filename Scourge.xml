@@ -41,11 +41,11 @@
 	<assets path="assets" include="enterprise.txt"/>
 	<assets path="assets" include="acid2.txt"/>
 
-	<ndll name="std" />
-	<ndll name="regexp" />
+	<!-- <ndll name="std" /> -->
+	<!-- <ndll name="regexp" /> -->
 	<!-- <ndll name="zlib" /> -->
-	<ndll name="nme" haxelib="nme" />
+	<!-- <ndll name="nme" haxelib="nme" /> -->
 
-	<icon path="Assets/nme.svg" />
+	<!-- <icon path="Assets/nme.svg" /> -->
 
 </project>

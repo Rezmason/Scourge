@@ -1,11 +1,28 @@
 package net.rezmason.scourge.textview.utils;
 
 import flash.display.BitmapData;
-import flash.display3D.IndexBuffer3D;
+// import flash.display3D.IndexBuffer3D;
 import flash.geom.Rectangle;
+
+import openfl.display.OpenGLView;
+
+using Lambda;
 
 class DrawUtil extends Util {
 
+    var renderCalls:Array<Rectangle->Void>;
+
+    public function new(view:OpenGLView):Void {
+        super(view);
+        //view.render = onRender;
+        renderCalls = [];
+    }
+
+    public function addRenderCall(func:Rectangle->Void):Void { renderCalls.push(func); }
+
+    public function removeRenderCall(func:Rectangle->Void):Void { renderCalls.remove(func); }
+
+    /*
     public function resize(width:Int, height:Int):Void {
         context.configureBackBuffer(width, height, 2, true);
     }
@@ -31,6 +48,11 @@ class DrawUtil extends Util {
 
     public function drawToBitmapData(destination:BitmapData):Void {
         context.drawToBitmapData(destination);
+    }
+    */
+
+    function onRender(rect:Rectangle):Void {
+        for (func in renderCalls) func(rect);
     }
 
 }
