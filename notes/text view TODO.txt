@@ -1,5 +1,6 @@
 OpenFL
     Mac target isn't rendering properly
+        Scissor rects are throwing it off (currently disabled in renderer)
     Stop making so many Float32Arrays
     Readback in separate buffer
     Style sigils and Utf8

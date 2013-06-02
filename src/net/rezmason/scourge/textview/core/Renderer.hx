@@ -30,7 +30,7 @@ class Renderer {
         }
     }
 
-    public function render(bodies:Array<Body>, method:RenderMethod, dest:RenderDestination, clear:Bool = true):Void {
+    public function render(bodies:Array<Body>, method:RenderMethod, dest:RenderDestination):Void {
 
         if (method == null) {
             trace("Null method.");
@@ -47,7 +47,7 @@ class Renderer {
 
         for (body in bodies) {
             if (body.numGlyphs == 0) continue;
-            drawUtil.setScissorRectangle(body.scissorRectangle);
+            // drawUtil.setScissorRectangle(body.scissorRectangle);
             method.setMatrices(body.camera, body.transform);
             method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
 
