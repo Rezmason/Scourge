@@ -12,15 +12,8 @@ import flash.utils.Timer;
 import net.rezmason.scourge.textview.core.*;
 import net.rezmason.scourge.textview.rendermethods.*;
 import net.rezmason.scourge.textview.utils.UtilitySet;
+import net.rezmason.scourge.textview.core.Types;
 import net.rezmason.utils.FlatFont;
-
-import openfl.display.OpenGLView;
-import openfl.gl.GL;
-import openfl.gl.GLBuffer;
-import openfl.gl.GLProgram;
-import openfl.gl.GLShader;
-import openfl.gl.GLUniformLocation;
-import openfl.utils.Float32Array;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -40,10 +33,6 @@ class TextDemo {
     var text:String;
 
     var fonts:Map<String, FlatFont>;
-    var shaderProgram:GLProgram;
-    var vertexAttribute:Int;
-    var vertexBuffer:GLBuffer;
-    var view:OpenGLView;
 
     var utils:UtilitySet;
     var bodies:Array<Body>;
@@ -99,13 +88,13 @@ class TextDemo {
         var _id:Int = 0;
         views = [];
 
-        //*
+        /*
         testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
         /**/
 
-        //*
+        /*
         uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(uiBody);
 
@@ -128,8 +117,8 @@ class TextDemo {
         views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
 
-        utils.drawUtil.addRenderCall(onRender);
-        // utils.drawUtil.addRenderCall(new NMEDemo(utils, fontTextures["full"]).render);
+        // utils.drawUtil.addRenderCall(onRender);
+        utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures["full"]).render);
     }
 
     function addListeners():Void {

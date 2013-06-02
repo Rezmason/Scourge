@@ -18,7 +18,7 @@ class Body {
     public var glyphTexture(default, null):GlyphTexture;
     public var scissorRectangle(default, null):Rectangle;
     public var numSegments(default, null):Int;
-    public var crop:Bool;
+    public var crop(default, set):Bool;
     public var letterbox:Bool;
 
     var redrawHitAreas:Void->Void;
@@ -83,16 +83,11 @@ class Body {
 
         rect = sanitizeLayoutRect(stageWidth, stageHeight, rect);
 
-        if (crop) {
+        if (scissorRectangle != null) {
             scissorRectangle.x = rect.x * stageWidth;
             scissorRectangle.y = rect.y * stageHeight;
             scissorRectangle.width  = rect.width  * stageWidth;
             scissorRectangle.height = rect.height * stageHeight;
-        } else {
-            scissorRectangle.x = 0;
-            scissorRectangle.y = 0;
-            scissorRectangle.width  = stageWidth;
-            scissorRectangle.height = stageHeight;
         }
 
         var cameraRect:Rectangle = rect.clone();
@@ -171,6 +166,12 @@ class Body {
         rawData[15] =  0;
         mat.rawData = rawData;
         return mat;
+    }
+
+    inline function set_crop(val:Bool):Bool {
+        if (crop != val) scissorRectangle = val ? new Rectangle() : null;
+        crop = val;
+        return crop;
     }
 
 }

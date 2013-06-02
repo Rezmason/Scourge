@@ -1,8 +1,6 @@
 package net.rezmason.scourge.textview.rendermethods;
 
 import flash.geom.Matrix3D;
-import openfl.gl.GLUniformLocation;
-// import openfl.utils.Float32Array;
 
 import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
@@ -11,48 +9,44 @@ import net.rezmason.scourge.textview.core.Types;
 
 class PrettyMethod extends RenderMethod {
 
-    var posLoc:Int;
-    var cornerLoc:Int;
-    var scaleLoc:Int;
-    var popLoc:Int;
-    var colorLoc:Int;
-    var textureLoc:Int;
-    var vidLoc:Int;
-    var uCameraMat:GLUniformLocation;
-    var uGlyphMat:GLUniformLocation;
-    var uBodyMat:GLUniformLocation;
-    var uSampler:GLUniformLocation;
-    // var uCrap:GLUniformLocation;
+    var aPos:Int;
+    var aCorner:Int;
+    var aScale:Int;
+    var aPop:Int;
+    var aColor:Int;
+    var aUV:Int;
+    var aVid:Int;
+    var uCameraMat:UniformLocation;
+    var uGlyphMat:UniformLocation;
+    var uBodyMat:UniformLocation;
+    var uSampler:UniformLocation;
 
     override public function activate():Void {
         programUtil.setProgram(program);
         programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         programUtil.setBlending(true);
         programUtil.setDepthTest(false);
-
-        // TODO: these constants should go in the GLSL
-        // programUtil.setProgramConstantsFromVector(uCrap, new Float32Array([2,0.3,0,0])); // uCrap contains 2, 0.3
     }
 
     override public function deactivate():Void {
-        programUtil.setVertexBufferAt(posLoc,     null, 0, 3);
-        programUtil.setVertexBufferAt(cornerLoc,  null, 3, 2);
-        programUtil.setVertexBufferAt(scaleLoc,   null, 5, 1);
-        programUtil.setVertexBufferAt(popLoc,     null, 6, 1);
-        programUtil.setVertexBufferAt(colorLoc,   null, 0, 3);
-        programUtil.setVertexBufferAt(textureLoc, null, 3, 2);
-        programUtil.setVertexBufferAt(vidLoc,     null, 5, 1);
+        programUtil.setVertexBufferAt(aPos,     null, 0, 3);
+        programUtil.setVertexBufferAt(aCorner,  null, 3, 2);
+        programUtil.setVertexBufferAt(aScale,   null, 5, 1);
+        programUtil.setVertexBufferAt(aPop,     null, 6, 1);
+        programUtil.setVertexBufferAt(aColor,   null, 0, 3);
+        programUtil.setVertexBufferAt(aUV,      null, 3, 2);
+        programUtil.setVertexBufferAt(aVid,     null, 5, 1);
     }
 
     override function composeShaders():Void {
         vertShader = '
-            attribute vec3 posLoc;
-            attribute vec2 cornerLoc;
-            attribute float scaleLoc;
-            attribute float popLoc;
-            attribute vec3 colorLoc;
-            attribute vec2 textureLoc;
-            attribute float vidLoc;
+            attribute vec3 aPos;
+            attribute vec2 aCorner;
+            attribute float aScale;
+            attribute float aPop;
+            attribute vec3 aColor;
+            attribute vec2 aUV;
+            attribute float aVid;
 
             uniform mat4 uCameraMat;
             uniform mat4 uGlyphMat;
@@ -64,14 +58,14 @@ class PrettyMethod extends RenderMethod {
             varying float vZ;
 
             void main(void) {
-                vec4 pos = uBodyMat * vec4(posLoc, 1.0);
-                pos.z += popLoc;
+                vec4 pos = uBodyMat * vec4(aPos, 1.0);
+                pos.z += aPop;
                 pos = uCameraMat * pos;
-                pos.xy += (uGlyphMat * vec4(cornerLoc, 1.0, 1.0)).xy * scaleLoc;
+                pos.xy += (uGlyphMat * vec4(aCorner, 1.0, 1.0)).xy * aScale;
 
-                vColor = colorLoc;
-                vUV = textureLoc;
-                vVid = vidLoc;
+                vColor = aColor;
+                vUV = aUV;
+                vVid = aVid;
                 vZ = pos.z;
 
                 pos.z = clamp(pos.z, 0.0, 1.0);
@@ -98,19 +92,18 @@ class PrettyMethod extends RenderMethod {
     }
 
     override function connectToShaders():Void {
-        posLoc     = program.getAttribLocation('posLoc');
-        cornerLoc  = program.getAttribLocation('cornerLoc');
-        scaleLoc   = program.getAttribLocation('scaleLoc');
-        popLoc     = program.getAttribLocation('popLoc');
-        colorLoc   = program.getAttribLocation('colorLoc');
-        textureLoc = program.getAttribLocation('textureLoc');
-        vidLoc     = program.getAttribLocation('vidLoc');
+        aPos     = program.getAttribLocation('aPos');
+        aCorner  = program.getAttribLocation('aCorner');
+        aScale   = program.getAttribLocation('aScale');
+        aPop     = program.getAttribLocation('aPop');
+        aColor   = program.getAttribLocation('aColor');
+        aUV = program.getAttribLocation('aUV');
+        aVid     = program.getAttribLocation('aVid');
 
         uCameraMat = program.getUniformLocation('uCameraMat');
         uGlyphMat = program.getUniformLocation('uGlyphMat');
         uBodyMat = program.getUniformLocation('uBodyMat');
         uSampler = program.getUniformLocation('uSampler');
-        // uCrap = program.getUniformLocation('uCrap');
     }
 
     override public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
@@ -125,13 +118,13 @@ class PrettyMethod extends RenderMethod {
     }
 
     override public function setSegment(segment:BodySegment):Void {
-        programUtil.setVertexBufferAt(posLoc,     segment.shapeBuffer, 0, 3); // posLoc contains x,y,z
-        programUtil.setVertexBufferAt(cornerLoc,  segment.shapeBuffer, 3, 2); // cornerLoc contains h,v
-        programUtil.setVertexBufferAt(scaleLoc,   segment.shapeBuffer, 5, 1); // scaleLoc contains s
-        programUtil.setVertexBufferAt(popLoc,     segment.shapeBuffer, 6, 1); // popLoc contains p
-        programUtil.setVertexBufferAt(colorLoc,   segment.colorBuffer, 0, 3); // colorLoc contains r,g,b
-        programUtil.setVertexBufferAt(textureLoc, segment.colorBuffer, 3, 2); // textureLoc contains u,v
-        programUtil.setVertexBufferAt(vidLoc,     segment.colorBuffer, 5, 1); // vidLoc contains i
+        programUtil.setVertexBufferAt(aPos,     segment.shapeBuffer, 0, 3); // aPos contains x,y,z
+        programUtil.setVertexBufferAt(aCorner,  segment.shapeBuffer, 3, 2); // aCorner contains h,v
+        programUtil.setVertexBufferAt(aScale,   segment.shapeBuffer, 5, 1); // aScale contains s
+        programUtil.setVertexBufferAt(aPop,     segment.shapeBuffer, 6, 1); // aPop contains p
+        programUtil.setVertexBufferAt(aColor,   segment.colorBuffer, 0, 3); // aColor contains r,g,b
+        programUtil.setVertexBufferAt(aUV,      segment.colorBuffer, 3, 2); // aUV contains u,v
+        programUtil.setVertexBufferAt(aVid,     segment.colorBuffer, 5, 1); // aVid contains i
     }
 }
 

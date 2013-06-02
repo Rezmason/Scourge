@@ -73,6 +73,8 @@ class BlendFactor {
     public static inline var SRC_ALPHA_SATURATE     = GL.SRC_ALPHA_SATURATE;
 }
 
+typedef UniformLocation = GLUniformLocation;
+
 #if js
     typedef ReadbackData = UInt8Array;
 #else

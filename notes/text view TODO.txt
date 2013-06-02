@@ -1,5 +1,10 @@
 OpenFL
+    Mac target isn't rendering properly
+    Stop making so many Float32Arrays
     Readback in separate buffer
+    Style sigils and Utf8
+
+    Mac target: resizing window and calling GL.drawElements crashes
 
 UI object
 

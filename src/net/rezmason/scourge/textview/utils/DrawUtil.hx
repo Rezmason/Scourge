@@ -28,6 +28,8 @@ class DrawUtil extends Util {
     }
 
     public inline function clear(color:Int = 0x0, alpha:Float = 1):Void {
+        setScissorRectangle(null);
+
         var red:Float   = ((color >> 16) & 0xFF) / 0xFF;
         var green:Float = ((color >>  8) & 0xFF) / 0xFF;
         var blue:Float  = ((color >>  0) & 0xFF) / 0xFF;

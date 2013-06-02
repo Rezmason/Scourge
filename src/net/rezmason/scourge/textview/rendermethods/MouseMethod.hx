@@ -1,7 +1,6 @@
 package net.rezmason.scourge.textview.rendermethods;
 
 import flash.geom.Matrix3D;
-import openfl.gl.GLUniformLocation;
 
 import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
@@ -12,12 +11,12 @@ class MouseMethod extends RenderMethod {
 
     //inline static var FAT_FINGERS:Float = 2; // TODO: Fat finger support needs to wait till we can z-order buttons
 
-    var posLoc:Int;
-    var cornerLoc:Int;
-    var paintLoc:Int;
-    var uCameraMat:GLUniformLocation;
-    var uGlyphMat:GLUniformLocation;
-    var uBodyMat:GLUniformLocation;
+    var aPos:Int;
+    var aCorner:Int;
+    var aPaint:Int;
+    var uCameraMat:UniformLocation;
+    var uGlyphMat:UniformLocation;
+    var uBodyMat:UniformLocation;
 
     override public function activate():Void {
         programUtil.setProgram(program);
@@ -26,9 +25,9 @@ class MouseMethod extends RenderMethod {
     }
 
     override public function deactivate():Void {
-        programUtil.setVertexBufferAt(posLoc,    null, 0, 3);
-        programUtil.setVertexBufferAt(cornerLoc, null, 3, 2);
-        programUtil.setVertexBufferAt(paintLoc,  null, 0, 3);
+        programUtil.setVertexBufferAt(aPos,    null, 0, 3);
+        programUtil.setVertexBufferAt(aCorner, null, 3, 2);
+        programUtil.setVertexBufferAt(aPaint,  null, 0, 3);
     }
 
     override function init():Void {
@@ -39,9 +38,9 @@ class MouseMethod extends RenderMethod {
 
     override function composeShaders():Void {
         vertShader = '
-            attribute vec3 posLoc;
-            attribute vec2 cornerLoc;
-            attribute vec3 paintLoc;
+            attribute vec3 aPos;
+            attribute vec2 aCorner;
+            attribute vec3 aPaint;
 
             uniform mat4 uCameraMat;
             uniform mat4 uGlyphMat;
@@ -51,10 +50,10 @@ class MouseMethod extends RenderMethod {
 
             void main(void) {
 
-                vPaint = vec4(paintLoc, 1.0);
+                vPaint = vec4(aPaint, 1.0);
 
-                vec4 pos = uCameraMat * uBodyMat * vec4(posLoc, 1.0);
-                pos.xy += (uGlyphMat * vec4(cornerLoc, 1.0, 1.0)).xy;
+                vec4 pos = uCameraMat * uBodyMat * vec4(aPos, 1.0);
+                pos.xy += (uGlyphMat * vec4(aCorner, 1.0, 1.0)).xy;
 
                 gl_Position = pos;
             }
@@ -72,9 +71,9 @@ class MouseMethod extends RenderMethod {
     }
 
     override function connectToShaders():Void {
-        posLoc     = program.getAttribLocation('posLoc');
-        cornerLoc  = program.getAttribLocation('cornerLoc');
-        paintLoc   = program.getAttribLocation('paintLoc');
+        aPos     = program.getAttribLocation('aPos');
+        aCorner  = program.getAttribLocation('aCorner');
+        aPaint   = program.getAttribLocation('aPaint');
 
         uCameraMat = program.getUniformLocation('uCameraMat');
         uGlyphMat  = program.getUniformLocation('uGlyphMat');
@@ -92,9 +91,9 @@ class MouseMethod extends RenderMethod {
     }
 
     override public function setSegment(segment:BodySegment):Void {
-        programUtil.setVertexBufferAt(posLoc,    segment.shapeBuffer, 0, 3);
-        programUtil.setVertexBufferAt(cornerLoc, segment.shapeBuffer, 3, 2);
-        programUtil.setVertexBufferAt(paintLoc,  segment.paintBuffer, 0, 3);
+        programUtil.setVertexBufferAt(aPos,    segment.shapeBuffer, 0, 3);
+        programUtil.setVertexBufferAt(aCorner, segment.shapeBuffer, 3, 2);
+        programUtil.setVertexBufferAt(aPaint,  segment.paintBuffer, 0, 3);
     }
 }
 
