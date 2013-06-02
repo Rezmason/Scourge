@@ -1,11 +1,12 @@
-OpenFL
-    Mac target isn't rendering properly
-        Scissor rects are throwing it off (currently disabled in renderer)
-    Stop making so many Float32Arrays
-    Readback in separate buffer
-    Style sigils and Utf8
+Readback in separate buffer
 
-    Mac target: resizing window and calling GL.drawElements crashes
+OpenFL native targets
+    Stop making so many Float32Arrays?
+        Something's slowing the Mac client down, that's for sure
+    Style sigils and Utf8
+    resizing window and calling GL.drawElements crashes
+    no blending?
+    no readPixels
 
 UI object
 

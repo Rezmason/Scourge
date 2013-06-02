@@ -28,23 +28,12 @@ class DrawUtil extends Util {
     }
 
     public inline function clear(color:Int = 0x0, alpha:Float = 1):Void {
-        setScissorRectangle(null);
-
         var red:Float   = ((color >> 16) & 0xFF) / 0xFF;
         var green:Float = ((color >>  8) & 0xFF) / 0xFF;
         var blue:Float  = ((color >>  0) & 0xFF) / 0xFF;
 
         GL.clearColor(red, green, blue, alpha);
         GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-    }
-
-    public inline function setScissorRectangle(rectangle:Rectangle):Void {
-        if (rectangle != null) {
-            GL.scissor(Std.int(rectangle.x), Std.int(rectangle.y), Std.int(rectangle.width), Std.int(rectangle.height));
-            GL.enable(GL.SCISSOR_TEST);
-        } else {
-            GL.disable(GL.SCISSOR_TEST);
-        }
     }
 
     public inline function drawTriangles(indexBuffer:IndexBuffer, firstIndex:Int = 0, numTriangles:Int = 0):Void {

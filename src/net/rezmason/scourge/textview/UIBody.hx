@@ -18,7 +18,7 @@ class UIBody extends Body {
 
     inline static var glideEase:Float = 0.6;
     inline static var NATIVE_DPI:Float = 72;
-    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 18;
+    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 12;
 
     inline static var LINE_TOKEN:String = "ª÷º";
 
@@ -58,7 +58,6 @@ class UIBody extends Body {
         baseTransform.appendScale(1, -1, 1);
 
         letterbox = false;
-        crop = false;
 
         glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * Capabilities.screenDPI / NATIVE_DPI;
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;

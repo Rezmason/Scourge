@@ -16,9 +16,7 @@ class Body {
     public var numGlyphs(default, null):Int;
     public var numVisibleGlyphs(default, null):Int;
     public var glyphTexture(default, null):GlyphTexture;
-    public var scissorRectangle(default, null):Rectangle;
     public var numSegments(default, null):Int;
-    public var crop(default, set):Bool;
     public var letterbox:Bool;
 
     var redrawHitAreas:Void->Void;
@@ -32,7 +30,6 @@ class Body {
         this.id = id;
         this.bufferUtil = bufferUtil;
         this.redrawHitAreas = redrawHitAreas;
-        crop = true;
         letterbox = true;
         this.glyphTexture = glyphTexture;
         glyphs = [];
@@ -49,7 +46,6 @@ class Body {
         camera = new Matrix3D();
         glyphTransform = new Matrix3D();
         glyphTransform.appendScale(0.0001, 0.0001, 1); // Prevents blowouts
-        scissorRectangle = new Rectangle();
     }
 
     function init():Void {
@@ -82,13 +78,6 @@ class Body {
     public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
 
         rect = sanitizeLayoutRect(stageWidth, stageHeight, rect);
-
-        if (scissorRectangle != null) {
-            scissorRectangle.x = rect.x * stageWidth;
-            scissorRectangle.y = rect.y * stageHeight;
-            scissorRectangle.width  = rect.width  * stageWidth;
-            scissorRectangle.height = rect.height * stageHeight;
-        }
 
         var cameraRect:Rectangle = rect.clone();
         cameraRect.offset(-0.5, -0.5);
@@ -167,11 +156,4 @@ class Body {
         mat.rawData = rawData;
         return mat;
     }
-
-    inline function set_crop(val:Bool):Bool {
-        if (crop != val) scissorRectangle = val ? new Rectangle() : null;
-        crop = val;
-        return crop;
-    }
-
 }

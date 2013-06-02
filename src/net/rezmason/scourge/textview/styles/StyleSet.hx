@@ -1,5 +1,7 @@
 package net.rezmason.scourge.textview.styles;
 
+import haxe.Utf8;
+
 using haxe.JSON;
 using Lambda;
 using Type;
@@ -31,6 +33,7 @@ class StyleSet {
     }
 
     public function extractFromText(input:String, defaultStyle:Style = null):String {
+
         if (defaultStyle == null) defaultStyle = cleanStyle;
         defaultStyle.removeAllGlyphs();
         defaultStyle.flatten();

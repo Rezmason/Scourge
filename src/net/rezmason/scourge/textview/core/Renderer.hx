@@ -47,7 +47,6 @@ class Renderer {
 
         for (body in bodies) {
             if (body.numGlyphs == 0) continue;
-            // drawUtil.setScissorRectangle(body.scissorRectangle);
             method.setMatrices(body.camera, body.transform);
             method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
 

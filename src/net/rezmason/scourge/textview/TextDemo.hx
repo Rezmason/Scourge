@@ -44,6 +44,8 @@ class TextDemo {
     var prettyMethod:RenderMethod;
     var renderer:Renderer;
 
+    var hitAreasInvalid:Bool;
+
     var splashBody:Body;
     var testBody:TestBody;
     var uiBody:UIBody;
@@ -88,13 +90,13 @@ class TextDemo {
         var _id:Int = 0;
         views = [];
 
-        /*
+        //*
         testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
         /**/
 
-        /*
+        //*
         uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(uiBody);
 
@@ -117,8 +119,8 @@ class TextDemo {
         views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
 
-        // utils.drawUtil.addRenderCall(onRender);
-        utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures["full"]).render);
+        utils.drawUtil.addRenderCall(onRender);
+        // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures["full"]).render);
     }
 
     function addListeners():Void {
@@ -126,7 +128,7 @@ class TextDemo {
         stage.addEventListener(Event.ACTIVATE, onActivate);
         stage.addEventListener(Event.DEACTIVATE, onDeactivate);
 
-        mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
+        // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
     function onRender(width:Int, height:Int):Void {
@@ -134,7 +136,15 @@ class TextDemo {
             this.width = width;
             this.height = height;
             onResize();
-            onEnterFrame();
+        }
+
+        if (active) {
+            if (hitAreasInvalid) {
+                renderer.render(bodies, mouseMethod, RenderDestination.MOUSE);
+                hitAreasInvalid = false;
+            }
+
+            renderer.render(bodies, prettyMethod, RenderDestination.SCREEN);
         }
     }
 
@@ -155,14 +165,12 @@ class TextDemo {
         if (active) return;
         active = true;
 
-        stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
         updateTimer.addEventListener(TimerEvent.TIMER, onTimer);
         lastTimeStamp = HaxeTimer.stamp();
         updateTimer.start();
         onResize();
         onTimer();
-        onEnterFrame();
-        renderer.render(bodies, mouseMethod, RenderDestination.MOUSE);
+        redrawHitAreas();
     }
 
     function onDeactivate(?event:Event):Void {
@@ -171,7 +179,6 @@ class TextDemo {
 
         updateTimer.removeEventListener(TimerEvent.TIMER, onTimer);
         updateTimer.stop();
-        stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
     }
 
     function onTimer(?event:Event):Void {
@@ -181,8 +188,7 @@ class TextDemo {
     }
 
     function redrawHitAreas():Void {
-        update(0);
-        renderer.render(bodies, mouseMethod, RenderDestination.MOUSE);
+        hitAreasInvalid = true;
     }
 
     function onMouseViewClick(?event:Event):Void {
@@ -238,9 +244,5 @@ class TextDemo {
         var x:Float = (stageX / stage.stageWidth  - view.rect.x) / view.rect.width;
         var y:Float = (stageY / stage.stageHeight - view.rect.y) / view.rect.height;
         view.body.interact(glyphID, interaction, x, y); // , delta
-    }
-
-    function onEnterFrame(?event:Event):Void {
-        renderer.render(bodies, prettyMethod, RenderDestination.SCREEN);
     }
 }
