@@ -43,6 +43,7 @@ class TextDemo {
     var mouseMethod:RenderMethod;
     var prettyMethod:RenderMethod;
     var renderer:Renderer;
+    var mainOutputBuffer:OutputBuffer;
 
     var hitAreasInvalid:Bool;
 
@@ -65,9 +66,10 @@ class TextDemo {
         makeFontTextures();
         container = new Sprite();
         stage.addChild(container);
-        mouseSystem = new MouseSystem(stage, interact);
+        mouseSystem = new MouseSystem(utils.drawUtil, stage, interact);
         // container.addChild(mouseSystem.view);
-        renderer = new Renderer(utils.drawUtil, mouseSystem);
+        renderer = new Renderer(utils.drawUtil);
+        mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         prettyMethod = new PrettyMethod(utils.programUtil);
         mouseMethod = new MouseMethod(utils.programUtil);
         updateTimer = new Timer(1000 / 30);
@@ -140,25 +142,30 @@ class TextDemo {
 
         if (active) {
             if (hitAreasInvalid) {
-                renderer.render(bodies, mouseMethod, RenderDestination.MOUSE);
+                renderer.render(bodies, mouseMethod, mouseSystem.outputBuffer);
+                mouseSystem.readOutputBuffer();
                 hitAreasInvalid = false;
             }
 
-            renderer.render(bodies, prettyMethod, RenderDestination.SCREEN);
+            renderer.render(bodies, prettyMethod, mainOutputBuffer);
         }
     }
 
     function onResize(?event:Event):Void {
+        var width:Int = stage.stageWidth;
+        var height:Int = stage.stageHeight;
+
         #if js
-            stage.width = stage.stageWidth;
-            stage.height = stage.stageHeight;
+            stage.width = width;
+            stage.height = height;
             container.scaleX = 1 / stage.scaleX;
             container.scaleY = 1 / stage.scaleY;
         #end
 
-        for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
-        mouseSystem.setSize(stage.stageWidth, stage.stageHeight);
-        renderer.setSize(stage.stageWidth, stage.stageHeight);
+        for (view in views) view.body.adjustLayout(width, height, view.rect);
+        mouseSystem.setSize(width, height);
+        mainOutputBuffer.resize(width, height);
+        redrawHitAreas();
     }
 
     function onActivate(?event:Event):Void {

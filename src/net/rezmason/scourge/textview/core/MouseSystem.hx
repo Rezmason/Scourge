@@ -10,6 +10,7 @@ import flash.utils.ByteArray;
 import flash.Vector;
 import flash.external.ExternalInterface;
 
+import net.rezmason.scourge.textview.utils.DrawUtil;
 import net.rezmason.scourge.textview.core.Types;
 
 typedef InteractFunction = Int->Int->Interaction->Float->Float/*->Float*/->Void;
@@ -18,8 +19,9 @@ class MouseSystem {
 
     inline static var NULL_ID:Int = -1;
 
-    public var data:ReadbackData;
+    public var outputBuffer(default, null):OutputBuffer;
     public var view(get, null):Sprite;
+    var data:ReadbackData;
     var bitmapData:BitmapData;
     var _view:MouseView;
 
@@ -29,11 +31,13 @@ class MouseSystem {
     var lastMoveEvent:MouseEvent;
     var width:Int;
     var height:Int;
+    var drawUtil:DrawUtil;
 
-    public function new(target:EventDispatcher, interact:InteractFunction):Void {
+    public function new(drawUtil:DrawUtil, target:EventDispatcher, interact:InteractFunction):Void {
         _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
         this.interact = interact;
+        this.drawUtil = drawUtil;
 
         target.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         target.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
@@ -51,6 +55,8 @@ class MouseSystem {
             if (ExternalInterface.available) ExternalInterface.addCallback('externalMouseEvent', onExternalWheel);
         #end
         */
+
+        outputBuffer = drawUtil.createOutputBuffer();
     }
 
     public function fartBD():Void {
@@ -82,6 +88,8 @@ class MouseSystem {
         bitmapData = new BitmapData(width, height, false, 0xFF00FF);
         _view.bitmap.bitmapData = bitmapData;
 
+        outputBuffer.resize(width, height);
+
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
@@ -89,6 +97,11 @@ class MouseSystem {
             data = new ReadbackData(width * height * 4);
         }
 
+        fartBD();
+    }
+
+    public function readOutputBuffer():Void {
+        drawUtil.readBack(outputBuffer, width, height, data);
         fartBD();
     }
 

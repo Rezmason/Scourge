@@ -23,10 +23,6 @@ class DrawUtil extends Util {
 
     public inline function removeRenderCall(func:Int->Int->Void):Void { renderCalls.remove(func); }
 
-    public inline function resize(width:Int, height:Int):Void {
-        GL.viewport(0, 0, width, height);
-    }
-
     public inline function clear(color:Int = 0x0, alpha:Float = 1):Void {
         var red:Float   = ((color >> 16) & 0xFF) / 0xFF;
         var green:Float = ((color >>  8) & 0xFF) / 0xFF;
@@ -42,11 +38,20 @@ class DrawUtil extends Util {
         GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
     }
 
-    public inline function present():Void {
-
+    public inline function createOutputBuffer():OutputBuffer {
+        return new OutputBuffer();
     }
 
-    public inline function readBack(width:Int, height:Int, data:ReadbackData):Void {
+    public inline function getMainOutputBuffer():OutputBuffer {
+        return new OutputBuffer(true);
+    }
+
+    public inline function setOutputBuffer(outputBuffer:OutputBuffer):Void {
+        GL.bindFramebuffer(GL.FRAMEBUFFER, outputBuffer.frameBuffer);
+    }
+
+    public inline function readBack(buffer:OutputBuffer, width:Int, height:Int, data:ReadbackData):Void {
+        setOutputBuffer(buffer);
         GL.readPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, data);
     }
 
