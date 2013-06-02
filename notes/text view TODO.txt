@@ -1,9 +1,5 @@
-PreloadSWF=/SDKs/TheMiner_v1.3.10_Pro/SWFs/TheMiner_en_v1_3_10.swf
-
 OpenFL
-    Rely solely on utils package to expose functionality
-    If openfl types need to show up in places, so be it.
-        We'll deal with that later. Just minimize GL references.
+    Readback in separate buffer
 
 UI object
 
@@ -51,3 +47,6 @@ Render the scene ONCE each time interaction changes
 
 Multiple font support?
     Context3D.setSamplerStateAt
+
+Instancing?
+    Maybe colors can be passed in as vecs

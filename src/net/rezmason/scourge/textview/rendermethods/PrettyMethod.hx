@@ -1,98 +1,137 @@
 package net.rezmason.scourge.textview.rendermethods;
 
-import flash.display3D.Context3DBlendFactor;
-import flash.display3D.Context3DCompareMode;
-import flash.display3D.Context3DProgramType;
-import flash.display3D.Context3DVertexBufferFormat;
 import flash.geom.Matrix3D;
-import flash.Vector;
+import openfl.gl.GLUniformLocation;
+// import openfl.utils.Float32Array;
 
 import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.RenderMethod;
+import net.rezmason.scourge.textview.core.Types;
 
 class PrettyMethod extends RenderMethod {
 
+    var posLoc:Int;
+    var cornerLoc:Int;
+    var scaleLoc:Int;
+    var popLoc:Int;
+    var colorLoc:Int;
+    var textureLoc:Int;
+    var vidLoc:Int;
+    var uCameraMat:GLUniformLocation;
+    var uGlyphMat:GLUniformLocation;
+    var uBodyMat:GLUniformLocation;
+    var uSampler:GLUniformLocation;
+    // var uCrap:GLUniformLocation;
+
     override public function activate():Void {
         programUtil.setProgram(program);
-        programUtil.setBlendFactors(Context3DBlendFactor.ONE, Context3DBlendFactor.ONE);
-        programUtil.setProgramConstantsFromVector(Context3DProgramType.FRAGMENT, 0, Vector.ofArray([2,0.3,0,0]), 1); // fc0 contains 2, 0.3
-        programUtil.setDepthTest(false, Context3DCompareMode.LESS);
+        programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        programUtil.setBlending(true);
+        programUtil.setDepthTest(false);
+
+        // TODO: these constants should go in the GLSL
+        // programUtil.setProgramConstantsFromVector(uCrap, new Float32Array([2,0.3,0,0])); // uCrap contains 2, 0.3
     }
 
     override public function deactivate():Void {
-        programUtil.setTextureAt(0, null); // fs0 is empty
-        programUtil.setVertexBufferAt(0, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va0 is empty
-        programUtil.setVertexBufferAt(1, null, 3, Context3DVertexBufferFormat.FLOAT_2); // va1 is empty
-        programUtil.setVertexBufferAt(2, null, 5, Context3DVertexBufferFormat.FLOAT_1); // va2 is empty
-        programUtil.setVertexBufferAt(3, null, 6, Context3DVertexBufferFormat.FLOAT_1); // va3 is empty
-        programUtil.setVertexBufferAt(4, null, 0, Context3DVertexBufferFormat.FLOAT_3); // va4 is empty
-        programUtil.setVertexBufferAt(5, null, 3, Context3DVertexBufferFormat.FLOAT_2); // va5 is empty
-        programUtil.setVertexBufferAt(6, null, 5, Context3DVertexBufferFormat.FLOAT_1); // va6 is empty
+        programUtil.setVertexBufferAt(posLoc,     null, 0, 3);
+        programUtil.setVertexBufferAt(cornerLoc,  null, 3, 2);
+        programUtil.setVertexBufferAt(scaleLoc,   null, 5, 1);
+        programUtil.setVertexBufferAt(popLoc,     null, 6, 1);
+        programUtil.setVertexBufferAt(colorLoc,   null, 0, 3);
+        programUtil.setVertexBufferAt(textureLoc, null, 3, 2);
+        programUtil.setVertexBufferAt(vidLoc,     null, 5, 1);
     }
 
-    override function makeVertexShader():String {
-        return [
-            "m44 vt1 va1 vc5",  // corner = glyphMat.project(hv)
-            "mul vt1.xy vt1.xy va2.xx", // corner *= s
+    override function composeShaders():Void {
+        vertShader = '
+            attribute vec3 posLoc;
+            attribute vec2 cornerLoc;
+            attribute float scaleLoc;
+            attribute float popLoc;
+            attribute vec3 colorLoc;
+            attribute vec2 textureLoc;
+            attribute float vidLoc;
 
-            "m44 vt0 va0 vc9",  // pos = bodyMat.project(xyz)
-            "add vt0.z vt0.z va3.x", // pos.z += p
-            "m44 vt0 vt0 vc1",  // pos = cameraMat.project(pos)
-            "add vt0.xy vt0.xy vt1.xy",  // pos = corner.xy + projected
+            uniform mat4 uCameraMat;
+            uniform mat4 uGlyphMat;
+            uniform mat4 uBodyMat;
 
-            "mov v0 va4",        // fInput[0] = rgba
-            "mov v1 va5",        // fInput[1] = uv
-            "mov v2 va6",        // fInput[2] = i
-            "mov v3 vt0.zzzz",   // fInput[3] = pos.z
+            varying vec3 vColor;
+            varying vec2 vUV;
+            varying float vVid;
+            varying float vZ;
 
-            "sat vt0.z vt0.z", // flatten the z that go beyond the frustum
+            void main(void) {
+                vec4 pos = uBodyMat * vec4(posLoc, 1.0);
+                pos.z += popLoc;
+                pos = uCameraMat * pos;
+                pos.xy += (uGlyphMat * vec4(cornerLoc, 1.0, 1.0)).xy * scaleLoc;
 
-            "mov op vt0",  // outputPosition = pos
-        ].join("\n");
+                vColor = colorLoc;
+                vUV = textureLoc;
+                vVid = vidLoc;
+                vZ = pos.z;
+
+                pos.z = clamp(pos.z, 0.0, 1.0);
+                gl_Position = pos;
+            }
+        ';
+
+        fragShader =
+            #if !desktop 'precision mediump float;' + #end
+            '
+            varying vec3 vColor;
+            varying vec2 vUV;
+            varying float vVid;
+            varying float vZ;
+
+            uniform sampler2D uSampler;
+
+            void main(void) {
+                vec4 texture = texture2D(uSampler, vUV);
+                if (vVid >= 0.3) texture *= -1.0;
+                gl_FragColor = vec4(vColor, 1.0) * (texture + vVid) * clamp(2.0 - vZ, 0.0, 1.0);
+            }
+        ';
     }
 
-    override function makeFragmentShader():String {
-        return [
+    override function connectToShaders():Void {
+        posLoc     = program.getAttribLocation('posLoc');
+        cornerLoc  = program.getAttribLocation('cornerLoc');
+        scaleLoc   = program.getAttribLocation('scaleLoc');
+        popLoc     = program.getAttribLocation('popLoc');
+        colorLoc   = program.getAttribLocation('colorLoc');
+        textureLoc = program.getAttribLocation('textureLoc');
+        vidLoc     = program.getAttribLocation('vidLoc');
 
-            "tex ft0 v1 fs0 <2d, linear, miplinear, clamp>",   // glyph = textures[0].colorAt(fInput[1])
-
-            // brightness = (i >= brightThreshold) ? i - glyph : i + glyph
-            "sge ft1 fc0.yyyy v2.xxxx",    // isBright = (fInput[2] >= brightThreshold) ? 1 : 0     0 to 1
-            "mul ft1 fc0.xxxx ft1",        // isBright *= brightMult                           0 to 2
-            "mul ft1 ft0 ft1",        // isBright *= glyph                                 0 to 2*glyph
-            "sub ft1 ft1 ft0",        // isBright -= brightSub                            -glyph to glyph
-            "add ft1 ft1 v2.xxxx",    // brightness = fInput[2] + isBright
-
-            // brightness *= (2 - z)
-            "sub ft0 fc0.xxxx v3",
-            "sat ft0 ft0",
-            "mul ft1 ft1 ft0",
-
-            "mul oc ft1 v0",          // outputColor = brightness * fInput[0]
-
-        ].join("\n");
+        uCameraMat = program.getUniformLocation('uCameraMat');
+        uGlyphMat = program.getUniformLocation('uGlyphMat');
+        uBodyMat = program.getUniformLocation('uBodyMat');
+        uSampler = program.getUniformLocation('uSampler');
+        // uCrap = program.getUniformLocation('uCrap');
     }
 
     override public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
         super.setGlyphTexture(glyphTexture, glyphTransform);
-        programUtil.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 5, glyphMat, true); // vc5 contains the character matrix
-        programUtil.setTextureAt(0, glyphTexture.texture); // fs0 contains our texture
+        programUtil.setProgramConstantsFromMatrix(uGlyphMat, glyphMat); // uGlyphMat contains the character matrix
+        programUtil.setTextureAt(uSampler, 0, glyphTexture.texture); // uSampler contains our texture
     }
 
     override public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void {
-        programUtil.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 1, cameraMat, true); // vc1 contains the camera matrix
-        programUtil.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 9, bodyMat, true); // vc9 contains the body's matrix
+        programUtil.setProgramConstantsFromMatrix(uCameraMat, cameraMat); // uCameraMat contains the camera matrix
+        programUtil.setProgramConstantsFromMatrix(uBodyMat, bodyMat); // uBodyMat contains the body's matrix
     }
 
     override public function setSegment(segment:BodySegment):Void {
-        programUtil.setVertexBufferAt(0, segment.shapeBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va0 contains x,y,z
-        programUtil.setVertexBufferAt(1, segment.shapeBuffer, 3, Context3DVertexBufferFormat.FLOAT_2); // va1 contains h,v
-        programUtil.setVertexBufferAt(2, segment.shapeBuffer, 5, Context3DVertexBufferFormat.FLOAT_1); // va2 contains s
-        programUtil.setVertexBufferAt(3, segment.shapeBuffer, 6, Context3DVertexBufferFormat.FLOAT_1); // va3 contains p
-        programUtil.setVertexBufferAt(4, segment.colorBuffer, 0, Context3DVertexBufferFormat.FLOAT_3); // va4 contains r,g,b
-        programUtil.setVertexBufferAt(5, segment.colorBuffer, 3, Context3DVertexBufferFormat.FLOAT_2); // va5 contains u,v
-        programUtil.setVertexBufferAt(6, segment.colorBuffer, 5, Context3DVertexBufferFormat.FLOAT_1); // va6 contains i
+        programUtil.setVertexBufferAt(posLoc,     segment.shapeBuffer, 0, 3); // posLoc contains x,y,z
+        programUtil.setVertexBufferAt(cornerLoc,  segment.shapeBuffer, 3, 2); // cornerLoc contains h,v
+        programUtil.setVertexBufferAt(scaleLoc,   segment.shapeBuffer, 5, 1); // scaleLoc contains s
+        programUtil.setVertexBufferAt(popLoc,     segment.shapeBuffer, 6, 1); // popLoc contains p
+        programUtil.setVertexBufferAt(colorLoc,   segment.colorBuffer, 0, 3); // colorLoc contains r,g,b
+        programUtil.setVertexBufferAt(textureLoc, segment.colorBuffer, 3, 2); // textureLoc contains u,v
+        programUtil.setVertexBufferAt(vidLoc,     segment.colorBuffer, 5, 1); // vidLoc contains i
     }
 }
 

@@ -5,9 +5,12 @@ import flash.display.Sprite;
 import flash.events.EventDispatcher;
 import flash.events.MouseEvent;
 import flash.geom.Rectangle;
+import flash.geom.Matrix;
 import flash.utils.ByteArray;
 import flash.Vector;
 import flash.external.ExternalInterface;
+
+import net.rezmason.scourge.textview.core.Types;
 
 typedef InteractFunction = Int->Int->Interaction->Float->Float/*->Float*/->Void;
 
@@ -15,16 +18,17 @@ class MouseSystem {
 
     inline static var NULL_ID:Int = -1;
 
-    public var bitmapData(default, null):BitmapData;
+    public var data:ReadbackData;
     public var view(get, null):Sprite;
+    var bitmapData:BitmapData;
     var _view:MouseView;
 
     var interact:InteractFunction;
     var hoverRawID:Int;
     var pressRawID:Int;
-    var pixRect:Rectangle;
-    var pixBytes:ByteArray;
     var lastMoveEvent:MouseEvent;
+    var width:Int;
+    var height:Int;
 
     public function new(target:EventDispatcher, interact:InteractFunction):Void {
         _view = new MouseView(0.2, 40);
@@ -39,8 +43,8 @@ class MouseSystem {
         hoverRawID = NULL_ID;
         pressRawID = NULL_ID;
 
-        pixRect = new Rectangle(0, 0, 3, 3);
-        pixBytes = new ByteArray();
+        width = -1;
+        height = -1;
 
         /*
         #if flash
@@ -49,25 +53,70 @@ class MouseSystem {
         */
     }
 
+    public function fartBD():Void {
+
+        return;
+
+        var byteArray:ByteArray;
+        #if js
+            byteArray = new FriendlyByteArray(data);
+        #else
+            byteArray = data;
+        #end
+        byteArray.position = 0;
+
+        var dupe:BitmapData = bitmapData.clone();
+        dupe.setPixels(bitmapData.rect, byteArray);
+
+        var flipMat:Matrix = new Matrix();
+        flipMat.scale(1, -1);
+        flipMat.translate(0, dupe.height);
+
+        bitmapData.draw(dupe, flipMat);
+
+        _view.bitmap.bitmapData = bitmapData;
+    }
+
     public function setSize(width:Int, height:Int):Void {
         if (bitmapData != null) bitmapData.dispose();
-        bitmapData = new BitmapData(width, height, false, 0x0);
+        bitmapData = new BitmapData(width, height, false, 0xFF00FF);
         _view.bitmap.bitmapData = bitmapData;
+
+        if (this.width != width || this.height != height) {
+            this.width = width;
+            this.height = height;
+
+            data = new ReadbackData(width * height * 4);
+        }
+
+        fartBD();
     }
 
     function getRawID(x:Float, y:Float):Int {
 
-        if (bitmapData == null) return NULL_ID;
+        if (data == null) return NULL_ID;
 
-        pixRect.x = Std.int(x) - 1;
-        pixRect.y = Std.int(y) - 1;
+        var rectLeft:Int = Std.int(x) - 1;
+        var rectTop:Int = Std.int(height - y) - 1;
+        var index:Int = (rectTop * width + rectLeft) * 4;
 
-        pixBytes.position = 0;
-        bitmapData.copyPixelsToByteArray(pixRect, pixBytes);
-        pixBytes.position = 0;
+        var idElements:Array<Int> = [
+            data[index + 0],
+            data[index + 1],
+            data[index + 2],
+            data[index + 3],
+        ];
 
-        var rawID:UInt = pixBytes.readUnsignedInt();
-        while (pixBytes.bytesAvailable > 0) if (pixBytes.readUnsignedInt() != rawID) return NULL_ID;
+        var rawID:Int = (idElements[0] << 16) | (idElements[1] << 8) | (idElements[2] << 0);
+
+        /*
+        for (row in 0...3) {
+            for (col in 0...3) {
+                index = (row * width + col) * 4;
+                for (el in 0...4) if (idElements[el] != data[index + el]) return NULL_ID;
+            }
+        }
+        */
 
         _view.update(x, y, rawID);
 
@@ -121,3 +170,20 @@ class MouseSystem {
     }
 
 }
+
+#if js
+    class FriendlyByteArray extends ByteArray {
+
+        public function new(?input:ReadbackData):Void {
+            if (input == null) super();
+            else setBytes(input);
+        }
+
+        public function setBytes(input:ReadbackData):Void {
+            byteView = input;
+            length = input.length;
+            allocated = length;
+            this.data = untyped __new__("DataView", input.buffer);
+        }
+    }
+#end

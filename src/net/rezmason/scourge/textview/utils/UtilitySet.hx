@@ -2,6 +2,7 @@ package net.rezmason.scourge.textview.utils;
 
 import flash.display.Stage;
 import openfl.display.OpenGLView;
+import openfl.gl.GL;
 
 class UtilitySet {
 
@@ -16,18 +17,34 @@ class UtilitySet {
 
         if (OpenGLView.isSupported) {
             view = new OpenGLView();
-            stage.addChildAt(view, 0);
+            stage.addChild(view);
 
             textureUtil = new TextureUtil(view);
             drawUtil = new DrawUtil(view);
             programUtil = new ProgramUtil(view);
             bufferUtil = new BufferUtil(view);
 
-            cbk();
+            haxe.Timer.delay(cbk, 0);
 
         } else {
             trace("OpenGLView isn't supported.");
         }
     }
 
+}
+
+class ReadbackOpenGLView extends OpenGLView {
+    public function new():Void {
+        super();
+
+        #if js
+        if (nmeGraphics != null) {
+            nmeContext = nmeGraphics.nmeSurface.getContextWebGL({ preserveDrawingBuffer: true });
+            #if debug
+            nmeContext = untyped WebGLDebugUtils.makeDebugContext(nmeContext);
+            #end
+        }
+        GL.nmeContext = nmeContext;
+        #end
+    }
 }

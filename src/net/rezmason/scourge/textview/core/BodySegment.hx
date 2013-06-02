@@ -1,19 +1,18 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.display3D.IndexBuffer3D;
-import flash.display3D.VertexBuffer3D;
 import flash.Vector;
 
+import net.rezmason.scourge.textview.core.Types;
 import net.rezmason.scourge.textview.utils.BufferUtil;
 
 class BodySegment {
 
     public var id(default, null):Int;
 
-    public var colorBuffer(default, null):VertexBuffer3D;
-    public var shapeBuffer(default, null):VertexBuffer3D;
-    public var paintBuffer(default, null):VertexBuffer3D;
-    public var indexBuffer(default, null):IndexBuffer3D;
+    public var colorBuffer(default, null):VertexBuffer;
+    public var shapeBuffer(default, null):VertexBuffer;
+    public var paintBuffer(default, null):VertexBuffer;
+    public var indexBuffer(default, null):IndexBuffer;
 
     public var colorVertices(default, null):Vector<Float>;
     public var shapeVertices(default, null):Vector<Float>;

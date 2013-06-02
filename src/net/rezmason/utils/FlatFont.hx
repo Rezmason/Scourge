@@ -146,7 +146,7 @@ class FlatFont {
         var numRows:Int = Std.int(numChars / numColumns) + 1;
 
         var width:Int = largestPowerOfTwo(Std.int(Math.max(charXOffset * numColumns, charYOffset * numRows)) + spacing);
-        var bitmapData:BitmapData = new BitmapData(width, width, true, 0x0);
+        var bitmapData:BitmapData = new BitmapData(width, width, true, 0xFF000000);
         //bitmapData.fillRect(bitmapData.rect, 0xFFFFFFFF);
 
         var sp:Sprite = new Sprite();

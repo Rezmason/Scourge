@@ -2,9 +2,8 @@ package net.rezmason.scourge.textview.core;
 
 import flash.display.BitmapData;
 import flash.geom.Matrix3D;
-
 import net.rezmason.utils.FlatFont;
-import net.rezmason.scourge.textview.utils.Types;
+import net.rezmason.scourge.textview.core.Types.Texture;
 import net.rezmason.scourge.textview.utils.TextureUtil;
 
 class GlyphTexture {
@@ -18,7 +17,7 @@ class GlyphTexture {
         this.font = font;
         var bmp:BitmapData = font.getBitmapDataClone();
         texture = textureUtil.createTexture(customize(bmp));
-        bmp.dispose();
+        // bmp.dispose();
 
         matrix = new Matrix3D();
         matrix.appendTranslation(-0.5, -0.5, 0);

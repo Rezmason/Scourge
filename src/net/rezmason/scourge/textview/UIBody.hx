@@ -18,7 +18,7 @@ class UIBody extends Body {
 
     inline static var glideEase:Float = 0.6;
     inline static var NATIVE_DPI:Float = 72;
-    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 24;
+    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 18;
 
     inline static var LINE_TOKEN:String = "ª÷º";
 
@@ -35,6 +35,7 @@ class UIBody extends Body {
     var currentScrollPos:Float;
     var glideGoal:Float;
     var gliding:Bool;
+    var lastRedrawPos:Float;
 
     var dragging:Bool;
     var dragStartY:Float;
@@ -97,6 +98,7 @@ class UIBody extends Body {
         numCols = Std.int(rect.width  * stageWidth  / glyphWidthInPixels );
         setGlyphScale(rect.width / numCols * 2, rect.height / numRowsForLayout * 2);
 
+        lastRedrawPos = Math.NaN;
         reorderGlyphs();
         updateText(text);
     }
@@ -218,7 +220,10 @@ class UIBody extends Body {
                 setScrollPos(currentScrollPos * glideEase + glideGoal * (1 - glideEase));
             } else {
                 setScrollPos(glideGoal);
-                redrawHitAreas();
+                if (lastRedrawPos != glideGoal) {
+                    lastRedrawPos = glideGoal;
+                    redrawHitAreas();
+                }
             }
         }
     }

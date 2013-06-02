@@ -39,12 +39,10 @@ class MouseView extends Sprite {
 
         if (val != 0xFFFFFF) {
             cursor.alpha = 1;
-            //textField.text = StringTools.hex(val);
-            textField.text = Std.string(val);
+            textField.text = StringTools.hex(val);
         } else {
             cursor.alpha = 0.5;
             textField.text = "---";
-            val = -1;
         }
     }
 

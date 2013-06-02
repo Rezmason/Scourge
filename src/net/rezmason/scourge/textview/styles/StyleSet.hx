@@ -33,6 +33,7 @@ class StyleSet {
     public function extractFromText(input:String, defaultStyle:Style = null):String {
         if (defaultStyle == null) defaultStyle = cleanStyle;
         defaultStyle.removeAllGlyphs();
+        defaultStyle.flatten();
         this.defaultStyle = defaultStyle;
         styleMouseID = 0;
         stylesByIndex = [];

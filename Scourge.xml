@@ -5,15 +5,9 @@
 
 	<app title="Scourge" file="Scourge" main="Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="11.4"/>
 
-	<set name="fullscreen" if="html5" />
-	<set name="fullscreen" if="target_webos" />
-	<set name="fullscreen" if="target_ios" />
-	<set name="fullscreen" if="target_android" />
-	<set name="fullscreen" if="target_neko" />
-	<set name="fullscreen" if="target_mac" />
+	<set name="fullscreen" />
 
-	<window width="800" height="600" fps="30" orientation="portrait" background="#000000" resizable="true" />
-	<window width="0" height="0" if="fullscreen" />
+	<window width="0" height="0" fps="30" orientation="portrait" background="#000000" resizable="true" />
 
 	<set name="BUILD_DIR" value="Export" />
 
@@ -27,13 +21,10 @@
 	<haxedef name="haxeJSON" />
 	<haxedef name="advanced-telemetry" if="flash"/>
 	<!-- <haxedef name="dce" value="no" if="flash"/> -->
-	<!-- <compilerflag name="-debug" /> -->
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 
 	<haxelib name="openfl" />
 	<!-- <haxelib name="hxsl" /> -->
-
-	<debug />
 	<!-- <haxelib name="actuate" /> -->
 
 	<assets path="assets/flatfonts" />

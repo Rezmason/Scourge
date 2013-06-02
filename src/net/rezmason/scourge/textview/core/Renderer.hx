@@ -1,11 +1,15 @@
 package net.rezmason.scourge.textview.core;
 
 import net.rezmason.scourge.textview.utils.DrawUtil;
+import net.rezmason.scourge.textview.core.Types;
 
 class Renderer {
 
     inline static var SPACE_WIDTH:Float = 2.0;
     inline static var SPACE_HEIGHT:Float = 2.0;
+
+    var width:Int;
+    var height:Int;
 
     var mouseSystem:MouseSystem;
     var drawUtil:DrawUtil;
@@ -14,13 +18,24 @@ class Renderer {
     public function new(drawUtil:DrawUtil, mouseSystem:MouseSystem) {
         this.drawUtil = drawUtil;
         this.mouseSystem = mouseSystem;
+        width = -1;
+        height = -1;
     }
 
     public function setSize(width:Int, height:Int):Void {
-        drawUtil.resize(width, height);
+        if (this.width != width || this.height != height) {
+            this.width = width;
+            this.height = height;
+            drawUtil.resize(width, height);
+        }
     }
 
     public function render(bodies:Array<Body>, method:RenderMethod, dest:RenderDestination, clear:Bool = true):Void {
+
+        if (method == null) {
+            trace("Null method.");
+            return;
+        }
 
         if (activeMethod != method) {
             if (activeMethod != null) activeMethod.deactivate();
@@ -44,7 +59,9 @@ class Renderer {
 
         switch (dest) {
             case SCREEN: drawUtil.present();
-            case MOUSE:  drawUtil.drawToBitmapData(mouseSystem.bitmapData);
+            case MOUSE:
+                drawUtil.readBack(width, height, mouseSystem.data);
+                mouseSystem.fartBD();
         }
     }
 }
