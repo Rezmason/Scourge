@@ -88,6 +88,6 @@ class Style {
 
     public function flatten():Void {
         basics = [];
-        for (field in styleFields) basics.push(values[field]);
+        for (ike in 0...styleFields.length) basics[ike] = Std.parseFloat('${values[styleFields[ike]]}');
     }
 }

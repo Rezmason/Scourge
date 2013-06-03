@@ -1,6 +1,7 @@
 package net.rezmason.scourge.textview.styles;
 
 import haxe.Utf8;
+import net.rezmason.scourge.textview.styles.Sigil.*;
 
 using haxe.JSON;
 using Lambda;
@@ -8,10 +9,8 @@ using Type;
 
 class StyleSet {
 
-    public inline static var SIGIL:String = "§";
-
     static var stringReg:EReg = ~/([^,\s:\\"\[\]]+)/g;
-    static var styleTagsReg:EReg = ~/[§∂«µ]\{[^\}]*\}/g;
+    static var styleTagsReg:EReg = new EReg('[$STYLE $ANIMATED_STYLE $BUTTON_STYLE $INPUT_STYLE]\\{[^\\}]*\\}', 'g');
 
     var styleTypes:Map<String, Class<Style>>;
 
@@ -26,10 +25,10 @@ class StyleSet {
         cleanStyle = new Style("", null, {r:1, g:1, b:1, i:0, s:1, p:0});
 
         styleTypes = new Map();
-        styleTypes.set("§", Style);
-        styleTypes.set("∂", AnimatedStyle);
-        styleTypes.set("«", InputStyle);
-        styleTypes.set("µ", ButtonStyle);
+        styleTypes.set(STYLE, Style);
+        styleTypes.set(ANIMATED_STYLE, AnimatedStyle);
+        styleTypes.set(BUTTON_STYLE, ButtonStyle);
+        styleTypes.set(INPUT_STYLE, InputStyle);
     }
 
     public function extractFromText(input:String, defaultStyle:Style = null):String {
@@ -54,7 +53,7 @@ class StyleSet {
 
         stylesByIndex.unshift(defaultStyle);
 
-        return styleTagsReg.replace(input, SIGIL);
+        return styleTagsReg.replace(input, STYLE);
     }
 
     public function getStyleByIndex(index:Int):Style {
@@ -76,6 +75,7 @@ class StyleSet {
     }
 
     inline function extractTags(input:String):Array<StyleTag> {
+
         var tags:Array<StyleTag> = [];
 
         while(styleTagsReg.match(input)) {
@@ -146,6 +146,7 @@ class StyleSet {
     }
 
     inline function parseTag(tagString:String):StyleTag {
+        // trace(tagString);
         var sigil:String = tagString.charAt(0);
         tagString = tagString.substr(2).substr(0, -1); // Remove leading '§{' and trailing '}'
         var tag:StyleTag = null;

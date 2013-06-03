@@ -10,6 +10,7 @@ import net.rezmason.scourge.textview.core.Interaction;
 
 import net.rezmason.scourge.textview.styles.Style;
 import net.rezmason.scourge.textview.styles.StyleSet;
+import net.rezmason.scourge.textview.styles.Sigil.STYLE;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using StringTools;
@@ -111,15 +112,17 @@ class UIBody extends Body {
         if (text == null) text = "";
         this.text = text;
 
+        var sigil:String = STYLE;
+
         if (numGlyphsInLayout == 0) return;
 
         // Simplify the text and wrap it to new lines as we construct the page
 
-        var styledLineReg:EReg = new EReg('(([^${StyleSet.SIGIL}]${StyleSet.SIGIL}*){$numCols})', 'g');
+        var styledLineReg:EReg = new EReg('(([^$sigil]$sigil*){$numCols})', 'g');
 
         function padLine(s) {
             // Pads a string until its length, ignoring sigils, is 1
-            return StringTools.rpad(s, " ", numCols + s.split(StyleSet.SIGIL).length - 1);
+            return StringTools.rpad(s, " ", numCols + s.split(sigil).length - 1);
         }
 
         function wrapLines(s) {
@@ -141,7 +144,7 @@ class UIBody extends Body {
         var lineStyleIndex:Int = 0;
         lineStyleIndices = [lineStyleIndex];
         for (line in page) {
-            lineStyleIndex += line.split(StyleSet.SIGIL).length - 1;
+            lineStyleIndex += line.split(sigil).length - 1;
             lineStyleIndices.push(lineStyleIndex);
         }
 
@@ -179,7 +182,7 @@ class UIBody extends Body {
         for (line in pageSegment) {
             var index:Int = 0;
             for (index in 0...line.length) {
-                if (line.charAt(index) == "§") {
+                if (line.charAt(index) == STYLE) {
                     currentStyle = styleSet.getStyleByIndex(++styleIndex);
                 } else {
                     var glyph:Glyph = glyphs[id++];

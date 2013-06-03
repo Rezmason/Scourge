@@ -1,3 +1,7 @@
+Style sigils and Utf8
+
+Context loss
+
 UI object
 
     Allow declared styles to be preserved, instead of remaking them
@@ -38,7 +42,6 @@ Board object
 OpenFL native targets
     Stop making so many Float32Arrays?
         Something's slowing the Mac client down, that's for sure
-    Style sigils and Utf8
     resizing window and calling GL.drawElements crashes
     no blending?
     no readPixels

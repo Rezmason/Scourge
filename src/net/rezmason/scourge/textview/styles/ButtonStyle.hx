@@ -56,8 +56,7 @@ class ButtonStyle extends DynamicStyle {
 
         if (interaction == MOVE) return;
 
-        fromIndex = toIndex;
-        time = 0;
+        var nextIndex:Int = toIndex;
 
         switch (interaction) {
             case ENTER: mouseIsOver = true;
@@ -67,9 +66,15 @@ class ButtonStyle extends DynamicStyle {
             case _:
         }
 
-        if (mouseIsOver && mouseIsDown) toIndex = DOWN_FRAME;
-        else if (!mouseIsOver && !mouseIsDown) toIndex = UP_FRAME;
-        else toIndex = OVER_FRAME;
+        if (mouseIsOver && mouseIsDown) nextIndex = DOWN_FRAME;
+        else if (!mouseIsOver && !mouseIsDown) nextIndex = UP_FRAME;
+        else nextIndex = OVER_FRAME;
+
+        if (nextIndex != toIndex) {
+            fromIndex = toIndex;
+            toIndex = nextIndex;
+            time = 0;
+        }
     }
 
     override public function toString():String return '${super.toString()}, frames:${values.get("frames")}';
