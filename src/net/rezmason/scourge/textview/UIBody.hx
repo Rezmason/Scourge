@@ -4,6 +4,8 @@ import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
 import flash.system.Capabilities;
 
+import haxe.Utf8;
+
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
@@ -13,15 +15,14 @@ import net.rezmason.scourge.textview.styles.StyleSet;
 import net.rezmason.scourge.textview.styles.Sigil.STYLE;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
-using StringTools;
 
 class UIBody extends Body {
 
-    inline static var glideEase:Float = 0.6;
-    inline static var NATIVE_DPI:Float = 72;
-    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 12;
+    /*inline*/ static var glideEase:Float = 0.6;
+    /*inline*/ static var NATIVE_DPI:Float = 72;
+    /*inline*/ static var GLYPH_HEIGHT_IN_POINTS:Float = 24;
 
-    inline static var LINE_TOKEN:String = "ª÷º";
+    /*inline*/ static var LINE_TOKEN:String = "¬¬¬";
 
     var styleSet:StyleSet;
 
@@ -79,6 +80,11 @@ class UIBody extends Body {
             glyph.set_paint(id << 16);
             glyphs.push(glyph);
         }
+
+        numRows = 0;
+        numCols = 0;
+        numRowsForLayout = 0;
+        numGlyphsInLayout = 0;
     }
 
     override public function update(delta:Float):Void {
@@ -95,6 +101,7 @@ class UIBody extends Body {
         numRows = Std.int(rect.height * stageHeight / glyphHeightInPixels);
         numRowsForLayout = numRows;
         numRows++;
+
         numCols = Std.int(rect.width  * stageWidth  / glyphWidthInPixels );
         setGlyphScale(rect.width / numCols * 2, rect.height / numRowsForLayout * 2);
 
@@ -118,17 +125,26 @@ class UIBody extends Body {
 
         // Simplify the text and wrap it to new lines as we construct the page
 
-        var styledLineReg:EReg = new EReg('(([^$sigil]$sigil*){$numCols})', 'g');
+        var styledLineReg:EReg = new EReg('(([^$sigil]$sigil*){$numCols})', 'gu');
 
-        function padLine(s) {
+        function padLine(line:String) {
             // Pads a string until its length, ignoring sigils, is 1
-            return StringTools.rpad(s, " ", numCols + s.split(sigil).length - 1);
+            return rpad(line, " ", numCols + line.split(sigil).length - 1);
         }
 
-        function wrapLines(s) {
+        function wrapLines(s:String) {
+
             // Splits a line into an array of lines whose length, ignoring sigils, is numCols
-            var sp = styledLineReg.replace(s, '$1$LINE_TOKEN');
-            if (sp.endsWith(LINE_TOKEN)) sp = sp.substr(0, sp.length - LINE_TOKEN.length);
+
+            var sp:String = styledLineReg.replace(s, '$1$LINE_TOKEN');
+
+            var ltl:Int = Utf8.length(LINE_TOKEN);
+            var spl:Int = Utf8.length(sp);
+
+            if (spl > ltl && Utf8.sub(sp, spl - ltl, ltl) == LINE_TOKEN) {
+                sp = Utf8.sub(sp, 0, spl - ltl);
+            }
+
             return sp.split(LINE_TOKEN).map(padLine).join(LINE_TOKEN);
         }
 
@@ -136,7 +152,7 @@ class UIBody extends Body {
 
         // Add blank lines to the end, to reach the minimum page length (numRows)
 
-        var blankParagraph:String = "".rpad(" ", numCols);
+        var blankParagraph:String = rpad("", " ", numCols);
         while (page.length < numRows) page.push(blankParagraph);
 
         // Count the sigils in each line, for style lookup
@@ -151,7 +167,7 @@ class UIBody extends Body {
         setScrollPos(Math.isNaN(currentScrollPos) ? bottomPos : currentScrollPos);
     }
 
-    inline function reorderGlyphs():Void {
+    /*inline*/ function reorderGlyphs():Void {
         var id:Int = 0;
         for (row in 0...numRows) {
             for (col in 0...numCols) {
@@ -167,7 +183,7 @@ class UIBody extends Body {
         toggleGlyphs(glyphs.slice(numGlyphsInLayout), false);
     }
 
-    inline function setScrollPos(pos:Float):Void {
+    /*inline*/ function setScrollPos(pos:Float):Void {
 
         currentScrollPos = pos;
 
@@ -181,12 +197,14 @@ class UIBody extends Body {
         var currentStyle:Style = styleSet.getStyleByIndex(styleIndex);
         for (line in pageSegment) {
             var index:Int = 0;
-            for (index in 0...line.length) {
-                if (line.charAt(index) == STYLE) {
+            for (index in 0...Utf8.length(line)) {
+                var char:String = Utf8.sub(line, index, 1);
+                if (char == STYLE) {
                     currentStyle = styleSet.getStyleByIndex(++styleIndex);
                 } else {
                     var glyph:Glyph = glyphs[id++];
-                    glyph.set_char(line.charCodeAt(index), glyphTexture.font);
+                    var charCode:Int = Utf8.charCodeAt(char, 0);
+                    glyph.set_char(charCode, glyphTexture.font);
                     currentStyle.addGlyph(glyph);
                     glyph.set_z(0);
                 }
@@ -202,7 +220,7 @@ class UIBody extends Body {
         transform.appendTranslation(0, (currentScrollPos - scrollStartIndex) / numRowsForLayout, 0);
     }
 
-    inline function taperScrollEdges():Void {
+    /*inline*/ function taperScrollEdges():Void {
         var offset:Float = ((currentScrollPos % 1) + 1) % 1;
         var lastRow:Int = (numRows - 1) * numCols;
         var glyph:Glyph;
@@ -215,7 +233,7 @@ class UIBody extends Body {
         }
     }
 
-    inline function updateGlide():Void {
+    /*inline*/ function updateGlide():Void {
         if (gliding) {
             gliding = Math.abs(glideGoal - currentScrollPos) > 0.001;
             if (gliding) {
@@ -252,8 +270,13 @@ class UIBody extends Body {
         }
     }
 
-    inline function get_numLines():Int { return page.length; }
+    inline function rpad(input:String, pad:String, len:Int):String {
+        while (Utf8.length(input) < len) input = input + pad;
+        return Utf8.sub(input, 0, len);
+    }
 
-    inline function get_numScrollPositions():Int { return page.length - numRows + 1; }
-    inline function get_bottomPos():Float { return numScrollPositions - 1; }
+    /*inline*/ function get_numLines():Int { return page.length; }
+
+    /*inline*/ function get_numScrollPositions():Int { return page.length - numRows + 1; }
+    /*inline*/ function get_bottomPos():Float { return numScrollPositions - 1; }
 }

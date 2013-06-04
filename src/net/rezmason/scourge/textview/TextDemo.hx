@@ -74,6 +74,7 @@ class TextDemo {
         mouseMethod = new MouseMethod(utils.programUtil);
         updateTimer = new Timer(1000 / 30);
         makeScene();
+
         addListeners();
         onActivate();
     }
@@ -92,7 +93,7 @@ class TextDemo {
         var _id:Int = 0;
         views = [];
 
-        //*
+        /*
         testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
@@ -120,15 +121,15 @@ class TextDemo {
         bodies.push(splashBody);
         views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
-
-        utils.drawUtil.addRenderCall(onRender);
-        // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures["full"]).render);
     }
 
     function addListeners():Void {
         // OLD - stage.addEventListener(Event.RESIZE, onResize);
         stage.addEventListener(Event.ACTIVATE, onActivate);
         stage.addEventListener(Event.DEACTIVATE, onDeactivate);
+
+        utils.drawUtil.addRenderCall(onRender);
+        // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures["full"]).render);
 
         // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }

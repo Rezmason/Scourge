@@ -13,6 +13,8 @@ import net.rezmason.utils.FlatFont;
 
 import net.rezmason.scourge.textview.TestStrings;
 
+import net.rezmason.scourge.textview.styles.StyleSet;
+
 class Scourge {
 
     public function new() {
@@ -36,8 +38,14 @@ class Scourge {
         // var str = Assets.getText("assets/enterprise.txt");
         // var str = Assets.getText("assets/acid2.txt");
         var str = TestStrings.STYLED_TEXT;
+        // var str = "One §{name:a, g:0,b:0}Two§{}";
 
         new net.rezmason.scourge.textview.TextDemo(Lib.current.stage, fonts, str);
+
+        /*
+        var styleSet:StyleSet = new StyleSet();
+        var page:String = styleSet.extractFromText(str);
+        /**/
     }
 
     static function makeFont(id:String):FlatFont

@@ -1,4 +1,6 @@
 Style sigils and Utf8
+    Line length isn't properly handled
+    ButtonStyles aren't working
 
 Context loss
 

@@ -99,9 +99,6 @@ class BodySegment {
         var offset:Int = visible ? 0 : -1;
         var diff:Int = 0;
 
-        var str = "";
-        for (glyph in glyphsToToggle) str += String.fromCharCode(glyph.charCode);
-
         for (srcGlyph in glyphsToToggle) {
 
             if (srcGlyph == null || srcGlyph.visible == visible) continue;
