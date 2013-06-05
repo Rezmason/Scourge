@@ -1,7 +1,7 @@
-package net.rezmason.scourge.textview.utils;
+package net.rezmason.gl.utils;
 
 import flash.display.BitmapData;
-import net.rezmason.scourge.textview.core.Types;
+import net.rezmason.gl.Types;
 
 class TextureUtil extends Util {
 

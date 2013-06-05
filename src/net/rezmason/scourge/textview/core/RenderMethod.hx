@@ -3,8 +3,8 @@ package net.rezmason.scourge.textview.core;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 
-import net.rezmason.scourge.textview.utils.ProgramUtil;
-import net.rezmason.scourge.textview.core.Types;
+import net.rezmason.gl.utils.ProgramUtil;
+import net.rezmason.gl.Program;
 
 class RenderMethod {
 

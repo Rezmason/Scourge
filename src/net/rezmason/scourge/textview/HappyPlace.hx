@@ -3,7 +3,7 @@ package net.rezmason.scourge.textview;
 import flash.geom.Matrix3D;
 import net.rezmason.scourge.textview.core.*;
 import net.rezmason.scourge.textview.rendermethods.*;
-import net.rezmason.scourge.textview.utils.UtilitySet;
+import net.rezmason.gl.utils.UtilitySet;
 
 
 class HappyPlace {

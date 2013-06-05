@@ -3,8 +3,8 @@ package net.rezmason.scourge.textview.core;
 import flash.display.BitmapData;
 import flash.geom.Matrix3D;
 import net.rezmason.utils.FlatFont;
-import net.rezmason.scourge.textview.core.Types.Texture;
-import net.rezmason.scourge.textview.utils.TextureUtil;
+import net.rezmason.gl.Texture;
+import net.rezmason.gl.utils.TextureUtil;
 
 class GlyphTexture {
 

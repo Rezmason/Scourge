@@ -5,7 +5,7 @@ import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import flash.Vector;
 
-import net.rezmason.scourge.textview.utils.BufferUtil;
+import net.rezmason.gl.utils.BufferUtil;
 
 class Body {
     public var segments(default, null):Array<BodySegment>;

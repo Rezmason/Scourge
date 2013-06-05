@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.utils;
+package net.rezmason.gl.utils;
 
 import openfl.display.OpenGLView;
 class Util {

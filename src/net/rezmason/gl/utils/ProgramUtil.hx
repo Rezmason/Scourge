@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.utils;
+package net.rezmason.gl.utils;
 
 import flash.geom.Matrix3D;
 import openfl.gl.GL;
@@ -7,7 +7,7 @@ import openfl.gl.GLShader;
 import openfl.gl.GLTexture;
 import openfl.gl.GLUniformLocation;
 
-import net.rezmason.scourge.textview.core.Types;
+import net.rezmason.gl.Types;
 
 class ProgramUtil extends Util {
 

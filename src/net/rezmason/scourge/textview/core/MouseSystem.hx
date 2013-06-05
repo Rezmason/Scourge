@@ -10,8 +10,9 @@ import flash.utils.ByteArray;
 import flash.Vector;
 import flash.external.ExternalInterface;
 
-import net.rezmason.scourge.textview.utils.DrawUtil;
-import net.rezmason.scourge.textview.core.Types;
+import net.rezmason.gl.utils.DrawUtil;
+import net.rezmason.gl.OutputBuffer;
+import net.rezmason.gl.Types;
 
 typedef InteractFunction = Int->Int->Interaction->Float->Float/*->Float*/->Void;
 

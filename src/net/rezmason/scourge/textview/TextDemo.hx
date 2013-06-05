@@ -11,8 +11,8 @@ import flash.geom.Vector3D;
 import flash.utils.Timer;
 import net.rezmason.scourge.textview.core.*;
 import net.rezmason.scourge.textview.rendermethods.*;
-import net.rezmason.scourge.textview.utils.UtilitySet;
-import net.rezmason.scourge.textview.core.Types;
+import net.rezmason.gl.utils.UtilitySet;
+import net.rezmason.gl.OutputBuffer;
 import net.rezmason.utils.FlatFont;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;

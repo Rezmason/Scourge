@@ -2,8 +2,9 @@ package net.rezmason.scourge.textview.core;
 
 import flash.Vector;
 
-import net.rezmason.scourge.textview.core.Types;
-import net.rezmason.scourge.textview.utils.BufferUtil;
+import net.rezmason.gl.VertexBuffer;
+import net.rezmason.gl.IndexBuffer;
+import net.rezmason.gl.utils.BufferUtil;
 
 class BodySegment {
 

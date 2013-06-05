@@ -1,0 +1,33 @@
+package net.rezmason.gl;
+
+import openfl.gl.GL;
+import openfl.gl.GLBuffer;
+import openfl.utils.Int16Array;
+
+class IndexBuffer {
+
+    @:allow(net.rezmason.gl) var buf:GLBuffer;
+    public var numIndices(default, null):Int;
+    var array:Int16Array;
+
+    public function new(numIndices:Int):Void {
+        this.numIndices = numIndices;
+        buf = GL.createBuffer();
+        array = new Int16Array(numIndices);
+    }
+
+    public inline function uploadFromVector(data:Array<Int>, offset:Int = 0, num:Int = 0):Void {
+        if (offset < 0 || offset > numIndices) {
+
+        } else {
+            if (offset + num > numIndices) num = numIndices - offset;
+
+            for (ike in offset...(offset + num)) {
+                array[ike] = data[ike];
+            }
+
+            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
+            GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, array, GL.STATIC_DRAW);
+        }
+    }
+}

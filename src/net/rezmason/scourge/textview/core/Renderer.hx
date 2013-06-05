@@ -1,7 +1,7 @@
 package net.rezmason.scourge.textview.core;
 
-import net.rezmason.scourge.textview.utils.DrawUtil;
-import net.rezmason.scourge.textview.core.Types;
+import net.rezmason.gl.utils.DrawUtil;
+import net.rezmason.gl.OutputBuffer;
 
 class Renderer {
 
