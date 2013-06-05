@@ -1,8 +1,5 @@
-Style sigils and Utf8
-    Line length isn't properly handled
-    ButtonStyles aren't working
-
-Context loss
+Stop making so many Float32Arrays?
+        Something's slowing the Mac client down, that's for sure
 
 UI object
 
@@ -42,10 +39,7 @@ Board object
         Dispatches interactions
 
 OpenFL native targets
-    Stop making so many Float32Arrays?
-        Something's slowing the Mac client down, that's for sure
     resizing window and calling GL.drawElements crashes
-    no blending?
     no readPixels
 
 Render the scene ONCE each time interaction changes

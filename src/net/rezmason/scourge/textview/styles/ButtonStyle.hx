@@ -49,6 +49,7 @@ class ButtonStyle extends DynamicStyle {
             ratio = easeFunc(time / period);
             interpolateGlyphs(fromIndex, toIndex, ratio);
         }
+
         super.updateGlyphs(delta);
     }
 

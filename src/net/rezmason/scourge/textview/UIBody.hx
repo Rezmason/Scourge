@@ -18,11 +18,11 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class UIBody extends Body {
 
-    /*inline*/ static var glideEase:Float = 0.6;
-    /*inline*/ static var NATIVE_DPI:Float = 72;
-    /*inline*/ static var GLYPH_HEIGHT_IN_POINTS:Float = 24;
+    inline static var glideEase:Float = 0.6;
+    inline static var NATIVE_DPI:Float = 72;
+    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 12;
 
-    /*inline*/ static var LINE_TOKEN:String = "¬¬¬";
+    inline static var LINE_TOKEN:String = "¬¬¬";
 
     var styleSet:StyleSet;
 
@@ -167,7 +167,7 @@ class UIBody extends Body {
         setScrollPos(Math.isNaN(currentScrollPos) ? bottomPos : currentScrollPos);
     }
 
-    /*inline*/ function reorderGlyphs():Void {
+    inline function reorderGlyphs():Void {
         var id:Int = 0;
         for (row in 0...numRows) {
             for (col in 0...numCols) {
@@ -183,7 +183,7 @@ class UIBody extends Body {
         toggleGlyphs(glyphs.slice(numGlyphsInLayout), false);
     }
 
-    /*inline*/ function setScrollPos(pos:Float):Void {
+    inline function setScrollPos(pos:Float):Void {
 
         currentScrollPos = pos;
 
@@ -220,7 +220,7 @@ class UIBody extends Body {
         transform.appendTranslation(0, (currentScrollPos - scrollStartIndex) / numRowsForLayout, 0);
     }
 
-    /*inline*/ function taperScrollEdges():Void {
+    inline function taperScrollEdges():Void {
         var offset:Float = ((currentScrollPos % 1) + 1) % 1;
         var lastRow:Int = (numRows - 1) * numCols;
         var glyph:Glyph;
@@ -233,7 +233,7 @@ class UIBody extends Body {
         }
     }
 
-    /*inline*/ function updateGlide():Void {
+    inline function updateGlide():Void {
         if (gliding) {
             gliding = Math.abs(glideGoal - currentScrollPos) > 0.001;
             if (gliding) {
@@ -275,8 +275,8 @@ class UIBody extends Body {
         return Utf8.sub(input, 0, len);
     }
 
-    /*inline*/ function get_numLines():Int { return page.length; }
+    inline function get_numLines():Int { return page.length; }
 
-    /*inline*/ function get_numScrollPositions():Int { return page.length - numRows + 1; }
-    /*inline*/ function get_bottomPos():Float { return numScrollPositions - 1; }
+    inline function get_numScrollPositions():Int { return page.length - numRows + 1; }
+    inline function get_bottomPos():Float { return numScrollPositions - 1; }
 }

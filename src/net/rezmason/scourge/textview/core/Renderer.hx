@@ -22,11 +22,15 @@ class Renderer {
             return;
         }
 
-        if (activeMethod != method) {
-            if (activeMethod != null) activeMethod.deactivate();
-            activeMethod = method;
-            activeMethod.activate();
-        }
+        #if js
+            if (activeMethod != method) {
+                if (activeMethod != null) activeMethod.deactivate();
+                activeMethod = method;
+                activeMethod.activate();
+            }
+        #else
+            method.activate();
+        #end
 
         drawUtil.setOutputBuffer(outputBuffer);
 

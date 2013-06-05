@@ -29,12 +29,16 @@ class AnimatedStyle extends DynamicStyle {
 
         time = (time + delta) % period;
 
-        var playhead:Float = time / period * stateStyles.length;
+        var numFrames:Int = stateStyles.length;
+        if (numFrames < 1) numFrames = 1;
+
+        var playhead:Float = time / period * numFrames;
         var fromIndex:Int = Std.int(Math.floor(playhead));
-        var toIndex:Int = Std.int(Math.ceil(playhead) % stateStyles.length);
+        var toIndex:Int = Std.int(Math.ceil(playhead) % numFrames);
         var ratio:Float = easeFunc((playhead + phase) % 1);
 
         interpolateGlyphs(fromIndex, toIndex, ratio);
+
         super.updateGlyphs(delta);
     }
 
@@ -47,7 +51,6 @@ class AnimatedStyle extends DynamicStyle {
     }
 
     override public function flatten():Void {
-
         period = values['period'];
         phase = values['phase'];
 

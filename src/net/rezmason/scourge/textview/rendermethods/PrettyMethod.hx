@@ -84,9 +84,9 @@ class PrettyMethod extends RenderMethod {
             uniform sampler2D uSampler;
 
             void main(void) {
-                vec4 texture = texture2D(uSampler, vUV);
+                vec3 texture = texture2D(uSampler, vUV).rgb;
                 if (vVid >= 0.3) texture *= -1.0;
-                gl_FragColor = vec4(vColor, 1.0) * (texture + vVid) * clamp(2.0 - vZ, 0.0, 1.0);
+                gl_FragColor = vec4(vColor * (texture + vVid) * clamp(2.0 - vZ, 0.0, 1.0), 1.0);
             }
         ';
     }

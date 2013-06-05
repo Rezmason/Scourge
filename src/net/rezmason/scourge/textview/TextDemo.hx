@@ -93,13 +93,13 @@ class TextDemo {
         var _id:Int = 0;
         views = [];
 
-        /*
+        //*
         testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
         /**/
 
-        //*
+        /*
         uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
         bodies.push(uiBody);
 
