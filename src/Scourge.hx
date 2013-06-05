@@ -13,7 +13,7 @@ import net.rezmason.utils.FlatFont;
 
 import net.rezmason.scourge.textview.TestStrings;
 
-import net.rezmason.scourge.textview.styles.StyleSet;
+// import net.rezmason.scourge.textview.styles.StyleSet;
 
 class Scourge {
 

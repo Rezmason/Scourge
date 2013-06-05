@@ -49,7 +49,7 @@ class TextDemo {
 
     var splashBody:Body;
     var testBody:TestBody;
-    var uiBody:UIBody;
+    // var uiBody:UIBody;
 
     var container:Sprite;
 

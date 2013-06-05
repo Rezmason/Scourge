@@ -1,6 +1,3 @@
-Stop making so many Float32Arrays?
-        Something's slowing the Mac client down, that's for sure
-
 UI object
 
     Allow declared styles to be preserved, instead of remaking them

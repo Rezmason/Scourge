@@ -16,42 +16,65 @@ import openfl.utils.UInt8Array;
 
 class VertexBuffer {
 
-    public var buf:GLBuffer;
-    public var footprint:Int;
+    @:allow(net.rezmason.scourge.textview.utils) var buf:GLBuffer;
+    public var footprint(default, null):Int;
+    public var numVertices(default, null):Int;
+    var array:Float32Array;
 
-    public function new(footprint:Int, ?data:Array<Float>):Void {
+    public function new(numVertices:Int, footprint:Int):Void {
         this.footprint = footprint;
+        this.numVertices = numVertices;
         buf = GL.createBuffer();
-        if (data != null) uploadFromVector(data);
+        array = new Float32Array(footprint * numVertices);
     }
 
     public inline function uploadFromVector(data:Array<Float>, offset:Int = 0, num:Int = 0):Void {
-        GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-        GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(data), GL.STATIC_DRAW);
+        if (offset < 0 || offset > numVertices) {
+
+        } else {
+            if (offset + num > numVertices) num = numVertices - offset;
+
+            for (ike in (offset * footprint)...((offset + num) * footprint)) {
+                array[ike] = data[ike];
+            }
+
+            GL.bindBuffer(GL.ARRAY_BUFFER, buf);
+            GL.bufferData(GL.ARRAY_BUFFER, array, GL.STATIC_DRAW);
+        }
     }
 }
 
 class IndexBuffer {
 
-    public var buf:GLBuffer;
-    public var count(default, null):Int;
+    @:allow(net.rezmason.scourge.textview.utils) var buf:GLBuffer;
+    public var numIndices(default, null):Int;
+    var array:Int16Array;
 
-    public function new(?data:Array<Int>):Void {
+    public function new(numIndices:Int):Void {
+        this.numIndices = numIndices;
         buf = GL.createBuffer();
-        count = 0;
-        if (data != null) uploadFromVector(data);
+        array = new Int16Array(numIndices);
     }
 
     public inline function uploadFromVector(data:Array<Int>, offset:Int = 0, num:Int = 0):Void {
-        count = data.length;
-        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
-        GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, new Int16Array(data), GL.STATIC_DRAW);
+        if (offset < 0 || offset > numIndices) {
+
+        } else {
+            if (offset + num > numIndices) num = numIndices - offset;
+
+            for (ike in offset...(offset + num)) {
+                array[ike] = data[ike];
+            }
+
+            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
+            GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, array, GL.STATIC_DRAW);
+        }
     }
 }
 
 class OutputBuffer {
 
-    public var frameBuffer(default, null):GLFramebuffer;
+    @:allow(net.rezmason.scourge.textview.utils) var frameBuffer:GLFramebuffer;
     var texture:GLTexture;
     var renderBuffer:GLRenderbuffer;
 
