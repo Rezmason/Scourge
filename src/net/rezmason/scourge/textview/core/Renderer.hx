@@ -1,38 +1,43 @@
 package net.rezmason.scourge.textview.core;
 
-import net.rezmason.scourge.textview.utils.DrawUtil;
+import net.rezmason.gl.utils.DrawUtil;
+import net.rezmason.gl.OutputBuffer;
 
 class Renderer {
 
     inline static var SPACE_WIDTH:Float = 2.0;
     inline static var SPACE_HEIGHT:Float = 2.0;
 
-    var mouseSystem:MouseSystem;
     var drawUtil:DrawUtil;
     var activeMethod:RenderMethod;
 
-    public function new(drawUtil:DrawUtil, mouseSystem:MouseSystem) {
+    public function new(drawUtil:DrawUtil) {
         this.drawUtil = drawUtil;
-        this.mouseSystem = mouseSystem;
     }
 
-    public function setSize(width:Int, height:Int):Void {
-        drawUtil.resize(width, height);
-    }
+    public function render(bodies:Array<Body>, method:RenderMethod, outputBuffer:OutputBuffer):Void {
 
-    public function render(bodies:Array<Body>, method:RenderMethod, dest:RenderDestination, clear:Bool = true):Void {
-
-        if (activeMethod != method) {
-            if (activeMethod != null) activeMethod.deactivate();
-            activeMethod = method;
-            activeMethod.activate();
+        if (method == null) {
+            trace("Null method.");
+            return;
         }
+
+        #if js
+            if (activeMethod != method) {
+                if (activeMethod != null) activeMethod.deactivate();
+                activeMethod = method;
+                activeMethod.activate();
+            }
+        #else
+            method.activate();
+        #end
+
+        drawUtil.setOutputBuffer(outputBuffer);
 
         drawUtil.clear(method.backgroundColor);
 
         for (body in bodies) {
             if (body.numGlyphs == 0) continue;
-            drawUtil.setScissorRectangle(body.scissorRectangle);
             method.setMatrices(body.camera, body.transform);
             method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
 
@@ -42,9 +47,6 @@ class Renderer {
             }
         }
 
-        switch (dest) {
-            case SCREEN: drawUtil.present();
-            case MOUSE:  drawUtil.drawToBitmapData(mouseSystem.bitmapData);
-        }
+        drawUtil.finishOutputBuffer(outputBuffer);
     }
 }

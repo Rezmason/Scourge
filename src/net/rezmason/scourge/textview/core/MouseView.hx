@@ -1,10 +1,10 @@
 package net.rezmason.scourge.textview.core;
 
-import nme.display.Bitmap;
-import nme.display.Shape;
-import nme.display.Sprite;
-import nme.geom.ColorTransform;
-import nme.text.TextField;
+import flash.display.Bitmap;
+import flash.display.Shape;
+import flash.display.Sprite;
+import flash.geom.ColorTransform;
+import flash.text.TextField;
 
 
 class MouseView extends Sprite {
@@ -39,12 +39,10 @@ class MouseView extends Sprite {
 
         if (val != 0xFFFFFF) {
             cursor.alpha = 1;
-            //textField.text = StringTools.hex(val);
-            textField.text = Std.string(val);
+            textField.text = StringTools.hex(val);
         } else {
             cursor.alpha = 0.5;
             textField.text = "---";
-            val = -1;
         }
     }
 

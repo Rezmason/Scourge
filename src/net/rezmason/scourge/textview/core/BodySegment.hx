@@ -1,19 +1,19 @@
 package net.rezmason.scourge.textview.core;
 
-import nme.display3D.IndexBuffer3D;
-import nme.display3D.VertexBuffer3D;
-import nme.Vector;
+import flash.Vector;
 
-import net.rezmason.scourge.textview.utils.BufferUtil;
+import net.rezmason.gl.VertexBuffer;
+import net.rezmason.gl.IndexBuffer;
+import net.rezmason.gl.utils.BufferUtil;
 
 class BodySegment {
 
     public var id(default, null):Int;
 
-    public var colorBuffer(default, null):VertexBuffer3D;
-    public var shapeBuffer(default, null):VertexBuffer3D;
-    public var paintBuffer(default, null):VertexBuffer3D;
-    public var indexBuffer(default, null):IndexBuffer3D;
+    public var colorBuffer(default, null):VertexBuffer;
+    public var shapeBuffer(default, null):VertexBuffer;
+    public var paintBuffer(default, null):VertexBuffer;
+    public var indexBuffer(default, null):IndexBuffer;
 
     public var colorVertices(default, null):Vector<Float>;
     public var shapeVertices(default, null):Vector<Float>;
@@ -99,9 +99,6 @@ class BodySegment {
         var step:Int = visible ? 1 : -1;
         var offset:Int = visible ? 0 : -1;
         var diff:Int = 0;
-
-        var str = "";
-        for (glyph in glyphsToToggle) str += String.fromCharCode(glyph.charCode);
 
         for (srcGlyph in glyphsToToggle) {
 

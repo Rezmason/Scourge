@@ -1,15 +1,15 @@
 package net.rezmason.utils;
 
-import nme.display.BitmapData;
-import nme.display.BlendMode;
-import nme.display.Sprite;
-import nme.geom.Matrix;
-import nme.geom.Rectangle;
-import nme.text.AntiAliasType;
-import nme.text.Font;
-import nme.text.TextField;
-import nme.text.TextFieldAutoSize;
-import nme.text.TextFormat;
+import flash.display.BitmapData;
+import flash.display.BlendMode;
+import flash.display.Sprite;
+import flash.geom.Matrix;
+import flash.geom.Rectangle;
+import flash.text.AntiAliasType;
+import flash.text.Font;
+import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
+import flash.text.TextFormat;
 
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;
@@ -146,7 +146,7 @@ class FlatFont {
         var numRows:Int = Std.int(numChars / numColumns) + 1;
 
         var width:Int = largestPowerOfTwo(Std.int(Math.max(charXOffset * numColumns, charYOffset * numRows)) + spacing);
-        var bitmapData:BitmapData = new BitmapData(width, width, true, 0x0);
+        var bitmapData:BitmapData = new BitmapData(width, width, true, 0xFF000000);
         //bitmapData.fillRect(bitmapData.rect, 0xFFFFFFFF);
 
         var sp:Sprite = new Sprite();

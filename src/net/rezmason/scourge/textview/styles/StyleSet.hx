@@ -1,15 +1,17 @@
 package net.rezmason.scourge.textview.styles;
 
+import haxe.Utf8;
+import haxe.CallStack;
+import net.rezmason.scourge.textview.styles.Sigil.*;
+
 using haxe.JSON;
 using Lambda;
 using Type;
 
 class StyleSet {
 
-    public inline static var SIGIL:String = "§";
-
-    static var stringReg:EReg = ~/([^,\s:\\"\[\]]+)/g;
-    static var styleTagsReg:EReg = ~/[§∂«µ]\{[^\}]*\}/g;
+    static var stringReg:EReg = new EReg('([a-zA-Z_][a-zA-Z0-9_]*)', 'gu');
+    static var styleTagsReg:EReg = new EReg('[$STYLE $ANIMATED_STYLE $BUTTON_STYLE $INPUT_STYLE]\\{[^\\}]*\\}', 'gu');
 
     var styleTypes:Map<String, Class<Style>>;
 
@@ -24,15 +26,17 @@ class StyleSet {
         cleanStyle = new Style("", null, {r:1, g:1, b:1, i:0, s:1, p:0});
 
         styleTypes = new Map();
-        styleTypes.set("§", Style);
-        styleTypes.set("∂", AnimatedStyle);
-        styleTypes.set("«", InputStyle);
-        styleTypes.set("µ", ButtonStyle);
+        styleTypes.set(STYLE, Style);
+        styleTypes.set(ANIMATED_STYLE, AnimatedStyle);
+        styleTypes.set(BUTTON_STYLE, ButtonStyle);
+        styleTypes.set(INPUT_STYLE, InputStyle);
     }
 
     public function extractFromText(input:String, defaultStyle:Style = null):String {
+
         if (defaultStyle == null) defaultStyle = cleanStyle;
         defaultStyle.removeAllGlyphs();
+        defaultStyle.flatten();
         this.defaultStyle = defaultStyle;
         styleMouseID = 0;
         stylesByIndex = [];
@@ -46,11 +50,9 @@ class StyleSet {
         allStyles.push(defaultStyle);
         convertReferenceTags(tags, stylesByID);
 
-        //for (style in allStyles) trace(style);
-
         stylesByIndex.unshift(defaultStyle);
 
-        return styleTagsReg.replace(input, SIGIL);
+        return styleTagsReg.replace(input, STYLE);
     }
 
     public function getStyleByIndex(index:Int):Style {
@@ -72,6 +74,7 @@ class StyleSet {
     }
 
     inline function extractTags(input:String):Array<StyleTag> {
+
         var tags:Array<StyleTag> = [];
 
         while(styleTagsReg.match(input)) {
@@ -103,30 +106,30 @@ class StyleSet {
         return stylesByID;
     }
 
-    inline function resolveStyleDependencies(stylesByID:Map<String, Style>):Void {
-        for (topStyle in allStyles) {
-            var style:Style = topStyle;
-            var dependencyStack:Array<String> = [];
-            while (true) {
-                dependencyStack.push(style.name);
+    function resolveStyleDependencies(stylesByID:Map<String, Style>):Void {
+            for (topStyle in allStyles) {
+                var style:Style = topStyle;
+                var dependencyStack:Array<String> = [];
+                while (true) {
+                    dependencyStack.push(style.name);
 
-                if (style.basis == null) break;
-                if (dependencyStack.has(style.basis)) {
-                    throw 'Cyclical style dependency, pal: ( $dependencyStack )';
+                    if (style.basis == null) break;
+                    if (dependencyStack.has(style.basis)) {
+                        throw 'Cyclical style dependency, pal: ( $dependencyStack )';
+                    }
+
+                    style = stylesByID[style.basis];
+                    if (style == null) break;
                 }
 
-                style = stylesByID[style.basis];
-                if (style == null) break;
+                while (dependencyStack.length > 0) {
+                    style = stylesByID[dependencyStack.pop()];
+                    if (style.basis != null) style.inherit(stylesByID[style.basis]);
+                }
             }
 
-            while (dependencyStack.length > 0) {
-                style = stylesByID[dependencyStack.pop()];
-                style.inherit(stylesByID[style.basis]);
-            }
-        }
-
-        // Some styles have more complex dependencies. We resolve them here.
-        for (style in allStyles) style.connectBases(stylesByID);
+            // Some styles have more complex dependencies. We resolve them here.
+            for (style in allStyles) style.connectBases(stylesByID);
     }
 
     inline function convertReferenceTags(tags:Array<StyleTag>, stylesByID:Map<String, Style>):Void {
@@ -142,11 +145,19 @@ class StyleSet {
     }
 
     inline function parseTag(tagString:String):StyleTag {
-        var sigil:String = tagString.charAt(0);
-        tagString = tagString.substr(2).substr(0, -1); // Remove leading '§{' and trailing '}'
+        var sigil:String = Utf8.sub(tagString, 0, 1);
+
+        tagString = Utf8.sub(tagString, 2, Utf8.length(tagString) - 2); // Remove leading '§{'
+        tagString = Utf8.sub(tagString, 0, Utf8.length(tagString) - 1); // Remove trailing '}'
+
         var tag:StyleTag = null;
-        if (tagString.indexOf(":") == -1) tag = RefTag(sigil, tagString); // Tags with no declared properties are obviously references
-        else tag = DeclTag(sigil, ("{" + stringReg.replace(tagString, '"$1"') + "}").parse()); // Turn the string into JSON and parse it
+        if (tagString.indexOf(":") == -1) {
+            tag = RefTag(sigil, tagString); // Tags with no declared properties are obviously references
+        } else {
+            var json:String = ("{" + stringReg.replace(tagString, '"$1"') + "}");
+            tag = DeclTag(sigil, json.parse()); // Turn the string into JSON and parse it
+        }
+
         return tag;
     }
 }

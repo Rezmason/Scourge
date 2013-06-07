@@ -1,4 +1,13 @@
-PreloadSWF=/SDKs/TheMiner_v1.3.10_Pro/SWFs/TheMiner_en_v1_3_10.swf
+AGAL target
+    Fix resizing
+    Acid2 nose
+    Interaction
+    Performance tweaking
+        Compare with the main branch
+        UIBody's VertexBuffer32.uploadFromVector
+        UIBody's BodySegment.writeArrayToVector
+
+    Load shader SWF at runtime?
 
 UI object
 
@@ -37,7 +46,9 @@ Board object
     Dialer
         Dispatches interactions
 
-
+OpenFL native targets
+    resizing window and calling GL.drawElements crashes
+    no readPixels
 
 Render the scene ONCE each time interaction changes
     On mouse/finger up after a drag (once there's no inertia)
@@ -46,3 +57,6 @@ Render the scene ONCE each time interaction changes
 
 Multiple font support?
     Context3D.setSamplerStateAt
+
+Instancing?
+    Maybe colors can be passed in as vecs

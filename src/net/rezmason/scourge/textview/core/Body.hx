@@ -1,11 +1,11 @@
 package net.rezmason.scourge.textview.core;
 
-import nme.geom.Matrix3D;
-import nme.geom.Rectangle;
-import nme.geom.Vector3D;
-import nme.Vector;
+import flash.geom.Matrix3D;
+import flash.geom.Rectangle;
+import flash.geom.Vector3D;
+import flash.Vector;
 
-import net.rezmason.scourge.textview.utils.BufferUtil;
+import net.rezmason.gl.utils.BufferUtil;
 
 class Body {
     public var segments(default, null):Array<BodySegment>;
@@ -16,9 +16,7 @@ class Body {
     public var numGlyphs(default, null):Int;
     public var numVisibleGlyphs(default, null):Int;
     public var glyphTexture(default, null):GlyphTexture;
-    public var scissorRectangle(default, null):Rectangle;
     public var numSegments(default, null):Int;
-    public var crop:Bool;
     public var letterbox:Bool;
 
     var redrawHitAreas:Void->Void;
@@ -32,7 +30,6 @@ class Body {
         this.id = id;
         this.bufferUtil = bufferUtil;
         this.redrawHitAreas = redrawHitAreas;
-        crop = true;
         letterbox = true;
         this.glyphTexture = glyphTexture;
         glyphs = [];
@@ -49,7 +46,6 @@ class Body {
         camera = new Matrix3D();
         glyphTransform = new Matrix3D();
         glyphTransform.appendScale(0.0001, 0.0001, 1); // Prevents blowouts
-        scissorRectangle = new Rectangle();
     }
 
     function init():Void {
@@ -82,18 +78,6 @@ class Body {
     public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
 
         rect = sanitizeLayoutRect(stageWidth, stageHeight, rect);
-
-        if (crop) {
-            scissorRectangle.x = rect.x * stageWidth;
-            scissorRectangle.y = rect.y * stageHeight;
-            scissorRectangle.width  = rect.width  * stageWidth;
-            scissorRectangle.height = rect.height * stageHeight;
-        } else {
-            scissorRectangle.x = 0;
-            scissorRectangle.y = 0;
-            scissorRectangle.width  = stageWidth;
-            scissorRectangle.height = stageHeight;
-        }
 
         var cameraRect:Rectangle = rect.clone();
         cameraRect.offset(-0.5, -0.5);
@@ -172,5 +156,4 @@ class Body {
         mat.rawData = rawData;
         return mat;
     }
-
 }

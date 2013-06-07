@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import nme.Vector;
+import flash.Vector;
 
 import net.rezmason.utils.FatChar;
 import net.rezmason.utils.FlatFont;

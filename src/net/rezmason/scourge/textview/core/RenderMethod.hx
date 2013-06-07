@@ -1,38 +1,30 @@
 package net.rezmason.scourge.textview.core;
 
-import nme.display3D.Context3DProgramType;
-import nme.display3D.Program3D;
-import nme.display3D.shaders.Shader;
-import nme.display3D.shaders.ShaderUtils;
-import nme.geom.Matrix3D;
-import nme.geom.Vector3D;
+import flash.geom.Matrix3D;
+import flash.geom.Vector3D;
 
-import net.rezmason.scourge.textview.utils.ProgramUtil;
-import net.rezmason.scourge.textview.utils.Types;
+import net.rezmason.gl.utils.ProgramUtil;
+import net.rezmason.gl.Program;
 
 class RenderMethod {
 
     inline static var GLYPH_MAG_LIMIT:Float = 0.7;
     static var unitVec:Vector3D = new Vector3D(1, 0, 0);
 
-    public var program(default, null):Program3D;
+    public var program(default, null):Program;
     public var backgroundColor(default, null):Int;
     var programUtil:ProgramUtil;
     var glyphMat:Matrix3D;
     var glyphMag:Float;
+    var vertShader:String;
+    var fragShader:String;
 
     public function new(programUtil:ProgramUtil):Void {
         this.programUtil = programUtil;
-        program = programUtil.createProgram();
-        glyphMag = 1;
-        backgroundColor = 0x0;
-        glyphMat = new Matrix3D();
+
         init();
-
-        var vertexShader:Shader = ShaderUtils.createShader(Context3DProgramType.VERTEX, makeVertexShader());
-        var fragmentShader:Shader = ShaderUtils.createShader(Context3DProgramType.FRAGMENT, makeFragmentShader());
-
-        program.upload(vertexShader, fragmentShader);
+        composeShaders();
+        program = programUtil.createProgram(vertShader, fragShader);
     }
 
     public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void { }
@@ -51,7 +43,14 @@ class RenderMethod {
     }
 
     public function setSegment(segment:BodySegment):Void { }
-    function init():Void { }
+
+    function init():Void {
+        glyphMag = 1;
+        backgroundColor = 0x0;
+        glyphMat = new Matrix3D();
+    }
+
+    function composeShaders():Void { }
     function makeVertexShader():String { return ""; }
     function makeFragmentShader():String { return ""; }
 }

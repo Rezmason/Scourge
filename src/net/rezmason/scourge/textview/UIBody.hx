@@ -1,8 +1,10 @@
 package net.rezmason.scourge.textview;
 
-import nme.geom.Matrix3D;
-import nme.geom.Rectangle;
-import nme.system.Capabilities;
+import flash.geom.Matrix3D;
+import flash.geom.Rectangle;
+import flash.system.Capabilities;
+
+import haxe.Utf8;
 
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
@@ -10,17 +12,17 @@ import net.rezmason.scourge.textview.core.Interaction;
 
 import net.rezmason.scourge.textview.styles.Style;
 import net.rezmason.scourge.textview.styles.StyleSet;
+import net.rezmason.scourge.textview.styles.Sigil.STYLE;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
-using StringTools;
 
 class UIBody extends Body {
 
     inline static var glideEase:Float = 0.6;
     inline static var NATIVE_DPI:Float = 72;
-    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 24;
+    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 12;
 
-    inline static var LINE_TOKEN:String = "ª÷º";
+    inline static var LINE_TOKEN:String = "¬¬¬";
 
     var styleSet:StyleSet;
 
@@ -35,6 +37,7 @@ class UIBody extends Body {
     var currentScrollPos:Float;
     var glideGoal:Float;
     var gliding:Bool;
+    var lastRedrawPos:Float;
 
     var dragging:Bool;
     var dragStartY:Float;
@@ -57,7 +60,6 @@ class UIBody extends Body {
         baseTransform.appendScale(1, -1, 1);
 
         letterbox = false;
-        crop = false;
 
         glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * Capabilities.screenDPI / NATIVE_DPI;
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
@@ -78,6 +80,11 @@ class UIBody extends Body {
             glyph.set_paint(id << 16);
             glyphs.push(glyph);
         }
+
+        numRows = 0;
+        numCols = 0;
+        numRowsForLayout = 0;
+        numGlyphsInLayout = 0;
     }
 
     override public function update(delta:Float):Void {
@@ -94,9 +101,11 @@ class UIBody extends Body {
         numRows = Std.int(rect.height * stageHeight / glyphHeightInPixels);
         numRowsForLayout = numRows;
         numRows++;
+
         numCols = Std.int(rect.width  * stageWidth  / glyphWidthInPixels );
         setGlyphScale(rect.width / numCols * 2, rect.height / numRowsForLayout * 2);
 
+        lastRedrawPos = Math.NaN;
         reorderGlyphs();
         updateText(text);
     }
@@ -110,21 +119,32 @@ class UIBody extends Body {
         if (text == null) text = "";
         this.text = text;
 
+        var sigil:String = STYLE;
+
         if (numGlyphsInLayout == 0) return;
 
         // Simplify the text and wrap it to new lines as we construct the page
 
-        var styledLineReg:EReg = new EReg('(([^${StyleSet.SIGIL}]${StyleSet.SIGIL}*){$numCols})', 'g');
+        var styledLineReg:EReg = new EReg('(([^$sigil]$sigil*){$numCols})', 'gu');
 
-        function padLine(s) {
+        function padLine(line:String) {
             // Pads a string until its length, ignoring sigils, is 1
-            return StringTools.rpad(s, " ", numCols + s.split(StyleSet.SIGIL).length - 1);
+            return rpad(line, " ", numCols + line.split(sigil).length - 1);
         }
 
-        function wrapLines(s) {
+        function wrapLines(s:String) {
+
             // Splits a line into an array of lines whose length, ignoring sigils, is numCols
-            var sp = styledLineReg.replace(s, '$1$LINE_TOKEN');
-            if (sp.endsWith(LINE_TOKEN)) sp = sp.substr(0, sp.length - LINE_TOKEN.length);
+
+            var sp:String = styledLineReg.replace(s, '$1$LINE_TOKEN');
+
+            var ltl:Int = Utf8.length(LINE_TOKEN);
+            var spl:Int = Utf8.length(sp);
+
+            if (spl > ltl && Utf8.sub(sp, spl - ltl, ltl) == LINE_TOKEN) {
+                sp = Utf8.sub(sp, 0, spl - ltl);
+            }
+
             return sp.split(LINE_TOKEN).map(padLine).join(LINE_TOKEN);
         }
 
@@ -132,7 +152,7 @@ class UIBody extends Body {
 
         // Add blank lines to the end, to reach the minimum page length (numRows)
 
-        var blankParagraph:String = "".rpad(" ", numCols);
+        var blankParagraph:String = rpad("", " ", numCols);
         while (page.length < numRows) page.push(blankParagraph);
 
         // Count the sigils in each line, for style lookup
@@ -140,7 +160,7 @@ class UIBody extends Body {
         var lineStyleIndex:Int = 0;
         lineStyleIndices = [lineStyleIndex];
         for (line in page) {
-            lineStyleIndex += line.split(StyleSet.SIGIL).length - 1;
+            lineStyleIndex += line.split(sigil).length - 1;
             lineStyleIndices.push(lineStyleIndex);
         }
 
@@ -177,12 +197,14 @@ class UIBody extends Body {
         var currentStyle:Style = styleSet.getStyleByIndex(styleIndex);
         for (line in pageSegment) {
             var index:Int = 0;
-            for (index in 0...line.length) {
-                if (line.charAt(index) == "§") {
+            for (index in 0...Utf8.length(line)) {
+                var char:String = Utf8.sub(line, index, 1);
+                if (char == STYLE) {
                     currentStyle = styleSet.getStyleByIndex(++styleIndex);
                 } else {
                     var glyph:Glyph = glyphs[id++];
-                    glyph.set_char(line.charCodeAt(index), glyphTexture.font);
+                    var charCode:Int = Utf8.charCodeAt(char, 0);
+                    glyph.set_char(charCode, glyphTexture.font);
                     currentStyle.addGlyph(glyph);
                     glyph.set_z(0);
                 }
@@ -218,7 +240,10 @@ class UIBody extends Body {
                 setScrollPos(currentScrollPos * glideEase + glideGoal * (1 - glideEase));
             } else {
                 setScrollPos(glideGoal);
-                redrawHitAreas();
+                if (lastRedrawPos != glideGoal) {
+                    lastRedrawPos = glideGoal;
+                    redrawHitAreas();
+                }
             }
         }
     }
@@ -243,6 +268,11 @@ class UIBody extends Body {
             targetStyle.interact(interaction);
             if (interaction == CLICK) trace('${targetStyle.name} clicked!');
         }
+    }
+
+    inline function rpad(input:String, pad:String, len:Int):String {
+        while (Utf8.length(input) < len) input = input + pad;
+        return Utf8.sub(input, 0, len);
     }
 
     inline function get_numLines():Int { return page.length; }

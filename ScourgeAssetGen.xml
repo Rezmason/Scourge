@@ -16,7 +16,6 @@
 	<compilerflag name="-debug" />
 
 	<haxelib name="openfl" />
-	<haxelib name="openfl-compatibility" />
 	<haxelib name="format" />
 
 	<assets path="assets" rename="assets" include="ProFontX.ttf" />

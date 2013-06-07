@@ -5,34 +5,28 @@
 
 	<app title="Scourge" file="Scourge" main="Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="11.4"/>
 
-	<set name="fullscreen" if="target_webos" />
-	<set name="fullscreen" if="target_ios" />
-	<set name="fullscreen" if="target_android" />
-	<set name="fullscreen" if="target_neko" />
-	<set name="fullscreen" if="target_mac" />
+	<set name="fullscreen" />
 
-	<window width="800" height="600" fps="30" orientation="portrait" background="#000000" resizable="true" />
-	<window width="0" height="0" if="fullscreen" />
+	<window width="0" height="0" fps="30" orientation="portrait" background="#000000" resizable="true" />
 
 	<set name="BUILD_DIR" value="Export" />
 
 	<classpath name="src" />
 
-	<!-- <haxeflag name="-swf-lib" value="flash_libs/glsl2agal.swf" if="flash" /> -->
+	<haxeflag name="-swf-lib" value="flash_libs/glsl2agal.swf" if="flash" />
 	<haxeflag name="-swf-lib" value="flash_libs/agalminiassembler.swf" if="flash" />
+    <haxedef name="stage3d" if="flash" />
+	<haxedef name="glsl2agal" if="flash" />
 
 	<!-- <haxeflag name="-D" value="dump=pretty" /> -->
 
 	<haxedef name="haxeJSON" />
 	<haxedef name="advanced-telemetry" if="flash"/>
 	<!-- <haxedef name="dce" value="no" if="flash"/> -->
-	<compilerflag name="-debug" />
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 
-	<haxelib name="nme" />
+	<haxelib name="openfl" />
 	<!-- <haxelib name="hxsl" /> -->
-
-	<debug />
 	<!-- <haxelib name="actuate" /> -->
 
 	<assets path="assets/flatfonts" />
@@ -40,11 +34,11 @@
 	<assets path="assets" include="enterprise.txt"/>
 	<assets path="assets" include="acid2.txt"/>
 
-	<ndll name="std" />
-	<ndll name="regexp" />
+	<!-- <ndll name="std" /> -->
+	<!-- <ndll name="regexp" /> -->
 	<!-- <ndll name="zlib" /> -->
-	<ndll name="nme" haxelib="nme" />
+	<!-- <ndll name="nme" haxelib="nme" /> -->
 
-	<icon path="Assets/nme.svg" />
+	<!-- <icon path="Assets/nme.svg" /> -->
 
 </project>
