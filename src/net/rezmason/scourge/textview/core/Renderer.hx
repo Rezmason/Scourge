@@ -46,5 +46,7 @@ class Renderer {
                 drawUtil.drawTriangles(segment.indexBuffer, 0, segment.numVisibleGlyphs * Almanac.TRIANGLES_PER_GLYPH);
             }
         }
+
+        drawUtil.finishOutputBuffer(outputBuffer);
     }
 }

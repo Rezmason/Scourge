@@ -17,7 +17,10 @@ class GlyphTexture {
         this.font = font;
         var bmp:BitmapData = font.getBitmapDataClone();
         texture = textureUtil.createTexture(customize(bmp));
-        // bmp.dispose();
+
+        #if flash
+            bmp.dispose();
+        #end
 
         matrix = new Matrix3D();
         matrix.appendTranslation(-0.5, -0.5, 0);

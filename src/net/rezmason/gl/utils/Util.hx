@@ -1,7 +1,13 @@
 package net.rezmason.gl.utils;
 
-import openfl.display.OpenGLView;
+typedef Context = #if flash flash.display3D.Context3D #else Class<openfl.gl.GL> #end ;
+typedef View = #if flash flash.display.Stage #else openfl.display.OpenGLView #end ;
+
 class Util {
-    var view:OpenGLView;
-    public function new(view:OpenGLView):Void { this.view = view; }
+    var context:Context;
+    var view:View;
+    public function new(view:View, context:Context):Void {
+        this.view = view;
+        this.context = context;
+    }
 }

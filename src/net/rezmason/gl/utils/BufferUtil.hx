@@ -1,14 +1,19 @@
 package net.rezmason.gl.utils;
 
 import net.rezmason.gl.Types;
+import net.rezmason.gl.utils.Util;
 
 class BufferUtil extends Util {
 
     public inline function createVertexBuffer(numVertices:Int, footprint:Int):VertexBuffer {
-        return new VertexBuffer(numVertices, footprint);
+        #if flash return context.createVertexBuffer(numVertices, footprint);
+        #else return new VertexBuffer(numVertices, footprint);
+        #end
     }
 
     public inline function createIndexBuffer(numIndices:Int):IndexBuffer {
-        return new IndexBuffer(numIndices);
+        #if flash return context.createIndexBuffer(numIndices);
+        #else return new IndexBuffer(numIndices);
+        #end
     }
 }

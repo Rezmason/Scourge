@@ -49,7 +49,7 @@ class TextDemo {
 
     var splashBody:Body;
     var testBody:TestBody;
-    // var uiBody:UIBody;
+    var uiBody:UIBody;
 
     var container:Sprite;
 
@@ -77,6 +77,9 @@ class TextDemo {
 
         addListeners();
         onActivate();
+
+        // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures["full"]).render);
+        // utils.drawUtil.addRenderCall(new AGALFuckBox(utils, fontTextures["full"]).render);
     }
 
     function makeFontTextures():Void {
@@ -129,7 +132,6 @@ class TextDemo {
         stage.addEventListener(Event.DEACTIVATE, onDeactivate);
 
         utils.drawUtil.addRenderCall(onRender);
-        // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures["full"]).render);
 
         // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }

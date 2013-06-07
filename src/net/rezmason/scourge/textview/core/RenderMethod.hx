@@ -25,7 +25,6 @@ class RenderMethod {
         init();
         composeShaders();
         program = programUtil.createProgram(vertShader, fragShader);
-        connectToShaders();
     }
 
     public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void { }
@@ -52,7 +51,6 @@ class RenderMethod {
     }
 
     function composeShaders():Void { }
-    function connectToShaders():Void { }
     function makeVertexShader():String { return ""; }
     function makeFragmentShader():String { return ""; }
 }

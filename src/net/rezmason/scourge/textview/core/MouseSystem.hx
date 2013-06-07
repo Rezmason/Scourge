@@ -8,7 +8,7 @@ import flash.geom.Rectangle;
 import flash.geom.Matrix;
 import flash.utils.ByteArray;
 import flash.Vector;
-import flash.external.ExternalInterface;
+// import flash.external.ExternalInterface;
 
 import net.rezmason.gl.utils.DrawUtil;
 import net.rezmason.gl.OutputBuffer;
@@ -95,7 +95,7 @@ class MouseSystem {
             this.width = width;
             this.height = height;
 
-            data = new ReadbackData(width * height * 4);
+            data = drawUtil.createReadbackData(width * height * 4);
         }
 
         fartBD();

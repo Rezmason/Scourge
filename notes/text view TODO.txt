@@ -1,3 +1,14 @@
+AGAL target
+    Fix resizing
+    Acid2 nose
+    Interaction
+    Performance tweaking
+        Compare with the main branch
+        UIBody's VertexBuffer32.uploadFromVector
+        UIBody's BodySegment.writeArrayToVector
+
+    Load shader SWF at runtime?
+
 UI object
 
     Allow declared styles to be preserved, instead of remaking them

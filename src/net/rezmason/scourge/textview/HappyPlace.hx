@@ -4,6 +4,7 @@ import flash.geom.Matrix3D;
 import net.rezmason.scourge.textview.core.*;
 import net.rezmason.scourge.textview.rendermethods.*;
 import net.rezmason.gl.utils.UtilitySet;
+import net.rezmason.gl.OutputBuffer;
 
 
 class HappyPlace {
@@ -14,6 +15,7 @@ class HappyPlace {
     var testBody:Body;
     var prettyMethod:RenderMethod;
     var renderer:Renderer;
+    var mainOutputBuffer:OutputBuffer;
 
     function bonk():Void {};
 
@@ -25,7 +27,8 @@ class HappyPlace {
 
         testBody = new TestBody(1, utils.bufferUtil, glyphTexture, bonk);
         prettyMethod = new PrettyMethod(utils.programUtil);
-        renderer = new Renderer(utils.drawUtil, null);
+        renderer = new Renderer(utils.drawUtil);
+        mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         bodies.push(testBody);
 
         testBody.transform.identity();
@@ -39,7 +42,7 @@ class HappyPlace {
 
     public function render(w:Int, h:Int):Void {
         testBody.update(0.1);
-        renderer.setSize(w, h);
-        renderer.render(bodies, prettyMethod, RenderDestination.SCREEN);
+        mainOutputBuffer.resize(w, h);
+        renderer.render(bodies, prettyMethod, mainOutputBuffer);
     }
 }
