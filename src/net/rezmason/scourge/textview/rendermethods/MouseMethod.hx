@@ -12,15 +12,23 @@ class MouseMethod extends RenderMethod {
 
     //inline static var FAT_FINGERS:Float = 2; // TODO: Fat finger support needs to wait till we can z-order buttons
 
+    var aPos:AttribsLocation;
+    var aCorner:AttribsLocation;
+    var aPaint:AttribsLocation;
+
+    var uGlyphMat:UniformLocation;
+    var uCameraMat:UniformLocation;
+    var uBodyMat:UniformLocation;
+
     override public function activate():Void {
         programUtil.setProgram(program);
         programUtil.setDepthTest(true);
     }
 
     override public function deactivate():Void {
-        programUtil.setVertexBufferAt(program, 'aPos',    null, 0, 3);
-        programUtil.setVertexBufferAt(program, 'aCorner', null, 3, 2);
-        programUtil.setVertexBufferAt(program, 'aPaint',  null, 0, 3);
+        programUtil.setVertexBufferAt(program, aPos,    null, 0, 3);
+        programUtil.setVertexBufferAt(program, aCorner, null, 3, 2);
+        programUtil.setVertexBufferAt(program, aPaint,  null, 0, 3);
     }
 
     override function init():Void {
@@ -63,20 +71,30 @@ class MouseMethod extends RenderMethod {
         ';
     }
 
+    override function connectToShaders():Void {
+        aPos    = programUtil.getAttribsLocation(program, 'aPos'   );
+        aCorner = programUtil.getAttribsLocation(program, 'aCorner');
+        aPaint  = programUtil.getAttribsLocation(program, 'aPaint' );
+
+        uGlyphMat  = programUtil.getUniformLocation(program, 'uGlyphMat' );
+        uCameraMat = programUtil.getUniformLocation(program, 'uCameraMat');
+        uBodyMat   = programUtil.getUniformLocation(program, 'uBodyMat'  );
+    }
+
     override public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
         super.setGlyphTexture(glyphTexture, glyphTransform);
-        programUtil.setProgramConstantsFromMatrix(program, 'uGlyphMat', glyphMat, true);
+        programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, glyphMat, true);
     }
 
     override public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void {
-        programUtil.setProgramConstantsFromMatrix(program, 'uCameraMat', cameraMat, true);
-        programUtil.setProgramConstantsFromMatrix(program, 'uBodyMat', bodyMat, true);
+        programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat, true);
+        programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat, true);
     }
 
     override public function setSegment(segment:BodySegment):Void {
-        programUtil.setVertexBufferAt(program, 'aPos',    segment.shapeBuffer, 0, 3);
-        programUtil.setVertexBufferAt(program, 'aCorner', segment.shapeBuffer, 3, 2);
-        programUtil.setVertexBufferAt(program, 'aPaint',  segment.paintBuffer, 0, 3);
+        programUtil.setVertexBufferAt(program, aPos,    segment.shapeBuffer, 0, 3);
+        programUtil.setVertexBufferAt(program, aCorner, segment.shapeBuffer, 3, 2);
+        programUtil.setVertexBufferAt(program, aPaint,  segment.paintBuffer, 0, 3);
     }
 }
 

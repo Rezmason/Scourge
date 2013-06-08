@@ -70,12 +70,11 @@ class ProgramUtil extends Util {
         #end
     }
 
-    public inline function setProgramConstantsFromMatrix(program:Program, name:String, matrix:Matrix3D, ?transpose:Bool):Void {
+    public inline function setProgramConstantsFromMatrix(program:Program, location:UniformLocation, matrix:Matrix3D, ?transpose:Bool):Void {
 
         #if flash
-            program.setUniformFromMatrix(name, matrix, transpose);
+            program.setUniformFromMatrix(location, matrix, transpose);
         #else
-            var location:UniformLocation = GL.getUniformLocation(program, name);
             GL.uniformMatrix3D(location, false, matrix);
         #end
     }
@@ -98,10 +97,10 @@ class ProgramUtil extends Util {
         #end
     }
 
-    public inline function setTextureAt(program:Program, name:String, texture:Texture):Void {
+    public inline function setTextureAt(program:Program, location:UniformLocation, texture:Texture):Void {
 
         #if flash
-            program.setTextureAt(name, texture);
+            program.setTextureAt(location, texture);
         #else
             GL.activeTexture(GL.TEXTURE0);
             GL.bindBitmapDataTexture(cast texture);
@@ -110,18 +109,16 @@ class ProgramUtil extends Util {
             // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
             // GL.generateMipmap(GL.TEXTURE_2D);
 
-            var location:UniformLocation = GL.getUniformLocation(program, name);
             GL.uniform1i(location, 0);
         #end
     }
 
-    public inline function setVertexBufferAt(program:Program, name:String, buffer:VertexBuffer, offset:Int = 0, size:Int = -1, ?normalized:Bool):Void {
+    public inline function setVertexBufferAt(program:Program, location:AttribsLocation, buffer:VertexBuffer, offset:Int = 0, size:Int = -1, ?normalized:Bool):Void {
 
         #if flash
             if (size < 0) size = 1;
-            program.setVertexBufferAt(name, buffer, offset, formats[size]);
+            program.setVertexBufferAt(location, buffer, offset, formats[size]);
         #else
-            var location:Int = GL.getAttribLocation(program, name);
             if (buffer != null) {
                 if (size < 0) size = buffer.footprint;
 
@@ -132,6 +129,22 @@ class ProgramUtil extends Util {
             } else {
                 GL.disableVertexAttribArray(location);
             }
+        #end
+    }
+
+    public inline function getUniformLocation(program:Program, name:String):UniformLocation {
+        #if flash
+            return program.getUniformLocation(name);
+        #else
+            return GL.getUniformLocation(program, name);
+        #end
+    }
+
+    public inline function getAttribsLocation(program:Program, name:String):AttribsLocation {
+        #if flash
+            return program.getAttribLocation(name);
+        #else
+            return GL.getAttribLocation(program, name);
         #end
     }
 }

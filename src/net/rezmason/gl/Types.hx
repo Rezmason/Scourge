@@ -1,11 +1,6 @@
 package net.rezmason.gl;
 
-#if !flash
-    typedef UniformLocation = openfl.gl.GLUniformLocation;
-#end
+typedef AttribsLocation = #if flash Int #else Int #end ;
+typedef UniformLocation = #if flash Int #else openfl.gl.GLUniformLocation #end ;
 
-#if js
-    typedef ReadbackData = openfl.utils.UInt8Array;
-#else
-    typedef ReadbackData = flash.utils.ByteArray;
-#end
+typedef ReadbackData = #if js openfl.utils.UInt8Array #else flash.utils.ByteArray #end ;

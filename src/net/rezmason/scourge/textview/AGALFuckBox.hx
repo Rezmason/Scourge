@@ -8,6 +8,7 @@ import flash.geom.Vector3D;
 
 import net.rezmason.gl.utils.*;
 import net.rezmason.gl.*;
+import net.rezmason.gl.Types;
 import net.rezmason.scourge.textview.core.*;
 
 class AGALFuckBox {
@@ -61,6 +62,20 @@ class AGALFuckBox {
         }
     ';
 
+    var uBodyMat:UniformLocation;
+    var uCameraMat:UniformLocation;
+    var uGlyphMat:UniformLocation;
+
+    var uSampler:UniformLocation;
+
+    var aPos:AttribsLocation;
+    var aCorner:AttribsLocation;
+    var aScale:AttribsLocation;
+    var aPop:AttribsLocation;
+    var aColor:AttribsLocation;
+    var aUV:AttribsLocation;
+    var aVid:AttribsLocation;
+
     var glyphTexture:GlyphTexture;
     var program:Program;
 
@@ -100,6 +115,22 @@ class AGALFuckBox {
         // Create program
 
         program = utils.programUtil.createProgram(vertShader, fragShader);
+
+        // Connect to shader
+
+        uBodyMat = utils.programUtil.getUniformLocation(program, 'uBodyMat');
+        uCameraMat = utils.programUtil.getUniformLocation(program, 'uCameraMat');
+        uGlyphMat = utils.programUtil.getUniformLocation(program, 'uGlyphMat');
+
+        uSampler = utils.programUtil.getUniformLocation(program, 'uSampler');
+
+        aPos = utils.programUtil.getAttribsLocation(program, 'aPos');
+        aCorner = utils.programUtil.getAttribsLocation(program, 'aCorner');
+        aScale = utils.programUtil.getAttribsLocation(program, 'aScale');
+        aPop = utils.programUtil.getAttribsLocation(program, 'aPop');
+        aColor = utils.programUtil.getAttribsLocation(program, 'aColor');
+        aUV = utils.programUtil.getAttribsLocation(program, 'aUV');
+        aVid = utils.programUtil.getAttribsLocation(program, 'aVid');
 
         // Create geometry
 
@@ -183,24 +214,26 @@ class AGALFuckBox {
         utils.programUtil.setDepthTest(false);
 
 
-        utils.programUtil.setProgramConstantsFromMatrix(program, 'uBodyMat', bodyMat, true); // uBodyMat contains the body's matrix
-        utils.programUtil.setProgramConstantsFromMatrix(program, 'uCameraMat', cameraMat, true); // uCameraMat contains the camera matrix
-        utils.programUtil.setProgramConstantsFromMatrix(program, 'uGlyphMat', glyphMat, true); // uGlyphMat contains the character matrix
+        utils.programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat, true); // uBodyMat contains the body's matrix
+        utils.programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat, true); // uCameraMat contains the camera matrix
+        utils.programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, glyphMat, true); // uGlyphMat contains the character matrix
 
-        utils.programUtil.setTextureAt(program, 'uSampler', glyphTexture.texture); // uSampler contains our texture
+        utils.programUtil.setTextureAt(program, uSampler, glyphTexture.texture); // uSampler contains our texture
 
-        utils.programUtil.setVertexBufferAt(program, 'aPos',     shapeBuffer, 0, 3); // aPos contains x,y,z
-        utils.programUtil.setVertexBufferAt(program, 'aCorner',  shapeBuffer, 3, 2); // aCorner contains h,v
-        utils.programUtil.setVertexBufferAt(program, 'aScale',   shapeBuffer, 5, 1); // aScale contains s
-        utils.programUtil.setVertexBufferAt(program, 'aPop',     shapeBuffer, 6, 1); // aPop contains p
-        utils.programUtil.setVertexBufferAt(program, 'aColor',   colorBuffer, 0, 3); // aColor contains r,g,b
-        utils.programUtil.setVertexBufferAt(program, 'aUV',      colorBuffer, 3, 2); // aUV contains u,v
-        utils.programUtil.setVertexBufferAt(program, 'aVid',     colorBuffer, 5, 1); // aVid contains i
+        utils.programUtil.setVertexBufferAt(program, aPos,     shapeBuffer, 0, 3); // aPos contains x,y,z
+        utils.programUtil.setVertexBufferAt(program, aCorner,  shapeBuffer, 3, 2); // aCorner contains h,v
+        utils.programUtil.setVertexBufferAt(program, aScale,   shapeBuffer, 5, 1); // aScale contains s
+        utils.programUtil.setVertexBufferAt(program, aPop,     shapeBuffer, 6, 1); // aPop contains p
+        utils.programUtil.setVertexBufferAt(program, aColor,   colorBuffer, 0, 3); // aColor contains r,g,b
+        utils.programUtil.setVertexBufferAt(program, aUV,      colorBuffer, 3, 2); // aUV contains u,v
+        utils.programUtil.setVertexBufferAt(program, aVid,     colorBuffer, 5, 1); // aVid contains i
 
         utils.drawUtil.setOutputBuffer(mainOutputBuffer);
         utils.drawUtil.clear(0xFF000000);
         utils.drawUtil.drawTriangles(indexBuffer, 0, numTriangles);
         utils.drawUtil.finishOutputBuffer(mainOutputBuffer);
+
+        utils.drawUtil.removeRenderCall(render);
     }
 
     inline function makeProjection():Matrix3D {
