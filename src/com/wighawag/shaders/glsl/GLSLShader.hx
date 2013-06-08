@@ -58,6 +58,7 @@ class GLSLShader {
     private var agalInfo : AgalInfo;
     public var type : Context3DProgramType;
     public var nativeShader : com.wighawag.shaders.Shader;
+    private var constTable : Map<Int, Vector<Float>>;
 
 
     public function new(type : Context3DProgramType, glslSource : String) {
@@ -75,42 +76,41 @@ class GLSLShader {
         agalInfo = new AgalInfo(agalInfoData);
         var agalSource = agalInfo.agalasm;
 
+        constTable = new Map();
+        for (constantName in agalInfo.consts.keys()){
+            var index:Int = getRegisterIndex(constantName);
+            var vec:Vector<Float> = Vector.ofArray(agalInfo.consts.get(constantName));
+            constTable.set(index, vec);
+        }
 
         nativeShader = ShaderUtils.createShader(type,agalSource);
 
     }
 
-    public function setUniformFromMatrix(context3D : Context3D, name : String , matrix : Matrix3D,transposedMatrix : Bool = false) : Void{
-        var registerIndex = getRegisterIndexForUniform(name);
-        context3D.setProgramConstantsFromMatrix(type, registerIndex, matrix, transposedMatrix);
+    public inline function setup(context3D:Context3D) : Void{
+        for (index in constTable.keys()) setUniformFromVector(context3D, index, constTable[index]);
+    }
+
+    public inline function setUniformFromMatrix(context3D : Context3D, index : Int , matrix : Matrix3D,transposedMatrix : Bool = false) : Void{
+        context3D.setProgramConstantsFromMatrix(type, index, matrix, transposedMatrix);
     }
 
     // expect 4 values
-    public function setUniformFromByteArray(context3D, name : String, data:ByteArray, byteArrayOffset:Int) : Void{
-        var registerIndex = getRegisterIndexForUniform(name);
-        context3D.setProgramConstantsFromByteArray(type, registerIndex, 1, data, byteArrayOffset);
+    public inline function setUniformFromByteArray(context3D, index : Int, data:ByteArray, byteArrayOffset:Int) : Void{
+        context3D.setProgramConstantsFromByteArray(type, index, 1, data, byteArrayOffset);
     }
 
     // TODO do not use vector but use 4 float arguments ?
     // for now it only use the first 4 float in the vector
-    public function setUniformFromVector(context3D : Context3D, name : String , vector : Vector<Float>) : Void{
-        var registerIndex = getRegisterIndexForUniform(name);
-        context3D.setProgramConstantsFromVector(type, registerIndex, vector, 1);
+    public inline function setUniformFromVector(context3D : Context3D, index : Int , vector : Vector<Float>) : Void{
+        context3D.setProgramConstantsFromVector(type, index, vector, 1);
     }
 
-    private function getRegisterIndexForUniform(name : String) : Int{
-        //SUBCLASS NEED TO IMPLEMENT
-        return -1;
+    public inline function getRegisterIndex(name : String) : Int{
+        var registerName = agalInfo.varnames.get(name);
+        if(registerName == null) registerName = name;
+        return Std.parseInt(registerName.substr(2)); //fc, vc, fs
     }
 
-    @:allow(com.wighawag.shaders.glsl)
-    private function hasVarying(name:String):Bool {
-        return agalInfo.varnames.exists(name);
-    }
-
-    public function setup(context3D : Context3D) : Void{
-        for (constantName in agalInfo.consts.keys()){
-            setUniformFromVector(context3D, constantName, Vector.ofArray(agalInfo.consts.get(constantName)));
-        }
-    }
+    public function hasVar(name:String):Bool return agalInfo.varnames.exists(name);
 }

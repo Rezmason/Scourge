@@ -1,16 +1,9 @@
 AGAL target
-    Switch GLSL hookup from strings to locations, because jesus christ.
-        Bring back connectToShaders
-        Store the locations and use them.
-            AttributeLocation
-            UniformLocation
     Fix resizing
     Acid2 nose
     Interaction
     Performance tweaking
-        Compare with the main branch
-        UIBody's VertexBuffer32.uploadFromVector
-        UIBody's BodySegment.writeArrayToVector
+        Body.update
 
     Load shader SWF at runtime?
 
