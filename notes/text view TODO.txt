@@ -1,11 +1,13 @@
 AGAL target
-    Fix resizing
-    Acid2 nose
     Interaction
+        Get the interactive area to update properly
+
     Performance tweaking
         Body.update
+        VertexBuffer3D.uploadFromVector
 
-    Load shader SWF at runtime?
+    Ask wighawag for permission
+        Or just dissolve the thing entirely.
 
 UI object
 

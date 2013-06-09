@@ -1,11 +1,12 @@
 package com.wighawag.shaders.glsl;
-import flash.Vector;
+
 import flash.display3D.Context3D;
 import flash.display3D.Context3DVertexBufferFormat;
 import flash.display3D.Program3D;
 import flash.display3D.VertexBuffer3D;
 import flash.display3D.textures.Texture;
 import flash.geom.Matrix3D;
+
 class GLSLProgram {
 
     private var context3D : Context3D;

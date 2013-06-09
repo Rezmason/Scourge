@@ -70,10 +70,10 @@ class ProgramUtil extends Util {
         #end
     }
 
-    public inline function setProgramConstantsFromMatrix(program:Program, location:UniformLocation, matrix:Matrix3D, ?transpose:Bool):Void {
+    public inline function setProgramConstantsFromMatrix(program:Program, location:UniformLocation, matrix:Matrix3D):Void {
 
         #if flash
-            program.setUniformFromMatrix(location, matrix, transpose);
+            program.setUniformFromMatrix(location, matrix, true);
         #else
             GL.uniformMatrix3D(location, false, matrix);
         #end

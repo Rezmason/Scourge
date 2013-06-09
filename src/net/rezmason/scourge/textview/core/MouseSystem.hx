@@ -22,6 +22,7 @@ class MouseSystem {
 
     public var outputBuffer(default, null):OutputBuffer;
     public var view(get, null):Sprite;
+    public var invalid(default, null):Bool;
     var data:ReadbackData;
     var bitmapData:BitmapData;
     var _view:MouseView;
@@ -50,6 +51,7 @@ class MouseSystem {
 
         width = -1;
         height = -1;
+        invalidate();
 
         /*
         #if flash
@@ -76,8 +78,10 @@ class MouseSystem {
         dupe.setPixels(bitmapData.rect, byteArray);
 
         var flipMat:Matrix = new Matrix();
-        flipMat.scale(1, -1);
-        flipMat.translate(0, dupe.height);
+        #if js
+            flipMat.scale(1, -1);
+            flipMat.translate(0, dupe.height);
+        #end
 
         bitmapData.draw(dupe, flipMat);
 
@@ -98,43 +102,48 @@ class MouseSystem {
             data = drawUtil.createReadbackData(width * height * 4);
         }
 
-        fartBD();
+        invalidate();
     }
 
     public function readOutputBuffer():Void {
+        invalid = false;
         drawUtil.readBack(outputBuffer, width, height, data);
         fartBD();
     }
 
+    public function invalidate():Void {
+        invalid = true;
+    }
+
     function getRawID(x:Float, y:Float):Int {
 
-        if (data == null) return NULL_ID;
+        if (data == null || data.length < width * height * 4) return NULL_ID;
 
-        var rectLeft:Int = Std.int(x) - 1;
-        var rectTop:Int = Std.int(height - y) - 1;
-        var index:Int = (rectTop * width + rectLeft) * 4;
+        var rectLeft:Int = Std.int(x);
+        var rectTop:Int = Std.int(#if !flash height - #end y) - 1;
+        var offset:Int = #if flash 1 #else 0 #end;
 
-        var idElements:Array<Int> = [
-            data[index + 0],
-            data[index + 1],
-            data[index + 2],
-            data[index + 3],
-        ];
+        var rawID:Int = getRawIDFromIndex((rectTop * width + rectLeft) * 4 + offset);
 
-        var rawID:Int = (idElements[0] << 16) | (idElements[1] << 8) | (idElements[2] << 0);
+        // Ignore any edge pixels. Deals with antialiasing.
+        // After all, if a hit area is important, it'll be big, and its edge pixels won't matter.
+        for (row in rectTop - 1...rectTop + 2) {
+            if (row < 0 || row >= height) continue; // Skip edges
+            for (col in rectLeft - 1...rectLeft + 2) {
+                if (col < 0 || col >= width) continue; // Skip edges
 
-        /*
-        for (row in 0...3) {
-            for (col in 0...3) {
-                index = (row * width + col) * 4;
-                for (el in 0...4) if (idElements[el] != data[index + el]) return NULL_ID;
+                // Blurry edge test
+                if (getRawIDFromIndex((row * width + col) * 4 + offset) != rawID) return NULL_ID;
             }
         }
-        */
 
         _view.update(x, y, rawID);
 
         return rawID;
+    }
+
+    inline function getRawIDFromIndex(index:Int):Int {
+        return (data[index] << 16) | (data[index + 1] << 8) | (data[index + 2] << 0);
     }
 
     function onMouseMove(event:MouseEvent):Void {

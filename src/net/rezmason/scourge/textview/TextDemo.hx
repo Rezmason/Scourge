@@ -45,8 +45,6 @@ class TextDemo {
     var renderer:Renderer;
     var mainOutputBuffer:OutputBuffer;
 
-    var hitAreasInvalid:Bool;
-
     var splashBody:Body;
     var testBody:TestBody;
     var uiBody:UIBody;
@@ -97,13 +95,13 @@ class TextDemo {
         views = [];
 
         //*
-        testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
+        testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"], mouseSystem.invalidate);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
         /**/
 
-        /*
-        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
+        //*
+        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures["full"], mouseSystem.invalidate);
         bodies.push(uiBody);
 
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
@@ -114,13 +112,13 @@ class TextDemo {
         /**/
 
         /*
-        var alphabetBody:Body = new AlphabetBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
+        var alphabetBody:Body = new AlphabetBody(_id++, utils.bufferUtil, fontTextures["full"], mouseSystem.invalidate);
         bodies.push(alphabetBody);
         views.push({body:alphabetBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
 
         /*
-        splashBody = new SplashBody(_id++, utils.bufferUtil, fontTextures["full"], redrawHitAreas);
+        splashBody = new SplashBody(_id++, utils.bufferUtil, fontTextures["full"], mouseSystem.invalidate);
         bodies.push(splashBody);
         views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
@@ -144,10 +142,9 @@ class TextDemo {
         }
 
         if (active) {
-            if (hitAreasInvalid) {
+            if (mouseSystem.invalid) {
                 renderer.render(bodies, mouseMethod, mouseSystem.outputBuffer);
                 mouseSystem.readOutputBuffer();
-                hitAreasInvalid = false;
             }
 
             renderer.render(bodies, prettyMethod, mainOutputBuffer);
@@ -168,7 +165,7 @@ class TextDemo {
         for (view in views) view.body.adjustLayout(width, height, view.rect);
         mouseSystem.setSize(width, height);
         mainOutputBuffer.resize(width, height);
-        redrawHitAreas();
+        mouseSystem.invalidate();
     }
 
     function onActivate(?event:Event):Void {
@@ -180,7 +177,7 @@ class TextDemo {
         updateTimer.start();
         onResize();
         onTimer();
-        redrawHitAreas();
+        mouseSystem.invalidate();
     }
 
     function onDeactivate(?event:Event):Void {
@@ -197,12 +194,8 @@ class TextDemo {
         lastTimeStamp = timeStamp;
     }
 
-    function redrawHitAreas():Void {
-        hitAreasInvalid = true;
-    }
-
     function onMouseViewClick(?event:Event):Void {
-        redrawHitAreas();
+        mouseSystem.invalidate();
     }
 
     function update(delta:Float):Void {

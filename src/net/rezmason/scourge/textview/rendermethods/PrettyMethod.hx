@@ -114,8 +114,8 @@ class PrettyMethod extends RenderMethod {
     }
 
     override public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void {
-        programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat, true); // uCameraMat contains the camera matrix
-        programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat, true); // uBodyMat contains the body's matrix
+        programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat); // uCameraMat contains the camera matrix
+        programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat); // uBodyMat contains the body's matrix
     }
 
     override public function setSegment(segment:BodySegment):Void {

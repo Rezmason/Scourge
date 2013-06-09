@@ -43,7 +43,7 @@ class DrawUtil extends Util {
         var blue:Float  = ((color >>  0) & 0xFF) / 0xFF;
 
         #if flash
-            context.clear(red / 0xFF, green / 0xFF, blue / 0xFF, alpha);
+            context.clear(red, green, blue, alpha);
         #else
             GL.clearColor(red, green, blue, alpha);
             GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
@@ -107,7 +107,6 @@ class DrawUtil extends Util {
     function onResize(event:Event):Void {
         stageRect.width = view.stageWidth;
         stageRect.height = view.stageHeight;
-        onRender(stageRect);
     }
 
     function onEnterFrame(event:Event):Void {

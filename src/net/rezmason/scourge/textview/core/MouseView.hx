@@ -26,7 +26,7 @@ class MouseView extends Sprite {
         cursor.graphics.endFill();
         textField = new TextField();
         textField.background = true;
-        textField.width = textField.height = 40;
+        textField.height = 30;
 
         addChild(bitmap);
         addChild(cursor);

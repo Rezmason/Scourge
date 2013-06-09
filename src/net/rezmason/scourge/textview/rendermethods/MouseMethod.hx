@@ -83,12 +83,12 @@ class MouseMethod extends RenderMethod {
 
     override public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
         super.setGlyphTexture(glyphTexture, glyphTransform);
-        programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, glyphMat, true);
+        programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, glyphMat);
     }
 
     override public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void {
-        programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat, true);
-        programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat, true);
+        programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat);
+        programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat);
     }
 
     override public function setSegment(segment:BodySegment):Void {
