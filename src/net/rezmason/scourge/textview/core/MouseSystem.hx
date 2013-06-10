@@ -131,7 +131,7 @@ class MouseSystem {
 
     function fartBD():Void {
 
-        // return;
+        #if js return; #end
 
         var byteArray:ByteArray = #if js new FriendlyByteArray(data) #else data #end ;
         byteArray.position = 0;

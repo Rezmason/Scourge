@@ -79,7 +79,7 @@ class DrawUtil extends Util {
             if (outputBuffer.bitmapData == null) context.present();
             else {
                 context.drawToBitmapData(outputBuffer.bitmapData);
-                outputBuffer.bitmapData.fillRect(new Rectangle(0, 200, 100, 100), 0xFF000000 | Std.int(Math.random() * 0xFFFFFF));
+                // outputBuffer.bitmapData.fillRect(new Rectangle(0, 200, 100, 100), 0xFF000000 | Std.int(Math.random() * 0xFFFFFF));
             }
         #end
     }

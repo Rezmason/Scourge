@@ -102,14 +102,18 @@ class ProgramUtil extends Util {
         #if flash
             program.setTextureAt(location, texture);
         #else
-            GL.activeTexture(GL.TEXTURE0);
-            GL.bindBitmapDataTexture(cast texture);
-            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+            if (texture != null) {
+                GL.activeTexture(GL.TEXTURE0);
+                GL.bindBitmapDataTexture(cast texture);
+                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
 
-            // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-            // GL.generateMipmap(GL.TEXTURE_2D);
+                // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+                // GL.generateMipmap(GL.TEXTURE_2D);
 
-            GL.uniform1i(location, 0);
+                GL.uniform1i(location, 0);
+            } else {
+
+            }
         #end
     }
 
