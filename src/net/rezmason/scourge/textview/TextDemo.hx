@@ -65,7 +65,7 @@ class TextDemo {
         container = new Sprite();
         stage.addChild(container);
         mouseSystem = new MouseSystem(utils.drawUtil, stage, interact);
-        // container.addChild(mouseSystem.view);
+        container.addChild(mouseSystem.view);
         renderer = new Renderer(utils.drawUtil);
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         prettyMethod = new PrettyMethod(utils.programUtil);
@@ -131,7 +131,7 @@ class TextDemo {
 
         utils.drawUtil.addRenderCall(onRender);
 
-        // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
+        mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
     function onRender(width:Int, height:Int):Void {
@@ -165,7 +165,6 @@ class TextDemo {
         for (view in views) view.body.adjustLayout(width, height, view.rect);
         mouseSystem.setSize(width, height);
         mainOutputBuffer.resize(width, height);
-        mouseSystem.invalidate();
     }
 
     function onActivate(?event:Event):Void {
@@ -177,7 +176,6 @@ class TextDemo {
         updateTimer.start();
         onResize();
         onTimer();
-        mouseSystem.invalidate();
     }
 
     function onDeactivate(?event:Event):Void {

@@ -1,6 +1,6 @@
 AGAL target
     Interaction
-        Get the interactive area to update properly
+        Why won't it draw?
 
     Performance tweaking
         Body.update

@@ -36,7 +36,8 @@ class MouseSystem {
     var drawUtil:DrawUtil;
 
     public function new(drawUtil:DrawUtil, target:EventDispatcher, interact:InteractFunction):Void {
-        _view = new MouseView(0.2, 40);
+        _view = new MouseView(0.2, 1);
+        // _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
         this.interact = interact;
         this.drawUtil = drawUtil;
@@ -62,47 +63,21 @@ class MouseSystem {
         outputBuffer = drawUtil.createOutputBuffer();
     }
 
-    public function fartBD():Void {
-
-        return;
-
-        var byteArray:ByteArray;
-        #if js
-            byteArray = new FriendlyByteArray(data);
-        #else
-            byteArray = data;
-        #end
-        byteArray.position = 0;
-
-        var dupe:BitmapData = bitmapData.clone();
-        dupe.setPixels(bitmapData.rect, byteArray);
-
-        var flipMat:Matrix = new Matrix();
-        #if js
-            flipMat.scale(1, -1);
-            flipMat.translate(0, dupe.height);
-        #end
-
-        bitmapData.draw(dupe, flipMat);
-
-        _view.bitmap.bitmapData = bitmapData;
-    }
-
     public function setSize(width:Int, height:Int):Void {
-        if (bitmapData != null) bitmapData.dispose();
-        bitmapData = new BitmapData(width, height, false, 0xFF00FF);
-        _view.bitmap.bitmapData = bitmapData;
-
-        outputBuffer.resize(width, height);
-
         if (this.width != width || this.height != height) {
             this.width = width;
             this.height = height;
 
-            data = drawUtil.createReadbackData(width * height * 4);
-        }
+            if (bitmapData != null) bitmapData.dispose();
+            bitmapData = new BitmapData(width, height, false, 0xFF00FF);
+            _view.bitmap.bitmapData = bitmapData;
 
-        invalidate();
+            outputBuffer.resize(width, height);
+
+            data = drawUtil.createReadbackData(width * height * 4);
+
+            invalidate();
+        }
     }
 
     public function readOutputBuffer():Void {
@@ -119,23 +94,31 @@ class MouseSystem {
 
         if (data == null || data.length < width * height * 4) return NULL_ID;
 
+        if (x < 0) x = 0;
+        if (x >= width) x = width - 1;
+
+        if (y < 0) y = 0;
+        if (y >= height) y = height - 1;
+
         var rectLeft:Int = Std.int(x);
-        var rectTop:Int = Std.int(#if !flash height - #end y) - 1;
+        var rectTop:Int = Std.int(#if !flash height - 1 - #end y);
         var offset:Int = #if flash 1 #else 0 #end;
 
         var rawID:Int = getRawIDFromIndex((rectTop * width + rectLeft) * 4 + offset);
 
-        // Ignore any edge pixels. Deals with antialiasing.
-        // After all, if a hit area is important, it'll be big, and its edge pixels won't matter.
-        for (row in rectTop - 1...rectTop + 2) {
-            if (row < 0 || row >= height) continue; // Skip edges
-            for (col in rectLeft - 1...rectLeft + 2) {
-                if (col < 0 || col >= width) continue; // Skip edges
+        #if flash
+            // Ignore any edge pixels. Deals with antialiasing.
+            // After all, if a hit area is important, it'll be big, and its edge pixels won't matter.
+            for (row in rectTop - 1...rectTop + 2) {
+                if (row < 0 || row >= height) continue; // Skip edges
+                for (col in rectLeft - 1...rectLeft + 2) {
+                    if (col < 0 || col >= width) continue; // Skip edges
 
-                // Blurry edge test
-                if (getRawIDFromIndex((row * width + col) * 4 + offset) != rawID) return NULL_ID;
+                    // Blurry edge test
+                    if (getRawIDFromIndex((row * width + col) * 4 + offset) != rawID) return NULL_ID;
+                }
             }
-        }
+        #end
 
         _view.update(x, y, rawID);
 
@@ -144,6 +127,31 @@ class MouseSystem {
 
     inline function getRawIDFromIndex(index:Int):Int {
         return (data[index] << 16) | (data[index + 1] << 8) | (data[index + 2] << 0);
+    }
+
+    function fartBD():Void {
+
+        // return;
+
+        var byteArray:ByteArray = #if js new FriendlyByteArray(data) #else data #end ;
+        byteArray.position = 0;
+
+        var dupe:BitmapData = bitmapData.clone();
+        dupe.setPixels(bitmapData.rect, byteArray);
+
+        var flipMat:Matrix = new Matrix();
+        #if js
+            flipMat.scale(1, -1);
+            flipMat.translate(0, dupe.height);
+        #end
+
+        bitmapData.lock();
+        bitmapData.fillRect(bitmapData.rect, 0xFF000000);
+        bitmapData.draw(dupe, flipMat);
+        bitmapData.unlock();
+        dupe.dispose();
+
+        _view.bitmap.bitmapData = bitmapData;
     }
 
     function onMouseMove(event:MouseEvent):Void {

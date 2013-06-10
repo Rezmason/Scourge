@@ -77,7 +77,10 @@ class DrawUtil extends Util {
     public inline function finishOutputBuffer(outputBuffer:OutputBuffer):Void {
         #if flash
             if (outputBuffer.bitmapData == null) context.present();
-            else context.drawToBitmapData(outputBuffer.bitmapData);
+            else {
+                context.drawToBitmapData(outputBuffer.bitmapData);
+                outputBuffer.bitmapData.fillRect(new Rectangle(0, 200, 100, 100), 0xFF000000 | Std.int(Math.random() * 0xFFFFFF));
+            }
         #end
     }
 
@@ -89,7 +92,9 @@ class DrawUtil extends Util {
         #if flash
             if (outputBuffer.bitmapData != null) {
                 var rect:Rectangle = new Rectangle(0, 0, width, height);
+                data.position = 0;
                 outputBuffer.bitmapData.copyPixelsToByteArray(rect, data);
+                data.position = 0;
             }
         #else
             setOutputBuffer(outputBuffer);

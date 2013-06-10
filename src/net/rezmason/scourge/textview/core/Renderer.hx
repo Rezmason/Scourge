@@ -22,7 +22,7 @@ class Renderer {
             return;
         }
 
-        #if js
+        #if (flash || js)
             if (activeMethod != method) {
                 if (activeMethod != null) activeMethod.deactivate();
                 activeMethod = method;
@@ -33,7 +33,6 @@ class Renderer {
         #end
 
         drawUtil.setOutputBuffer(outputBuffer);
-
         drawUtil.clear(method.backgroundColor);
 
         for (body in bodies) {

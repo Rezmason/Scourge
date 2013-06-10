@@ -36,6 +36,8 @@ class PrettyMethod extends RenderMethod {
         programUtil.setVertexBufferAt(program, aColor,  null, 0, 3);
         programUtil.setVertexBufferAt(program, aUV,     null, 3, 2);
         programUtil.setVertexBufferAt(program, aVid,    null, 5, 1);
+
+        programUtil.setTextureAt(program, uSampler, null);
     }
 
     override function composeShaders():Void {
