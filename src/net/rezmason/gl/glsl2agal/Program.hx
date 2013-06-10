@@ -1,4 +1,4 @@
-package com.wighawag.glsl2agal;
+package net.rezmason.gl.glsl2agal;
 
 import flash.display3D.Context3D;
 import flash.display3D.Context3DProgramType;
@@ -7,6 +7,19 @@ import flash.display3D.Program3D;
 import flash.display3D.VertexBuffer3D;
 import flash.display3D.textures.Texture;
 import flash.geom.Matrix3D;
+
+/**
+
+    The net.rezmason.gl.glsl2agal package is derived from the NME contributions
+    of Ronan Sandford (aka @wighawag) toward cross-platform Stage3D support:
+
+    https://github.com/wighawag/NMEStage3DTest
+
+    While functional, the code included here and in the net.rezmason.gl package
+    do not represent the primary efforts of the OpenFL community toward a fully
+    cross-platform 3D API.
+
+**/
 
 class Program {
 

@@ -1,4 +1,4 @@
-package com.wighawag.glsl2agal;
+package net.rezmason.gl.glsl2agal;
 
 import flash.Vector;
 import flash.display3D.Context3D;
@@ -11,7 +11,20 @@ import flash.utils.ByteArray;
 import com.adobe.utils.AGALMiniAssembler;   // glsl2agal.swf
 import nme.display3D.shaders.GlslToAgal;    // agalminiassembler.swf
 
-@:allow(com.wighawag.glsl2agal)
+/**
+
+    The net.rezmason.gl.glsl2agal package is derived from the NME contributions
+    of Ronan Sandford (aka @wighawag) toward cross-platform Stage3D support:
+
+    https://github.com/wighawag/NMEStage3DTest
+
+    While functional, the code included here and in the net.rezmason.gl package
+    do not represent the primary efforts of the OpenFL community toward a fully
+    cross-platform 3D API.
+
+**/
+
+@:allow(net.rezmason.gl.glsl2agal)
 class Shader {
 
     var type(default, null):Context3DProgramType;

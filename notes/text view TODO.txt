@@ -1,16 +1,3 @@
-Note: debugging webgl target with the console open slows it down
-    Use Chrome instead
-
-AGAL target
-
-    Performance tweaking
-        Body.update
-        VertexBuffer3D.uploadFromVector
-
-        Maybe Glyphs can get and set properties on their parent Vectors instead of having their own Vectors
-
-    Ask wighawag for permission to use his glsl2agal classes
-
 UI object
 
     Allow declared styles to be preserved, instead of remaking them
@@ -47,6 +34,11 @@ Board object
     Creeping text
     Dialer
         Dispatches interactions
+
+Note: debugging webgl target with the console open slows it down
+    Use Chrome instead
+
+Maybe Glyphs can get and set properties on their parent Vectors instead of having their own Vectors
 
 OpenFL native targets
     resizing window and calling GL.drawElements crashes
