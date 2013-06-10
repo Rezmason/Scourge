@@ -65,7 +65,7 @@ class TextDemo {
         container = new Sprite();
         stage.addChild(container);
         mouseSystem = new MouseSystem(utils.drawUtil, stage, interact);
-        container.addChild(mouseSystem.view);
+        // container.addChild(mouseSystem.view);
         renderer = new Renderer(utils.drawUtil);
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         prettyMethod = new PrettyMethod(utils.programUtil);
@@ -77,7 +77,7 @@ class TextDemo {
         onActivate();
 
         // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures["full"]).render);
-        // utils.drawUtil.addRenderCall(new AGALFuckBox(utils, fontTextures["full"]).render);
+        // utils.drawUtil.addRenderCall(new AGALAquarium(utils, fontTextures["full"]).render);
     }
 
     function makeFontTextures():Void {

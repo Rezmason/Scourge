@@ -5,8 +5,6 @@ import flash.geom.Matrix3D;
     import flash.display3D.Context3DCompareMode;
     import flash.display3D.Context3DProgramType;
     import flash.display3D.Context3DVertexBufferFormat;
-
-    import com.wighawag.shaders.glsl.*;
 #else
     import openfl.gl.GL;
     import openfl.gl.GLShader;
@@ -31,9 +29,7 @@ class ProgramUtil extends Util {
     public inline function createProgram(vertSource:String, fragSource:String):Program {
 
         #if flash
-            var program:GLSLProgram = new GLSLProgram(context);
-            program.upload( new GLSLVertexShader(vertSource), new GLSLFragmentShader(fragSource));
-            return program;
+            return Program.create(context, vertSource, fragSource);
         #else
             var program:Program = GL.createProgram();
 

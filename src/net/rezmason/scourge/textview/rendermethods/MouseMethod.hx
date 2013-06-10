@@ -22,7 +22,6 @@ class MouseMethod extends RenderMethod {
 
     override public function activate():Void {
         programUtil.setProgram(program);
-        programUtil.setDepthTest(true);
     }
 
     override public function deactivate():Void {

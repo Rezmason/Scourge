@@ -2,15 +2,14 @@ Note: debugging webgl target with the console open slows it down
     Use Chrome instead
 
 AGAL target
-    Interaction
-        Something in PrettyMethod is preventing MouseMethod from working right
 
     Performance tweaking
         Body.update
         VertexBuffer3D.uploadFromVector
 
-    Ask wighawag for permission
-        Or just dissolve the thing entirely.
+        Maybe Glyphs can get and set properties on their parent Vectors instead of having their own Vectors
+
+    Ask wighawag for permission to use his glsl2agal classes
 
 UI object
 

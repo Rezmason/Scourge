@@ -1,3 +1,3 @@
 package net.rezmason.gl;
 
-typedef Program = #if flash com.wighawag.shaders.glsl.GLSLProgram #else openfl.gl.GLProgram #end ;
+typedef Program = #if flash com.wighawag.glsl2agal.Program #else openfl.gl.GLProgram #end ;

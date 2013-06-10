@@ -11,7 +11,7 @@ import net.rezmason.gl.*;
 import net.rezmason.gl.Types;
 import net.rezmason.scourge.textview.core.*;
 
-class AGALFuckBox {
+class AGALAquarium {
 
     static var fragShader:String = '
         varying vec3 vColor;

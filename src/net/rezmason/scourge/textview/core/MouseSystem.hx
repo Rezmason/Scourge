@@ -83,7 +83,7 @@ class MouseSystem {
     public function readOutputBuffer():Void {
         invalid = false;
         drawUtil.readBack(outputBuffer, width, height, data);
-        fartBD();
+        // fartBD();
     }
 
     public function invalidate():Void {
@@ -130,8 +130,6 @@ class MouseSystem {
     }
 
     function fartBD():Void {
-
-        #if js return; #end
 
         var byteArray:ByteArray = #if js new FriendlyByteArray(data) #else data #end ;
         byteArray.position = 0;

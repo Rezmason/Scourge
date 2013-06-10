@@ -38,6 +38,7 @@ class PrettyMethod extends RenderMethod {
         programUtil.setVertexBufferAt(program, aVid,    null, 5, 1);
 
         programUtil.setTextureAt(program, uSampler, null);
+        programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         programUtil.setDepthTest(true);
     }
 
