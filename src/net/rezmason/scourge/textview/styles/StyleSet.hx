@@ -32,7 +32,7 @@ class StyleSet {
         styleTypes.set(INPUT_STYLE, InputStyle);
     }
 
-    public function extractFromText(input:String, defaultStyle:Style = null):String {
+    public function extractFromText(input:String, refreshStyles:Bool = false, defaultStyle:Style = null):String {
 
         if (defaultStyle == null) defaultStyle = cleanStyle;
         defaultStyle.removeAllGlyphs();

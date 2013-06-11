@@ -20,7 +20,7 @@ class UIBody extends Body {
 
     inline static var glideEase:Float = 0.6;
     inline static var NATIVE_DPI:Float = 72;
-    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 12;
+    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 18;
 
     inline static var LINE_TOKEN:String = "¬¬¬";
 
@@ -61,7 +61,7 @@ class UIBody extends Body {
 
         letterbox = false;
 
-        glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * Capabilities.screenDPI / NATIVE_DPI;
+        glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * getScreenDPI() / NATIVE_DPI;
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
 
         var numGlyphColumns:Int = Std.int(Capabilities.screenResolutionX / glyphWidthInPixels);
@@ -115,7 +115,7 @@ class UIBody extends Body {
         glideGoal = Math.round(Math.max(0, Math.min(bottomPos, pos)));
     }
 
-    public function updateText(text:String):Void {
+    public function updateText(text:String, refreshStyles:Bool = false):Void {
         if (text == null) text = "";
         this.text = text;
 
@@ -148,7 +148,7 @@ class UIBody extends Body {
             return sp.split(LINE_TOKEN).map(padLine).join(LINE_TOKEN);
         }
 
-        page = styleSet.extractFromText(text).split("\n").map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
+        page = styleSet.extractFromText(text, refreshStyles).split("\n").map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
 
         // Add blank lines to the end, to reach the minimum page length (numRows)
 
@@ -279,4 +279,15 @@ class UIBody extends Body {
 
     inline function get_numScrollPositions():Int { return page.length - numRows + 1; }
     inline function get_bottomPos():Float { return numScrollPositions - 1; }
+
+    inline function getScreenDPI():Float {
+        #if flash
+            var dpi:Null<Float> = Reflect.field(flash.Lib.current.loaderInfo.parameters, 'dpi');
+            if (dpi == null) dpi = 72;
+            trace(dpi);
+            return dpi;
+        #else
+            return Capabilities.screenDPI;
+        #end
+    }
 }
