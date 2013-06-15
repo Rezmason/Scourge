@@ -15,7 +15,7 @@ class AlphabetBody extends Body {
         TestStrings.SYMBOLS +
         TestStrings.WEIRD_SYMBOLS +
         TestStrings.BOX_SYMBOLS +
-    "";
+    '';
 
     override function init():Void {
 

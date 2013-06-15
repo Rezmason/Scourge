@@ -27,14 +27,14 @@ class Pointers {
 
     #if !USE_POINTERS inline #end
     public static function at<T>(a:Array<T>, p:Ptr<T>):T {
-        #if USE_POINTERS if (p == null) throw "Null pointer"; return a[p._];
+        #if USE_POINTERS if (p == null) throw 'Null pointer'; return a[p._];
         #else return a[p];
         #end
     }
 
     #if !USE_POINTERS inline #end
     public static function d<T>(p:Ptr<T>, a:Array<T>):T {
-        #if USE_POINTERS if (a == null) throw "Null array"; return a[p._];
+        #if USE_POINTERS if (a == null) throw 'Null array'; return a[p._];
         #else return a[p];
         #end
     }
@@ -42,8 +42,8 @@ class Pointers {
     #if !USE_POINTERS inline #end
     public static function mod<T>(a:Array<T>, p:Ptr<T>, v:T):T {
         #if USE_POINTERS
-            if (p == null) throw "Null pointer";
-            if (locks[p.pSet]) throw "Pointer is locked";
+            if (p == null) throw 'Null pointer';
+            if (locks[p.pSet]) throw 'Pointer is locked';
             return a[p._] = v;
         #else return a[p] = v;
         #end

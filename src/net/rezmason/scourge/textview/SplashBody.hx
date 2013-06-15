@@ -41,7 +41,7 @@ class SplashBody extends Body {
 
         time = 0;
 
-        var arr:Array<String> = TestStrings.SPLASH.split("\n");
+        var arr:Array<String> = TestStrings.SPLASH.split('\n');
         arr.pop();
         arr.pop();
 
@@ -61,7 +61,7 @@ class SplashBody extends Body {
                 var y:Float = ((row + 0.5) / numRows    - 0.5) * 0.3;
                 var z:Float = 0.2;
 
-                if (arr[row].charAt(col) == " ") continue;
+                if (arr[row].charAt(col) == ' ') continue;
 
                 var charCode:Int = arr[row].charCodeAt(col);
 

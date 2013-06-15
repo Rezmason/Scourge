@@ -34,7 +34,7 @@ class EndTurnRule extends Rule {
         var playerID:Int = startPlayerIndex;
         while (getPlayer(playerID).at(head_) == Aspect.NULL) {
             playerID = (playerID + 1) % numPlayers();
-            if (playerID == startPlayerIndex) throw "No players have heads!";
+            if (playerID == startPlayerIndex) throw 'No players have heads!';
         }
 
         // reset freshness on all nodes

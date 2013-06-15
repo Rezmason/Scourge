@@ -58,12 +58,12 @@ using net.rezmason.utils.Pointers;
             extraAspectTemplate[ike] = prop.initialValue;
         }
         __initPtrs();
-        #if ROPES_VERBOSE trace(myName() + " initializing"); #end
+        #if ROPES_VERBOSE trace('${myName()} initializing'); #end
         _prime();
     }
 
     @:final public function update():Void {
-        #if ROPES_VERBOSE trace(myName() + " updating"); #end
+        #if ROPES_VERBOSE trace('${myName()} updating'); #end
         _update();
     }
 
@@ -72,26 +72,26 @@ using net.rezmason.utils.Pointers;
         if (defaultChoice) choice = 0;
 
         if (moves == null || moves.length < choice || moves[choice] == null) {
-            throw "Invalid choice index.";
+            throw 'Invalid choice index.';
         }
         #if ROPES_VERBOSE
-            if (defaultChoice) trace(myName() + " choosing default move");
-            else trace(myName() + " choosing move " + choice);
+            if (defaultChoice) trace('${myName()} choosing default move');
+            else trace('${myName()} choosing move $choice');
         #end
         _chooseMove(choice);
     }
 
     @:final public function chooseQuantumMove(choice:Int):Void {
         if (quantumMoves == null || quantumMoves.length < choice || quantumMoves[choice] == null) {
-            throw "Invalid choice index.";
+            throw 'Invalid choice index.';
         }
-        #if ROPES_VERBOSE trace(myName() + "choosing quantum move " + choice); #end
+        #if ROPES_VERBOSE trace('${myName()}choosing quantum move $choice'); #end
         _chooseQuantumMove(choice);
     }
 
     @:final inline function myName():String {
         var name:String = Type.getClassName(Type.getClass(this));
-        name = name.substr(name.lastIndexOf(".") + 1);
+        name = name.substr(name.lastIndexOf('.') + 1);
         return name;
     }
 
@@ -135,24 +135,24 @@ using net.rezmason.utils.Pointers;
 
     #if macro
     private static var lkpSources:Map<String, String> = [
-        "state"=>"plan",
-        "player"=>"plan",
-        "node"=>"plan",
-        "extra"=>"this",
+        'state'=>'plan',
+        'player'=>'plan',
+        'node'=>'plan',
+        'extra'=>'this',
     ];
 
     private static var restrictedFields:Array<String> = [
-        "__initReqs", "__initPointers",
-        "prime",
-        "update",
-        "chooseMove",
-        "chooseQuantumMove",
+        '__initReqs', '__initPointers',
+        'prime',
+        'update',
+        'chooseMove',
+        'chooseQuantumMove',
     ];
     #end
 
     macro public static function build():Array<Field> {
 
-        var msg:String = "Building " + Context.getLocalClass().get().name + "  ";
+        var msg:String = 'Building ${Context.getLocalClass().get().name}  ';
 
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
@@ -163,7 +163,7 @@ using net.rezmason.utils.Pointers;
         for (field in fields) {
 
             if (restrictedFields.has(field.name)) {
-                throw new Error("Rules cannot manually override the function " + field.name, field.pos);
+                throw new Error('Rules cannot manually override the function ${field.name}', field.pos);
             }
 
             for (metaTag in field.meta) {
@@ -173,8 +173,8 @@ using net.rezmason.utils.Pointers;
                     var aspect:Expr = metaTag.params[0];
                     metaTag.params = [];
 
-                    var kindLookup:String = kind + "AspectLookup";
-                    var kindRequirements:String = kind + "AspectRequirements";
+                    var kindLookup:String = '${kind}AspectLookup';
+                    var kindRequirements:String = '${kind}AspectRequirements';
 
                     declarations.push(macro $i{kindRequirements}.push($aspect));
                     assignments.push(macro $i{name} = $p{[lkpSources[kind], kindLookup]}[$aspect.id]);
@@ -189,10 +189,10 @@ using net.rezmason.utils.Pointers;
             }
         }
 
-        msg += "\n";
+        msg += '\n';
 
-        fields.push(overrider("__initReqs", declarations, pos));
-        fields.push(overrider("__initPtrs", assignments, pos));
+        fields.push(overrider('__initReqs', declarations, pos));
+        fields.push(overrider('__initPtrs', assignments, pos));
 
         #if ROPES_VERBOSE
             neko.Lib.print(msg);

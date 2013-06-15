@@ -81,8 +81,8 @@ class TextDemo {
         addKeyListeners();
         onActivate();
 
-        // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures["full"]).render);
-        // utils.drawUtil.addRenderCall(new AGALAquarium(utils, fontTextures["full"]).render);
+        // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures['full']).render);
+        // utils.drawUtil.addRenderCall(new AGALAquarium(utils, fontTextures['full']).render);
     }
 
     function makeFontTextures():Void {
@@ -100,13 +100,13 @@ class TextDemo {
         views = [];
 
         //*
-        testBody = new TestBody(_id++, utils.bufferUtil, fontTextures["full"], mouseSystem.invalidate);
+        testBody = new TestBody(_id++, utils.bufferUtil, fontTextures['full'], mouseSystem.invalidate);
         bodies.push(testBody);
         views.push({body:testBody, rect:new Rectangle(0, 0, 0.6, 1)});
         /**/
 
         //*
-        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures["full"], mouseSystem.invalidate);
+        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures['full'], mouseSystem.invalidate);
         bodies.push(uiBody);
 
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
@@ -117,13 +117,13 @@ class TextDemo {
         /**/
 
         /*
-        var alphabetBody:Body = new AlphabetBody(_id++, utils.bufferUtil, fontTextures["full"], mouseSystem.invalidate);
+        var alphabetBody:Body = new AlphabetBody(_id++, utils.bufferUtil, fontTextures['full'], mouseSystem.invalidate);
         bodies.push(alphabetBody);
         views.push({body:alphabetBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/
 
         /*
-        splashBody = new SplashBody(_id++, utils.bufferUtil, fontTextures["full"], mouseSystem.invalidate);
+        splashBody = new SplashBody(_id++, utils.bufferUtil, fontTextures['full'], mouseSystem.invalidate);
         bodies.push(splashBody);
         views.push({body:splashBody, rect:new Rectangle(0, 0, 1, 1)});
         /**/

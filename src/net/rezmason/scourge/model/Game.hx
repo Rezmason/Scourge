@@ -38,7 +38,7 @@ class Game {
     public function begin(config:ScourgeConfig, randomFunction:Void->Float, annotateFunc:String->Void = null, savedState:SavedState = null):Int {
 
         if (hasBegun)
-            throw "The game has already begun; it cannot begin again until you end it.";
+            throw 'The game has already begun; it cannot begin again until you end it.';
 
         // Build the game from the config
 
@@ -117,7 +117,7 @@ class Game {
     public function end():Void {
 
         if (!hasBegun)
-            throw "The game cannot end, because it hasn't begun.";
+            throw 'The game cannot end, because it hasn\'t begun.';
 
         historian.reset();
         actions = null;
@@ -140,12 +140,12 @@ class Game {
 
     public function chooseMove(actionIndex:Int, moveIndex:Int = 0, isQuantum:Bool = false):Int {
         if (actionIndex < 0 || actionIndex > actionIDs.length - 1)
-            throw "Invalid action";
+            throw 'Invalid action';
 
         var action:Rule = actions[actionIndex];
 
         if (moveIndex < 0 || moveIndex > action.moves.length - 1)
-            throw "Invalid move for action " + actionIDs[actionIndex];
+            throw 'Invalid move for action ${actionIDs[actionIndex]}';
 
         if (isQuantum) action.chooseQuantumMove(moveIndex);
         else action.chooseMove(moveIndex);
@@ -194,7 +194,7 @@ class Game {
 
             for (ruleField in ruleFields) {
                 lacedRuleFields.push(ruleField);
-                var lacedField:String = "annotate_" + ruleField;
+                var lacedField:String = 'annotate_' + ruleField;
                 lacedRuleFields.push(lacedField);
                 var annotateRule:Rule = new AnnotateRule(function() annotateFunc(ruleField));
                 basicRules[lacedField] = annotateRule;

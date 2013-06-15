@@ -18,7 +18,7 @@ class Renderer {
     public function render(bodies:Array<Body>, method:RenderMethod, outputBuffer:OutputBuffer):Void {
 
         if (method == null) {
-            trace("Null method.");
+            trace('Null method.');
             return;
         }
 

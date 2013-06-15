@@ -133,7 +133,7 @@ class FlatFont {
         var requiredChars:Map<String, Bool> = new Map<String, Bool>();
         var numChars:Int = 1;
 
-        for (char in charString.split("")) {
+        for (char in charString.split('')) {
             if (!~/\s+/g.match(char) && !requiredChars.exists(char)) {
                 numChars++;
                 requiredChars[char] = true;
@@ -162,7 +162,7 @@ class FlatFont {
         textField.y = 0;
         textField.autoSize = TextFieldAutoSize.LEFT;
 
-        textField.text = " ";
+        textField.text = ' ';
         var charBounds = textField.getCharBoundaries(0);
         var glyphRatio:Float = charBounds.height / charBounds.width;
 
@@ -194,7 +194,7 @@ class FlatFont {
 
             bitmapData.draw(sp, mat, null, BlendMode.NORMAL, clipRect, true);
 
-            Reflect.setField(charCoordJSON, "_" + charCode, {x: dx, y: dy});
+            Reflect.setField(charCoordJSON, '_' + charCode, {x: dx, y: dy});
 
             mat.tx -= dx;
             mat.ty -= dy;

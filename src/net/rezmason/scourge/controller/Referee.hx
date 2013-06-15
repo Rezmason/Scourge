@@ -37,7 +37,7 @@ class Referee {
 
     public function beginGame(playerConfigs:Array<PlayerConfig>, randGen:RandGen, gameConfig:ScourgeConfig):Void {
         if (playerConfigs.length != gameConfig.numPlayers)
-            throw "Player config specifies " + playerConfigs.length + " players: game config specifies " + gameConfig.numPlayers;
+            throw 'Player config specifies ${playerConfigs.length} players: game config specifies ${gameConfig.numPlayers}';
 
         log = [];
         this.gameConfig = gameConfig;
@@ -52,7 +52,7 @@ class Referee {
 
     public function resumeGame(playerConfigs:Array<PlayerConfig>, randGen:RandGen, savedGame:SavedGame):Void {
         if (playerConfigs.length != savedGame.config.numPlayers)
-            throw "Player config specifies " + playerConfigs.length + " players: saved game specifies " + savedGame.config.numPlayers;
+            throw 'Player config specifies ${playerConfigs.length} players: saved game specifies ${savedGame.config.numPlayers}';
 
         log = copyLog(savedGame.log);
         this.gameConfig = savedGame.config;
@@ -83,15 +83,15 @@ class Referee {
     private function handlePlayerEvent(player:Player, event:GameEvent):Void {
 
         if (busy)
-            throw "Players must not dispatch events synchronously!";
+            throw 'Players must not dispatch events synchronously!';
 
         if (!gameBegun)
-            throw "Game has not begun!";
+            throw 'Game has not begun!';
 
         var playerIndex:Int = players.indexOf(player);
 
         if (playerIndex == -1)
-            throw "Player is not part of this game!";
+            throw 'Player is not part of this game!';
 
         event.player = playerIndex;
         event.timeReceived = UnixTime.now();
@@ -99,14 +99,14 @@ class Referee {
         switch (event.type) {
             case PlayerAction(action, option):
                 if (game.currentPlayer != playerIndex)
-                    throw "Player " + playerIndex + " cannot act at this time!";
+                    throw 'Player $playerIndex cannot act at this time!';
                 clearFloats();
                 game.chooseMove(action, option);
                 if (game.winner >= 0) game.end(); // TEMPORARY
                 refereeCall(getFloatsAction());
                 broadcastAndLog(event);
             case RefereeAction(_):
-                throw "Player's can't send referee calls!";
+                throw 'Players can\'t send referee calls!';
             case Ready:
                 readyCheck();
         }
@@ -115,11 +115,11 @@ class Referee {
     private function broadcastAndLog(event:GameEvent):Void {
         log.push(event);
         var wasBusy:Bool = busy;
-        //trace("BUSY: BROADCAST");
+        //trace('BUSY: BROADCAST');
         busy = true;
         for (player in players) player.send(event.copy());
         busy = wasBusy;
-        //trace(busy ? "STILL BUSY" : "FREE");
+        //trace(busy ? 'STILL BUSY' : 'FREE');
     }
 
     private function refereeCall(action:RefereeActionType):Void {
@@ -129,7 +129,7 @@ class Referee {
     private function readyCheck():Void {
         if (allReady) return;
         var wasBusy:Bool = busy;
-        //trace("BUSY: READY CHECK");
+        //trace('BUSY: READY CHECK');
         busy = true;
         allReady = true;
         for (player in players) {
@@ -142,7 +142,7 @@ class Referee {
         if (allReady) refereeCall(AllReady);
 
         busy = wasBusy;
-        //trace(busy ? "STILL BUSY" : "FREE");
+        //trace(busy ? 'STILL BUSY' : 'FREE');
     }
 
     private inline static function copyLog(source:Array<GameEvent>):Array<GameEvent> {

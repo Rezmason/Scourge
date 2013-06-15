@@ -21,7 +21,7 @@ class RuleFactory {
                 //var ruleDef:Class<Rule> = cast ruleDefs[field].resolveClass();
                 var ruleDef:Class<Rule> = ruleDefs[field];
                 if (ruleDef == null) {
-                    trace("Rule not found: " + field);
+                    trace('Rule not found: $field');
                 } else {
                     var args:Array<Dynamic> = [cfg.field(field)];
                     args.remove(null);
@@ -44,12 +44,12 @@ class RuleFactory {
                 var rules:Array<Rule> = [];
                 var ruleFields:Array<String> = cfg.field(field);
                 for (ruleField in ruleFields) {
-                    if (ruleField == field) trace("Joint rule " + field + " cannot contain itself.");
-                    else if (ruleStack.has(ruleField)) trace("Cyclical joint rule definition: " + field + " and " + ruleField);
+                    if (ruleField == field) trace('Joint rule $field cannot contain itself.');
+                    else if (ruleStack.has(ruleField)) trace('Cyclical joint rule definition: $field and $ruleField');
                     else if (basicRules.exists(ruleField)) rules.push(basicRules[ruleField]);
                     else if (combinedRules.exists(ruleField)) rules.push(combinedRules[ruleField]);
                     else if (cfg.hasField(ruleField)) rules.push(makeJointRule(ruleField));
-                    else trace("Rule not found: " + ruleField);
+                    else trace('Rule not found: $ruleField');
                 }
                 var jointRule:Rule = new JointRule(rules);
                 combinedRules[field] = jointRule;
@@ -60,7 +60,7 @@ class RuleFactory {
             var cfgFields:Array<String> = cfg.fields();
             ArraySort.sort(cfgFields, StringSort.sort);
             for (field in cfgFields) {
-                if (basicRules.exists(field)) trace("Basic rule already exists with name: " + field);
+                if (basicRules.exists(field)) trace('Basic rule already exists with name: $field');
                 else if (!combinedRules.exists(field)) makeJointRule(field);
             }
         }

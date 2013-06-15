@@ -212,7 +212,7 @@ class BuildBoardRule extends Rule {
 
         var initGridWidth:Int = boardWidth + 1;
 
-        initGrid = INIT_GRID_CLEANER.replace(initGrid, "");
+        initGrid = INIT_GRID_CLEANER.replace(initGrid, '');
 
         var y:Int = 0;
         for (row in grid.walk(Gr.s)) {
@@ -220,7 +220,7 @@ class BuildBoardRule extends Rule {
             for (column in row.walk(Gr.e)) {
                 if (column.value.at(isFilled_) == Aspect.FALSE) {
                     var char:String = initGrid.charAt(y * initGridWidth + x + 1);
-                    if (char != " ") {
+                    if (char != ' ') {
                         column.value.mod(isFilled_, Aspect.TRUE);
                         if (!NUMERIC_CHAR.match(char)) column.value.mod(occupier_, Aspect.NULL);
                         else column.value.mod(occupier_, Std.parseInt(char));
@@ -241,7 +241,7 @@ class BuildBoardRule extends Rule {
             if (node.value.at(isFilled_) != Aspect.FALSE) {
                 var occupier:Int = node.value.at(occupier_);
                 if (occupier != Aspect.NULL) {
-                    if (bodies[occupier] == null) throw "A node is owned by a player that doesn't exist: " + occupier;
+                    if (bodies[occupier] == null) throw 'A node is owned by a player that doesn\'t exist: $occupier';
                     else bodies[occupier].push(node);
                 }
             }

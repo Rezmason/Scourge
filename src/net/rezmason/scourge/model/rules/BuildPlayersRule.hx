@@ -27,7 +27,7 @@ class BuildPlayersRule extends Rule {
     }
 
     override private function _prime():Void {
-        if (cfg.numPlayers < 1) throw "Invalid number of players in player config.";
+        if (cfg.numPlayers < 1) throw 'Invalid number of players in player config.';
         playerAspectTemplate = plan.playerAspectTemplate.copy();
         for (ike in 0...cfg.numPlayers) makePlayer();
     }

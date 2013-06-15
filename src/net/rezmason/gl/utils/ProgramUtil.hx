@@ -39,7 +39,7 @@ class ProgramUtil extends Util {
 
             if (GL.getProgramParameter(program, GL.LINK_STATUS) == 0) {
                 var result:String = GL.getProgramInfoLog(program);
-                if (result != "") throw result;
+                if (result != '') throw result;
             }
 
             return program;
@@ -52,9 +52,9 @@ class ProgramUtil extends Util {
             GL.shaderSource(shader, source);
             GL.compileShader(shader);
             if (GL.getShaderParameter(shader, GL.COMPILE_STATUS) == 0) {
-                trace("--- ERR ---\n" + source);
+                trace('--- ERR ---\n$source');
                 var err:String = GL.getShaderInfoLog(shader);
-                if (err != "") throw err;
+                if (err != '') throw err;
             }
             return shader;
         }

@@ -18,7 +18,7 @@ class PlayerFactory {
         for (ike in 0...playerConfigs.length) {
             var config:PlayerConfig = playerConfigs[ike];
             if (config == null)
-                throw "Null player config.";
+                throw 'Null player config.';
 
             var playerType:Class<Player> = null;
             switch (config.type) {

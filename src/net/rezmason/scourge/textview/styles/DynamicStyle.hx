@@ -16,11 +16,11 @@ class DynamicStyle extends Style {
                 var stateStyle:Style = new Style('${name}_$ike');
                 if (stateNames[ike] == null || bases[stateNames[ike]] == null) stateStyle.inherit(this);
                 else stateStyle.inherit(bases[stateNames[ike]]);
-                stateStyle.inherit(bases[""]);
+                stateStyle.inherit(bases['']);
                 stateStyles.push(stateStyle);
             }
         } else {
-            inherit(bases[""]);
+            inherit(bases['']);
         }
     }
 

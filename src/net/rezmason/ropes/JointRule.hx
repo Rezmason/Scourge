@@ -24,7 +24,7 @@ class JointRule extends Rule {
     }
 
     override private function _chooseMove(choice:Int):Void {
-        #if ROPES_VERBOSE trace("{"); #end
+        #if ROPES_VERBOSE trace('{'); #end
 
         rules[0].chooseMove(choice);
         for (ike in 1...rules.length) {
@@ -33,11 +33,11 @@ class JointRule extends Rule {
             rule.chooseMove();
         }
 
-        #if ROPES_VERBOSE trace("}"); #end
+        #if ROPES_VERBOSE trace('}'); #end
     }
 
     override private function _chooseQuantumMove(choice:Int):Void {
-        #if ROPES_VERBOSE trace("{"); #end
+        #if ROPES_VERBOSE trace('{'); #end
 
         rules[0].chooseQuantumMove(choice);
         for (ike in 1...rules.length) {
@@ -46,7 +46,7 @@ class JointRule extends Rule {
             rule.chooseMove();
         }
 
-        #if ROPES_VERBOSE trace("}"); #end
+        #if ROPES_VERBOSE trace('}'); #end
     }
 }
 

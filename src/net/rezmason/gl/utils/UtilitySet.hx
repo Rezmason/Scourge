@@ -41,7 +41,7 @@ class UtilitySet {
                 stage.addChild(view);
                 init();
             } else {
-                trace("OpenGLView isn't supported.");
+                trace('OpenGLView isn\'t supported.');
             }
         #end
     }

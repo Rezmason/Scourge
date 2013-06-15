@@ -89,7 +89,7 @@ class Game {
 			player.biteSize = 1;
 			player.alive = true;
 
-			player.name = "Player " + player.uid; // for now
+			player.name = 'Player ${player.uid}'; // for now
 			player.color = ike;
 			player.order = ike + 1;
 

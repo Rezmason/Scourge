@@ -1,7 +1,7 @@
 package tables;
 
-import neko.FileSystem;
-import neko.io.File;
+import sys.FileSystem;
+import sys.io.File;
 
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.tools.PieceGenerator;

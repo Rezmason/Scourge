@@ -22,7 +22,7 @@ class UIBody extends Body {
     inline static var NATIVE_DPI:Float = 72;
     inline static var GLYPH_HEIGHT_IN_POINTS:Float = 18;
 
-    inline static var LINE_TOKEN:String = "¬¬¬";
+    inline static var LINE_TOKEN:String = '¬¬¬';
 
     var styleSet:StyleSet;
 
@@ -117,7 +117,7 @@ class UIBody extends Body {
 
     public function updateText(text:String, refreshStyles:Bool = false):Void {
 
-        if (text == null) text = "";
+        if (text == null) text = '';
         this.text = text;
 
         var sigil:String = STYLE;
@@ -130,7 +130,7 @@ class UIBody extends Body {
 
         function padLine(line:String) {
             // Pads a string until its length, ignoring sigils, is 1
-            return rpad(line, " ", numCols + line.split(sigil).length - 1);
+            return rpad(line, ' ', numCols + line.split(sigil).length - 1);
         }
 
         function wrapLines(s:String) {
@@ -149,11 +149,11 @@ class UIBody extends Body {
             return sp.split(LINE_TOKEN).map(padLine).join(LINE_TOKEN);
         }
 
-        page = styleSet.extractFromText(text, refreshStyles).split("\n").map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
+        page = styleSet.extractFromText(text, refreshStyles).split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
 
         // Add blank lines to the end, to reach the minimum page length (numRows)
 
-        var blankParagraph:String = rpad("", " ", numCols);
+        var blankParagraph:String = rpad('', ' ', numCols);
         while (page.length < numRows) page.push(blankParagraph);
 
         // Count the sigils in each line, for style lookup

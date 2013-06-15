@@ -1,9 +1,8 @@
-TextView (see file)
-    View elements
-
-Give array access to History
 Switch Pointers to Abstracts?
     There's operator overloading.
+
+TextView (see file)
+    View elements
 
 hxsl
     Modify RenderMethod a little to be based on hxsl.Shader

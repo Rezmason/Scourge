@@ -159,7 +159,7 @@ class BiteRule extends Rule {
             }
         }
 
-        //trace("\n" + biteMoves.join("\n"));
+        //trace('\n' + biteMoves.join('\n'));
 
         moves = cast biteMoves;
     }

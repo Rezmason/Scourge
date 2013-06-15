@@ -39,7 +39,7 @@ class RenderMethod {
         glyphMat.appendScale(glyphMag, glyphMag, 1);
 
         #if debug
-            if (glyphMat.transformVector(unitVec).length > GLYPH_MAG_LIMIT) throw "You blew the glyph mag fuse!";
+            if (glyphMat.transformVector(unitVec).length > GLYPH_MAG_LIMIT) throw 'You blew the glyph mag fuse!';
         #end
     }
 
@@ -53,7 +53,7 @@ class RenderMethod {
 
     function composeShaders():Void { }
     function connectToShaders():Void { }
-    function makeVertexShader():String { return ""; }
-    function makeFragmentShader():String { return ""; }
+    function makeVertexShader():String { return ''; }
+    function makeFragmentShader():String { return ''; }
 }
 

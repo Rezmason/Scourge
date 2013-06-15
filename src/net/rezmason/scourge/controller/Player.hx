@@ -24,8 +24,8 @@ class Player {
     }
 
     public function send(event:GameEvent):Void {
-        if (!ready && Type.enumConstructor(event.type) == "PlayerAction")
-            throw "This player is not yet ready!";
+        if (!ready && Type.enumConstructor(event.type) == 'PlayerAction')
+            throw 'This player is not yet ready!';
         processEvent(event);
     }
 

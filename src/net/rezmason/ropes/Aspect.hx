@@ -15,7 +15,7 @@ import net.rezmason.ropes.Types;
 
         var classType = Context.getLocalClass().get();
 
-        var msg:String = "Building " + classType.name + "  ";
+        var msg:String = 'Building ${classType.name}  ';
 
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
@@ -23,7 +23,7 @@ import net.rezmason.ropes.Types;
         for (field in fields) {
 
             for (metaTag in field.meta) {
-                if (metaTag.name == "aspect") {
+                if (metaTag.name == 'aspect') {
 
                     var aspect:Expr = metaTag.params[0];
                     metaTag.params = [];
@@ -31,11 +31,11 @@ import net.rezmason.ropes.Types;
                     // Turn some literal values into Aspect consts
                     switch (aspect.expr) {
                         case EConst(CIdent(s)):
-                            aspect = macro $p{["Aspect", s.toUpperCase()]};
+                            aspect = macro $p{['Aspect', s.toUpperCase()]};
                         case _:
                     }
 
-                    var id:Expr = macro $v{classType.module + "::" + field.name.toUpperCase()};
+                    var id:Expr = macro $v{classType.module + '::' + field.name.toUpperCase()};
                     field.access = [AStatic, APublic];
                     field.kind = FVar(null, macro {id:$id, initialValue:$aspect});
                     msg += metaTag.name.charAt(0);
@@ -45,7 +45,7 @@ import net.rezmason.ropes.Types;
             }
         }
 
-        msg += "\n";
+        msg += '\n';
 
         #if ROPES_VERBOSE
             neko.Lib.print(msg);

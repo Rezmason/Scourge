@@ -108,7 +108,7 @@ class Body {
     }
 
     inline function spitGlyphs():Void {
-        var str:String = "";
+        var str:String = '';
         for (glyph in glyphs) {
             var char:String = String.fromCharCode(glyph.charCode);
             if (!glyph.visible) char = char.toLowerCase();

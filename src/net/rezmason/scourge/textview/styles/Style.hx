@@ -82,7 +82,7 @@ class Style {
     }
 
     public function connectBases(bases:Map<String, Style>):Void {
-        inherit(bases[""]);
+        inherit(bases['']);
     }
 
     public function flatten():Void {

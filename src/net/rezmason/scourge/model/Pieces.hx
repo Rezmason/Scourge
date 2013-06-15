@@ -8,7 +8,7 @@ using Lambda;
 using haxe.Json;
 
 class Pieces {
-    private static var pieceGroupsBySize:Array<Array<PieceGroup>> = Resource.getString("pieces").parse();
+    private static var pieceGroupsBySize:Array<Array<PieceGroup>> = Resource.getString('pieces').parse();
 
     private static var pieceGroupsById:Array<PieceGroup> = [];
     private static var pieceIdsBySize:Array<Array<Int>> = pieceGroupsToIds();

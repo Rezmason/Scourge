@@ -13,17 +13,17 @@ typedef ReplenishableConfig = { prop:AspectProperty, amount:Int, period:Int, max
 
 class ScourgeConfigFactory {
 
-    public static var ruleDefs:Map<String, Class<Rule>> = cast Siphon.getDefs("net.rezmason.scourge.model.rules", "src", "Rule");
+    public static var ruleDefs:Map<String, Class<Rule>> = cast Siphon.getDefs('net.rezmason.scourge.model.rules', 'src', 'Rule');
 
-    public static function makeDefaultActionList():Array<String> { return ["dropAction", "quitAction"]; }
-    public static function makeStartAction():String { return "startAction"; }
-    public static function makeDemiurgicRuleList():Array<String> { return ["BuildStateRule", "BuildPlayersRule", "BuildBoardRule"]; }
+    public static function makeDefaultActionList():Array<String> { return ['dropAction', 'quitAction']; }
+    public static function makeStartAction():String { return 'startAction'; }
+    public static function makeDemiurgicRuleList():Array<String> { return ['BuildStateRule', 'BuildPlayersRule', 'BuildBoardRule']; }
     public static function makeActionList(config:ScourgeConfig):Array<String> {
 
-        var actionList:Array<String> = ["quitAction", "dropAction", "pickPieceAction"];
+        var actionList:Array<String> = ['quitAction', 'dropAction', 'pickPieceAction'];
 
-        if (config.maxSwaps > 0) actionList.push("swapAction");
-        if (config.maxBites > 0) actionList.push("biteAction");
+        if (config.maxSwaps > 0) actionList.push('swapAction');
+        if (config.maxBites > 0) actionList.push('biteAction');
 
         return actionList;
     }
@@ -101,18 +101,18 @@ class ScourgeConfigFactory {
 
     public static function makeCombinedRuleCfg(config:ScourgeConfig):Dynamic<Array<String>> {
         var combinedRuleConfig:Dynamic<Array<String>> = {
-            cleanUp: ["DecayRule", "KillHeadlessPlayerRule", "OneLivingPlayerRule"],
-            wrapUp: ["EndTurnRule", "ReplenishRule"],
+            cleanUp: ['DecayRule', 'KillHeadlessPlayerRule', 'OneLivingPlayerRule'],
+            wrapUp: ['EndTurnRule', 'ReplenishRule'],
 
-            pickPieceAction: ["PickPieceRule"],
-            startAction: ["cleanUp"],
-            quitAction: ["ForfeitRule", "cleanUp", "wrapUp"],
-            dropAction: ["DropPieceRule", "EatCellsRule", "cleanUp", "wrapUp", "SkipsExhaustedRule"],
+            pickPieceAction: ['PickPieceRule'],
+            startAction: ['cleanUp'],
+            quitAction: ['ForfeitRule', 'cleanUp', 'wrapUp'],
+            dropAction: ['DropPieceRule', 'EatCellsRule', 'cleanUp', 'wrapUp', 'SkipsExhaustedRule'],
         };
 
-        if (config.includeCavities) combinedRuleConfig.cleanUp = ["DecayRule", "CavityRule", "KillHeadlessPlayerRule", "OneLivingPlayerRule"];
-        if (config.maxSwaps > 0) combinedRuleConfig.swapAction = ["SwapPieceRule"];
-        if (config.maxBites > 0) combinedRuleConfig.biteAction = ["BiteRule", "cleanUp"];
+        if (config.includeCavities) combinedRuleConfig.cleanUp = ['DecayRule', 'CavityRule', 'KillHeadlessPlayerRule', 'OneLivingPlayerRule'];
+        if (config.maxSwaps > 0) combinedRuleConfig.swapAction = ['SwapPieceRule'];
+        if (config.maxBites > 0) combinedRuleConfig.biteAction = ['BiteRule', 'cleanUp'];
 
         return combinedRuleConfig;
     }

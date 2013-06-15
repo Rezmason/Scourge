@@ -9,7 +9,7 @@ typedef G = Glyph;
 
 class GlyphUtils {
 
-    static var blank:Int = " ".charCodeAt(0);
+    static var blank:Int = ' '.charCodeAt(0);
 
     inline static var spv:Int = Almanac.SHAPE_FLOATS_PER_VERTEX;
     inline static var cpv:Int = Almanac.COLOR_FLOATS_PER_VERTEX;

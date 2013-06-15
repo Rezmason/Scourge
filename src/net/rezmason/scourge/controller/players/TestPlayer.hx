@@ -24,7 +24,7 @@ class TestPlayer extends Player {
 
     override private function prime():Void {
         floats = [];
-        //trace("PRIME");
+        //trace('PRIME');
     }
 
     override private function processEvent(event:GameEvent):Void {
@@ -47,12 +47,12 @@ class TestPlayer extends Player {
     }
 
     private function init(config:ScourgeConfig):Void {
-        //trace("INIT " + index);
+        //trace('INIT $index');
         game.begin(config, retrieveRandomFloat, annotate ? handleAnnotation : null);
     }
 
     private function resume(savedGame:SavedGame):Void {
-        //trace("RESUME " + index);
+        //trace('RESUME $index');
         game.begin(savedGame.config, retrieveRandomFloat, annotate ? handleAnnotation : null, savedGame.state);
     }
 
@@ -62,17 +62,17 @@ class TestPlayer extends Player {
     }
 
     private function connect():Void {
-        //trace("CONNECT " + index);
+        //trace('CONNECT $index');
         delay(getReady);
     }
 
     private function disconnect():Void {
-        //trace("DISCONNECT " + index);
+        //trace('DISCONNECT $index');
         if (game.hasBegun) game.end();
     }
 
     private function play():Void {
-        //trace("PLAY " + index);
+        //trace('PLAY $index');
         if (game.hasBegun) {
             if (game.winner >= 0) game.end(); // TEMPORARY
             else if (game.currentPlayer == index) delay(choose);
@@ -88,12 +88,12 @@ class TestPlayer extends Player {
     }
 
     private function choose():Void {
-        //trace("CHOOSE " + index);
+        //trace('CHOOSE $index');
 
-        var dropIndex:Int = game.actionIDs.indexOf("dropAction");
+        var dropIndex:Int = game.actionIDs.indexOf('dropAction');
         var firstDropMove:Int = game.getMoves()[dropIndex].length - 1;
 
-        var pickPieceIndex:Int = game.actionIDs.indexOf("pickPieceAction");
+        var pickPieceIndex:Int = game.actionIDs.indexOf('pickPieceAction');
         var firstPickPieceMove:Int = game.getMoves()[pickPieceIndex].length - 1;
 
         if (firstDropMove == 0 && firstPickPieceMove == 0) volley(PlayerAction(pickPieceIndex, firstPickPieceMove));

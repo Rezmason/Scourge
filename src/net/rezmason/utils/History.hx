@@ -47,7 +47,7 @@ class History<T> {
     public function revert(goalRev:Int):Void {
 
         if (goalRev < 0 || goalRev > revision) {
-            throw "Invalid revision " + goalRev + " falls out of range 0-" + revision;
+            throw 'Invalid revision $goalRev falls out of range 0-$revision';
         }
 
         if (goalRev == revision) {
@@ -103,12 +103,12 @@ class History<T> {
     }
 
     public inline function get(index:Int):Null<T> {
-        if (length == 0) throw "Invalid get : no data allocated";
+        if (length == 0) throw 'Invalid get : no data allocated for index $index';
         return array[index];
     }
 
     public inline function set(index:Int, val:Null<T>):Null<T> {
-        if (length == 0) throw "Invalid set : no data allocated";
+        if (length == 0) throw 'Invalid set : no data allocated for index $index';
         return array[index] = val;
     }
 

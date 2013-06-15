@@ -34,7 +34,7 @@ class PieceGenerator {
     // so it's structured to repurpose its previous solutions.
 
     public static function generate(size:Int, type:Int):Array<Piece> {
-        if (size < 0 || type < 0 || type > PieceType.FREE) throw "Invalid generator input";
+        if (size < 0 || type < 0 || type > PieceType.FREE) throw 'Invalid generator input';
         if (pieces[type][size] == null) makePieces(size, type);
         return pieces[type][size];
     }
@@ -42,7 +42,7 @@ class PieceGenerator {
     // Returns pieces arranged in a matrix, representing their rotations and reflections
 
     public static function generateGroups(size:Int):Array<PieceGroup> {
-        if (size < 0) throw "Invalid generator input";
+        if (size < 0) throw 'Invalid generator input';
         if (pieceGroups[size] == null) makePieceGroups(size);
         return pieceGroups[size];
     }
@@ -67,7 +67,7 @@ class PieceGenerator {
     }
 
     private static function makeFixedPatterns(size:Int):Void {
-        //trace("FS " + size);
+        //trace('FS ' + size);
 
         var patterns:Array<Pattern> = [];
 
@@ -101,7 +101,7 @@ class PieceGenerator {
     }
 
     private static function makeOneSidedPatterns(size:Int):Void {
-        //trace("OS " + size);
+        //trace('OS ' + size);
 
         // Grab the previously found fixed patterns
         if (fixedPatternsBySize[size] == null) makeFixedPatterns(size);
@@ -150,7 +150,7 @@ class PieceGenerator {
     }
 
     private static function makeFreePatterns(size:Int):Void {
-        //trace("FR " + size);
+        //trace('FR ' + size);
 
         // Grab the previously found one-sided patterns
         if (oneSidedPatternsBySize[size] == null) makeOneSidedPatterns(size);
@@ -379,15 +379,15 @@ class PieceGenerator {
 
         // Handy.
 
-        var str:String = "\n";
+        var str:String = '\n';
         var size:Int = pattern.length;
         for (row in pattern) {
-            str += "";
+            str += '';
             for (column in 0...size) {
-                if (row[column]) str += "•";
-                else str += " ";
+                if (row[column]) str += '•';
+                else str += ' ';
             }
-            str += "\n";
+            str += '\n';
         }
         return str;
     }

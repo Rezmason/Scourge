@@ -27,7 +27,7 @@ class StyleSet {
     public var defaultStyle(default, null):Style;
 
     public function new():Void {
-        defaultStyle = new Style("", null, {r:1, g:1, b:1, i:0, s:1, p:0});
+        defaultStyle = new Style('', null, {r:1, g:1, b:1, i:0, s:1, p:0});
     }
 
     public function extractFromText(input:String, refreshStyles:Bool = false):String {
@@ -89,7 +89,7 @@ class StyleSet {
             switch (tags[ike]) {
                 case DeclTag(s, dec):
                     var name:String = dec.name;
-                    if (name == null) name = "style" + styleMouseID;
+                    if (name == null) name = 'style$styleMouseID';
                     var style:Style = styleTypes[s].createInstance([name, dec.basis, dec, styleMouseID]);
                     allStyles.push(style);
                     stylesByID[name] = style;
@@ -147,10 +147,10 @@ class StyleSet {
         tagString = Utf8.sub(tagString, 0, Utf8.length(tagString) - 1); // Remove trailing '}'
 
         var tag:StyleTag = null;
-        if (tagString.indexOf(":") == -1) {
+        if (tagString.indexOf(':') == -1) {
             tag = RefTag(sigil, tagString); // Tags with no declared properties are obviously references
         } else {
-            var json:String = ("{" + stringReg.replace(tagString, '"$1"') + "}");
+            var json:String = ('{' + stringReg.replace(tagString, '"$1"') + '}');
             tag = DeclTag(sigil, json.parse()); // Turn the string into JSON and parse it
         }
 

@@ -14,7 +14,7 @@ using net.rezmason.utils.Pointers;
 
 class BoardUtils {
 
-    private inline static function ALPHABET():Int { return "a".charCodeAt(0); }
+    private inline static function ALPHABET():Int { return 'a'.charCodeAt(0); }
 
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
@@ -24,13 +24,13 @@ class BoardUtils {
 
     public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:Map<String, String> = null):String {
 
-        if (state.nodes.length == 0) return "empty grid";
+        if (state.nodes.length == 0) return 'empty grid';
 
         if (otherNodeAspects == null) otherNodeAspects = new Map<String, String>();
         var otherAspectPtrs:Map<String, AspectPtr> = new Map<String, AspectPtr>();
         for (id in otherNodeAspects.keys()) otherAspectPtrs[id] = plan.nodeAspectLookup[otherNodeAspects[id]];
 
-        var str:String = "";
+        var str:String = '';
 
         var grid:BoardNode = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n);
 
@@ -38,7 +38,7 @@ class BoardUtils {
         var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
 
         for (row in grid.walk(Gr.s)) {
-            str += "\n";
+            str += '\n';
             for (column in row.walk(Gr.e)) {
 
                 var otherAspectFound:Bool = false;
@@ -56,16 +56,16 @@ class BoardUtils {
                     var occupier:Null<Int> = column.value.at(occupier_);
                     var isFilled:Null<Int> = column.value.at(isFilled_);
 
-                    if (occupier == null) str += "n";
+                    if (occupier == null) str += 'n';
                     else if (occupier != Aspect.NULL && isFilled == Aspect.FALSE) str += String.fromCharCode(ALPHABET() + occupier);
-                    else if (occupier != Aspect.NULL) str += "" + occupier;
-                    else if (isFilled == Aspect.TRUE) str += "X";
-                    else if (isFilled == Aspect.FALSE && occupier == Aspect.NULL) str += " ";
+                    else if (occupier != Aspect.NULL) str += '' + occupier;
+                    else if (isFilled == Aspect.TRUE) str += 'X';
+                    else if (isFilled == Aspect.FALSE && occupier == Aspect.NULL) str += ' ';
                 }
             }
         }
 
-        if (addSpaces) str = ADD_SPACES.replace(str, "$1 ");
+        if (addSpaces) str = ADD_SPACES.replace(str, '$1 ');
 
         return str;
     }

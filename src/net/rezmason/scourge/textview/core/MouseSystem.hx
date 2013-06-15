@@ -212,7 +212,7 @@ class MouseSystem {
             byteView = input;
             length = input.length;
             allocated = length;
-            this.data = untyped __new__("DataView", input.buffer);
+            this.data = untyped __new__('DataView', input.buffer);
         }
     }
 #end
