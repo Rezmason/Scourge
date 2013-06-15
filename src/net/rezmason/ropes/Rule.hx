@@ -54,7 +54,7 @@ using net.rezmason.utils.Pointers;
 
         for (ike in 0...extraAspectRequirements.length) {
             var prop:AspectProperty = extraAspectRequirements[ike];
-            extraAspectLookup.set(prop.id, ike.intToPointer(state.key));
+            extraAspectLookup[prop.id] = ike.intToPointer(state.key);
             extraAspectTemplate[ike] = prop.initialValue;
         }
         __initPtrs();
@@ -116,10 +116,10 @@ using net.rezmason.utils.Pointers;
     }
 
     // Are these still necessary?
-    @:final inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup.get(prop.id); }
-    @:final inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup.get(prop.id); }
-    @:final inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup.get(prop.id); }
-    @:final inline function extraPtr(prop:AspectProperty):AspectPtr { return extraAspectLookup.get(prop.id); }
+    @:final inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup[prop.id]; }
+    @:final inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup[prop.id]; }
+    @:final inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup[prop.id]; }
+    @:final inline function extraPtr(prop:AspectProperty):AspectPtr { return extraAspectLookup[prop.id]; }
 
     @:final inline function getNode(index:Int):BoardNode { return state.nodes[index]; }
     @:final inline function getPlayer(index:Int):AspectSet { return state.players[index]; }
@@ -177,7 +177,7 @@ using net.rezmason.utils.Pointers;
                     var kindRequirements:String = kind + "AspectRequirements";
 
                     declarations.push(macro $i{kindRequirements}.push($aspect));
-                    assignments.push(macro $i{name} = $p{[lkpSources.get(kind), kindLookup]}.get($aspect.id));
+                    assignments.push(macro $i{name} = $p{[lkpSources[kind], kindLookup]}[$aspect.id]);
 
                     field.kind = FVar(macro :net.rezmason.ropes.Types.AspectPtr, null);
                     field.access.remove(AStatic);

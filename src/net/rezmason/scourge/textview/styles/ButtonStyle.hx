@@ -34,7 +34,7 @@ class ButtonStyle extends DynamicStyle {
         super(name, basis, initValues, mouseID);
         if (mouseID == null) mouseID = 0;
         this.mouseID = mouseID;
-        for (field in buttonFields) values.set(field, Reflect.field(initValues, field));
+        for (field in buttonFields) values[field] = Reflect.field(initValues, field);
     }
 
     override public function inherit(parent:Style):Void {
@@ -78,7 +78,7 @@ class ButtonStyle extends DynamicStyle {
         }
     }
 
-    override public function toString():String return '${super.toString()}, frames:${values.get("frames")}';
+    override public function toString():String return '${super.toString()}, frames:${values["frames"]}';
 
     override public function connectBases(bases:Map<String, Style>):Void {
         var frames:Array<String> = [];

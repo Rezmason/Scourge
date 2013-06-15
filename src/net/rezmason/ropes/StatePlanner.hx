@@ -1,6 +1,7 @@
 package net.rezmason.ropes;
 
 import haxe.ds.ArraySort;
+
 import net.rezmason.ropes.GridNode;
 import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Aspect;
@@ -46,7 +47,7 @@ class StatePlanner {
         ArraySort.sort(requirements, propSort);
         for (ike in 0...requirements.length) {
             var prop:AspectProperty = requirements[ike];
-            lookup.set(prop.id, ike.intToPointer(key));
+            lookup[prop.id] = ike.intToPointer(key);
             template[ike] = prop.initialValue;
         }
     }

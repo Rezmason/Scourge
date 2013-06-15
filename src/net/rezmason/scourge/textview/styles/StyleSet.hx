@@ -13,31 +13,27 @@ class StyleSet {
     static var stringReg:EReg = new EReg('([a-zA-Z_][a-zA-Z0-9_]*)', 'gu');
     static var styleTagsReg:EReg = new EReg('[$STYLE $ANIMATED_STYLE $BUTTON_STYLE $INPUT_STYLE]\\{[^\\}]*\\}', 'gu');
 
-    var styleTypes:Map<String, Class<Style>>;
+    static var styleTypes:Map<String, Class<Style>> = [
+        STYLE => Style,
+        ANIMATED_STYLE => AnimatedStyle,
+        BUTTON_STYLE => ButtonStyle,
+        INPUT_STYLE => InputStyle,
+    ];
 
     var styleMouseID:Int;
     var stylesByIndex:Array<Style>;
     var allStyles:Array<Style>;
 
     public var defaultStyle(default, null):Style;
-    var cleanStyle:Style;
 
     public function new():Void {
-        cleanStyle = new Style("", null, {r:1, g:1, b:1, i:0, s:1, p:0});
-
-        styleTypes = new Map();
-        styleTypes.set(STYLE, Style);
-        styleTypes.set(ANIMATED_STYLE, AnimatedStyle);
-        styleTypes.set(BUTTON_STYLE, ButtonStyle);
-        styleTypes.set(INPUT_STYLE, InputStyle);
+        defaultStyle = new Style("", null, {r:1, g:1, b:1, i:0, s:1, p:0});
     }
 
-    public function extractFromText(input:String, refreshStyles:Bool = false, defaultStyle:Style = null):String {
+    public function extractFromText(input:String, refreshStyles:Bool = false):String {
 
-        if (defaultStyle == null) defaultStyle = cleanStyle;
         defaultStyle.removeAllGlyphs();
         defaultStyle.flatten();
-        this.defaultStyle = defaultStyle;
         styleMouseID = 0;
         stylesByIndex = [];
         allStyles = [];
@@ -107,29 +103,29 @@ class StyleSet {
     }
 
     function resolveStyleDependencies(stylesByID:Map<String, Style>):Void {
-            for (topStyle in allStyles) {
-                var style:Style = topStyle;
-                var dependencyStack:Array<String> = [];
-                while (true) {
-                    dependencyStack.push(style.name);
+        for (topStyle in allStyles) {
+            var style:Style = topStyle;
+            var dependencyStack:Array<String> = [];
+            while (true) {
+                dependencyStack.push(style.name);
 
-                    if (style.basis == null) break;
-                    if (dependencyStack.has(style.basis)) {
-                        throw 'Cyclical style dependency, pal: ( $dependencyStack )';
-                    }
-
-                    style = stylesByID[style.basis];
-                    if (style == null) break;
+                if (style.basis == null) break;
+                if (dependencyStack.has(style.basis)) {
+                    throw 'Cyclical style dependency, pal: ( $dependencyStack )';
                 }
 
-                while (dependencyStack.length > 0) {
-                    style = stylesByID[dependencyStack.pop()];
-                    if (style.basis != null) style.inherit(stylesByID[style.basis]);
-                }
+                style = stylesByID[style.basis];
+                if (style == null) break;
             }
 
-            // Some styles have more complex dependencies. We resolve them here.
-            for (style in allStyles) style.connectBases(stylesByID);
+            while (dependencyStack.length > 0) {
+                style = stylesByID[dependencyStack.pop()];
+                if (style.basis != null) style.inherit(stylesByID[style.basis]);
+            }
+        }
+
+        // Some styles have more complex dependencies. We resolve them here.
+        for (style in allStyles) style.connectBases(stylesByID);
     }
 
     inline function convertReferenceTags(tags:Array<StyleTag>, stylesByID:Map<String, Style>):Void {

@@ -1,6 +1,5 @@
 package net.rezmason.scourge.textview.styles;
 
-import haxe.ds.StringMap;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 
@@ -21,9 +20,9 @@ class Style {
     static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 's', 'p'];
 
     public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
-        values = new StringMap<Dynamic>();
+        values = new Map<String, Dynamic>();
         if (initValues == null) initValues = {};
-        for (field in styleFields) values.set(field, Reflect.field(initValues, field));
+        for (field in styleFields) values[field] = cast Reflect.field(initValues, field);
         this.name = name;
         this.basis = basis;
         this.mouseID = 0;
@@ -79,7 +78,7 @@ class Style {
 
     function inheritWithFields(parent:Style, fields:Array<String>):Void {
         if (parent == null) return;
-        for (field in fields) if (values[field] == null) values.set(field, parent.values[field]);
+        for (field in fields) if (values[field] == null) values[field] = parent.values[field];
     }
 
     public function connectBases(bases:Map<String, Style>):Void {

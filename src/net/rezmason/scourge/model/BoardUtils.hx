@@ -1,7 +1,5 @@
 package net.rezmason.scourge.model;
 
-import haxe.ds.StringMap;
-
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.Types;
 import net.rezmason.ropes.GridNode;
@@ -24,20 +22,20 @@ class BoardUtils {
         return state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n).run(Gr.s, south).run(Gr.e, east);
     }
 
-    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:StringMap<String> = null):String {
+    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:Map<String, String> = null):String {
 
         if (state.nodes.length == 0) return "empty grid";
 
-        if (otherNodeAspects == null) otherNodeAspects = new StringMap<String>();
-        var otherAspectPtrs:StringMap<AspectPtr> = new StringMap<AspectPtr>();
-        for (id in otherNodeAspects.keys()) otherAspectPtrs.set(id, plan.nodeAspectLookup.get(otherNodeAspects.get(id)));
+        if (otherNodeAspects == null) otherNodeAspects = new Map<String, String>();
+        var otherAspectPtrs:Map<String, AspectPtr> = new Map<String, AspectPtr>();
+        for (id in otherNodeAspects.keys()) otherAspectPtrs[id] = plan.nodeAspectLookup[otherNodeAspects[id]];
 
         var str:String = "";
 
         var grid:BoardNode = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n);
 
-        var occupier_:AspectPtr = plan.nodeAspectLookup.get(OwnershipAspect.OCCUPIER.id);
-        var isFilled_:AspectPtr = plan.nodeAspectLookup.get(OwnershipAspect.IS_FILLED.id);
+        var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
 
         for (row in grid.walk(Gr.s)) {
             str += "\n";
@@ -46,10 +44,10 @@ class BoardUtils {
                 var otherAspectFound:Bool = false;
 
                 for (id in otherAspectPtrs.keys()) {
-                    var ptr:AspectPtr = otherAspectPtrs.get(id);
+                    var ptr:AspectPtr = otherAspectPtrs[id];
                     if (column.value.at(ptr) > 0) {
                         otherAspectFound = true;
-                        str += otherNodeAspects.get(id);
+                        str += otherNodeAspects[id];
                         break;
                     }
                 }

@@ -17,7 +17,7 @@ class AnimatedStyle extends DynamicStyle {
         time = 0;
         easeFunc = Quad.easeInOut;
         super(name, basis, initValues, mouseID);
-        for (field in animationFields) values.set(field, Reflect.field(initValues, field));
+        for (field in animationFields) values[field] = Reflect.field(initValues, field);
     }
 
     override public function inherit(parent:Style):Void {
@@ -42,10 +42,10 @@ class AnimatedStyle extends DynamicStyle {
         super.updateGlyphs(delta);
     }
 
-    override public function toString():String return '${super.toString()}, frames:${values.get("frames")}';
+    override public function toString():String return '${super.toString()}, frames:${values["frames"]}';
 
     override public function connectBases(bases:Map<String, Style>):Void {
-        var frames:Array<String> = values.get("frames");
+        var frames:Array<String> = values["frames"];
         if (frames == null) frames = [];
         connectStates(bases, frames);
     }

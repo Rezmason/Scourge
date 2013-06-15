@@ -1,6 +1,5 @@
 package net.rezmason.scourge.model.rules;
 
-import haxe.ds.IntMap;
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.GridNode;
 import net.rezmason.ropes.Types;
@@ -107,7 +106,7 @@ class DropPieceRule extends Rule {
                     if (!cfg.allowRotating && rotationIndex != allowedRotationIndex) continue;
                     var rotation:Piece = reflection[rotationIndex];
 
-                    var coordCache:IntMap<Array<IntCoord>> = new IntMap<Array<IntCoord>>();
+                    var coordCache:Map<Int, Array<IntCoord>> = new Map<Int, Array<IntCoord>>();
 
                     // For each edge node,
                     for (node in edgeNodes) {
@@ -123,8 +122,8 @@ class DropPieceRule extends Rule {
                         for (homeCoord in footprint) {
 
                             var nodeID:Int = node.value.at(nodeID_);
-                            var cache:Array<IntCoord> = coordCache.get(nodeID);
-                            if (cache == null) coordCache.set(nodeID, cache = []);
+                            var cache:Array<IntCoord> = coordCache[nodeID];
+                            if (cache == null) coordCache[nodeID] = cache = [];
                             if (!cache.has(homeCoord)) {
                                 cache.push(homeCoord);
 

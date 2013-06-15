@@ -65,7 +65,7 @@ class SplashBody extends Body {
 
                 var charCode:Int = arr[row].charCodeAt(col);
 
-                var color:SplashColor = colors.get(arr[row].charAt(col));
+                var color:SplashColor = colors[arr[row].charAt(col]);
                 if (color == null) color = {r:1, g:1, b:1};
                 var r:Float = color.r;
                 var g:Float = color.g;

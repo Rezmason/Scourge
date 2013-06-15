@@ -1,7 +1,6 @@
 package net.rezmason.ropes;
 
 import haxe.ds.ArraySort;
-import haxe.ds.StringMap;
 import net.rezmason.ropes.Types;
 import net.rezmason.utils.StringSort;
 
@@ -11,49 +10,49 @@ using Type;
 
 class RuleFactory {
 
-    public static function makeBasicRules(ruleDefs:StringMap<Class<Rule>>, cfg:Dynamic):StringMap<Rule> {
+    public static function makeBasicRules(ruleDefs:Map<String, Class<Rule>>, cfg:Dynamic):Map<String, Rule> {
 
-        var rules:StringMap<Rule> = new StringMap<Rule>();
+        var rules:Map<String, Rule> = new Map<String, Rule>();
 
         if (cfg != null) {
             var cfgFields:Array<String> = cfg.fields();
             ArraySort.sort(cfgFields, StringSort.sort);
             for (field in cfgFields) {
-                //var ruleDef:Class<Rule> = cast ruleDefs.get(field).resolveClass();
-                var ruleDef:Class<Rule> = ruleDefs.get(field);
+                //var ruleDef:Class<Rule> = cast ruleDefs[field].resolveClass();
+                var ruleDef:Class<Rule> = ruleDefs[field];
                 if (ruleDef == null) {
                     trace("Rule not found: " + field);
                 } else {
                     var args:Array<Dynamic> = [cfg.field(field)];
                     args.remove(null);
-                    rules.set(field, ruleDef.createInstance(args));
+                    rules[field] = ruleDef.createInstance(args);
                 }
             }
         }
         return rules;
     }
 
-    public static function combineRules(cfg:Dynamic<Array<String>>, basicRules:StringMap<Rule>):StringMap<Rule> {
-        var combinedRules:StringMap<Rule> = new StringMap<Rule>();
+    public static function combineRules(cfg:Dynamic<Array<String>>, basicRules:Map<String, Rule>):Map<String, Rule> {
+        var combinedRules:Map<String, Rule> = new Map<String, Rule>();
 
         if (cfg != null) {
 
             var ruleStack:Array<String> = [];
 
-            function makeJointRule(field:String):JointRule {
+            function makeJointRule(field:String):Rule {
                 ruleStack.push(field);
                 var rules:Array<Rule> = [];
                 var ruleFields:Array<String> = cfg.field(field);
                 for (ruleField in ruleFields) {
                     if (ruleField == field) trace("Joint rule " + field + " cannot contain itself.");
                     else if (ruleStack.has(ruleField)) trace("Cyclical joint rule definition: " + field + " and " + ruleField);
-                    else if (basicRules.exists(ruleField)) rules.push(basicRules.get(ruleField));
-                    else if (combinedRules.exists(ruleField)) rules.push(combinedRules.get(ruleField));
+                    else if (basicRules.exists(ruleField)) rules.push(basicRules[ruleField]);
+                    else if (combinedRules.exists(ruleField)) rules.push(combinedRules[ruleField]);
                     else if (cfg.hasField(ruleField)) rules.push(makeJointRule(ruleField));
                     else trace("Rule not found: " + ruleField);
                 }
-                var jointRule:JointRule = new JointRule(rules);
-                combinedRules.set(field, jointRule);
+                var jointRule:Rule = new JointRule(rules);
+                combinedRules[field] = jointRule;
                 ruleStack.pop();
                 return jointRule;
             }
@@ -71,5 +70,5 @@ class RuleFactory {
 
 /*
     Give each field a status: unbuilt, building, built
-    Populate a StringMap<RuleConfigStatus> and check it
+    Populate a Map<String, RuleConfigStatus> and check it
 */

@@ -23,15 +23,15 @@ class StatePlan {
     }
 
     public static inline function onState(plan:StatePlan, prop:AspectProperty):AspectPtr {
-        return plan.stateAspectLookup.get(prop.id);
+        return plan.stateAspectLookup[prop.id];
     }
 
     public static inline function onPlayer(plan:StatePlan, prop:AspectProperty):AspectPtr {
-        return plan.playerAspectLookup.get(prop.id);
+        return plan.playerAspectLookup[prop.id];
     }
 
     public static inline function onNode(plan:StatePlan, prop:AspectProperty):AspectPtr {
-        return plan.nodeAspectLookup.get(prop.id);
+        return plan.nodeAspectLookup[prop.id];
     }
 
 }

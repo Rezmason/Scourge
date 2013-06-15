@@ -11,8 +11,6 @@ import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
 import flash.text.TextFormat;
 
-import haxe.ds.IntMap;
-import haxe.ds.StringMap;
 import haxe.Utf8;
 
 using Lambda;
@@ -33,7 +31,7 @@ typedef FlatFontJSON = {
 class FlatFont {
 
     var bitmapData:BitmapData;
-    var charCoords:IntMap<CharCoord>;
+    var charCoords:Map<Int, CharCoord>;
     var missingChars:Array<Int>;
     var defaultCharCoord:CharCoord;
     var jsonString:String;
@@ -52,7 +50,7 @@ class FlatFont {
         bdHeight = bitmapData.height;
 
         this.jsonString = jsonString;
-        charCoords = new IntMap<CharCoord>();
+        charCoords = new Map<Int, CharCoord>();
         missingChars = [];
 
         var expandedJSON:FlatFontJSON = jsonString.parse();
@@ -64,7 +62,7 @@ class FlatFont {
 
         for (field in Reflect.fields(expandedJSON.charCoords)) {
             var code:Int = Std.parseInt(field.substr(1));
-            charCoords.set(code, Reflect.field(expandedJSON.charCoords, field));
+            charCoords[code] = cast Reflect.field(expandedJSON.charCoords, field);
         }
 
         missingChars = expandedJSON.missingChars;
@@ -77,7 +75,7 @@ class FlatFont {
     }
 
     public inline function getCharCodeMatrix(code:Int):Matrix {
-        var charCoord:CharCoord = charCoords.get(code);
+        var charCoord:CharCoord = charCoords[code];
         var mat:Matrix = new Matrix();
         if (charCoord != null) {
             mat.tx = -charCoord.x;
@@ -91,7 +89,7 @@ class FlatFont {
     }
 
     public inline function getCharCodeUVs(code:Int):Array<UV> {
-        var charCoord:CharCoord = charCoords.get(code);
+        var charCoord:CharCoord = charCoords[code];
         if (charCoord == null) charCoord = defaultCharCoord;
 
         var bumpU:Float = 0.5 / bdWidth;
@@ -132,13 +130,13 @@ class FlatFont {
 
         var charCoordJSON:Dynamic = {};
         var missingChars:Array<Int> = [];
-        var requiredChars:StringMap<Bool> = new StringMap<Bool>();
+        var requiredChars:Map<String, Bool> = new Map<String, Bool>();
         var numChars:Int = 1;
 
         for (char in charString.split("")) {
             if (!~/\s+/g.match(char) && !requiredChars.exists(char)) {
                 numChars++;
-                requiredChars.set(char, true);
+                requiredChars[char] = true;
             }
         }
 

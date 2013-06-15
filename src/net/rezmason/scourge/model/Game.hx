@@ -56,10 +56,10 @@ class Game {
         var demiurgicRules:Map<String, Rule> = new Map<String, Rule>();
         var rules:Array<Rule> = [];
         for (key in basicRules.keys().a2z()) {
-            var rule:Rule = basicRules.get(key);
+            var rule:Rule = basicRules[key];
             rules.push(rule);
 
-            if (rule.demiurgic) demiurgicRules.set(key, rule);
+            if (rule.demiurgic) demiurgicRules[key] = rule;
             else basicRulesArray.push(rule);
         }
 
@@ -70,7 +70,7 @@ class Game {
         // Prime the rules with the state and plan
 
         // demiurgic ones go first
-        for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules.get(key).prime(state, plan);
+        for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules[key].prime(state, plan);
         for (rule in basicRulesArray) rule.prime(state, plan);
 
         // Grab some aspect pointers so we can quickly evaluate the state
@@ -82,13 +82,13 @@ class Game {
 
         actionIDs = ScourgeConfigFactory.makeActionList(config);
         actions = [];
-        for (actionID in actionIDs) actions.push(combinedRules.get(actionID));
+        for (actionID in actionIDs) actions.push(combinedRules[actionID]);
 
         // Find the default actions
 
         var defaultActionIDs:Array<String> = ScourgeConfigFactory.makeDefaultActionList();
         defaultActions = [];
-        for (defaultActionID in defaultActionIDs) defaultActions.push(combinedRules.get(defaultActionID));
+        for (defaultActionID in defaultActionIDs) defaultActions.push(combinedRules[defaultActionID]);
 
         // Find the start action and make it happen
 
@@ -96,13 +96,13 @@ class Game {
             historian.load(savedState);
         } else {
             historian.key.lock();
-            var startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
+            var startAction = combinedRules[ScourgeConfigFactory.makeStartAction()];
             startAction.update();
             historian.key.unlock();
             startAction.chooseMove();
         }
         /*
-        var startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
+        var startAction = combinedRules[ScourgeConfigFactory.makeStartAction(]);
         startAction.update();
         startAction.chooseMove();
         */
@@ -196,7 +196,8 @@ class Game {
                 lacedRuleFields.push(ruleField);
                 var lacedField:String = "annotate_" + ruleField;
                 lacedRuleFields.push(lacedField);
-                basicRules.set(lacedField, new AnnotateRule(function() annotateFunc(ruleField)));
+                var annotateRule:Rule = new AnnotateRule(function() annotateFunc(ruleField));
+                basicRules[lacedField] = annotateRule;
             }
 
             cfg.setField(field, lacedRuleFields);

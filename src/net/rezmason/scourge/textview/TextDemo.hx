@@ -3,6 +3,7 @@ package net.rezmason.scourge.textview;
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.events.Event;
+import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.events.TimerEvent;
 import flash.geom.Matrix3D;
@@ -49,6 +50,8 @@ class TextDemo {
     var testBody:TestBody;
     var uiBody:UIBody;
 
+    var keysDown:Map<Int, Bool>;
+
     var container:Sprite;
 
     public function new(stage:Stage, fonts:Map<String, FlatFont>, text:String):Void {
@@ -66,6 +69,7 @@ class TextDemo {
         stage.addChild(container);
         mouseSystem = new MouseSystem(utils.drawUtil, stage, interact);
         // container.addChild(mouseSystem.view);
+        keysDown = new Map();
         renderer = new Renderer(utils.drawUtil);
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         prettyMethod = new PrettyMethod(utils.programUtil);
@@ -74,6 +78,7 @@ class TextDemo {
         makeScene();
 
         addListeners();
+        addKeyListeners();
         onActivate();
 
         // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures["full"]).render);
@@ -132,6 +137,27 @@ class TextDemo {
         utils.drawUtil.addRenderCall(onRender);
 
         mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
+    }
+
+    function addKeyListeners():Void {
+        stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+        stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+    }
+
+    function onKeyDown(event:KeyboardEvent):Void {
+        var keyDown:Null<Bool> = keysDown[event.charCode];
+        if (keyDown != true) {
+            keysDown[event.charCode]  = true;
+            trace('Key down: ${event.charCode}');
+        }
+    }
+
+    function onKeyUp(event:KeyboardEvent):Void {
+        var keyDown:Null<Bool> = keysDown[event.charCode];
+        if (keyDown != true) {
+            keysDown[event.charCode]  = false;
+            trace('Key down: ${event.charCode}');
+        }
     }
 
     function onRender(width:Int, height:Int):Void {

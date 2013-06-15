@@ -1,6 +1,5 @@
 package net.rezmason.scourge.model.rules;
 
-import haxe.ds.IntMap;
 import net.rezmason.ropes.Aspect;
 //import net.rezmason.ropes.GridNode;
 import net.rezmason.ropes.Types;
@@ -74,8 +73,8 @@ class CavityRule extends Rule {
         // After reversing the search results, they are sorted in the order of most-outside to least-outside
         widePerimeter.reverse();
 
-        var nodeIDs:IntMap<Bool> = new IntMap<Bool>();
-        for (node in widePerimeter) nodeIDs.set(node.value.at(nodeID_), true);
+        var nodeIDs:Map<Int, Bool> = new Map<Int, Bool>();
+        for (node in widePerimeter) nodeIDs[node.value.at(nodeID_)] = true;
 
         var empties:Array<BoardNode> = [];
 

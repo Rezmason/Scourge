@@ -46,13 +46,13 @@ class Shader {
 
     inline function populateVarTable(sVars:Dynamic<String>):Void {
         varTable = new Map();
-        for (name in Reflect.fields(sVars)) varTable.set(name, Reflect.field(sVars, name));
+        for (name in Reflect.fields(sVars)) varTable[name] = cast Reflect.field(sVars, name);
     }
 
     inline function populateConstTable(sConsts:Dynamic<Array<Float>>):Void {
         constTable = new Map();
         for (name in Reflect.fields(sConsts))
-            constTable.set(getRegisterIndex(name), Vector.ofArray(Reflect.field(sConsts, name)));
+            constTable[getRegisterIndex(name)] = Vector.ofArray(Reflect.field(sConsts, name));
     }
 
     inline function assmebleAGAL(type:Context3DProgramType, shaderSource:String):ByteArray {
@@ -81,7 +81,7 @@ class Shader {
     }
 
     inline function getRegisterIndex(name:String):Int {
-        var registerName:String = varTable.get(name);
+        var registerName:String = varTable[name];
         if(registerName == null) registerName = name;
         return Std.parseInt(registerName.substr(2)); //vc#, fc#, fs#
     }

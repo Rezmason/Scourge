@@ -41,7 +41,7 @@ class DynamicStyle extends Style {
             var field:String = Style.styleFields[ike];
             var doesFieldChange:Bool = false;
             var fieldValues:Array<Float> = [];
-            var firstValue:Null<Float> = null;
+            var firstValue = null;
 
             if (values[field] == null && stateStyles.length > 0) {
                 firstValue = stateStyles[0].values[field];
@@ -56,7 +56,7 @@ class DynamicStyle extends Style {
                 hasNoStates = false;
             } else if (values[field] == null) {
                 states[ike] = null;
-                values.set(field, firstValue);
+                values[field] = firstValue;
             }
         }
 

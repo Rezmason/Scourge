@@ -1,14 +1,9 @@
 TextView (see file)
     View elements
 
-Talk to Granick about nme.Vector abstract and BodySegment
-
-Once munit's on haxelib:
-    Use array access for maps in unit tests and models
-        Remember, you have to use Map constructor. Forget StringMap and IntMap!
-        Hunt down any other ~/\.(g|s)et\(/g matches
-    Switch Pointers to Abstracts?
-        There's operator overloading.
+Give array access to History
+Switch Pointers to Abstracts?
+    There's operator overloading.
 
 hxsl
     Modify RenderMethod a little to be based on hxsl.Shader

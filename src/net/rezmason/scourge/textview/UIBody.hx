@@ -116,6 +116,7 @@ class UIBody extends Body {
     }
 
     public function updateText(text:String, refreshStyles:Bool = false):Void {
+
         if (text == null) text = "";
         this.text = text;
 

@@ -1,6 +1,5 @@
 package net.rezmason.utils;
 
-import haxe.ds.IntMap;
 import haxe.Serializer;
 
 class History<T> {
@@ -12,7 +11,7 @@ class History<T> {
     private var oldArray:Array<T>;
     private var changeCount:Int;
     private var fullChanges:Array<Array<T>>;
-    private var incrementalChanges:Array<IntMap<T>>;
+    private var incrementalChanges:Array<Map<Int, T>>;
 
     public function new():Void {
         length = 0;
@@ -61,9 +60,9 @@ class History<T> {
             if (goalRev > fullRev) {
                 var incrRev:Int = fullRev + 1;
                 for (ike in incrRev...goalRev + 1) {
-                    var incrementalChange:IntMap<T> = incrementalChanges[ike];
+                    var incrementalChange:Map<Int, T> = incrementalChanges[ike];
                     for (key in incrementalChange.keys()) {
-                        array[key] = oldArray[key] = incrementalChange.get(key);
+                        array[key] = oldArray[key] = incrementalChange[key];
                     }
                 }
             }
@@ -83,15 +82,15 @@ class History<T> {
             changeCount = 0;
             fullChanges[revision] = array.copy();
         } else {
-            var hash:IntMap<T> = new IntMap<T>();
+            var map:Map<Int, T> = new Map();
             for (ike in 0...length) {
                 if (oldArray[ike] != array[ike]) {
-                    hash.set(ike, array[ike]);
+                    map[ike] = array[ike];
                     oldArray[ike] = array[ike];
                     changeCount++;
                 }
             }
-            incrementalChanges[revision] = hash;
+            incrementalChanges[revision] = map;
         }
 
         return revision;
