@@ -30,10 +30,10 @@ class TestMain
 			var httpClient = new HTTPClient(new SummaryReportClient());
 		#end
 
-		var runner:TestRunner = new TestRunner(client); 
+		var runner:TestRunner = new TestRunner(client);
 		runner.addResultClient(httpClient);
 		//runner.addResultClient(new HTTPClient(new JUnitReportClient()));
-		
+
 		runner.completionHandler = completionHandler;
 		runner.run(suites);
 	}
@@ -47,9 +47,9 @@ class TestMain
 		try
 		{
 			#if flash
-				flash.external.ExternalInterface.call("testResult", successful);
+				flash.external.ExternalInterface.call('testResult', successful);
 			#elseif js
-				js.Lib.eval("testResult(" + successful + ");");
+				js.Lib.eval('testResult($successful);');
 			#elseif sys
 				Sys.exit(0);
 			#end

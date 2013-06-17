@@ -49,11 +49,11 @@ class StateHistorian {
     }
 
     private inline function writeAspects(aspects:AspectSet, histAspects:AspectSet):Void {
-        for (ike in 0...aspects.length) history.set(histAspects[ike], aspects[ike]);
+        for (ike in 0...aspects.size()) history.set(histAspects[ike], aspects[ike]);
     }
 
     private inline function readAspects(aspects:AspectSet, histAspects:AspectSet):Void {
-        for (ike in 0...aspects.length) aspects[ike] = history.get(histAspects[ike]);
+        for (ike in 0...aspects.size()) aspects[ike] = history.get(histAspects[ike]);
     }
 }
 

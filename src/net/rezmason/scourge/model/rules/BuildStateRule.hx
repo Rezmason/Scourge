@@ -27,14 +27,8 @@ class BuildStateRule extends Rule {
     }
 
     override private function _prime():Void {
-
-        var aspects:AspectSet = buildAspectSet(plan.stateAspectTemplate);
-        for (ike in 0...aspects.length) state.aspects[ike] = aspects[ike];
-
-        var historyState:State = cfg.buildCfg.historyState;
-        aspects = buildHistAspectSet(plan.stateAspectTemplate, cfg.buildCfg.history);
-        for (ike in 0...aspects.length) historyState.aspects[ike] = aspects[ike];
-
+        plan.stateAspectTemplate.copyTo(state.aspects);
+        plan.stateAspectTemplate.mapTo(cfg.buildCfg.history.alloc, cfg.buildCfg.historyState.aspects);
         state.aspects.mod(currentPlayer_, cfg.firstPlayer);
     }
 }

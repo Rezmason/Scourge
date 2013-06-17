@@ -38,7 +38,7 @@ class CavityRule extends Rule {
     }
 
     override private function _chooseMove(choice:Int):Void {
-                var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
+        var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
         for (player in eachPlayer()) remapCavities(player.at(playerID_), maxFreshness);
         state.aspects.mod(maxFreshness_, maxFreshness);
     }

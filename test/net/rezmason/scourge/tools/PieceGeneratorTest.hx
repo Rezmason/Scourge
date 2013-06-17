@@ -20,18 +20,18 @@ class PieceGeneratorTest {
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace("tick " + time);
+        trace('tick $time');
     }
     #end
 
     @Test
     public function jsonTest():Void {
 
-        var str:String = "\n";
+        var str:String = '\n';
 
         for (size in 0...4) {
 
-            str += "" + size + "\n__\n";
+            str += '$size\n__\n';
 
             var pieceGroups:Array<PieceGroup> = Pieces.getAllPiecesOfSize(size + 1);
 
@@ -43,18 +43,18 @@ class PieceGeneratorTest {
 
                 for (ike in 0...left.length) {
                     Assert.areEqual(size + 1, left[ike][0].length);
-                    str += "\n" + spitPiece(left[ike]);
+                    str += '\n' + spitPiece(left[ike]);
                     if (right != null) {
                         Assert.areNotEqual(Std.string(left[ike]), Std.string(right[ike]));
                         Assert.areEqual(size + 1, right[ike][0].length);
-                        str += "\n" + spitPiece(right[ike]);
+                        str += '\n' + spitPiece(right[ike]);
                     }
-                    str += "\n" + " ";
+                    str += '\n ';
                 }
-                str += "\n" + "____";
+                str += '\n____';
             }
 
-            VisualAssert.assert("all rotations and reflections of pieces of sizes 0-" + size, str);
+            VisualAssert.assert('all rotations and reflections of pieces of sizes 0-$size', str);
         }
     }
 
@@ -94,7 +94,7 @@ class PieceGeneratorTest {
             pieceGroups = pieceGroups.concat(groups);
         }
 
-        var str:String = "\n";
+        var str:String = '\n';
 
         for (group in pieceGroups) {
             var left:Array<Piece> = group[0];
@@ -103,45 +103,45 @@ class PieceGeneratorTest {
             if (right != null) Assert.areEqual(left.length, right.length);
 
             for (ike in 0...left.length) {
-                str += "\n" + spitPiece(left[ike]);
+                str += '\n' + spitPiece(left[ike]);
                 if (right != null) {
                     Assert.areNotEqual(Std.string(left[ike]), Std.string(right[ike]));
-                    str += "\n" + spitPiece(right[ike]);
+                    str += '\n' + spitPiece(right[ike]);
                 }
-                str += "\n" + " ";
+                str += '\n ';
             }
-            str += "\n" + "____";
+            str += '\n____';
         }
 
-        VisualAssert.assert("all rotations and reflections of pieces of sizes 0-3", str);
+        VisualAssert.assert('all rotations and reflections of pieces of sizes 0-3', str);
     }
 
     private function spitPiece(piece:Piece):String {
         var max:Int = piece[0].length + 2;
 
-        var str:String = "";
+        var str:String = '';
         for (ike in 0...max * max) {
-            str += "-";
+            str += '-';
         }
 
         for (coord in piece[0]) {
             var index:Int = max * (coord[1] + 1) + coord[0] + 1;
-            str = str.substr(0, index) + "O" + str.substr(index + 1);
+            str = str.substr(0, index) + 'O' + str.substr(index + 1);
         }
 
         for (coord in piece[1]) {
             var index:Int = max * (coord[1] + 1) + coord[0] + 1;
-            str = str.substr(0, index) + "." + str.substr(index + 1);
+            str = str.substr(0, index) + '.' + str.substr(index + 1);
         }
 
         for (coord in piece[2]) {
             var index:Int = max * (coord[1] + 1) + coord[0] + 1;
-            str = str.substr(0, index) + "*" + str.substr(index + 1);
+            str = str.substr(0, index) + '*' + str.substr(index + 1);
         }
 
         for (ike in 0...max) {
             var index:Int = ike * max + ike;
-            str = str.substr(0, index) + "\n" + str.substr(index);
+            str = str.substr(0, index) + '\n' + str.substr(index);
         }
 
         return str;

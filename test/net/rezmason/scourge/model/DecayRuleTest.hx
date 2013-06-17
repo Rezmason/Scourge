@@ -27,7 +27,7 @@ class DecayRuleTest extends ScourgeRuleTest
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace("tick " + time);
+        trace('tick $time');
     }
     #end
 
@@ -40,17 +40,17 @@ class DecayRuleTest extends ScourgeRuleTest
         var decayRule:DecayRule = new DecayRule(cfg);
         makeState([decayRule], 1, TestBoards.loosePetri);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
         Assert.areEqual(17, numCells); // 51 cells for player 0
 
-        VisualAssert.assert("Loose petri", state.spitBoard(plan));
+        VisualAssert.assert('Loose petri', state.spitBoard(plan));
 
         decayRule.chooseMove();
 
-        VisualAssert.assert("Empty petri, disconnected region gone", state.spitBoard(plan));
+        VisualAssert.assert('Empty petri, disconnected region gone', state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1, numCells); // only one cell for player 0
 
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
@@ -83,17 +83,17 @@ class DecayRuleTest extends ScourgeRuleTest
         bump.value.mod(occupier_, 0);
         bump.value.mod(isFilled_, Aspect.TRUE);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
         Assert.areEqual(18, numCells); // 51 cells for player 0
 
-        VisualAssert.assert("Loose petri", state.spitBoard(plan));
+        VisualAssert.assert('Loose petri', state.spitBoard(plan));
 
         decayRule.chooseMove();
 
-        VisualAssert.assert("Empty petri, disconnected region gone", state.spitBoard(plan));
+        VisualAssert.assert('Empty petri, disconnected region gone', state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(18, numCells); // only one cell for player 0
     }
 }

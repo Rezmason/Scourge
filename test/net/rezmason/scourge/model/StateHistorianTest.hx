@@ -32,7 +32,7 @@ class StateHistorianTest {
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace("tick " + time);
+        trace('tick $time');
     }
     #end
 

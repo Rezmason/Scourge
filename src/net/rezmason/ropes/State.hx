@@ -17,14 +17,14 @@ class State {
 
         this.key = key;
 
-        aspects = [];
+        aspects = new AspectSet();
         players = [];
         nodes   = [];
         extras  = [];
     }
 
     public function wipe():Void {
-        aspects.splice(0, aspects.length);
+        aspects.wipe();
         players.splice(0, players.length);
         nodes.splice  (0, nodes.length);
         extras.splice (0, extras.length);

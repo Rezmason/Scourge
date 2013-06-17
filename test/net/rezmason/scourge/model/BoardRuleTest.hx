@@ -30,7 +30,7 @@ class BoardRuleTest extends ScourgeRuleTest {
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace("tick " + time);
+        trace('tick $time');
     }
     #end
 
@@ -52,7 +52,7 @@ class BoardRuleTest extends ScourgeRuleTest {
             Assert.isNotNull(node.value.at(occupier_));
         }
 
-        VisualAssert.assert("Should appear to be four integers, equally spaced and equally distant from the edges of a box", state.spitBoard(plan));
+        VisualAssert.assert('Should appear to be four integers, equally spaced and equally distant from the edges of a box', state.spitBoard(plan));
         Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, state.spitBoard(plan, false));
 
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
@@ -79,7 +79,7 @@ class BoardRuleTest extends ScourgeRuleTest {
     @Test
     public function configTest2():Void {
         makeState(null, 1, null, true);
-        VisualAssert.assert("Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box", state.spitBoard(plan));
+        VisualAssert.assert('Should appear to be an integer in the center of a perfect circle, which should fit neatly in a box', state.spitBoard(plan));
         Assert.areEqual(TestBoards.emptyPetri, state.spitBoard(plan, false));
     }
 
@@ -88,11 +88,11 @@ class BoardRuleTest extends ScourgeRuleTest {
 
         makeState(null, 4, TestBoards.spiral);
 
-        VisualAssert.assert("Should appear to be a four-player board with a spiral interior", state.spitBoard(plan));
+        VisualAssert.assert('Should appear to be a four-player board with a spiral interior', state.spitBoard(plan));
 
         Assert.areEqual(TestBoards.spiral, state.spitBoard(plan, false));
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), '').length;
 
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);

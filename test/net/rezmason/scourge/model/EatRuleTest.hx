@@ -29,7 +29,7 @@ class EatRuleTest extends ScourgeRuleTest
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace("tick " + time);
+        trace('tick $time');
     }
     #end
 
@@ -50,7 +50,7 @@ class EatRuleTest extends ScourgeRuleTest
         state.grabXY(9, 7).value.mod(freshness_, 1);
         state.grabXY(12, 6).value.mod(freshness_, 1);// Don't eat that head!
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25, numCells);
 
         eatRule.update();
@@ -58,13 +58,13 @@ class EatRuleTest extends ScourgeRuleTest
 
         // straight up eating
 
-        VisualAssert.assert("two player grab", state.spitBoard(plan));
+        VisualAssert.assert('two player grab', state.spitBoard(plan));
 
         eatRule.chooseMove();
 
-        VisualAssert.assert("two player grab, vertical portions of horseshoe arm eaten", state.spitBoard(plan));
+        VisualAssert.assert('two player grab, vertical portions of horseshoe arm eaten', state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 6, numCells);
 
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
@@ -89,18 +89,18 @@ class EatRuleTest extends ScourgeRuleTest
         state.grabXY(9, 7).value.mod(freshness_, 1);
         state.grabXY(12, 6).value.mod(freshness_, 1);// Don't eat that head!
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25, numCells);
 
         // recursive eating
 
-        VisualAssert.assert("two player grab", state.spitBoard(plan));
+        VisualAssert.assert('two player grab', state.spitBoard(plan));
 
         eatRule.chooseMove();
 
-        VisualAssert.assert("two player grab, horseshoe arms eaten", state.spitBoard(plan));
+        VisualAssert.assert('two player grab, horseshoe arms eaten', state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 6 + 1, numCells);
 
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
@@ -123,16 +123,16 @@ class EatRuleTest extends ScourgeRuleTest
 
         state.grabXY(12, 6).value.mod(freshness_, 1);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25, numCells);
 
-        VisualAssert.assert("two player grab", state.spitBoard(plan));
+        VisualAssert.assert('two player grab', state.spitBoard(plan));
 
         eatRule.chooseMove();
 
-        VisualAssert.assert("two player grab, player one eaten", state.spitBoard(plan));
+        VisualAssert.assert('two player grab, player one eaten', state.spitBoard(plan));
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 13, numCells); // Eat everything
 
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
@@ -152,14 +152,14 @@ class EatRuleTest extends ScourgeRuleTest
 
         state.grabXY(12, 6).value.mod(freshness_, 1);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25, numCells);
 
         eatRule.chooseMove();
 
-        VisualAssert.assert("two player grab, player one head eaten and body killed", state.spitBoard(plan));
+        VisualAssert.assert('two player grab, player one head eaten and body killed', state.spitBoard(plan));
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 1, numCells); // Only eat the head
 
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
@@ -186,7 +186,7 @@ class EatRuleTest extends ScourgeRuleTest
         state.grabXY(6, 13).value.mod(freshness_, 1);
         state.grabXY(7, 13).value.mod(freshness_, 1);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(76, numCells);
 
         eatRule.update();
@@ -194,13 +194,13 @@ class EatRuleTest extends ScourgeRuleTest
 
         // straight up eating
 
-        VisualAssert.assert("two player N", state.spitBoard(plan));
+        VisualAssert.assert('two player N', state.spitBoard(plan));
 
         eatRule.chooseMove();
 
-        VisualAssert.assert("two player N, left descender eaten", state.spitBoard(plan));
+        VisualAssert.assert('two player N, left descender eaten', state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(76 + 14, numCells);
 
         var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];

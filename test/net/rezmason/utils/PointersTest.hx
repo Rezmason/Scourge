@@ -17,7 +17,7 @@ class PointersTest {
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace("tick " + time);
+        trace('tick $time');
     }
     #end
 
@@ -28,9 +28,9 @@ class PointersTest {
 
         var key = Pointers.makeSet();
 
-		var arr1:Array<Int> = [0, 1, 2, 3, 4];
-		var arr2:Array<Ptr<Int>> = [arr1.ptr(4, key), arr1.ptr(3, key), arr1.ptr(2, key), arr1.ptr(1, key), arr1.ptr(0, key)];
-		var arr3:Array<Ptr<Ptr<Int>>> = [arr2.ptr(0, key), arr2.ptr(2, key), arr2.ptr(4, key)];
+		var arr1:PtrArray<Int> = new PtrArray([0, 1, 2, 3, 4]);
+		var arr2:PtrArray<Ptr<Int>> = new PtrArray([arr1.ptr(4, key), arr1.ptr(3, key), arr1.ptr(2, key), arr1.ptr(1, key), arr1.ptr(0, key)]);
+		var arr3:PtrArray<Ptr<Ptr<Int>>> = new PtrArray([arr2.ptr(0, key), arr2.ptr(2, key), arr2.ptr(4, key)]);
 
 		Assert.areEqual(4, arr1.at(arr2.at(arr3[0])));
 
@@ -40,17 +40,9 @@ class PointersTest {
 
 		Assert.areEqual(5, arr1[4]);
 
-		Assert.areEqual(5, arr3[0].d(arr2).d(arr1));
-
-		arr1.mod(arr3[0].d(arr2), 3);
-		Assert.areEqual(3, arr1[4]);
-
 		var fancy:Ptr<Int> = 0.intToPointer(key);
 
-		Assert.areEqual(arr1[0], fancy.d(arr1));
-
         // Throws compiler error:
-        //arr3[0].d(arr1);
         //arr1.at(arr3[0]);
 
 	}

@@ -13,9 +13,9 @@ class StatePlan {
     public var nodeAspectLookup(default, null):AspectLookup;
 
     public function new():Void {
-        stateAspectTemplate = [];
-        playerAspectTemplate = [];
-        nodeAspectTemplate = [];
+        stateAspectTemplate = new AspectSet();
+        playerAspectTemplate = new AspectSet();
+        nodeAspectTemplate = new AspectSet();
 
         stateAspectLookup = new AspectLookup();
         playerAspectLookup = new AspectLookup();

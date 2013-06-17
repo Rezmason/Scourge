@@ -41,7 +41,7 @@ using net.rezmason.utils.Pointers;
         playerAspectRequirements = [];
         nodeAspectRequirements = [];
         extraAspectRequirements = [];
-        extraAspectTemplate = [];
+        extraAspectTemplate = new AspectSet();
         extraAspectLookup = new AspectLookup();
         moves = [];
         quantumMoves = [];
@@ -95,24 +95,12 @@ using net.rezmason.utils.Pointers;
         return name;
     }
 
-    @:final inline function buildAspectSet(template:AspectSet):AspectSet {
-        var aspects:AspectSet = new AspectSet();
-        for (val in template) aspects.push(val);
-        return aspects;
-    }
-
-    @:final inline function buildHistAspectSet(template:AspectSet, history:StateHistory):AspectSet {
-        var aspects:AspectSet = new AspectSet();
-        for (val in template) aspects.push(history.alloc(val));
-        return aspects;
-    }
-
     @:final inline function buildExtra():AspectSet {
-        return buildAspectSet(extraAspectTemplate);
+        return extraAspectTemplate.copy();
     }
 
     @:final inline function buildHistExtra(history:StateHistory):AspectSet {
-        return buildHistAspectSet(extraAspectTemplate, history);
+        return extraAspectTemplate.map(history.alloc);
     }
 
     // Are these still necessary?

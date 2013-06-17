@@ -32,7 +32,7 @@ class RefereeTest {
 
 	}
 
-	#if neko @Ignore("Runs too slow on NekoVM") #end
+	#if neko @Ignore('Runs too slow on NekoVM') #end
 	@Test
 	public function serializeTest():Void {
 		playerCfgs = [{type:Test(null, false)}, {type:Test(null, false)}, {type:Test(null, false)}, {type:Test(null, false)}];
@@ -41,10 +41,10 @@ class RefereeTest {
 		var savedGame = referee.saveGame();
 		var data:String = savedGame.state.data;
 		//trace(data);
-		Assert.areEqual(Resource.getString("serializedState"), data + "\n");
+		Assert.areEqual(Resource.getString('serializedState'), data + '\n');
 	}
 
-	#if neko @Ignore("Runs slow on NekoVM") #end
+	#if neko @Ignore('Runs slow on NekoVM') #end
 	@Test
 	public function saveTest():Void {
 

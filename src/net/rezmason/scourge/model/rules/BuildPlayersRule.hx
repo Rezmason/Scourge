@@ -33,10 +33,10 @@ class BuildPlayersRule extends Rule {
     }
 
     inline function makePlayer():AspectSet {
-        var player:AspectSet = buildAspectSet(playerAspectTemplate);
+        var player:AspectSet = playerAspectTemplate.copy();
         player.mod(playerID_, numPlayers());
         state.players.push(player);
-        var histNode:AspectSet = buildHistAspectSet(playerAspectTemplate, cfg.buildCfg.history);
+        var histNode:AspectSet = playerAspectTemplate.map(cfg.buildCfg.history.alloc);
         cfg.buildCfg.historyState.players.push(histNode);
 
         return player;

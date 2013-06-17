@@ -28,7 +28,7 @@ class CavityRuleTest extends ScourgeRuleTest
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace("tick " + time);
+        trace('tick $time');
     }
     #end
 
@@ -38,23 +38,23 @@ class CavityRuleTest extends ScourgeRuleTest
         var cavityRule:CavityRule = new CavityRule();
         makeState([cavityRule], 1, TestBoards.cavityCity);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
-        var numCavityCells:Int = ~/([^a])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
+        var numCavityCells:Int = ~/([^a])/g.replace(state.spitBoard(plan), '').length;
 
         Assert.areEqual(50, numCells);
         Assert.areEqual(0, numCavityCells);
 
-        VisualAssert.assert("cavity city (empty)", state.spitBoard(plan));
+        VisualAssert.assert('cavity city (empty)', state.spitBoard(plan));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
-        state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
+        state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), '').length);
 
         cavityRule.chooseMove();
 
-        VisualAssert.assert("cavity city (all cavities filled)", state.spitBoard(plan));
+        VisualAssert.assert('cavity city (all cavities filled)', state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
-        numCavityCells = ~/([^a])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
+        numCavityCells = ~/([^a])/g.replace(state.spitBoard(plan), '').length;
 
         Assert.areEqual(50, numCells);
         Assert.areEqual(31, numCavityCells);
@@ -89,23 +89,23 @@ class CavityRuleTest extends ScourgeRuleTest
         var totalArea:Int = state.players[0].at(totalArea_);
         state.players[0].mod(totalArea_, totalArea + 1);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
-        var numCavityCells:Int = ~/([^a])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
+        var numCavityCells:Int = ~/([^a])/g.replace(state.spitBoard(plan), '').length;
 
         Assert.areEqual(51, numCells);
         Assert.areEqual(0, numCavityCells);
 
-        VisualAssert.assert("cavity city (empty) with broken moat", state.spitBoard(plan));
+        VisualAssert.assert('cavity city (empty) with broken moat', state.spitBoard(plan));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
-        state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), "").length);
+        state.players[0].mod(totalArea_, ~/([^0])/g.replace(state.spitBoard(plan), '').length);
 
         cavityRule.chooseMove();
 
-        VisualAssert.assert("cavity city (all cavities filled) with broken moat", state.spitBoard(plan));
+        VisualAssert.assert('cavity city (all cavities filled) with broken moat', state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
-        numCavityCells = ~/([^a])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
+        numCavityCells = ~/([^a])/g.replace(state.spitBoard(plan), '').length;
 
         Assert.areEqual(51, numCells);
         Assert.areEqual(31, numCavityCells);

@@ -36,7 +36,7 @@ class TurnRulesTest extends ScourgeRuleTest
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace("tick " + time);
+        trace('tick $time');
     }
     #end
 
@@ -97,17 +97,17 @@ class TurnRulesTest extends ScourgeRuleTest
         Assert.isNotNull(moves);
         Assert.areEqual(1, moves.length);
 
-        VisualAssert.assert("player 0 is alive", state.spitBoard(plan));
+        VisualAssert.assert('player 0 is alive', state.spitBoard(plan));
 
         forfeitRule.chooseMove();
 
-        VisualAssert.assert("player 0 is dead and gone", state.spitBoard(plan));
+        VisualAssert.assert('player 0 is dead and gone', state.spitBoard(plan));
 
         Assert.areEqual(Aspect.NULL, playerHead.value.at(occupier_));
         Assert.areEqual(0, playerHead.value.at(isFilled_));
 
         // Player 1 should be gone
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(0, numCells);
 
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
@@ -122,7 +122,7 @@ class TurnRulesTest extends ScourgeRuleTest
         var killHeadlessPlayerRule:KillHeadlessPlayerRule = new KillHeadlessPlayerRule();
         makeState([killHeadlessPlayerRule], 4);
 
-        // Change occupier of current player's head
+        // Change occupier of current player\'s head
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
@@ -198,7 +198,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // kill the first, third and fourth players
         for (ike in 0...state.players.length) {
-            if (ike == 1) continue; // We're skipping player 2
+            if (ike == 1) continue; // We\'re skipping player 2
 
             var player:AspectSet = state.players[ike];
             player.mod(head_, Aspect.NULL);

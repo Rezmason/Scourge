@@ -98,10 +98,10 @@ class ScourgeConfigFactoryTest
 		config.initGrid = TestBoards.twoPlayerBullshit;
 		makeState();
 
-		VisualAssert.assert("floating zero square, stringy player one with no head", state.spitBoard(plan));
+		VisualAssert.assert('floating zero square, stringy player one with no head', state.spitBoard(plan));
 
-		var num0Cells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), "").length;
-		var num1Cells:Int = ~/([^1])/g.replace(state.spitBoard(plan, false), "").length;
+		var num0Cells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), '').length;
+		var num1Cells:Int = ~/([^1])/g.replace(state.spitBoard(plan, false), '').length;
 
 		Assert.areEqual(24, num0Cells);
 		Assert.areEqual(32, num1Cells);
@@ -109,10 +109,10 @@ class ScourgeConfigFactoryTest
 		startAction.update();
 		startAction.chooseMove();
 
-		VisualAssert.assert("big square player zero with cavity, no player one", state.spitBoard(plan));
+		VisualAssert.assert('big square player zero with cavity, no player one', state.spitBoard(plan));
 
-		var num0Cells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), "").length;
-		var num1Cells:Int = ~/([^1])/g.replace(state.spitBoard(plan, false), "").length;
+		var num0Cells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), '').length;
+		var num1Cells:Int = ~/([^1])/g.replace(state.spitBoard(plan, false), '').length;
 
 		Assert.areEqual(20, num0Cells);
 		Assert.areEqual(0, num1Cells);
@@ -139,7 +139,7 @@ class ScourgeConfigFactoryTest
 		config.initGrid = TestBoards.twoPlayerGrab;
 		makeState();
 
-		VisualAssert.assert("two player grab", state.spitBoard(plan));
+		VisualAssert.assert('two player grab', state.spitBoard(plan));
 
 		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
 		var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
@@ -150,22 +150,22 @@ class ScourgeConfigFactoryTest
 
 		Assert.areEqual(13, state.players[1].at(totalArea_));
 
-		VisualAssert.assert("two player grab", state.spitBoard(plan));
+		VisualAssert.assert('two player grab', state.spitBoard(plan));
 
 		biteAction.update();
 		biteAction.chooseMove(4); // bite
 
 		Assert.areEqual(6, state.players[1].at(totalArea_));
 
-		VisualAssert.assert("player zero bit off player one's leg", state.spitBoard(plan));
+		VisualAssert.assert('player zero bit off player one\'s leg', state.spitBoard(plan));
 
-		VisualAssert.assert("no difference", state.spitBoard(plan));
+		VisualAssert.assert('no difference', state.spitBoard(plan));
 
 		// How about some skipping?
 		dropAction.update();
 		dropAction.chooseMove(); // skip
 
-		VisualAssert.assert("no difference", state.spitBoard(plan));
+		VisualAssert.assert('no difference', state.spitBoard(plan));
 
 		dropAction.update();
 		dropAction.chooseMove(); // skip
@@ -175,7 +175,7 @@ class ScourgeConfigFactoryTest
 
 		Assert.areEqual(0, state.players[1].at(totalArea_));
 
-		VisualAssert.assert("player zero bit player one in the head: dead", state.spitBoard(plan));
+		VisualAssert.assert('player zero bit player one in the head: dead', state.spitBoard(plan));
 	}
 
 	@Test
@@ -243,7 +243,7 @@ class ScourgeConfigFactoryTest
 		// dropPiece, eatCells, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
 		config.numPlayers = 2;
-		config.pieceTableIDs = [Pieces.getPieceIdBySizeAndIndex(4, 1)]; // "L/J block"
+		config.pieceTableIDs = [Pieces.getPieceIdBySizeAndIndex(4, 1)]; // 'L/J block'
 		config.initGrid = TestBoards.twoPlayerGrab;
 		makeState();
 		startAction.update();
@@ -251,14 +251,14 @@ class ScourgeConfigFactoryTest
 
 		var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
 
-		VisualAssert.assert("two player grab", state.spitBoard(plan));
+		VisualAssert.assert('two player grab', state.spitBoard(plan));
 
 		pickPieceAction.update();
 		pickPieceAction.chooseMove();
 		dropAction.update();
 		dropAction.chooseMove(35); // drop, eat
 
-		VisualAssert.assert("player zero dropped an L, ate player one's leg; small new cavity", state.spitBoard(plan));
+		VisualAssert.assert('player zero dropped an L, ate player one\'s leg; small new cavity', state.spitBoard(plan));
 
 		pickPieceAction.update();
 		pickPieceAction.chooseMove();
@@ -296,7 +296,7 @@ class ScourgeConfigFactoryTest
 		trace(bestMove);
 		*/
 
-		VisualAssert.assert("player zero dropped another L, ate player one's head and body; another cavity", state.spitBoard(plan));
+		VisualAssert.assert('player zero dropped another L, ate player one\'s head and body; another cavity', state.spitBoard(plan));
 
 		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
 		Assert.areEqual(0, state.aspects.at(winner_));
@@ -322,11 +322,11 @@ class ScourgeConfigFactoryTest
 		for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules.get(key).prime(state, plan);
         for (rule in basicRulesArray) rule.prime(state, plan);
         startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
-	    biteAction = combinedRules.get("biteAction");
-	    swapAction = combinedRules.get("swapAction");
-	    pickPieceAction = combinedRules.get("pickPieceAction");
-	    quitAction = combinedRules.get("quitAction");
-	    dropAction = combinedRules.get("dropAction");
+	    biteAction = combinedRules.get('biteAction');
+	    swapAction = combinedRules.get('swapAction');
+	    pickPieceAction = combinedRules.get('pickPieceAction');
+	    quitAction = combinedRules.get('quitAction');
+	    dropAction = combinedRules.get('dropAction');
     }
 
     private function randomFunction():Float { return 0; }

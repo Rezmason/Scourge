@@ -32,7 +32,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace("tick " + time);
+        trace('tick $time');
     }
     #end
 
@@ -47,7 +47,7 @@ class PieceRulesTest extends ScourgeRuleTest
 	public function placePieceScourgeRuleTestOrtho():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -70,16 +70,16 @@ class PieceRulesTest extends ScourgeRuleTest
 
         Assert.areEqual(72, moves.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        VisualAssert.assert("empty petri", state.spitBoard(plan));
+        VisualAssert.assert('empty petri', state.spitBoard(plan));
 
         dropRule.chooseMove();
 
-        VisualAssert.assert("empty petri, L piece on top left extending up", state.spitBoard(plan));
+        VisualAssert.assert('empty petri, L piece on top left extending up', state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
 
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
@@ -94,7 +94,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceScourgeRuleTestOrthoNoFlipping():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -117,12 +117,12 @@ class PieceRulesTest extends ScourgeRuleTest
 
         Assert.areEqual(36, moves.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
         dropRule.chooseMove();
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -130,7 +130,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceScourgeRuleTestOrthoNoSpinning():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -153,12 +153,12 @@ class PieceRulesTest extends ScourgeRuleTest
 
         Assert.areEqual(18, moves.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
         dropRule.chooseMove();
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -166,7 +166,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceScourgeRuleTestOrthoNoSpinningOrFlipping():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -189,12 +189,12 @@ class PieceRulesTest extends ScourgeRuleTest
 
         Assert.areEqual(9, moves.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
         dropRule.chooseMove();
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -202,7 +202,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceScourgeRuleTestOrthoSelf():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -225,12 +225,12 @@ class PieceRulesTest extends ScourgeRuleTest
 
         Assert.areEqual(9 + 4, moves.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
         dropRule.chooseMove();
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -254,16 +254,16 @@ class PieceRulesTest extends ScourgeRuleTest
 
         Assert.areEqual(1, moves.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
-        VisualAssert.assert("empty petri", state.spitBoard(plan));
+        VisualAssert.assert('empty petri', state.spitBoard(plan));
 
         dropRule.chooseMove();
 
-        VisualAssert.assert("empty petri", state.spitBoard(plan));
+        VisualAssert.assert('empty petri', state.spitBoard(plan));
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1, numCells); // 1 cell still for player 0
     }
 
@@ -352,7 +352,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceScourgeRuleTestDiag():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -375,12 +375,12 @@ class PieceRulesTest extends ScourgeRuleTest
 
         Assert.areEqual(40, moves.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1, numCells); // 1 cell for player 0
 
         dropRule.chooseMove();
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
     }
 
@@ -388,7 +388,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceScourgeRuleTestOrthoDiag():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // "L/J block"
+            pieceTableID:Pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -412,12 +412,12 @@ class PieceRulesTest extends ScourgeRuleTest
 
         Assert.areEqual(33, moves.length);
 
-        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(5, numCells); // 5 cells for player 0
 
         dropRule.chooseMove();
 
-        numCells = ~/([^0])/g.replace(state.spitBoard(plan), "").length;
+        numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(5 + 4, numCells); // 9 cells for player 0
     }
 

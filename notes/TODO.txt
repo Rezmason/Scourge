@@ -1,17 +1,20 @@
-Switch Pointers to Abstracts?
-    There's operator overloading.
-
 TextView (see file)
     View elements
-
-hxsl
-    Modify RenderMethod a little to be based on hxsl.Shader
-    Modify ProgramUtil to use hxsl Shader
-    Change into ShaderUtil
 
 Console
 Board view
 Piece view
+
+Rearchitect pointers?
+
+Turn GridNodes into AspectLists with NeighborAspects
+    Branch for this one
+
+Implement noneuclidean walking and running
+    add() function should create heading data
+    walk() and run() functions should operate on heading data
+    heading data should be available after a walk
+    Turtle?
 
 Finalize ROPES classes
 
@@ -38,13 +41,6 @@ Make renderer cross-platform
     Oh boy...
 
 Checksums
-
-Implement noneuclidean walking and running
-
-    add() function should create heading data
-    walk() and run() functions should operate on heading data
-    heading data should be available after a walk
-    Turtle?
 
 Rewrite the eat rule recursion config property to be an Int of depth
     Rather than being recursive or not recursive at all, let the user specify how many recursive steps to take

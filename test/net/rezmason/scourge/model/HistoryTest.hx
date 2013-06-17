@@ -22,7 +22,7 @@ class HistoryTest
     @After
     public function tearDown():Void {
         time = massive.munit.util.Timer.stamp() - time;
-        trace("tick " + time);
+        trace('tick $time');
     }
     #end
 
@@ -61,7 +61,7 @@ class HistoryTest
         // invalid revert
         try {
             history.revert(6);
-            Assert.fail("Invalid revert failed to throw error");
+            Assert.fail('Invalid revert failed to throw error');
         } catch (error:Dynamic) {}
 
         // revert to early state
@@ -102,7 +102,7 @@ class HistoryTest
 
         try {
             history.get(propA);
-            Assert.fail("Bad get failed to throw error");
+            Assert.fail('Bad get failed to throw error');
         } catch (error:Dynamic) {}
 
         var propD:Int = history.alloc(1);
@@ -125,7 +125,7 @@ class HistoryTest
 
         try {
             history.get(propE);
-            Assert.fail("Bad get failed to throw error");
+            Assert.fail('Bad get failed to throw error');
         } catch (error:Dynamic) {}
 
     }
