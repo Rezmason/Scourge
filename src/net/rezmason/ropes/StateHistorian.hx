@@ -10,10 +10,10 @@ class StateHistorian {
     public var state(default, null):State;
     public var historyState(default, null):State;
     public var history(default, null):StateHistory;
-    public var key(default, null):PtrSet;
+    public var key(default, null):PtrKey;
 
     public function new():Void {
-        key = Pointers.makeSet();
+        key = new PtrKey();
         state = new State(key);
         historyState = new State(key);
         history = new StateHistory();
@@ -49,11 +49,11 @@ class StateHistorian {
     }
 
     private inline function writeAspects(aspects:AspectSet, histAspects:AspectSet):Void {
-        for (ike in 0...aspects.size()) history.set(histAspects[ike], aspects[ike]);
+        for (ptr in aspects.ptrs(key)) history.set(histAspects[ptr], aspects[ptr]);
     }
 
     private inline function readAspects(aspects:AspectSet, histAspects:AspectSet):Void {
-        for (ike in 0...aspects.size()) aspects[ike] = history.get(histAspects[ike]);
+        for (ptr in aspects.ptrs(key)) aspects[ptr] = history.get(histAspects[ptr]);
     }
 }
 

@@ -11,9 +11,9 @@ class State {
     public var players(default, null):Array<AspectSet>;
     public var nodes(default, null):Array<GridNode<AspectSet>>; // aka BoardNode
     public var extras(default, null):Array<AspectSet>;
-    public var key(default, set):PtrSet;
+    public var key(default, set):PtrKey;
 
-    public function new(key:PtrSet):Void {
+    public function new(key:PtrKey):Void {
 
         this.key = key;
 
@@ -44,7 +44,7 @@ class State {
         extras  = s.unserialize();
     }
 
-    public function set_key(val:PtrSet):PtrSet {
+    public function set_key(val:PtrKey):PtrKey {
         if (key == null) key = val;
         return val;
     }

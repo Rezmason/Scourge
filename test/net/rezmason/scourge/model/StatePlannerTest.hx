@@ -38,7 +38,7 @@ class StatePlannerTest {
     @Test
     public function configTest1():Void {
 
-        var key:PtrSet = Pointers.makeSet();
+        var key:PtrKey = new PtrKey();
 
         var history:StateHistory = new StateHistory();
         var historyState:State = new State(key);

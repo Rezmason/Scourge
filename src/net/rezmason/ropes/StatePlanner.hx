@@ -43,12 +43,13 @@ class StatePlanner {
         return plan;
     }
 
-    function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet, key:PtrSet):Void {
+    function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet, key:PtrKey):Void {
         ArraySort.sort(requirements, propSort);
         for (ike in 0...requirements.length) {
             var prop:AspectProperty = requirements[ike];
-            lookup[prop.id] = ike.intToPointer(key);
-            template[ike] = prop.initialValue;
+            var ptr:AspectPtr = template.ptr(ike, key);
+            lookup[prop.id] = ptr;
+            template.mod(ptr, prop.initialValue);
         }
     }
 

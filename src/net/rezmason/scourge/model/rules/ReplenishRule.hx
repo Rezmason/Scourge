@@ -117,7 +117,7 @@ class ReplenishRule extends Rule {
 
         // We represent replenishables as extras
         var rep:AspectSet = buildExtra();
-        rep.mod(repPropLookup_, lookup[repCfg.prop.id].pointerToInt());
+        rep.mod(repPropLookup_, lookup[repCfg.prop.id].toInt());
         rep.mod(repID_, numExtras());
 
         state.extras.push(rep);
@@ -135,7 +135,7 @@ class ReplenishRule extends Rule {
             if (step == repCfg.period) {
                 // Time for action! Resolve the pointer and update values at that location
                 step = 0;
-                var ptr:AspectPtr = replenishable.at(repPropLookup_).intToPointer(state.key);
+                var ptr:AspectPtr = AspectPtr.intToPointer(replenishable.at(repPropLookup_), state.key);
                 updateFunc(repCfg, ptr); // TODO: Do this with fewer function calls (and iterations)
             }
             replenishable.mod(repStep_, step);

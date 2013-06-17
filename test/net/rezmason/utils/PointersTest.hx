@@ -26,21 +26,23 @@ class PointersTest {
 	{
 		//Assert.isTrue(false);
 
-        var key = Pointers.makeSet();
+        var key = new PtrKey();
 
 		var arr1:PtrArray<Int> = new PtrArray([0, 1, 2, 3, 4]);
 		var arr2:PtrArray<Ptr<Int>> = new PtrArray([arr1.ptr(4, key), arr1.ptr(3, key), arr1.ptr(2, key), arr1.ptr(1, key), arr1.ptr(0, key)]);
 		var arr3:PtrArray<Ptr<Ptr<Int>>> = new PtrArray([arr2.ptr(0, key), arr2.ptr(2, key), arr2.ptr(4, key)]);
 
-		Assert.areEqual(4, arr1.at(arr2.at(arr3[0])));
+		Assert.areEqual(4, arr1.at(arr2.at(arr3.at(arr3.ptr(0, key)))));
 
-		arr1.mod(arr2.at(arr3[0]), 5);
+		arr1.mod(arr2.at(arr3.at(arr3.ptr(0, key))), 5);
 
-        arr1.mod(arr2.at(arr3[0]), 5);
+        arr1.mod(arr2.at(arr3.at(arr3.ptr(0, key))), 5);
 
-		Assert.areEqual(5, arr1[4]);
+        arr1.mod(arr1.ptr(0, key), 1);
 
-		var fancy:Ptr<Int> = 0.intToPointer(key);
+		Assert.areEqual(5, arr1.at(arr1.ptr(4, key)));
+
+		var fancy:Ptr<Int> = Ptr.intToPointer(0, key);
 
         // Throws compiler error:
         //arr1.at(arr3[0]);
