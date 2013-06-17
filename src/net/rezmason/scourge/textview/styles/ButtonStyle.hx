@@ -53,17 +53,17 @@ class ButtonStyle extends DynamicStyle {
         super.updateGlyphs(delta);
     }
 
-    override public function interact(interaction:Interaction):Void {
+    override public function interact(type:MouseInteractionType):Void {
 
-        if (interaction == MOVE) return;
+        if (type == MOVE) return;
 
         var nextIndex:Int = toIndex;
 
-        switch (interaction) {
+        switch (type) {
             case ENTER: mouseIsOver = true;
             case EXIT: mouseIsOver = false;
-            case DOWN: mouseIsDown = true;
-            case UP, DROP: mouseIsDown = false;
+            case MOUSE_DOWN: mouseIsDown = true;
+            case MOUSE_UP, DROP: mouseIsDown = false;
             case _:
         }
 

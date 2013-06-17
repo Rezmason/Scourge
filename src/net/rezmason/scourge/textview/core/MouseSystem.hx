@@ -14,7 +14,7 @@ import net.rezmason.gl.utils.DrawUtil;
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.Types;
 
-typedef InteractFunction = Int->Int->Interaction->Float->Float/*->Float*/->Void;
+import net.rezmason.scourge.textview.core.Interaction;
 
 class MouseSystem {
 
@@ -178,20 +178,20 @@ class MouseSystem {
     */
     function onMouseDown(event:MouseEvent):Void {
         pressRawID = getRawID(event.stageX, event.stageY);
-        sendInteraction(pressRawID, event, DOWN);
+        sendInteraction(pressRawID, event, MOUSE_DOWN);
     }
 
     function onMouseUp(event:MouseEvent):Void {
         var rawID:Int = getRawID(event.stageX, event.stageY);
-        sendInteraction(rawID, event, UP);
+        sendInteraction(rawID, event, MOUSE_UP);
         sendInteraction(pressRawID, event, rawID == pressRawID ? CLICK : DROP);
         pressRawID = NULL_ID;
     }
 
-    inline function sendInteraction(rawID:Int, event:MouseEvent, interaction:Interaction):Void {
+    inline function sendInteraction(rawID:Int, event:MouseEvent, type:MouseInteractionType):Void {
         var bodyID:Int = rawID >> 16 & 0xFF;
         var glyphID:Int = rawID & 0xFFFF;
-        if (bodyID >= 0) interact(bodyID, glyphID, interaction, event.stageX, event.stageY/*, event.delta*/);
+        if (bodyID >= 0) interact(bodyID, glyphID, MOUSE(type, event.stageX, event.stageY));
     }
 
     function get_view():Sprite {

@@ -17,7 +17,8 @@ class Body {
     public var numVisibleGlyphs(default, null):Int;
     public var glyphTexture(default, null):GlyphTexture;
     public var numSegments(default, null):Int;
-    public var letterbox:Bool;
+    public var letterbox(default, null):Bool;
+    public var catchMouseInRect(default, null):Bool;
 
     var redrawHitAreas:Void->Void;
     var projection:Matrix3D;
@@ -31,6 +32,7 @@ class Body {
         this.bufferUtil = bufferUtil;
         this.redrawHitAreas = redrawHitAreas;
         letterbox = true;
+        catchMouseInRect = true;
         this.glyphTexture = glyphTexture;
         glyphs = [];
 
@@ -103,7 +105,7 @@ class Body {
         }
     }
 
-    public function interact(id:Int, interaction:Interaction, x:Float, y:Float/*, delta:Float*/):Void {
+    public function interact(id:Int, interaction:Interaction):Void {
 
     }
 

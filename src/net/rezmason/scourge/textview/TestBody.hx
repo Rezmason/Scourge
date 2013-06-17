@@ -4,6 +4,7 @@ import flash.geom.Rectangle;
 
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
+import net.rezmason.scourge.textview.core.Interaction;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -16,6 +17,8 @@ class TestBody extends Body {
         TestStrings.ALPHANUMERICS +
     '';
 
+    inline static var NUM_GLYPHS:Int = 1200 /* 40000 */ ;
+
     var time:Float;
     var hues:Array<Float>;
 
@@ -24,13 +27,11 @@ class TestBody extends Body {
         time = 0;
         hues = [];
 
-        var numGlyphs:Int = 1200;
-
         var dTheta:Float = Math.PI * (3 - Math.sqrt(5));
-        var dZ:Float = 2 / (numGlyphs + 1);
+        var dZ:Float = 2 / (NUM_GLYPHS + 1);
         var theta:Float = 0;
         var _z:Float = 1 - dZ / 2;
-        for (ike in 0...numGlyphs) {
+        for (ike in 0...NUM_GLYPHS) {
 
             var glyph:Glyph = new Glyph();
             glyph.visible = true;
@@ -45,8 +46,6 @@ class TestBody extends Body {
             /**/
 
             var i:Float = 0.2;
-            var s:Float = 2;
-            var p:Float = 0;
 
             var charCode:Int = CHARS.charCodeAt(ike % CHARS.length);
 
@@ -69,7 +68,7 @@ class TestBody extends Body {
             b = rgb.b;
             /**/
 
-            glyph.set_shape(x, y, z, s, p);
+            glyph.set_shape(x, y, z, 1, 0);
             glyph.set_color(r, g, b);
             glyph.set_i(i);
             glyph.set_char(charCode, glyphTexture.font);
@@ -105,8 +104,8 @@ class TestBody extends Body {
             var glyph:Glyph = glyphs[ike];
 
             var d:Float = glyph.get_z();
-            var p:Float = (Math.cos(time * 4 + d * 20) * 0.5 + 1) * 0.4;
-            var s:Float = (Math.cos(time * 4 + d * 30) * 0.5 + 1) * 2.0;
+            var p:Float = (Math.cos(time * 4 + d * 20) * 0.5 + 1) * 480  / NUM_GLYPHS;
+            var s:Float = (Math.cos(time * 4 + d * 30) * 0.5 + 1) * 2400 / NUM_GLYPHS;
 
             //var rgb:RGB = hsv2rgb(hues[ike] + s * 0.1);
 
@@ -117,6 +116,24 @@ class TestBody extends Body {
         }
 
         super.update(delta);
+    }
+
+    override public function interact(id:Int, interaction:Interaction):Void {
+        var glyph:Glyph = glyphs[id];
+        switch (interaction) {
+            case MOUSE(type, x, y):
+                if (type == CLICK) setGlobalColor(Math.random(), Math.random(), Math.random());
+            case KEYBOARD(type, char):
+                if (type == KEY_UP) setGlobalChar(char);
+        }
+    }
+
+    inline function setGlobalColor(r:Float, g:Float, b:Float):Void {
+        for (glyph in glyphs) glyph.set_color(r, g, b);
+    }
+
+    inline function setGlobalChar(charCode:Int):Void {
+        for (glyph in glyphs) glyph.set_char(charCode, glyphTexture.font);
     }
 
     /*

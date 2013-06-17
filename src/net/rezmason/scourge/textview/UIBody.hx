@@ -249,25 +249,29 @@ class UIBody extends Body {
         }
     }
 
-    override public function interact(id:Int, interaction:Interaction, x:Float, y:Float):Void {
-        if (dragging) {
-            switch (interaction) {
-                case DROP, CLICK:
-                    dragging = false;
-                case ENTER, EXIT, MOVE:
-                    glideTextToPos(dragStartPos + (dragStartY - y) * numRowsForLayout);
-                case _:
-            }
-        } else if (id == 0) {
-            if (interaction == DOWN) {
-                dragging = true;
-                dragStartY = y;
-                dragStartPos = currentScrollPos;
-            }
-        } else {
-            var targetStyle:Style = styleSet.getStyleByMouseID(id);
-            targetStyle.interact(interaction);
-            if (interaction == CLICK) trace('${targetStyle.name} clicked!');
+    override public function interact(id:Int, interaction:Interaction):Void {
+        switch (interaction) {
+            case MOUSE(type, x, y):
+                if (dragging) {
+                    switch (type) {
+                        case DROP, CLICK:
+                            dragging = false;
+                        case ENTER, EXIT, MOVE:
+                            glideTextToPos(dragStartPos + (dragStartY - y) * numRowsForLayout);
+                        case _:
+                    }
+                } else if (id == 0) {
+                    if (type == MOUSE_DOWN) {
+                        dragging = true;
+                        dragStartY = y;
+                        dragStartPos = currentScrollPos;
+                    }
+                } else {
+                    var targetStyle:Style = styleSet.getStyleByMouseID(id);
+                    targetStyle.interact(type);
+                    if (type == CLICK) trace('${targetStyle.name} clicked!');
+                }
+            case KEYBOARD(type, char):
         }
     }
 
@@ -285,7 +289,6 @@ class UIBody extends Body {
         #if flash
             var dpi:Null<Float> = Reflect.field(flash.Lib.current.loaderInfo.parameters, 'dpi');
             if (dpi == null) dpi = 72;
-            trace(dpi);
             return dpi;
         #else
             return Capabilities.screenDPI;

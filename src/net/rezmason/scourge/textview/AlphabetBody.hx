@@ -55,15 +55,19 @@ class AlphabetBody extends Body {
         transform.appendScale(1, -1, 1);
     }
 
-    override public function interact(id:Int, interaction:Interaction, x:Float, y:Float):Void {
+    override public function interact(id:Int, interaction:Interaction):Void {
         var glyph:Glyph = glyphs[id];
         switch (interaction) {
-            case ENTER: glyph.set_s(2);
-            case EXIT: glyph.set_s(1);
-            case DOWN: glyph.set_i(1);
-            case UP, DROP: glyph.set_i(0);
-            case CLICK: glyph.set_b(1 - glyph.get_b());
-            case _:
+            case MOUSE(type, x, y):
+                switch (type) {
+                    case ENTER: glyph.set_s(2);
+                    case EXIT: glyph.set_s(1);
+                    case MOUSE_DOWN: glyph.set_i(1);
+                    case MOUSE_UP, DROP: glyph.set_i(0);
+                    case CLICK: glyph.set_b(1 - glyph.get_b());
+                    case _:
+                }
+            case KEYBOARD(type, char):
         }
     }
 }

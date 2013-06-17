@@ -5,8 +5,8 @@ UI object
 
     Defer text changes until after dragging
 
-Keyboard interaction
-    Just another Interaction type
+Maybe Glyphs can get and set properties on their parent Vectors instead of having their own Vectors
+    Body segments and glyphs are made simultaneously
 
 Back to UI object
 
@@ -37,8 +37,6 @@ Board object
 
 Note: debugging webgl target with the console open slows it down
     Use Chrome instead
-
-Maybe Glyphs can get and set properties on their parent Vectors instead of having their own Vectors
 
 OpenFL native targets
     resizing window and calling GL.drawElements crashes

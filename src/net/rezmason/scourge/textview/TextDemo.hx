@@ -3,7 +3,6 @@ package net.rezmason.scourge.textview;
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.events.Event;
-import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.events.TimerEvent;
 import flash.geom.Matrix3D;
@@ -32,6 +31,8 @@ class TextDemo {
     var lastTimeStamp:Float;
 
     var text:String;
+    var prompt:String;
+    var caret:String;
 
     var fonts:Map<String, FlatFont>;
 
@@ -41,6 +42,7 @@ class TextDemo {
     var fontTextures:Map<String, GlyphTexture>;
 
     var mouseSystem:MouseSystem;
+    var keyboardSystem:KeyboardSystem;
     var mouseMethod:RenderMethod;
     var prettyMethod:RenderMethod;
     var renderer:Renderer;
@@ -50,8 +52,6 @@ class TextDemo {
     var testBody:TestBody;
     var uiBody:UIBody;
 
-    var keysDown:Map<Int, Bool>;
-
     var container:Sprite;
 
     public function new(stage:Stage, fonts:Map<String, FlatFont>, text:String):Void {
@@ -59,6 +59,16 @@ class TextDemo {
         this.stage = stage;
         this.fonts = fonts;
         this.text = text;
+        prompt =
+            '§{name:br1,p:0,s:1.0}' +
+            '§{name:br2,p:-0.04,s:1.2}' +
+            '∂{name:breathe,period:3.5,frames:[br1,br2,br1],r:1,g:0,b:1}' +
+            'Ω_rezmason§{} => ';
+
+        caret =
+            '§{name:caret1,r:1,g:1,b:1}' +
+            '§{name:caret2,r:0,g:0,b:0}' +
+            '∂{name:caret,period:1,frames:[caret1,caret2],i:1} §{}';
 
         utils = new UtilitySet(stage, onCreate);
     }
@@ -68,8 +78,8 @@ class TextDemo {
         container = new Sprite();
         stage.addChild(container);
         mouseSystem = new MouseSystem(utils.drawUtil, stage, interact);
+        keyboardSystem = new KeyboardSystem(stage, interact);
         // container.addChild(mouseSystem.view);
-        keysDown = new Map();
         renderer = new Renderer(utils.drawUtil);
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         prettyMethod = new PrettyMethod(utils.programUtil);
@@ -78,7 +88,6 @@ class TextDemo {
         makeScene();
 
         addListeners();
-        addKeyListeners();
         onActivate();
 
         // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures['full']).render);
@@ -113,7 +122,7 @@ class TextDemo {
         uiRect.inflate(-0.025, -0.1);
 
         views.push({body:uiBody, rect:uiRect});
-        uiBody.updateText(text);
+        uiBody.updateText(text + prompt + caret);
         /**/
 
         /*
@@ -137,27 +146,6 @@ class TextDemo {
         utils.drawUtil.addRenderCall(onRender);
 
         mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
-    }
-
-    function addKeyListeners():Void {
-        stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-        stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-    }
-
-    function onKeyDown(event:KeyboardEvent):Void {
-        var keyDown:Null<Bool> = keysDown[event.charCode];
-        if (keyDown != true) {
-            keysDown[event.charCode]  = true;
-            trace('Key down: ${event.charCode}');
-        }
-    }
-
-    function onKeyUp(event:KeyboardEvent):Void {
-        var keyDown:Null<Bool> = keysDown[event.charCode];
-        if (keyDown != true) {
-            keysDown[event.charCode]  = false;
-            trace('Key down: ${event.charCode}');
-        }
     }
 
     function onRender(width:Int, height:Int):Void {
@@ -210,6 +198,8 @@ class TextDemo {
 
         updateTimer.removeEventListener(TimerEvent.TIMER, onTimer);
         updateTimer.stop();
+
+        keyboardSystem.focusBodyID = -1;
     }
 
     function onTimer(?event:Event):Void {
@@ -265,11 +255,39 @@ class TextDemo {
         body.transform.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
     }
 
-    function interact(bodyID:Int, glyphID:Int, interaction:Interaction, stageX:Float, stageY:Float/*, delta:Float*/):Void {
-        if (bodyID >= bodies.length) return;
-        var view:View = views[bodyID];
-        var x:Float = (stageX / stage.stageWidth  - view.rect.x) / view.rect.width;
-        var y:Float = (stageY / stage.stageHeight - view.rect.y) / view.rect.height;
-        view.body.interact(glyphID, interaction, x, y); // , delta
+    function interact(bodyID:Int, glyphID:Int, interaction:Interaction):Void {
+
+        var targetView:View = null;
+
+        if (bodyID >= 0 && bodyID < bodies.length) targetView = views[bodyID];
+
+        switch (interaction) {
+            case MOUSE(type, oX, oY):
+
+                if (targetView == null) {
+                    for (view in views) {
+                        if (!view.body.catchMouseInRect) continue;
+                        if (view.rect.contains(oX / stage.stageWidth, oY / stage.stageHeight)) {
+                            glyphID = -1;
+                            bodyID = view.body.id;
+                            targetView = views[bodyID];
+                            break;
+                        }
+                    }
+                }
+
+                if (type == CLICK) keyboardSystem.focusBodyID = bodyID;
+
+                if (targetView != null) {
+                    var nX:Float = (oX / stage.stageWidth  - targetView.rect.x) / targetView.rect.width;
+                    var nY:Float = (oY / stage.stageHeight - targetView.rect.y) / targetView.rect.height;
+                    interaction = MOUSE(type, nX, nY);
+                }
+
+            case KEYBOARD(type, char):
+                trace('$type $char');
+        }
+
+        if (targetView != null) targetView.body.interact(glyphID, interaction);
     }
 }
