@@ -56,7 +56,7 @@ using net.rezmason.utils.Pointers;
             var prop:AspectProperty = extraAspectRequirements[ike];
             var ptr:AspectPtr = extraAspectTemplate.ptr(ike, state.key);
             extraAspectLookup[prop.id] = ptr;
-            extraAspectTemplate.mod(ptr, prop.initialValue);
+            extraAspectTemplate[ptr] = prop.initialValue;
         }
         __initPtrs();
         #if ROPES_VERBOSE trace('${myName()} initializing'); #end

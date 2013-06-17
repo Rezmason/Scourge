@@ -83,20 +83,20 @@ class ReplenishRuleTest extends ScourgeRuleTest
             var index2:Int = Std.int(Math.min(expectedValues2.length - 1, ike));
             var index3:Int = Std.int(Math.min(expectedValues3.length - 1, ike));
 
-            Assert.areEqual(expectedValues1[index1], state.aspects.at(stateValue1_));
-            Assert.areEqual(expectedValues2[index2], state.aspects.at(stateValue2_));
-            Assert.areEqual(expectedValues3[index3], state.aspects.at(stateValue3_));
+            Assert.areEqual(expectedValues1[index1], state.aspects[stateValue1_]);
+            Assert.areEqual(expectedValues2[index2], state.aspects[stateValue2_]);
+            Assert.areEqual(expectedValues3[index3], state.aspects[stateValue3_]);
 
             for (player in state.players) {
-                Assert.areEqual(expectedValues1[index1], player.at(playerValue1_));
-                Assert.areEqual(expectedValues2[index2], player.at(playerValue2_));
-                Assert.areEqual(expectedValues3[index3], player.at(playerValue3_));
+                Assert.areEqual(expectedValues1[index1], player[playerValue1_]);
+                Assert.areEqual(expectedValues2[index2], player[playerValue2_]);
+                Assert.areEqual(expectedValues3[index3], player[playerValue3_]);
             }
 
             for (node in state.nodes) {
-                Assert.areEqual(expectedValues1[index1], node.value.at(nodeValue1_));
-                Assert.areEqual(expectedValues2[index2], node.value.at(nodeValue2_));
-                Assert.areEqual(expectedValues3[index3], node.value.at(nodeValue3_));
+                Assert.areEqual(expectedValues1[index1], node.value[nodeValue1_]);
+                Assert.areEqual(expectedValues2[index2], node.value[nodeValue2_]);
+                Assert.areEqual(expectedValues3[index3], node.value[nodeValue3_]);
             }
 
             replenishRule.chooseMove();

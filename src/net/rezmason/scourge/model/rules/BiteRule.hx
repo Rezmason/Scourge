@@ -59,7 +59,7 @@ class BiteRule extends Rule {
     }
 
     override private function _prime():Void {
-        for (player in eachPlayer()) player.mod(numBites_, cfg.startingBites);
+        for (player in eachPlayer()) player[numBites_] = cfg.startingBites;
     }
 
     override private function _update():Void {
@@ -67,16 +67,16 @@ class BiteRule extends Rule {
         biteMoves = [];
 
         // get current player head
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var currentPlayer:Int = state.aspects[currentPlayer_];
 
         var headIDs:Array<Int> = [];
-        for (player in eachPlayer()) headIDs.push(player.at(head_));
+        for (player in eachPlayer()) headIDs.push(player[head_]);
 
         var player = getPlayer(currentPlayer);
-        if (player.at(numBites_) > 0) {
+        if (player[numBites_] > 0) {
 
-            var totalArea:Int = player.at(totalArea_);
-            var bodyNode:BoardNode = getNode(player.at(bodyFirst_));
+            var totalArea:Int = player[totalArea_];
+            var bodyNode:BoardNode = getNode(player[bodyFirst_]);
             var body:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_);
             var frontNodes:Array<BoardNode> = body.filter(isFront.bind(headIDs)).array();
 
@@ -86,13 +86,13 @@ class BiteRule extends Rule {
             for (node in frontNodes) {
                 for (neighbor in neighborsFor(node)) {
                     if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
-                        var move:BiteMove = generateMove(node.value.at(nodeID_), [neighbor.value.at(nodeID_)]);
+                        var move:BiteMove = generateMove(node.value[nodeID_], [neighbor.value[nodeID_]]);
                         if (!cfg.omnidirectional && cfg.baseReachOnThickness) {
                             // The baseReachOnThickness config param uses this data to determine how far to extend a bite
                             var backwards:Int = (node.neighbors.indexOf(neighbor) + 4) % 8;
                             var depth:Int = 0;
                             for (innerNode in node.walk(backwards)) {
-                                if (innerNode.value.at(occupier_) == currentPlayer) depth++;
+                                if (innerNode.value[occupier_] == currentPlayer) depth++;
                                 else break;
                             }
                             move.thickness = depth;
@@ -122,8 +122,8 @@ class BiteRule extends Rule {
                         for (bitNodeID in move.bitNodes) {
                             var bitNode:BoardNode = getNode(bitNodeID);
                             for (neighbor in neighborsFor(bitNode)) {
-                                if (isValidEnemy(headIDs, currentPlayer, neighbor) && !move.bitNodes.has(neighbor.value.at(nodeID_))) {
-                                    newMoves.push(generateMove(move.targetNode, move.bitNodes.concat([neighbor.value.at(nodeID_)]), move));
+                                if (isValidEnemy(headIDs, currentPlayer, neighbor) && !move.bitNodes.has(neighbor.value[nodeID_])) {
+                                    newMoves.push(generateMove(move.targetNode, move.bitNodes.concat([neighbor.value[nodeID_]]), move));
                                 }
                             }
                         }
@@ -134,7 +134,7 @@ class BiteRule extends Rule {
                         var direction:Int = getNode(move.targetNode).neighbors.indexOf(firstBitNode);
                         var neighbor:BoardNode = lastBitNode.neighbors[direction];
                         if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
-                            var nextMove:BiteMove = generateMove(move.targetNode, move.bitNodes.concat([neighbor.value.at(nodeID_)]), move);
+                            var nextMove:BiteMove = generateMove(move.targetNode, move.bitNodes.concat([neighbor.value[nodeID_]]), move);
                             nextMove.thickness = move.thickness;
                             newMoves.push(nextMove);
                         }
@@ -173,10 +173,10 @@ class BiteRule extends Rule {
             // Grab data from the move
 
             var node:BoardNode = getNode(move.targetNode);
-            var currentPlayer:Int = state.aspects.at(currentPlayer_);
+            var currentPlayer:Int = state.aspects[currentPlayer_];
 
-            var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
-            var numBites:Int = getPlayer(currentPlayer).at(numBites_) - 1;
+            var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
+            var numBites:Int = getPlayer(currentPlayer)[numBites_] - 1;
 
             // Find the cells removed from each player
 
@@ -185,35 +185,35 @@ class BiteRule extends Rule {
 
             for (bitNodeID in move.bitNodes) {
                 var bitNode:BoardNode = getNode(bitNodeID);
-                bitNodesByPlayer[bitNode.value.at(occupier_)].push(bitNode);
+                bitNodesByPlayer[bitNode.value[occupier_]].push(bitNode);
             }
 
             // Remove the appropriate cells from each player
 
             for (player in eachPlayer()) {
-                var bitNodes:Array<BoardNode> = bitNodesByPlayer[player.at(playerID_)];
-                var bodyFirst:Int = player.at(bodyFirst_);
+                var bitNodes:Array<BoardNode> = bitNodesByPlayer[player[playerID_]];
+                var bodyFirst:Int = player[bodyFirst_];
                 for (node in bitNodes) bodyFirst = killCell(node, maxFreshness++, bodyFirst);
-                player.mod(bodyFirst_, bodyFirst);
+                player[bodyFirst_] = bodyFirst;
             }
 
-            state.aspects.mod(maxFreshness_, maxFreshness);
-            getPlayer(currentPlayer).mod(numBites_, numBites);
+            state.aspects[maxFreshness_] = maxFreshness;
+            getPlayer(currentPlayer)[numBites_] = numBites;
         }
     }
 
     // "front" as in "battle front". Areas where the current player touches other players
     inline function isFront(headIDs:Array<Int>, node:BoardNode):Bool {
-        return neighborsFor(node).exists(isValidEnemy.bind(headIDs, node.value.at(occupier_)));
+        return neighborsFor(node).exists(isValidEnemy.bind(headIDs, node.value[occupier_]));
     }
 
     // Depending on the config, enemy nodes of different kinds can be bitten
     inline function isValidEnemy(headIDs:Array<Int>, allegiance:Int, node:BoardNode):Bool {
         var val:Bool = true;
-        if (node.value.at(occupier_) == allegiance) val = false; // Can't be the current player
-        else if (node.value.at(occupier_) == Aspect.NULL) val = false; // Can't be the current player
-        else if (!cfg.biteThroughCavities && node.value.at(isFilled_) == Aspect.FALSE) val = false; // Must be filled, or must allow biting through a cavity
-        else if (!cfg.biteHeads && headIDs.has(node.value.at(nodeID_))) val = false;
+        if (node.value[occupier_] == allegiance) val = false; // Can't be the current player
+        else if (node.value[occupier_] == Aspect.NULL) val = false; // Can't be the current player
+        else if (!cfg.biteThroughCavities && node.value[isFilled_] == Aspect.FALSE) val = false; // Must be filled, or must allow biting through a cavity
+        else if (!cfg.biteHeads && headIDs.has(node.value[nodeID_])) val = false;
 
         return val;
     }
@@ -240,14 +240,14 @@ class BiteRule extends Rule {
     }
 
     inline function killCell(node:BoardNode, freshness:Int, firstIndex:Int):Int {
-        if (node.value.at(isFilled_) == Aspect.TRUE) {
+        if (node.value[isFilled_] == Aspect.TRUE) {
             var nextNode:BoardNode = node.removeNode(state.nodes, bodyNext_, bodyPrev_);
-            if (firstIndex == node.value.at(nodeID_)) firstIndex = nextNode == null ? Aspect.NULL : nextNode.value.at(nodeID_);
-            node.value.mod(isFilled_, Aspect.FALSE);
+            if (firstIndex == node.value[nodeID_]) firstIndex = nextNode == null ? Aspect.NULL : nextNode.value[nodeID_];
+            node.value[isFilled_] = Aspect.FALSE;
         }
 
-        node.value.mod(occupier_, Aspect.NULL);
-        node.value.mod(freshness_, freshness);
+        node.value[occupier_] = Aspect.NULL;
+        node.value[freshness_] = freshness;
 
         return firstIndex;
     }

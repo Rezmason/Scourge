@@ -46,9 +46,9 @@ class EatRuleTest extends ScourgeRuleTest
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
 
-        state.grabXY(7, 7).value.mod(freshness_, 1);
-        state.grabXY(9, 7).value.mod(freshness_, 1);
-        state.grabXY(12, 6).value.mod(freshness_, 1);// Don't eat that head!
+        state.grabXY(7, 7).value[freshness_] = 1;
+        state.grabXY(9, 7).value[freshness_] = 1;
+        state.grabXY(12, 6).value[freshness_] = 1; // Don't eat that head!
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25, numCells);
@@ -67,7 +67,7 @@ class EatRuleTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 6, numCells);
 
-        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
+        var bodyNode:BoardNode = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -85,9 +85,9 @@ class EatRuleTest extends ScourgeRuleTest
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
 
-        state.grabXY(7, 7).value.mod(freshness_, 1);
-        state.grabXY(9, 7).value.mod(freshness_, 1);
-        state.grabXY(12, 6).value.mod(freshness_, 1);// Don't eat that head!
+        state.grabXY(7, 7).value[freshness_] = 1;
+        state.grabXY(9, 7).value[freshness_] = 1;
+        state.grabXY(12, 6).value[freshness_] = 1; // Don't eat that head!
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25, numCells);
@@ -103,7 +103,7 @@ class EatRuleTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 6 + 1, numCells);
 
-        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
+        var bodyNode:BoardNode = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -121,7 +121,7 @@ class EatRuleTest extends ScourgeRuleTest
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
 
-        state.grabXY(12, 6).value.mod(freshness_, 1);
+        state.grabXY(12, 6).value[freshness_] = 1;
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25, numCells);
@@ -135,7 +135,7 @@ class EatRuleTest extends ScourgeRuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 13, numCells); // Eat everything
 
-        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
+        var bodyNode:BoardNode = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -150,7 +150,7 @@ class EatRuleTest extends ScourgeRuleTest
 
         var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
 
-        state.grabXY(12, 6).value.mod(freshness_, 1);
+        state.grabXY(12, 6).value[freshness_] = 1;
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25, numCells);
@@ -165,7 +165,7 @@ class EatRuleTest extends ScourgeRuleTest
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
-        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
+        var bodyNode:BoardNode = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -183,8 +183,8 @@ class EatRuleTest extends ScourgeRuleTest
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
 
-        state.grabXY(6, 13).value.mod(freshness_, 1);
-        state.grabXY(7, 13).value.mod(freshness_, 1);
+        state.grabXY(6, 13).value[freshness_] = 1;
+        state.grabXY(7, 13).value[freshness_] = 1;
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(76, numCells);
@@ -203,7 +203,7 @@ class EatRuleTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(76 + 14, numCells);
 
-        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
+        var bodyNode:BoardNode = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }

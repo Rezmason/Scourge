@@ -38,31 +38,31 @@ class CavityRule extends Rule {
     }
 
     override private function _chooseMove(choice:Int):Void {
-        var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
-        for (player in eachPlayer()) remapCavities(player.at(playerID_), maxFreshness);
-        state.aspects.mod(maxFreshness_, maxFreshness);
+        var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
+        for (player in eachPlayer()) remapCavities(player[playerID_], maxFreshness);
+        state.aspects[maxFreshness_] = maxFreshness;
     }
 
     private function remapCavities(playerID:Int, maxFreshness:Int):Void {
         var player:AspectSet = getPlayer(playerID);
 
         // We destroy the existing cavity list
-        var cavityFirst:Int = player.at(cavityFirst_);
+        var cavityFirst:Int = player[cavityFirst_];
         var oldCavityNodes:Array<BoardNode> = [];
         if (cavityFirst != Aspect.NULL) {
             oldCavityNodes = getNode(cavityFirst).boardListToArray(state.nodes, bodyNext_);
             for (node in oldCavityNodes) clearCavityCell(node, maxFreshness);
-            player.mod(cavityFirst_, Aspect.NULL);
+            player[cavityFirst_] = Aspect.NULL;
         }
 
         // No one cares about your cavities if you're dead
-        if (player.at(head_) == Aspect.NULL) return;
+        if (player[head_] == Aspect.NULL) return;
 
         // Now for the fun part: finding all the cavity nodes.
 
         var cavityNodes:Array<BoardNode> = [];
-        var body:Array<BoardNode> = getNode(player.at(bodyFirst_)).boardListToArray(state.nodes, bodyNext_);
-        var head:BoardNode = getNode(player.at(head_));
+        var body:Array<BoardNode> = getNode(player[bodyFirst_]).boardListToArray(state.nodes, bodyNext_);
+        var head:BoardNode = getNode(player[head_]);
 
         // We're going to search the board for ALL nodes UNTIL we have found all body nodes
         // This takes advantage of the FILO search pattern of GridUtils.getGraph
@@ -74,7 +74,7 @@ class CavityRule extends Rule {
         widePerimeter.reverse();
 
         var nodeIDs:Map<Int, Bool> = new Map<Int, Bool>();
-        for (node in widePerimeter) nodeIDs[node.value.at(nodeID_)] = true;
+        for (node in widePerimeter) nodeIDs[node.value[nodeID_]] = true;
 
         var empties:Array<BoardNode> = [];
 
@@ -83,13 +83,13 @@ class CavityRule extends Rule {
 
             var node:BoardNode = widePerimeter[ike];
 
-            var occupier:Int = node.value.at(occupier_);
-            var isFilled:Int = node.value.at(isFilled_);
+            var occupier:Int = node.value[occupier_];
+            var isFilled:Int = node.value[isFilled_];
 
             // Dismiss filled nodes
             if (isFilled == Aspect.TRUE) {
                 // remove enemy filled nodes from the nodeIDs
-                if (occupier != playerID) nodeIDs.remove(node.value.at(nodeID_));
+                if (occupier != playerID) nodeIDs.remove(node.value[nodeID_]);
             } else {
                 empties.push(node);
             }
@@ -104,8 +104,8 @@ class CavityRule extends Rule {
             for (node in empties) {
                 newEmpties.push(node);
                 for (neighbor in node.orthoNeighbors()) {
-                    if (neighbor == null || !nodeIDs.exists(neighbor.value.at(nodeID_))) {
-                        nodeIDs.remove(node.value.at(nodeID_));
+                    if (neighbor == null || !nodeIDs.exists(neighbor.value[nodeID_])) {
+                        nodeIDs.remove(node.value[nodeID_]);
                         newEmpties.pop();
                         break;
                     }
@@ -123,11 +123,11 @@ class CavityRule extends Rule {
             for (node in cavityNodes) createCavity(playerID, oldCavityNodes.has(node) ? 0 : maxFreshness, node);
 
             cavityNodes.chainByAspect(nodeID_, cavityNext_, cavityPrev_);
-            player.mod(cavityFirst_, cavityNodes[0].value.at(nodeID_));
+            player[cavityFirst_] = cavityNodes[0].value[nodeID_];
 
             // Cavities affect the player's total area:
-            var totalArea:Int = player.at(totalArea_) + cavityNodes.length;
-            player.mod(totalArea_, totalArea);
+            var totalArea:Int = player[totalArea_] + cavityNodes.length;
+            player[totalArea_] = totalArea;
         }
     }
 
@@ -135,20 +135,20 @@ class CavityRule extends Rule {
     // of aspects it has found, and ends the search when they're all found
     function isWithinPerimeter(allegiance:Int, me:AspectSet, you:AspectSet):Bool {
         if (remainingNodes <= 0) return false;
-        if (me.at(isFilled_) == Aspect.TRUE && me.at(occupier_) == allegiance) remainingNodes--;
+        if (me[isFilled_] == Aspect.TRUE && me[occupier_] == allegiance) remainingNodes--;
         return true;
     }
 
     inline function createCavity(occupier:Int, maxFreshness:Int, node:BoardNode):Void {
-        node.value.mod(isFilled_, Aspect.FALSE);
-        node.value.mod(occupier_, occupier);
-        node.value.mod(freshness_, maxFreshness);
+        node.value[isFilled_] = Aspect.FALSE;
+        node.value[occupier_] = occupier;
+        node.value[freshness_] = maxFreshness;
     }
 
     inline function clearCavityCell(node:BoardNode, maxFreshness:Int):Void {
-        node.value.mod(isFilled_, Aspect.FALSE);
-        node.value.mod(occupier_, Aspect.NULL);
-        node.value.mod(freshness_, maxFreshness);
+        node.value[isFilled_] = Aspect.FALSE;
+        node.value[occupier_] = Aspect.NULL;
+        node.value[freshness_] = maxFreshness;
         node.removeNode(state.nodes, cavityNext_, cavityPrev_);
     }
 }

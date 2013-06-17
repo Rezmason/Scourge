@@ -132,7 +132,7 @@ class BuildBoardRule extends Rule {
 
     inline function makeNode():BoardNode {
         var node:BoardNode = new BoardNode(nodeAspectTemplate.copy());
-        node.value.mod(nodeID_, numNodes());
+        node.value[nodeID_] = numNodes();
         state.nodes.push(node);
 
         var histAspects:AspectSet = nodeAspectTemplate.map(cfg.buildCfg.history.alloc);
@@ -165,10 +165,10 @@ class BuildBoardRule extends Rule {
     }
 
     inline function obstructGraphRim(grid:BoardNode):Void {
-        for (node in grid.walk(Gr.e)) node.value.mod(isFilled_, Aspect.TRUE);
-        for (node in grid.walk(Gr.s)) node.value.mod(isFilled_, Aspect.TRUE);
-        for (node in grid.run(Gr.s).walk(Gr.e)) node.value.mod(isFilled_, Aspect.TRUE);
-        for (node in grid.run(Gr.e).walk(Gr.s)) node.value.mod(isFilled_, Aspect.TRUE);
+        for (node in grid.walk(Gr.e)) node.value[isFilled_] = Aspect.TRUE;
+        for (node in grid.walk(Gr.s)) node.value[isFilled_] = Aspect.TRUE;
+        for (node in grid.run(Gr.s).walk(Gr.e)) node.value[isFilled_] = Aspect.TRUE;
+        for (node in grid.run(Gr.e).walk(Gr.s)) node.value[isFilled_] = Aspect.TRUE;
     }
 
     inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>, plantHeads:Bool):Void {
@@ -178,11 +178,11 @@ class BuildBoardRule extends Rule {
             var coord:XY = headCoords[ike];
             var head:BoardNode = grid.run(Gr.e, Std.int(coord.x)).run(Gr.s, Std.int(coord.y));
             if (plantHeads) {
-                head.value.mod(isFilled_, Aspect.TRUE);
-                head.value.mod(occupier_, ike);
-                getPlayer(ike).mod(head_, head.value.at(nodeID_));
-            } else if (head.value.at(isFilled_) == Aspect.TRUE && head.value.at(occupier_) == ike) {
-                getPlayer(ike).mod(head_, head.value.at(nodeID_));
+                head.value[isFilled_] = Aspect.TRUE;
+                head.value[occupier_] = ike;
+                getPlayer(ike)[head_] = head.value[nodeID_];
+            } else if (head.value[isFilled_] == Aspect.TRUE && head.value[occupier_] == ike) {
+                getPlayer(ike)[head_] = head.value[nodeID_];
             }
         }
     }
@@ -194,11 +194,11 @@ class BuildBoardRule extends Rule {
         for (row in grid.walk(Gr.s)) {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
-                if (column.value.at(isFilled_) == 0) {
+                if (column.value[isFilled_] == 0) {
                     var fx:Float = x - radius + 0.5 - RIM;
                     var fy:Float = y - radius + 0.5 - RIM;
                     var insideCircle:Bool = Math.sqrt(fx * fx + fy * fy) < radius;
-                    if (!insideCircle) column.value.mod(isFilled_, 1);
+                    if (!insideCircle) column.value[isFilled_] = 1;
                 }
                 x++;
             }
@@ -218,12 +218,12 @@ class BuildBoardRule extends Rule {
         for (row in grid.walk(Gr.s)) {
             var x:Int = 0;
             for (column in row.walk(Gr.e)) {
-                if (column.value.at(isFilled_) == Aspect.FALSE) {
+                if (column.value[isFilled_] == Aspect.FALSE) {
                     var char:String = initGrid.charAt(y * initGridWidth + x + 1);
                     if (char != ' ') {
-                        column.value.mod(isFilled_, Aspect.TRUE);
-                        if (!NUMERIC_CHAR.match(char)) column.value.mod(occupier_, Aspect.NULL);
-                        else column.value.mod(occupier_, Std.parseInt(char));
+                        column.value[isFilled_] = Aspect.TRUE;
+                        if (!NUMERIC_CHAR.match(char)) column.value[occupier_] = Aspect.NULL;
+                        else column.value[occupier_] = Std.parseInt(char);
                     }
                 }
                 x++;
@@ -238,8 +238,8 @@ class BuildBoardRule extends Rule {
         for (player in eachPlayer()) bodies.push([]);
 
         for (node in eachNode()) {
-            if (node.value.at(isFilled_) != Aspect.FALSE) {
-                var occupier:Int = node.value.at(occupier_);
+            if (node.value[isFilled_] != Aspect.FALSE) {
+                var occupier:Int = node.value[occupier_];
                 if (occupier != Aspect.NULL) {
                     if (bodies[occupier] == null) throw 'A node is owned by a player that doesn\'t exist: $occupier';
                     else bodies[occupier].push(node);
@@ -248,10 +248,10 @@ class BuildBoardRule extends Rule {
         }
 
         for (player in eachPlayer()) {
-            var body:Array<BoardNode> = bodies[player.at(playerID_)];
+            var body:Array<BoardNode> = bodies[player[playerID_]];
             if (body.length > 0) {
                 var bodyFirstNode:BoardNode = body[0];
-                player.mod(bodyFirst_, bodyFirstNode.value.at(nodeID_));
+                player[bodyFirst_] = bodyFirstNode.value[nodeID_];
                 body.chainByAspect(nodeID_, bodyNext_, bodyPrev_);
             }
         }

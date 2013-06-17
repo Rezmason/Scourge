@@ -33,11 +33,11 @@ class SkipsExhaustedRule extends Rule {
 
         var stalemate:Bool = true;
 
-        if (state.aspects.at(winner_) != Aspect.NULL) {
+        if (state.aspects[winner_] != Aspect.NULL) {
             stalemate = false;
         } else {
             for (player in eachPlayer()) {
-                if (player.at(numConsecutiveSkips_) < cfg.maxSkips) {
+                if (player[numConsecutiveSkips_] < cfg.maxSkips) {
                     stalemate = false;
                     break;
                 }
@@ -49,14 +49,14 @@ class SkipsExhaustedRule extends Rule {
 
         if (stalemate) {
             for (player in eachPlayer()) {
-                var playerID:Int = player.at(playerID_);
-                var totalArea:Int = player.at(totalArea_);
+                var playerID:Int = player[playerID_];
+                var totalArea:Int = player[totalArea_];
 
                 if (totalArea > largestArea) largestPlayers = [playerID];
                 else if (totalArea == largestArea) largestPlayers.push(playerID);
             }
 
-            state.aspects.mod(winner_, largestPlayers.pop());
+            state.aspects[winner_] = largestPlayers.pop();
         }
     }
 }

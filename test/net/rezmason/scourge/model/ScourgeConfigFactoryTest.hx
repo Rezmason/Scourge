@@ -123,10 +123,10 @@ class ScourgeConfigFactoryTest
 		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
 		var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
 
-		Assert.areEqual(36, state.players[0].at(totalArea_));
-		Assert.areEqual(Aspect.NULL, state.players[1].at(head_));
-		Assert.areEqual(0, state.aspects.at(winner_));
-		Assert.areEqual(0, state.aspects.at(currentPlayer_));
+		Assert.areEqual(36, state.players[0][totalArea_]);
+		Assert.areEqual(Aspect.NULL, state.players[1][head_]);
+		Assert.areEqual(0, state.aspects[winner_]);
+		Assert.areEqual(0, state.aspects[currentPlayer_]);
 	}
 
 	@Test
@@ -148,14 +148,14 @@ class ScourgeConfigFactoryTest
 		startAction.update();
 		startAction.chooseMove();
 
-		Assert.areEqual(13, state.players[1].at(totalArea_));
+		Assert.areEqual(13, state.players[1][totalArea_]);
 
 		VisualAssert.assert('two player grab', state.spitBoard(plan));
 
 		biteAction.update();
 		biteAction.chooseMove(4); // bite
 
-		Assert.areEqual(6, state.players[1].at(totalArea_));
+		Assert.areEqual(6, state.players[1][totalArea_]);
 
 		VisualAssert.assert('player zero bit off player one\'s leg', state.spitBoard(plan));
 
@@ -173,7 +173,7 @@ class ScourgeConfigFactoryTest
 		biteAction.update();
 		biteAction.chooseMove(); // bite head
 
-		Assert.areEqual(0, state.players[1].at(totalArea_));
+		Assert.areEqual(0, state.players[1][totalArea_]);
 
 		VisualAssert.assert('player zero bit player one in the head: dead', state.spitBoard(plan));
 	}
@@ -197,7 +197,7 @@ class ScourgeConfigFactoryTest
 		var numSwaps_:AspectPtr = plan.onPlayer(SwapAspect.NUM_SWAPS);
 		var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
 
-		Assert.areEqual(config.startingSwaps, state.players[0].at(numSwaps_));
+		Assert.areEqual(config.startingSwaps, state.players[0][numSwaps_]);
 
 		var pickedPieces:Array<Null<Int>> = [];
 
@@ -207,16 +207,16 @@ class ScourgeConfigFactoryTest
 			pickPieceAction.update();
 			pickPieceAction.chooseMove();
 
-			var piece:Int = state.aspects.at(pieceTableID_);
+			var piece:Int = state.aspects[pieceTableID_];
 
-			Assert.areEqual(config.pieceTableIDs[(ike + 1) % config.pieceHatSize], state.aspects.at(pieceTableID_));
+			Assert.areEqual(config.pieceTableIDs[(ike + 1) % config.pieceHatSize], state.aspects[pieceTableID_]);
 
 			var index:Int = ike % config.pieceHatSize;
 			if (pickedPieces[index] == null) pickedPieces[index] = piece;
 			else Assert.areEqual(pickedPieces[index], piece);
 		}
 
-		Assert.areEqual(0, state.players[0].at(numSwaps_));
+		Assert.areEqual(0, state.players[0][numSwaps_]);
 	}
 
 	@Test
@@ -234,7 +234,7 @@ class ScourgeConfigFactoryTest
 
 		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
 
-		Assert.areEqual(1, state.aspects.at(winner_));
+		Assert.areEqual(1, state.aspects[winner_]);
 	}
 
 	@Test
@@ -274,7 +274,7 @@ class ScourgeConfigFactoryTest
 
 		/*
 		var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-		var enemyHead:BoardNode = state.nodes[state.players[1].at(head_)];
+		var enemyHead:BoardNode = state.nodes[state.players[1][head_]];
 
 		var drmoves:Array<DropPieceMove> = cast dropAction.moves;
 		var bestMove:DropPieceMove = null;
@@ -299,7 +299,7 @@ class ScourgeConfigFactoryTest
 		VisualAssert.assert('player zero dropped another L, ate player one\'s head and body; another cavity', state.spitBoard(plan));
 
 		var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
-		Assert.areEqual(0, state.aspects.at(winner_));
+		Assert.areEqual(0, state.aspects[winner_]);
 	}
 
 	private function makeState():Void {

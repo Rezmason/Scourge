@@ -63,19 +63,19 @@ class ReplenishRule extends Rule {
         // Create the replenishables
         for (repCfg in cfg.stateProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.stateAspectLookup);
-            repCfg.replenishableID = replenishable.at(repID_);
+            repCfg.replenishableID = replenishable[repID_];
             stateReps.push(replenishable);
         }
 
         for (repCfg in cfg.playerProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.playerAspectLookup);
-            repCfg.replenishableID = replenishable.at(repID_);
+            repCfg.replenishableID = replenishable[repID_];
             playerReps.push(replenishable);
         }
 
         for (repCfg in cfg.nodeProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.nodeAspectLookup);
-            repCfg.replenishableID = replenishable.at(repID_);
+            repCfg.replenishableID = replenishable[repID_];
             nodeReps.push(replenishable);
         }
 
@@ -83,23 +83,23 @@ class ReplenishRule extends Rule {
 
         if (stateReps.length > 0) {
             stateReps.chainByAspect(repID_, repNext_, repPrev_);
-            state.aspects.mod(stateRepFirst_, stateReps[0].at(repID_));
+            state.aspects[stateRepFirst_] = stateReps[0][repID_];
         } else {
-            state.aspects.mod(stateRepFirst_, Aspect.NULL);
+            state.aspects[stateRepFirst_] = Aspect.NULL;
         }
 
         if (playerReps.length > 0) {
             playerReps.chainByAspect(repID_, repNext_, repPrev_);
-            state.aspects.mod(playerRepFirst_, playerReps[0].at(repID_));
+            state.aspects[playerRepFirst_] = playerReps[0][repID_];
         } else {
-            state.aspects.mod(playerRepFirst_, Aspect.NULL);
+            state.aspects[playerRepFirst_] = Aspect.NULL;
         }
 
         if (nodeReps.length > 0) {
             nodeReps.chainByAspect(repID_, repNext_, repPrev_);
-            state.aspects.mod(nodeRepFirst_, nodeReps[0].at(repID_));
+            state.aspects[nodeRepFirst_] = nodeReps[0][repID_];
         } else {
-            state.aspects.mod(nodeRepFirst_, Aspect.NULL);
+            state.aspects[nodeRepFirst_] = Aspect.NULL;
         }
     }
 
@@ -117,8 +117,8 @@ class ReplenishRule extends Rule {
 
         // We represent replenishables as extras
         var rep:AspectSet = buildExtra();
-        rep.mod(repPropLookup_, lookup[repCfg.prop.id].toInt());
-        rep.mod(repID_, numExtras());
+        rep[repPropLookup_] = lookup[repCfg.prop.id].toInt();
+        rep[repID_] = numExtras();
 
         state.extras.push(rep);
         cfg.buildCfg.historyState.extras.push(buildHistExtra(cfg.buildCfg.history));
@@ -130,43 +130,43 @@ class ReplenishRule extends Rule {
         // Each replenishable gets its iterator incremented
         for (repCfg in repCfgs) {
             var replenishable:AspectSet = getExtra(repCfg.replenishableID);
-            var step:Int = replenishable.at(repStep_);
+            var step:Int = replenishable[repStep_];
             step++;
             if (step == repCfg.period) {
                 // Time for action! Resolve the pointer and update values at that location
                 step = 0;
-                var ptr:AspectPtr = AspectPtr.intToPointer(replenishable.at(repPropLookup_), state.key);
+                var ptr:AspectPtr = AspectPtr.intToPointer(replenishable[repPropLookup_], state.key);
                 updateFunc(repCfg, ptr); // TODO: Do this with fewer function calls (and iterations)
             }
-            replenishable.mod(repStep_, step);
+            replenishable[repStep_] = step;
         }
     }
 
     // Only one aspect set to update– the state's.
     private function updateState(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
-        var value:Int = state.aspects.at(ptr);
+        var value:Int = state.aspects[ptr];
         value += repCfg.amount;
         if (value > repCfg.maxAmount) value = repCfg.maxAmount;
-        state.aspects.mod(ptr, value);
+        state.aspects[ptr] = value;
     }
 
     // Update each player's aspect set
     private function updatePlayers(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
         for (player in eachPlayer()) {
-            var value:Int = player.at(ptr);
+            var value:Int = player[ptr];
             value += repCfg.amount;
             if (value > repCfg.maxAmount) value = repCfg.maxAmount;
-            player.mod(ptr, value);
+            player[ptr] = value;
         }
     }
 
     // Update each node's aspect set
     private function updateNodes(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
         for (node in eachNode()) {
-            var value:Int = node.value.at(ptr);
+            var value:Int = node.value[ptr];
             value += repCfg.amount;
             if (value > repCfg.maxAmount) value = repCfg.maxAmount;
-            node.value.mod(ptr, value);
+            node.value[ptr] = value;
         }
     }
 }

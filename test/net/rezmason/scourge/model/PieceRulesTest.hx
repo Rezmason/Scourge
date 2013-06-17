@@ -85,7 +85,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
-        var bodyNode:BoardNode = state.nodes[state.players[0].at(bodyFirst_)];
+        var bodyNode:BoardNode = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
 	}
@@ -292,8 +292,8 @@ class PieceRulesTest extends ScourgeRuleTest
             Assert.areEqual(1, pickPieceRule.moves.length);
             Assert.areEqual(pieceTableIDs.length - (ike % hatSize), pickPieceRule.quantumMoves.length);
             pickPieceRule.chooseMove();
-            Assert.areEqual(pieceTableIDs[ike % hatSize], state.aspects.at(pieceTableID_));
-            state.aspects.mod(pieceTableID_, Aspect.NULL);
+            Assert.areEqual(pieceTableIDs[ike % hatSize], state.aspects[pieceTableID_]);
+            state.aspects[pieceTableID_] =  Aspect.NULL;
             pickPieceRule.update();
         }
     }
@@ -445,7 +445,7 @@ class PieceRulesTest extends ScourgeRuleTest
         for (ike in 0...hatSize + 1) {
             Assert.areEqual(pieceTableIDs.length, pickPieceRule.moves.length);
             pickPieceRule.chooseMove();
-            state.aspects.mod(pieceTableID_, Aspect.NULL);
+            state.aspects[pieceTableID_] =  Aspect.NULL;
             pickPieceRule.update();
         }
     }
@@ -460,7 +460,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
 
-        state.aspects.mod(pieceTableID_, 0);
+        state.aspects[pieceTableID_] =  0;
 
         swapPieceRule.update();
 
@@ -469,7 +469,7 @@ class PieceRulesTest extends ScourgeRuleTest
             swapPieceRule.chooseMove();
             swapPieceRule.update();
             Assert.areEqual(0, swapPieceRule.moves.length);
-            state.aspects.mod(pieceTableID_, 0);
+            state.aspects[pieceTableID_] =  0;
             swapPieceRule.update();
         }
 

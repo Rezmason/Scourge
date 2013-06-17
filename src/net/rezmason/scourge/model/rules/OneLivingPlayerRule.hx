@@ -24,11 +24,11 @@ class OneLivingPlayerRule extends Rule {
 
         var playersWithHeads:Array<Int> = [];
         for (player in eachPlayer()) {
-            var headIndex:Int = player.at(head_);
-            if (headIndex != Aspect.NULL) playersWithHeads.push(player.at(playerID_));
+            var headIndex:Int = player[head_];
+            if (headIndex != Aspect.NULL) playersWithHeads.push(player[playerID_]);
         }
 
-        if (playersWithHeads.length == 1) state.aspects.mod(winner_, playersWithHeads.pop());
+        if (playersWithHeads.length == 1) state.aspects[winner_] = playersWithHeads.pop();
     }
 }
 

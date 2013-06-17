@@ -49,7 +49,7 @@ class StatePlanner {
             var prop:AspectProperty = requirements[ike];
             var ptr:AspectPtr = template.ptr(ike, key);
             lookup[prop.id] = ptr;
-            template.mod(ptr, prop.initialValue);
+            template[ptr] = prop.initialValue;
         }
     }
 

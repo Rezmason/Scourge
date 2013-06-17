@@ -27,21 +27,21 @@ class EndTurnRule extends Rule {
 
         // Get current player
 
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var currentPlayer:Int = state.aspects[currentPlayer_];
 
         // Find the next living player
         var startPlayerIndex:Int = (currentPlayer + 1) % numPlayers();
         var playerID:Int = startPlayerIndex;
-        while (getPlayer(playerID).at(head_) == Aspect.NULL) {
+        while (getPlayer(playerID)[head_] == Aspect.NULL) {
             playerID = (playerID + 1) % numPlayers();
             if (playerID == startPlayerIndex) throw 'No players have heads!';
         }
 
         // reset freshness on all nodes
-        for (node in eachNode()) node.value.mod(freshness_, 0);
+        for (node in eachNode()) node.value[freshness_] = 0;
 
-        state.aspects.mod(currentPlayer_, playerID);
-        state.aspects.mod(maxFreshness_, 0);
+        state.aspects[currentPlayer_] = playerID;
+        state.aspects[maxFreshness_] = 0;
     }
 }
 

@@ -51,14 +51,14 @@ class TurnRulesTest extends ScourgeRuleTest
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
 
         var expectedCurrentPlayer:Int = 0;
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var currentPlayer:Int = state.aspects[currentPlayer_];
 
         Assert.areEqual(expectedCurrentPlayer, currentPlayer);
 
         // Get rid of player 4's head
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        state.players[3].mod(head_, Aspect.NULL);
+        state.players[3][head_] = Aspect.NULL;
 
 
         endTurnRule.update();
@@ -69,7 +69,7 @@ class TurnRulesTest extends ScourgeRuleTest
         while (expectedCurrentPlayer < 10) {
             expectedCurrentPlayer++;
             endTurnRule.chooseMove();
-            currentPlayer = state.aspects.at(currentPlayer_);
+            currentPlayer = state.aspects[currentPlayer_];
             Assert.areEqual(expectedCurrentPlayer % 3, currentPlayer);
         }
     }
@@ -88,8 +88,8 @@ class TurnRulesTest extends ScourgeRuleTest
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
         var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
 
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var head:Int = state.players[currentPlayer].at(head_);
+        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var head:Int = state.players[currentPlayer][head_];
         var playerHead:BoardNode = state.nodes[head];
 
         forfeitRule.update();
@@ -103,15 +103,15 @@ class TurnRulesTest extends ScourgeRuleTest
 
         VisualAssert.assert('player 0 is dead and gone', state.spitBoard(plan));
 
-        Assert.areEqual(Aspect.NULL, playerHead.value.at(occupier_));
-        Assert.areEqual(0, playerHead.value.at(isFilled_));
+        Assert.areEqual(Aspect.NULL, playerHead.value[occupier_]);
+        Assert.areEqual(0, playerHead.value[isFilled_]);
 
         // Player 1 should be gone
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(0, numCells);
 
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        Assert.areEqual(Aspect.NULL, state.players[currentPlayer].at(bodyFirst_));
+        Assert.areEqual(Aspect.NULL, state.players[currentPlayer][bodyFirst_]);
     }
 
     @Test
@@ -131,11 +131,11 @@ class TurnRulesTest extends ScourgeRuleTest
         var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
 
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
-        var head:Int = state.players[currentPlayer].at(head_);
+        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var head:Int = state.players[currentPlayer][head_];
         var playerHead:BoardNode = state.nodes[head];
 
-        playerHead.value.mod(occupier_, 1);
+        playerHead.value[occupier_] = 1;
 
         killHeadlessPlayerRule.update();
         var moves:Array<Move> = killHeadlessPlayerRule.moves;
@@ -144,10 +144,10 @@ class TurnRulesTest extends ScourgeRuleTest
 
         killHeadlessPlayerRule.chooseMove();
 
-        head = state.players[currentPlayer].at(head_);
+        head = state.players[currentPlayer][head_];
         Assert.areEqual(Aspect.NULL, head);
 
-        var bodyFirst:Int = state.players[currentPlayer].at(bodyFirst_);
+        var bodyFirst:Int = state.players[currentPlayer][bodyFirst_];
         Assert.areEqual(Aspect.NULL, bodyFirst);
     }
 
@@ -165,25 +165,25 @@ class TurnRulesTest extends ScourgeRuleTest
         // Have each player skip four times, then check for a winner
         for (ike in 0...state.players.length) {
             var player:AspectSet = state.players[ike];
-            player.mod(numConsecutiveSkips_, 4);
-            player.mod(totalArea_, 4 - ike);
+            player[numConsecutiveSkips_] = 4;
+            player[totalArea_] = 4 - ike;
         }
 
         skipsExhaustedRule.update();
         skipsExhaustedRule.chooseMove();
-        Assert.areEqual(Aspect.NULL, state.aspects.at(winner_));
+        Assert.areEqual(Aspect.NULL, state.aspects[winner_]);
 
         // Have each player skip one more time, then check for a winner
 
         for (ike in 0...state.players.length) {
             var player:AspectSet = state.players[ike];
-            player.mod(numConsecutiveSkips_, 5);
-            player.mod(totalArea_, 4 - ike);
+            player[numConsecutiveSkips_] = 5;
+            player[totalArea_] = 4 - ike;
         }
 
         skipsExhaustedRule.update();
         skipsExhaustedRule.chooseMove();
-        Assert.areEqual(3, state.aspects.at(winner_));
+        Assert.areEqual(3, state.aspects[winner_]);
     }
 
     @Test
@@ -201,13 +201,13 @@ class TurnRulesTest extends ScourgeRuleTest
             if (ike == 1) continue; // We\'re skipping player 2
 
             var player:AspectSet = state.players[ike];
-            player.mod(head_, Aspect.NULL);
+            player[head_] = Aspect.NULL;
         }
 
         // update and check for a winner
 
         oneLivingPlayerRule.update();
         oneLivingPlayerRule.chooseMove();
-        Assert.areEqual(1, state.aspects.at(winner_));
+        Assert.areEqual(1, state.aspects[winner_]);
     }
 }

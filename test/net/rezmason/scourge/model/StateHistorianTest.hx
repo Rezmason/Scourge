@@ -101,14 +101,14 @@ class StateHistorianTest {
 
 		// Freshen and eat body
 
-        state.grabXY(7, 7).value.mod(freshness_, 1);
-        state.grabXY(9, 7).value.mod(freshness_, 1);
+        state.grabXY(7, 7).value[freshness_] = 1;
+        state.grabXY(9, 7).value[freshness_] = 1;
         eatRule.chooseMove();
 
 		pushChange();
 
 		// Freshen and eat head
-        state.grabXY(12, 6).value.mod(freshness_, 1);
+        state.grabXY(12, 6).value[freshness_] = 1;
 		eatRule.chooseMove();
 
 		pushChange();

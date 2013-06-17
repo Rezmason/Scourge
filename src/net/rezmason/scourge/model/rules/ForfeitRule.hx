@@ -33,30 +33,30 @@ class ForfeitRule extends Rule {
 
     override private function _chooseMove(choice:Int):Void {
 
-        var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
+        var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
 
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var currentPlayer:Int = state.aspects[currentPlayer_];
         var player:AspectSet = getPlayer(currentPlayer);
-        var bodyNode:BoardNode = getNode(player.at(bodyFirst_));
+        var bodyNode:BoardNode = getNode(player[bodyFirst_]);
 
         // Clear the player's head and body
 
         for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
-        player.mod(bodyFirst_, Aspect.NULL);
-        player.mod(head_, Aspect.NULL);
+        player[bodyFirst_] = Aspect.NULL;
+        player[head_] = Aspect.NULL;
 
-        state.aspects.mod(maxFreshness_, maxFreshness);
+        state.aspects[maxFreshness_] = maxFreshness;
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
-        if (me.at(isFilled_) == Aspect.FALSE) return false;
-        return me.at(occupier_) == you.at(occupier_);
+        if (me[isFilled_] == Aspect.FALSE) return false;
+        return me[occupier_] == you[occupier_];
     }
 
     function killCell(node:BoardNode, maxFreshness:Int):Void {
-        node.value.mod(isFilled_, Aspect.FALSE);
-        node.value.mod(occupier_, Aspect.NULL);
-        node.value.mod(freshness_, maxFreshness);
+        node.value[isFilled_] = Aspect.FALSE;
+        node.value[occupier_] = Aspect.NULL;
+        node.value[freshness_] = maxFreshness;
 
         node.removeNode(state.nodes, bodyNext_, bodyPrev_);
     }

@@ -43,37 +43,37 @@ class BoardRuleTest extends ScourgeRuleTest {
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
         for (player in state.players) {
-            Assert.isNotNull(player.at(head_));
-            Assert.areNotEqual(Aspect.NULL, player.at(head_));
+            Assert.isNotNull(player[head_]);
+            Assert.areNotEqual(Aspect.NULL, player[head_]);
         }
 
         for (node in state.nodes) {
             Assert.isNotNull(node);
-            Assert.isNotNull(node.value.at(occupier_));
+            Assert.isNotNull(node.value[occupier_]);
         }
 
         VisualAssert.assert('Should appear to be four integers, equally spaced and equally distant from the edges of a box', state.spitBoard(plan));
         Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, state.spitBoard(plan, false));
 
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
-        var currentPlayer:Int = state.aspects.at(currentPlayer_);
+        var currentPlayer:Int = state.aspects[currentPlayer_];
 
-        var playerHead:BoardNode = state.nodes[state.players[currentPlayer].at(head_)];
+        var playerHead:BoardNode = state.nodes[state.players[currentPlayer][head_]];
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);
-            Assert.areEqual(Aspect.NULL, neighbor.value.at(occupier_));
-            neighbor.value.mod(occupier_, 0);
+            Assert.areEqual(Aspect.NULL, neighbor.value[occupier_]);
+            neighbor.value[occupier_] = 0;
         }
 
-        Assert.areEqual(0, playerHead.nw().value.at(occupier_));
-        Assert.areEqual(0, playerHead.n( ).value.at(occupier_));
-        Assert.areEqual(0, playerHead.ne().value.at(occupier_));
-        Assert.areEqual(0, playerHead.e( ).value.at(occupier_));
-        Assert.areEqual(0, playerHead.se().value.at(occupier_));
-        Assert.areEqual(0, playerHead.s( ).value.at(occupier_));
-        Assert.areEqual(0, playerHead.sw().value.at(occupier_));
-        Assert.areEqual(0, playerHead.w( ).value.at(occupier_));
+        Assert.areEqual(0, playerHead.nw().value[occupier_]);
+        Assert.areEqual(0, playerHead.n( ).value[occupier_]);
+        Assert.areEqual(0, playerHead.ne().value[occupier_]);
+        Assert.areEqual(0, playerHead.e( ).value[occupier_]);
+        Assert.areEqual(0, playerHead.se().value[occupier_]);
+        Assert.areEqual(0, playerHead.s( ).value[occupier_]);
+        Assert.areEqual(0, playerHead.sw().value[occupier_]);
+        Assert.areEqual(0, playerHead.w( ).value[occupier_]);
     }
 
     @Test
@@ -98,7 +98,7 @@ class BoardRuleTest extends ScourgeRuleTest {
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
 
-        var bodyFirst:Int = state.players[0].at(bodyFirst_);
+        var bodyFirst:Int = state.players[0][bodyFirst_];
         Assert.areNotEqual(Aspect.NULL, bodyFirst);
 
         testListLength(numCells, state.nodes[bodyFirst], bodyNext_, bodyPrev_);

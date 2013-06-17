@@ -26,8 +26,8 @@ class TestPieceRule extends Rule {
     }
 
     override public function _prime():Void {
-        state.aspects.mod(pieceTableID_, cfg.pieceTableID);
-        state.aspects.mod(pieceReflection_, cfg.reflection);
-        state.aspects.mod(pieceRotation_, cfg.rotation);
+        state.aspects[pieceTableID_] = cfg.pieceTableID;
+        state.aspects[pieceReflection_] = cfg.reflection;
+        state.aspects[pieceRotation_] = cfg.rotation;
     }
 }

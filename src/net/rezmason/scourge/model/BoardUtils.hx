@@ -45,7 +45,7 @@ class BoardUtils {
 
                 for (id in otherAspectPtrs.keys()) {
                     var ptr:AspectPtr = otherAspectPtrs[id];
-                    if (column.value.at(ptr) > 0) {
+                    if (column.value[ptr] > 0) {
                         otherAspectFound = true;
                         str += otherNodeAspects[id];
                         break;
@@ -53,8 +53,8 @@ class BoardUtils {
                 }
 
                 if (!otherAspectFound) {
-                    var occupier:Null<Int> = column.value.at(occupier_);
-                    var isFilled:Null<Int> = column.value.at(isFilled_);
+                    var occupier:Null<Int> = column.value[occupier_];
+                    var isFilled:Null<Int> = column.value[isFilled_];
 
                     if (occupier == null) str += 'n';
                     else if (occupier != Aspect.NULL && isFilled == Aspect.FALSE) str += String.fromCharCode(ALPHABET() + occupier);
@@ -81,8 +81,8 @@ class BoardUtils {
     }
 
     public inline static function removeNode(node:BoardNode, nodes:Array<BoardNode>, next:AspectPtr, prev:AspectPtr):BoardNode {
-        var nextNodeID:Int = node.value.at(next);
-        var prevNodeID:Int = node.value.at(prev);
+        var nextNodeID:Int = node.value[next];
+        var prevNodeID:Int = node.value[prev];
 
         var nextNode:BoardNode = null;
 
@@ -91,17 +91,17 @@ class BoardUtils {
         if (nextNodeID != Aspect.NULL) {
             wasConnected = true;
             nextNode = nodes[nextNodeID];
-            nodes[nextNodeID].value.mod(prev, prevNodeID);
+            nodes[nextNodeID].value[prev] = prevNodeID;
         }
 
         if (prevNodeID != Aspect.NULL) {
             wasConnected = true;
-            nodes[prevNodeID].value.mod(next, nextNodeID);
+            nodes[prevNodeID].value[next] = nextNodeID;
         }
 
         if (wasConnected) {
-            node.value.mod(next, Aspect.NULL);
-            node.value.mod(prev, Aspect.NULL);
+            node.value[next] = Aspect.NULL;
+            node.value[prev] = Aspect.NULL;
         }
 
         return nextNode;
@@ -110,15 +110,15 @@ class BoardUtils {
     public inline static function addNode(node:BoardNode, addedNode:BoardNode, nodes:Array<BoardNode>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):BoardNode {
         removeNode(addedNode, nodes, next, prev);
 
-        var prevNodeID:Int = node.value.at(prev);
-        var addedNodeID:Int = addedNode.value.at(id);
+        var prevNodeID:Int = node.value[prev];
+        var addedNodeID:Int = addedNode.value[id];
 
-        addedNode.value.mod(next, node.value.at(id));
-        addedNode.value.mod(prev, prevNodeID);
-        node.value.mod(prev, addedNodeID);
+        addedNode.value[next] = node.value[id];
+        addedNode.value[prev] = prevNodeID;
+        node.value[prev] = addedNodeID;
         if (prevNodeID != Aspect.NULL) {
             var prevNode:BoardNode = nodes[prevNodeID];
-            prevNode.value.mod(next, addedNodeID);
+            prevNode.value[next] = addedNodeID;
         }
 
         return addedNode;
@@ -133,14 +133,14 @@ class BoardUtils {
 
             for (ike in 1...nodes.length) {
                 var nextNode:BoardNode = nodes[ike];
-                node.value.mod(next, nextNode.value.at(id));
-                nextNode.value.mod(prev, node.value.at(id));
+                node.value[next] = nextNode.value[id];
+                nextNode.value[prev] = node.value[id];
                 node = nextNode;
             }
 
-            node.value.mod(next, Aspect.NULL);
+            node.value[next] = Aspect.NULL;
             node = nodes[0];
-            node.value.mod(prev, Aspect.NULL);
+            node.value[prev] = Aspect.NULL;
         }
     }
 }
@@ -163,7 +163,7 @@ class BoardNodeIterator {
 
     public function next():BoardNode {
         var lastNode:BoardNode = node;
-        var nodeIndex:Int = node.value.at(aspectPointer);
+        var nodeIndex:Int = node.value[aspectPointer];
         if (nodeIndex == Aspect.NULL) node = null;
         else node = nodes[nodeIndex];
         return lastNode;

@@ -41,13 +41,13 @@ class DecayRule extends Rule {
 
     override private function _chooseMove(choice:Int):Void {
 
-        var maxFreshness:Int = state.aspects.at(maxFreshness_) + 1;
+        var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
 
         // Grab all the player heads
 
         var heads:Array<BoardNode> = [];
         for (player in eachPlayer()) {
-            var headIndex:Int = player.at(head_);
+            var headIndex:Int = player[head_];
             if (headIndex != Aspect.NULL) heads.push(getNode(headIndex));
         }
 
@@ -59,7 +59,7 @@ class DecayRule extends Rule {
 
             var totalArea:Int = 0;
 
-            var bodyFirst:Int = player.at(bodyFirst_);
+            var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != Aspect.NULL) {
                 for (node in getNode(bodyFirst).iterate(state.nodes, bodyNext_)) {
                     if (!livingBodyNeighbors.has(node)) bodyFirst = killCell(node, maxFreshness, bodyFirst);
@@ -67,26 +67,26 @@ class DecayRule extends Rule {
                 }
             }
 
-            player.mod(bodyFirst_, bodyFirst);
-            player.mod(totalArea_, totalArea);
+            player[bodyFirst_] = bodyFirst;
+            player[totalArea_] = totalArea;
         }
 
-        state.aspects.mod(maxFreshness_, maxFreshness);
+        state.aspects[maxFreshness_] = maxFreshness;
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
-        if (me.at(isFilled_) == Aspect.FALSE) return false;
-        return me.at(occupier_) == you.at(occupier_);
+        if (me[isFilled_] == Aspect.FALSE) return false;
+        return me[occupier_] == you[occupier_];
     }
 
     function killCell(node:BoardNode, maxFreshness:Int, firstIndex:Int):Int {
-        node.value.mod(isFilled_, Aspect.FALSE);
-        node.value.mod(occupier_, Aspect.NULL);
-        node.value.mod(freshness_, maxFreshness);
+        node.value[isFilled_] = Aspect.FALSE;
+        node.value[occupier_] = Aspect.NULL;
+        node.value[freshness_] = maxFreshness;
 
         var nextNode:BoardNode = node.removeNode(state.nodes, bodyNext_, bodyPrev_);
-        if (firstIndex == node.value.at(nodeID_)) {
-            firstIndex = (nextNode == null) ? Aspect.NULL : nextNode.value.at(nodeID_);
+        if (firstIndex == node.value[nodeID_]) {
+            firstIndex = (nextNode == null) ? Aspect.NULL : nextNode.value[nodeID_];
         }
         return firstIndex;
     }

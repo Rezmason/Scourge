@@ -49,23 +49,7 @@ abstract PtrArray<T>(Array<T>) {
         #end
     }
 
-    public inline function size():Int return this.length;
-
-
-    public inline function at(p:Ptr<T>):T {
-        #if USE_POINTERS if (p == null) throw 'Null pointer'; return this[p.i()];
-        #else return this[p.toInt()];
-        #end
-    }
-
-    public inline function mod(p:Ptr<T>, v:T):T {
-        #if USE_POINTERS
-            if (p == null) throw 'Null pointer';
-            if (p.isLocked()) throw 'Pointer is locked';
-            return this[p.i()] = v;
-        #else return this[p.toInt()] = v;
-        #end
-    }
+    @:allow(net.rezmason.utils) inline function size():Int return this.length;
 
     public inline function ptr(i:Int, k:PtrKey):Ptr<T> { return new Ptr(i, k); }
 

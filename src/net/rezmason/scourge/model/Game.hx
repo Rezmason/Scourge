@@ -208,9 +208,9 @@ class Game {
 
     private function get_revision():Int { return historian.history.revision; }
 
-    private function get_currentPlayer():Int { return historian.state.aspects.at(currentPlayer_); }
+    private function get_currentPlayer():Int { return historian.state.aspects[currentPlayer_]; }
 
-    private function get_winner():Int { return historian.state.aspects.at(winner_); }
+    private function get_winner():Int { return historian.state.aspects[winner_]; }
 
     private function get_state():State { return historian.state; }
 

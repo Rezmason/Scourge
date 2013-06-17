@@ -80,15 +80,15 @@ class PickPieceRule extends Rule {
             // The hat's been refilled; all piece moves are available as quantum moves
             moves = [pickMove];
             quantumMoves = cast allMoves.copy();
-        } else if (state.aspects.at(pieceTableID_) == Aspect.NULL) {
+        } else if (state.aspects[pieceTableID_] == Aspect.NULL) {
             moves = [pickMove];
 
             // Iterate over the hat's contents and incrlude the corresopnding quantum moves
 
             var quantumPieceMoves:Array<PickPieceMove> = [];
-            var firstHatPiece:AspectSet = getExtra(state.aspects.at(pieceHatFirst_));
+            var firstHatPiece:AspectSet = getExtra(state.aspects[pieceHatFirst_]);
             var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
-            for (piece in hatPieces) quantumPieceMoves.push(allMoves[piece.at(pieceMoveID_)]);
+            for (piece in hatPieces) quantumPieceMoves.push(allMoves[piece[pieceMoveID_]]);
             quantumMoves = cast quantumPieceMoves;
         }
     }
@@ -164,17 +164,17 @@ class PickPieceRule extends Rule {
         // Create a hat extra for every move
         var allPieces:Array<AspectSet> = [];
         for (move in allMoves) {
-            extraAspectTemplate.mod(pieceID_, numExtras());
+            extraAspectTemplate[pieceID_] = numExtras();
             move.hatIndex = numExtras();
             var piece:AspectSet = buildExtra();
-            piece.mod(pieceMoveID_, move.id);
+            piece[pieceMoveID_] = move.id;
             allPieces.push(piece);
             state.extras.push(piece);
             cfg.buildCfg.historyState.extras.push(buildHistExtra(cfg.buildCfg.history));
         }
 
         allPieces.chainByAspect(pieceID_, pieceNext_, piecePrev_);
-        state.aspects.mod(pieceFirst_, allPieces[0].at(pieceID_));
+        state.aspects[pieceFirst_] = allPieces[0][pieceID_];
     }
 
     private function generateMove(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):PickPieceMove {
@@ -192,14 +192,14 @@ class PickPieceRule extends Rule {
     }
 
     private function setPiece(pieceTableID:Int, reflection:Int, rotation:Int):Void {
-        state.aspects.mod(pieceTableID_, pieceTableID);
-        state.aspects.mod(pieceReflection_, reflection);
-        state.aspects.mod(pieceRotation_, rotation);
+        state.aspects[pieceTableID_] = pieceTableID;
+        state.aspects[pieceReflection_] = reflection;
+        state.aspects[pieceRotation_] = rotation;
     }
 
     private function pickMoveFromHat(move:PickPieceMove = null):PickPieceMove {
 
-        var firstHatPiece:AspectSet = getExtra(state.aspects.at(pieceHatFirst_));
+        var firstHatPiece:AspectSet = getExtra(state.aspects[pieceHatFirst_]);
         var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
 
         // Because pieces are differently weighted, we need to use a binary search algo
@@ -211,39 +211,39 @@ class PickPieceRule extends Rule {
         var weights:Array<Float> = [];
         for (piece in hatPieces) {
             weights.push(maxWeight);
-            maxWeight += allMoves[piece.at(pieceMoveID_)].weight;
+            maxWeight += allMoves[piece[pieceMoveID_]].weight;
         }
 
         var pickedPiece:AspectSet = null;
         if (move == null) {
             var pick:Float = cfg.randomFunction() * maxWeight;
             pickedPiece = hatPieces[binarySearch(pick, weights)];
-            move = allMoves[pickedPiece.at(pieceMoveID_)];
+            move = allMoves[pickedPiece[pieceMoveID_]];
         } else {
             pickedPiece = getExtra(move.hatIndex);
         }
 
 
-        state.aspects.mod(piecesPicked_, state.aspects.at(piecesPicked_) + 1);
+        state.aspects[piecesPicked_] = state.aspects[piecesPicked_] + 1;
 
         var nextPiece:AspectSet = pickedPiece.removeSet(state.extras, pieceHatNext_, pieceHatPrev_);
 
         if (pickedPiece == firstHatPiece) {
             firstHatPiece = nextPiece;
-            if (firstHatPiece == null) state.aspects.mod(pieceHatFirst_, Aspect.NULL);
-            else state.aspects.mod(pieceHatFirst_, firstHatPiece.at(pieceID_));
+            if (firstHatPiece == null) state.aspects[pieceHatFirst_] = Aspect.NULL;
+            else state.aspects[pieceHatFirst_] = firstHatPiece[pieceID_];
         }
 
         return move;
     }
 
     private function buildHat():Void {
-        var firstPiece:AspectSet = getExtra(state.aspects.at(pieceFirst_));
+        var firstPiece:AspectSet = getExtra(state.aspects[pieceFirst_]);
         var allPieces:Array<AspectSet> = firstPiece.listToArray(state.extras, pieceNext_);
         allPieces.chainByAspect(pieceID_, pieceHatNext_, pieceHatPrev_);
-        state.aspects.mod(pieceHatFirst_, firstPiece.at(pieceID_));
-        state.aspects.mod(piecesPicked_, 0);
-        state.aspects.mod(pieceHatPlayer_, state.aspects.at(currentPlayer_));
+        state.aspects[pieceHatFirst_] = firstPiece[pieceID_];
+        state.aspects[piecesPicked_] = 0;
+        state.aspects[pieceHatPlayer_] = state.aspects[currentPlayer_];
     }
 
     private function binarySearch(val:Float, list:Array<Float>):Int {
@@ -260,7 +260,7 @@ class PickPieceRule extends Rule {
 
     // We fill the hat up again if it's empty
     private function remakeHat():Bool {
-        return state.aspects.at(pieceHatPlayer_) != state.aspects.at(currentPlayer_) ||
-                state.aspects.at(piecesPicked_) == cfg.hatSize;
+        return state.aspects[pieceHatPlayer_] != state.aspects[currentPlayer_] ||
+                state.aspects[piecesPicked_] == cfg.hatSize;
     }
 }
