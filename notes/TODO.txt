@@ -5,8 +5,6 @@ Console
 Board view
 Piece view
 
-Rearchitect pointers?
-
 Turn GridNodes into AspectLists with NeighborAspects
     Branch for this one
 

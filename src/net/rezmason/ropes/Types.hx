@@ -8,7 +8,7 @@ using net.rezmason.utils.Pointers;
 private typedef Atom = Null<Int>; // Our low-level value type
 
 typedef AspectPtr = Ptr<Atom>;
-typedef AspectSet = PtrArray<Atom>; // The properties of an element of the state
+typedef AspectSet = PtrSet<Atom>; // The properties of an element of the state
 typedef BoardNode = GridNode<AspectSet>;
 
 typedef AspectProperty = { var id(default, null):String; var initialValue(default, null):Atom; }; // The distinct possible properties of our state

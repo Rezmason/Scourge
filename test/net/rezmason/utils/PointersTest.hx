@@ -28,9 +28,9 @@ class PointersTest {
 
         var key = new PtrKey();
 
-		var arr1:PtrArray<Int> = new PtrArray([0, 1, 2, 3, 4]);
-		var arr2:PtrArray<Ptr<Int>> = new PtrArray([arr1.ptr(4, key), arr1.ptr(3, key), arr1.ptr(2, key), arr1.ptr(1, key), arr1.ptr(0, key)]);
-		var arr3:PtrArray<Ptr<Ptr<Int>>> = new PtrArray([arr2.ptr(0, key), arr2.ptr(2, key), arr2.ptr(4, key)]);
+		var arr1:PtrSet<Int> = new PtrSet([0, 1, 2, 3, 4]);
+		var arr2:PtrSet<Ptr<Int>> = new PtrSet([arr1.ptr(4, key), arr1.ptr(3, key), arr1.ptr(2, key), arr1.ptr(1, key), arr1.ptr(0, key)]);
+		var arr3:PtrSet<Ptr<Ptr<Int>>> = new PtrSet([arr2.ptr(0, key), arr2.ptr(2, key), arr2.ptr(4, key)]);
 
 		Assert.areEqual(4, arr1[arr2[arr3[arr3.ptr(0, key)]]]);
 
