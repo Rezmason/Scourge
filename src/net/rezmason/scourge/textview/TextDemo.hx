@@ -263,7 +263,6 @@ class TextDemo {
 
         switch (interaction) {
             case MOUSE(type, oX, oY):
-
                 if (targetView == null) {
                     for (view in views) {
                         if (!view.body.catchMouseInRect) continue;
@@ -284,8 +283,7 @@ class TextDemo {
                     interaction = MOUSE(type, nX, nY);
                 }
 
-            case KEYBOARD(type, char):
-                trace('$type $char');
+            case _:
         }
 
         if (targetView != null) targetView.body.interact(glyphID, interaction);

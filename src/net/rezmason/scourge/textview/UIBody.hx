@@ -268,12 +268,24 @@ class UIBody extends Body {
                     }
                 } else {
                     var targetStyle:Style = styleSet.getStyleByMouseID(id);
-                    targetStyle.interact(type);
-                    if (type == CLICK) trace('${targetStyle.name} clicked!');
+                    if (targetStyle != null) {
+                        targetStyle.interact(type);
+                        if (type == CLICK) trace('${targetStyle.name} clicked!');
+                    }
                 }
             case KEYBOARD(type, char):
+                // handleKeyboardInteraction(type, char);
         }
     }
+
+    /*
+    function handleKeyboardInteraction(type:KeyboardInteractionType, char:Int):Void {
+        if (type != KEY_DOWN) return;
+
+        if (char == 8) updateText(text.substr(0, text.length - 1));
+        if (char > 0) updateText(text + String.fromCharCode(char));
+    }
+    */
 
     inline function rpad(input:String, pad:String, len:Int):String {
         while (Utf8.length(input) < len) input = input + pad;

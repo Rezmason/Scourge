@@ -32,6 +32,10 @@ class TestStrings {
     '§{name:merp3, p: 0.01, b:0}DOWN§{}\n\n' +
     '∂{name:animation, period:1, frames:[merp1, merp2, merp3]}DANCE, DAMN IT§{}\n' +
     'µ{name:button, up:merp1, over:merp2, down:merp3, period:0.2, i:1}  BUTTON TIME  §{}\n' +
+    '\n' +
+    'µ{name:button2, basis:button}  ANOTHER BUTTON  §{}\n' +
+    '\n' +
+    'µ{button}  BUTTON TIME AGAIN  §{}\n' +
     '';
 
     public inline static var SYMBOLS:String = '<>[]{}-=!@#$%^*()_+';

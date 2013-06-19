@@ -1,14 +1,16 @@
+Maybe Glyphs can get and set properties on their parent Vectors instead of having their own Vectors
+    body.getGlyph(id)
+    body.makeGlyph()
+        if (lastSegment.full) lastSegment = new BodySegment()
+        return lastSegment.makeGlyph()
+    Get glyphs FROM body segments
+
 UI object
 
     Allow declared styles to be preserved, instead of remaking them
         This hopefully fixes the bug where animations pause or reset when you drag around the text
 
     Defer text changes until after dragging
-
-Maybe Glyphs can get and set properties on their parent Vectors instead of having their own Vectors
-    Body segments and glyphs are made simultaneously
-
-Back to UI object
 
     InputStyle extends DynamicStyle
         «
@@ -23,6 +25,21 @@ Back to UI object
             the new text IS the result of interaction,
         -scroll to the new bottom
     Scroll indicator (looks like meterstick)
+
+    Separate UIBody into regions, so we can limit large changes to small regions
+        This allows us to share styles between regions
+
+        Stale region
+            Not interactive at all
+            appended
+        Active region
+            Interactive
+            Fully updated
+        Prompt region
+            Interactive
+            Frequent partial updates
+            Few styles
+            Relatively small
 
 Board object
     Move rotation logic into TestBody before cloning
