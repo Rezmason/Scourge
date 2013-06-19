@@ -2,8 +2,11 @@ package net.rezmason.scourge.textview;
 
 import flash.geom.Rectangle;
 
+import net.rezmason.gl.utils.BufferUtil;
+
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
+import net.rezmason.scourge.textview.core.GlyphTexture;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -22,7 +25,6 @@ class SplashBody extends Body {
         {r:0.37, g:0.37, b:0.37}
     */
 
-
     static var colors = [
         'S' => {r:1.00, g:0.00, b:0.56},
         'C' => {r:1.00, g:0.78, b:0.00},
@@ -36,17 +38,22 @@ class SplashBody extends Body {
     var glyphTowers:Array<Array<Glyph>>;
 
     var time:Float;
+    var lines:Array<String>;
 
-    override function init():Void {
+    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
 
         time = 0;
 
-        var arr:Array<String> = TestStrings.SPLASH.split('\n');
-        arr.pop();
-        arr.pop();
+        lines = TestStrings.SPLASH.split('\n');
+        lines.pop();
+        lines.pop();
 
-        var numRows:Int = arr.length;
-        var numCols:Int = arr[0].length;
+        var num:Int = 3 * lines.length * lines[0].length;
+
+        super(id, bufferUtil, num, glyphTexture, redrawHitAreas);
+
+        var numRows:Int = lines.length;
+        var numCols:Int = lines[0].length;
 
         glyphTowers = [];
 
@@ -61,11 +68,11 @@ class SplashBody extends Body {
                 var y:Float = ((row + 0.5) / numRows    - 0.5) * 0.3;
                 var z:Float = 0.2;
 
-                if (arr[row].charAt(col) == ' ') continue;
+                if (lines[row].charAt(col) == ' ') continue;
 
-                var charCode:Int = arr[row].charCodeAt(col);
+                var charCode:Int = lines[row].charCodeAt(col);
 
-                var color:SplashColor = colors[arr[row].charAt(col)];
+                var color:SplashColor = colors[lines[row].charAt(col)];
                 if (color == null) color = {r:1, g:1, b:1};
                 var r:Float = color.r;
                 var g:Float = color.g;
@@ -76,11 +83,8 @@ class SplashBody extends Body {
                 var glyphTower:Array<Glyph> = [];
 
                 for (ike in 0...thickness) {
-                    var glyph:Glyph = new Glyph();
-                    glyph.visible = true;
-                    glyph.id = glyphID;
-                    glyph.prime();
-                    glyphs.push(glyph);
+                    var glyph:Glyph = glyphs[glyphID];
+
                     glyphTower.push(glyph);
 
                     glyph.set_shape(x, y, z, s, 0);
@@ -88,13 +92,14 @@ class SplashBody extends Body {
                     glyph.set_i(0);
                     glyph.set_char(charCode, glyphTexture.font);
                     glyph.set_paint(glyph.id | id << 16);
-                    glyphID++;
 
                     z -= 0.03;
                     s *= 1.4;
                     r *= 0.3;
                     g *= 0.3;
                     b *= 0.3;
+
+                    glyphID++;
                 }
 
                 glyphTowers.push(glyphTower);

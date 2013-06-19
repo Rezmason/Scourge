@@ -7,6 +7,8 @@ import flash.Vector;
 
 import net.rezmason.gl.utils.BufferUtil;
 
+using net.rezmason.scourge.textview.core.GlyphUtils;
+
 class Body {
     public var segments(default, null):Array<BodySegment>;
     public var id(default, null):Int;
@@ -27,7 +29,7 @@ class Body {
 
     var bufferUtil:BufferUtil;
 
-    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(id:Int, bufferUtil:BufferUtil, numGlyphs:Int, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
         this.id = id;
         this.bufferUtil = bufferUtil;
         this.redrawHitAreas = redrawHitAreas;
@@ -38,11 +40,9 @@ class Body {
 
         projection = makeProjection();
 
-        init();
-        numGlyphs = glyphs.length;
-        numVisibleGlyphs = glyphs.length;
+        this.numGlyphs = numGlyphs;
+        numVisibleGlyphs = numGlyphs;
         makeSegments();
-        numSegments = segments.length;
 
         transform = new Matrix3D();
         camera = new Matrix3D();
@@ -50,25 +50,25 @@ class Body {
         glyphTransform.appendScale(0.0001, 0.0001, 1); // Prevents blowouts
     }
 
-    function init():Void {
-
-    }
-
     function makeSegments():Void {
 
         segments = [];
+        glyphs = [];
 
-        var remainingGlyphs:Int = glyphs.length;
+        var remainingGlyphs:Int = numGlyphs;
         var startGlyph:Int = 0;
-
         var segmentID:Int = 0;
         while (startGlyph < numGlyphs) {
             var len:Int = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
-            segments.push(new BodySegment(bufferUtil, segmentID, glyphs.slice(startGlyph, startGlyph + len)));
+            var segment:BodySegment = new BodySegment(bufferUtil, segmentID, len);
+            segments.push(segment);
+            glyphs = glyphs.concat(segment.glyphs);
             startGlyph += Almanac.BUFFER_CHUNK;
             remainingGlyphs -= Almanac.BUFFER_CHUNK;
             segmentID++;
         }
+
+        numSegments = segments.length;
     }
 
     public function toggleGlyphs(_glyphs:Array<Glyph>, visible:Bool):Void {
@@ -112,9 +112,7 @@ class Body {
     inline function spitGlyphs():Void {
         var str:String = '';
         for (glyph in glyphs) {
-            var char:String = String.fromCharCode(glyph.charCode);
-            if (!glyph.visible) char = char.toLowerCase();
-            str += char;
+            str += glyph.toString();
         }
         trace(str);
     }

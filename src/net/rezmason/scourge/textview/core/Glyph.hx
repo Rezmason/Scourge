@@ -2,22 +2,28 @@ package net.rezmason.scourge.textview.core;
 
 import flash.Vector;
 
+@:allow(net.rezmason.scourge.textview.core.BodySegment)
+@:allow(net.rezmason.scourge.textview.core.GlyphUtils)
 class Glyph {
-    public var id:Int;
-    public var shape(default, null):Vector<Float>;
-    public var color(default, null):Vector<Float>;
-    public var paint(default, null):Vector<Float>;
-    public var _paint:Int;
-    public var visible:Bool;
-    public var charCode:Int;
-    public var dirty:Bool;
 
-    public var vertexAddress:Int;
-    public var indexAddress:Int;
+    public var id(default, null):Int;
+    public var dirty(default, null):Bool;
 
-    public function new():Void {
+    var shape(default, null):Vector<Float>;
+    var color(default, null):Vector<Float>;
+    var paint(default, null):Vector<Float>;
+
+    var _paint:Int;
+    var visible:Bool;
+    var charCode:Int;
+    var vertexAddress:Int;
+    var indexAddress:Int;
+
+    function new(id:Int):Void {
+        this.id = id;
         shape = new Vector<Float>(0, false);
         color = new Vector<Float>(0, false);
         paint = new Vector<Float>(0, false);
+        visible = true;
     }
 }

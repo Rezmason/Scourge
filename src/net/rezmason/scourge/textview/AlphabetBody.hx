@@ -2,9 +2,12 @@ package net.rezmason.scourge.textview;
 
 import flash.geom.Rectangle;
 
+import net.rezmason.gl.utils.BufferUtil;
+
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.core.GlyphTexture;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -17,19 +20,17 @@ class AlphabetBody extends Body {
         TestStrings.BOX_SYMBOLS +
     '';
 
-    override function init():Void {
+    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
 
         var totalChars:Int = CHARS.length;
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));
         var numCols:Int = Std.int(Math.ceil(totalChars / numRows));
 
-        for (ike in 0...totalChars) {
+        super(id, bufferUtil, totalChars, glyphTexture, redrawHitAreas);
 
-            var glyph:Glyph = new Glyph();
-            glyph.visible = true;
-            glyph.id = ike;
-            glyph.prime();
-            glyphs.push(glyph);
+        for (ike in 0...numGlyphs) {
+
+            var glyph:Glyph = glyphs[ike];
 
             var col:Int = ike % numCols;
             var row:Int = Std.int(ike / numCols);

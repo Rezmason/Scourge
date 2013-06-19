@@ -6,9 +6,12 @@ import flash.system.Capabilities;
 
 import haxe.Utf8;
 
+import net.rezmason.gl.utils.BufferUtil;
+
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.core.GlyphTexture;
 
 import net.rezmason.scourge.textview.styles.Style;
 import net.rezmason.scourge.textview.styles.StyleSet;
@@ -52,14 +55,12 @@ class UIBody extends Body {
     public var numScrollPositions(get, null):Int;
     public var bottomPos(get, null):Float;
 
-    override function init():Void {
+    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
 
         styleSet = new StyleSet();
 
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
-
-        letterbox = false;
 
         glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * getScreenDPI() / NATIVE_DPI;
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
@@ -72,19 +73,16 @@ class UIBody extends Body {
         currentScrollPos = Math.NaN;
         gliding = false;
 
-        for (glyphID in 0...numGlyphs) {
-            var glyph:Glyph = new Glyph();
-            glyph.visible = true;
-            glyph.id = glyphID;
-            glyph.prime();
-            glyph.set_paint(id << 16);
-            glyphs.push(glyph);
-        }
-
         numRows = 0;
         numCols = 0;
         numRowsForLayout = 0;
         numGlyphsInLayout = 0;
+
+        super(id, bufferUtil, numGlyphs, glyphTexture, redrawHitAreas);
+
+        letterbox = false;
+
+        for (ike in 0...numGlyphs) glyphs[ike].set_paint(id << 16);
     }
 
     override public function update(delta:Float):Void {

@@ -15,8 +15,6 @@ import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.utils.FlatFont;
 
-using net.rezmason.scourge.textview.core.GlyphUtils;
-
 typedef HaxeTimer = haxe.Timer;
 typedef View = {rect:Rectangle, body:Body};
 

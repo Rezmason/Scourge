@@ -2,9 +2,12 @@ package net.rezmason.scourge.textview;
 
 import flash.geom.Rectangle;
 
+import net.rezmason.gl.utils.BufferUtil;
+
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.core.GlyphTexture;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -17,27 +20,23 @@ class TestBody extends Body {
         TestStrings.ALPHANUMERICS +
     '';
 
-    inline static var NUM_GLYPHS:Int = 1200 /* 40000 */ ;
-
     var time:Float;
     var hues:Array<Float>;
 
-    override function init():Void {
-
+    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
         time = 0;
         hues = [];
 
+        var num:Int = 1200 /* 40000 */ ;
+        super(id, bufferUtil, num, glyphTexture, redrawHitAreas);
+
         var dTheta:Float = Math.PI * (3 - Math.sqrt(5));
-        var dZ:Float = 2 / (NUM_GLYPHS + 1);
+        var dZ:Float = 2 / (numGlyphs + 1);
         var theta:Float = 0;
         var _z:Float = 1 - dZ / 2;
-        for (ike in 0...NUM_GLYPHS) {
 
-            var glyph:Glyph = new Glyph();
-            glyph.visible = true;
-            glyph.id = ike;
-            glyph.prime();
-            glyphs.push(glyph);
+        for (ike in 0...numGlyphs) {
+            var glyph:Glyph = glyphs[ike];
 
             var hue:Float = (theta + _z * dTheta * 2) / (Math.PI * 2);
             hues.push(hue);
@@ -104,8 +103,8 @@ class TestBody extends Body {
             var glyph:Glyph = glyphs[ike];
 
             var d:Float = glyph.get_z();
-            var p:Float = (Math.cos(time * 4 + d * 20) * 0.5 + 1) * 480  / NUM_GLYPHS;
-            var s:Float = (Math.cos(time * 4 + d * 30) * 0.5 + 1) * 2400 / NUM_GLYPHS;
+            var p:Float = (Math.cos(time * 4 + d * 20) * 0.5 + 1) * 480  / numGlyphs;
+            var s:Float = (Math.cos(time * 4 + d * 30) * 0.5 + 1) * 2400 / numGlyphs;
 
             //var rgb:RGB = hsv2rgb(hues[ike] + s * 0.1);
 

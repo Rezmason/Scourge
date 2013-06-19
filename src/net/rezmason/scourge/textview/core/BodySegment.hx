@@ -6,6 +6,8 @@ import net.rezmason.gl.VertexBuffer;
 import net.rezmason.gl.IndexBuffer;
 import net.rezmason.gl.utils.BufferUtil;
 
+using net.rezmason.scourge.textview.core.GlyphUtils;
+
 class BodySegment {
 
     public var id(default, null):Int;
@@ -29,23 +31,23 @@ class BodySegment {
 
     public var dirty(default, null):Bool;
 
-    public function new(bufferUtil:BufferUtil, segmentID:Int, glyphs:Array<Glyph>):Void {
+    public function new(bufferUtil:BufferUtil, segmentID:Int, numGlyphs:Int):Void {
+
         id = segmentID;
         dirty = true;
-        this.glyphs = glyphs;
         glyphsByIndex = [];
-        numGlyphs = glyphs.length;
+        this.numGlyphs = numGlyphs;
         numVisibleGlyphs = numGlyphs;
 
-        if (numGlyphs == 0) return;
+        if (numGlyphs <= 0) return;
 
-        createBuffers(bufferUtil);
-        createVectors();
+        createGlyphs();
+        createBuffersAndVectors(bufferUtil);
         populateVectors(true);
         update();
     }
 
-    inline function createBuffers(bufferUtil:BufferUtil):Void {
+    inline function createBuffersAndVectors(bufferUtil:BufferUtil):Void {
         var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
         var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
 
@@ -53,13 +55,20 @@ class BodySegment {
         colorBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX);
         paintBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.PAINT_FLOATS_PER_VERTEX);
         indexBuffer = bufferUtil.createIndexBuffer(numGlyphIndices);
+
+        shapeVertices = new Vector<Float>(numGlyphVertices * Almanac.SHAPE_FLOATS_PER_VERTEX);
+        colorVertices = new Vector<Float>(numGlyphVertices * Almanac.COLOR_FLOATS_PER_VERTEX);
+        paintVertices = new Vector<Float>(numGlyphVertices * Almanac.PAINT_FLOATS_PER_VERTEX);
+        indices = new Vector<UInt>(numGlyphIndices);
     }
 
-    inline function createVectors():Void {
-        shapeVertices = new Vector<Float>();
-        colorVertices = new Vector<Float>();
-        paintVertices = new Vector<Float>();
-        indices = new Vector<UInt>();
+    inline function createGlyphs():Void {
+        glyphs = [];
+        for (ike in 0...numGlyphs) {
+            var glyph:Glyph = new Glyph(ike);
+            glyph.prime();
+            glyphs.push(glyph);
+        }
     }
 
     public inline function populateVectors(insert:Bool = false):Void {
@@ -87,6 +96,7 @@ class BodySegment {
         if (numGlyphs > 0) {
             var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
             var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
+
             shapeBuffer.uploadFromVector(shapeVertices, 0, numGlyphVertices);
             colorBuffer.uploadFromVector(colorVertices, 0, numGlyphVertices);
             paintBuffer.uploadFromVector(paintVertices, 0, numGlyphVertices);

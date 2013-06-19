@@ -120,6 +120,12 @@ class GlyphUtils {
         return gl._paint;
     }
 
+    public inline static function toString(gl:G):String {
+        var char = String.fromCharCode(gl.charCode);
+        if (!gl.visible) char = char.toLowerCase();
+        return char;
+    }
+
     private inline static function pop4(vec:Vector<Float>, offset:Int, step:Int, val:Float):Float {
         if (vec[offset + 0 * step] != val) {
             vec[offset + 0 * step] = val;
