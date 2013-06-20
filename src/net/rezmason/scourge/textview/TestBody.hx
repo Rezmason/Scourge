@@ -35,9 +35,7 @@ class TestBody extends Body {
         var theta:Float = 0;
         var _z:Float = 1 - dZ / 2;
 
-        for (ike in 0...numGlyphs) {
-            var glyph:Glyph = glyphs[ike];
-
+        for (glyph in glyphs) {
             var hue:Float = (theta + _z * dTheta * 2) / (Math.PI * 2);
             hues.push(hue);
             /*
@@ -46,7 +44,7 @@ class TestBody extends Body {
 
             var i:Float = 0.2;
 
-            var charCode:Int = CHARS.charCodeAt(ike % CHARS.length);
+            var charCode:Int = CHARS.charCodeAt(glyph.id % CHARS.length);
 
             var rad:Float = Math.sqrt(1 - _z * _z);
             var x:Float = Math.cos(theta) * rad;

@@ -52,6 +52,8 @@ class SplashBody extends Body {
 
         super(id, bufferUtil, num, glyphTexture, redrawHitAreas);
 
+        catchMouseInRect = false;
+
         var numRows:Int = lines.length;
         var numCols:Int = lines[0].length;
 

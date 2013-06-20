@@ -99,10 +99,7 @@ class Body {
     }
 
     public function update(delta:Float):Void {
-        for (segment in segments) {
-            segment.populateVectors();
-            segment.update();
-        }
+        for (segment in segments) segment.update();
     }
 
     public function interact(id:Int, interaction:Interaction):Void {

@@ -1,9 +1,4 @@
-Maybe Glyphs can get and set properties on their parent Vectors instead of having their own Vectors
-    body.getGlyph(id)
-    body.makeGlyph()
-        if (lastSegment.full) lastSegment = new BodySegment()
-        return lastSegment.makeGlyph()
-    Get glyphs FROM body segments
+Keyboard events aren't working on JS
 
 UI object
 

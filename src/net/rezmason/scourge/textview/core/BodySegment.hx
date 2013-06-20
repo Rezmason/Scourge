@@ -29,21 +29,15 @@ class BodySegment {
     public var glyphs(default, null):Array<Glyph>;
     var glyphsByIndex:Array<Glyph>;
 
-    public var dirty(default, null):Bool;
-
     public function new(bufferUtil:BufferUtil, segmentID:Int, numGlyphs:Int):Void {
-
+        if (numGlyphs < 0) numGlyphs = 0;
         id = segmentID;
-        dirty = true;
         glyphsByIndex = [];
         this.numGlyphs = numGlyphs;
         numVisibleGlyphs = numGlyphs;
-
-        if (numGlyphs <= 0) return;
-
-        createGlyphs();
         createBuffersAndVectors(bufferUtil);
-        populateVectors(true);
+        createGlyphs();
+        for (glyph in glyphs) insertGlyph(glyph, glyph.id);
         update();
     }
 
@@ -65,34 +59,12 @@ class BodySegment {
     inline function createGlyphs():Void {
         glyphs = [];
         for (ike in 0...numGlyphs) {
-            var glyph:Glyph = new Glyph(ike);
-            glyph.prime();
+            var glyph:Glyph = new Glyph(ike, shapeVertices, colorVertices, paintVertices);
             glyphs.push(glyph);
         }
     }
 
-    public inline function populateVectors(insert:Bool = false):Void {
-        for (ike in 0...numGlyphs) {
-            var glyph:Glyph = glyphs[ike];
-            if (insert || glyph.dirty) {
-                writeArrayToVector(shapeVertices, ike * Almanac.SHAPE_FLOATS_PER_GLYPH, glyph.shape, Almanac.SHAPE_FLOATS_PER_GLYPH);
-                writeArrayToVector(colorVertices, ike * Almanac.COLOR_FLOATS_PER_GLYPH, glyph.color, Almanac.COLOR_FLOATS_PER_GLYPH);
-                writeArrayToVector(paintVertices, ike * Almanac.PAINT_FLOATS_PER_GLYPH, glyph.paint, Almanac.PAINT_FLOATS_PER_GLYPH);
-
-                glyph.vertexAddress = ike;
-                glyph.dirty = false;
-
-                if (insert) insertGlyph(glyph, ike);
-
-                dirty = true;
-            }
-        }
-    }
-
     public function update():Void {
-        if (!dirty) return;
-        dirty = false;
-
         if (numGlyphs > 0) {
             var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
             var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
@@ -118,7 +90,6 @@ class BodySegment {
             if (glyphsByIndex[srcIndexAddress] != srcGlyph) continue;
             var dstIndexAddress:Int = numVisibleGlyphs + offset;
 
-            dirty = true;
             srcGlyph.visible = visible;
             var dstGlyph:Glyph = glyphsByIndex[dstIndexAddress];
 
@@ -135,7 +106,7 @@ class BodySegment {
     }
 
     inline function insertGlyph(glyph:Glyph, indexAddress:Int):Void {
-        var firstVertIndex:Int = glyph.vertexAddress * Almanac.VERTICES_PER_GLYPH;
+        var firstVertIndex:Int = glyph.id * Almanac.VERTICES_PER_GLYPH;
 
         var vec:Vector<UInt> = new Vector<UInt>();
         vec.push(firstVertIndex + 0);

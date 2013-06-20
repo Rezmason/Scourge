@@ -28,6 +28,8 @@ class AlphabetBody extends Body {
 
         super(id, bufferUtil, totalChars, glyphTexture, redrawHitAreas);
 
+        catchMouseInRect = false;
+
         for (ike in 0...numGlyphs) {
 
             var glyph:Glyph = glyphs[ike];

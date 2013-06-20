@@ -21,11 +21,13 @@ package net.rezmason.gl;
             array = new Float32Array(footprint * numVertices);
         }
 
-        public inline function uploadFromVector(data:Array<Float>, offset:Int = 0, num:Int = 0):Void {
+        public inline function uploadFromVector(data:Array<Float>, offset:Int, num:Int):Void {
             if (offset < 0 || offset > numVertices) {
 
             } else {
                 if (offset + num > numVertices) num = numVertices - offset;
+
+                // TODO: SPEED THIS UP
 
                 for (ike in (offset * footprint)...((offset + num) * footprint)) {
                     array[ike] = data[ike];

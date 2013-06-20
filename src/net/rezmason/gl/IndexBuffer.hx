@@ -19,11 +19,13 @@ package net.rezmason.gl;
             array = new Int16Array(numIndices);
         }
 
-        public inline function uploadFromVector(data:Array<Int>, offset:Int = 0, num:Int = 0):Void {
+        public inline function uploadFromVector(data:Array<Int>, offset:Int, num:Int):Void {
             if (offset < 0 || offset > numIndices) {
 
             } else {
                 if (offset + num > numIndices) num = numIndices - offset;
+
+                // TODO: SPEED THIS UP
 
                 for (ike in offset...(offset + num)) {
                     array[ike] = data[ike];

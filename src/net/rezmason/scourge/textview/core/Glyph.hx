@@ -7,23 +7,22 @@ import flash.Vector;
 class Glyph {
 
     public var id(default, null):Int;
-    public var dirty(default, null):Bool;
 
-    var shape(default, null):Vector<Float>;
-    var color(default, null):Vector<Float>;
-    var paint(default, null):Vector<Float>;
+    var shape:Vector<Float>;
+    var color:Vector<Float>;
+    var paint:Vector<Float>;
 
-    var _paint:Int;
+    var paintHex:Int;
     var visible:Bool;
     var charCode:Int;
-    var vertexAddress:Int;
     var indexAddress:Int;
 
-    function new(id:Int):Void {
+    function new(id:Int, shape:Vector<Float>, color:Vector<Float>, paint:Vector<Float>):Void {
         this.id = id;
-        shape = new Vector<Float>(0, false);
-        color = new Vector<Float>(0, false);
-        paint = new Vector<Float>(0, false);
+        this.shape = shape;
+        this.color = color;
+        this.paint = paint;
+        GlyphUtils.makeCorners(this);
         visible = true;
     }
 }
