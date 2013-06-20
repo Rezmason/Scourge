@@ -1,9 +1,8 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.Vector;
-
-import net.rezmason.gl.VertexBuffer;
 import net.rezmason.gl.IndexBuffer;
+import net.rezmason.gl.Types;
+import net.rezmason.gl.VertexBuffer;
 import net.rezmason.gl.utils.BufferUtil;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
@@ -17,10 +16,10 @@ class BodySegment {
     public var paintBuffer(default, null):VertexBuffer;
     public var indexBuffer(default, null):IndexBuffer;
 
-    public var colorVertices(default, null):Vector<Float>;
-    public var shapeVertices(default, null):Vector<Float>;
-    public var paintVertices(default, null):Vector<Float>;
-    public var indices(default, null):Vector<UInt>;
+    public var colorVertices(default, null):VertexArray;
+    public var shapeVertices(default, null):VertexArray;
+    public var paintVertices(default, null):VertexArray;
+    public var indices(default, null):IndexArray;
 
     public var startGlyph(default, null):Int;
     public var numGlyphs(default, null):Int;
@@ -50,10 +49,10 @@ class BodySegment {
         paintBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.PAINT_FLOATS_PER_VERTEX);
         indexBuffer = bufferUtil.createIndexBuffer(numGlyphIndices);
 
-        shapeVertices = new Vector<Float>(numGlyphVertices * Almanac.SHAPE_FLOATS_PER_VERTEX);
-        colorVertices = new Vector<Float>(numGlyphVertices * Almanac.COLOR_FLOATS_PER_VERTEX);
-        paintVertices = new Vector<Float>(numGlyphVertices * Almanac.PAINT_FLOATS_PER_VERTEX);
-        indices = new Vector<UInt>(numGlyphIndices);
+        shapeVertices = new VertexArray(numGlyphVertices * Almanac.SHAPE_FLOATS_PER_VERTEX);
+        colorVertices = new VertexArray(numGlyphVertices * Almanac.COLOR_FLOATS_PER_VERTEX);
+        paintVertices = new VertexArray(numGlyphVertices * Almanac.PAINT_FLOATS_PER_VERTEX);
+        indices = new IndexArray(numGlyphIndices);
     }
 
     inline function createGlyphs():Void {
@@ -108,21 +107,18 @@ class BodySegment {
     inline function insertGlyph(glyph:Glyph, indexAddress:Int):Void {
         var firstVertIndex:Int = glyph.id * Almanac.VERTICES_PER_GLYPH;
 
-        var vec:Vector<UInt> = new Vector<UInt>();
-        vec.push(firstVertIndex + 0);
-        vec.push(firstVertIndex + 1);
-        vec.push(firstVertIndex + 2);
-        vec.push(firstVertIndex + 0);
-        vec.push(firstVertIndex + 2);
-        vec.push(firstVertIndex + 3);
+        var order:Array<UInt> = [
+            firstVertIndex + 0,
+            firstVertIndex + 1,
+            firstVertIndex + 2,
+            firstVertIndex + 0,
+            firstVertIndex + 2,
+            firstVertIndex + 3,
+        ];
 
-        writeArrayToVector(indices, indexAddress * Almanac.INDICES_PER_GLYPH, vec, Almanac.INDICES_PER_GLYPH);
+        for (ike in 0...order.length) indices[indexAddress * Almanac.INDICES_PER_GLYPH + ike] = order[ike];
 
         glyphsByIndex[indexAddress] = glyph;
         glyph.indexAddress = indexAddress;
-    }
-
-    inline function writeArrayToVector<T>(array:Vector<T>, startIndex:Int, items:Vector<T>, numItems:Int):Void {
-        for (ike in 0...items.length) array[startIndex + ike] = items[ike];
     }
 }

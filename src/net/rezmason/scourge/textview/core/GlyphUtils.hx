@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.Vector;
+import net.rezmason.gl.Types;
 
 import net.rezmason.utils.FatChar;
 import net.rezmason.utils.FlatFont;
@@ -150,12 +150,12 @@ class GlyphUtils {
         return char;
     }
 
-    private inline static function pop1(vec:Vector<Float>, glyphOffset:Int, propOffset:Int, val:Float):Float {
+    private inline static function pop1(vec:VertexArray, glyphOffset:Int, propOffset:Int, val:Float):Float {
         vec[glyphOffset + propOffset] = val;
         return val;
     }
 
-    private inline static function pop4(vec:Vector<Float>, glyphOffset:Int, propOffset:Int, step:Int, val:Float):Float {
+    private inline static function pop4(vec:VertexArray, glyphOffset:Int, propOffset:Int, step:Int, val:Float):Float {
         if (vec[glyphOffset + propOffset + 0 * step] != val) {
             vec[glyphOffset + propOffset + 0 * step] = val;
             vec[glyphOffset + propOffset + 1 * step] = val;

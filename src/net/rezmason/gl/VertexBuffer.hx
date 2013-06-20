@@ -5,33 +5,31 @@ package net.rezmason.gl;
 #else
     import openfl.gl.GL;
     import openfl.gl.GLBuffer;
-    import openfl.utils.Float32Array;
+    import net.rezmason.gl.Types;
 
     class VertexBuffer {
 
         @:allow(net.rezmason.gl) var buf:GLBuffer;
         public var footprint(default, null):Int;
         public var numVertices(default, null):Int;
-        var array:Float32Array;
+        var array:VertexArray;
 
         public function new(numVertices:Int, footprint:Int):Void {
             this.footprint = footprint;
             this.numVertices = numVertices;
             buf = GL.createBuffer();
-            array = new Float32Array(footprint * numVertices);
+            array = new VertexArray(footprint * numVertices);
         }
 
-        public inline function uploadFromVector(data:Array<Float>, offset:Int, num:Int):Void {
+        public inline function uploadFromVector(data:VertexArray, offset:Int, num:Int):Void {
             if (offset < 0 || offset > numVertices) {
 
             } else {
                 if (offset + num > numVertices) num = numVertices - offset;
 
-                // TODO: SPEED THIS UP
+                if (num * footprint < data.length) data = data.subarray(0, num * footprint);
 
-                for (ike in (offset * footprint)...((offset + num) * footprint)) {
-                    array[ike] = data[ike];
-                }
+                array.set(data, offset);
 
                 GL.bindBuffer(GL.ARRAY_BUFFER, buf);
                 GL.bufferData(GL.ARRAY_BUFFER, array, GL.STATIC_DRAW);

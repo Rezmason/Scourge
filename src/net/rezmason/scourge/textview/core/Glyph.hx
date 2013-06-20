@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.Vector;
+import net.rezmason.gl.Types;
 
 @:allow(net.rezmason.scourge.textview.core.BodySegment)
 @:allow(net.rezmason.scourge.textview.core.GlyphUtils)
@@ -8,16 +8,16 @@ class Glyph {
 
     public var id(default, null):Int;
 
-    var shape:Vector<Float>;
-    var color:Vector<Float>;
-    var paint:Vector<Float>;
+    var shape:VertexArray;
+    var color:VertexArray;
+    var paint:VertexArray;
 
     var paintHex:Int;
     var visible:Bool;
     var charCode:Int;
     var indexAddress:Int;
 
-    function new(id:Int, shape:Vector<Float>, color:Vector<Float>, paint:Vector<Float>):Void {
+    function new(id:Int, shape:VertexArray, color:VertexArray, paint:VertexArray):Void {
         this.id = id;
         this.shape = shape;
         this.color = color;

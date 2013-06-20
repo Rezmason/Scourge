@@ -5,31 +5,29 @@ package net.rezmason.gl;
 #else
     import openfl.gl.GL;
     import openfl.gl.GLBuffer;
-    import openfl.utils.Int16Array;
+    import net.rezmason.gl.Types;
 
     class IndexBuffer {
 
         @:allow(net.rezmason.gl) var buf:GLBuffer;
         public var numIndices(default, null):Int;
-        var array:Int16Array;
+        var array:IndexArray;
 
         public function new(numIndices:Int):Void {
             this.numIndices = numIndices;
             buf = GL.createBuffer();
-            array = new Int16Array(numIndices);
+            array = new IndexArray(numIndices);
         }
 
-        public inline function uploadFromVector(data:Array<Int>, offset:Int, num:Int):Void {
+        public inline function uploadFromVector(data:IndexArray, offset:Int, num:Int):Void {
             if (offset < 0 || offset > numIndices) {
 
             } else {
                 if (offset + num > numIndices) num = numIndices - offset;
 
-                // TODO: SPEED THIS UP
+                if (num < data.length) data = data.subarray(0, num);
 
-                for (ike in offset...(offset + num)) {
-                    array[ike] = data[ike];
-                }
+                array.set(data, offset);
 
                 GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
                 GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, array, GL.STATIC_DRAW);
