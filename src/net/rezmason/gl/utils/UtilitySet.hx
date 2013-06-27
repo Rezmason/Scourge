@@ -36,7 +36,7 @@ class UtilitySet {
             }
         #else
             if (View.isSupported) {
-                view = new ReadbackView();
+                view = new View();
                 context = GL;
                 stage.addChild(view);
                 init();
@@ -67,21 +67,3 @@ class UtilitySet {
         haxe.Timer.delay(cbk, 0);
     }
 }
-
-#if !flash
-    class ReadbackView extends View {
-        public function new():Void {
-            super();
-
-            #if js
-            if (nmeGraphics != null) {
-                nmeContext = nmeGraphics.nmeSurface.getContextWebGL({ preserveDrawingBuffer: true });
-                #if debug
-                nmeContext = untyped WebGLDebugUtils.makeDebugContext(nmeContext);
-                #end
-            }
-            GL.nmeContext = nmeContext;
-            #end
-        }
-    }
-#end

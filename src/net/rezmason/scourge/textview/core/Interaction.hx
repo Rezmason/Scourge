@@ -3,7 +3,7 @@ package net.rezmason.scourge.textview.core;
 typedef InteractFunction = Int->Int->Interaction->Void;
 
 enum Interaction {
-    KEYBOARD(type:KeyboardInteractionType, char:Int);
+    KEYBOARD(type:KeyboardInteractionType, key:Int, char:Int, shift:Bool, alt:Bool, ctrl:Bool);
     MOUSE(type:MouseInteractionType, x:Float, y:Float);
 }
 

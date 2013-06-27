@@ -25,9 +25,12 @@ package net.rezmason.gl;
             } else {
                 if (offset + num > numIndices) num = numIndices - offset;
 
-                if (num < data.length) data = data.subarray(0, num);
-
-                array.set(data, offset);
+                #if js
+                    if (num < data.length) data = data.subarray(0, num);
+                    array.set(data, offset);
+                #else
+                    for (ike in 0...num) array[ike + offset] = data[ike];
+                #end
 
                 GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
                 GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, array, GL.STATIC_DRAW);

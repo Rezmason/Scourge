@@ -70,7 +70,7 @@ class AlphabetBody extends Body {
                     case CLICK: glyph.set_b(1 - glyph.get_b());
                     case _:
                 }
-            case KEYBOARD(type, char):
+            case KEYBOARD(type, key):
         }
     }
 }

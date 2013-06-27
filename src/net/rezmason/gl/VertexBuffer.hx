@@ -27,9 +27,14 @@ package net.rezmason.gl;
             } else {
                 if (offset + num > numVertices) num = numVertices - offset;
 
-                if (num * footprint < data.length) data = data.subarray(0, num * footprint);
-
-                array.set(data, offset);
+                #if js
+                    if (num * footprint < data.length) data = data.subarray(0, num * footprint);
+                    array.set(data, offset);
+                #else
+                    for (ike in 0...num * footprint) {
+                        array[ike + offset * footprint] = data[ike];
+                    }
+                #end
 
                 GL.bindBuffer(GL.ARRAY_BUFFER, buf);
                 GL.bufferData(GL.ARRAY_BUFFER, array, GL.STATIC_DRAW);

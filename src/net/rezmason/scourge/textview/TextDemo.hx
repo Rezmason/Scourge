@@ -50,8 +50,6 @@ class TextDemo {
     var testBody:TestBody;
     var uiBody:UIBody;
 
-    var container:Sprite;
-
     public function new(stage:Stage, fonts:Map<String, FlatFont>, text:String):Void {
         active = false;
         this.stage = stage;
@@ -73,11 +71,9 @@ class TextDemo {
 
     function onCreate():Void {
         makeFontTextures();
-        container = new Sprite();
-        stage.addChild(container);
-        mouseSystem = new MouseSystem(utils.drawUtil, stage, interact);
+        mouseSystem = new MouseSystem(utils.drawUtil, stage, renderMouse, interact);
         keyboardSystem = new KeyboardSystem(stage, interact);
-        // container.addChild(mouseSystem.view);
+        // stage.addChild(mouseSystem.view);
         renderer = new Renderer(utils.drawUtil);
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         prettyMethod = new PrettyMethod(utils.programUtil);
@@ -138,6 +134,7 @@ class TextDemo {
 
     function addListeners():Void {
         // OLD - stage.addEventListener(Event.RESIZE, onResize);
+
         stage.addEventListener(Event.ACTIVATE, onActivate);
         stage.addEventListener(Event.DEACTIVATE, onDeactivate);
 
@@ -153,26 +150,16 @@ class TextDemo {
             onResize();
         }
 
-        if (active) {
-            if (mouseSystem.invalid) {
-                renderer.render(bodies, mouseMethod, mouseSystem.outputBuffer);
-                mouseSystem.readOutputBuffer();
-            }
+        if (active) renderer.render(bodies, prettyMethod, mainOutputBuffer);
+    }
 
-            renderer.render(bodies, prettyMethod, mainOutputBuffer);
-        }
+    function renderMouse():Void {
+        renderer.render(bodies, mouseMethod, mouseSystem.outputBuffer);
     }
 
     function onResize(?event:Event):Void {
         var width:Int = stage.stageWidth;
         var height:Int = stage.stageHeight;
-
-        #if js
-            stage.width = width;
-            stage.height = height;
-            container.scaleX = 1 / stage.scaleX;
-            container.scaleY = 1 / stage.scaleY;
-        #end
 
         for (view in views) view.body.adjustLayout(width, height, view.rect);
         mouseSystem.setSize(width, height);
@@ -188,16 +175,15 @@ class TextDemo {
         updateTimer.start();
         onResize();
         onTimer();
+        keyboardSystem.attach();
     }
 
     function onDeactivate(?event:Event):Void {
         if (!active) return;
         active = false;
-
         updateTimer.removeEventListener(TimerEvent.TIMER, onTimer);
         updateTimer.stop();
-
-        keyboardSystem.focusBodyID = -1;
+        keyboardSystem.detach();
     }
 
     function onTimer(?event:Event):Void {
@@ -280,6 +266,8 @@ class TextDemo {
                     var nY:Float = (oY / stage.stageHeight - targetView.rect.y) / targetView.rect.height;
                     interaction = MOUSE(type, nX, nY);
                 }
+
+                keyboardSystem.attach();
 
             case _:
         }

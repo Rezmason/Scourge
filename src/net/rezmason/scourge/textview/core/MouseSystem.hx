@@ -28,6 +28,7 @@ class MouseSystem {
     var _view:MouseView;
 
     var interact:InteractFunction;
+    var update:Void->Void;
     var hoverRawID:Int;
     var pressRawID:Int;
     var lastMoveEvent:MouseEvent;
@@ -35,12 +36,13 @@ class MouseSystem {
     var height:Int;
     var drawUtil:DrawUtil;
 
-    public function new(drawUtil:DrawUtil, target:EventDispatcher, interact:InteractFunction):Void {
+    public function new(drawUtil:DrawUtil, target:EventDispatcher, update:Void->Void, interact:InteractFunction):Void {
         _view = new MouseView(0.2, 1);
         // _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
         this.interact = interact;
         this.drawUtil = drawUtil;
+        this.update = update;
 
         target.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         target.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
@@ -78,12 +80,6 @@ class MouseSystem {
 
             invalidate();
         }
-    }
-
-    public function readOutputBuffer():Void {
-        invalid = false;
-        drawUtil.readBack(outputBuffer, width, height, data);
-        // fartBD();
     }
 
     public function invalidate():Void {
@@ -153,6 +149,14 @@ class MouseSystem {
     }
 
     function onMouseMove(event:MouseEvent):Void {
+
+        if (invalid) {
+            update();
+            drawUtil.readBack(outputBuffer, width, height, data);
+            // fartBD();
+            invalid = false;
+        }
+
         var rawID:Int = getRawID(event.stageX, event.stageY);
         if (rawID == hoverRawID) {
             sendInteraction(rawID, event, MOVE);
@@ -201,6 +205,9 @@ class MouseSystem {
 }
 
 #if js
+
+    // This is only used for visual debugging, so I'm kind of okay with not including it in OpenFL
+
     class FriendlyByteArray extends ByteArray {
 
         public function new(?input:ReadbackData):Void {

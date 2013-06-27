@@ -1,5 +1,3 @@
-Keyboard events aren't working on JS
-
 UI object
 
     Allow declared styles to be preserved, instead of remaking them

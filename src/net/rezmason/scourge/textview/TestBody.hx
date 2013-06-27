@@ -120,8 +120,8 @@ class TestBody extends Body {
         switch (interaction) {
             case MOUSE(type, x, y):
                 if (type == CLICK) setGlobalColor(Math.random(), Math.random(), Math.random());
-            case KEYBOARD(type, char):
-                if (type == KEY_UP) setGlobalChar(char);
+            case KEYBOARD(type, key, char, shift, alt, ctrl):
+                if (type == KEY_DOWN) setGlobalChar(char);
         }
     }
 
@@ -130,7 +130,7 @@ class TestBody extends Body {
     }
 
     inline function setGlobalChar(charCode:Int):Void {
-        for (glyph in glyphs) glyph.set_char(charCode, glyphTexture.font);
+        if (charCode > 0) for (glyph in glyphs) glyph.set_char(charCode, glyphTexture.font);
     }
 
     /*
