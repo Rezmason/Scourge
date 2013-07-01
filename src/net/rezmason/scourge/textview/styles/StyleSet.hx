@@ -4,7 +4,6 @@ import haxe.Utf8;
 import haxe.CallStack;
 import net.rezmason.scourge.textview.styles.Sigil.*;
 
-using haxe.JSON;
 using Lambda;
 using Type;
 
@@ -124,7 +123,7 @@ class StyleSet {
 
                 var endIndex:Int = right.indexOf('}');
                 if (endIndex != -1) {
-                    tags.push(parseTag(tagSigil + right.substr(0, endIndex + 1)));
+                    tags.push(makeTag(tagSigil + right.substr(0, endIndex + 1)));
                     right = right.substr(endIndex, right.length);
                     right = Utf8.sub(right, 1, Utf8.length(right));
                 }
@@ -136,7 +135,9 @@ class StyleSet {
         return left + right;
     }
 
-    inline function propsToJSON(input:String):String {
+    inline function parseTag(input:String):Dynamic {
+
+        var tag:Dynamic = {};
 
         var left:String = '';
         var right:String = input;
@@ -163,54 +164,63 @@ class StyleSet {
 
             if (firstColonIndex != -1) {
 
-                left = left + '"' + right.substr(0, firstColonIndex) + '":';
+                var field:String = right.substr(0, firstColonIndex);
+                var value:Dynamic = null;
+
+                // left = left + '"' + right.substr(0, firstColonIndex) + '":';
                 right = right.substr(firstColonIndex + 1, right.length);
 
                 // Search for second colon
-                var value:String = '';
+                var valueString:String = '';
                 var secondColonIndex:Int = right.indexOf(':');
                 if (secondColonIndex == -1) {
-                    value = right;
+                    valueString = right;
                     right = '';
                 } else {
                     // Search for last comma before second colon
                     var lastCommaIndex:Int = right.substr(0, secondColonIndex).lastIndexOf(',');
-                    value = right.substr(0, lastCommaIndex);
+                    valueString = right.substr(0, lastCommaIndex);
                     right = right.substr(lastCommaIndex + 1, right.length);
                 }
 
-                if (value.indexOf('[') == 0) {
+                if (valueString.indexOf('[') == 0) {
+                    var valueArray:Array<String> = [];
                     // array of strings ; replace commas with "," and wrap in [" "]
-                    value = value.substr(1, value.length);
-                    value = value.substr(0, value.length - 1);
-                    var seq:String = '';
-                    while (value.length > 0) {
-                        var commaIndex:Int = value.indexOf(',');
+                    valueString = valueString.substr(1, valueString.length);
+                    valueString = valueString.substr(0, valueString.length - 1);
+                    // var seq:String = '';
+                    while (valueString.length > 0) {
+                        var commaIndex:Int = valueString.indexOf(',');
                         if (commaIndex == -1) {
-                            seq = seq + '"$value"';
-                            value = '';
+                            // seq = seq + '"$valueString"';
+                            valueArray.push(valueString);
+                            valueString = '';
                         } else {
-                            seq = seq + '"' + value.substr(0, commaIndex) + '",';
-                            value = value.substr(commaIndex + 1, value.length);
+                            valueArray.push(valueString.substr(0, commaIndex));
+                            // seq = seq + '"' + valueString.substr(0, commaIndex) + '",';
+                            valueString = valueString.substr(commaIndex + 1, valueString.length);
                         }
                     }
-                    value = '[$seq]';
+                    // valueString = '[$seq]';
+                    value = valueArray;
                 } else {
-                    value = '"$value"';
+                    value = valueString;
+                    // valueString = '"$valueString"';
                 }
 
-                left = left + value;
+                // left = left + valueString;
+                Reflect.setField(tag, field, value);
 
-                if (secondColonIndex != -1) left = left + ',';
+                // if (secondColonIndex != -1) left = left + ',';
 
             } else {
                 break;
             }
         }
 
-        left = '{$left}';
+        // left = '{$left}';
 
-        return left;
+        return tag;
     }
 
     function resolveStyleDependencies():Void {
@@ -251,7 +261,7 @@ class StyleSet {
         }
     }
 
-    inline function parseTag(tagString:String):StyleTag {
+    inline function makeTag(tagString:String):StyleTag {
 
         var sigil:String = Utf8.sub(tagString, 0, 1);
         tagString = Utf8.sub(tagString, 2, Utf8.length(tagString)); // Remove leading '§{'
@@ -278,8 +288,7 @@ class StyleSet {
             if (stylesByName[name] != null) {
                 tag = RefTag(sigil, name);
             } else {
-                var json:String = propsToJSON(tagString);
-                tag = DeclTag(sigil, name, json.parse()); // Turn the string into JSON and parse it
+                tag = DeclTag(sigil, name, parseTag(tagString));
             }
         }
 
