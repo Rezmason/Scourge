@@ -10,9 +10,6 @@ using Type;
 
 class StyleSet {
 
-    static var stringReg:EReg = new EReg('([a-zA-Z_][a-zA-Z0-9_]*)', 'gu');
-    static var styleTagsReg:EReg = new EReg('[$STYLE $ANIMATED_STYLE $BUTTON_STYLE $INPUT_STYLE]\\{[^\\}]*\\}', 'gu');
-
     static var styleTypes:Map<String, Class<Style>> = [
         STYLE => Style,
         ANIMATED_STYLE => AnimatedStyle,
@@ -20,9 +17,12 @@ class StyleSet {
         INPUT_STYLE => InputStyle,
     ];
 
-    var styleMouseID:Int;
+    var numDeclTags:Int;
     var stylesByIndex:Array<Style>;
     var allStyles:Array<Style>;
+    var newStyles:Array<Style>;
+    var stylesByName:Map<String, Style>;
+    var tags:Array<StyleTag>;
 
     public var defaultStyle(default, null):Style;
 
@@ -32,23 +32,33 @@ class StyleSet {
 
     public function extractFromText(input:String, refreshStyles:Bool = false):String {
 
+        refreshStyles = refreshStyles || allStyles == null;
+
         defaultStyle.removeAllGlyphs();
         defaultStyle.flatten();
-        styleMouseID = 0;
+        numDeclTags = 0;
         stylesByIndex = [];
-        allStyles = [];
+        newStyles = [];
+        tags = [];
 
-        var tags:Array<StyleTag> = extractTags(input);
-        var stylesByID:Map<String, Style> = convertDeclarativeTags(tags);
-        stylesByID[defaultStyle.name] = defaultStyle;
-        resolveStyleDependencies(stylesByID);
-        for (style in allStyles) style.flatten();
-        allStyles.push(defaultStyle);
-        convertReferenceTags(tags, stylesByID);
+        if (refreshStyles) {
+            allStyles = [];
+            stylesByName = new Map();
+            stylesByName[defaultStyle.name] = defaultStyle;
+        }
+
+        var output:String = extractTags(input);
+        convertDeclarativeTags();
+        resolveStyleDependencies();
+        for (style in newStyles) style.flatten();
+        if (refreshStyles) allStyles.push(defaultStyle);
+        convertReferenceTags();
+
+        // trace('${newStyles.length} new styles.');
 
         stylesByIndex.unshift(defaultStyle);
 
-        return styleTagsReg.replace(input, STYLE);
+        return output;
     }
 
     public function getStyleByIndex(index:Int):Style {
@@ -69,41 +79,142 @@ class StyleSet {
         for (style in allStyles) style.updateGlyphs(delta);
     }
 
-    inline function extractTags(input:String):Array<StyleTag> {
-
-        var tags:Array<StyleTag> = [];
-
-        while(styleTagsReg.match(input)) {
-            var pos = styleTagsReg.matchedPos();
-            tags.push(parseTag(input.substr(pos.pos, pos.len)));
-            input = input.substr(pos.pos + pos.len);
-        }
-
-        return tags;
-    }
-
-    inline function convertDeclarativeTags(tags:Array<StyleTag>):Map<String, Style> {
-        var stylesByID:Map<String, Style> = new Map();
-
+    inline function convertDeclarativeTags():Void {
+        var declTagItr:Int = 0;
         for (ike in 0...tags.length) {
             switch (tags[ike]) {
-                case DeclTag(s, dec):
-                    var name:String = dec.name;
-                    if (name == null) name = 'style$styleMouseID';
-                    var style:Style = styleTypes[s].createInstance([name, dec.basis, dec, styleMouseID]);
+                case DeclTag(s, name, dec):
+                    var style:Style = styleTypes[s].createInstance([name, dec.basis, dec, declTagItr]);
                     allStyles.push(style);
-                    stylesByID[name] = style;
+                    newStyles.push(style);
+                    stylesByName[name] = style;
                     stylesByIndex[ike] = style;
-                    styleMouseID++;
+                    declTagItr++;
                 case _:
             }
         }
-
-        return stylesByID;
     }
 
-    function resolveStyleDependencies(stylesByID:Map<String, Style>):Void {
-        for (topStyle in allStyles) {
+    inline function extractTags(input:String):String {
+
+        var left:String = '';
+        var right:String = input;
+        while (right.length > 0) {
+            var startIndex:Int = -1;
+            var tagSigil:String = '';
+
+            // Find the next sigil
+
+            for (sigil in [STYLE, ANIMATED_STYLE, BUTTON_STYLE, INPUT_STYLE]) {
+                var index:Int = right.indexOf(sigil);
+                if (index != -1 && (startIndex == -1 || startIndex > index)) {
+                    startIndex = index;
+                    tagSigil = sigil;
+                }
+            }
+
+            // Find the close brace
+
+            if (startIndex != -1) {
+                if (startIndex > 0) left = left + right.substr(0, startIndex);
+                left = left + STYLE;
+
+                right = right.substr(startIndex, right.length);
+                right = Utf8.sub(right, 1, Utf8.length(right));
+
+                var endIndex:Int = right.indexOf('}');
+                if (endIndex != -1) {
+                    tags.push(parseTag(tagSigil + right.substr(0, endIndex + 1)));
+                    right = right.substr(endIndex, right.length);
+                    right = Utf8.sub(right, 1, Utf8.length(right));
+                }
+            } else {
+                break;
+            }
+        }
+
+        return left + right;
+    }
+
+    inline function propsToJSON(input:String):String {
+
+        var left:String = '';
+        var right:String = input;
+
+        // Remove spaces
+
+        while (right.length > 0) {
+            var startIndex:Int = right.indexOf(' ');
+            if (startIndex != -1) {
+                left = left + right.substr(0, startIndex);
+                right = right.substr(startIndex + 1, right.length);
+            } else {
+                break;
+            }
+        }
+
+        right = left + right;
+        left = '';
+
+        while (right.length > 0) {
+
+            // Search for colon
+            var firstColonIndex:Int = right.indexOf(':');
+
+            if (firstColonIndex != -1) {
+
+                left = left + '"' + right.substr(0, firstColonIndex) + '":';
+                right = right.substr(firstColonIndex + 1, right.length);
+
+                // Search for second colon
+                var value:String = '';
+                var secondColonIndex:Int = right.indexOf(':');
+                if (secondColonIndex == -1) {
+                    value = right;
+                    right = '';
+                } else {
+                    // Search for last comma before second colon
+                    var lastCommaIndex:Int = right.substr(0, secondColonIndex).lastIndexOf(',');
+                    value = right.substr(0, lastCommaIndex);
+                    right = right.substr(lastCommaIndex + 1, right.length);
+                }
+
+                if (value.indexOf('[') == 0) {
+                    // array of strings ; replace commas with "," and wrap in [" "]
+                    value = value.substr(1, value.length);
+                    value = value.substr(0, value.length - 1);
+                    var seq:String = '';
+                    while (value.length > 0) {
+                        var commaIndex:Int = value.indexOf(',');
+                        if (commaIndex == -1) {
+                            seq = seq + '"$value"';
+                            value = '';
+                        } else {
+                            seq = seq + '"' + value.substr(0, commaIndex) + '",';
+                            value = value.substr(commaIndex + 1, value.length);
+                        }
+                    }
+                    value = '[$seq]';
+                } else {
+                    value = '"$value"';
+                }
+
+                left = left + value;
+
+                if (secondColonIndex != -1) left = left + ',';
+
+            } else {
+                break;
+            }
+        }
+
+        left = '{$left}';
+
+        return left;
+    }
+
+    function resolveStyleDependencies():Void {
+        for (topStyle in newStyles) {
             var style:Style = topStyle;
             var dependencyStack:Array<String> = [];
             while (true) {
@@ -114,25 +225,25 @@ class StyleSet {
                     throw 'Cyclical style dependency, pal: ( $dependencyStack )';
                 }
 
-                style = stylesByID[style.basis];
+                style = stylesByName[style.basis];
                 if (style == null) break;
             }
 
             while (dependencyStack.length > 0) {
-                style = stylesByID[dependencyStack.pop()];
-                if (style.basis != null) style.inherit(stylesByID[style.basis]);
+                style = stylesByName[dependencyStack.pop()];
+                if (style.basis != null) style.inherit(stylesByName[style.basis]);
             }
         }
 
         // Some styles have more complex dependencies. We resolve them here.
-        for (style in allStyles) style.connectBases(stylesByID);
+        for (style in newStyles) style.connectBases(stylesByName);
     }
 
-    inline function convertReferenceTags(tags:Array<StyleTag>, stylesByID:Map<String, Style>):Void {
+    inline function convertReferenceTags():Void {
         for (ike in 0...tags.length) {
             switch (tags[ike]) {
                 case RefTag(s, ref):
-                    var style:Style = stylesByID[ref];
+                    var style:Style = stylesByName[ref];
                     if (style == null) style = defaultStyle;
                     stylesByIndex[ike] = style;
                 case _:
@@ -141,17 +252,35 @@ class StyleSet {
     }
 
     inline function parseTag(tagString:String):StyleTag {
-        var sigil:String = Utf8.sub(tagString, 0, 1);
 
-        tagString = Utf8.sub(tagString, 2, Utf8.length(tagString) - 2); // Remove leading '§{'
+        var sigil:String = Utf8.sub(tagString, 0, 1);
+        tagString = Utf8.sub(tagString, 2, Utf8.length(tagString)); // Remove leading '§{'
         tagString = Utf8.sub(tagString, 0, Utf8.length(tagString) - 1); // Remove trailing '}'
 
         var tag:StyleTag = null;
         if (tagString.indexOf(':') == -1) {
             tag = RefTag(sigil, tagString); // Tags with no declared properties are obviously references
         } else {
-            var json:String = ('{' + stringReg.replace(tagString, '"$1"') + '}');
-            tag = DeclTag(sigil, json.parse()); // Turn the string into JSON and parse it
+            var nameIndex:Int = tagString.indexOf('name');
+            var name:String = '';
+            if (nameIndex != -1) {
+                name = Utf8.sub(tagString, nameIndex, tagString.length);
+
+                var splitIndex:Int = name.indexOf(':');
+                name = Utf8.sub(name, splitIndex + 1, name.length);
+                splitIndex = name.indexOf(',');
+                if (splitIndex != -1) name = Utf8.sub(name, 0, splitIndex);
+            } else {
+                name = 'style$numDeclTags';
+            }
+            numDeclTags++;
+
+            if (stylesByName[name] != null) {
+                tag = RefTag(sigil, name);
+            } else {
+                var json:String = propsToJSON(tagString);
+                tag = DeclTag(sigil, name, json.parse()); // Turn the string into JSON and parse it
+            }
         }
 
         return tag;

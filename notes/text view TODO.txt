@@ -1,7 +1,19 @@
 UI object
 
-    Allow declared styles to be preserved, instead of remaking them
-        This hopefully fixes the bug where animations pause or reset when you drag around the text
+    Separate UIBody into regions, so we can limit large changes to small regions
+        This allows us to share styles between regions
+
+        Stale region
+            Not interactive at all
+            appended
+        Active region
+            Interactive
+            Fully updated
+        Prompt region
+            Interactive
+            Frequent partial updates
+            Few styles
+            Relatively small
 
     Defer text changes until after dragging
 
@@ -18,21 +30,6 @@ UI object
             the new text IS the result of interaction,
         -scroll to the new bottom
     Scroll indicator (looks like meterstick)
-
-    Separate UIBody into regions, so we can limit large changes to small regions
-        This allows us to share styles between regions
-
-        Stale region
-            Not interactive at all
-            appended
-        Active region
-            Interactive
-            Fully updated
-        Prompt region
-            Interactive
-            Frequent partial updates
-            Few styles
-            Relatively small
 
 Board object
     Move rotation logic into TestBody before cloning

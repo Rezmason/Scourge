@@ -51,6 +51,10 @@ class UIBody extends Body {
     var numRowsForLayout:Int;
     var numGlyphsInLayout:Int;
 
+    var time:Float;
+
+    var pendingString:String;
+
     public var numLines(get, null):Int;
     public var numScrollPositions(get, null):Int;
     public var bottomPos(get, null):Float;
@@ -78,6 +82,9 @@ class UIBody extends Body {
         numRowsForLayout = 0;
         numGlyphsInLayout = 0;
 
+        time = 0;
+        pendingString = '';
+
         super(id, bufferUtil, numGlyphs, glyphTexture, redrawHitAreas);
 
         letterbox = false;
@@ -86,6 +93,10 @@ class UIBody extends Body {
     }
 
     override public function update(delta:Float):Void {
+        if (pendingString.length > 0) {
+            updateText(text + pendingString);
+            pendingString = '';
+        }
         updateGlide();
         styleSet.updateGlyphs(delta);
         taperScrollEdges();
@@ -113,39 +124,71 @@ class UIBody extends Body {
         glideGoal = Math.round(Math.max(0, Math.min(bottomPos, pos)));
     }
 
+    inline function padLine(line:String) {
+
+        var count:Int = 0;
+        var right:String = line;
+        while (Utf8.length(right) > 0) {
+            var sigilIndex:Int = right.indexOf(STYLE);
+            if (sigilIndex == -1) break;
+            right = right.substr(sigilIndex, right.length);
+            right = Utf8.sub(right, 1, Utf8.length(right));
+            count++;
+        }
+
+        // Pads a string until its length, ignoring sigils, is numCols
+        line = rpad(line, ' ', numCols + count);
+        return line;
+    }
+
+    inline function wrapLines(s:String) {
+
+        // Splits a line into an array of lines whose length, ignoring sigils, is numCols
+
+        var left:String = '';
+        var right:String = s;
+
+        var count:Int = 0;
+        while (right.length > 0) {
+            var len:Int = right.length;
+            var line:String = '';
+            line = Utf8.sub(right, 0, numCols - count);
+            var sigilIndex:Int = line.indexOf(STYLE);
+            if (sigilIndex == -1) {
+                left = left + line + LINE_TOKEN;
+                if (numCols - count < right.length) right = Utf8.sub(right, numCols - count, Utf8.length(right));
+                else right = '';
+                count = 0;
+            } else {
+                if (sigilIndex > 0) left = left + right.substr(0, sigilIndex);
+                left = left + STYLE;
+                right = right.substr(sigilIndex, right.length);
+                if (Utf8.length(right) > 1) right = Utf8.sub(right, 1, Utf8.length(right));
+                else right = '';
+                count += sigilIndex;
+            }
+        }
+
+        var sp:String = left;
+
+        var ltl:Int = Utf8.length(LINE_TOKEN);
+        var spl:Int = Utf8.length(sp);
+
+        if (spl > ltl && Utf8.sub(sp, spl - ltl, ltl) == LINE_TOKEN) {
+            sp = Utf8.sub(sp, 0, spl - ltl);
+        }
+
+        return sp.split(LINE_TOKEN).map(padLine).join(LINE_TOKEN);
+    }
+
     public function updateText(text:String, refreshStyles:Bool = false):Void {
 
         if (text == null) text = '';
         this.text = text;
 
-        var sigil:String = STYLE;
-
         if (numGlyphsInLayout == 0) return;
 
         // Simplify the text and wrap it to new lines as we construct the page
-
-        var styledLineReg:EReg = new EReg('(([^$sigil]$sigil*){$numCols})', 'gu');
-
-        function padLine(line:String) {
-            // Pads a string until its length, ignoring sigils, is 1
-            return rpad(line, ' ', numCols + line.split(sigil).length - 1);
-        }
-
-        function wrapLines(s:String) {
-
-            // Splits a line into an array of lines whose length, ignoring sigils, is numCols
-
-            var sp:String = styledLineReg.replace(s, '$1$LINE_TOKEN');
-
-            var ltl:Int = Utf8.length(LINE_TOKEN);
-            var spl:Int = Utf8.length(sp);
-
-            if (spl > ltl && Utf8.sub(sp, spl - ltl, ltl) == LINE_TOKEN) {
-                sp = Utf8.sub(sp, 0, spl - ltl);
-            }
-
-            return sp.split(LINE_TOKEN).map(padLine).join(LINE_TOKEN);
-        }
 
         page = styleSet.extractFromText(text, refreshStyles).split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
 
@@ -159,7 +202,7 @@ class UIBody extends Body {
         var lineStyleIndex:Int = 0;
         lineStyleIndices = [lineStyleIndex];
         for (line in page) {
-            lineStyleIndex += line.split(sigil).length - 1;
+            lineStyleIndex += line.split(STYLE).length - 1;
             lineStyleIndices.push(lineStyleIndex);
         }
 
@@ -193,16 +236,17 @@ class UIBody extends Body {
 
         styleSet.removeAllGlyphs();
 
+        var styleCode:Int = Utf8.charCodeAt(STYLE, 0);
+
         var currentStyle:Style = styleSet.getStyleByIndex(styleIndex);
         for (line in pageSegment) {
             var index:Int = 0;
             for (index in 0...Utf8.length(line)) {
-                var char:String = Utf8.sub(line, index, 1);
-                if (char == STYLE) {
+                var charCode:Int = Utf8.charCodeAt(line, index);
+                if (charCode == styleCode) {
                     currentStyle = styleSet.getStyleByIndex(++styleIndex);
                 } else {
                     var glyph:Glyph = glyphs[id++];
-                    var charCode:Int = Utf8.charCodeAt(char, 0);
                     glyph.set_char(charCode, glyphTexture.font);
                     currentStyle.addGlyph(glyph);
                     glyph.set_z(0);
@@ -272,16 +316,14 @@ class UIBody extends Body {
                     }
                 }
             case KEYBOARD(type, key, char, shift, alt, ctrl):
-                handleKeyboardInteraction(type, char);
+                if (type == KEY_DOWN) {
+                    if (key == 8) {
+                        // delete command
+                    } else if (char > 0) {
+                        pendingString += String.fromCharCode(char);
+                    }
+                }
         }
-    }
-
-
-    function handleKeyboardInteraction(type:KeyboardInteractionType, char:Int):Void {
-        if (type != KEY_DOWN) return;
-
-        if (char == 8) updateText(text.substr(0, text.length - 1));
-        if (char > 0) updateText(text + String.fromCharCode(char));
     }
 
     inline function rpad(input:String, pad:String, len:Int):String {
@@ -299,8 +341,10 @@ class UIBody extends Body {
             var dpi:Null<Float> = Reflect.field(flash.Lib.current.loaderInfo.parameters, 'dpi');
             if (dpi == null) dpi = 72;
             return dpi;
-        #else
+        #elseif js
             return Capabilities.screenDPI;
+        #else
+            return 72;
         #end
     }
 }

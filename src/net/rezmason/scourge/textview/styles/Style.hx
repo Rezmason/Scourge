@@ -16,6 +16,7 @@ class Style {
 
     var glyphs:Array<Glyph>;
     var mouseID:Int;
+    var paint:Int;
 
     static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 's', 'p'];
 
@@ -35,9 +36,13 @@ class Style {
         return dupe;
     }
 
-    public function addGlyph(glyph:Glyph):Void glyphs.push(glyph);
+    public function addGlyph(glyph:Glyph):Void {
+        if (glyphs.length == 0) paint = (glyph.get_paint() & 0xFF0000) | (mouseID & 0xFFFF);
+        else glyph.set_paint(paint);
+        glyphs.push(glyph);
+    }
 
-    public function removeAllGlyphs():Void glyphs.splice(0, glyphs.length);
+    public function removeAllGlyphs():Void glyphs = [];
 
     public function updateGlyphs(delta:Float):Void {
 
@@ -50,14 +55,11 @@ class Style {
         var s:Float = basics[4];
         var p:Float = basics[5];
 
-        var paint:Int = (glyphs[0].get_paint() & 0xFF0000) | (mouseID & 0xFFFF);
-
         for (glyph in glyphs) {
             glyph.set_color(r, g, b);
             glyph.set_i(i);
             glyph.set_s(s);
             glyph.set_p(p);
-            glyph.set_paint(paint);
         }
     }
 

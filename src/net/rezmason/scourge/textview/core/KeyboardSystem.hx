@@ -47,7 +47,7 @@ class KeyboardSystem {
 
     inline function sendInteraction(event:KeyboardEvent, type:KeyboardInteractionType):Void {
         var char:Int = event.charCode;
-        trace('$char <${String.fromCharCode(char)}>');
+        // trace('$char <${String.fromCharCode(char)}>');
         interact(focusBodyID, -1, KEYBOARD(type, event.keyCode, char, event.shiftKey, event.altKey, event.ctrlKey));
     }
 
