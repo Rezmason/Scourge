@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.styles;
+package net.rezmason.scourge.textview.text;
 
 enum StyleTag {
     RefTag(sigil:String, reference:String);

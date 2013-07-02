@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.styles;
+package net.rezmason.scourge.textview.text;
 
 class Sigil {
     public inline static var STYLE:String = '§';

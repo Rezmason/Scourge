@@ -13,9 +13,9 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 
-import net.rezmason.scourge.textview.styles.Style;
-import net.rezmason.scourge.textview.styles.StyleSet;
-import net.rezmason.scourge.textview.styles.Sigil.STYLE;
+import net.rezmason.scourge.textview.text.Style;
+import net.rezmason.scourge.textview.text.StyleSet;
+import net.rezmason.scourge.textview.text.Sigil.STYLE;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 

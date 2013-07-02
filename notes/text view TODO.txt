@@ -1,12 +1,11 @@
 UI object
 
-    Isolate text regions from UIBody
-        "Concatenated" for rendering
-        interactivity can be limited to certain regions
+    Split StyleSet, UIBody and TextRegion
+        UIBody "concatenates" TextRegions for rendering
 
-        Stale region - not interactive, appended when command is executed, cleared when clear is executed
-        Active region - interactive, fully replaced when command is executed
-        Prompt region - interactive, typed into and everything, cleared when cancel is executed
+        Stale region - not interactive, no dynamic styles, appended when command is executed, cleared when clear is executed
+        Active region - interactive, dynamic styles, fully replaced when command is executed
+        Prompt region - interactive, dynamic styles, typed into and everything, cleared when cancel is executed
 
     Defer text changes until after dragging
 

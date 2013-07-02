@@ -1,7 +1,7 @@
-package net.rezmason.scourge.textview.styles;
+package net.rezmason.scourge.textview.text;
 
 import haxe.Utf8;
-import net.rezmason.scourge.textview.styles.Sigil.*;
+import net.rezmason.scourge.textview.text.Sigil.*;
 
 using Lambda;
 using Type;

@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.styles;
+package net.rezmason.scourge.textview.text;
 
 import net.kawa.tween.easing.*;
 
