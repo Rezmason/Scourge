@@ -1,19 +1,12 @@
 UI object
 
-    Separate UIBody into regions, so we can limit large changes to small regions
-        This allows us to share styles between regions
+    Isolate text regions from UIBody
+        "Concatenated" for rendering
+        interactivity can be limited to certain regions
 
-        Stale region
-            Not interactive at all
-            appended
-        Active region
-            Interactive
-            Fully updated
-        Prompt region
-            Interactive
-            Frequent partial updates
-            Few styles
-            Relatively small
+        Stale region - not interactive, appended when command is executed, cleared when clear is executed
+        Active region - interactive, fully replaced when command is executed
+        Prompt region - interactive, typed into and everything, cleared when cancel is executed
 
     Defer text changes until after dragging
 

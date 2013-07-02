@@ -22,8 +22,8 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 class UIBody extends Body {
 
     inline static var glideEase:Float = 0.6;
-    inline static var NATIVE_DPI:Float = 72;
-    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 18;
+    inline static var NATIVE_DPI:Float = 96;
+    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 24;
 
     inline static var LINE_TOKEN:String = '¬¬¬';
 
@@ -66,13 +66,15 @@ class UIBody extends Body {
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
 
+        trace(getScreenDPI());
+
         glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * getScreenDPI() / NATIVE_DPI;
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
 
         var numGlyphColumns:Int = Std.int(Capabilities.screenResolutionX / glyphWidthInPixels);
         var numGlyphRows:Int = Std.int(Capabilities.screenResolutionY / glyphHeightInPixels);
 
-        var numGlyphs:Int = numGlyphRows * numGlyphColumns;
+        var numGlyphs:Int = (numGlyphRows + 1) * numGlyphColumns;
 
         currentScrollPos = Math.NaN;
         gliding = false;
@@ -148,6 +150,8 @@ class UIBody extends Body {
         var left:String = '';
         var right:String = s;
 
+        var wrappedLines:Array<String> = [];
+
         var count:Int = 0;
         while (right.length > 0) {
             var len:Int = right.length;
@@ -155,30 +159,31 @@ class UIBody extends Body {
             line = Utf8.sub(right, 0, numCols - count);
             var sigilIndex:Int = line.indexOf(STYLE);
             if (sigilIndex == -1) {
-                left = left + line + LINE_TOKEN;
-                if (numCols - count < right.length) right = Utf8.sub(right, numCols - count, Utf8.length(right));
-                else right = '';
+                left = left + line;
+                wrappedLines.push(padLine(left));
+                left = '';
+                if (numCols - count < right.length) {
+                    right = Utf8.sub(right, numCols - count, Utf8.length(right));
+                    left = '';
+                } else {
+                    right = '';
+                    left = null;
+                }
                 count = 0;
             } else {
-                if (sigilIndex > 0) left = left + right.substr(0, sigilIndex);
+                line = right.substr(0, sigilIndex);
+                if (sigilIndex > 0) left = left + line;
                 left = left + STYLE;
                 right = right.substr(sigilIndex, right.length);
                 if (Utf8.length(right) > 1) right = Utf8.sub(right, 1, Utf8.length(right));
                 else right = '';
-                count += sigilIndex;
+                count += Utf8.length(line);
             }
         }
 
-        var sp:String = left;
+        if (left != null) wrappedLines.push(padLine(left));
 
-        var ltl:Int = Utf8.length(LINE_TOKEN);
-        var spl:Int = Utf8.length(sp);
-
-        if (spl > ltl && Utf8.sub(sp, spl - ltl, ltl) == LINE_TOKEN) {
-            sp = Utf8.sub(sp, 0, spl - ltl);
-        }
-
-        return sp.split(LINE_TOKEN).map(padLine).join(LINE_TOKEN);
+        return wrappedLines.join(LINE_TOKEN);
     }
 
     public function updateText(text:String, refreshStyles:Bool = false):Void {
@@ -327,8 +332,10 @@ class UIBody extends Body {
     }
 
     inline function rpad(input:String, pad:String, len:Int):String {
-        while (Utf8.length(input) < len) input = input + pad;
-        return Utf8.sub(input, 0, len);
+        len = len - Utf8.length(input);
+        var str:String = '';
+        while (str.length < len) str = str + pad;
+        return input + str;
     }
 
     inline function get_numLines():Int { return page.length; }
@@ -339,12 +346,12 @@ class UIBody extends Body {
     inline function getScreenDPI():Float {
         #if flash
             var dpi:Null<Float> = Reflect.field(flash.Lib.current.loaderInfo.parameters, 'dpi');
-            if (dpi == null) dpi = 72;
+            if (dpi == null) dpi = NATIVE_DPI;
             return dpi;
         #elseif js
             return Capabilities.screenDPI;
         #else
-            return 72;
+            return NATIVE_DPI;
         #end
     }
 }

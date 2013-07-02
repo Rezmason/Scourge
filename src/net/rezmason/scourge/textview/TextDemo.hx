@@ -115,6 +115,8 @@ class TextDemo {
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
         uiRect.inflate(-0.025, -0.1);
 
+        // var uiRect:Rectangle = new Rectangle(0, 0, 1, 1);
+
         views.push({body:uiBody, rect:uiRect});
         uiBody.updateText(text + prompt + caret);
         /**/

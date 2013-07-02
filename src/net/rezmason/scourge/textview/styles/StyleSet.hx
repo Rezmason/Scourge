@@ -1,7 +1,6 @@
 package net.rezmason.scourge.textview.styles;
 
 import haxe.Utf8;
-import haxe.CallStack;
 import net.rezmason.scourge.textview.styles.Sigil.*;
 
 using Lambda;
