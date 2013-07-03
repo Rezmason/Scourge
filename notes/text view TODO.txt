@@ -1,6 +1,9 @@
 UI object
 
-    Split StyleSet, UIBody and TextRegion
+    TextRegion
+
+        Some of UIBody's stuff belongs in there
+
         UIBody "concatenates" TextRegions for rendering
 
         Stale region - not interactive, no dynamic styles, appended when command is executed, cleared when clear is executed

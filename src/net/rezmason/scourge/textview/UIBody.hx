@@ -16,6 +16,7 @@ import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.text.Style;
 import net.rezmason.scourge.textview.text.StyleSet;
 import net.rezmason.scourge.textview.text.Sigil.STYLE;
+import net.rezmason.scourge.textview.text.TextRegion;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -27,7 +28,8 @@ class UIBody extends Body {
 
     inline static var LINE_TOKEN:String = '¬¬¬';
 
-    var styleSet:StyleSet;
+    var styles:StyleSet;
+    var region:TextRegion;
 
     var text:String;
     var page:Array<String>;
@@ -61,12 +63,11 @@ class UIBody extends Body {
 
     public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
 
-        styleSet = new StyleSet();
+        styles = new StyleSet();
+        region = new TextRegion(styles);
 
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
-
-        trace(getScreenDPI());
 
         glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * getScreenDPI() / NATIVE_DPI;
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
@@ -100,7 +101,7 @@ class UIBody extends Body {
             pendingString = '';
         }
         updateGlide();
-        styleSet.updateGlyphs(delta);
+        styles.updateGlyphs(delta);
         taperScrollEdges();
         super.update(delta);
     }
@@ -195,7 +196,7 @@ class UIBody extends Body {
 
         // Simplify the text and wrap it to new lines as we construct the page
 
-        page = styleSet.extractFromText(text, refreshStyles).split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
+        page = region.extractFromText(text, refreshStyles).split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
 
         // Add blank lines to the end, to reach the minimum page length (numRows)
 
@@ -239,17 +240,17 @@ class UIBody extends Body {
         var pageSegment:Array<String> = page.slice(scrollStartIndex, scrollStartIndex + numRows);
         var styleIndex:Int = lineStyleIndices[scrollStartIndex];
 
-        styleSet.removeAllGlyphs();
+        styles.removeAllGlyphs();
 
         var styleCode:Int = Utf8.charCodeAt(STYLE, 0);
 
-        var currentStyle:Style = styleSet.getStyleByIndex(styleIndex);
+        var currentStyle:Style = region.getStyleByIndex(styleIndex);
         for (line in pageSegment) {
             var index:Int = 0;
             for (index in 0...Utf8.length(line)) {
                 var charCode:Int = Utf8.charCodeAt(line, index);
                 if (charCode == styleCode) {
-                    currentStyle = styleSet.getStyleByIndex(++styleIndex);
+                    currentStyle = region.getStyleByIndex(++styleIndex);
                 } else {
                     var glyph:Glyph = glyphs[id++];
                     glyph.set_char(charCode, glyphTexture.font);
@@ -259,7 +260,7 @@ class UIBody extends Body {
             }
         }
 
-        styleSet.updateGlyphs(0);
+        styles.updateGlyphs(0);
 
         taperScrollEdges();
 
@@ -314,7 +315,7 @@ class UIBody extends Body {
                         dragStartPos = currentScrollPos;
                     }
                 } else {
-                    var targetStyle:Style = styleSet.getStyleByMouseID(id);
+                    var targetStyle:Style = styles.getStyleByMouseID(id);
                     if (targetStyle != null) {
                         targetStyle.interact(type);
                         if (type == CLICK) trace('${targetStyle.name} clicked!');

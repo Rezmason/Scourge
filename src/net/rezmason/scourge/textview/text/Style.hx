@@ -38,7 +38,7 @@ class Style {
 
     public function addGlyph(glyph:Glyph):Void {
         if (glyphs.length == 0) paint = (glyph.get_paint() & 0xFF0000) | (mouseID & 0xFFFF);
-        else glyph.set_paint(paint);
+        glyph.set_paint(paint);
         glyphs.push(glyph);
     }
 
