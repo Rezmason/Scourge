@@ -4,9 +4,9 @@ import net.kawa.tween.easing.*;
 
 class AnimatedStyle extends DynamicStyle {
 
+    public var time(default, set):Float;
     var period:Null<Float>;
     var phase:Null<Float>;
-    var time:Float;
     var easeFunc:Float->Float;
 
     static var animationFields:Array<String> = ['period', 'phase', 'frames'];
@@ -61,5 +61,11 @@ class AnimatedStyle extends DynamicStyle {
         phase = ((phase % period) + period) % period;
 
         super.flatten();
+    }
+
+    inline function set_time(value:Float):Float {
+        if (Math.isNaN(value)) value = 0;
+        time = value;
+        return time;
     }
 }

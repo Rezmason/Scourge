@@ -1,14 +1,17 @@
 UI object
 
-    TextRegion
+    Migrate lots of UIBody stuff into TextRegion
+        UIBody should just be a Body that renders styled text
+        Talk to someone about this stuff
 
-        Some of UIBody's stuff belongs in there
+    Styles we need
+        for each player plus white,
+            Button style
+            "Stale button" style
 
-        UIBody "concatenates" TextRegions for rendering
-
-        Stale region - not interactive, no dynamic styles, appended when command is executed, cleared when clear is executed
-        Active region - interactive, dynamic styles, fully replaced when command is executed
-        Prompt region - interactive, dynamic styles, typed into and everything, cleared when cancel is executed
+    Stale region - not interactive, no dynamic styles, appended when command is executed, cleared when clear is executed
+    Active region - interactive, dynamic styles, fully replaced when command is executed
+    Prompt region - interactive, dynamic styles, typed into and everything, cleared when cancel is executed
 
     Defer text changes until after dragging
 

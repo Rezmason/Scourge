@@ -3,19 +3,21 @@ package net.rezmason.scourge.textview;
 import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
 import flash.system.Capabilities;
+import flash.ui.Keyboard;
 
 import haxe.Utf8;
+import openfl.Assets;
 
 import net.rezmason.gl.utils.BufferUtil;
-
+import net.rezmason.scourge.textview.TestStrings;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
-import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.GlyphTexture;
-
+import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.text.AnimatedStyle;
+import net.rezmason.scourge.textview.text.Sigil.STYLE;
 import net.rezmason.scourge.textview.text.Style;
 import net.rezmason.scourge.textview.text.StyleSet;
-import net.rezmason.scourge.textview.text.Sigil.STYLE;
 import net.rezmason.scourge.textview.text.TextRegion;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
@@ -31,7 +33,8 @@ class UIBody extends Body {
     var styles:StyleSet;
     var region:TextRegion;
 
-    var text:String;
+    var combinedText:String;
+    var combinedTextLength:Int;
     var page:Array<String>;
     var lineStyleIndices:Array<Int>;
 
@@ -55,13 +58,22 @@ class UIBody extends Body {
 
     var time:Float;
 
-    var pendingString:String;
+    var blurb:String;
+    var prompt:String;
+    var caret:String;
+    var systemInput:String;
+    var systemOutput:String;
+    var dirty:Bool;
+    var caretStyle:AnimatedStyle;
+    var interpret:String->String;
 
     public var numLines(get, null):Int;
     public var numScrollPositions(get, null):Int;
     public var bottomPos(get, null):Float;
 
-    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, interpret:String->String):Void {
+
+        this.interpret = interpret;
 
         styles = new StyleSet();
         region = new TextRegion(styles);
@@ -86,24 +98,57 @@ class UIBody extends Body {
         numGlyphsInLayout = 0;
 
         time = 0;
-        pendingString = '';
 
         super(id, bufferUtil, numGlyphs, glyphTexture, redrawHitAreas);
 
         letterbox = false;
 
         for (ike in 0...numGlyphs) glyphs[ike].set_paint(id << 16);
+
+        // blurb = [TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n");
+        // blurb = Assets.getText("assets/not plus.txt");
+        // blurb = Assets.getText("assets/enterprise.txt");
+        // blurb = Assets.getText("assets/acid2.txt");
+        blurb = TestStrings.STYLED_TEXT;
+        // blurb = "One. §{i:1}Two§{}.";
+
+        styles.extract(TestStrings.BREATHING_PROMPT_STYLE);
+        styles.extract(TestStrings.CARET_STYLE);
+
+        caretStyle = cast styles.getStyleByName('caret');
+
+        prompt = '§{breathingprompt}Ω_rezmason§{} => §{}';
+        setCaret('|');
+        systemInput = '';
+        systemOutput = '\n';
+        dirty = false;
+
+        updateText(blurb + systemOutput + prompt + systemInput + caret);
     }
 
     override public function update(delta:Float):Void {
-        if (pendingString.length > 0) {
-            updateText(text + pendingString);
-            pendingString = '';
+        if (dirty) {
+            dirty = false;
+            updateText(blurb + systemOutput + prompt + systemInput + caret);
+            caretStyle.time = 0;
+            glideTextToPos(bottomPos);
         }
         updateGlide();
         styles.updateGlyphs(delta);
         taperScrollEdges();
         super.update(delta);
+    }
+
+    public function setText(text:String):Void {
+        blurb = text;
+    }
+
+    public function setPrompt(text:String):Void {
+        prompt = text;
+    }
+
+    public function setCaret(text:String):Void {
+        caret = '§{caret}$text§{}';
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
@@ -119,7 +164,7 @@ class UIBody extends Body {
 
         lastRedrawPos = Math.NaN;
         reorderGlyphs();
-        updateText(text);
+        updateText(blurb + systemOutput + prompt + systemInput + caret);
     }
 
     public function glideTextToPos(pos:Float):Void {
@@ -127,7 +172,7 @@ class UIBody extends Body {
         glideGoal = Math.round(Math.max(0, Math.min(bottomPos, pos)));
     }
 
-    inline function padLine(line:String) {
+    inline function padLine(line:String):String {
 
         var count:Int = 0;
         var right:String = line;
@@ -187,20 +232,21 @@ class UIBody extends Body {
         return wrappedLines.join(LINE_TOKEN);
     }
 
-    public function updateText(text:String, refreshStyles:Bool = false):Void {
+    public function updateText(combinedText:String, refreshStyles:Bool = false):Void {
 
-        if (text == null) text = '';
-        this.text = text;
+        if (combinedText == null) combinedText = '';
+        this.combinedText = swapTabsWithSpaces(combinedText);
 
         if (numGlyphsInLayout == 0) return;
 
-        // Simplify the text and wrap it to new lines as we construct the page
+        // Simplify the combinedText and wrap it to new lines as we construct the page
 
-        page = region.extractFromText(text, refreshStyles).split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
+        page = region.extractFromText(this.combinedText, refreshStyles).split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
 
         // Add blank lines to the end, to reach the minimum page length (numRows)
 
         var blankParagraph:String = rpad('', ' ', numCols);
+        combinedTextLength = page.length;
         while (page.length < numRows) page.push(blankParagraph);
 
         // Count the sigils in each line, for style lookup
@@ -213,6 +259,25 @@ class UIBody extends Body {
         }
 
         setScrollPos(Math.isNaN(currentScrollPos) ? bottomPos : currentScrollPos);
+    }
+
+    inline function swapTabsWithSpaces(input:String):String {
+        var left:String = '';
+        var right:String = input;
+
+        while (Utf8.length(right) > 0) {
+            var tabIndex:Int = right.indexOf('\t');
+            if (tabIndex == -1) {
+                left = left + right;
+                right = '';
+            } else {
+                left = left + right.substr(0, tabIndex) + '    ';
+                right = right.substr(tabIndex, right.length);
+                right = Utf8.sub(right, 1, Utf8.length(right));
+            }
+        }
+
+        return left;
     }
 
     inline function reorderGlyphs():Void {
@@ -322,11 +387,40 @@ class UIBody extends Body {
                     }
                 }
             case KEYBOARD(type, key, char, shift, alt, ctrl):
-                if (type == KEY_DOWN) {
-                    if (key == 8) {
-                        // delete command
-                    } else if (char > 0) {
-                        pendingString += String.fromCharCode(char);
+                if (type == KEY_DOWN || type == KEY_REPEAT) {
+                    switch (key) {
+                        case Keyboard.BACKSPACE:
+                            // delete command
+                            if (systemInput.length > 0) {
+                                var lim:Int = -1;
+
+                                if (ctrl) lim = 0;
+                                else if (alt) lim = systemInput.lastIndexOf(' ');
+                                else lim = systemInput.length - 1;
+
+                                if (lim == -1) lim = 0;
+
+                                systemInput = systemInput.substr(0, lim);
+                            }
+                            dirty = true;
+                        case Keyboard.ENTER:
+                            blurb += systemOutput + prompt + systemInput;
+                            if (systemInput.length == 0) systemOutput = '\n';
+                            else systemOutput = '\n' + interpret(systemInput) + '\n';
+                            systemInput = '';
+                            dirty = true;
+                        case Keyboard.ESCAPE:
+                            if (systemInput.length > 0) {
+                                dirty = true;
+                                systemInput = '';
+                            }
+                        case Keyboard.RIGHT:
+                            if (type == KEY_DOWN) trace("Auto complete");
+                        case _:
+                            if (char > 0) {
+                                systemInput += String.fromCharCode(char);
+                                dirty = true;
+                            }
                     }
                 }
         }
@@ -341,7 +435,10 @@ class UIBody extends Body {
 
     inline function get_numLines():Int { return page.length; }
 
-    inline function get_numScrollPositions():Int { return page.length - numRows + 1; }
+    inline function get_numScrollPositions():Int {
+        return combinedTextLength < numRowsForLayout ? 1 : combinedTextLength - numRowsForLayout + 1;
+    }
+
     inline function get_bottomPos():Float { return numScrollPositions - 1; }
 
     inline function getScreenDPI():Float {

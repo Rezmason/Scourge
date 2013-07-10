@@ -1,10 +1,5 @@
 package net.rezmason.scourge.textview.text;
 
-import haxe.Utf8;
-import net.rezmason.scourge.textview.text.Sigil.*;
-
-using Lambda;
-
 class TextRegion {
 
     var stylesByIndex:Array<Style>;

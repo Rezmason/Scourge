@@ -18,7 +18,7 @@ class StyleSet {
         defaultStyle.flatten();
     }
 
-    public inline function extract(input:String, bucket:Array<Style>, refreshStyles:Bool = false):String {
+    public inline function extract(input:String, bucket:Array<Style> = null, refreshStyles:Bool = false):String {
 
         refreshStyles = refreshStyles || allStyles == null;
 
@@ -61,7 +61,8 @@ class StyleSet {
 
                 var endIndex:Int = right.indexOf('}');
                 if (endIndex != -1) {
-                    bucket.push(makeStyle(styleType, right.substr(0, endIndex + 1)));
+                    var style:Style = makeStyle(styleType, right.substr(0, endIndex + 1));
+                    if (bucket != null) bucket.push(style);
                     right = right.substr(endIndex, right.length);
                     right = Utf8.sub(right, 1, Utf8.length(right));
                 }
@@ -71,13 +72,16 @@ class StyleSet {
         }
 
         allStyles.push(defaultStyle);
-        bucket.unshift(defaultStyle);
+        if (bucket != null) bucket.unshift(defaultStyle);
         flatten();
+
+        // trace('${newStyles.length} styles created.');
 
         return left + right;
     }
 
     public inline function getStyleByMouseID(id:Int):Style return allStyles[id];
+    public inline function getStyleByName(name:String):Style return stylesByName[name];
     public inline function removeAllGlyphs():Void  for (style in allStyles) style.removeAllGlyphs();
     public inline function updateGlyphs(delta:Float):Void for (style in allStyles) style.updateGlyphs(delta);
 
@@ -118,7 +122,10 @@ class StyleSet {
         input = Utf8.sub(input, 0, Utf8.length(input) - 1); // Remove trailing '}'
 
         var name:String = input.indexOf(':') == -1 ? input : StyleUtils.parseName(input);
-        if (name == null) name = 'style${allStyles.length}';
+        if (name == null) {
+            // name = 'style${allStyles.length}';
+            throw 'Style declaration must include name, chief: ( $input )';
+        }
 
         var style:Style = stylesByName[name];
         if (style == null) {

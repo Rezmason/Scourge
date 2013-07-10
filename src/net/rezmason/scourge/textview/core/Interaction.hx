@@ -22,5 +22,6 @@ enum MouseInteractionType {
 
 enum KeyboardInteractionType {
     KEY_DOWN;
+    KEY_REPEAT;
     KEY_UP;
 }

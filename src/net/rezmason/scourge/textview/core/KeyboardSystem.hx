@@ -30,19 +30,13 @@ class KeyboardSystem {
     }
 
     function onKeyDown(event:KeyboardEvent):Void {
-        var keyDown:Null<Bool> = keysDown[event.keyCode];
-        if (keyDown != true) {
-            keysDown[event.keyCode]  = true;
-            sendInteraction(event, KEY_DOWN);
-        }
+        sendInteraction(event, keysDown[event.keyCode] ? KEY_REPEAT : KEY_DOWN);
+        keysDown[event.keyCode] = true;
     }
 
     function onKeyUp(event:KeyboardEvent):Void {
-        var keyDown:Null<Bool> = keysDown[event.keyCode];
-        if (keyDown != false) {
-            keysDown[event.keyCode]  = false;
-            sendInteraction(event, KEY_UP);
-        }
+        sendInteraction(event, KEY_UP);
+        keysDown[event.keyCode] = false;
     }
 
     inline function sendInteraction(event:KeyboardEvent, type:KeyboardInteractionType):Void {

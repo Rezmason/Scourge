@@ -1,6 +1,5 @@
 package net.rezmason.scourge.textview;
 
-import flash.display.Sprite;
 import flash.display.Stage;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -9,6 +8,7 @@ import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import flash.utils.Timer;
+
 import net.rezmason.scourge.textview.core.*;
 import net.rezmason.scourge.textview.rendermethods.*;
 import net.rezmason.gl.utils.UtilitySet;
@@ -28,10 +28,6 @@ class TextDemo {
     var updateTimer:Timer;
     var lastTimeStamp:Float;
 
-    var text:String;
-    var prompt:String;
-    var caret:String;
-
     var fonts:Map<String, FlatFont>;
 
     var utils:UtilitySet;
@@ -50,22 +46,10 @@ class TextDemo {
     var testBody:TestBody;
     var uiBody:UIBody;
 
-    public function new(stage:Stage, fonts:Map<String, FlatFont>, text:String):Void {
+    public function new(stage:Stage, fonts:Map<String, FlatFont>):Void {
         active = false;
         this.stage = stage;
         this.fonts = fonts;
-        this.text = text;
-        prompt =
-            '§{name:br1,p:0,s:1.0}' +
-            '§{name:br2,p:-0.04,s:1.2}' +
-            '∂{name:breathe,period:3.5,frames:[br1,br2,br1],r:1,g:0,b:1}' +
-            'Ω_rezmason§{} => ';
-
-        caret =
-            '§{name:caret1,r:1,g:1,b:1}' +
-            '§{name:caret2,r:0,g:0,b:0}' +
-            '∂{name:caret,period:1,frames:[caret1,caret2],i:1} §{}';
-
         utils = new UtilitySet(stage, onCreate);
     }
 
@@ -109,16 +93,12 @@ class TextDemo {
         /**/
 
         //*
-        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures['full'], mouseSystem.invalidate);
+        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures['full'], mouseSystem.invalidate, interpretCommand);
         bodies.push(uiBody);
-
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
         uiRect.inflate(-0.025, -0.1);
-
-        // var uiRect:Rectangle = new Rectangle(0, 0, 1, 1);
-
+        // uiRect = new Rectangle(0, 0, 1, 1);
         views.push({body:uiBody, rect:uiRect});
-        uiBody.updateText(text + prompt + caret);
         /**/
 
         /*
@@ -239,6 +219,18 @@ class TextDemo {
     function spinBody(body:Body, numX:Float, numY:Float):Void {
         body.transform.appendRotation(-numX * 360 - 180     , Vector3D.Z_AXIS);
         body.transform.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
+    }
+
+    function interpretCommand(input:String):String {
+        var elements:Array<String> = input.split(' ');
+        switch (elements[0]) {
+            case 'demo':
+                trace(elements[1]);
+                return 'Demo function set to ${elements[1]}';
+            case _:
+                return 'Unknown command: \'${elements[0]}\'';
+        }
+        return '';
     }
 
     function interact(bodyID:Int, glyphID:Int, interaction:Interaction):Void {
