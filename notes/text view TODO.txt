@@ -1,8 +1,9 @@
 UI object
 
-    Migrate lots of UIBody stuff into TextRegion
-        UIBody should just be a Body that renders styled text
-        Talk to someone about this stuff
+    Migrate lots of UIBody stuff into UIText
+        updateDirtyText isn't updating at the right time
+
+    Defer mouse system update until first mouse event after resize/init
 
     Styles we need
         for each player plus white,
