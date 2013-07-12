@@ -12,12 +12,10 @@ import net.rezmason.scourge.textview.text.Sigil.STYLE;
 import net.rezmason.scourge.textview.text.Style;
 import net.rezmason.scourge.textview.text.StyleSet;
 
-@:allow(net.rezmason.scourge.textview.UIBody)
 class UIText {
 
     var numRows:Int;
     var numCols:Int;
-    var numRowsForLayout:Int;
 
     inline static var LINE_TOKEN:String = '¬¬¬';
 
@@ -46,14 +44,13 @@ class UIText {
 
         numRows = 0;
         numCols = 0;
-        numRowsForLayout = 0;
 
         // blurb = [TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n");
         // blurb = Assets.getText("assets/not plus.txt");
         // blurb = Assets.getText("assets/enterprise.txt");
         // blurb = Assets.getText("assets/acid2.txt");
         blurb = TestStrings.STYLED_TEXT;
-        // blurb = "One. §{i:1}Two§{}.";
+        // blurb = "One. §{i:1}Two§{}.";x
 
         styles.extract(TestStrings.BREATHING_PROMPT_STYLE);
         styles.extract(TestStrings.CARET_STYLE);
@@ -73,19 +70,18 @@ class UIText {
         return stylesByIndex[index] != null ? stylesByIndex[index] : styles.defaultStyle;
     }
 
-    public inline function extractFromText(input:String, refreshStyles:Bool = false):String {
+    inline function extractFromText(input:String, refreshStyles:Bool = false):String {
         stylesByIndex = [];
         return styles.extract(input, stylesByIndex, refreshStyles);
     }
 
-    function adjustLayout(numRows:Int, numCols:Int, numRowsForLayout:Int):Void {
+    public function adjustLayout(numRows:Int, numCols:Int):Void {
         this.numRows = numRows;
         this.numCols = numCols;
-        this.numRowsForLayout = numRowsForLayout;
         this.textIsDirty = true;
     }
 
-    function updateDirtyText(force:Bool = false):Bool {
+    public function updateDirtyText(force:Bool = false):Bool {
 
         var updating:Bool = force || textIsDirty;
 
@@ -124,15 +120,15 @@ class UIText {
         return updating;
     }
 
-    function resetStyledGlyphs():Void styles.removeAllGlyphs();
+    public function resetStyledGlyphs():Void styles.removeAllGlyphs();
 
-    function updateStyledGlyphs(delta:Float):Void styles.updateGlyphs(delta);
+    public function updateStyledGlyphs(delta:Float):Void styles.updateGlyphs(delta);
 
-    function setText(text:String):Void blurb = text;
+    public function setText(text:String):Void blurb = text;
 
-    function setPrompt(text:String):Void prompt = text;
+    public function setPrompt(text:String):Void prompt = text;
 
-    function setCaret(text:String):Void caret = '§{caret}$text§{}';
+    public function setCaret(text:String):Void caret = '§{caret}$text§{}';
 
     inline function padLine(line:String):String {
 
@@ -194,7 +190,7 @@ class UIText {
         return wrappedLines.join(LINE_TOKEN);
     }
 
-    function interact(id:Int, interaction:Interaction):Void {
+    public function interact(id:Int, interaction:Interaction):Void {
         switch (interaction) {
             case KEYBOARD(type, key, char, shift, alt, ctrl):
                 if (type == KEY_DOWN || type == KEY_REPEAT) {
@@ -244,9 +240,9 @@ class UIText {
         }
     }
 
-    function getPageSegment(index:Int):Array<String> return page.slice(index, index + numRows);
+    public function getPageSegment(index:Int):Array<String> return page.slice(index, index + numRows);
 
-    function getLineStyleIndex(index:Int):Int return lineStyleIndices[index];
+    public function getLineStyleIndex(index:Int):Int return lineStyleIndices[index];
 
     inline function swapTabsWithSpaces(input:String):String {
         var left:String = '';
@@ -275,8 +271,8 @@ class UIText {
     }
 
     inline function numScrollPositions():Int {
-        return combinedTextLength < numRowsForLayout ? 1 : combinedTextLength - numRowsForLayout + 1;
+        return combinedTextLength < (numRows - 1) ? 1 : combinedTextLength - (numRows - 1) + 1;
     }
 
-    inline function bottomPos():Float return numScrollPositions() - 1;
+    public inline function bottomPos():Float return numScrollPositions() - 1;
 }

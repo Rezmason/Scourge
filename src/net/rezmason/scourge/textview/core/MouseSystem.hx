@@ -71,12 +71,9 @@ class MouseSystem {
             this.height = height;
 
             if (bitmapData != null) bitmapData.dispose();
-            bitmapData = new BitmapData(width, height, false, 0xFF00FF);
-            _view.bitmap.bitmapData = bitmapData;
-
-            outputBuffer.resize(width, height);
-
-            data = drawUtil.createReadbackData(width * height * 4);
+            bitmapData = null;
+            _view.bitmap.bitmapData = null;
+            data = null;
 
             invalidate();
         }
@@ -151,9 +148,18 @@ class MouseSystem {
     function onMouseMove(event:MouseEvent):Void {
 
         if (invalid) {
+            if (bitmapData == null) {
+                bitmapData = new BitmapData(width, height, false, 0xFF00FF);
+                _view.bitmap.bitmapData = bitmapData;
+            }
+
+            outputBuffer.resize(width, height);
+            if (data == null) data = drawUtil.createReadbackData(width * height * 4);
+
             update();
             drawUtil.readBack(outputBuffer, width, height, data);
             // fartBD();
+
             invalid = false;
         }
 

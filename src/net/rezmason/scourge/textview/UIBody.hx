@@ -38,11 +38,10 @@ class UIBody extends Body {
 
     var numRows:Int;
     var numCols:Int;
-    var numRowsForLayout:Int;
 
     var uiText:UIText;
 
-    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, interpret:String->String):Void {
+    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, uiText:UIText):Void {
 
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
@@ -60,7 +59,6 @@ class UIBody extends Body {
 
         numRows = 0;
         numCols = 0;
-        numRowsForLayout = 0;
 
         super(id, bufferUtil, numGlyphs, glyphTexture, redrawHitAreas);
 
@@ -68,7 +66,7 @@ class UIBody extends Body {
 
         for (ike in 0...numGlyphs) glyphs[ike].set_paint(id << 16);
 
-        uiText = new UIText(interpret);
+        this.uiText = uiText;
     }
 
     override public function update(delta:Float):Void {
@@ -89,20 +87,18 @@ class UIBody extends Body {
         super.adjustLayout(stageWidth, stageHeight, rect);
         rect = sanitizeLayoutRect(stageWidth, stageHeight, rect);
 
-        numRows = Std.int(rect.height * stageHeight / glyphHeightInPixels);
-        numRowsForLayout = numRows;
-        numRows++;
+        numRows = Std.int(rect.height * stageHeight / glyphHeightInPixels) + 1;
 
         numCols = Std.int(rect.width  * stageWidth  / glyphWidthInPixels );
-        setGlyphScale(rect.width / numCols * 2, rect.height / numRowsForLayout * 2);
+        setGlyphScale(rect.width / numCols * 2, rect.height / (numRows - 1) * 2);
 
         lastRedrawPos = Math.NaN;
         reorderGlyphs();
 
-        uiText.adjustLayout(numRows, numCols, numRowsForLayout);
+        uiText.adjustLayout(numRows, numCols);
     }
 
-    public function glideTextToPos(pos:Float):Void {
+    function glideTextToPos(pos:Float):Void {
         gliding = true;
         glideGoal = Math.round(Math.max(0, Math.min(uiText.bottomPos(), pos)));
     }
@@ -115,7 +111,7 @@ class UIBody extends Body {
                         case DROP, CLICK:
                             dragging = false;
                         case ENTER, EXIT, MOVE:
-                            glideTextToPos(dragStartPos + (dragStartY - y) * numRowsForLayout);
+                            glideTextToPos(dragStartPos + (dragStartY - y) * (numRows - 1));
                         case _:
                     }
                 } else if (id == 0) {
@@ -136,7 +132,7 @@ class UIBody extends Body {
         for (row in 0...numRows) {
             for (col in 0...numCols) {
                 var x:Float = ((col + 0.5) / numCols - 0.5);
-                var y:Float = ((row + 0.5) / numRowsForLayout - 0.5);
+                var y:Float = ((row + 0.5) / (numRows - 1) - 0.5);
                 var glyph:Glyph = glyphs[id++];
                 glyph.set_pos(x, y, 0);
             }
@@ -181,7 +177,7 @@ class UIBody extends Body {
 
         transform.identity();
         transform.append(baseTransform);
-        transform.appendTranslation(0, (currentScrollPos - scrollStartIndex) / numRowsForLayout, 0);
+        transform.appendTranslation(0, (currentScrollPos - scrollStartIndex) / (numRows - 1), 0);
     }
 
     inline function taperScrollEdges():Void {

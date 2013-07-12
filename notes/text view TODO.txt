@@ -1,9 +1,7 @@
 UI object
 
-    Migrate lots of UIBody stuff into UIText
-        updateDirtyText isn't updating at the right time
-
-    Defer mouse system update until first mouse event after resize/init
+    Clean up UIText and UIBody
+        How do these two interact?
 
     Styles we need
         for each player plus white,

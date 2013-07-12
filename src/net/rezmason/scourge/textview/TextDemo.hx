@@ -93,7 +93,7 @@ class TextDemo {
         /**/
 
         //*
-        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures['full'], mouseSystem.invalidate, interpretCommand);
+        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures['full'], mouseSystem.invalidate, new UIText(interpretCommand));
         bodies.push(uiBody);
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
         uiRect.inflate(-0.025, -0.1);
