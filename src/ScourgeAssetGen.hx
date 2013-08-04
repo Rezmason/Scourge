@@ -52,7 +52,7 @@ class ScourgeAssetGen {
 
             var bytesOutput:BytesOutput = new BytesOutput();
             var writer:Writer = new Writer(bytesOutput);
-            var data = Tools.build32BE(fontBD.width, fontBD.height, Bytes.ofData(fontBD.getPixels(fontBD.rect)));
+            var data = Tools.build32ARGB(fontBD.width, fontBD.height, Bytes.ofData(fontBD.getPixels(fontBD.rect)));
             writer.write(data);
 
             fileRef = new FileReference();

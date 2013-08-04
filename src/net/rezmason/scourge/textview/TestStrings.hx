@@ -38,8 +38,9 @@ class TestStrings {
     'µ{button}  BUTTON TIME AGAIN  §{}\n' +
     '§{name:broken, r:hello}ABCD§{}';
 
-    public inline static var CARET_STYLE:String = '§{name:_c1,r:1,g:1,b:1}§{name:_c2,r:0,g:0,b:0}∂{name:caret,period:1,frames:[_c1,_c2],i:0}';
+    public inline static var CARET_STYLE:String = '§{name:_c1,i:1}§{name:_c2,i:0}∂{name:caret,period:1,frames:[_c1,_c2]}';
     public inline static var BREATHING_PROMPT_STYLE:String = '§{name:_br1,p:0,s:1.0}§{name:_br2,p:-0.04,s:1.2}∂{name:breathingprompt,period:3.5,frames:[_br1,_br2,_br1],r:1,g:0,b:1}';
+    public inline static var INPUT_STYLE:String = '§{name:hint1,r:0.6,g:0.6,b:0.6,s:0.7}§{name:valid1,p:0.01}§{name:invalid1,p:-0.01}«{name:input1, hint:hint1, valid:valid1, invalid:invalid1, period:1}';
 
     public inline static var SYMBOLS:String = '<>[]{}-=!@#$%^*()_+';
     public inline static var WEIRD_SYMBOLS:String = '¤¬ÎøΔΩ•◊';

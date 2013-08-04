@@ -26,6 +26,10 @@
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 
 	<haxelib name="openfl" />
+
+	<set name="custom-html5-backend" />
+	<haxelib name="openfl-html5-revised" if="html5" />
+
 	<!-- <haxelib name="hxsl" /> -->
 	<!-- <haxelib name="actuate" /> -->
 

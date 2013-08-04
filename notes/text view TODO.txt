@@ -1,33 +1,3 @@
-UI object
-
-    Clean up UIText and UIBody
-        How do these two interact?
-
-    Styles we need
-        for each player plus white,
-            Button style
-            "Stale button" style
-
-    Stale region - not interactive, no dynamic styles, appended when command is executed, cleared when clear is executed
-    Active region - interactive, dynamic styles, fully replaced when command is executed
-    Prompt region - interactive, dynamic styles, typed into and everything, cleared when cancel is executed
-
-    Defer text changes until after dragging
-
-    InputStyle extends DynamicStyle
-        «
-        hint, valid, invalid, transitionSpeed
-        Make the acid2 "Hello World!" a field
-            Hitting enter should trace the field's contents
-
-    Solidify text update behavior
-        If:
-            the user WAS at the bottom, or
-            the user IS past the bottom, or
-            the new text IS the result of interaction,
-        -scroll to the new bottom
-    Scroll indicator (looks like meterstick)
-
 Board object
     Move rotation logic into TestBody before cloning
         Click'n'drag
@@ -39,8 +9,26 @@ Board object
     Dialer
         Dispatches interactions
 
-Note: debugging webgl target with the console open slows it down
-    Use Chrome instead
+Command interpreter
+
+UI object
+
+    InputStyle use
+        UIText keeps track of "input spans"
+            The indices of the open tag, the body text and the close tag
+        Clicking on an input should move the caret
+            Text insertion should be as easy as appending to the input span's text value and recompositing
+        Clicking past the line should move the caret to the end of the line
+            We need to guarantee that there is always something to click here
+        Option-left and option-right should move the caret as well
+
+    Solidify text update behavior
+        If:
+            the user WAS at the bottom, or
+            the user IS past the bottom, or
+            the new text IS the result of interaction,
+        -scroll to the new bottom
+    Scroll indicator (looks like meterstick)
 
 OpenFL native targets
     resizing window and calling GL.drawElements crashes

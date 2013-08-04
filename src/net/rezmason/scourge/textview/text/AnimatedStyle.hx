@@ -8,6 +8,7 @@ class AnimatedStyle extends DynamicStyle {
     var period:Null<Float>;
     var phase:Null<Float>;
     var easeFunc:Float->Float;
+    var playing:Bool;
 
     static var animationFields:Array<String> = ['period', 'phase', 'frames'];
 
@@ -15,9 +16,20 @@ class AnimatedStyle extends DynamicStyle {
         period = null;
         phase = null;
         time = 0;
+        playing = true;
         easeFunc = Quad.easeInOut;
         super(name, basis, initValues, mouseID);
         for (field in animationFields) values[field] = Reflect.field(initValues, field);
+    }
+
+    public function start(time:Float = 0):Void {
+        this.time = time % period;
+        playing = true;
+    }
+
+    public function stop():Void {
+        this.time = 0;
+        playing = false;
     }
 
     override public function inherit(parent:Style):Void {
@@ -27,7 +39,9 @@ class AnimatedStyle extends DynamicStyle {
 
     override public function updateGlyphs(delta:Float):Void {
 
-        time = (time + delta) % period;
+        if (playing) {
+            time = (time + delta) % period;
+        }
 
         var numFrames:Int = stateStyles.length;
         if (numFrames < 1) numFrames = 1;

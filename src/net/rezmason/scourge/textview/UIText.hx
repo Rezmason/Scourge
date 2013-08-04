@@ -29,16 +29,18 @@ class UIText {
 
     var blurb:String;
     var prompt:String;
-    var caret:String;
+    var caretStart:String;
+    var caretEnd:String;
+    var caretIndex:Int;
     var systemInput:String;
     var systemOutput:String;
     var textIsDirty:Bool;
     var caretStyle:AnimatedStyle;
-    var interpret:String->String;
+    var interpretCommand:String->Bool->Command;
 
-    public function new(interpret:String->String):Void {
+    public function new(interpretCommand:String->Bool->Command):Void {
 
-        this.interpret = interpret;
+        this.interpretCommand = interpretCommand;
 
         styles = new StyleSet();
 
@@ -54,11 +56,14 @@ class UIText {
 
         styles.extract(TestStrings.BREATHING_PROMPT_STYLE);
         styles.extract(TestStrings.CARET_STYLE);
+        styles.extract(TestStrings.INPUT_STYLE);
 
         caretStyle = cast styles.getStyleByName('caret');
 
         prompt = '§{breathingprompt}Ω_rezmason§{} => §{}';
-        setCaret('|');
+        caretStart = '§{caret}';
+        caretEnd = '§{}';
+        caretIndex = 0;
         systemInput = '';
         systemOutput = '\n';
         textIsDirty = false;
@@ -88,7 +93,16 @@ class UIText {
         if (updating) {
             if (!force) textIsDirty = false;
 
-            combinedText = blurb + systemOutput + prompt + systemInput + caret;
+            var left:String = Utf8.sub(systemInput, 0, caretIndex);
+            var mid:String = Utf8.sub(systemInput, caretIndex, 1);
+            var right:String = Utf8.sub(systemInput, caretIndex + 1, Utf8.length(systemInput));
+
+            if (mid == '') mid = ' ';
+
+            if (mid == ' ') caretStyle.start();
+            else caretStyle.stop();
+
+            combinedText = blurb + systemOutput + prompt + left + caretStart + mid + caretEnd + right;
             if (combinedText == null) combinedText = '';
             this.combinedText = swapTabsWithSpaces(combinedText);
 
@@ -113,8 +127,6 @@ class UIText {
                     lineStyleIndices.push(lineStyleIndex);
                 }
             }
-
-            caretStyle.time = 0;
         }
 
         return updating;
@@ -127,8 +139,6 @@ class UIText {
     public function setText(text:String):Void blurb = text;
 
     public function setPrompt(text:String):Void prompt = text;
-
-    public function setCaret(text:String):Void caret = '§{caret}$text§{}';
 
     inline function padLine(line:String):String {
 
@@ -197,34 +207,65 @@ class UIText {
                     switch (key) {
                         case Keyboard.BACKSPACE:
                             // delete command
-                            if (systemInput.length > 0) {
+
+                            var left:String = Utf8.sub(systemInput, 0, caretIndex);
+                            var right:String = Utf8.sub(systemInput, caretIndex, Utf8.length(systemInput));
+
+                            if (Utf8.length(left) > 0) {
                                 var lim:Int = -1;
 
                                 if (ctrl) lim = 0;
-                                else if (alt) lim = systemInput.lastIndexOf(' ');
-                                else lim = systemInput.length - 1;
+                                // TODO: alt-delete
+                                else lim = Utf8.length(left) - 1;
 
                                 if (lim == -1) lim = 0;
 
-                                systemInput = systemInput.substr(0, lim);
+                                left = Utf8.sub(left, 0, lim);
+                                caretIndex = lim;
                             }
+
+                            systemInput = left + right;
                             textIsDirty = true;
+
                         case Keyboard.ENTER:
                             blurb += systemOutput + prompt + systemInput;
-                            if (systemInput.length == 0) systemOutput = '\n';
-                            else systemOutput = '\n' + interpret(systemInput) + '\n';
+                            if (Utf8.length(systemInput) == 0) systemOutput = '\n';
+                            else systemOutput = '\n' + printCommand(interpretCommand(systemInput, false));
                             systemInput = '';
+                            caretIndex = 0;
                             textIsDirty = true;
                         case Keyboard.ESCAPE:
-                            if (systemInput.length > 0) {
+                            if (Utf8.length(systemInput) > 0) {
                                 textIsDirty = true;
                                 systemInput = '';
+                                caretIndex = 0;
                             }
+                        case Keyboard.LEFT:
+                            caretIndex--;
+                            if (caretIndex < 0) {
+                                caretIndex = 0;
+                            }
+                            textIsDirty = true;
+                            // TODO: alt-left
+                            // TODO: ctrl-left
+                            // TODO: input spans
                         case Keyboard.RIGHT:
-                            if (type == KEY_DOWN) trace("Auto complete");
+                            caretIndex++;
+                            if (caretIndex > Utf8.length(systemInput)) {
+                                caretIndex = Utf8.length(systemInput);
+                            }
+                            textIsDirty = true;
+                            // TODO: alt-right
+                            // TODO: ctrl-left
+                            // TODO: input spans
                         case _:
+                            var left:String = Utf8.sub(systemInput, 0, caretIndex);
+                            var right:String = Utf8.sub(systemInput, caretIndex, Utf8.length(systemInput));
+
                             if (char > 0) {
-                                systemInput += String.fromCharCode(char);
+                                left += String.fromCharCode(char);
+                                caretIndex++;
+                                systemInput = left + right;
                                 textIsDirty = true;
                             }
                     }
@@ -272,6 +313,21 @@ class UIText {
 
     inline function numScrollPositions():Int {
         return combinedTextLength < (numRows - 1) ? 1 : combinedTextLength - (numRows - 1) + 1;
+    }
+
+    inline function printCommand(command:Command):String {
+        var str:String = null;
+        switch (command) {
+            case EMPTY: str = '';
+            case ERROR(message): str = message + '\n';
+            case COMMIT(message): str = message + '\n';
+            case CHAT(message): str = message + '\n';
+            case LIST(filteredMoves):
+                if (filteredMoves.length == 0) str = 'No moves available. \n';
+                else str = '${filteredMoves.length} moves available:\n ${filteredMoves.join("\n")}\n';
+        }
+
+        return str;
     }
 
     public inline function bottomPos():Float return numScrollPositions() - 1;
