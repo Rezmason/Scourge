@@ -51,24 +51,12 @@ class TextDemo {
     var testBody:TestBody;
     var uiBody:UIBody;
 
-    public function new(stage:Stage, fonts:Map<String, FlatFont>):Void {
+    public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         active = false;
+        this.utils = utils;
         this.stage = stage;
         this.fonts = fonts;
-        utils = new UtilitySet(stage, onCreate); // onLab, onBasicSetup
-    }
 
-    function onLab():Void {
-        var fontTexture:GlyphTexture = new GlyphTexture(utils.textureUtil, fonts['full']);
-        utils.drawUtil.addRenderCall(new Lab(utils, fontTexture).render);
-    }
-
-    function onBasicSetup():Void {
-        var fontTexture:GlyphTexture = new GlyphTexture(utils.textureUtil, fonts['full']);
-        utils.drawUtil.addRenderCall(new BasicSetup(utils, fontTexture).render);
-    }
-
-    function onCreate():Void {
         makeFontTextures();
 
         prettyMethod = new PrettyMethod();

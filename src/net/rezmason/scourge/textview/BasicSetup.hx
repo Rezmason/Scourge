@@ -1,19 +1,19 @@
 package net.rezmason.scourge.textview;
 
-import flash.Lib;
 import flash.display.Stage;
 import flash.events.Event;
 import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 
+import net.rezmason.gl.OutputBuffer;
+import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.RenderMethod;
 import net.rezmason.scourge.textview.core.Renderer;
 import net.rezmason.scourge.textview.rendermethods.PrettyMethod;
-import net.rezmason.gl.utils.UtilitySet;
-import net.rezmason.gl.OutputBuffer;
+import net.rezmason.utils.FlatFont;
 
 class BasicSetup {
 
@@ -35,11 +35,10 @@ class BasicSetup {
 
     var t:Float;
 
-    public function new(utils:UtilitySet, glyphTexture:GlyphTexture):Void {
+    public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
-        this.glyphTexture = glyphTexture;
-
-        stage = Lib.current.stage;
+        this.stage = stage;
+        this.glyphTexture = new GlyphTexture(utils.textureUtil, fonts['full']);
 
         prettyMethod = new PrettyMethod();
         prettyMethod.load(utils.programUtil, initScene);
@@ -52,9 +51,10 @@ class BasicSetup {
         bodyMat = body.transform;
         onResize();
         t = 0;
+        utils.drawUtil.addRenderCall(onRender);
     }
 
-    public function render(width:Int, height:Int):Void {
+    function onRender(width:Int, height:Int):Void {
 
         update();
 

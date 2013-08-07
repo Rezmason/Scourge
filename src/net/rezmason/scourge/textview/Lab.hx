@@ -1,6 +1,5 @@
 package net.rezmason.scourge.textview;
 
-import flash.Lib;
 import flash.Vector;
 import flash.display.Stage;
 import flash.geom.Matrix3D;
@@ -10,6 +9,7 @@ import net.rezmason.gl.utils.*;
 import net.rezmason.gl.*;
 import net.rezmason.gl.Types;
 import net.rezmason.scourge.textview.core.*;
+import net.rezmason.utils.FlatFont;
 
 class Lab {
 
@@ -91,15 +91,15 @@ class Lab {
     var indexBuffer:IndexBuffer;
 
     var utils:UtilitySet;
+    var stage:Stage;
 
     var t:Float;
     var segment:BodySegment;
 
-    public function new(utils:UtilitySet, glyphTexture:GlyphTexture):Void {
+    public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
-        this.glyphTexture = glyphTexture;
-
-        var stage:Stage = Lib.current.stage;
+        this.stage = stage;
+        this.glyphTexture = new GlyphTexture(utils.textureUtil, fonts['full']);
 
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         mainOutputBuffer.resize(stage.stageWidth, stage.stageHeight);
@@ -192,6 +192,8 @@ class Lab {
         aColor = utils.programUtil.getAttribsLocation(program, 'aColor');
         aUV = utils.programUtil.getAttribsLocation(program, 'aUV');
         aVid = utils.programUtil.getAttribsLocation(program, 'aVid');
+
+        utils.drawUtil.addRenderCall(onRender);
     }
 
     function bonk():Void {
@@ -209,7 +211,7 @@ class Lab {
         glyphMat.appendScale(scale, scale, 1);
     }
 
-    public function render(w:Int, h:Int):Void {
+    function onRender(w:Int, h:Int):Void {
 
         if (program == null) return;
 
