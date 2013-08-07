@@ -33,6 +33,7 @@ class Body {
         this.id = id;
         this.bufferUtil = bufferUtil;
         this.redrawHitAreas = redrawHitAreas;
+        if (this.redrawHitAreas == null) redrawHitAreas = function() {};
         letterbox = true;
         catchMouseInRect = true;
         this.glyphTexture = glyphTexture;

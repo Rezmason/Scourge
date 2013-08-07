@@ -19,13 +19,25 @@ class RenderMethod {
     var vertShader:String;
     var fragShader:String;
 
-    public function new(programUtil:ProgramUtil):Void {
+    var onLoaded:Void->Void;
+
+    public function new():Void {}
+
+    public function load(programUtil:ProgramUtil, onLoaded:Void->Void):Void {
         this.programUtil = programUtil;
+        this.onLoaded = onLoaded;
 
         init();
         composeShaders();
-        program = programUtil.createProgram(vertShader, fragShader);
+
+        programUtil.loadProgram(vertShader, fragShader, onProgramLoaded);
+    }
+
+    function onProgramLoaded(program:Program):Void {
+        this.program = program;
         connectToShaders();
+        this.onLoaded();
+        this.onLoaded = null;
     }
 
     public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void { }

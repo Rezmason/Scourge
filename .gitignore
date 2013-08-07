@@ -5,6 +5,6 @@ TestSuite.hx
 junk
 tables/*.n
 tables/*.json
-bin
 Export
+flash_workers/flash/haxe
 dump

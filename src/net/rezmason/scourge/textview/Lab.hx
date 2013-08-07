@@ -11,9 +11,9 @@ import net.rezmason.gl.*;
 import net.rezmason.gl.Types;
 import net.rezmason.scourge.textview.core.*;
 
-class AGALAquarium {
+class Lab {
 
-    static var fragShader:String = '
+    static var fragShader:String = #if !desktop 'precision mediump float;' + #end '
         varying vec3 vColor;
         varying vec2 vUV;
         varying float vVid;
@@ -114,23 +114,7 @@ class AGALAquarium {
 
         // Create program
 
-        program = utils.programUtil.createProgram(vertShader, fragShader);
-
-        // Connect to shader
-
-        uBodyMat = utils.programUtil.getUniformLocation(program, 'uBodyMat');
-        uCameraMat = utils.programUtil.getUniformLocation(program, 'uCameraMat');
-        uGlyphMat = utils.programUtil.getUniformLocation(program, 'uGlyphMat');
-
-        uSampler = utils.programUtil.getUniformLocation(program, 'uSampler');
-
-        aPos = utils.programUtil.getAttribsLocation(program, 'aPos');
-        aCorner = utils.programUtil.getAttribsLocation(program, 'aCorner');
-        aScale = utils.programUtil.getAttribsLocation(program, 'aScale');
-        aPop = utils.programUtil.getAttribsLocation(program, 'aPop');
-        aColor = utils.programUtil.getAttribsLocation(program, 'aColor');
-        aUV = utils.programUtil.getAttribsLocation(program, 'aUV');
-        aVid = utils.programUtil.getAttribsLocation(program, 'aVid');
+        utils.programUtil.loadProgram(vertShader, fragShader, onProgramLoaded);
 
         // Create geometry
 
@@ -190,6 +174,26 @@ class AGALAquarium {
         t = 0;
     }
 
+    function onProgramLoaded(program:Program):Void {
+        this.program = program;
+
+        // Connect to shader
+
+        uBodyMat = utils.programUtil.getUniformLocation(program, 'uBodyMat');
+        uCameraMat = utils.programUtil.getUniformLocation(program, 'uCameraMat');
+        uGlyphMat = utils.programUtil.getUniformLocation(program, 'uGlyphMat');
+
+        uSampler = utils.programUtil.getUniformLocation(program, 'uSampler');
+
+        aPos = utils.programUtil.getAttribsLocation(program, 'aPos');
+        aCorner = utils.programUtil.getAttribsLocation(program, 'aCorner');
+        aScale = utils.programUtil.getAttribsLocation(program, 'aScale');
+        aPop = utils.programUtil.getAttribsLocation(program, 'aPop');
+        aColor = utils.programUtil.getAttribsLocation(program, 'aColor');
+        aUV = utils.programUtil.getAttribsLocation(program, 'aUV');
+        aVid = utils.programUtil.getAttribsLocation(program, 'aVid');
+    }
+
     function bonk():Void {
 
     }
@@ -207,16 +211,17 @@ class AGALAquarium {
 
     public function render(w:Int, h:Int):Void {
 
+        if (program == null) return;
+
         updateTransform();
 
         utils.programUtil.setProgram(program);
         utils.programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         utils.programUtil.setDepthTest(false);
 
-
-        utils.programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat, true); // uBodyMat contains the body's matrix
-        utils.programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat, true); // uCameraMat contains the camera matrix
-        utils.programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, glyphMat, true); // uGlyphMat contains the character matrix
+        utils.programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat); // uBodyMat contains the body's matrix
+        utils.programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat); // uCameraMat contains the camera matrix
+        utils.programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, glyphMat); // uGlyphMat contains the character matrix
 
         utils.programUtil.setTextureAt(program, uSampler, glyphTexture.texture); // uSampler contains our texture
 
@@ -232,8 +237,6 @@ class AGALAquarium {
         utils.drawUtil.clear(0xFF000000);
         utils.drawUtil.drawTriangles(indexBuffer, 0, numTriangles);
         utils.drawUtil.finishOutputBuffer(mainOutputBuffer);
-
-        utils.drawUtil.removeRenderCall(render);
     }
 
     inline function makeProjection():Matrix3D {

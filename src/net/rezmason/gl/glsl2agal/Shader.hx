@@ -7,9 +7,10 @@ import flash.display3D.Context3DVertexBufferFormat;
 import flash.display3D.VertexBuffer3D;
 import flash.display3D.textures.Texture;
 import flash.geom.Matrix3D;
+import flash.utils.Endian;
 import flash.utils.ByteArray;
-import com.adobe.utils.AGALMiniAssembler;   // glsl2agal.swf
-import nme.display3D.shaders.GlslToAgal;    // agalminiassembler.swf
+
+import net.rezmason.gl.glsl2agal.Types;
 
 /**
 
@@ -32,16 +33,13 @@ class Shader {
     var varTable:Map<String, String>;
     var constTable:Map<Int, Vector<Float>>;
 
-    function new(type:Context3DProgramType, glslSource:String) {
-        this.type = type;
-        var agalInfoData:Dynamic = convertGLSLToAGAL(type, glslSource);
-        populateVarTable(agalInfoData.varnames);
-        populateConstTable(agalInfoData.consts);
-        nativeShader = assmebleAGAL(type, agalInfoData.agalasm);
-    }
-
-    inline function convertGLSLToAGAL(type:Context3DProgramType, shaderSource:String):Dynamic {
-        return haxe.JSON.Json.parse((new GlslToAgal(shaderSource, cast type)).compile());
+    function new(agal:AGALOutput) {
+        type = agal.type;
+        var json:Dynamic = agal.json;
+        populateVarTable(json.varnames);
+        populateConstTable(json.consts);
+        nativeShader = agal.nativeShader;
+        nativeShader.endian = Endian.LITTLE_ENDIAN;
     }
 
     inline function populateVarTable(sVars:Dynamic<String>):Void {
@@ -53,12 +51,6 @@ class Shader {
         constTable = new Map();
         for (name in Reflect.fields(sConsts))
             constTable[getRegisterIndex(name)] = Vector.ofArray(Reflect.field(sConsts, name));
-    }
-
-    inline function assmebleAGAL(type:Context3DProgramType, shaderSource:String):ByteArray {
-        var assembler = new AGALMiniAssembler ();
-        assembler.assemble (cast type, shaderSource);
-        return assembler.agalcode;
     }
 
     inline function setup(context3D:Context3D):Void {

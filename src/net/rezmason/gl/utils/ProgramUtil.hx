@@ -26,10 +26,10 @@ class ProgramUtil extends Util {
         ];
     #end
 
-    public inline function createProgram(vertSource:String, fragSource:String):Program {
+    public inline function loadProgram(vertSource:String, fragSource:String, onLoaded:Program->Void):Void {
 
         #if flash
-            return Program.create(context, vertSource, fragSource);
+            Program.load(context, vertSource, fragSource, onLoaded);
         #else
             var program:Program = GL.createProgram();
 
@@ -42,7 +42,7 @@ class ProgramUtil extends Util {
                 if (result != '') throw result;
             }
 
-            return program;
+            onLoaded(program);
         #end
     }
 

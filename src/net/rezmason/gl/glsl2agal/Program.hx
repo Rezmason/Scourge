@@ -1,5 +1,6 @@
 package net.rezmason.gl.glsl2agal;
 
+import openfl.Assets.getBytes;
 import flash.display3D.Context3D;
 import flash.display3D.Context3DProgramType;
 import flash.display3D.Context3DVertexBufferFormat;
@@ -7,6 +8,9 @@ import flash.display3D.Program3D;
 import flash.display3D.VertexBuffer3D;
 import flash.display3D.textures.Texture;
 import flash.geom.Matrix3D;
+
+import net.rezmason.gl.glsl2agal.Types;
+import net.rezmason.utils.TempAgency;
 
 /**
 
@@ -28,13 +32,31 @@ class Program {
     private var vertexShader:Shader;
     private var fragmentShader:Shader;
 
-    public static function create(context3D:Context3D, vertSource:String, fragSource:String):Program {
-        var program:Program = new Program(context3D);
-        program.upload(
-            new Shader(Context3DProgramType.VERTEX, vertSource),
-            new Shader(Context3DProgramType.FRAGMENT, fragSource)
-        );
-        return program;
+    static var agency:TempAgency<GLSLInput, AGALOutput> = null;
+
+    public static function load(context3D:Context3D, vertSource:String, fragSource:String, onLoaded:Program->Void):Void {
+
+        if (agency == null) agency = new TempAgency(getBytes("flash_workers/GLSL2AGALConverter.swf"));
+
+        var vertShader:Shader = null;
+        var fragShader:Shader = null;
+
+        function onWorkDone(agal:AGALOutput):Void {
+
+            var shader:Shader = new Shader(agal);
+
+            if (agal.type == Context3DProgramType.VERTEX) vertShader = shader;
+            else fragShader = shader;
+
+            if (vertShader != null && fragShader != null) {
+                var program:Program = new Program(context3D);
+                program.upload(vertShader, fragShader);
+                onLoaded(program);
+            }
+        }
+
+        agency.addWork({type:Context3DProgramType.VERTEX, source:vertSource}, onWorkDone);
+        agency.addWork({type:Context3DProgramType.FRAGMENT, source:fragSource}, onWorkDone);
     }
 
     public function new(context3D:Context3D) {

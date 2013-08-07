@@ -55,26 +55,44 @@ class TextDemo {
         active = false;
         this.stage = stage;
         this.fonts = fonts;
-        utils = new UtilitySet(stage, onCreate);
+        utils = new UtilitySet(stage, onCreate); // onLab, onBasicSetup
+    }
+
+    function onLab():Void {
+        var fontTexture:GlyphTexture = new GlyphTexture(utils.textureUtil, fonts['full']);
+        utils.drawUtil.addRenderCall(new Lab(utils, fontTexture).render);
+    }
+
+    function onBasicSetup():Void {
+        var fontTexture:GlyphTexture = new GlyphTexture(utils.textureUtil, fonts['full']);
+        utils.drawUtil.addRenderCall(new BasicSetup(utils, fontTexture).render);
     }
 
     function onCreate():Void {
         makeFontTextures();
+
+        prettyMethod = new PrettyMethod();
+        mouseMethod = new MouseMethod();
+
+        prettyMethod.load(utils.programUtil, onMethodLoaded);
+        mouseMethod.load(utils.programUtil, onMethodLoaded);
+    }
+
+    function onMethodLoaded():Void {
+        if (prettyMethod.program == null || mouseMethod.program == null) return;
+        initScene();
+    }
+
+    function initScene():Void {
         mouseSystem = new MouseSystem(utils.drawUtil, stage, renderMouse, interact);
         keyboardSystem = new KeyboardSystem(stage, interact);
         // stage.addChild(mouseSystem.view);
         renderer = new Renderer(utils.drawUtil);
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
-        prettyMethod = new PrettyMethod(utils.programUtil);
-        mouseMethod = new MouseMethod(utils.programUtil);
         updateTimer = new Timer(1000 / 30);
         makeScene();
-
         addListeners();
         onActivate();
-
-        // utils.drawUtil.addRenderCall(new HappyPlace(utils, fontTextures['full']).render);
-        // utils.drawUtil.addRenderCall(new AGALAquarium(utils, fontTextures['full']).render);
     }
 
     function makeFontTextures():Void {
