@@ -11,7 +11,7 @@
 	<haxeflag name="-swf-lib" value="flash_libs/agalminiassembler.swf" />
 	<haxedef name="haxeJSON" />
 	<haxedef name="advanced-telemetry"/>
-	<haxedef name="dce" value="full"/>
+	<haxedef name="dce" value="no"/>
 
 	<haxelib name="openfl" />
 
