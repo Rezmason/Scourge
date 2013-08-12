@@ -82,8 +82,10 @@ class GridUtils {
         for (ike in 0...sourceList.length) sourceList[ike].id = ike;
         for (node in sourceList) {
             var neighbors:Array<Null<Int>> = [];
-            for (ike in 0...node.neighbors.length)
+            for (ike in 0...node.neighbors.length) {
                 if (node.neighbors[ike] != null) neighbors[ike] = node.neighbors[ike].id;
+                else neighbors[ike] = -1;
+            }
             data.push([node.value, neighbors, node.headingOffsets]);
         }
 
@@ -100,10 +102,8 @@ class GridUtils {
             var neighbors:Array<Null<Int>> = data[ike][1];
             var headingOffsets:Array<Null<Int>> = data[ike][2];
             var node:GridNode<T> = nodes[ike];
-            for (ike in 0...neighbors.length)
-                if (neighbors[ike] != null) node.neighbors[ike] = nodes[neighbors[ike]];
-            for (ike in 0...headingOffsets.length)
-                node.headingOffsets[ike] = headingOffsets[ike];
+            for (ike in 0...neighbors.length) if (neighbors[ike] != -1) node.neighbors[ike] = nodes[neighbors[ike]];
+            for (ike in 0...headingOffsets.length) node.headingOffsets[ike] = headingOffsets[ike];
         }
 
         return nodes;
