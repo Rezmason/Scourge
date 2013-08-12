@@ -34,6 +34,7 @@ class StatePlanner {
             stateRequirements.absorb(rule.stateAspectRequirements);
             playerRequirements.absorb(rule.playerAspectRequirements);
             nodeRequirements.absorb(rule.nodeAspectRequirements);
+            // trace(Type.getClassName(Type.getClass(rule)));
         }
 
         planAspects(stateRequirements, plan.stateAspectLookup, plan.stateAspectTemplate, state.key);

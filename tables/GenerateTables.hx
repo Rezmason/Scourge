@@ -20,6 +20,6 @@ class GenerateTables {
             pieceGroupsBySize.push(PieceGenerator.generateGroups(size + 1));
         }
 
-        File.write("./tables/pieces.json", false).writeString(pieceGroupsBySize.stringify());
+        File.write("./tables/pieces.json.txt", false).writeString(pieceGroupsBySize.stringify());
     }
 }

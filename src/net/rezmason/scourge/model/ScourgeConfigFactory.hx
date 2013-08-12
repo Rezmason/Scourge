@@ -8,6 +8,7 @@ import net.rezmason.utils.Siphon;
 import net.rezmason.scourge.model.aspects.BiteAspect;
 import net.rezmason.scourge.model.aspects.SwapAspect;
 import net.rezmason.scourge.model.Pieces;
+import net.rezmason.scourge.tools.Resource;
 
 typedef ReplenishableConfig = { prop:AspectProperty, amount:Int, period:Int, maxAmount:Int, }
 
@@ -29,6 +30,9 @@ class ScourgeConfigFactory {
     }
 
     public static function makeDefaultConfig():ScourgeConfig {
+
+        var pieces:Pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
+
         return {
             allowAllPieces:false,
             allowFlipping:false,
@@ -66,7 +70,8 @@ class ScourgeConfigFactory {
             maxBites:10,
             maxSkips:3,
             initGrid:null,
-            pieceTableIDs:Pieces.getAllPieceIDsOfSize(4),
+            pieces:pieces,
+            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
         };
     }
 
@@ -170,6 +175,7 @@ class ScourgeConfigFactory {
             allowAll:config.allowAllPieces,
             hatSize:config.pieceHatSize,
             randomFunction:randomFunction,
+            pieces:config.pieces,
         };
     }
 
@@ -182,6 +188,7 @@ class ScourgeConfigFactory {
             allowNowhere:config.allowNowhereDrop,
             orthoOnly:config.orthoDropOnly,
             diagOnly:config.diagDropOnly,
+            pieces:config.pieces,
         };
     }
 

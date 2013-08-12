@@ -14,6 +14,7 @@ import net.rezmason.scourge.model.rules.BuildPlayersRule;
 import net.rezmason.scourge.model.rules.BuildStateRule;
 import net.rezmason.scourge.model.rules.EatCellsRule;
 import net.rezmason.scourge.model.rules.PickPieceRule;
+import net.rezmason.scourge.tools.Resource;
 
 using net.rezmason.utils.Pointers;
 using net.rezmason.scourge.model.BoardUtils;
@@ -64,6 +65,7 @@ class StateHistorianTest {
             allowAll:false,
             hatSize:1,
             randomFunction:function() return 0,
+            pieces:new Pieces(Resource.getString('tables/pieces.json.txt'))
 		}
 
         var buildStateRule:BuildStateRule = new BuildStateRule(cast config);

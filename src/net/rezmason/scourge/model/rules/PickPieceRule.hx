@@ -18,6 +18,7 @@ typedef PickPieceConfig = {
     public var allowAll:Bool; // if true, nothing is left to chance
     public var hatSize:Int; // Number of pieces in the "hat" before it's refilled
     public var randomFunction:Void->Float; // Source of random numbers
+    public var pieces:Pieces;
 }
 
 typedef PickPieceMove = {>Move,
@@ -137,7 +138,7 @@ class PickPieceRule extends Rule {
             var freq:Null<Int> = pieceFrequencies[pieceTableID];
             if (freq == 0 || freq == null) continue;
 
-            var piece:PieceGroup = Pieces.getPieceById(pieceTableID);
+            var piece:PieceGroup = cfg.pieces.getPieceById(pieceTableID);
 
             // A piece that can't be flipped or rotated has its multiple symmetries
             // added to the hat, and so it has more moves

@@ -4,7 +4,7 @@ import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;
 
-import haxe.Resource;
+import net.rezmason.scourge.tools.Resource;
 
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
@@ -40,8 +40,18 @@ class RefereeTest {
 
 		var savedGame = referee.saveGame();
 		var data:String = savedGame.state.data;
-		//trace(data);
-		Assert.areEqual(Resource.getString('serializedState'), data + '\n');
+		// trace(data);
+
+		var prevData:String = Resource.getString('tables/serializedState.txt');
+		if (prevData.charAt(prevData.length - 1) == '\n') prevData = prevData.substr(0, -1);
+
+		var ike:Int = 0;
+		while (ike < prevData.length) {
+			Assert.areEqual('$ike: ' + prevData.substr(ike, 200), '$ike: ' + data.substr(ike, 200));
+			ike += 200;
+		}
+
+		// Assert.areEqual(prevData, data);
 	}
 
 	#if neko @Ignore('Runs slow on NekoVM') #end
@@ -80,6 +90,11 @@ class RefereeTest {
 		var board = referee.spitBoard();
 
 		//trace(board);
+
+		var moves:String = referee.spitMoves();
+		// trace(moves);
+
+		// trace(referee.spitPlan());
 
 		referee.endGame();
 		Assert.isFalse(referee.gameBegun);

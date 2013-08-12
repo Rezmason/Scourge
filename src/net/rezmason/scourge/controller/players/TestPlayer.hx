@@ -29,8 +29,8 @@ class TestPlayer extends Player {
 
     override private function processEvent(event:GameEvent):Void {
         switch (event.type) {
-            case PlayerAction(action, option):
-                if (game.hasBegun) game.chooseMove(action, option);
+            case PlayerAction(action, move):
+                if (game.hasBegun) game.chooseMove(action, move);
                 play();
             case RefereeAction(action):
                 switch (action) {

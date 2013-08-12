@@ -38,6 +38,7 @@ import net.rezmason.ropes.Types;
                     var id:Expr = macro $v{classType.module + '::' + field.name.toUpperCase()};
                     field.access = [AStatic, APublic];
                     field.kind = FVar(null, macro {id:$id, initialValue:$aspect});
+
                     msg += metaTag.name.charAt(0);
 
                     break;
@@ -47,7 +48,7 @@ import net.rezmason.ropes.Types;
 
         msg += '\n';
 
-        #if ROPES_VERBOSE
+        #if ROPES_MACRO_VERBOSE
             neko.Lib.print(msg);
         #end
 

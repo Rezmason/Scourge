@@ -6,6 +6,7 @@ import VisualAssert;
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.Pieces;
 import net.rezmason.scourge.tools.PieceGenerator;
+import net.rezmason.scourge.tools.Resource;
 
 class PieceGeneratorTest {
 
@@ -27,13 +28,16 @@ class PieceGeneratorTest {
     @Test
     public function jsonTest():Void {
 
+        var json:String = Resource.getString('tables/pieces.json.txt');
+        var pieces:Pieces = new Pieces(json);
+
         var str:String = '\n';
 
         for (size in 0...4) {
 
             str += '$size\n__\n';
 
-            var pieceGroups:Array<PieceGroup> = Pieces.getAllPiecesOfSize(size + 1);
+            var pieceGroups:Array<PieceGroup> = pieces.getAllPiecesOfSize(size + 1);
 
             for (group in pieceGroups) {
                 var left:Array<Piece> = group[0];

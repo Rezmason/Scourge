@@ -21,6 +21,7 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.SwapAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
 import net.rezmason.scourge.model.rules.DropPieceRule;
+import net.rezmason.scourge.tools.Resource;
 
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.GridUtils;
@@ -240,10 +241,12 @@ class ScourgeConfigFactoryTest
 	@Test
 	public function dropActionTest():Void {
 
+		var pieces:Pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
+
 		// dropPiece, eatCells, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
 		config.numPlayers = 2;
-		config.pieceTableIDs = [Pieces.getPieceIdBySizeAndIndex(4, 1)]; // 'L/J block'
+		config.pieceTableIDs = [pieces.getPieceIdBySizeAndIndex(4, 1)]; // 'L/J block'
 		config.initGrid = TestBoards.twoPlayerGrab;
 		makeState();
 		startAction.update();

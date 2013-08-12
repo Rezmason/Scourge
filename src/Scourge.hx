@@ -1,5 +1,7 @@
 package;
 
+import massive.munit.TestRunner;
+
 import openfl.Assets.*;
 import flash.Lib;
 
@@ -22,6 +24,15 @@ class Scourge {
         }
 
         utils = new UtilitySet(Lib.current.stage, init);
+
+        test();
+    }
+
+    static function test():Void {
+        var client = new SimpleTestClient();
+        var runner:TestRunner = new TestRunner(client);
+        runner.completionHandler = function(b) trace(client.output);
+        runner.run([TestSuite]);
     }
 
     static function init():Void {

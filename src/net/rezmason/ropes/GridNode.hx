@@ -9,7 +9,7 @@ class GridNode<T> {
     public function new(value:T):Void {
         this.value = value;
         neighbors = [];
-        headingOffsets = [];
+        headingOffsets = [0, 0, 0, 0, 0, 0, 0, 0];
         id = -1;
     }
 }

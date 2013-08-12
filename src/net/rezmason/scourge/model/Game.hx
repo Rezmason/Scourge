@@ -175,6 +175,24 @@ class Game {
         return state.spitBoard(plan);
     }
 
+    public function spitMoves():String {
+        var str:String = '';
+        var moves:Array<Array<Move>> = getMoves();
+        for (ike in 0...moves.length) {
+            for (move in moves[ike]) {
+                str += spitMove(ike, move) + ', \n';
+            }
+        }
+        return '[\n${str}\n]';
+    }
+
+    public function spitMove(actionID:Int, move:Move):String {
+        var str:String = 'actionID: $actionID, id: ${move.id}, ';
+        var fields:Array<String> = Reflect.fields(move);
+        for (field in fields.iterator().a2z()) str += '$field: ${Std.string(Reflect.field(move, field))}, ';
+        return '{$str}';
+    }
+
     private function pushHist():Int {
         historian.write();
         return historian.history.commit();

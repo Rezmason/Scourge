@@ -76,8 +76,25 @@ class Referee {
         return {state:game.save(), log:savedLog, config:gameConfig, timeSaved:UnixTime.now()};
     }
 
-    public function spitBoard():String {
-        return game.spitBoard();
+    public function spitBoard():String return game.spitBoard();
+
+    public function spitMoves():String return game.spitMoves();
+
+    public function spitPlan():String {
+        return
+        'state:\n${spitAspectLookup(game.plan.stateAspectLookup)}' +
+        'player:\n${spitAspectLookup(game.plan.playerAspectLookup)}' +
+        'node:\n${spitAspectLookup(game.plan.nodeAspectLookup)}';
+    }
+
+    function spitAspectLookup(lkp:AspectLookup):String {
+        var str:String = '';
+        var arr:Array<String> = [];
+        for (key in lkp.keys()) {
+            var ptr = lkp[key];
+            arr[ptr.toInt()] = '\t$key: ${ptr.toInt()}, ';
+        }
+        return str + arr.join('\n') + '\n';
     }
 
     private function handlePlayerEvent(player:Player, event:GameEvent):Void {
@@ -97,11 +114,11 @@ class Referee {
         event.timeReceived = UnixTime.now();
 
         switch (event.type) {
-            case PlayerAction(action, option):
+            case PlayerAction(action, move):
                 if (game.currentPlayer != playerIndex)
                     throw 'Player $playerIndex cannot act at this time!';
                 clearFloats();
-                game.chooseMove(action, option);
+                game.chooseMove(action, move);
                 if (game.winner >= 0) game.end(); // TEMPORARY
                 refereeCall(getFloatsAction());
                 broadcastAndLog(event);

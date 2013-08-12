@@ -13,6 +13,15 @@
 
 	<classpath name="src" />
 
+	<haxelib name="munit" />
+	<classpath name="test" />
+
+	<assets path="tables" />
+
+	<haxedef name="USE_POINTERS" />
+	<!-- <haxedef name="ROPES_VERBOSE" /> -->
+	<!-- <haxedef name="ROPES_MACRO_VERBOSE" /> -->
+
 	<assets path="flash_workers/flash/bin" rename="flash_workers" />
 	<haxedef name="stage3d" if="flash" />
 	<haxedef name="glsl2agal" if="flash" />

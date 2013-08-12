@@ -29,7 +29,7 @@ typedef SavedGame = {
 }
 
 enum GameEventType {
-    PlayerAction(action:Int, option:Int);
+    PlayerAction(action:Int, move:Int);
     Ready;
     RefereeAction(action:RefereeActionType);
 }

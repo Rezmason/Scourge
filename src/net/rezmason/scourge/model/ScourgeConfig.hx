@@ -37,5 +37,6 @@ typedef ScourgeConfig = {
     var bitePeriod:Int;
     var maxBites:Int;
     var initGrid:String;
+    var pieces:Pieces;
     var pieceTableIDs:Array<Int>;
 }

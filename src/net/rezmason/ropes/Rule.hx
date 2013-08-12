@@ -183,7 +183,7 @@ using net.rezmason.utils.Pointers;
         fields.push(overrider('__initReqs', declarations, pos));
         fields.push(overrider('__initPtrs', assignments, pos));
 
-        #if ROPES_VERBOSE
+        #if ROPES_MACRO_VERBOSE
             neko.Lib.print(msg);
         #end
 

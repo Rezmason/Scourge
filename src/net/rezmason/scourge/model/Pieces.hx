@@ -1,19 +1,24 @@
 package net.rezmason.scourge.model;
 
-import haxe.Resource;
-
 import net.rezmason.scourge.model.PieceTypes;
 
 using Lambda;
-using haxe.Json;
+using haxe.JSON;
 
 class Pieces {
-    private static var pieceGroupsBySize:Array<Array<PieceGroup>> = Resource.getString('pieces').parse();
 
-    private static var pieceGroupsById:Array<PieceGroup> = [];
-    private static var pieceIdsBySize:Array<Array<Int>> = pieceGroupsToIds();
+    private var pieceGroupsBySize:Array<Array<PieceGroup>>;
+    private var pieceGroupsById:Array<PieceGroup>;
+    private var pieceIdsBySize:Array<Array<Int>>;
 
-    private inline static function pieceGroupsToIds():Array<Array<Int>> {
+    public function new(json:String):Void {
+        if (json == null) throw "Null JSON.";
+        pieceGroupsBySize = json.parse();
+        pieceGroupsById = [];
+        pieceIdsBySize = pieceGroupsToIds();
+    }
+
+    private inline function pieceGroupsToIds():Array<Array<Int>> {
         var arr:Array<Array<Int>> = [];
         for (groups in pieceGroupsBySize) {
             var ids:Array<Int> = [];
@@ -23,14 +28,14 @@ class Pieces {
         return arr;
     }
 
-    public inline static function getPieceById(id:Int):PieceGroup { return pieceGroupsById[id]; }
-    public inline static function getPieceBySizeAndIndex(size:Int, index:Int):PieceGroup { return pieceGroupsBySize[size - 1][index]; }
-    public inline static function getPieceIdBySizeAndIndex(size:Int, index:Int):Int { return pieceGroupsById.indexOf(pieceGroupsBySize[size - 1][index]); }
-    public inline static function getNumPiecesBySize(size:Int):Int { return pieceIdsBySize[size - 1].length; }
-    public inline static function getPieceId(piece:PieceGroup):Int { return pieceGroupsById.indexOf(piece); }
-    public inline static function getAllPiecesOfSize(size:Int):Array<PieceGroup> { return pieceGroupsBySize[size - 1].copy(); }
+    public inline function getPieceById(id:Int):PieceGroup { return pieceGroupsById[id]; }
+    public inline function getPieceBySizeAndIndex(size:Int, index:Int):PieceGroup { return pieceGroupsBySize[size - 1][index]; }
+    public inline function getPieceIdBySizeAndIndex(size:Int, index:Int):Int { return pieceGroupsById.indexOf(pieceGroupsBySize[size - 1][index]); }
+    public inline function getNumPiecesBySize(size:Int):Int { return pieceIdsBySize[size - 1].length; }
+    public inline function getPieceId(piece:PieceGroup):Int { return pieceGroupsById.indexOf(piece); }
+    public inline function getAllPiecesOfSize(size:Int):Array<PieceGroup> { return pieceGroupsBySize[size - 1].copy(); }
 
-    public inline static function getAllPieceIDsOfSize(size:Int):Array<Int> {
+    public inline function getAllPieceIDsOfSize(size:Int):Array<Int> {
         var ids:Array<Int> = [];
         for (piece in getAllPiecesOfSize(size)) ids.push(pieceGroupsById.indexOf(piece));
         return ids;

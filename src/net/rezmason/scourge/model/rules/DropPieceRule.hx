@@ -25,6 +25,7 @@ typedef DropPieceConfig = {
     public var allowNowhere:Bool;
     public var orthoOnly:Bool;
     public var diagOnly:Bool;
+    public var pieces:Pieces;
 }
 
 typedef DropPieceMove = {>Move,
@@ -87,7 +88,7 @@ class DropPieceRule extends Rule {
             // Find edge nodes of current player
             var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge).array();
 
-            var pieceGroup:PieceGroup = Pieces.getPieceById(state.aspects[pieceTableID_]);
+            var pieceGroup:PieceGroup = cfg.pieces.getPieceById(state.aspects[pieceTableID_]);
             var pieceReflection:Int = state.aspects[pieceReflection_];
             var pieceRotation:Int = state.aspects[pieceRotation_];
 
@@ -184,7 +185,7 @@ class DropPieceRule extends Rule {
         var player:AspectSet = getPlayer(currentPlayer);
 
         if (move.targetNode != Aspect.NULL) {
-            var pieceGroup:PieceGroup = Pieces.getPieceById(state.aspects[pieceTableID_]);
+            var pieceGroup:PieceGroup = cfg.pieces.getPieceById(state.aspects[pieceTableID_]);
             var node:BoardNode = getNode(move.targetNode);
             var coords:Array<IntCoord> = pieceGroup[move.reflection][move.rotation][0];
             var homeCoord:IntCoord = move.coord;

@@ -4,13 +4,14 @@
 -lib hamcrest
 -cp src
 -debug
--resource tables/pieces.json@pieces
--resource tables/serializedState.txt@serializedState
+-resource tables/pieces.json.txt@tables/pieces.json.txt
+-resource tables/serializedState.txt@tables/serializedState.txt
 #-D VISUAL_TEST
 #-D TIME_TESTS
 -D USE_POINTERS
 -D haxeJSON
 #-D ROPES_VERBOSE
+#-D ROPES_MACRO_VERBOSE
 
 -cp test
 -swf-version 9
@@ -23,13 +24,14 @@
 -lib hamcrest
 -cp src
 -debug
--resource tables/pieces.json@pieces
--resource tables/serializedState.txt@serializedState
+-resource tables/pieces.json.txt@tables/pieces.json.txt
+-resource tables/serializedState.txt@tables/serializedState.txt
 #-D VISUAL_TEST
 #-D TIME_TESTS
 -D USE_POINTERS
 -D haxeJSON
 #-D ROPES_VERBOSE
+#-D ROPES_MACRO_VERBOSE
 
 -cp test
 -js build/js_test.js
@@ -43,13 +45,14 @@
 -lib hamcrest
 -cp src
 -debug
--resource tables/pieces.json@pieces
--resource tables/serializedState.txt@serializedState
+-resource tables/pieces.json.txt@tables/pieces.json.txt
+-resource tables/serializedState.txt@tables/serializedState.txt
 #-D VISUAL_TEST
 #-D TIME_TESTS
 -D USE_POINTERS
 -D haxeJSON
 #-D ROPES_VERBOSE
+#-D ROPES_MACRO_VERBOSE
 
 -cp test
 -neko build/neko_test.n
