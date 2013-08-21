@@ -1,11 +1,24 @@
-Board object
-    Mock State
-    Nodes to glyphs
-    Instant text changes (for UI, for instance)
-    Throb map
-    Creeping text
-    Dialer
-        Dispatches interactions
+NodeView and BoardBody
+    Basics
+        Mock state - two-player test board
+            UIPlayer
+        Create a corresponding NodeView for each node
+            Give each NodeView three glyphs:
+                UI
+                Slime
+                Board
+        handleBoardUpdate function
+            Each node view checks for a change in board state
+                Includes connectivity pass
+            (Narratological cues would happen here, like stress level and text unlock)
+        handleUIUpdate function
+            Interpret UI state
+            Each node view checks for a change in UI state
+        updateAnimation
+            (for propagating waves along slimes' bodies)
+        Dialer animation
+            Dispatches keyboard interactions
+
 
 Command interpreter
 

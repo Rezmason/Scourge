@@ -10,6 +10,9 @@ import net.rezmason.gl.utils.BufferUtil;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class Body {
+
+    static var DEFAULT_VIEW_RECT:Rectangle = new Rectangle(0, 0, 1, 1);
+
     public var segments(default, null):Array<BodySegment>;
     public var id(default, null):Int;
     public var transform:Matrix3D;
@@ -21,6 +24,7 @@ class Body {
     public var numSegments(default, null):Int;
     public var letterbox(default, null):Bool;
     public var catchMouseInRect(default, null):Bool;
+    public var viewRect(default, set):Rectangle;
 
     var redrawHitAreas:Void->Void;
     var projection:Matrix3D;
@@ -38,6 +42,7 @@ class Body {
         catchMouseInRect = true;
         this.glyphTexture = glyphTexture;
         glyphs = [];
+        viewRect = DEFAULT_VIEW_RECT;
 
         projection = makeProjection();
 
@@ -78,9 +83,9 @@ class Body {
         //spitGlyphs();
     }
 
-    public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
+    public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
 
-        rect = sanitizeLayoutRect(stageWidth, stageHeight, rect);
+        var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
 
         var cameraRect:Rectangle = rect.clone();
         cameraRect.offset(-0.5, -0.5);
@@ -153,5 +158,11 @@ class Body {
         rawData[15] =  0;
         mat.rawData = rawData;
         return mat;
+    }
+
+    inline function set_viewRect(rect:Rectangle):Rectangle {
+        if (rect == null) rect = DEFAULT_VIEW_RECT;
+        viewRect = rect;
+        return rect;
     }
 }

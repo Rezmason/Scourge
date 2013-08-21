@@ -84,9 +84,9 @@ class UIBody extends Body {
         super.update(delta);
     }
 
-    override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
-        super.adjustLayout(stageWidth, stageHeight, rect);
-        rect = sanitizeLayoutRect(stageWidth, stageHeight, rect);
+    override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
+        super.adjustLayout(stageWidth, stageHeight);
+        var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
 
         numRows = Std.int(rect.height * stageHeight / glyphHeightInPixels) + 1;
 
