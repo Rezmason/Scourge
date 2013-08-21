@@ -2,11 +2,8 @@ package net.rezmason.scourge.textview;
 
 import flash.display.Stage;
 import flash.events.Event;
-import flash.events.MouseEvent;
 import flash.events.TimerEvent;
-import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
-import flash.geom.Vector3D;
 import flash.utils.Timer;
 
 import net.rezmason.ropes.Types.Move;
@@ -42,6 +39,7 @@ class TextDemo {
 
     var mouseSystem:MouseSystem;
     var keyboardSystem:KeyboardSystem;
+    var mouseDownTargetView:View;
     var mouseMethod:RenderMethod;
     var prettyMethod:RenderMethod;
     var renderer:Renderer;
@@ -74,6 +72,7 @@ class TextDemo {
     function initScene():Void {
         mouseSystem = new MouseSystem(utils.drawUtil, stage, renderMouse, interact);
         keyboardSystem = new KeyboardSystem(stage, interact);
+        mouseDownTargetView = null;
         // stage.addChild(mouseSystem.view);
         renderer = new Renderer(utils.drawUtil);
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
@@ -126,14 +125,12 @@ class TextDemo {
     }
 
     function addListeners():Void {
-        // OLD - stage.addEventListener(Event.RESIZE, onResize);
-
         stage.addEventListener(Event.ACTIVATE, onActivate);
         stage.addEventListener(Event.DEACTIVATE, onDeactivate);
 
         utils.drawUtil.addRenderCall(onRender);
 
-        mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
+        // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
     function onRender(width:Int, height:Int):Void {
@@ -181,56 +178,12 @@ class TextDemo {
 
     function onTimer(?event:Event):Void {
         var timeStamp:Float = HaxeTimer.stamp();
-        update(timeStamp - lastTimeStamp);
+        var delta:Float = timeStamp - lastTimeStamp;
+        for (body in bodies) body.update(delta);
         lastTimeStamp = timeStamp;
     }
 
-    function onMouseViewClick(?event:Event):Void {
-        mouseSystem.invalidate();
-    }
-
-    function update(delta:Float):Void {
-
-        var numX:Float = (stage.mouseX / stage.stageWidth) * 2 - 1;
-        var numY:Float = (stage.mouseY / stage.stageHeight) * 2 - 1;
-
-        if (Math.isNaN(numX)) numX = 0;
-        if (Math.isNaN(numY)) numY = 0;
-
-        var bodyMat:Matrix3D;
-
-        if (testBody != null) {
-            bodyMat = testBody.transform;
-            bodyMat.identity();
-            spinBody(testBody, numX, numY);
-            bodyMat.appendTranslation(0, 0, 0.5);
-        }
-
-        if (splashBody != null) {
-            bodyMat = splashBody.transform;
-            bodyMat.identity();
-            spinBody(splashBody, 0, 0.5);
-            spinBody(splashBody, numX * -0.04, 0.08);
-            bodyMat.appendTranslation(0, 0.5, 0.5);
-        }
-
-        //if (uiBody != null) uiBody.scrollTextToRatio(stage.mouseY / stage.stageHeight);
-
-        /*
-        var divider:Float = stage.mouseX / stage.stageWidth;
-        views[0].rect.right = divider;
-        views[1].rect.left  = divider;
-
-        for (view in views) view.body.adjustLayout(stage.stageWidth, stage.stageHeight, view.rect);
-        /**/
-
-        for (body in bodies) body.update(delta);
-    }
-
-    function spinBody(body:Body, numX:Float, numY:Float):Void {
-        body.transform.appendRotation(-numX * 360 - 180     , Vector3D.Z_AXIS);
-        body.transform.appendRotation(-numY * 360 - 180 + 90, Vector3D.X_AXIS);
-    }
+    // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();
 
     function interpretCommand(input:String, hinting:Bool):Command {
 
@@ -328,13 +281,20 @@ class TextDemo {
         switch (interaction) {
             case MOUSE(type, oX, oY):
                 if (targetView == null) {
-                    for (view in views) {
-                        if (!view.body.catchMouseInRect) continue;
-                        if (view.rect.contains(oX / stage.stageWidth, oY / stage.stageHeight)) {
-                            glyphID = -1;
-                            bodyID = view.body.id;
-                            targetView = views[bodyID];
-                            break;
+
+                    if (type == DROP && mouseDownTargetView != null) {
+                        targetView = mouseDownTargetView;
+                        mouseDownTargetView = null;
+                    } else {
+                        for (view in views) {
+                            if (!view.body.catchMouseInRect) continue;
+                            if (view.rect.contains(oX / stage.stageWidth, oY / stage.stageHeight)) {
+                                glyphID = -1;
+                                bodyID = view.body.id;
+                                targetView = view;
+                                if (type == MOUSE_DOWN) mouseDownTargetView = view;
+                                break;
+                            }
                         }
                     }
                 }

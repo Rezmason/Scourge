@@ -1,6 +1,4 @@
 Board object
-    Move rotation logic into TestBody before cloning
-        Click'n'drag
     Mock State
     Nodes to glyphs
     Instant text changes (for UI, for instance)

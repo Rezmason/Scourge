@@ -25,7 +25,7 @@ class Scourge {
 
         utils = new UtilitySet(Lib.current.stage, init);
 
-        test();
+        // test();
     }
 
     static function test():Void {

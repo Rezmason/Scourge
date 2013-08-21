@@ -21,11 +21,11 @@ class MouseSystem {
     inline static var NULL_ID:Int = -1;
 
     public var outputBuffer(default, null):OutputBuffer;
-    public var view(get, null):Sprite;
+    // public var view(get, null):Sprite;
     public var invalid(default, null):Bool;
     var data:ReadbackData;
     var bitmapData:BitmapData;
-    var _view:MouseView;
+    // var _view:MouseView;
 
     var interact:InteractFunction;
     var update:Void->Void;
@@ -37,7 +37,7 @@ class MouseSystem {
     var drawUtil:DrawUtil;
 
     public function new(drawUtil:DrawUtil, target:EventDispatcher, update:Void->Void, interact:InteractFunction):Void {
-        _view = new MouseView(0.2, 1);
+        // _view = new MouseView(0.2, 1);
         // _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
         this.interact = interact;
@@ -72,7 +72,7 @@ class MouseSystem {
 
             if (bitmapData != null) bitmapData.dispose();
             bitmapData = null;
-            _view.bitmap.bitmapData = null;
+            // _view.bitmap.bitmapData = null;
             data = null;
 
             invalidate();
@@ -113,7 +113,7 @@ class MouseSystem {
             }
         #end
 
-        _view.update(x, y, rawID);
+        // _view.update(x, y, rawID);
 
         return rawID;
     }
@@ -122,6 +122,7 @@ class MouseSystem {
         return (data[index] << 16) | (data[index + 1] << 8) | (data[index + 2] << 0);
     }
 
+    /*
     function fartBD():Void {
 
         var byteArray:ByteArray = #if js new FriendlyByteArray(data) #else data #end ;
@@ -144,13 +145,14 @@ class MouseSystem {
 
         _view.bitmap.bitmapData = bitmapData;
     }
+    */
 
     function onMouseMove(event:MouseEvent):Void {
 
         if (invalid) {
             if (bitmapData == null) {
                 bitmapData = new BitmapData(width, height, false, 0xFF00FF);
-                _view.bitmap.bitmapData = bitmapData;
+                // _view.bitmap.bitmapData = bitmapData;
             }
 
             outputBuffer.resize(width, height);
@@ -204,9 +206,11 @@ class MouseSystem {
         if (bodyID >= 0) interact(bodyID, glyphID, MOUSE(type, event.stageX, event.stageY));
     }
 
+    /*
     function get_view():Sprite {
         return _view;
     }
+    */
 
 }
 
