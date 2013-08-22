@@ -43,16 +43,14 @@ class TextDemo {
 
     function makeScene():Void {
 
-        var _id:Int = 0;
-
-        //*
-        testBody = new TestBody(_id++, utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
+        /*
+        testBody = new TestBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         testBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(testBody);
         /**/
 
         //*
-        uiBody = new UIBody(_id++, utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, new UIText(interpretCommand));
+        uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, new UIText(interpretCommand));
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
         uiRect.inflate(-0.025, -0.1);
         // uiRect = new Rectangle(0, 0, 1, 1);
@@ -61,12 +59,12 @@ class TextDemo {
         /**/
 
         /*
-        var alphabetBody:Body = new AlphabetBody(_id++, utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
+        var alphabetBody:Body = new AlphabetBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         engine.addBody(alphabetBody);
         /**/
 
         /*
-        splashBody = new SplashBody(_id++, utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
+        splashBody = new SplashBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         engine.addBody(splashBody);
         /**/
 

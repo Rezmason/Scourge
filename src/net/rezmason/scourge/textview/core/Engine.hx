@@ -26,6 +26,7 @@ class Engine {
 
     var utils:UtilitySet;
     var bodies:Array<Body>;
+    var holes:Array<Int>;
     var fontTextures:Map<String, GlyphTexture>;
 
     var mouseSystem:MouseSystem;
@@ -49,6 +50,7 @@ class Engine {
         height = 1;
         framerate = 1000 / 30;
         bodies = [];
+        holes = [];
     }
 
     public function init(onReady:Void->Void):Void {
@@ -69,9 +71,20 @@ class Engine {
 
     public inline function get_invalidateMouse():Void->Void return mouseSystem.invalidate;
 
-    public function addBody(body:Body):Void if (!bodies.has(body)) bodies.push(body);
+    public function addBody(body:Body):Void {
+        if (!bodies.has(body)) {
+            var hole:Int = holes.length > 0 ? holes.pop() : bodies.length;
+            body.setID(hole);
+            bodies[hole] = body;
+        }
+    }
 
-    public function removeBody(body:Body):Void bodies.remove(body);
+    public function removeBody(body:Body):Void {
+        if (bodies[body.id] == body) {
+            holes.push(body.id);
+            bodies[body.id] = null;
+        }
+    }
 
     function onMethodLoaded():Void if (prettyMethod.program != null && mouseMethod.program != null) initScene();
 

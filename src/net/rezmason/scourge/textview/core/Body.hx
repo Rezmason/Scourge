@@ -33,8 +33,8 @@ class Body {
 
     var bufferUtil:BufferUtil;
 
-    public function new(id:Int, bufferUtil:BufferUtil, numGlyphs:Int, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
-        this.id = id;
+    public function new(bufferUtil:BufferUtil, numGlyphs:Int, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+        id = 0;
         this.bufferUtil = bufferUtil;
         this.redrawHitAreas = redrawHitAreas;
         if (this.redrawHitAreas == null) redrawHitAreas = function() {};
@@ -54,6 +54,12 @@ class Body {
         camera = new Matrix3D();
         glyphTransform = new Matrix3D();
         glyphTransform.appendScale(0.0001, 0.0001, 1); // Prevents blowouts
+    }
+
+    @:allow(net.rezmason.scourge.textview.core)
+    function setID(id:Int):Void {
+        this.id = id << 16;
+        for (glyph in glyphs) glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id);
     }
 
     function makeSegments():Void {

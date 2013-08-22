@@ -30,12 +30,12 @@ class TestBody extends Body {
     var rawTransform:Matrix3D;
     var setBackTransform:Matrix3D;
 
-    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
         time = 0;
         hues = [];
 
         var num:Int = 2400 /* 40000 */ ;
-        super(id, bufferUtil, num, glyphTexture, redrawHitAreas);
+        super(bufferUtil, num, glyphTexture, redrawHitAreas);
 
         dragging = false;
         dragStartTransform = new Matrix3D();

@@ -20,13 +20,13 @@ class AlphabetBody extends Body {
         TestStrings.BOX_SYMBOLS +
     '';
 
-    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
 
         var totalChars:Int = CHARS.length;
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));
         var numCols:Int = Std.int(Math.ceil(totalChars / numRows));
 
-        super(id, bufferUtil, totalChars, glyphTexture, redrawHitAreas);
+        super(bufferUtil, totalChars, glyphTexture, redrawHitAreas);
 
         catchMouseInRect = false;
 

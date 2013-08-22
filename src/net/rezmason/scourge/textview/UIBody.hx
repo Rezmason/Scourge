@@ -41,7 +41,7 @@ class UIBody extends Body {
 
     var uiText:UIText;
 
-    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, uiText:UIText):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, uiText:UIText):Void {
 
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
@@ -60,11 +60,9 @@ class UIBody extends Body {
         numRows = 0;
         numCols = 0;
 
-        super(id, bufferUtil, numGlyphs, glyphTexture, redrawHitAreas);
+        super(bufferUtil, numGlyphs, glyphTexture, redrawHitAreas);
 
         letterbox = false;
-
-        for (ike in 0...numGlyphs) glyphs[ike].set_paint(id << 16);
 
         this.uiText = uiText;
     }

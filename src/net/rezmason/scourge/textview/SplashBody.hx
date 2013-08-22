@@ -40,7 +40,7 @@ class SplashBody extends Body {
     var time:Float;
     var lines:Array<String>;
 
-    public function new(id:Int, bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
 
         time = 0;
 
@@ -50,7 +50,7 @@ class SplashBody extends Body {
 
         var num:Int = 3 * lines.length * lines[0].length;
 
-        super(id, bufferUtil, num, glyphTexture, redrawHitAreas);
+        super(bufferUtil, num, glyphTexture, redrawHitAreas);
 
         catchMouseInRect = false;
 
