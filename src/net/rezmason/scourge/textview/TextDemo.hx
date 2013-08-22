@@ -4,16 +4,11 @@ import flash.display.Stage;
 import flash.events.Event;
 import flash.geom.Rectangle;
 
-import net.rezmason.ropes.Types.Move;
-import net.rezmason.scourge.controller.Operation;
-
 import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.utils.FlatFont;
-
-using Lambda;
 
 class TextDemo {
 
@@ -25,7 +20,9 @@ class TextDemo {
     var fontTextures:Map<String, GlyphTexture>;
     var splashBody:Body;
     var testBody:TestBody;
+    var boardBody:BoardBody;
     var uiBody:UIBody;
+    var interpreter:Interpreter;
 
     public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
@@ -50,7 +47,14 @@ class TextDemo {
         /**/
 
         //*
-        uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, new UIText(interpretCommand));
+        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
+        boardBody.viewRect = new Rectangle(0, 0, 0.6, 1);
+        engine.addBody(boardBody);
+        /**/
+
+        //*
+        interpreter = new Interpreter();
+        uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, new UIText(interpreter));
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
         uiRect.inflate(-0.025, -0.1);
         // uiRect = new Rectangle(0, 0, 1, 1);
@@ -83,91 +87,4 @@ class TextDemo {
     function onDeactivate(?event:Event):Void engine.deactivate();
 
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();
-
-    function interpretCommand(input:String, hinting:Bool):Command {
-
-        var allMoves:Array<Array<Move>> = [[],[],[],[]];
-        var operations:Map<String, Operation> = [
-            'bite' => new Operation(0, new Map()),
-            'drop' => new Operation(1, new Map()),
-            'swap' => new Operation(2, new Map()),
-            'skip' => new Operation(3, new Map()),
-        ];
-
-        // input string is free of syles and hint data
-
-        if (input == null || input.length == 0) return EMPTY;
-
-        var opName:String = input;
-        var spcIndex:Int = input.indexOf(' ');
-        if (spcIndex != -1) opName = input.substr(0, spcIndex);
-
-        if (opName == 'msg') {
-            //     style the opName as a opName
-            //     style
-            return CHAT(input.substr(opName.length + 1));
-        }
-
-        var op:Operation = operations[opName];
-        if (op == null) {
-            //     style the opName as invalid
-            //     style the rest as dim invalid
-            return ERROR('UNRECOGNIZED COMMAND $opName');
-        }
-
-        // style the opName as a opName
-
-        var stack:Array<String> = input.split(' ');
-        stack.reverse();
-        stack.pop();
-
-        var filteredMoves = allMoves[op.index].copy();
-
-        var keys:Array<String> = [];
-
-        while (stack.length > 0) {
-            var key:String = stack.pop();
-            var value:String = stack.pop();
-
-            if (!op.hasParam(key)) {
-                //    style key as invalid
-                //    style the rest as dim invalid
-                return ERROR('UNRECOGNIZED PARAM $key');
-            }
-
-            filteredMoves = op.applyFilter(key, value, filteredMoves);
-
-            if (filteredMoves == null) {
-                //    style value as invalid
-                //    style the rest as dim invalid
-                return ERROR('INVALID VALUE $value FOR PARAM $key');
-            }
-
-            keys.push(key);
-
-            //    style key as a param
-            //    style value as a value
-        }
-
-        if (hinting) {
-            var hint:String = '';
-            for (paramName in op.params) {
-                if (!keys.has(paramName)) {
-                    //     style as a "hint button"
-                    hint += ' $paramName';
-                }
-            }
-        } else {
-            if (filteredMoves.length == 1) return COMMIT('MOVE: ${filteredMoves[0]}');
-            else return LIST(filteredMoves.map(printMove));
-        }
-
-        return null;
-    }
-
-    function printMove(move:Move):String {
-        var str:String = '';
-        for (field in Reflect.fields(move)) str += '$field : ${Reflect.field(move, field)},';
-        return '[$str]';
-    }
 }

@@ -18,6 +18,8 @@ NodeView and BoardBody
             (for propagating waves along slimes' bodies)
         Dialer animation
             Dispatches keyboard interactions
+    Orchestrate changes in the game
+        Test that board state is properly handled
 
 
 Command interpreter

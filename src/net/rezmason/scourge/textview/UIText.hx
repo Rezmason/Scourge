@@ -36,11 +36,11 @@ class UIText {
     var systemOutput:String;
     var textIsDirty:Bool;
     var caretStyle:AnimatedStyle;
-    var interpretCommand:String->Bool->Command;
+    var interpreter:Interpreter;
 
-    public function new(interpretCommand:String->Bool->Command):Void {
+    public function new(interpreter:Interpreter):Void {
 
-        this.interpretCommand = interpretCommand;
+        this.interpreter = interpreter;
 
         styles = new StyleSet();
 
@@ -230,7 +230,7 @@ class UIText {
                         case Keyboard.ENTER:
                             blurb += systemOutput + prompt + systemInput;
                             if (Utf8.length(systemInput) == 0) systemOutput = '\n';
-                            else systemOutput = '\n' + printCommand(interpretCommand(systemInput, false));
+                            else systemOutput = '\n' + printCommand(interpreter.run(systemInput, false));
                             systemInput = '';
                             caretIndex = 0;
                             textIsDirty = true;
