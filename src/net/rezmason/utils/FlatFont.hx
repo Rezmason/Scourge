@@ -50,7 +50,7 @@ class FlatFont {
         bdHeight = bitmapData.height;
 
         this.jsonString = jsonString;
-        charCoords = new Map<Int, CharCoord>();
+        charCoords = new Map();
         missingChars = [];
 
         var expandedJSON:FlatFontJSON = jsonString.parse();
@@ -130,7 +130,7 @@ class FlatFont {
 
         var charCoordJSON:Dynamic = {};
         var missingChars:Array<Int> = [];
-        var requiredChars:Map<String, Bool> = new Map<String, Bool>();
+        var requiredChars:Map<String, Bool> = new Map();
         var numChars:Int = 1;
 
         for (char in charString.split('')) {

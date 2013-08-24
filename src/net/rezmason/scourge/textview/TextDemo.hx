@@ -40,14 +40,15 @@ class TextDemo {
 
     function makeScene():Void {
 
-        /*
+        //*
         testBody = new TestBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         testBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(testBody);
         /**/
 
-        //*
-        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
+        /*
+        var game:Game = null;
+        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, game);
         boardBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(boardBody);
         /**/

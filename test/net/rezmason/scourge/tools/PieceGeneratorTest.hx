@@ -55,7 +55,7 @@ class PieceGeneratorTest {
                     }
                     str += '\n ';
                 }
-                str += '\n____';
+                str += '\n____\n';
             }
 
             VisualAssert.assert('all rotations and reflections of pieces of sizes 0-$size', str);
@@ -114,7 +114,7 @@ class PieceGeneratorTest {
                 }
                 str += '\n ';
             }
-            str += '\n____';
+            str += '\n____\n';
         }
 
         VisualAssert.assert('all rotations and reflections of pieces of sizes 0-3', str);

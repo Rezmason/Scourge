@@ -18,7 +18,8 @@
 
 	<assets path="tables" />
 
-	<haxedef name="USE_POINTERS" />
+	<!-- <haxedef name="VISUAL_TEST" if="mac" /> -->
+	<!-- <haxedef name="USE_POINTERS" /> -->
 	<!-- <haxedef name="ROPES_VERBOSE" /> -->
 	<!-- <haxedef name="ROPES_MACRO_VERBOSE" /> -->
 

@@ -26,9 +26,9 @@ class BoardUtils {
 
         if (state.nodes.length == 0) return 'empty grid';
 
-        if (otherNodeAspects == null) otherNodeAspects = new Map<String, String>();
-        var otherAspectPtrs:Map<String, AspectPtr> = new Map<String, AspectPtr>();
-        for (id in otherNodeAspects.keys()) otherAspectPtrs[id] = plan.nodeAspectLookup[otherNodeAspects[id]];
+        if (otherNodeAspects == null) otherNodeAspects = new Map();
+        var otherAspectPtrs:Map<String, AspectPtr> = new Map();
+        for (id in otherNodeAspects.keys()) otherAspectPtrs[id] = plan.nodeAspectLookup[id];
 
         var str:String = '';
 

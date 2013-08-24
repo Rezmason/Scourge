@@ -42,7 +42,7 @@ class DecayRuleTest extends ScourgeRuleTest
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
-        Assert.areEqual(17, numCells); // 51 cells for player 0
+        Assert.areEqual(17, numCells); // 17 cells for player 0
 
         VisualAssert.assert('Loose petri', state.spitBoard(plan));
 
@@ -85,15 +85,15 @@ class DecayRuleTest extends ScourgeRuleTest
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
-        Assert.areEqual(18, numCells); // 51 cells for player 0
+        Assert.areEqual(18, numCells); // 18 cells for player 0
 
         VisualAssert.assert('Loose petri', state.spitBoard(plan));
 
         decayRule.chooseMove();
 
-        VisualAssert.assert('Empty petri, disconnected region gone', state.spitBoard(plan));
+        VisualAssert.assert('Loose petri', state.spitBoard(plan));
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
-        Assert.areEqual(18, numCells); // only one cell for player 0
+        Assert.areEqual(18, numCells); // 18 cells for player 0
     }
 }

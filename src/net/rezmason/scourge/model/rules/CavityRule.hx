@@ -73,7 +73,7 @@ class CavityRule extends Rule {
         // After reversing the search results, they are sorted in the order of most-outside to least-outside
         widePerimeter.reverse();
 
-        var nodeIDs:Map<Int, Bool> = new Map<Int, Bool>();
+        var nodeIDs:Map<Int, Bool> = new Map();
         for (node in widePerimeter) nodeIDs[node.value[nodeID_]] = true;
 
         var empties:Array<BoardNode> = [];

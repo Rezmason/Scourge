@@ -11,30 +11,34 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 
+import net.rezmason.scourge.model.Game;
+
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class BoardBody extends Body {
 
     inline static var COLOR_RANGE:Int = 6;
-    inline static var CHARS:String =
-        TestStrings.ALPHANUMERICS +
-    '';
+    inline static var CHARS:String = TestStrings.WEIRD_SYMBOLS;
 
-    var time:Float;
-    var hues:Array<Float>;
+    static var TEAM_COLORS:Array<Int> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ];
 
     var dragging:Bool;
     var dragX:Float;
     var dragY:Float;
     var dragStartTransform:Matrix3D;
     var rawTransform:Matrix3D;
-    var setBackTransform:Matrix3D;
+    var homeTransform:Matrix3D;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
-        time = 0;
-        hues = [];
+    var game:Game;
 
-        var num:Int = 2400 /* 40000 */ ;
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, game:Game):Void {
+
+        this.game = game;
+        // Create a node view for each node
+            // for now, base x and y positions on neighborness
+        // Find center and nudge everybody in that direction
+
+        var num:Int = game.state.nodes.length * 1;
         super(bufferUtil, num, glyphTexture, redrawHitAreas);
 
         dragging = false;
@@ -42,48 +46,16 @@ class BoardBody extends Body {
         rawTransform = new Matrix3D();
         rawTransform.appendRotation( 45, Vector3D.X_AXIS);
         rawTransform.appendRotation(315, Vector3D.Z_AXIS);
-        setBackTransform = rawTransform.clone();
-        setBackTransform.appendTranslation(0, 0, 0.5);
-        transform.copyFrom(setBackTransform);
+        homeTransform = new Matrix3D();
+        homeTransform.appendTranslation(0, 0, 0.5);
 
-        var dTheta:Float = Math.PI * (3 - Math.sqrt(5));
-        var dZ:Float = 2 / (numGlyphs + 1);
-        var theta:Float = 0;
-        var _z:Float = 1 - dZ / 2;
+        transform = rawTransform.clone();
+        transform.append(homeTransform);
 
         for (glyph in glyphs) {
-            var hue:Float = (theta + _z * dTheta * 2) / (Math.PI * 2);
-            hues.push(hue);
 
-            var i:Float = 0.2;
-
-            var charCode:Int = CHARS.charCodeAt(glyph.id % CHARS.length);
-
-            var rad:Float = Math.sqrt(1 - _z * _z);
-            var x:Float = Math.cos(theta) * rad;
-            var y:Float = Math.sin(theta) * rad;
-            var z:Float = _z;
-
-            x *= 0.6;
-            y *= 0.6;
-            z *= 0.6;
-
-            var r:Float = ramp(x + 0.5);
-            var g:Float = ramp(y + 0.5);
-            var b:Float = ramp(z + 0.5);
-
-            glyph.set_shape(x, y, z, 1, 0);
-            glyph.set_color(r, g, b);
-            glyph.set_i(i);
-            glyph.set_char(charCode, glyphTexture.font);
-            glyph.set_paint(glyph.id | id << 16);
-
-            _z -= dZ;
-            theta += dTheta;
         }
     }
-
-    inline function ramp(num:Float):Float return (2 - num) * num;
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
         super.adjustLayout(stageWidth, stageHeight);
@@ -97,23 +69,7 @@ class BoardBody extends Body {
     }
 
     override public function update(delta:Float):Void {
-        time += delta;
-
-        transform.identity();
-        transform.appendRotation(time * 30, Vector3D.Z_AXIS);
-        transform.append(setBackTransform);
-
-        for (ike in 0...glyphs.length) {
-            var glyph:Glyph = glyphs[ike];
-
-            var d:Float = glyph.get_z();
-            var p:Float = (Math.cos(time * 4 + d * 20) * 0.5 + 1) * 0.4;
-            var s:Float = (Math.cos(time * 4 + d * 30) * 0.5 + 1) * 2.0;
-
-            glyph.set_p(p);
-            glyph.set_s(s);
-        }
-
+        if (!dragging) transform.interpolateTo(homeTransform, 0.5);
         super.update(delta);
     }
 
@@ -144,8 +100,8 @@ class BoardBody extends Body {
         rawTransform.copyFrom(dragStartTransform);
         rawTransform.appendRotation((dragX - x) * 180, Vector3D.Y_AXIS);
         rawTransform.appendRotation((dragY - y) * 180, Vector3D.X_AXIS);
-        setBackTransform.copyFrom(rawTransform);
-        setBackTransform.appendTranslation(0, 0, 0.5);
+        transform.copyFrom(rawTransform);
+        transform.append(homeTransform);
     }
 
     inline function stopDrag():Void {

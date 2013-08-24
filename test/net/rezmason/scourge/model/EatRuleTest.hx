@@ -157,7 +157,7 @@ class EatRuleTest extends ScourgeRuleTest
 
         eatRule.chooseMove();
 
-        VisualAssert.assert('two player grab, player one head eaten and body killed', state.spitBoard(plan));
+        VisualAssert.assert('two player grab, player one head eaten', state.spitBoard(plan));
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 1, numCells); // Only eat the head

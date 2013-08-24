@@ -107,7 +107,7 @@ class DropPieceRule extends Rule {
                     if (!cfg.allowRotating && rotationIndex != allowedRotationIndex) continue;
                     var rotation:Piece = reflection[rotationIndex];
 
-                    var coordCache:Map<Int, Array<IntCoord>> = new Map<Int, Array<IntCoord>>();
+                    var coordCache:Map<Int, Array<IntCoord>> = new Map();
 
                     // For each edge node,
                     for (node in edgeNodes) {

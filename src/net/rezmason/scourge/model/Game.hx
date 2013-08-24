@@ -32,8 +32,12 @@ class Game {
     var defaultActions:Array<Rule>;
     var winner_:AspectPtr;
     var currentPlayer_:AspectPtr;
+    var planner:StatePlanner;
 
-    public function new():Void { historian = new StateHistorian(); }
+    public function new():Void {
+        historian = new StateHistorian();
+        planner = new StatePlanner();
+    }
 
     public function begin(config:ScourgeConfig, randomFunction:Void->Float, annotateFunc:String->Void = null, savedState:SavedState = null):Int {
 
@@ -53,7 +57,7 @@ class Game {
         // Find the demiurgic rules
 
         var basicRulesArray:Array<Rule> = [];
-        var demiurgicRules:Map<String, Rule> = new Map<String, Rule>();
+        var demiurgicRules:Map<String, Rule> = new Map();
         var rules:Array<Rule> = [];
         for (key in basicRules.keys().a2z()) {
             var rule:Rule = basicRules[key];
@@ -65,7 +69,7 @@ class Game {
 
         // Plan the state
 
-        plan = new StatePlanner().planState(state, rules);
+        plan = planner.planState(state, rules);
 
         // Prime the rules with the state and plan
 

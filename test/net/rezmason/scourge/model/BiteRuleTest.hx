@@ -21,7 +21,7 @@ using net.rezmason.utils.Pointers;
 class BiteRuleTest extends ScourgeRuleTest
 {
     private static var PIECE_SIZE:Int = 4;
-    private static var freshnessBoardMod:Map<String, String> = ['F'=>FreshnessAspect.FRESHNESS.id];
+    private static var freshnessBoardMod:Map<String, String> = [FreshnessAspect.FRESHNESS.id=>'F'];
 
     #if TIME_TESTS
     var time:Float;

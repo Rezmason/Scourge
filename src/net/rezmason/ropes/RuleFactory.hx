@@ -12,7 +12,7 @@ class RuleFactory {
 
     public static function makeBasicRules(ruleDefs:Map<String, Class<Rule>>, cfg:Dynamic):Map<String, Rule> {
 
-        var rules:Map<String, Rule> = new Map<String, Rule>();
+        var rules:Map<String, Rule> = new Map();
 
         if (cfg != null) {
             var cfgFields:Array<String> = cfg.fields();
@@ -33,7 +33,7 @@ class RuleFactory {
     }
 
     public static function combineRules(cfg:Dynamic<Array<String>>, basicRules:Map<String, Rule>):Map<String, Rule> {
-        var combinedRules:Map<String, Rule> = new Map<String, Rule>();
+        var combinedRules:Map<String, Rule> = new Map();
 
         if (cfg != null) {
 
