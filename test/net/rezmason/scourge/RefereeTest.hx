@@ -6,6 +6,7 @@ import massive.munit.util.Timer;
 
 import net.rezmason.scourge.tools.Resource;
 
+import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
 
@@ -60,7 +61,7 @@ class RefereeTest {
 
 		var deferredCalls = [];
 
-		function defer(func) {
+		function defer(game:Game, func:Void->Void) {
 			deferredCalls.push(func);
 		}
 

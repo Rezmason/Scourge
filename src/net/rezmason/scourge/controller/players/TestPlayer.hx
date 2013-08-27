@@ -2,12 +2,13 @@ package net.rezmason.scourge.controller.players;
 
 import haxe.Unserializer;
 import net.rezmason.scourge.controller.Types;
+import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 
 using Lambda;
 using net.rezmason.scourge.model.BoardUtils;
 
-typedef TestHelper = (Void->Void)->Dynamic;
+typedef TestHelper = Game->(Void->Void)->Dynamic;
 
 class TestPlayer extends Player {
 
@@ -106,7 +107,7 @@ class TestPlayer extends Player {
     }
 
     private inline function delay(func:Void->Void) {
-        if (func != null && helper != null) helper(func);
+        if (func != null && helper != null) helper(game, func);
     }
 
     private function handleAnnotation(sender:String):Void

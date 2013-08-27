@@ -23,6 +23,8 @@ class Glyph {
         this.color = color;
         this.paint = paint;
         GlyphUtils.makeCorners(this);
+        GlyphUtils.set_color(this, 1, 1, 1);
+        GlyphUtils.set_s(this, 1);
         visible = true;
     }
 }

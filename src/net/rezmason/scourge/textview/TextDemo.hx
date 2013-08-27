@@ -10,6 +10,11 @@ import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.utils.FlatFont;
 
+import net.rezmason.scourge.controller.Referee;
+import net.rezmason.scourge.controller.Types;
+import net.rezmason.scourge.model.Game;
+import net.rezmason.scourge.model.ScourgeConfigFactory;
+
 class TextDemo {
 
     var engine:Engine;
@@ -24,12 +29,16 @@ class TextDemo {
     var uiBody:UIBody;
     var interpreter:Interpreter;
 
+    var game:Game;
+    var referee:Referee;
+    var turnFunc:Void->Void;
+
     public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
         this.stage = stage;
         makeFontTextures(fonts);
         engine = new Engine(utils, stage, fontTextures);
-        engine.init(makeScene);
+        engine.init(init);
         addListeners();
     }
 
@@ -38,16 +47,47 @@ class TextDemo {
         for (key in fonts.keys()) fontTextures[key] = new GlyphTexture(utils.textureUtil, fonts[key]);
     }
 
+    function init():Void {
+        makeGame();
+    }
+
+    function takeTurn(game:Game, func:Void->Void):Void {
+        if (this.game == null) {
+            this.game = game;
+            makeScene();
+        }
+        turnFunc = func;
+    }
+
+    function makeTurn():Void {
+        if (turnFunc != null) {
+            var func:Void->Void = turnFunc;
+            turnFunc = null;
+            func();
+        }
+    }
+
+    function makeGame():Void {
+        var playerCfgs = [{type:Test(takeTurn, false)}, {type:Test(takeTurn, false)}];
+        var cfg = ScourgeConfigFactory.makeDefaultConfig();
+        cfg.numPlayers = playerCfgs.length;
+        referee = new Referee();
+        referee.beginGame(playerCfgs, randomFunction, cfg);
+    }
+
+    function randomFunction():Float {
+        return 0;
+    }
+
     function makeScene():Void {
 
-        //*
+        /*
         testBody = new TestBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         testBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(testBody);
         /**/
 
-        /*
-        var game:Game = null;
+        //*
         boardBody = new BoardBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, game);
         boardBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(boardBody);

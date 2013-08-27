@@ -1,6 +1,7 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.ropes.Types.SavedState;
+import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 
 typedef PlayerConfig = {
@@ -8,7 +9,7 @@ typedef PlayerConfig = {
 }
 
 enum PlayerType {
-    Test(helper:(Void->Void)->Void, annotate:Bool);
+    Test(helper:Game->(Void->Void)->Void, annotate:Bool);
     Human;
     Machine;
     Remote;

@@ -21,7 +21,6 @@ class TestBody extends Body {
     '';
 
     var time:Float;
-    var hues:Array<Float>;
 
     var dragging:Bool;
     var dragX:Float;
@@ -32,7 +31,6 @@ class TestBody extends Body {
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
         time = 0;
-        hues = [];
 
         var num:Int = 2400 /* 40000 */ ;
         super(bufferUtil, num, glyphTexture, redrawHitAreas);
@@ -52,9 +50,6 @@ class TestBody extends Body {
         var _z:Float = 1 - dZ / 2;
 
         for (glyph in glyphs) {
-            var hue:Float = (theta + _z * dTheta * 2) / (Math.PI * 2);
-            hues.push(hue);
-
             var i:Float = 0.2;
 
             var charCode:Int = CHARS.charCodeAt(glyph.id % CHARS.length);
