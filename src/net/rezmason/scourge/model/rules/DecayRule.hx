@@ -45,14 +45,14 @@ class DecayRule extends Rule {
 
         // Grab all the player heads
 
-        var heads:Array<BoardNode> = [];
+        var heads:Map<Int, BoardNode> = new Map();
         for (player in eachPlayer()) {
             var headIndex:Int = player[head_];
-            if (headIndex != Aspect.NULL) heads.push(getNode(headIndex));
+            if (headIndex != Aspect.NULL) heads[headIndex] = getNode(headIndex);
         }
 
         // Use the heads as starting points for a flood fill of connected living cells
-        var livingBodyNeighbors:Array<BoardNode> = heads.expandGraph(cfg.orthoOnly, isLivingBodyNeighbor);
+        var livingBodyNeighbors:Map<Int, BoardNode> = heads.expandGraph(cfg.orthoOnly, isLivingBodyNeighbor);
 
         // Remove cells from player bodies
         for (player in eachPlayer()) {
@@ -62,7 +62,7 @@ class DecayRule extends Rule {
             var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != Aspect.NULL) {
                 for (node in getNode(bodyFirst).iterate(state.nodes, bodyNext_)) {
-                    if (!livingBodyNeighbors.has(node)) bodyFirst = killCell(node, maxFreshness, bodyFirst);
+                    if (!livingBodyNeighbors.exists(node.id)) bodyFirst = killCell(node, maxFreshness, bodyFirst);
                     else totalArea++;
                 }
             }

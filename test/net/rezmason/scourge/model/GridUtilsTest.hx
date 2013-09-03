@@ -50,15 +50,16 @@ class GridUtilsTest {
         for (n in first.walk(Gr.e)) ike++;
         Assert.areEqual(10, ike);
 
-        Assert.areEqual(10, first.getGraph().length);
+        Assert.areEqual(10, first.getGraphSequence().length);
 
-        Assert.areEqual(5, first.getGraph(underFiveOnly).length);
+        Assert.areEqual(5, first.getGraphSequence(underFiveOnly).length);
     }
 
     function underFiveOnly(val:Int, connection:Int):Bool { return val < 5; }
 
     function makeNode():GridNode<Int> {
-        var node:GridNode<Int> = new GridNode<Int>(nodeItr++);
+        var node:GridNode<Int> = new GridNode<Int>(nodeItr, nodeItr);
+        nodeItr++;
         return node;
     }
 }

@@ -38,6 +38,9 @@ class UIText {
     var caretStyle:AnimatedStyle;
     var interpreter:Interpreter;
 
+    var inputHistory:Array<String>;
+    var histItr:Int;
+
     public function new(interpreter:Interpreter):Void {
 
         this.interpreter = interpreter;
@@ -67,6 +70,9 @@ class UIText {
         systemInput = '';
         systemOutput = '\n';
         textIsDirty = false;
+
+        inputHistory = [];
+        histItr = 1;
 
         updateDirtyText(true);
     }
@@ -229,8 +235,13 @@ class UIText {
 
                         case Keyboard.ENTER:
                             blurb += systemOutput + prompt + systemInput;
-                            if (Utf8.length(systemInput) == 0) systemOutput = '\n';
-                            else systemOutput = '\n' + printCommand(interpreter.run(systemInput, false));
+                            if (Utf8.length(systemInput) == 0) {
+                                systemOutput = '\n';
+                            } else {
+                                systemOutput = '\n' + printCommand(interpreter.run(systemInput, false));
+                                inputHistory.push(systemInput);
+                                histItr = inputHistory.length;
+                            }
                             systemInput = '';
                             caretIndex = 0;
                             textIsDirty = true;
@@ -258,6 +269,21 @@ class UIText {
                             // TODO: alt-right
                             // TODO: ctrl-left
                             // TODO: input spans
+                        case Keyboard.UP:
+                            if (inputHistory.length > 0) {
+                                if (histItr > 0) histItr--;
+                                systemInput = inputHistory[histItr];
+                                caretIndex = systemInput.length;
+                                textIsDirty = true;
+                            }
+                        case Keyboard.DOWN:
+                            if (inputHistory.length > 0) {
+                                if (histItr < inputHistory.length) histItr++;
+                                if (histItr == inputHistory.length) systemInput = '';
+                                else systemInput = inputHistory[histItr];
+                                caretIndex = systemInput.length;
+                                textIsDirty = true;
+                            }
                         case _:
                             var left:String = Utf8.sub(systemInput, 0, caretIndex);
                             var right:String = Utf8.sub(systemInput, caretIndex, Utf8.length(systemInput));
@@ -325,6 +351,7 @@ class UIText {
             case LIST(filteredMoves):
                 if (filteredMoves.length == 0) str = 'No moves available. \n';
                 else str = '${filteredMoves.length} moves available:\n ${filteredMoves.join("\n")}\n';
+            case CUSTOM_COMMAND(name, output): str = '$name :: $output\n';
         }
 
         return str;

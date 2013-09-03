@@ -7,8 +7,14 @@ using Lambda;
 
 class Interpreter {
 
-    public function new():Void {
+    var customOps:Map<String, String->String>;
 
+    public function new():Void {
+        customOps = new Map();
+    }
+
+    public function addCommand(name:String, command:String->String):Void {
+        customOps[name] = command;
     }
 
     public function run(input:String, hinting:Bool):Command {
@@ -33,6 +39,10 @@ class Interpreter {
             //     style the opName as a opName
             //     style
             return CHAT(input.substr(opName.length + 1));
+        }
+
+        if (customOps.exists(opName)) {
+            return CUSTOM_COMMAND(opName, customOps[opName](input));
         }
 
         var op:Operation = operations[opName];

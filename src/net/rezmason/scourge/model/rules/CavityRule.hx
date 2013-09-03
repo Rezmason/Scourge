@@ -48,9 +48,9 @@ class CavityRule extends Rule {
 
         // We destroy the existing cavity list
         var cavityFirst:Int = player[cavityFirst_];
-        var oldCavityNodes:Array<BoardNode> = [];
+        var oldCavityNodes:Map<Int, BoardNode> = new Map();
         if (cavityFirst != Aspect.NULL) {
-            oldCavityNodes = getNode(cavityFirst).boardListToArray(state.nodes, bodyNext_);
+            oldCavityNodes = getNode(cavityFirst).boardListToMap(state.nodes, bodyNext_);
             for (node in oldCavityNodes) clearCavityCell(node, maxFreshness);
             player[cavityFirst_] = Aspect.NULL;
         }
@@ -68,7 +68,7 @@ class CavityRule extends Rule {
         // This takes advantage of the FILO search pattern of GridUtils.getGraph
 
         remainingNodes = body.length - 1;
-        var widePerimeter:Array<BoardNode> = head.getGraph(true, isWithinPerimeter.bind(playerID));
+        var widePerimeter:Array<BoardNode> = head.getGraphSequence(true, isWithinPerimeter.bind(playerID));
 
         // After reversing the search results, they are sorted in the order of most-outside to least-outside
         widePerimeter.reverse();
@@ -120,7 +120,7 @@ class CavityRule extends Rule {
         if (cavityNodes.length > 0) {
 
             // Cavity nodes that haven't changed don't get freshened
-            for (node in cavityNodes) createCavity(playerID, oldCavityNodes.has(node) ? 0 : maxFreshness, node);
+            for (node in cavityNodes) createCavity(playerID, oldCavityNodes.exists(node.id) ? 0 : maxFreshness, node);
 
             cavityNodes.chainByAspect(nodeID_, cavityNext_, cavityPrev_);
             player[cavityFirst_] = cavityNodes[0].value[nodeID_];

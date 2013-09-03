@@ -6,7 +6,6 @@ import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.State;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 
-using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.Pointers;
 
 typedef BuildStateConfig = {
@@ -27,8 +26,8 @@ class BuildStateRule extends Rule {
     }
 
     override private function _prime():Void {
-        plan.stateAspectTemplate.copyTo(state.aspects);
-        plan.stateAspectTemplate.mapTo(cfg.buildCfg.history.alloc, cfg.buildCfg.historyState.aspects);
+        plan.stateAspectTemplate.copyTo(state.aspects, 0);
+        plan.stateAspectTemplate.mapTo(cfg.buildCfg.history.alloc, cfg.buildCfg.historyState.aspects, 0);
         state.aspects[currentPlayer_] = cfg.firstPlayer;
     }
 }

@@ -6,4 +6,5 @@ enum Command {
     COMMIT(message:String);
     CHAT(message:String);
     LIST(filteredMoves:Array<String>);
+    CUSTOM_COMMAND(commandName:String, output:String);
 }

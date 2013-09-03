@@ -41,10 +41,12 @@ class RefereeTest {
 
 		var savedGame = referee.saveGame();
 		var data:String = savedGame.state.data;
-		// trace(data);
 
 		var prevData:String = Resource.getString('tables/serializedState.txt');
 		if (prevData.charAt(prevData.length - 1) == '\n') prevData = prevData.substr(0, -1);
+
+		// trace(prevData);
+		// trace(data);
 
 		var ike:Int = 0;
 		while (ike < prevData.length) {

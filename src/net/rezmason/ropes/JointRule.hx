@@ -1,6 +1,6 @@
 package net.rezmason.ropes;
 
-using net.rezmason.utils.ArrayUtils;
+using net.rezmason.utils.MapUtils;
 
 class JointRule extends Rule {
 

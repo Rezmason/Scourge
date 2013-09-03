@@ -5,6 +5,7 @@ import haxe.Unserializer;
 import net.rezmason.ropes.GridNode;
 
 using Lambda;
+using net.rezmason.utils.MapUtils;
 
 typedef SpreadFilter<T> = T->T->Bool;
 
@@ -50,12 +51,13 @@ class GridUtils {
         return [n(node), e(node), s(node), w(node)];
     }
 
-    public inline static function getGraph<T>(source:GridNode<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridNode<T>> {
-        return expandGraph([source], orthoOnly, spreadFilter);
+    public inline static function getGraph<T>(source:GridNode<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Map<Int, GridNode<T>> {
+        return expandGraph([source.id => source], orthoOnly, spreadFilter);
     }
 
-    public inline static function expandGraph<T>(sources:Array<GridNode<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridNode<T>> {
-        var nodes:Array<GridNode<T>> = sources.copy();
+    public inline static function expandGraph<T>(sources:Map<Int, GridNode<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Map<Int, GridNode<T>> {
+        var nodes:Map<Int, GridNode<T>> = new Map();
+        nodes.absorb(sources);
         var newNodes:List<GridNode<T>> = sources.list();
 
         var node:GridNode<T> = newNodes.pop();
@@ -64,10 +66,38 @@ class GridUtils {
             var neighbors:Array<GridNode<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
 
             for (neighbor in neighbors) {
-                if (neighbor != null && !nodes.has(neighbor) &&
-                        (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
+                if (neighbor != null && !nodes.exists(neighbor.id) && (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
+                    nodes[neighbor.id] = neighbor;
+                    newNodes.add(neighbor);
+                }
+            }
+            node = newNodes.pop();
+        }
+
+        return nodes;
+    }
+
+    public inline static function getGraphSequence<T>(source:GridNode<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridNode<T>> {
+        return expandGraphSequence([source], orthoOnly, spreadFilter);
+    }
+
+    public inline static function expandGraphSequence<T>(sources:Array<GridNode<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridNode<T>> {
+        var nodes:Array<GridNode<T>> = sources.copy();
+        var newNodes:List<GridNode<T>> = sources.list();
+
+        var nodesByID:Map<Int, GridNode<T>> = new Map();
+        for (node in nodes) nodesByID[node.id] = node;
+
+        var node:GridNode<T> = newNodes.pop();
+        while (node != null) {
+
+            var neighbors:Array<GridNode<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
+
+            for (neighbor in neighbors) {
+                if (neighbor != null && !nodesByID.exists(neighbor.id) && (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
                     nodes.push(neighbor);
                     newNodes.add(neighbor);
+                    nodesByID[neighbor.id] = neighbor;
                 }
             }
             node = newNodes.pop();
@@ -79,7 +109,6 @@ class GridUtils {
     public inline static function serializeGrid<T>(s:Serializer, sourceList:Array<GridNode<T>>):Void {
         var data:Array<Array<Dynamic>> = [];
 
-        for (ike in 0...sourceList.length) sourceList[ike].id = ike;
         for (node in sourceList) {
             var neighbors:Array<Null<Int>> = [];
             for (ike in 0...node.neighbors.length) {
@@ -97,7 +126,7 @@ class GridUtils {
 
         var nodes:Array<GridNode<T>> = [];
 
-        for (datum in data) nodes.push(new GridNode<T>(datum[0]));
+        for (ike in 0...data.length) nodes.push(new GridNode<T>(ike, data[ike][0]));
         for (ike in 0...nodes.length) {
             var neighbors:Array<Null<Int>> = data[ike][1];
             var headingOffsets:Array<Null<Int>> = data[ike][2];

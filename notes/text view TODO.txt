@@ -1,19 +1,24 @@
+Bug in DropPieceRule!
+    Piece can go over walls, apparently
+Null object reference in BitePieceRule!
+
 NodeView and BoardBody
+
+    Character scaling for large games
+
+    Throb
+        A wave pool whose width is the longest distance from a player's head to their tail
+            It's easy to expand and contract the wave pool
+        The view nodes look up the propagation data for their distance value
+
     Basics
-        Mock state - two-player test board
-            UIPlayer
-        Create a corresponding NodeView for each node
-            Give each NodeView three glyphs:
-                UI
-                Slime
-                Board
         handleBoardUpdate function
             Each node view checks for a change in board state
                 Includes connectivity pass
             (Narratological cues would happen here, like stress level and text unlock)
         handleUIUpdate function
             Interpret UI state
-            Each node view checks for a change in UI state
+            Check each UI for a change in state
         updateAnimation
             (for propagating waves along slimes' bodies)
         Dialer animation

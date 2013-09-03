@@ -5,11 +5,11 @@ import haxe.ds.ArraySort;
 import net.rezmason.ropes.GridNode;
 import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Aspect;
-import net.rezmason.utils.StringSort;
 
 using Lambda;
 using net.rezmason.ropes.GridUtils;
-using net.rezmason.utils.ArrayUtils;
+using net.rezmason.utils.Alphabetizer;
+using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
 class StatePlanner {
@@ -45,14 +45,13 @@ class StatePlanner {
     }
 
     function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet, key:PtrKey):Void {
-        ArraySort.sort(requirements, propSort);
-        for (ike in 0...requirements.length) {
-            var prop:AspectProperty = requirements[ike];
-            var ptr:AspectPtr = template.ptr(ike, key);
+        var itr:Int = 0;
+        for (id in requirements.keys().a2z()) {
+            var prop:AspectProperty = requirements[id];
+            var ptr:AspectPtr = template.ptr(itr, key);
             lookup[prop.id] = ptr;
             template[ptr] = prop.initialValue;
+            itr++;
         }
     }
-
-    inline static function propSort(a:AspectProperty, b:AspectProperty):Int { return StringSort.sort(a.id, b.id); }
 }

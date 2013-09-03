@@ -9,6 +9,7 @@ using Lambda;
 
 import net.rezmason.ropes.Types;
 
+using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;
 
 #if !macro @:autoBuild(net.rezmason.ropes.Rule.build()) #end class Rule {
@@ -37,10 +38,10 @@ using net.rezmason.utils.Pointers;
 
     public function new():Void {
         demiurgic = false;
-        stateAspectRequirements = [];
-        playerAspectRequirements = [];
-        nodeAspectRequirements = [];
-        extraAspectRequirements = [];
+        stateAspectRequirements = new AspectRequirements();
+        playerAspectRequirements = new AspectRequirements();
+        nodeAspectRequirements = new AspectRequirements();
+        extraAspectRequirements = new AspectRequirements();
         extraAspectTemplate = new AspectSet();
         extraAspectLookup = new AspectLookup();
         moves = [];
@@ -52,12 +53,15 @@ using net.rezmason.utils.Pointers;
         this.state = state;
         this.plan = plan;
 
-        for (ike in 0...extraAspectRequirements.length) {
-            var prop:AspectProperty = extraAspectRequirements[ike];
-            var ptr:AspectPtr = extraAspectTemplate.ptr(ike, state.key);
+        var itr:Int = 0;
+        for (id in extraAspectRequirements.keys().a2z()) {
+            var prop:AspectProperty = extraAspectRequirements[id];
+            var ptr:AspectPtr = extraAspectTemplate.ptr(itr, state.key);
             extraAspectLookup[prop.id] = ptr;
             extraAspectTemplate[ptr] = prop.initialValue;
+            itr++;
         }
+
         __initPtrs();
         #if ROPES_VERBOSE trace('${myName()} initializing'); #end
         _prime();
@@ -122,6 +126,10 @@ using net.rezmason.utils.Pointers;
     @:final inline function numPlayers():Int { return state.players.length; }
     @:final inline function numExtras():Int { return state.extras.length; }
 
+    @:final inline function addStateAspectRequirement(req:AspectProperty):Void stateAspectRequirements [req.id] = req;
+    @:final inline function addPlayerAspectRequirement(req:AspectProperty):Void playerAspectRequirements [req.id] = req;
+    @:final inline function addNodeAspectRequirement(req:AspectProperty):Void nodeAspectRequirements [req.id] = req;
+
     #if macro
     private static var lkpSources:Map<String, String> = [
         'state'=>'plan',
@@ -165,7 +173,7 @@ using net.rezmason.utils.Pointers;
                     var kindLookup:String = '${kind}AspectLookup';
                     var kindRequirements:String = '${kind}AspectRequirements';
 
-                    declarations.push(macro $i{kindRequirements}.push($aspect));
+                    declarations.push(macro $i{kindRequirements}.set($aspect.id, $aspect));
                     assignments.push(macro $i{name} = $p{[lkpSources[kind], kindLookup]}[$aspect.id]);
 
                     field.kind = FVar(macro :net.rezmason.ropes.Types.AspectPtr, null);

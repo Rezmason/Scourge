@@ -30,7 +30,8 @@ typedef DropPieceConfig = {
 
 typedef DropPieceMove = {>Move,
     var targetNode:Int;
-    var addedNodes:Array<Int>;
+    var numAddedNodes:Int;
+    var addedNodes:Map<Int, BoardNode>;
     var rotation:Int;
     var reflection:Int;
     var coord:IntCoord;
@@ -74,7 +75,8 @@ class DropPieceRule extends Rule {
                 reflection:0,
                 id:0,
                 duplicate:false,
-                addedNodes:[],
+                numAddedNodes:0,
+                addedNodes:new Map(),
             };
             dropMoves.push(cast nowhereMove);
         }
@@ -107,7 +109,7 @@ class DropPieceRule extends Rule {
                     if (!cfg.allowRotating && rotationIndex != allowedRotationIndex) continue;
                     var rotation:Piece = reflection[rotationIndex];
 
-                    var coordCache:Map<Int, Array<IntCoord>> = new Map();
+                    var coordCache:Map<Int, Map<IntCoord, Bool>> = new Map();
 
                     // For each edge node,
                     for (node in edgeNodes) {
@@ -123,20 +125,22 @@ class DropPieceRule extends Rule {
                         for (homeCoord in footprint) {
 
                             var nodeID:Int = node.value[nodeID_];
-                            var cache:Array<IntCoord> = coordCache[nodeID];
-                            if (cache == null) coordCache[nodeID] = cache = [];
-                            if (!cache.has(homeCoord)) {
-                                cache.push(homeCoord);
+                            var cache:Map<IntCoord, Bool> = coordCache[nodeID];
+                            if (cache == null) coordCache[nodeID] = cache = new Map();
+                            if (!cache.exists(homeCoord)) {
+                                cache[homeCoord] = true;
 
                                 // Is the piece's body clear?
 
                                 var valid:Bool = true;
 
-                                var addedNodes:Array<Int> = [];
+                                var numAddedNodes:Int = 0;
+                                var addedNodes:Map<Int, BoardNode> = new Map();
 
                                 for (coord in rotation[0]) {
                                     var nodeAtCoord:BoardNode = walkNode(node, coord, homeCoord);
-                                    addedNodes.push(nodeAtCoord.value[nodeID_]);
+                                    addedNodes[nodeAtCoord.value[nodeID_]] = nodeAtCoord;
+                                    numAddedNodes++;
                                     var occupier:Int = nodeAtCoord.value[occupier_];
                                     var isFilled:Int = nodeAtCoord.value[isFilled_];
 
@@ -153,6 +157,7 @@ class DropPieceRule extends Rule {
                                         rotation:rotationIndex,
                                         reflection:reflectionIndex,
                                         id:dropMoves.length,
+                                        numAddedNodes:numAddedNodes,
                                         addedNodes:addedNodes,
                                         duplicate:false,
                                     });
@@ -217,8 +222,8 @@ class DropPieceRule extends Rule {
     inline function movesAreEqual(move1:DropPieceMove, move2:DropPieceMove):Bool {
         var val:Bool = true;
         //if (move1.targetNode != move2.targetNode) val = false;
-        if (move1.addedNodes.length != move2.addedNodes.length) val = false;
-        else for (addedNode in move1.addedNodes) if (!move2.addedNodes.has(addedNode)) { val = false; break; }
+        if (move1.numAddedNodes != move2.numAddedNodes) val = false;
+        else for (addedNodeID in move1.addedNodes.keys()) if (!move2.addedNodes.exists(addedNodeID)) { val = false; break; }
         return val;
     }
 

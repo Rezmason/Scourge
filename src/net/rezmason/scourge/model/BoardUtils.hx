@@ -80,6 +80,12 @@ class BoardUtils {
         return arr;
     }
 
+    public inline static function boardListToMap(_node:BoardNode, _nodes:Array<BoardNode>, _aspectPointer:AspectPtr):Map<Int, BoardNode> {
+        var map:Map<Int, BoardNode> = new Map();
+        for (node in iterate(_node, _nodes, _aspectPointer)) map[node.id] = node;
+        return map;
+    }
+
     public inline static function removeNode(node:BoardNode, nodes:Array<BoardNode>, next:AspectPtr, prev:AspectPtr):BoardNode {
         var nextNodeID:Int = node.value[next];
         var prevNodeID:Int = node.value[prev];

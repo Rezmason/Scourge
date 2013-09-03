@@ -19,11 +19,11 @@ abstract PtrSet<T>(Array<T>) {
     public inline function new(a:Array<T> = null) this = (a == null) ? [] : a.copy();
     public inline function wipe():Void this.splice(0, this.length);
     public inline function copy():PtrSet<T> return cast this.copy();
-    public inline function copyTo(dest:PtrSet<T>, offset:Int = 0):Void {
+    public inline function copyTo(dest:PtrSet<T>, offset:Int):Void {
         for (ike in 0...this.length) dest.write(ike + offset, this[ike]);
     }
     public inline function map<U>(mapFunc:T->U):PtrSet<U> return cast this.map(mapFunc);
-    public inline function mapTo<U>(mapFunc:T->U, dest:PtrSet<U>, offset:Int = 0):Void {
+    public inline function mapTo<U>(mapFunc:T->U, dest:PtrSet<U>, offset:Int):Void {
         for (ike in 0...this.length) dest.write(ike + offset, mapFunc(this[ike]));
     }
 
@@ -44,7 +44,7 @@ abstract PtrSet<T>(Array<T>) {
         #end
     }
 
-    @:allow(net.rezmason.utils) inline function length():Int return this.length;
+    @:allow(net.rezmason.utils.PtrIterator) inline function length():Int return this.length;
 
     public inline function ptr(i:Int, k:PtrKey):Ptr<T> return new Ptr(i, k);
     public inline function ptrs(k:PtrKey):PtrIterator<T> return new PtrIterator(cast this, k);

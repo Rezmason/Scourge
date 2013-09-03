@@ -131,12 +131,12 @@ class BuildBoardRule extends Rule {
     }
 
     inline function makeNode():BoardNode {
-        var node:BoardNode = new BoardNode(nodeAspectTemplate.copy());
-        node.value[nodeID_] = numNodes();
+        var node:BoardNode = new BoardNode(numNodes(), nodeAspectTemplate.copy());
+        node.value[nodeID_] = node.id;
         state.nodes.push(node);
 
         var histAspects:AspectSet = nodeAspectTemplate.map(cfg.buildCfg.history.alloc);
-        var histNode:BoardNode = new BoardNode(histAspects);
+        var histNode:BoardNode = new BoardNode(node.id, histAspects);
         cfg.buildCfg.historyState.nodes.push(histNode);
 
         return node;

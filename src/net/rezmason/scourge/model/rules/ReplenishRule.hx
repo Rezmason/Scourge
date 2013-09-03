@@ -45,9 +45,9 @@ class ReplenishRule extends Rule {
         super();
         this.cfg = cfg;
 
-        for (rProp in cfg.stateProperties) stateAspectRequirements.push(rProp.prop);
-        for (rProp in cfg.playerProperties) playerAspectRequirements.push(rProp.prop);
-        for (rProp in cfg.nodeProperties) nodeAspectRequirements.push(rProp.prop);
+        for (rProp in cfg.stateProperties ) addStateAspectRequirement (rProp.prop);
+        for (rProp in cfg.playerProperties) addPlayerAspectRequirement(rProp.prop);
+        for (rProp in cfg.nodeProperties  ) addNodeAspectRequirement  (rProp.prop);
 
         moves.push({id:0});
     }
@@ -117,6 +117,7 @@ class ReplenishRule extends Rule {
 
         // We represent replenishables as extras
         var rep:AspectSet = buildExtra();
+
         rep[repPropLookup_] = lookup[repCfg.prop.id].toInt();
         rep[repID_] = numExtras();
 

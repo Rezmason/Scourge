@@ -118,7 +118,7 @@ class Lab {
 
         // Create geometry
 
-        var body:Body = new TestBody(1, utils.bufferUtil, glyphTexture, bonk);
+        var body:Body = new TestBody(utils.bufferUtil, glyphTexture, bonk);
         body.update(0);
         segment = body.segments[0];
 

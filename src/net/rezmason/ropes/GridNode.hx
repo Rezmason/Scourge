@@ -4,13 +4,13 @@ class GridNode<T> {
     public var value(default, null):T;
     public var neighbors(default, null):Array<GridNode<T>>;
     public var headingOffsets(default, null):Array<Int>;
-    public var id:Int;
+    public var id(default, null):Int;
 
-    public function new(value:T):Void {
+    public function new(id:Int, value:T):Void {
         this.value = value;
+        this.id = id;
         neighbors = [];
         headingOffsets = [0, 0, 0, 0, 0, 0, 0, 0];
-        id = -1;
     }
 }
 

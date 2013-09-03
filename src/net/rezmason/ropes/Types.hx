@@ -12,7 +12,7 @@ typedef AspectSet = PtrSet<Atom>; // The properties of an element of the state
 typedef BoardNode = GridNode<AspectSet>;
 
 typedef AspectProperty = { var id(default, null):String; var initialValue(default, null):Atom; }; // The distinct possible properties of our state
-typedef AspectRequirements = Array<AspectProperty>;
+typedef AspectRequirements = Map<String, AspectProperty>;
 typedef AspectLookup = Map<String, AspectPtr>; // The indices of property types in the AspectSet of an element
 
 typedef Move = {id:Int, ?relatedID:Int, ?weight:Float};
