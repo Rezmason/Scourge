@@ -109,8 +109,6 @@ class DropPieceRule extends Rule {
                     if (!cfg.allowRotating && rotationIndex != allowedRotationIndex) continue;
                     var rotation:Piece = reflection[rotationIndex];
 
-                    var coordCache:Map<Int, Map<IntCoord, Bool>> = new Map();
-
                     // For each edge node,
                     for (node in edgeNodes) {
 
@@ -124,44 +122,37 @@ class DropPieceRule extends Rule {
                         // Using each footprint coord as a home coord (aka the point of connection),
                         for (homeCoord in footprint) {
 
-                            var nodeID:Int = node.value[nodeID_];
-                            var cache:Map<IntCoord, Bool> = coordCache[nodeID];
-                            if (cache == null) coordCache[nodeID] = cache = new Map();
-                            if (!cache.exists(homeCoord)) {
-                                cache[homeCoord] = true;
+                            // Is the piece's body clear?
 
-                                // Is the piece's body clear?
+                            var valid:Bool = true;
 
-                                var valid:Bool = true;
+                            var numAddedNodes:Int = 0;
+                            var addedNodes:Map<Int, BoardNode> = new Map();
 
-                                var numAddedNodes:Int = 0;
-                                var addedNodes:Map<Int, BoardNode> = new Map();
+                            for (coord in rotation[0]) {
+                                var nodeAtCoord:BoardNode = walkNode(node, coord, homeCoord);
+                                addedNodes[nodeAtCoord.value[nodeID_]] = nodeAtCoord;
+                                numAddedNodes++;
+                                var occupier:Int = nodeAtCoord.value[occupier_];
+                                var isFilled:Int = nodeAtCoord.value[isFilled_];
 
-                                for (coord in rotation[0]) {
-                                    var nodeAtCoord:BoardNode = walkNode(node, coord, homeCoord);
-                                    addedNodes[nodeAtCoord.value[nodeID_]] = nodeAtCoord;
-                                    numAddedNodes++;
-                                    var occupier:Int = nodeAtCoord.value[occupier_];
-                                    var isFilled:Int = nodeAtCoord.value[isFilled_];
-
-                                    if (isFilled == Aspect.TRUE && occupier != Aspect.NULL && !(cfg.overlapSelf && occupier == currentPlayer)) {
-                                        valid = false;
-                                        break;
-                                    }
+                                if (isFilled == Aspect.TRUE && occupier != Aspect.NULL && !(cfg.overlapSelf && occupier == currentPlayer)) {
+                                    valid = false;
+                                    break;
                                 }
+                            }
 
-                                if (valid) {
-                                    dropMoves.push({
-                                        targetNode:nodeID,
-                                        coord:homeCoord,
-                                        rotation:rotationIndex,
-                                        reflection:reflectionIndex,
-                                        id:dropMoves.length,
-                                        numAddedNodes:numAddedNodes,
-                                        addedNodes:addedNodes,
-                                        duplicate:false,
-                                    });
-                                }
+                            if (valid) {
+                                dropMoves.push({
+                                    targetNode:node.value[nodeID_],
+                                    coord:homeCoord,
+                                    rotation:rotationIndex,
+                                    reflection:reflectionIndex,
+                                    id:dropMoves.length,
+                                    numAddedNodes:numAddedNodes,
+                                    addedNodes:addedNodes,
+                                    duplicate:false,
+                                });
                             }
                         }
                     }

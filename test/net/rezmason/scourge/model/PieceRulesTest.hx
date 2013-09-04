@@ -99,6 +99,40 @@ class PieceRulesTest extends ScourgeRuleTest
 	}
 
     @Test
+    public function placePieceScourgeRuleTestOrthoNoSpace():Void {
+
+        var testPieceCfg:TestPieceConfig = {
+            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
+            reflection:0,
+            rotation:0,
+        };
+        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceCfg);
+
+        var dropConfig:DropPieceConfig = {
+            overlapSelf:false,
+            allowFlipping:true,
+            allowRotating:true,
+            growGraph:false,
+            allowNowhere:false,
+            orthoOnly:true,
+            diagOnly:false,
+            pieces:pieces,
+        };
+        var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
+        makeState([testPieceRule, dropRule], 1, TestBoards.fullPetri);
+
+        dropRule.update();
+        var moves:Array<DropPieceMove> = cast dropRule.moves;
+
+        Assert.areEqual(0, moves.length); // The board is full! There should be no moves.
+
+        var numWalls:Int = ~/([^X])/g.replace(state.spitBoard(plan), '').length;
+        Assert.areEqual(72, numWalls); // 72 walls cells
+
+        VisualAssert.assert('full petri', state.spitBoard(plan));
+    }
+
+    @Test
     public function placePieceScourgeRuleTestOrthoNoFlipping():Void {
 
         var testPieceCfg:TestPieceConfig = {

@@ -1,6 +1,7 @@
 Bug in DropPieceRule!
     Piece can go over walls, apparently
 Null object reference in BitePieceRule!
+RandomFunction fails when it's set to Math.random??
 
 NodeView and BoardBody
 

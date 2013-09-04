@@ -84,6 +84,7 @@ class TextDemo {
             {type:Test(takeTurn, false)},
         ];
         var cfg = ScourgeConfigFactory.makeDefaultConfig();
+        cfg.allowRotating = false;
         // cfg.circular = true;
         cfg.numPlayers = playerCfgs.length;
         referee = new Referee();
