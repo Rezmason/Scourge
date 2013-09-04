@@ -18,14 +18,14 @@
 	<haxelib name="munit" />
 	<classpath name="test" />
 
-	<assets path="tables" />
+	<assets path="tables" include="*.txt" />
 
 	<!-- <haxedef name="VISUAL_TEST" if="mac" /> -->
 	<!-- <haxedef name="USE_POINTERS" /> -->
 	<!-- <haxedef name="ROPES_VERBOSE" /> -->
 	<!-- <haxedef name="ROPES_MACRO_VERBOSE" /> -->
 
-	<assets path="flash_workers/flash/bin" rename="flash_workers" />
+	<assets path="flash_workers/flash/bin" rename="flash_workers" if="flash" />
 	<haxedef name="stage3d" if="flash" />
 	<haxedef name="glsl2agal" if="flash" />
 
