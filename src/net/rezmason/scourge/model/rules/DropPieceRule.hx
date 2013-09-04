@@ -136,7 +136,7 @@ class DropPieceRule extends Rule {
                                 var occupier:Int = nodeAtCoord.value[occupier_];
                                 var isFilled:Int = nodeAtCoord.value[isFilled_];
 
-                                if (isFilled == Aspect.TRUE && occupier != Aspect.NULL && !(cfg.overlapSelf && occupier == currentPlayer)) {
+                                if (isFilled == Aspect.TRUE && !(cfg.overlapSelf && occupier == currentPlayer)) {
                                     valid = false;
                                     break;
                                 }
