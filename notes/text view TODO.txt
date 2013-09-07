@@ -1,9 +1,15 @@
-Null object reference in BitePieceRule!
-RandomFunction fails when it's set to Math.random??
+Make BodySegments expandable
+    Create new vertex, index buffers
+    GlyphUtils.transfer
+    Then add more glyphs
+    Destroy previous buffers
+
+Make Bodies expandable
+    Concat the new glyphs of the expanded BodySegments to the glyphs vec
+    Create new BodySegments if necessary
+        Concat their glyphs to the glyphs vec
 
 NodeView and BoardBody
-
-    Character scaling for large games
 
     Throb
         A wave pool whose width is the longest distance from a player's head to their tail

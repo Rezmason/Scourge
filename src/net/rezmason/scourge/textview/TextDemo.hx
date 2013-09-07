@@ -17,6 +17,8 @@ import net.rezmason.scourge.controller.Types;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
 
+import haxe.Timer;
+
 class TextDemo {
 
     var engine:Engine;
@@ -35,6 +37,8 @@ class TextDemo {
     var referee:Referee;
     var turnFuncs:Array<Void->Void>;
 
+    var robotTimer:Timer;
+
     public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
         this.stage = stage;
@@ -42,6 +46,7 @@ class TextDemo {
         engine = new Engine(utils, stage, fontTextures);
         engine.init(init);
         addListeners();
+        robotTimer = null;
     }
 
     function makeFontTextures(fonts:Map<String, FlatFont>):Void {
@@ -62,9 +67,7 @@ class TextDemo {
         turnFuncs.push(func);
     }
 
-    function makeTurn(input:String):String {
-
-        var output:String = "PROBLEM?";
+    function makeTurn():Void {
 
         var funcs:Array<Void->Void> = turnFuncs.splice(0, turnFuncs.length);
         funcs.reverse();
@@ -72,27 +75,57 @@ class TextDemo {
         if (funcs.length > 0) {
             while (funcs.length > 0) funcs.pop()();
             boardBody.handleBoardUpdate();
-            output = "MOVED";
         }
+    }
 
-        return output;
+    function makeTurn2():Void {
+        makeTurn();
+        makeTurn();
+    }
+
+    function startRobots(input:String):String {
+        stopRobots("");
+        robotTimer = new Timer(Std.parseInt(input.split(' ')[1]));
+        trace(input);
+        robotTimer.run = makeTurn2;
+        makeTurn2();
+        return "ROBOTS STARTED";
+    }
+
+    function stopRobots(input:String):String {
+        if (robotTimer != null) robotTimer.stop();
+        robotTimer = null;
+        return "ROBOTS STOPPED";
     }
 
     function makeGame():Void {
+        if (referee == null) referee = new Referee();
+        else referee.endGame();
+
         var playerCfgs = [
+            {type:Test(takeTurn, false)},
+            {type:Test(takeTurn, false)},
             {type:Test(takeTurn, false)},
             {type:Test(takeTurn, false)},
         ];
         var cfg = ScourgeConfigFactory.makeDefaultConfig();
         cfg.allowRotating = false;
-        // cfg.circular = true;
+        cfg.circular = true;
+        cfg.allowAllPieces = false;
         cfg.numPlayers = playerCfgs.length;
-        referee = new Referee();
         referee.beginGame(playerCfgs, randomFunction, cfg);
     }
 
     function randomFunction():Float {
         return 0;
+    }
+
+    function setFont(input:String):String {
+        var fontName:String = input.split(' ')[1];
+        var fontTexture:GlyphTexture = fontTextures[fontName];
+        if (fontTexture == null) return 'Font $fontName does not exist.';
+        for (body in engine.eachBody()) body.glyphTexture = fontTexture;
+        return 'Font set to $fontName';
     }
 
     function makeScene():Void {
@@ -111,8 +144,10 @@ class TextDemo {
 
         //*
         interpreter = new Interpreter();
-        interpreter.addCommand("makeTurn", makeTurn);
+        interpreter.addCommand("startRobots", startRobots);
+        interpreter.addCommand("stopRobots", stopRobots);
         interpreter.addCommand("runTests", runTests);
+        interpreter.addCommand("setFont", setFont);
         uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, new UIText(interpreter));
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
         uiRect.inflate(-0.025, -0.1);

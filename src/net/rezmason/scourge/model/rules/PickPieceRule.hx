@@ -84,7 +84,7 @@ class PickPieceRule extends Rule {
         } else if (state.aspects[pieceTableID_] == Aspect.NULL) {
             moves = [pickMove];
 
-            // Iterate over the hat's contents and incrlude the corresopnding quantum moves
+            // Iterate over the hat's contents and include the corresopnding quantum moves
 
             var quantumPieceMoves:Array<PickPieceMove> = [];
             var firstHatPiece:AspectSet = getExtra(state.aspects[pieceHatFirst_]);
@@ -250,9 +250,11 @@ class PickPieceRule extends Rule {
     private function binarySearch(val:Float, list:Array<Float>):Int {
         function search(min:Int, max:Int):Int {
             var halfway:Int = Std.int((min + max) * 0.5);
+
             if (max < min) return -1;
-            else if (list[halfway] > val) return search(min, halfway - 1);
-            else if (list[halfway] < val) return search(halfway + 1, max);
+            else if (max - min == 1) return (list[max] - val > val - list[min]) ? min : max;
+            else if (list[halfway] > val) return search(min, halfway);
+            else if (list[halfway] < val) return search(halfway, max);
             else return halfway;
         }
 

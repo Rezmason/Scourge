@@ -146,6 +146,21 @@ class TestBoards {
         'XXXX00000XXXX\n' +
         'XXXXXXXXXXXXX';
 
+    public static var frozenPetri:String = '\n' +
+        'XXXXXXXXXXXXX\n' +
+        'XXXXXXXXXXXXX\n' +
+        'XXXXXXXXXXXXX\n' +
+        'XXXXXXXXXXXXX\n' +
+        'XXXXXXXXXXXXX\n' +
+        'XXXXX   XXXXX\n' +
+        'XXXXX 0 XXXXX\n' +
+        'XXXXX   XXXXX\n' +
+        'XXXXXXXXXXXXX\n' +
+        'XXXXXXXXXXXXX\n' +
+        'XXXXXXXXXXXXX\n' +
+        'XXXXXXXXXXXXX\n' +
+        'XXXXXXXXXXXXX';
+
     public static var flowerPetri:String = '\n' +
         'XXXXXXXXXXXXX\n' +
         'XXXX     XXXX\n' +

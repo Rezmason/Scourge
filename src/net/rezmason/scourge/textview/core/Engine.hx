@@ -143,6 +143,8 @@ class Engine {
         keyboardSystem.detach();
     }
 
+    public function eachBody():Iterator<Body> return bodies.iterator();
+
     function onTimer():Void {
         var timeStamp:Float = Timer.stamp();
         var delta:Float = timeStamp - lastTimeStamp;

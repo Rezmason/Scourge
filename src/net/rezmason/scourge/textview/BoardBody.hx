@@ -213,9 +213,19 @@ class BoardBody extends Body {
                         size = 1;
                     }
                 } else {
+                    var isVisible:Bool = false;
+                    for (direction in GridUtils.orthoDirections()) {
+                        var neighborNode:BoardNode = view.node.neighbors[direction];
+                        if (neighborNode == null) continue;
+                        if (neighborNode.value[isFilled_] == Aspect.FALSE || neighborNode.value[occupier_] != Aspect.NULL) {
+                            isVisible = true;
+                            break;
+                        }
+                    }
+
                     color = WALL_COLOR;
                     code = wallCode;
-                    size = 0.9;
+                    size = isVisible ? 0.9 : 0;
                 }
             } else {
                 color = BOARD_COLOR;

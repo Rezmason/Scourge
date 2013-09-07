@@ -20,7 +20,7 @@ class Body {
     public var glyphTransform:Matrix3D;
     public var numGlyphs(default, null):Int;
     public var numVisibleGlyphs(default, null):Int;
-    public var glyphTexture(default, null):GlyphTexture;
+    public var glyphTexture(default, set):GlyphTexture;
     public var numSegments(default, null):Int;
     public var letterbox(default, null):Bool;
     public var catchMouseInRect(default, null):Bool;
@@ -40,8 +40,8 @@ class Body {
         if (this.redrawHitAreas == null) redrawHitAreas = function() {};
         letterbox = true;
         catchMouseInRect = true;
-        this.glyphTexture = glyphTexture;
         glyphs = [];
+        this.glyphTexture = glyphTexture;
         viewRect = DEFAULT_VIEW_RECT;
 
         projection = makeProjection();
@@ -170,5 +170,11 @@ class Body {
         if (rect == null) rect = DEFAULT_VIEW_RECT;
         viewRect = rect;
         return rect;
+    }
+
+    inline function set_glyphTexture(gt:GlyphTexture):GlyphTexture {
+        this.glyphTexture = gt;
+        for (glyph in glyphs) glyph.set_char(glyph.get_char(), gt.font);
+        return gt;
     }
 }
