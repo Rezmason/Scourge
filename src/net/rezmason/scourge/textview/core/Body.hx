@@ -80,6 +80,7 @@ class Body {
                 var len:Int = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
                 var segment:BodySegment = null;
                 var donor:BodySegment = oldSegments[segmentID];
+
                 if (donor != null && donor.numGlyphs == len) {
                     segment = donor;
                 } else {
@@ -94,12 +95,11 @@ class Body {
                 segmentID++;
             }
 
-            for (ike in numGlyphs...trueNumGlyphs) glyphs[ike].set_s(0);
-
             trueNumGlyphs = numGlyphs;
         }
 
         this.numGlyphs = numGlyphs;
+        for (ike in numGlyphs...trueNumGlyphs) glyphs[ike].set_s(0);
     }
 
     public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {

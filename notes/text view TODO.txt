@@ -1,5 +1,4 @@
 Make UIBody expand when it has to
-Make BoardBody expand when it has to
 
 NodeView and BoardBody
 

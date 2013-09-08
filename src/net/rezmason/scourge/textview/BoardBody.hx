@@ -54,6 +54,13 @@ class BoardBody extends Body {
 
     var boardScale:Float;
 
+    var boardCode:Int;
+    var wallCode:Int;
+    var bodyCode:Int;
+    var headCode:Int;
+    var uiCode:Int;
+    var blankCode:Int;
+
     var game:Game;
     var nodeViews:Array<NodeView>;
     var nodeViewsByNode:Map<BoardNode, NodeView>;
@@ -62,30 +69,11 @@ class BoardBody extends Body {
     var isFilled_:AspectPtr;
     var head_:AspectPtr;
 
-    var boardCode:Int;
-    var wallCode:Int;
-    var bodyCode:Int;
-    var headCode:Int;
-    var uiCode:Int;
-    var blankCode:Int;
-
     var headNodes:Array<BoardNode>;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, game:Game):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
 
         super(bufferUtil, glyphTexture, redrawHitAreas);
-
-        this.game = game;
-
-        occupier_ = game.plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
-        isFilled_ = game.plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
-        head_ = game.plan.playerAspectLookup[BodyAspect.HEAD.id];
-
-        var nodes:Array<BoardNode> = game.state.nodes;
-
-        growTo(nodes.length * 2);
-
-        nodeViews = [];
 
         dragging = false;
         dragStartTransform = new Matrix3D();
@@ -98,8 +86,27 @@ class BoardBody extends Body {
         bodyCode = Utf8.charCodeAt('•', 0);
         headCode = Utf8.charCodeAt('Ω', 0);
         uiCode = Utf8.charCodeAt('', 0);
-
         blankCode = Utf8.charCodeAt(' ', 0);
+
+        boardScale = 1;
+    }
+
+    public function attach(game:Game):Void {
+
+        if (this.game != game) detach();
+        if (game == null) return;
+
+        this.game = game;
+
+        occupier_ = game.plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
+        isFilled_ = game.plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        head_ = game.plan.playerAspectLookup[BodyAspect.HEAD.id];
+
+        var nodes:Array<BoardNode> = game.state.nodes;
+
+        growTo(nodes.length * 2);
+
+        nodeViews = [];
 
         nodeViewsByNode = new Map();
 
@@ -164,6 +171,7 @@ class BoardBody extends Body {
         var centerY:Float = (minY + maxY) * 0.5;
 
         boardScale = 18 / (maxX - minX);
+        homeTransform.identity();
         homeTransform.appendScale(boardScale, boardScale, boardScale);
         homeTransform.appendTranslation(0, 0, 0.5);
 
@@ -184,11 +192,24 @@ class BoardBody extends Body {
         handleBoardUpdate();
     }
 
+    public function detach():Void {
+        if (game == null) return;
+
+        game = null;
+        nodeViews = null;
+
+        for (key in nodeViewsByNode.keys()) nodeViewsByNode.remove(key);
+        nodeViewsByNode = null;
+
+        headNodes = null;
+    }
+
     public function handleBoardUpdate():Void {
         var itr:Int = 0;
         for (player in game.state.players) headNodes[itr++] = game.state.nodes[player[head_]];
 
         for (view in nodeViews) {
+
             var playerID:Null<Int> = view.node.value[occupier_];
             var isFilled:Bool = view.node.value[isFilled_] == Aspect.TRUE;
 
@@ -261,8 +282,10 @@ class BoardBody extends Body {
 
         var screenSize:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
         var rectSize:Float = Math.min(rect.width * stageWidth, rect.height * stageHeight) / screenSize;
+
         var glyphWidth:Float = rectSize * 0.1 * boardScale;
-        setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
+        var glyphScreenRatio:Float = glyphTexture.font.glyphRatio * stageWidth / stageHeight;
+        setGlyphScale(glyphWidth, glyphWidth * glyphScreenRatio);
     }
 
     override public function update(delta:Float):Void {

@@ -55,15 +55,20 @@ class TextDemo {
     }
 
     function init():Void {
-        makeGame();
+        makeScene();
     }
 
     function takeTurn(game:Game, func:Void->Void):Void {
         if (this.game == null) {
             this.game = game;
-            makeScene();
             turnFuncs = [];
+
+            if (boardBody != null) {
+                boardBody.attach(this.game);
+                onResize();
+            }
         }
+
         turnFuncs.push(func);
     }
 
@@ -98,22 +103,31 @@ class TextDemo {
         return "ROBOTS STOPPED";
     }
 
-    function makeGame():Void {
+    function makeGame(input:String):String {
+
+        stopRobots("");
+
         if (referee == null) referee = new Referee();
         else referee.endGame();
 
-        var playerCfgs = [
-            {type:Test(takeTurn, false)},
-            {type:Test(takeTurn, false)},
-            {type:Test(takeTurn, false)},
-            {type:Test(takeTurn, false)},
-        ];
+        game = null;
+
+        var numPlayers:Int = Std.parseInt(input.split(' ')[1]);
+
+        if (numPlayers < 2) numPlayers = 2;
+
+        var playerCfgs = [];
+
+        for (ike in 0...numPlayers) playerCfgs.push({type:Test(takeTurn, false)});
+
         var cfg = ScourgeConfigFactory.makeDefaultConfig();
         cfg.allowRotating = false;
         cfg.circular = true;
         cfg.allowAllPieces = false;
         cfg.numPlayers = playerCfgs.length;
         referee.beginGame(playerCfgs, randomFunction, cfg);
+
+        return 'Starting a $numPlayers player game.';
     }
 
     function randomFunction():Float {
@@ -137,7 +151,7 @@ class TextDemo {
         /**/
 
         //*
-        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, game);
+        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         boardBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(boardBody);
         /**/
@@ -148,6 +162,7 @@ class TextDemo {
         interpreter.addCommand("stopRobots", stopRobots);
         interpreter.addCommand("runTests", runTests);
         interpreter.addCommand("setFont", setFont);
+        interpreter.addCommand("makeGame", makeGame);
         uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, new UIText(interpreter));
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
         uiRect.inflate(-0.025, -0.1);

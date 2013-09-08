@@ -9,24 +9,24 @@ typedef G = Glyph;
 
 class GlyphUtils {
 
-    inline static var R_OFFSET:Int = 0;
-    inline static var G_OFFSET:Int = 1;
-    inline static var B_OFFSET:Int = 2;
-    inline static var U_OFFSET:Int = 3;
-    inline static var V_OFFSET:Int = 4;
-    inline static var I_OFFSET:Int = 5;
+    inline static var rOff:Int = Almanac.R_OFFSET;
+    inline static var gOff:Int = Almanac.G_OFFSET;
+    inline static var bOff:Int = Almanac.B_OFFSET;
+    inline static var uOff:Int = Almanac.U_OFFSET;
+    inline static var vOff:Int = Almanac.V_OFFSET;
+    inline static var iOff:Int = Almanac.I_OFFSET;
 
-    inline static var X_OFFSET:Int = 0;
-    inline static var Y_OFFSET:Int = 1;
-    inline static var Z_OFFSET:Int = 2;
-    inline static var CH_OFFSET:Int = 3;
-    inline static var CV_OFFSET:Int = 4;
-    inline static var S_OFFSET:Int = 5;
-    inline static var P_OFFSET:Int = 6;
+    inline static var xOff:Int = Almanac.X_OFFSET;
+    inline static var yOff:Int = Almanac.Y_OFFSET;
+    inline static var zOff:Int = Almanac.Z_OFFSET;
+    inline static var aOff:Int = Almanac.A_OFFSET;
+    inline static var dOff:Int = Almanac.D_OFFSET;
+    inline static var sOff:Int = Almanac.S_OFFSET;
+    inline static var pOff:Int = Almanac.P_OFFSET;
 
-    inline static var PR_OFFSET:Int = 0;
-    inline static var PG_OFFSET:Int = 1;
-    inline static var PB_OFFSET:Int = 2;
+    inline static var prOff:Int = Almanac.PR_OFFSET;
+    inline static var pgOff:Int = Almanac.PG_OFFSET;
+    inline static var pbOff:Int = Almanac.PB_OFFSET;
 
     static var blank:Int = ' '.charCodeAt(0);
 
@@ -40,17 +40,17 @@ class GlyphUtils {
 
     // Color
 
-    public inline static function get_r(gl:G) { return gl.color[gl.id * cpg + R_OFFSET]; }
-    public inline static function set_r(gl:G, v) { return pop4(gl.color, gl.id * cpg, R_OFFSET, cpv, v); }
+    public inline static function get_r(gl:G) { return gl.color[gl.id * cpg + rOff]; }
+    public inline static function set_r(gl:G, v) { return pop4(gl.color, gl.id * cpg, rOff, cpv, v); }
 
-    public inline static function get_g(gl:G) { return gl.color[gl.id * cpg + G_OFFSET]; }
-    public inline static function set_g(gl:G, v) { return pop4(gl.color, gl.id * cpg, G_OFFSET, cpv, v); }
+    public inline static function get_g(gl:G) { return gl.color[gl.id * cpg + gOff]; }
+    public inline static function set_g(gl:G, v) { return pop4(gl.color, gl.id * cpg, gOff, cpv, v); }
 
-    public inline static function get_b(gl:G) { return gl.color[gl.id * cpg + B_OFFSET]; }
-    public inline static function set_b(gl:G, v) { return pop4(gl.color, gl.id * cpg, B_OFFSET, cpv, v); }
+    public inline static function get_b(gl:G) { return gl.color[gl.id * cpg + bOff]; }
+    public inline static function set_b(gl:G, v) { return pop4(gl.color, gl.id * cpg, bOff, cpv, v); }
 
-    public inline static function get_i(gl:G) { return gl.color[gl.id * cpg + I_OFFSET]; }
-    public inline static function set_i(gl:G, v) { return pop4(gl.color, gl.id * cpg, I_OFFSET, cpv, v); }
+    public inline static function get_i(gl:G) { return gl.color[gl.id * cpg + iOff]; }
+    public inline static function set_i(gl:G, v) { return pop4(gl.color, gl.id * cpg, iOff, cpv, v); }
 
     public inline static function set_color(gl:G, r, g, b) {
         set_r(gl, r);
@@ -60,18 +60,18 @@ class GlyphUtils {
 
     // Shape
 
-    public inline static function get_x(gl:G) { return gl.shape[gl.id * spg + X_OFFSET]; }
-    public inline static function set_x(gl:G, v) { return pop4(gl.shape, gl.id * spg, X_OFFSET, spv, v); }
-    public inline static function get_y(gl:G) { return gl.shape[gl.id * spg + Y_OFFSET]; }
-    public inline static function set_y(gl:G, v) { return pop4(gl.shape, gl.id * spg, Y_OFFSET, spv, v); }
-    public inline static function get_z(gl:G) { return gl.shape[gl.id * spg + Z_OFFSET]; }
-    public inline static function set_z(gl:G, v) { return pop4(gl.shape, gl.id * spg, Z_OFFSET, spv, v); }
+    public inline static function get_x(gl:G) { return gl.shape[gl.id * spg + xOff]; }
+    public inline static function set_x(gl:G, v) { return pop4(gl.shape, gl.id * spg, xOff, spv, v); }
+    public inline static function get_y(gl:G) { return gl.shape[gl.id * spg + yOff]; }
+    public inline static function set_y(gl:G, v) { return pop4(gl.shape, gl.id * spg, yOff, spv, v); }
+    public inline static function get_z(gl:G) { return gl.shape[gl.id * spg + zOff]; }
+    public inline static function set_z(gl:G, v) { return pop4(gl.shape, gl.id * spg, zOff, spv, v); }
 
-    public inline static function get_s(gl:G) { return gl.shape[gl.id * spg + S_OFFSET]; }
-    public inline static function set_s(gl:G, v) { return pop4(gl.shape, gl.id * spg, S_OFFSET, spv, v); }
+    public inline static function get_s(gl:G) { return gl.shape[gl.id * spg + sOff]; }
+    public inline static function set_s(gl:G, v) { return pop4(gl.shape, gl.id * spg, sOff, spv, v); }
 
-    public inline static function get_p(gl:G) { return gl.shape[gl.id * spg + P_OFFSET]; }
-    public inline static function set_p(gl:G, v) { return pop4(gl.shape, gl.id * spg, P_OFFSET, spv, v); }
+    public inline static function get_p(gl:G) { return gl.shape[gl.id * spg + pOff]; }
+    public inline static function set_p(gl:G, v) { return pop4(gl.shape, gl.id * spg, pOff, spv, v); }
 
     public inline static function set_shape(gl:G, x, y, z, s, p) {
         set_pos(gl, x, y, z);
@@ -87,15 +87,15 @@ class GlyphUtils {
 
     public inline static function makeCorners(gl:G):Void {
         var glyphOffset:Int = gl.id * spg;
-        pop1(gl.shape, glyphOffset, CH_OFFSET + 0 * spv, 0);
-        pop1(gl.shape, glyphOffset, CH_OFFSET + 1 * spv, 0);
-        pop1(gl.shape, glyphOffset, CH_OFFSET + 2 * spv, 1);
-        pop1(gl.shape, glyphOffset, CH_OFFSET + 3 * spv, 1);
+        pop1(gl.shape, glyphOffset, aOff + 0 * spv, 0);
+        pop1(gl.shape, glyphOffset, aOff + 1 * spv, 0);
+        pop1(gl.shape, glyphOffset, aOff + 2 * spv, 1);
+        pop1(gl.shape, glyphOffset, aOff + 3 * spv, 1);
 
-        pop1(gl.shape, glyphOffset, CV_OFFSET + 0 * spv, 0);
-        pop1(gl.shape, glyphOffset, CV_OFFSET + 1 * spv, 1);
-        pop1(gl.shape, glyphOffset, CV_OFFSET + 2 * spv, 1);
-        pop1(gl.shape, glyphOffset, CV_OFFSET + 3 * spv, 0);
+        pop1(gl.shape, glyphOffset, dOff + 0 * spv, 0);
+        pop1(gl.shape, glyphOffset, dOff + 1 * spv, 1);
+        pop1(gl.shape, glyphOffset, dOff + 2 * spv, 1);
+        pop1(gl.shape, glyphOffset, dOff + 3 * spv, 0);
     }
 
     // Character
@@ -107,15 +107,15 @@ class GlyphUtils {
             var charUV = font.getCharCodeUVs(code);
             var glyphOffset:Int = gl.id * cpg;
 
-            pop1(gl.color, glyphOffset, U_OFFSET + 0 * cpv, charUV[3].u);
-            pop1(gl.color, glyphOffset, U_OFFSET + 1 * cpv, charUV[0].u);
-            pop1(gl.color, glyphOffset, U_OFFSET + 2 * cpv, charUV[1].u);
-            pop1(gl.color, glyphOffset, U_OFFSET + 3 * cpv, charUV[2].u);
+            pop1(gl.color, glyphOffset, uOff + 0 * cpv, charUV[3].u);
+            pop1(gl.color, glyphOffset, uOff + 1 * cpv, charUV[0].u);
+            pop1(gl.color, glyphOffset, uOff + 2 * cpv, charUV[1].u);
+            pop1(gl.color, glyphOffset, uOff + 3 * cpv, charUV[2].u);
 
-            pop1(gl.color, glyphOffset, V_OFFSET + 0 * cpv, charUV[3].v);
-            pop1(gl.color, glyphOffset, V_OFFSET + 1 * cpv, charUV[0].v);
-            pop1(gl.color, glyphOffset, V_OFFSET + 2 * cpv, charUV[1].v);
-            pop1(gl.color, glyphOffset, V_OFFSET + 3 * cpv, charUV[2].v);
+            pop1(gl.color, glyphOffset, vOff + 0 * cpv, charUV[3].v);
+            pop1(gl.color, glyphOffset, vOff + 1 * cpv, charUV[0].v);
+            pop1(gl.color, glyphOffset, vOff + 2 * cpv, charUV[1].v);
+            pop1(gl.color, glyphOffset, vOff + 3 * cpv, charUV[2].v);
 
             gl.charCode = code;
         }
@@ -134,9 +134,9 @@ class GlyphUtils {
             var paintB = ((val >>  0) & 0xFF) / 0xFF;
             var glyphOffset:Int = gl.id * ppg;
 
-            pop4(gl.paint, glyphOffset, PR_OFFSET, ppv, paintR);
-            pop4(gl.paint, glyphOffset, PG_OFFSET, ppv, paintG);
-            pop4(gl.paint, glyphOffset, PB_OFFSET, ppv, paintB);
+            pop4(gl.paint, glyphOffset, prOff, ppv, paintR);
+            pop4(gl.paint, glyphOffset, pgOff, ppv, paintG);
+            pop4(gl.paint, glyphOffset, pbOff, ppv, paintB);
 
             gl.paintHex = val;
         }
@@ -144,17 +144,23 @@ class GlyphUtils {
         return gl.paintHex;
     }
 
-    public inline static function toString(gl:G):String {
-        var char = String.fromCharCode(gl.charCode);
-        if (!gl.visible) char = char.toLowerCase();
-        return char;
-    }
-
     public inline static function transfer(gl:G, shape:VertexArray, color:VertexArray, paint:VertexArray):Void {
         gl.shape = shape;
         gl.color = color;
         gl.paint = paint;
+
+        makeCorners(gl);
+        GlyphUtils.set_color(gl, 1, 1, 1);
+        GlyphUtils.set_s(gl, 1);
+
+        gl.charCode = -1;
+        gl.paintHex = -1;
+
+        pop4(gl.color, gl.id * cpg, uOff, cpv, 0);
+        pop4(gl.color, gl.id * cpg, vOff, cpv, 0);
     }
+
+    public inline static function toString(gl:G):String return String.fromCharCode(gl.charCode);
 
     private inline static function pop1(vec:VertexArray, glyphOffset:Int, propOffset:Int, val:Float):Float {
         vec[glyphOffset + propOffset] = val;
