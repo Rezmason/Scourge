@@ -51,18 +51,11 @@ class UIBody extends Body {
         glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * getScreenDPI() / NATIVE_DPI;
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
 
-        var numGlyphColumns:Int = Std.int(Capabilities.screenResolutionX / glyphWidthInPixels);
-        var numGlyphRows:Int = Std.int(Capabilities.screenResolutionY / glyphHeightInPixels);
-
-        var num:Int = (numGlyphRows + 1) * numGlyphColumns;
-
         currentScrollPos = Math.NaN;
         gliding = false;
 
         numRows = 0;
         numCols = 0;
-
-        growTo(num);
 
         letterbox = false;
 

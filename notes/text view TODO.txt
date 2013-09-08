@@ -1,5 +1,3 @@
-Make UIBody expand when it has to
-
 NodeView and BoardBody
 
     Throb

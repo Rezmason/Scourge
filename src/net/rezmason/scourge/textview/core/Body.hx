@@ -66,6 +66,7 @@ class Body {
 
     function growTo(numGlyphs:Int):Void {
         if (trueNumGlyphs < numGlyphs) {
+
             var oldSegments:Array<BodySegment> = segments;
             var oldGlyphs:Array<Glyph> = glyphs;
 
@@ -107,6 +108,8 @@ class Body {
         }
 
         this.numGlyphs = numGlyphs;
+
+        setID(id >> 16);
         for (ike in numGlyphs...trueNumGlyphs) glyphs[ike].set_s(0);
     }
 
