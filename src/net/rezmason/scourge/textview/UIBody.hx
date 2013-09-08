@@ -138,8 +138,8 @@ class UIBody extends Body {
         }
 
         var numGlyphsInLayout:Int = numRows * numCols;
-        toggleGlyphs(glyphs.slice(0, numGlyphsInLayout), true);
-        toggleGlyphs(glyphs.slice(numGlyphsInLayout), false);
+        for (ike in 0...numGlyphsInLayout) glyphs[ike].set_s(1);
+        for (ike in numGlyphsInLayout...numGlyphs) glyphs[ike].set_s(0);
     }
 
     inline function setScrollPos(pos:Float):Void {

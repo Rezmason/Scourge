@@ -1,13 +1,9 @@
-Make BodySegments expandable
-    Create new vertex, index buffers
-    GlyphUtils.transfer
-    Then add more glyphs
-    Destroy previous buffers
-
 Make Bodies expandable
-    Concat the new glyphs of the expanded BodySegments to the glyphs vec
     Create new BodySegments if necessary
-        Concat their glyphs to the glyphs vec
+        Copy the last old one to the first new one
+
+Make UIBody expand when it has to
+Make BoardBody expand when it has to
 
 NodeView and BoardBody
 

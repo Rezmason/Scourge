@@ -40,5 +40,11 @@ package net.rezmason.gl;
                 GL.bufferData(GL.ARRAY_BUFFER, array, GL.STATIC_DRAW);
             }
         }
+
+        public inline function dispose():Void {
+            array = null;
+            footprint = -1;
+            numVertices = -1;
+        }
     }
 #end

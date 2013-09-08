@@ -42,7 +42,7 @@ class Renderer {
 
             for (segment in body.segments) {
                 method.setSegment(segment);
-                drawUtil.drawTriangles(segment.indexBuffer, 0, segment.numVisibleGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+                drawUtil.drawTriangles(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
             }
         }
 

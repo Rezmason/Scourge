@@ -36,5 +36,10 @@ package net.rezmason.gl;
                 GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, array, GL.STATIC_DRAW);
             }
         }
+
+        public inline function dispose():Void {
+            array = null;
+            numIndices = -1;
+        }
     }
 #end

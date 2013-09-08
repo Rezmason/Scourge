@@ -19,9 +19,7 @@ class Body {
     public var camera:Matrix3D;
     public var glyphTransform:Matrix3D;
     public var numGlyphs(default, null):Int;
-    public var numVisibleGlyphs(default, null):Int;
     public var glyphTexture(default, set):GlyphTexture;
-    public var numSegments(default, null):Int;
     public var letterbox(default, null):Bool;
     public var catchMouseInRect(default, null):Bool;
     public var viewRect(default, set):Rectangle;
@@ -47,7 +45,6 @@ class Body {
         projection = makeProjection();
 
         this.numGlyphs = numGlyphs;
-        numVisibleGlyphs = numGlyphs;
         makeSegments();
 
         transform = new Matrix3D();
@@ -79,14 +76,6 @@ class Body {
             remainingGlyphs -= Almanac.BUFFER_CHUNK;
             segmentID++;
         }
-
-        numSegments = segments.length;
-    }
-
-    public function toggleGlyphs(_glyphs:Array<Glyph>, visible:Bool):Void {
-        if (_glyphs == null || _glyphs.length == 0) return;
-        for (ike in 0...numSegments) numVisibleGlyphs += segments[ike].toggleGlyphs(_glyphs, visible);
-        //spitGlyphs();
     }
 
     public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
@@ -118,6 +107,7 @@ class Body {
 
     }
 
+    /*
     inline function spitGlyphs():Void {
         var str:String = '';
         for (glyph in glyphs) {
@@ -125,6 +115,7 @@ class Body {
         }
         trace(str);
     }
+    */
 
     inline function sanitizeLayoutRect(stageWidth:Float, stageHeight:Float, rect:Rectangle):Rectangle {
         rect = rect.clone();

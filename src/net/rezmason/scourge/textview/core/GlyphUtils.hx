@@ -150,6 +150,12 @@ class GlyphUtils {
         return char;
     }
 
+    public inline static function transfer(gl:G, shape:VertexArray, color:VertexArray, paint:VertexArray):Void {
+        gl.shape = shape;
+        gl.color = color;
+        gl.paint = paint;
+    }
+
     private inline static function pop1(vec:VertexArray, glyphOffset:Int, propOffset:Int, val:Float):Float {
         vec[glyphOffset + propOffset] = val;
         return val;

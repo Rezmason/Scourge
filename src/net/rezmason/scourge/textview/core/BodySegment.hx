@@ -21,22 +21,15 @@ class BodySegment {
     public var paintVertices(default, null):VertexArray;
     public var indices(default, null):IndexArray;
 
-    public var startGlyph(default, null):Int;
     public var numGlyphs(default, null):Int;
-    public var numVisibleGlyphs(default, null):Int;
-
     public var glyphs(default, null):Array<Glyph>;
-    var glyphsByIndex:Array<Glyph>;
 
-    public function new(bufferUtil:BufferUtil, segmentID:Int, numGlyphs:Int):Void {
+    public function new(bufferUtil:BufferUtil, segmentID:Int, numGlyphs:Int, donor:BodySegment = null):Void {
         if (numGlyphs < 0) numGlyphs = 0;
         id = segmentID;
-        glyphsByIndex = [];
         this.numGlyphs = numGlyphs;
-        numVisibleGlyphs = numGlyphs;
         createBuffersAndVectors(bufferUtil);
-        createGlyphs();
-        for (glyph in glyphs) insertGlyph(glyph, glyph.id);
+        createGlyphs(donor);
         update();
     }
 
@@ -55,11 +48,24 @@ class BodySegment {
         indices = new IndexArray(numGlyphIndices);
     }
 
-    inline function createGlyphs():Void {
+    inline function createGlyphs(donor:BodySegment):Void {
         glyphs = [];
         for (ike in 0...numGlyphs) {
-            var glyph:Glyph = new Glyph(ike, shapeVertices, colorVertices, paintVertices);
+            var glyph:Glyph = null;
+            if (donor != null) {
+                glyph = donor.glyphs[ike];
+                glyph.transfer(shapeVertices, colorVertices, paintVertices);
+            }
+
+            if (glyph == null) glyph = new Glyph(ike, shapeVertices, colorVertices, paintVertices);
             glyphs.push(glyph);
+        }
+
+        var order:Array<UInt> = Almanac.VERT_ORDER;
+        for (glyph in glyphs) {
+            var indexAddress:Int = glyph.id * Almanac.INDICES_PER_GLYPH;
+            var firstVertIndex:Int = glyph.id * Almanac.VERTICES_PER_GLYPH;
+            for (ike in 0...order.length) indices[indexAddress + ike] = firstVertIndex + order[ike];
         }
     }
 
@@ -75,50 +81,18 @@ class BodySegment {
         }
     }
 
-    public function toggleGlyphs(glyphsToToggle:Array<Glyph>, visible:Bool):Int {
+    public function destroy():Void {
+        shapeBuffer.dispose();
+        colorBuffer.dispose();
+        paintBuffer.dispose();
+        indexBuffer.dispose();
 
-        var step:Int = visible ? 1 : -1;
-        var offset:Int = visible ? 0 : -1;
-        var diff:Int = 0;
-
-        for (srcGlyph in glyphsToToggle) {
-
-            if (srcGlyph == null || srcGlyph.visible == visible) continue;
-
-            var srcIndexAddress:Int = srcGlyph.indexAddress;
-            if (glyphsByIndex[srcIndexAddress] != srcGlyph) continue;
-            var dstIndexAddress:Int = numVisibleGlyphs + offset;
-
-            srcGlyph.visible = visible;
-            var dstGlyph:Glyph = glyphsByIndex[dstIndexAddress];
-
-            if (srcGlyph != dstGlyph) {
-                insertGlyph(dstGlyph, srcIndexAddress);
-                insertGlyph(srcGlyph, dstIndexAddress);
-            }
-
-            numVisibleGlyphs += step;
-            diff += step;
-        }
-
-        return diff;
-    }
-
-    inline function insertGlyph(glyph:Glyph, indexAddress:Int):Void {
-        var firstVertIndex:Int = glyph.id * Almanac.VERTICES_PER_GLYPH;
-
-        var order:Array<UInt> = [
-            firstVertIndex + 0,
-            firstVertIndex + 1,
-            firstVertIndex + 2,
-            firstVertIndex + 0,
-            firstVertIndex + 2,
-            firstVertIndex + 3,
-        ];
-
-        for (ike in 0...order.length) indices[indexAddress * Almanac.INDICES_PER_GLYPH + ike] = order[ike];
-
-        glyphsByIndex[indexAddress] = glyph;
-        glyph.indexAddress = indexAddress;
+        colorVertices = null;
+        shapeVertices = null;
+        paintVertices = null;
+        indices = null;
+        glyphs = null;
+        numGlyphs = -1;
+        id = -1;
     }
 }

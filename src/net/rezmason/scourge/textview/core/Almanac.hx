@@ -16,4 +16,6 @@ class Almanac {
 
     public inline static var BUFFER_SIZE:Int = 0xFFFF;
     public inline static var BUFFER_CHUNK:Int = Std.int(BUFFER_SIZE / VERTICES_PER_GLYPH);
+
+    public static var VERT_ORDER:Array<UInt> = [0, 1, 2, 0, 2, 3,];
 }

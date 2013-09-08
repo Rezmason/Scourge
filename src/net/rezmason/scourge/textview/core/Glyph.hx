@@ -15,7 +15,6 @@ class Glyph {
     var paintHex:Int;
     var visible:Bool;
     var charCode:Int;
-    var indexAddress:Int;
 
     function new(id:Int, shape:VertexArray, color:VertexArray, paint:VertexArray):Void {
         this.id = id;
