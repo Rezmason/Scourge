@@ -43,6 +43,8 @@ class UIBody extends Body {
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, uiText:UIText):Void {
 
+        super(bufferUtil, glyphTexture, redrawHitAreas);
+
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
 
@@ -52,7 +54,7 @@ class UIBody extends Body {
         var numGlyphColumns:Int = Std.int(Capabilities.screenResolutionX / glyphWidthInPixels);
         var numGlyphRows:Int = Std.int(Capabilities.screenResolutionY / glyphHeightInPixels);
 
-        var numGlyphs:Int = (numGlyphRows + 1) * numGlyphColumns;
+        var num:Int = (numGlyphRows + 1) * numGlyphColumns;
 
         currentScrollPos = Math.NaN;
         gliding = false;
@@ -60,7 +62,7 @@ class UIBody extends Body {
         numRows = 0;
         numCols = 0;
 
-        super(bufferUtil, numGlyphs, glyphTexture, redrawHitAreas);
+        growTo(num);
 
         letterbox = false;
 

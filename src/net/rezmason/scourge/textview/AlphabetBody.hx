@@ -1,7 +1,5 @@
 package net.rezmason.scourge.textview;
 
-import flash.geom.Rectangle;
-
 import net.rezmason.gl.utils.BufferUtil;
 
 import net.rezmason.scourge.textview.core.Glyph;
@@ -22,11 +20,13 @@ class AlphabetBody extends Body {
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
 
+        super(bufferUtil, glyphTexture, redrawHitAreas);
+
         var totalChars:Int = CHARS.length;
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));
         var numCols:Int = Std.int(Math.ceil(totalChars / numRows));
 
-        super(bufferUtil, totalChars, glyphTexture, redrawHitAreas);
+        growTo(totalChars);
 
         catchMouseInRect = false;
 
@@ -50,8 +50,8 @@ class AlphabetBody extends Body {
         }
     }
 
-    override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
-        super.adjustLayout(stageWidth, stageHeight, rect);
+    override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
+        super.adjustLayout(stageWidth, stageHeight);
         setGlyphScale(0.05, 0.05 * stageWidth / stageHeight);
 
         transform.identity();
@@ -70,7 +70,7 @@ class AlphabetBody extends Body {
                     case CLICK: glyph.set_b(1 - glyph.get_b());
                     case _:
                 }
-            case KEYBOARD(type, key):
+            case KEYBOARD(type, key, char, shift, alt, ctrl):
         }
     }
 }

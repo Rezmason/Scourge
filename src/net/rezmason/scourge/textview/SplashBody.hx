@@ -42,15 +42,15 @@ class SplashBody extends Body {
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
 
+        super(bufferUtil, glyphTexture, redrawHitAreas);
+
         time = 0;
 
         lines = TestStrings.SPLASH.split('\n');
         lines.pop();
         lines.pop();
 
-        var num:Int = 3 * lines.length * lines[0].length;
-
-        super(bufferUtil, num, glyphTexture, redrawHitAreas);
+        growTo(3 * lines.length * lines[0].length);
 
         catchMouseInRect = false;
 
@@ -67,7 +67,7 @@ class SplashBody extends Body {
             for (col in 0...numCols) {
 
                 var x:Float = ((col + 0.5) / numCols - 0.5) * 2;
-                var y:Float = ((row + 0.5) / numRows    - 0.5) * 0.3;
+                var y:Float = ((row + 0.5) / numRows - 0.5) * 0.3;
                 var z:Float = 0.2;
 
                 if (lines[row].charAt(col) == ' ') continue;
@@ -107,16 +107,19 @@ class SplashBody extends Body {
                 glyphTowers.push(glyphTower);
             }
         }
+
+        transform.appendScale(1, -1, 1);
     }
 
-    override public function adjustLayout(stageWidth:Int, stageHeight:Int, rect:Rectangle):Void {
-        super.adjustLayout(stageWidth, stageHeight, rect);
+    override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
+        super.adjustLayout(stageWidth, stageHeight);
 
-        rect = sanitizeLayoutRect(stageWidth, stageHeight, rect);
+        var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
 
         var screenSize:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
         var rectSize:Float = Math.min(rect.width * stageWidth, rect.height * stageHeight) / screenSize;
         var glyphWidth:Float = rectSize * 0.065;
+
         setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
 

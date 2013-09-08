@@ -1,7 +1,3 @@
-Make Bodies expandable
-    Create new BodySegments if necessary
-        Copy the last old one to the first new one
-
 Make UIBody expand when it has to
 Make BoardBody expand when it has to
 

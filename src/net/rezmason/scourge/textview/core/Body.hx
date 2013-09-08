@@ -24,6 +24,8 @@ class Body {
     public var catchMouseInRect(default, null):Bool;
     public var viewRect(default, set):Rectangle;
 
+    var trueNumGlyphs:Int;
+
     var redrawHitAreas:Void->Void;
     var projection:Matrix3D;
 
@@ -31,7 +33,7 @@ class Body {
 
     var bufferUtil:BufferUtil;
 
-    public function new(bufferUtil:BufferUtil, numGlyphs:Int, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
         id = 0;
         this.bufferUtil = bufferUtil;
         this.redrawHitAreas = redrawHitAreas;
@@ -44,8 +46,11 @@ class Body {
 
         projection = makeProjection();
 
-        this.numGlyphs = numGlyphs;
-        makeSegments();
+        numGlyphs = 0;
+        trueNumGlyphs = 0;
+
+        segments = [];
+        glyphs = [];
 
         transform = new Matrix3D();
         camera = new Matrix3D();
@@ -59,23 +64,42 @@ class Body {
         for (glyph in glyphs) glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id);
     }
 
-    function makeSegments():Void {
+    function growTo(numGlyphs:Int):Void {
+        if (trueNumGlyphs < numGlyphs) {
+            var oldSegments:Array<BodySegment> = segments;
+            var oldGlyphs:Array<Glyph> = glyphs;
 
-        segments = [];
-        glyphs = [];
+            glyphs = [];
+            segments = [];
 
-        var remainingGlyphs:Int = numGlyphs;
-        var startGlyph:Int = 0;
-        var segmentID:Int = 0;
-        while (startGlyph < numGlyphs) {
-            var len:Int = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
-            var segment:BodySegment = new BodySegment(bufferUtil, segmentID, len);
-            segments.push(segment);
-            glyphs = glyphs.concat(segment.glyphs);
-            startGlyph += Almanac.BUFFER_CHUNK;
-            remainingGlyphs -= Almanac.BUFFER_CHUNK;
-            segmentID++;
+            var remainingGlyphs:Int = numGlyphs;
+            var startGlyph:Int = 0;
+            var segmentID:Int = 0;
+
+            while (startGlyph < numGlyphs) {
+                var len:Int = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
+                var segment:BodySegment = null;
+                var donor:BodySegment = oldSegments[segmentID];
+                if (donor != null && donor.numGlyphs == len) {
+                    segment = donor;
+                } else {
+                    segment = new BodySegment(bufferUtil, segmentID, len, donor);
+                    if (donor != null) donor.destroy();
+                }
+
+                segments.push(segment);
+                glyphs = glyphs.concat(segment.glyphs);
+                startGlyph += Almanac.BUFFER_CHUNK;
+                remainingGlyphs -= Almanac.BUFFER_CHUNK;
+                segmentID++;
+            }
+
+            for (ike in numGlyphs...trueNumGlyphs) glyphs[ike].set_s(0);
+
+            trueNumGlyphs = numGlyphs;
         }
+
+        this.numGlyphs = numGlyphs;
     }
 
     public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {

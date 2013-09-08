@@ -73,6 +73,8 @@ class BoardBody extends Body {
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, game:Game):Void {
 
+        super(bufferUtil, glyphTexture, redrawHitAreas);
+
         this.game = game;
 
         occupier_ = game.plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
@@ -81,7 +83,7 @@ class BoardBody extends Body {
 
         var nodes:Array<BoardNode> = game.state.nodes;
 
-        super(bufferUtil, nodes.length * 2, glyphTexture, redrawHitAreas);
+        growTo(nodes.length * 2);
 
         nodeViews = [];
 
@@ -169,10 +171,6 @@ class BoardBody extends Body {
             var x:Float = (view.x - centerX) * 0.065;
             var y:Float = (view.y - centerY) * 0.065;
             var z:Float = (x * x + y * y) * -0.2;
-
-            // view.boardGlyph.set_pos(x, y, z - 0.00);
-            // view.bodyGlyph.set_pos(x * 0.96, y * 0.96, z - 0.05);
-            view.uiGlyph.set_pos(x * 0.95, y * 0.95, z - 0.07);
 
             view.x = x;
             view.y = y;
