@@ -150,11 +150,11 @@ class GlyphUtils {
         gl.paint = paint;
 
         makeCorners(gl);
-        GlyphUtils.set_color(gl, 1, 1, 1);
-        GlyphUtils.set_s(gl, 1);
 
-        gl.charCode = -1;
-        gl.paintHex = -1;
+        gl.charCode = 0;
+        gl.paintHex = 0;
+
+        set_paint(gl, gl.paintHex);
 
         pop4(gl.color, gl.id * cpg, uOff, cpv, 0);
         pop4(gl.color, gl.id * cpg, vOff, cpv, 0);
