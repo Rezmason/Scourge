@@ -83,6 +83,7 @@ class Body {
 
                 if (donor != null && donor.numGlyphs == len) {
                     segment = donor;
+                    segment.numGlyphs = len;
                 } else {
                     segment = new BodySegment(bufferUtil, segmentID, len, donor);
                     if (donor != null) donor.destroy();
@@ -96,6 +97,13 @@ class Body {
             }
 
             trueNumGlyphs = numGlyphs;
+
+        } else {
+            var remainingGlyphs:Int = numGlyphs;
+            for (segment in segments) {
+                segment.numGlyphs = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
+                remainingGlyphs -= Almanac.BUFFER_CHUNK;
+            }
         }
 
         this.numGlyphs = numGlyphs;

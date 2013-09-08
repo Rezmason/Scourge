@@ -89,9 +89,11 @@ class UIBody extends Body {
         var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
 
         numRows = Std.int(rect.height * stageHeight / glyphHeightInPixels) + 1;
-
         numCols = Std.int(rect.width  * stageWidth  / glyphWidthInPixels );
+
         setGlyphScale(rect.width / numCols * 2, rect.height / (numRows - 1) * 2);
+
+        growTo(numRows * numCols);
 
         lastRedrawPos = Math.NaN;
         reorderGlyphs();
@@ -134,14 +136,10 @@ class UIBody extends Body {
             for (col in 0...numCols) {
                 var x:Float = ((col + 0.5) / numCols - 0.5);
                 var y:Float = ((row + 0.5) / (numRows - 1) - 0.5);
-                var glyph:Glyph = glyphs[id++];
-                glyph.set_pos(x, y, 0);
+                glyphs[id].set_pos(x, y, 0);
+                id++;
             }
         }
-
-        var numGlyphsInLayout:Int = numRows * numCols;
-        for (ike in 0...numGlyphsInLayout) glyphs[ike].set_s(1);
-        for (ike in numGlyphsInLayout...numGlyphs) glyphs[ike].set_s(0);
     }
 
     inline function setScrollPos(pos:Float):Void {
