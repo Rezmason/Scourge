@@ -1,21 +1,28 @@
 package net.rezmason.scourge.textview.waves;
 
 import flash.display.Shape;
+import flash.events.Event;
+import haxe.Timer;
 
 class WavePoolShape extends Shape {
 
     public var pool(default, null):WavePool;
     public var size(default, null):Int;
 
+    var then:Float;
+
     public function new(size:Int):Void {
         super();
         pool = new WavePool(size);
         this.size = size;
-        addEventListener("enterFrame", function(e) update(0.05));
+        addEventListener(Event.ENTER_FRAME, update);
+        then = Timer.stamp();
     }
 
-    public function update(delta:Float):Void {
-        pool.update(delta);
+    function update(event:Event):Void {
+        var now:Float = Timer.stamp();
+        pool.update(now - then);
+        then = now;
 
         this.graphics.clear();
         this.graphics.beginFill(0xFFFFFF);
