@@ -13,6 +13,10 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 
+import net.rezmason.scourge.textview.waves.WavePool;
+import net.rezmason.scourge.textview.waves.Ripple;
+import net.rezmason.scourge.textview.waves.WaveFunctions;
+
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.Types;
 import net.rezmason.ropes.GridNode;

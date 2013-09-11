@@ -1,9 +1,17 @@
 NodeView and BoardBody
 
     Throb
-        A wave pool whose width is the longest distance from a player's head to their tail
-            It's easy to expand and contract the wave pool
-        The view nodes look up the propagation data for their distance value
+        BoardBody maintains a WavePool for each player
+        On board update,
+            Update distance data of each NodeView
+            Update each player's WavePool's length
+        For now, have a timer send a wave to each pool when it ticks
+        On update,
+            Update each wave pool
+            Update each node view's wave height
+
+    Also, cavities
+        Board symbol, player color
 
     Basics
         handleBoardUpdate function
