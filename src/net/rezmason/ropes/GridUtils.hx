@@ -51,6 +51,10 @@ class GridUtils {
         return [n(node), e(node), s(node), w(node)];
     }
 
+    public inline static function diagNeighbors<T>(node:GridNode<T>):Array<GridNode<T>> {
+        return [ne(node), se(node), sw(node), nw(node)];
+    }
+
     public inline static function getGraph<T>(source:GridNode<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Map<Int, GridNode<T>> {
         return expandGraph([source.id => source], orthoOnly, spreadFilter);
     }

@@ -26,7 +26,8 @@ class Referee {
     var floats:Array<Float>;
     var busy:Bool;
 
-    public var gameBegun(get, null):Bool;
+    public var gameBegun(get, never):Bool;
+    public var numPlayers(get, never):Int;
 
     public function new():Void {
         game = new Game();
@@ -180,5 +181,7 @@ class Referee {
         return RandomFloats(SafeSerializer.run(floats));
     }
 
-    private inline function get_gameBegun():Bool { return game.hasBegun; }
+    private inline function get_gameBegun():Bool return game.hasBegun;
+
+    private inline function get_numPlayers():Int return players == null ? -1 : players.length;
 }

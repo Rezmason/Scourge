@@ -255,8 +255,8 @@ class Main {
 	}
 
 	private static function updateVesicles(?event:Event):Void {
-		//for (vesicle in vesicles) vesicle.update();
-		vesicles[0].update();
+		for (vesicle in vesicles) vesicle.update();
+		// vesicles[0].update();
 	}
 
 	private static function makeTexture(rez:Int, seed:Int, rgb:RGB, topTex:BitmapData):BitmapData {

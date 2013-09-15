@@ -143,6 +143,10 @@ class Engine {
         keyboardSystem.detach();
     }
 
+    public function setKeyboardFocus(body:Body):Void {
+        if (bodies.has(body)) keyboardSystem.focusBodyID = body.id;
+    }
+
     public function eachBody():Iterator<Body> return bodies.iterator();
 
     function onTimer():Void {

@@ -532,7 +532,7 @@ class Game {
 			state.bodyGrid[index] = state.currentPlayer.order;
 			state.freshGrid[index] = state.freshness;
 
-			cell = state.gridCellMap[index];
+			cell = state.gridCellMap.get(index);
 			heads = cell.heads;
 			tails = cell.tails;
 

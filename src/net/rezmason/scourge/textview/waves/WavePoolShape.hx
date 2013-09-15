@@ -27,7 +27,7 @@ class WavePoolShape extends Shape {
         this.graphics.clear();
         this.graphics.beginFill(0xFFFFFF);
         this.graphics.moveTo(0, 0);
-        for (ike in 0...size) this.graphics.lineTo(ike, pool.heightAtIndex(ike));
+        for (ike in 0...size) this.graphics.lineTo(ike, pool.getHeightAtIndex(ike));
         this.graphics.lineTo(size, 0);
     }
 }

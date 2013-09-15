@@ -124,7 +124,7 @@ class Board {
 		biting = false;
 		pieceBlockJobs = [];
 		keyList = [];
-		guiColorTransform = new ColorTransform();
+		guiColorTransform = new ColorTransform(0, 0, 0);
 		overSwapButton = false;
 		overBiteButton = false;
 		waitingForGrid = false;
@@ -221,8 +221,10 @@ class Board {
 		updateBox();
 		grid.init(game.getPlayers(true), playerCTs);
 		update(true, true);
+		tweenGUIColors();
 		scene.mouseEnabled = scene.mouseChildren = true;
 		resize();
+		fadeInGrid();
 		//grid.fillBoardRandomly();
 	}
 
@@ -858,5 +860,12 @@ class Board {
 		pieceBlockJobs[currentBlockForSwapHint] = block.to(Layout.QUICK * 0.7, {x:spotX, y:spotY}, Linear.easeOut, pushCurrentSwapBlock);
 
 		currentBlockForSwapHint = (currentBlockForSwapHint + 1) % pieceBlocks.length;
+	}
+
+	private function fadeInGrid():Void {
+		var gridTween:Dynamic = {};
+		gridTween.alpha = 1;
+		grid.alpha = 0;
+		grid.to(Layout.QUICK * 3, gridTween, Layout.SLIDE);
 	}
 }

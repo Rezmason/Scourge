@@ -19,6 +19,8 @@ import net.rezmason.scourge.model.ScourgeConfigFactory;
 
 import haxe.Timer;
 
+using Lambda;
+
 class TextDemo {
 
     var engine:Engine;
@@ -51,7 +53,10 @@ class TextDemo {
 
     function makeFontTextures(fonts:Map<String, FlatFont>):Void {
         fontTextures = new Map();
-        for (key in fonts.keys()) fontTextures[key] = new GlyphTexture(utils.textureUtil, fonts[key]);
+        for (key in fonts.keys()) {
+            fontTextures[key] = cast new GlyphTexture(utils.textureUtil, fonts[key]);
+            fontTextures[key + "_fog"] = cast new FoggyGlyphTexture(utils.textureUtil, fonts[key]);
+        }
     }
 
     function init():Void {
@@ -64,7 +69,7 @@ class TextDemo {
             turnFuncs = [];
 
             if (boardBody != null) {
-                boardBody.attach(this.game);
+                boardBody.attach(this.game, referee.numPlayers);
                 onResize();
             }
         }
@@ -112,7 +117,9 @@ class TextDemo {
 
         game = null;
 
-        var numPlayers:Int = Std.parseInt(input.split(' ')[1]);
+        var args:Array<String> = input.split(' ');
+
+        var numPlayers:Int = Std.parseInt(args[1]);
 
         if (numPlayers < 2) numPlayers = 2;
 
@@ -122,7 +129,7 @@ class TextDemo {
 
         var cfg = ScourgeConfigFactory.makeDefaultConfig();
         cfg.allowRotating = false;
-        cfg.circular = true;
+        cfg.circular = args.has('circular');
         cfg.allowAllPieces = false;
         cfg.numPlayers = playerCfgs.length;
         referee.beginGame(playerCfgs, randomFunction, cfg);
@@ -151,7 +158,7 @@ class TextDemo {
         /**/
 
         //*
-        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
+        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full_fog'], engine.invalidateMouse);
         boardBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(boardBody);
         /**/
@@ -182,7 +189,7 @@ class TextDemo {
         /**/
 
         onResize();
-        engine.activate();
+        onActivate();
     }
 
     function addListeners():Void {
@@ -195,7 +202,11 @@ class TextDemo {
         engine.setSize(stage.stageWidth, stage.stageHeight);
     }
 
-    function onActivate(?event:Event):Void engine.activate();
+    function onActivate(?event:Event):Void {
+        engine.activate();
+        if (uiBody != null) engine.setKeyboardFocus(uiBody);
+    }
+
     function onDeactivate(?event:Event):Void engine.deactivate();
 
     function runTests(input:String):String {

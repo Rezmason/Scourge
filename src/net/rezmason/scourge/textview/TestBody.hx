@@ -35,7 +35,7 @@ class TestBody extends Body {
 
         time = 0;
 
-        growTo(2400); // 40000
+        growTo(2400); // 40000, 240
 
         dragging = false;
         dragStartTransform = new Matrix3D();

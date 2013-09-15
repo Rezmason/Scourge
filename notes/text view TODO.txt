@@ -1,14 +1,9 @@
 NodeView and BoardBody
 
     Throb
-        BoardBody maintains a WavePool for each player
-        On board update,
-            Update distance data of each NodeView
-            Update each player's WavePool's length
-        For now, have a timer send a wave to each pool when it ticks
-        On update,
-            Update each wave pool
-            Update each node view's wave height
+
+        Now, stop the pools from looping
+            Drive the heartbeats by a timer
 
     Also, cavities
         Board symbol, player color

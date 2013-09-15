@@ -37,7 +37,8 @@ class PlayerStat extends Sprite {
 
 		alive = false;
 		cacheAsBitmap = true;
-		tint = new ColorTransform();
+		tint = new ColorTransform(0, 0, 0);
+		updateTint();
 
 		uid = _uid;
 		background = GUIFactory.drawSolidRect(new Shape(), 0x606060, 1, 0, 0, Layout.WELL_WIDTH, hgt);

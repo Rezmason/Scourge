@@ -27,12 +27,12 @@ class Scourge {
     }
 
     static function init():Void {
-        // new net.rezmason.scourge.textview.TextDemo(utils, Lib.current.stage, fonts);
+        new net.rezmason.scourge.textview.TextDemo(utils, Lib.current.stage, fonts);
 
         // new net.rezmason.scourge.textview.Lab(utils, Lib.current.stage, fonts);
         // new net.rezmason.scourge.textview.BasicSetup(utils, Lib.current.stage, fonts);
 
-        showWavePool();
+        // showWavePool();
     }
 
     static function showWavePool():Void {

@@ -32,7 +32,7 @@ class WavePool {
         }
     }
 
-    public inline function heightAtIndex(index:Int):Float {
+    public inline function getHeightAtIndex(index:Int):Float {
         return (index < 0 || index >= size) ? Math.NaN : heights[index];
     }
 
