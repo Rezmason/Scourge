@@ -1,12 +1,63 @@
-TextView (see file)
-    View elements
+Change the Player stuff
+    Players don't necessarily have Games
+    Player factory should connect TestPlayers to the AI– which has a game
+    AI sends game to TextDemo
 
-Console
-Board view
+NodeView and BoardBody
+
+    Throb
+
+        Now, stop the pools from looping
+            Drive the heartbeats by a timer
+
+    Also, cavities
+        Board symbol, player color
+
+    Basics
+        handleBoardUpdate function
+            Each node view checks for a change in board state
+                Includes connectivity pass
+            (Narratological cues would happen here, like stress level and text unlock)
+        handleUIUpdate function
+            Interpret UI state
+            Check each UI for a change in state
+        updateAnimation
+            (for propagating waves along slimes' bodies)
+        Dialer animation
+            Dispatches keyboard interactions
+    Orchestrate changes in the game
+        Test that board state is properly handled
+
+Command interpreter
+
+InputStyle use
+    UIText keeps track of "input spans"
+        The indices of the open tag, the body text and the close tag
+    Clicking on an input should move the caret
+        Text insertion should be as easy as appending to the input span's text value and recompositing
+    Clicking past the line should move the caret to the end of the line
+        We need to guarantee that there is always something to click here
+    Option-left and option-right should move the caret as well
+
+Solidify text update behavior
+    If:
+        the user WAS at the bottom, or
+        the user IS past the bottom, or
+        the new text IS the result of interaction,
+    -scroll to the new bottom
+Scroll indicator (looks like meterstick)
+
+OpenFL native targets
+    resizing window and calling GL.drawElements crashes
+    no readPixels
+
+Render the scene ONCE each time interaction changes
+    On mouse/finger up after a drag (once there's no inertia)
+    On button click/tap
+    On first mouse move after a keystroke
+
+
 Piece view
-
-Turn GridNodes into AspectLists with NeighborAspects
-    Branch for this one
 
 Implement noneuclidean walking and running
     add() function should create heading data
