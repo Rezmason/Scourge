@@ -21,7 +21,7 @@ class RenderMethod {
 
     var onLoaded:Void->Void;
 
-    public function new():Void {}
+    function new():Void {}
 
     public function load(programUtil:ProgramUtil, onLoaded:Void->Void):Void {
         this.programUtil = programUtil;

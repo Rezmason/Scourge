@@ -1,7 +1,6 @@
-Change the Player stuff
-    Players don't necessarily have Games
-    Player factory should connect TestPlayers to the AI– which has a game
-    AI sends game to TextDemo
+Rework the players stuff
+    The Referee shouldn't create the players; some other code should
+    The Referee-Player interface should be based on messages
 
 NodeView and BoardBody
 

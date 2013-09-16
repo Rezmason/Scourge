@@ -15,7 +15,7 @@ class Player {
 
     public var ready(default, null):Bool;
 
-    public function new(index:Int, config:PlayerConfig, handler:Player->GameEvent->Void):Void {
+    function new(index:Int, config:PlayerConfig, handler:Player->GameEvent->Void):Void {
         this.index = index;
         this.handler = handler;
         this.config = config;

@@ -33,7 +33,7 @@ class Body {
 
     var bufferUtil:BufferUtil;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
         id = 0;
         this.bufferUtil = bufferUtil;
         this.redrawHitAreas = redrawHitAreas;

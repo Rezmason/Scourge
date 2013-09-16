@@ -6,7 +6,9 @@ typedef View = #if flash flash.display.Stage #else openfl.display.OpenGLView #en
 class Util {
     var context:Context;
     var view:View;
-    public function new(view:View, context:Context):Void {
+
+    @:allow(net.rezmason.gl.utils.UtilitySet)
+    function new(view:View, context:Context):Void {
         this.view = view;
         this.context = context;
     }

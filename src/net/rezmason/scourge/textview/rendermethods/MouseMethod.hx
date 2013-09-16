@@ -20,6 +20,8 @@ class MouseMethod extends RenderMethod {
     var uCameraMat:UniformLocation;
     var uBodyMat:UniformLocation;
 
+    public function new():Void super();
+
     override public function activate():Void {
         programUtil.setProgram(program);
     }

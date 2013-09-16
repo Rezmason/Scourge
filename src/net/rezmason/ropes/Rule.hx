@@ -36,7 +36,7 @@ using net.rezmason.utils.Pointers;
     private function __initReqs():Void {}
     private function __initPtrs():Void {}
 
-    public function new():Void {
+    function new():Void {
         demiurgic = false;
         stateAspectRequirements = new AspectRequirements();
         playerAspectRequirements = new AspectRequirements();
