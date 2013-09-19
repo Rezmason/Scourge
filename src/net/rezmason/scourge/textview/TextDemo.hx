@@ -55,7 +55,7 @@ class TextDemo {
         fontTextures = new Map();
         for (key in fonts.keys()) {
             fontTextures[key] = cast new GlyphTexture(utils.textureUtil, fonts[key]);
-            fontTextures[key + "_fog"] = cast new FoggyGlyphTexture(utils.textureUtil, fonts[key]);
+            fontTextures[key + "_fog"] = cast new GlyphTexture(utils.textureUtil, fonts[key]);
         }
     }
 

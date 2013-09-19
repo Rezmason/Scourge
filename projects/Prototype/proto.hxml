@@ -1,0 +1,14 @@
+-swf deploy/scourge.swf
+-main Proto
+-debug
+--flash-strict
+-swf-version 11
+-swf-header 800:495:30:FF00FF
+-cp src
+
+-D proto
+-swf-lib assets/ScourgeLib.swf
+-swf-lib assets/ScourgeBiteSymbols.swf
+
+#--macro patchTypes('patch/types.patch')
+--macro patchTypes('patch/flextypes.patch')

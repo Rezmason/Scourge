@@ -1,6 +1,9 @@
 Rework the players stuff
-    The Referee shouldn't create the players; some other code should
     The Referee-Player interface should be based on messages
+        For now, messages can be events or signals dispatched from a common source
+    The Referee shouldn't create the players; some other code should
+        BotPlayers should be registered with the local ExpertSystem
+        Local HumanPlayers should be registered with the UI
 
 NodeView and BoardBody
 
