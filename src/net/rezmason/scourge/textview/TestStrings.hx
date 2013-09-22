@@ -79,7 +79,7 @@ class TestStrings {
         '0123456789' +
         '';
 
-    public inline static var PUNCTUATION:String = '\'?!.,;:-~/\\`|&';
+    public inline static var PUNCTUATION:String = '\'\"?!.,;:-~/\\`|&';
 
     public inline static function CHAR_COLORS():Map<Int, Int> {
         return [

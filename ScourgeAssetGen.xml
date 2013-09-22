@@ -18,9 +18,6 @@
 	<haxelib name="openfl" />
 	<haxelib name="format" />
 
-	<assets path="assets" rename="assets" include="ProFontX.ttf" />
-	<assets path="assets/SourceCodePro_FontsOnly-1.013/TTF" rename="assets" include="SourceCodePro-Semibold.ttf" />
-
 	<!-- <ndll name="std" /> -->
 	<!-- <ndll name="regexp" /> -->
 	<!-- <ndll name="zlib" /> -->

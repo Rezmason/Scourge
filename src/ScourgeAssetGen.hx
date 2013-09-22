@@ -6,18 +6,21 @@ import haxe.io.BytesOutput;
 import haxe.io.Bytes;
 import format.png.Tools;
 import format.png.Writer;
-import openfl.Assets;
 import flash.Lib;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.events.Event;
+import flash.text.Font;
 
 import flash.net.FileReference;
 
 import net.rezmason.utils.FlatFont;
 
 import net.rezmason.scourge.textview.TestStrings;
+
+@:font("assets/ProFontX.ttf") class ProFont extends Font {}
+@:font("assets/SourceCodePro_FontsOnly-1.013/TTF/SourceCodePro-Semibold.ttf") class SourceProFont extends Font {}
 
 class ScourgeAssetGen {
 
@@ -31,8 +34,8 @@ class ScourgeAssetGen {
             TestStrings.BOX_SYMBOLS,
         ].join("");
 
-        var font1:FlatFont = FlatFont.flatten(Assets.getFont("assets/ProFontX.ttf"), 140, requiredString, 48, 48, 1);
-        var font2:FlatFont = FlatFont.flatten(Assets.getFont("assets/SourceCodePro-Semibold.ttf"), 140, requiredString, 48, 48, 1);
+        var font1:FlatFont = FlatFont.flatten(new ProFont(), 140, requiredString, 48, 48, 1);
+        var font2:FlatFont = FlatFont.flatten(new SourceProFont(), 140, requiredString, 48, 48, 1);
         var font3:FlatFont = FlatFont.combine(font1, [font2]);
 
         deploy(font1, "profont");
