@@ -29,13 +29,13 @@ class TestBody extends Body {
     var rawTransform:Matrix3D;
     var setBackTransform:Matrix3D;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, numGlyphs:Int = 2400):Void {
 
         super(bufferUtil, glyphTexture, redrawHitAreas);
 
         time = 0;
 
-        growTo(2400); // 40000, 240
+        growTo(numGlyphs); // 40000, 240
 
         dragging = false;
         dragStartTransform = new Matrix3D();
@@ -47,11 +47,12 @@ class TestBody extends Body {
         transform.copyFrom(setBackTransform);
 
         var dTheta:Float = Math.PI * (3 - Math.sqrt(5));
-        var dZ:Float = 2 / (numGlyphs + 1);
+        var dZ:Float = 2 / (this.numGlyphs + 1);
         var theta:Float = 0;
         var _z:Float = 1 - dZ / 2;
 
         for (glyph in glyphs) {
+
             var i:Float = 0.2;
 
             var charCode:Int = CHARS.charCodeAt(glyph.id % CHARS.length);

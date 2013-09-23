@@ -22,6 +22,8 @@ class OutputBuffer {
     #end
 
     var empty:Bool;
+    var width:Int;
+    var height:Int;
 
     public function new(?empty:Bool #if flash, ?context:Context3D #end):Void {
         this.empty = empty;
@@ -42,6 +44,12 @@ class OutputBuffer {
     }
 
     public function resize(width:Int, height:Int):Void {
+
+        if (this.width == width && this.height == height) return;
+
+        this.width = width;
+        this.height = height;
+
         if (empty) {
             #if flash
                 context.configureBackBuffer(width, height, 2, true);

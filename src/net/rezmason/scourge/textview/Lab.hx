@@ -79,12 +79,11 @@ class Lab {
     var glyphTexture:GlyphTexture;
     var program:Program;
 
-    var cameraMat:Matrix3D;
-    var bodyMat:Matrix3D;
-    var glyphMat:Matrix3D;
+    var body:Body;
 
     var numTriangles:Int;
     var mainOutputBuffer:OutputBuffer;
+    var secondBuffer:OutputBuffer;
 
     var shapeBuffer:VertexBuffer;
     var colorBuffer:VertexBuffer;
@@ -93,24 +92,29 @@ class Lab {
     var utils:UtilitySet;
     var stage:Stage;
 
+    var width:Int;
+    var height:Int;
+
     var t:Float;
     var segment:BodySegment;
+
+    var data:ReadbackData;
 
     public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
         this.stage = stage;
         this.glyphTexture = new GlyphTexture(utils.textureUtil, fonts['full']);
 
+        width = stage.stageWidth;
+        height = stage.stageHeight;
+
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
-        mainOutputBuffer.resize(stage.stageWidth, stage.stageHeight);
+        mainOutputBuffer.resize(width, height);
 
-        // create matrices
+        secondBuffer = utils.drawUtil.createOutputBuffer();
+        secondBuffer.resize(width, height);
 
-        cameraMat = makeProjection();
-        bodyMat = new Matrix3D();
-        glyphMat = new Matrix3D();
-
-        bodyMat.appendTranslation(0, 0, 0);
+        data = utils.drawUtil.createReadbackData(width * height * 4);
 
         // Create program
 
@@ -118,9 +122,14 @@ class Lab {
 
         // Create geometry
 
-        var body:Body = new TestBody(utils.bufferUtil, glyphTexture, bonk);
+        body = new TestBody(utils.bufferUtil, glyphTexture, bonk, 10);
         body.update(0);
         segment = body.segments[0];
+
+        var scale:Float = 0.1;
+        body.glyphTransform.identity();
+        body.glyphTransform.append(glyphTexture.matrix);
+        body.glyphTransform.appendScale(scale, scale, 1);
 
         /*
         var shapeVertices:Vector<Float> = Vector.ofArray(cast [
@@ -169,7 +178,7 @@ class Lab {
         colorBuffer = segment.colorBuffer;
         indexBuffer = segment.indexBuffer;
 
-        numTriangles = Std.int(segment.numGlyphs / 2);
+        numTriangles = Std.int(segment.numGlyphs * 2);
 
         t = 0;
     }
@@ -200,30 +209,34 @@ class Lab {
 
     }
 
-    function updateTransform():Void {
+    function update():Void {
+        /*
         t += 0.1;
         var scale:Float = Math.sin(t) * 0.25 + 1;
 
         scale *= 0.03;
 
-        glyphMat.identity();
-        glyphMat.append(glyphTexture.matrix);
-        glyphMat.appendScale(scale, scale, 1);
+        body.glyphTransform.identity();
+        body.glyphTransform.append(glyphTexture.matrix);
+        body.glyphTransform.appendScale(scale, scale, 1);
+        */
+
+        body.update(0.1);
     }
 
     function onRender(w:Int, h:Int):Void {
 
         if (program == null) return;
 
-        updateTransform();
+        update();
 
         utils.programUtil.setProgram(program);
         utils.programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         utils.programUtil.setDepthTest(false);
 
-        utils.programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat); // uBodyMat contains the body's matrix
-        utils.programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat); // uCameraMat contains the camera matrix
-        utils.programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, glyphMat); // uGlyphMat contains the character matrix
+        utils.programUtil.setProgramConstantsFromMatrix(program, uBodyMat, body.transform); // uBodyMat contains the body's matrix
+        utils.programUtil.setProgramConstantsFromMatrix(program, uCameraMat, body.camera); // uCameraMat contains the camera matrix
+        utils.programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, body.glyphTransform); // uGlyphMat contains the character matrix
 
         utils.programUtil.setTextureAt(program, uSampler, glyphTexture.texture); // uSampler contains our texture
 
@@ -235,10 +248,30 @@ class Lab {
         utils.programUtil.setVertexBufferAt(program, aUV,      colorBuffer, 3, 2); // aUV contains u,v
         utils.programUtil.setVertexBufferAt(program, aVid,     colorBuffer, 5, 1); // aVid contains i
 
+        //*
+        utils.drawUtil.setOutputBuffer(secondBuffer);
+        utils.drawUtil.clear(0xFF000000);
+        utils.drawUtil.drawTriangles(indexBuffer, 0, numTriangles);
+        utils.drawUtil.finishOutputBuffer(secondBuffer);
+
+        utils.drawUtil.readBack(secondBuffer, width, height, data);
+
+        var whiteCount:Int = 0;
+
+        for (i in 0...width * height) {
+            var pixel:Int = (data[i * 4 + 3] << 24) | (data[i * 4 + 1] << 16) | (data[i * 4 + 1] << 8) | (data[i * 4 + 2] << 0);
+            if (pixel == 0xFFFFFFFF) whiteCount++;
+        }
+
+        trace(whiteCount / (width * height));
+        /**/
+
+        //*
         utils.drawUtil.setOutputBuffer(mainOutputBuffer);
         utils.drawUtil.clear(0xFF000000);
         utils.drawUtil.drawTriangles(indexBuffer, 0, numTriangles);
         utils.drawUtil.finishOutputBuffer(mainOutputBuffer);
+        /**/
     }
 
     inline function makeProjection():Matrix3D {
