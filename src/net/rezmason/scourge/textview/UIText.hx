@@ -99,9 +99,15 @@ class UIText {
         if (updating) {
             if (!force) textIsDirty = false;
 
-            var left:String = Utf8.sub(systemInput, 0, caretIndex);
-            var mid:String = Utf8.sub(systemInput, caretIndex, 1);
-            var right:String = Utf8.sub(systemInput, caretIndex + 1, Utf8.length(systemInput));
+            var left:String = '';
+            var mid:String = '';
+            var right:String = '';
+
+            if (Utf8.length(systemInput) > 0) {
+                left = Utf8.sub(systemInput, 0, caretIndex);
+                mid = Utf8.sub(systemInput, caretIndex, 1);
+                right = Utf8.sub(systemInput, caretIndex + 1, Utf8.length(systemInput));
+            }
 
             if (mid == '') mid = ' ';
 
