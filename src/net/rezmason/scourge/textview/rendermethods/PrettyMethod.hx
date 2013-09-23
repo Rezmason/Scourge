@@ -2,6 +2,8 @@ package net.rezmason.scourge.textview.rendermethods;
 
 import flash.geom.Matrix3D;
 
+import openfl.Assets.getText;
+
 import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.RenderMethod;
@@ -45,56 +47,8 @@ class PrettyMethod extends RenderMethod {
     }
 
     override function composeShaders():Void {
-        vertShader = '
-            attribute vec3 aPos;
-            attribute vec2 aCorner;
-            attribute float aScale;
-            attribute float aPop;
-            attribute vec3 aColor;
-            attribute vec2 aUV;
-            attribute float aVid;
-
-            uniform mat4 uCameraMat;
-            uniform mat4 uGlyphMat;
-            uniform mat4 uBodyMat;
-
-            varying vec3 vColor;
-            varying vec2 vUV;
-            varying float vVid;
-            varying float vZ;
-
-            void main(void) {
-                vec4 pos = uBodyMat * vec4(aPos, 1.0);
-                pos.z += aPop;
-                pos = uCameraMat * pos;
-                pos.xy += ((uGlyphMat * vec4(aCorner, 1.0, 1.0)).xy) * aScale;
-
-                vColor = aColor;
-                vUV = aUV;
-                vVid = aVid;
-                vZ = pos.z;
-
-                pos.z = clamp(pos.z, 0.0, 1.0);
-                gl_Position = pos;
-            }
-        ';
-
-        fragShader =
-            #if !desktop 'precision mediump float;' + #end
-            '
-            varying vec3 vColor;
-            varying vec2 vUV;
-            varying float vVid;
-            varying float vZ;
-
-            uniform sampler2D uSampler;
-
-            void main(void) {
-                vec3 texture = texture2D(uSampler, vUV).rgb;
-                if (vVid >= 0.3) texture *= -1.0;
-                gl_FragColor = vec4(vColor * (texture + vVid) * clamp(2.0 - vZ, 0.0, 1.0), 1.0);
-            }
-        ';
+        vertShader = getText('shaders/scourge_glyphs.vert');
+        fragShader = #if !desktop 'precision mediump float;' + #end getText('shaders/scourge_glyphs.frag');
     }
 
     override function connectToShaders():Void {

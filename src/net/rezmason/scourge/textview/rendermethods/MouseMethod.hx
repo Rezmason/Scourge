@@ -2,6 +2,8 @@ package net.rezmason.scourge.textview.rendermethods;
 
 import flash.geom.Matrix3D;
 
+import openfl.Assets.getText;
+
 import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.RenderMethod;
@@ -39,37 +41,8 @@ class MouseMethod extends RenderMethod {
     }
 
     override function composeShaders():Void {
-        vertShader = '
-            attribute vec3 aPos;
-            attribute vec2 aCorner;
-            attribute vec3 aPaint;
-
-            uniform mat4 uCameraMat;
-            uniform mat4 uGlyphMat;
-            uniform mat4 uBodyMat;
-
-            varying vec4 vPaint;
-
-            void main(void) {
-
-                vPaint = vec4(aPaint, 1.0);
-
-                vec4 pos = uCameraMat * (uBodyMat * vec4(aPos, 1.0));
-                pos.xy += (uGlyphMat * vec4(aCorner, 1.0, 1.0)).xy;
-
-                gl_Position = pos;
-            }
-        ';
-
-        fragShader =
-            #if !desktop 'precision mediump float;' + #end
-            '
-            varying vec4 vPaint;
-
-            void main(void) {
-                gl_FragColor = vPaint;
-            }
-        ';
+        vertShader = getText('shaders/mousepicking.vert');
+        fragShader = #if !desktop 'precision mediump float;' + #end getText('shaders/mousepicking.frag');
     }
 
     override function connectToShaders():Void {
