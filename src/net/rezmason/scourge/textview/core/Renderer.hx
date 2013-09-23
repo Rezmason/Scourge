@@ -22,15 +22,11 @@ class Renderer {
             return;
         }
 
-        #if (flash || js)
-            if (activeMethod != method) {
-                if (activeMethod != null) activeMethod.deactivate();
-                activeMethod = method;
-                activeMethod.activate();
-            }
-        #else
-            method.activate();
-        #end
+        if (activeMethod != method) {
+            if (activeMethod != null) activeMethod.deactivate();
+            activeMethod = method;
+            activeMethod.activate();
+        }
 
         drawUtil.setOutputBuffer(outputBuffer);
         drawUtil.clear(method.backgroundColor);
