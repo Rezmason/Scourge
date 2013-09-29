@@ -39,12 +39,15 @@ class NodeView {
     public var curve:Float;
     public var lift:Float;
     public var isVisible:Bool;
+    public var wiggleX:Float;
+    public var wiggleY:Float;
 
     public var distance:Int;
 
     public function new():Void {
         x = y = z = curve = lift = size = distance = 0;
         isVisible = true;
+        wiggleX = wiggleY = 0;
     }
 }
 
@@ -52,7 +55,8 @@ class BoardBody extends Body {
 
     inline static var COLOR_RANGE:Int = 6;
 
-    static var TEAM_COLORS:Array<Int> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ];
+    static var TEAM_COLORS:Array<Int> =        [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ];
+    static var TEAM_CAVITY_COLORS:Array<Int> = [0x990040, 0x997800, 0x109900, 0x007099, 0x993000, 0x700099, 0x001099, 0x303030, ];
     static var BOARD_COLOR:Int = 0x303030;
     static var WALL_COLOR:Int = 0x606060;
     static var BODY_CHARS:String = TestStrings.ALPHANUMERICS;
@@ -260,7 +264,7 @@ class BoardBody extends Body {
                 node = pendingNodes.pop();
             }
 
-            trace([ike, maxDistance + 1]);
+            // trace([ike, maxDistance + 1]);
             wavePools[ike].size = maxDistance + 1;
         }
 
@@ -276,16 +280,23 @@ class BoardBody extends Body {
             var hasPlayer:Bool = playerID != Aspect.NULL;
 
             view.curve = isFilled ? 0.96 : 1;
-            view.lift = isFilled ? -0.05 : 0;
+
+            if (isFilled) view.lift = -0.05;
+            else if (hasPlayer) view.lift = -0.03;
+            else view.lift = 0;
 
             var code:Int = blankCode;
             var size:Float = 1;
             var color:Int = 0xFFFFFF;
             var isVisible:Bool = true;
+            var glow:Float = 0;
+            var wiggleX:Float = 0;
+            var wiggleY:Float = 0;
 
             if (isFilled) {
                 if (hasPlayer) {
                     color = TEAM_COLORS[playerID % TEAM_COLORS.length];
+                    glow = 0.15;
                     if (headNodes[playerID] == node) {
                         code = headCode;
                         size = 1.2;
@@ -293,10 +304,22 @@ class BoardBody extends Body {
                         // code = bodyCode;
                         // code = BODY_CHARS.charCodeAt(Std.random(Utf8.length(BODY_CHARS)));
                         code = BODY_CHARS.charCodeAt(view.distance % Utf8.length(BODY_CHARS));
-                        size = 1;
-                    }
-                } else {
 
+                        var numNeighbors:Int = 0;
+                        for (direction in GridUtils.allDirections()) {
+                            var neighborNode:BoardNode = node.neighbors[direction];
+                            if (neighborNode != null && neighborNode.value[occupier_] == playerID) numNeighbors++;
+                        }
+                        size = (numNeighbors / 8) * 0.6 + 0.2;
+                    }
+
+                    wiggleX = view.wiggleX;
+                    wiggleY = view.wiggleY;
+
+                    if (wiggleX == 0) wiggleX = (Math.random() * 2 - 1) * 0.01;
+                    if (wiggleY == 0) wiggleY = (Math.random() * 2 - 1) * 0.01;
+
+                } else {
                     isVisible = false;
                     for (direction in GridUtils.allDirections()) {
                         var neighborNode:BoardNode = node.neighbors[direction];
@@ -312,6 +335,11 @@ class BoardBody extends Body {
                     size = 0;
                     if (isVisible) wallNodeViews.push(view);
                 }
+            } else if (hasPlayer) {
+                color = TEAM_CAVITY_COLORS[playerID % TEAM_CAVITY_COLORS.length];
+                glow = 0.05;
+                code = boardCode;
+                size = 0.5;
             } else {
                 color = BOARD_COLOR;
                 code = boardCode;
@@ -319,8 +347,13 @@ class BoardBody extends Body {
             }
 
             view.size = size;
+            view.wiggleX = wiggleX;
+            view.wiggleY = wiggleY;
             colorGlyph(view.boardGlyph, color);
-            view.boardGlyph.set_pos(view.x * view.curve, view.y * view.curve, view.z + view.lift);
+            view.boardGlyph.set_i(glow);
+            view.boardGlyph.set_x(view.x * view.curve + view.wiggleX);
+            view.boardGlyph.set_y(view.y * view.curve + view.wiggleX);
+            view.boardGlyph.set_z(view.z + view.lift);
             view.boardGlyph.set_s(size);
             view.boardGlyph.set_char(code, glyphTexture.font);
             view.isVisible = isVisible;
@@ -386,6 +419,10 @@ class BoardBody extends Body {
             if (playerID != Aspect.NULL && view.node.value[isFilled_] == Aspect.TRUE) {
                 var h:Float = wavePools[playerID].getHeightAtIndex(view.distance);
                 // view.boardGlyph.set_p(h * 0.08);
+
+                view.boardGlyph.set_x(view.x * view.curve + view.wiggleX * (1 + h * 2));
+                view.boardGlyph.set_y(view.y * view.curve + view.wiggleY * (1 + h * 2));
+
                 view.boardGlyph.set_z(view.z + view.lift + h * 0.05);
                 view.boardGlyph.set_s(view.size - h * 0.2);
             }
