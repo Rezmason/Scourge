@@ -1,5 +1,4 @@
 Native target needs love
-    Blend mode stuff – seems to be wrong
     keyboard input code crashes- what, for real?
         Fine! Be that way!
             See if I give a fuck

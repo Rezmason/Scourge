@@ -9,6 +9,7 @@ import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.RenderMethod;
 import net.rezmason.gl.BlendFactor;
 import net.rezmason.gl.Types;
+import net.rezmason.gl.VertexBuffer;
 
 class PrettyMethod extends RenderMethod {
 
@@ -33,14 +34,6 @@ class PrettyMethod extends RenderMethod {
     }
 
     override public function deactivate():Void {
-        programUtil.setVertexBufferAt(program, aPos,    null, 0, 3);
-        programUtil.setVertexBufferAt(program, aCorner, null, 3, 2);
-        programUtil.setVertexBufferAt(program, aScale,  null, 5, 1);
-        programUtil.setVertexBufferAt(program, aPop,    null, 6, 1);
-        programUtil.setVertexBufferAt(program, aColor,  null, 0, 3);
-        programUtil.setVertexBufferAt(program, aUV,     null, 3, 2);
-        programUtil.setVertexBufferAt(program, aVid,    null, 5, 1);
-
         programUtil.setTextureAt(program, uSampler, null);
         programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         programUtil.setDepthTest(true);
@@ -79,13 +72,22 @@ class PrettyMethod extends RenderMethod {
     }
 
     override public function setSegment(segment:BodySegment):Void {
-        programUtil.setVertexBufferAt(program, aPos,    segment.shapeBuffer, 0, 3); // aPos contains x,y,z
-        programUtil.setVertexBufferAt(program, aCorner, segment.shapeBuffer, 3, 2); // aCorner contains h,v
-        programUtil.setVertexBufferAt(program, aScale,  segment.shapeBuffer, 5, 1); // aScale contains s
-        programUtil.setVertexBufferAt(program, aPop,    segment.shapeBuffer, 6, 1); // aPop contains p
-        programUtil.setVertexBufferAt(program, aColor,  segment.colorBuffer, 0, 3); // aColor contains r,g,b
-        programUtil.setVertexBufferAt(program, aUV,     segment.colorBuffer, 3, 2); // aUV contains u,v
-        programUtil.setVertexBufferAt(program, aVid,    segment.colorBuffer, 5, 1); // aVid contains i
+
+        var shapeBuffer:VertexBuffer = null;
+        var colorBuffer:VertexBuffer = null;
+
+        if (segment != null) {
+            shapeBuffer = segment.shapeBuffer;
+            colorBuffer = segment.colorBuffer;
+        }
+
+        programUtil.setVertexBufferAt(program, aPos,    shapeBuffer, 0, 3); // aPos contains x,y,z
+        programUtil.setVertexBufferAt(program, aCorner, shapeBuffer, 3, 2); // aCorner contains h,v
+        programUtil.setVertexBufferAt(program, aScale,  shapeBuffer, 5, 1); // aScale contains s
+        programUtil.setVertexBufferAt(program, aPop,    shapeBuffer, 6, 1); // aPop contains p
+        programUtil.setVertexBufferAt(program, aColor,  colorBuffer, 0, 3); // aColor contains r,g,b
+        programUtil.setVertexBufferAt(program, aUV,     colorBuffer, 3, 2); // aUV contains u,v
+        programUtil.setVertexBufferAt(program, aVid,    colorBuffer, 5, 1); // aVid contains i
     }
 }
 

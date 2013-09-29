@@ -9,6 +9,7 @@ import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.RenderMethod;
 import net.rezmason.gl.BlendFactor;
 import net.rezmason.gl.Types;
+import net.rezmason.gl.VertexBuffer;
 
 class MouseMethod extends RenderMethod {
 
@@ -29,9 +30,6 @@ class MouseMethod extends RenderMethod {
     }
 
     override public function deactivate():Void {
-        programUtil.setVertexBufferAt(program, aPos,    null, 0, 3);
-        programUtil.setVertexBufferAt(program, aCorner, null, 3, 2);
-        programUtil.setVertexBufferAt(program, aPaint,  null, 0, 3);
     }
 
     override function init():Void {
@@ -66,9 +64,18 @@ class MouseMethod extends RenderMethod {
     }
 
     override public function setSegment(segment:BodySegment):Void {
-        programUtil.setVertexBufferAt(program, aPos,    segment.shapeBuffer, 0, 3);
-        programUtil.setVertexBufferAt(program, aCorner, segment.shapeBuffer, 3, 2);
-        programUtil.setVertexBufferAt(program, aPaint,  segment.paintBuffer, 0, 3);
+
+        var shapeBuffer:VertexBuffer = null;
+        var paintBuffer:VertexBuffer = null;
+
+        if (segment != null) {
+            shapeBuffer = segment.shapeBuffer;
+            paintBuffer = segment.paintBuffer;
+        }
+
+        programUtil.setVertexBufferAt(program, aPos,    shapeBuffer, 0, 3);
+        programUtil.setVertexBufferAt(program, aCorner, shapeBuffer, 3, 2);
+        programUtil.setVertexBufferAt(program, aPaint,  paintBuffer, 0, 3);
     }
 }
 

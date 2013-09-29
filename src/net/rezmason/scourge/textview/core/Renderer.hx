@@ -9,7 +9,6 @@ class Renderer {
     inline static var SPACE_HEIGHT:Float = 2.0;
 
     var drawUtil:DrawUtil;
-    var activeMethod:RenderMethod;
 
     public function new(drawUtil:DrawUtil) {
         this.drawUtil = drawUtil;
@@ -22,11 +21,7 @@ class Renderer {
             return;
         }
 
-        if (activeMethod != method) {
-            if (activeMethod != null) activeMethod.deactivate();
-            activeMethod = method;
-            activeMethod.activate();
-        }
+        method.activate();
 
         drawUtil.setOutputBuffer(outputBuffer);
         drawUtil.clear(method.backgroundColor);
@@ -42,6 +37,8 @@ class Renderer {
             }
         }
 
+        method.setSegment(null);
+        method.deactivate();
         drawUtil.finishOutputBuffer(outputBuffer);
     }
 }
