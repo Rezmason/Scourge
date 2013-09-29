@@ -12,7 +12,7 @@ import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.Interaction;
-import net.rezmason.scourge.textview.text.Sigil.STYLE;
+import net.rezmason.scourge.textview.text.Sigil.STYLE_CODE;
 import net.rezmason.scourge.textview.text.Style;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
@@ -21,7 +21,7 @@ class UIBody extends Body {
 
     inline static var glideEase:Float = 0.6;
     inline static var NATIVE_DPI:Float = 96;
-    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 24;
+    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 18;
 
     var glyphWidthInPixels :Float;
     var glyphHeightInPixels:Float;
@@ -40,6 +40,8 @@ class UIBody extends Body {
     var numCols:Int;
 
     var uiText:UIText;
+
+    public var padding:Float;
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, uiText:UIText):Void {
 
@@ -78,8 +80,11 @@ class UIBody extends Body {
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
+
+        viewRect.inflate(-padding, -padding);
         super.adjustLayout(stageWidth, stageHeight);
         var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
+        viewRect.inflate(padding, padding);
 
         numRows = Std.int(rect.height * stageHeight / glyphHeightInPixels) + 1;
         numCols = Std.int(rect.width  * stageWidth  / glyphWidthInPixels );
@@ -146,14 +151,12 @@ class UIBody extends Body {
 
         uiText.resetStyledGlyphs();
 
-        var styleCode:Int = Utf8.charCodeAt(STYLE, 0);
-
         var currentStyle:Style = uiText.getStyleByIndex(styleIndex);
         for (line in pageSegment) {
             var index:Int = 0;
             for (index in 0...Utf8.length(line)) {
                 var charCode:Int = Utf8.charCodeAt(line, index);
-                if (charCode == styleCode) {
+                if (charCode == STYLE_CODE) {
                     currentStyle = uiText.getStyleByIndex(++styleIndex);
                 } else {
                     var glyph:Glyph = glyphs[id++];

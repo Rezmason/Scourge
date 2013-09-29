@@ -1,9 +1,3 @@
-Native target needs love
-    keyboard input code crashes- what, for real?
-        Fine! Be that way!
-            See if I give a fuck
-        Oh, but I can't stay mad at you
-
 Rework the players stuff
     The Referee-Player interface should be based on messages
         For now, messages can be events or signals dispatched from a common source

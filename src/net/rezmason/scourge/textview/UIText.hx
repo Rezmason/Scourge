@@ -3,6 +3,7 @@ package net.rezmason.scourge.textview;
 import flash.ui.Keyboard;
 
 import haxe.Utf8;
+import haxe.io.Bytes;
 import openfl.Assets;
 
 import net.rezmason.scourge.textview.TestStrings;
@@ -50,6 +51,7 @@ class UIText {
         numRows = 0;
         numCols = 0;
 
+        // blurb = '';
         // blurb = [TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n");
         // blurb = Assets.getText("assets/not plus.txt");
         // blurb = Assets.getText("assets/enterprise.txt");
@@ -97,17 +99,12 @@ class UIText {
         var updating:Bool = force || textIsDirty;
 
         if (updating) {
+
             if (!force) textIsDirty = false;
 
-            var left:String = '';
-            var mid:String = '';
-            var right:String = '';
-
-            if (Utf8.length(systemInput) > 0) {
-                left = Utf8.sub(systemInput, 0, caretIndex);
-                mid = Utf8.sub(systemInput, caretIndex, 1);
-                right = Utf8.sub(systemInput, caretIndex + 1, Utf8.length(systemInput));
-            }
+            var left:String = sub(systemInput, 0, caretIndex);
+            var mid:String = sub(systemInput, caretIndex, 1);
+            var right:String = sub(systemInput, caretIndex + 1);
 
             if (mid == '') mid = ' ';
 
@@ -115,14 +112,13 @@ class UIText {
             else caretStyle.stop();
 
             combinedText = blurb + systemOutput + prompt + left + caretStart + mid + caretEnd + right;
-            if (combinedText == null) combinedText = '';
-            this.combinedText = swapTabsWithSpaces(combinedText);
+            combinedText = swapTabsWithSpaces(combinedText);
 
             if (numRows * numCols > 0) {
 
                 // Simplify the combinedText and wrap it to new lines as we construct the page
 
-                page = extractFromText(this.combinedText, false).split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
+                page = extractFromText(combinedText, false).split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
 
                 // Add blank lines to the end, to reach the minimum page length (numRows)
 
@@ -156,11 +152,10 @@ class UIText {
 
         var count:Int = 0;
         var right:String = line;
-        while (Utf8.length(right) > 0) {
+        while (length(right) > 0) {
             var sigilIndex:Int = right.indexOf(STYLE);
             if (sigilIndex == -1) break;
-            right = right.substr(sigilIndex, right.length);
-            right = Utf8.sub(right, 1, Utf8.length(right));
+            right = sub(right, sigilIndex + 1);
             count++;
         }
 
@@ -182,14 +177,14 @@ class UIText {
         while (right.length > 0) {
             var len:Int = right.length;
             var line:String = '';
-            line = Utf8.sub(right, 0, numCols - count);
+            line = sub(right, 0, numCols - count);
             var sigilIndex:Int = line.indexOf(STYLE);
             if (sigilIndex == -1) {
                 left = left + line;
                 wrappedLines.push(padLine(left));
                 left = '';
                 if (numCols - count < right.length) {
-                    right = Utf8.sub(right, numCols - count, Utf8.length(right));
+                    right = sub(right, numCols - count);
                     left = '';
                 } else {
                     right = '';
@@ -201,9 +196,9 @@ class UIText {
                 if (sigilIndex > 0) left = left + line;
                 left = left + STYLE;
                 right = right.substr(sigilIndex, right.length);
-                if (Utf8.length(right) > 1) right = Utf8.sub(right, 1, Utf8.length(right));
+                if (length(right) > 1) right = sub(right, 1);
                 else right = '';
-                count += Utf8.length(line);
+                count += length(line);
             }
         }
 
@@ -220,19 +215,19 @@ class UIText {
                         case Keyboard.BACKSPACE:
                             // delete command
 
-                            var left:String = Utf8.sub(systemInput, 0, caretIndex);
-                            var right:String = Utf8.sub(systemInput, caretIndex, Utf8.length(systemInput));
+                            var left:String = sub(systemInput, 0, caretIndex);
+                            var right:String = sub(systemInput, caretIndex);
 
-                            if (Utf8.length(left) > 0) {
+                            if (length(left) > 0) {
                                 var lim:Int = -1;
 
                                 if (ctrl) lim = 0;
                                 // TODO: alt-delete
-                                else lim = Utf8.length(left) - 1;
+                                else lim = length(left) - 1;
 
                                 if (lim == -1) lim = 0;
 
-                                left = Utf8.sub(left, 0, lim);
+                                left = sub(left, 0, lim);
                                 caretIndex = lim;
                             }
 
@@ -241,7 +236,7 @@ class UIText {
 
                         case Keyboard.ENTER:
                             blurb += systemOutput + prompt + systemInput;
-                            if (Utf8.length(systemInput) == 0) {
+                            if (length(systemInput) == 0) {
                                 systemOutput = '\n';
                             } else {
                                 systemOutput = '\n' + printCommand(interpreter.run(systemInput, false));
@@ -252,7 +247,7 @@ class UIText {
                             caretIndex = 0;
                             textIsDirty = true;
                         case Keyboard.ESCAPE:
-                            if (Utf8.length(systemInput) > 0) {
+                            if (length(systemInput) > 0) {
                                 textIsDirty = true;
                                 systemInput = '';
                                 caretIndex = 0;
@@ -268,8 +263,8 @@ class UIText {
                             // TODO: input spans
                         case Keyboard.RIGHT:
                             caretIndex++;
-                            if (caretIndex > Utf8.length(systemInput)) {
-                                caretIndex = Utf8.length(systemInput);
+                            if (caretIndex > length(systemInput)) {
+                                caretIndex = length(systemInput);
                             }
                             textIsDirty = true;
                             // TODO: alt-right
@@ -291,8 +286,8 @@ class UIText {
                                 textIsDirty = true;
                             }
                         case _:
-                            var left:String = Utf8.sub(systemInput, 0, caretIndex);
-                            var right:String = Utf8.sub(systemInput, caretIndex, Utf8.length(systemInput));
+                            var left:String = sub(systemInput, 0, caretIndex);
+                            var right:String = sub(systemInput, caretIndex);
 
                             if (char > 0) {
                                 left += String.fromCharCode(char);
@@ -302,14 +297,14 @@ class UIText {
                             }
                     }
                 }
-                case MOUSE(type, x, y):
-                    if (id != 0) {
-                        var targetStyle:Style = styles.getStyleByMouseID(id);
-                        if (targetStyle != null) {
-                            targetStyle.interact(type);
-                            if (type == CLICK) trace('${targetStyle.name} clicked!');
-                        }
+            case MOUSE(type, x, y):
+                if (id != 0) {
+                    var targetStyle:Style = styles.getStyleByMouseID(id);
+                    if (targetStyle != null) {
+                        targetStyle.interact(type);
+                        if (type == CLICK) trace('${targetStyle.name} clicked!');
                     }
+                }
         }
     }
 
@@ -321,7 +316,7 @@ class UIText {
         var left:String = '';
         var right:String = input;
 
-        while (Utf8.length(right) > 0) {
+        while (length(right) > 0) {
             var tabIndex:Int = right.indexOf('\t');
             if (tabIndex == -1) {
                 left = left + right;
@@ -329,7 +324,7 @@ class UIText {
             } else {
                 left = left + right.substr(0, tabIndex) + '    ';
                 right = right.substr(tabIndex, right.length);
-                right = Utf8.sub(right, 1, Utf8.length(right));
+                right = sub(right, 1);
             }
         }
 
@@ -337,7 +332,7 @@ class UIText {
     }
 
     inline function rpad(input:String, pad:String, len:Int):String {
-        len = len - Utf8.length(input);
+        len = len - length(input);
         var str:String = '';
         while (str.length < len) str = str + pad;
         return input + str;
@@ -364,4 +359,22 @@ class UIText {
     }
 
     public inline function bottomPos():Float return numScrollPositions() - 1;
+
+    static inline function sub(input:String, pos:Int, len:Int = -1):String {
+
+        var output:String = '';
+        if (len == -1) len = length(input);
+        if (input != '' && len > 0 && pos < length(input)) {
+            output = Utf8.sub(input, pos, length(input));
+            output = Utf8.sub(output, 0, len);
+        }
+
+        return output;
+    }
+
+    static inline function length(input:String):Int {
+        var output:Int = 0;
+        if (input != '') output = Utf8.length(input);
+        return output;
+    }
 }

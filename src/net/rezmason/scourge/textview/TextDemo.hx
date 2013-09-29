@@ -132,6 +132,7 @@ class TextDemo {
         cfg.circular = args.has('circular');
         cfg.allowAllPieces = false;
         cfg.numPlayers = playerCfgs.length;
+        cfg.includeCavities = true;
         referee.beginGame(playerCfgs, randomFunction, cfg);
 
         return 'Starting a $numPlayers player game.';
@@ -172,9 +173,8 @@ class TextDemo {
         interpreter.addCommand("makeGame", makeGame);
         uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, new UIText(interpreter));
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
-        uiRect.inflate(-0.025, -0.1);
-        // uiRect = new Rectangle(0, 0, 1, 1);
         uiBody.viewRect = uiRect;
+        uiBody.padding = 0.025;
         engine.addBody(uiBody);
         /**/
 
