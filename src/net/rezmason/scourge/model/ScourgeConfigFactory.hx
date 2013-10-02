@@ -21,7 +21,7 @@ class ScourgeConfigFactory {
     public static function makeDemiurgicRuleList():Array<String> { return ['BuildStateRule', 'BuildPlayersRule', 'BuildBoardRule']; }
     public static function makeActionList(config:ScourgeConfig):Array<String> {
 
-        var actionList:Array<String> = ['quitAction', 'dropAction', 'pickPieceAction'];
+        var actionList:Array<String> = ['quitAction', 'dropAction', 'pickAction'];
 
         if (config.maxSwaps > 0) actionList.push('swapAction');
         if (config.maxBites > 0) actionList.push('biteAction');
@@ -109,7 +109,7 @@ class ScourgeConfigFactory {
             cleanUp: ['DecayRule', 'KillHeadlessPlayerRule', 'OneLivingPlayerRule'],
             wrapUp: ['EndTurnRule', 'ReplenishRule'],
 
-            pickPieceAction: ['PickPieceRule'],
+            pickAction: ['PickPieceRule'],
             startAction: ['cleanUp'],
             quitAction: ['ForfeitRule', 'cleanUp', 'wrapUp'],
             dropAction: ['DropPieceRule', 'EatCellsRule', 'cleanUp', 'wrapUp', 'SkipsExhaustedRule'],

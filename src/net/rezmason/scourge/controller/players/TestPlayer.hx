@@ -1,9 +1,13 @@
 package net.rezmason.scourge.controller.players;
 
 import haxe.Unserializer;
+import net.rezmason.ropes.Types.Move;
 import net.rezmason.scourge.controller.Types;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
+
+import net.rezmason.scourge.model.aspects.*;
+import net.rezmason.ropes.Types;
 
 using Lambda;
 using net.rezmason.scourge.model.BoardUtils;
@@ -14,6 +18,17 @@ class TestPlayer extends Player {
 
     var helper:TestHelper;
     var annotate:Bool;
+
+    var dropIndex:Int;
+    var pickIndex:Int;
+    var quitIndex:Int;
+
+    var swapIndex:Int;
+    var biteIndex:Int;
+
+    var indices:Array<Int>;
+
+    var moves:Array<Array<Move>>;
 
     public function new(index:Int, config:PlayerConfig, handler:Player->GameEvent->Void, helper:TestHelper, annotate:Bool):Void {
         super(index, config, handler);
@@ -50,6 +65,15 @@ class TestPlayer extends Player {
     private function init(config:ScourgeConfig):Void {
         //trace('INIT $index');
         game.begin(config, retrieveRandomFloat, annotate ? handleAnnotation : null);
+
+        dropIndex = game.actionIDs.indexOf('dropAction');
+        pickIndex = game.actionIDs.indexOf('pickAction');
+        quitIndex = game.actionIDs.indexOf('quitAction');
+
+        swapIndex = game.actionIDs.indexOf('swapAction');
+        biteIndex = game.actionIDs.indexOf('biteAction');
+
+        indices = [pickIndex, dropIndex, pickIndex, swapIndex, biteIndex, quitIndex];
     }
 
     private function resume(savedGame:SavedGame):Void {
@@ -89,17 +113,14 @@ class TestPlayer extends Player {
     }
 
     private function choose():Void {
-        //trace('CHOOSE $index');
+        moves = game.getMoves();
+        for (index in indices) if (volleyRandomPlayerAction(index)) break;
+    }
 
-        var dropIndex:Int = game.actionIDs.indexOf('dropAction');
-        var firstDropMove:Int = game.getMoves()[dropIndex].length - 1;
-
-        var pickPieceIndex:Int = game.actionIDs.indexOf('pickPieceAction');
-        var firstPickPieceMove:Int = game.getMoves()[pickPieceIndex].length - 1;
-
-        if (firstDropMove == 0 && firstPickPieceMove == 0) volley(PlayerAction(pickPieceIndex, firstPickPieceMove));
-        else if (firstDropMove > 0) volley(PlayerAction(dropIndex, firstDropMove));
-        else trace('ERROR: $firstDropMove $firstPickPieceMove');
+    private inline function volleyRandomPlayerAction(index:Int):Bool {
+        var possible:Bool = index != -1 && moves[index].length > 0;
+        if (possible) volley(PlayerAction(index, Std.random(moves[index].length)));
+        return possible;
     }
 
     private function volley(eventType:GameEventType):Void {

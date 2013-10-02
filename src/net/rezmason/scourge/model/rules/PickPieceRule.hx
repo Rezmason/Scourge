@@ -72,7 +72,6 @@ class PickPieceRule extends Rule {
     }
 
     override private function _update():Void {
-
         if (cfg.allowAll) {
             // The simplest system; the player can use any provided piece at any time
             moves = cast allMoves.copy();
@@ -91,6 +90,8 @@ class PickPieceRule extends Rule {
             var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
             for (piece in hatPieces) quantumPieceMoves.push(allMoves[piece[pieceMoveID_]]);
             quantumMoves = cast quantumPieceMoves;
+        } else {
+            moves = [];
         }
     }
 
@@ -248,17 +249,21 @@ class PickPieceRule extends Rule {
     }
 
     private function binarySearch(val:Float, list:Array<Float>):Int {
-        function search(min:Int, max:Int):Int {
-            var halfway:Int = Std.int((min + max) * 0.5);
 
-            if (max < min) return -1;
-            else if (max - min == 1) return (list[max] - val > val - list[min]) ? min : max;
-            else if (list[halfway] > val) return search(min, halfway);
-            else if (list[halfway] < val) return search(halfway, max);
-            else return halfway;
+        function search(min:Int, max:Int):Int {
+
+            var halfway:Int = Std.int((min + max) * 0.5);
+            var output:Int = halfway;
+
+            if (max < min) output = -1;
+            else if (max - min == 1) output = (list[max] - val > val - list[min]) ? min : max;
+            else if (list[halfway] > val) output = search(min, halfway);
+            else if (list[halfway] < val) output = search(halfway, max);
+
+            return output;
         }
 
-        return search(0, list.length);
+        return search(0, list.length - 1);
     }
 
     // We fill the hat up again if it's empty

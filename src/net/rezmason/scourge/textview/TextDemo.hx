@@ -95,6 +95,7 @@ class TextDemo {
 
     function startRobots(input:String):String {
         stopRobots("");
+        if (referee == null) return "GAME DOES NOT EXIST";
         robotTimer = new Timer(Std.parseInt(input.split(' ')[1]));
         trace(input);
         robotTimer.run = makeTurn2;
@@ -113,7 +114,7 @@ class TextDemo {
         stopRobots("");
 
         if (referee == null) referee = new Referee();
-        else referee.endGame();
+        else if (referee.gameBegun) referee.endGame();
 
         game = null;
 
@@ -128,11 +129,13 @@ class TextDemo {
         for (ike in 0...numPlayers) playerCfgs.push({type:Test(takeTurn, false)});
 
         var cfg = ScourgeConfigFactory.makeDefaultConfig();
-        cfg.allowRotating = false;
+        cfg.allowRotating = true;
         cfg.circular = args.has('circular');
-        cfg.allowAllPieces = false;
+        cfg.allowNowhereDrop = false;
         cfg.numPlayers = playerCfgs.length;
         cfg.includeCavities = true;
+        // cfg.maxSwaps = 0;
+        // cfg.maxBites = 0;
         referee.beginGame(playerCfgs, randomFunction, cfg);
 
         return 'Starting a $numPlayers player game.';
