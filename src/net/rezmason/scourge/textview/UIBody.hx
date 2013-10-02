@@ -67,9 +67,7 @@ class UIBody extends Body {
     override public function update(delta:Float):Void {
 
         if (!dragging && uiText.updateDirtyText()) {
-            if (Math.isNaN(currentScrollPos)) currentScrollPos = uiText.bottomPos();
-            setScrollPos(currentScrollPos);
-
+            if (Math.isNaN(currentScrollPos)) setScrollPos(uiText.bottomPos());
             glideTextToPos(uiText.bottomPos());
         }
 
