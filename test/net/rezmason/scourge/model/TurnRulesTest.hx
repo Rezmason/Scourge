@@ -12,7 +12,7 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
 import net.rezmason.scourge.model.rules.EndTurnRule;
 import net.rezmason.scourge.model.rules.ForfeitRule;
-import net.rezmason.scourge.model.rules.KillHeadlessPlayerRule;
+import net.rezmason.scourge.model.rules.KillHeadlessBodyRule;
 import net.rezmason.scourge.model.rules.OneLivingPlayerRule;
 import net.rezmason.scourge.model.rules.SkipsExhaustedRule;
 import net.rezmason.scourge.model.rules.DropPieceRule;
@@ -119,8 +119,8 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Should remove heads that are not occupied by their owner
 
-        var killHeadlessPlayerRule:KillHeadlessPlayerRule = new KillHeadlessPlayerRule();
-        makeState([killHeadlessPlayerRule], 4);
+        var killHeadlessBodyRule:KillHeadlessBodyRule = new KillHeadlessBodyRule();
+        makeState([killHeadlessBodyRule], 4);
 
         // Change occupier of current player\'s head
 
@@ -137,12 +137,12 @@ class TurnRulesTest extends ScourgeRuleTest
 
         playerHead.value[occupier_] = 1;
 
-        killHeadlessPlayerRule.update();
-        var moves:Array<Move> = killHeadlessPlayerRule.moves;
+        killHeadlessBodyRule.update();
+        var moves:Array<Move> = killHeadlessBodyRule.moves;
         Assert.isNotNull(moves);
         Assert.areEqual(1, moves.length);
 
-        killHeadlessPlayerRule.chooseMove();
+        killHeadlessBodyRule.chooseMove();
 
         head = state.players[currentPlayer][head_];
         Assert.areEqual(Aspect.NULL, head);

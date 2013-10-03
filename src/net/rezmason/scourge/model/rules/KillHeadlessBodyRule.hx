@@ -14,7 +14,7 @@ using Lambda;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
 
-class KillHeadlessPlayerRule extends Rule {
+class KillHeadlessBodyRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;

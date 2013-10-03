@@ -43,7 +43,7 @@ class ScourgeConfigFactoryTest
     var startAction:Rule;
     var biteAction:Rule;
     var swapAction:Rule;
-    var pickPieceAction:Rule;
+    var pickAction:Rule;
     var quitAction:Rule;
     var dropAction:Rule;
 
@@ -192,8 +192,8 @@ class ScourgeConfigFactoryTest
 		startAction.update();
 		startAction.chooseMove();
 
-		pickPieceAction.update();
-		pickPieceAction.chooseMove();
+		pickAction.update();
+		pickAction.chooseMove();
 
 		var numSwaps_:AspectPtr = plan.onPlayer(SwapAspect.NUM_SWAPS);
 		var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
@@ -205,8 +205,8 @@ class ScourgeConfigFactoryTest
 		for (ike in 0...config.startingSwaps) {
 			swapAction.update();
 			swapAction.chooseMove();
-			pickPieceAction.update();
-			pickPieceAction.chooseMove();
+			pickAction.update();
+			pickAction.chooseMove();
 
 			var piece:Int = state.aspects[pieceTableID_];
 
@@ -256,22 +256,22 @@ class ScourgeConfigFactoryTest
 
 		VisualAssert.assert('two player grab', state.spitBoard(plan));
 
-		pickPieceAction.update();
-		pickPieceAction.chooseMove();
+		pickAction.update();
+		pickAction.chooseMove();
 		dropAction.update();
 		dropAction.chooseMove(35); // drop, eat
 
 		VisualAssert.assert('player zero dropped an L, ate player one\'s leg; small new cavity', state.spitBoard(plan));
 
-		pickPieceAction.update();
-		pickPieceAction.chooseMove();
+		pickAction.update();
+		pickAction.chooseMove();
 		dropAction.update();
 		dropAction.chooseMove(); // skip
 
 		var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
-		pickPieceAction.update();
-		pickPieceAction.chooseMove();
+		pickAction.update();
+		pickAction.chooseMove();
 		dropAction.update();
 		dropAction.chooseMove(32); // drop, eat, kill
 
@@ -327,7 +327,7 @@ class ScourgeConfigFactoryTest
         startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
 	    biteAction = combinedRules.get('biteAction');
 	    swapAction = combinedRules.get('swapAction');
-	    pickPieceAction = combinedRules.get('pickPieceAction');
+	    pickAction = combinedRules.get('pickAction');
 	    quitAction = combinedRules.get('quitAction');
 	    dropAction = combinedRules.get('dropAction');
     }
