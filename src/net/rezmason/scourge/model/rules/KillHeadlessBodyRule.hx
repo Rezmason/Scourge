@@ -35,15 +35,15 @@ class KillHeadlessBodyRule extends Rule {
 
         var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
 
-        // Check each player to see if their heads are no longer theirs
+        // Check each player to see if they still have head nodes
 
         for (player in eachPlayer()) {
             var playerID:Int = player[playerID_];
 
             var head:Int = player[head_];
-            var bodyFirst:Int = player[bodyFirst_];
 
             if (head != Aspect.NULL) {
+                var bodyFirst:Int = player[bodyFirst_];
                 var playerHead:BoardNode = getNode(head);
                 if (playerHead.value[occupier_] != playerID || playerHead.value[isFilled_] == Aspect.FALSE) {
 
@@ -51,7 +51,7 @@ class KillHeadlessBodyRule extends Rule {
 
                     player[head_] = Aspect.NULL;
                     var bodyNode:BoardNode = getNode(bodyFirst);
-                    if (bodyNode != null && bodyNode.value[occupier_] == playerID) for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
+                    for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
                     player[bodyFirst_] = Aspect.NULL;
                 }
             }

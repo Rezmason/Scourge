@@ -74,32 +74,30 @@ class TextDemo {
             }
         }
 
+        trace("Take turn");
+
         turnFuncs.push(func);
     }
 
     function makeTurn():Void {
-
         var funcs:Array<Void->Void> = turnFuncs.splice(0, turnFuncs.length);
         funcs.reverse();
 
         if (funcs.length > 0) {
             while (funcs.length > 0) funcs.pop()();
             boardBody.handleBoardUpdate();
+        } else {
+            trace("ROBOTS AUTO-STOPPED");
+            stopRobots("");
         }
-    }
-
-    function makeTurn2():Void {
-        makeTurn();
-        makeTurn();
     }
 
     function startRobots(input:String):String {
         stopRobots("");
         if (referee == null) return "GAME DOES NOT EXIST";
         robotTimer = new Timer(Std.parseInt(input.split(' ')[1]));
-        trace(input);
-        robotTimer.run = makeTurn2;
-        makeTurn2();
+        robotTimer.run = makeTurn;
+        makeTurn();
         return "ROBOTS STARTED";
     }
 
@@ -122,6 +120,8 @@ class TextDemo {
 
         var numPlayers:Int = Std.parseInt(args[1]);
 
+        if (numPlayers > 8) numPlayers = 8;
+
         if (numPlayers < 2) numPlayers = 2;
 
         var playerCfgs = [];
@@ -142,7 +142,7 @@ class TextDemo {
     }
 
     function randomFunction():Float {
-        return 0;
+        return Math.random();
     }
 
     function setFont(input:String):String {
@@ -201,14 +201,9 @@ class TextDemo {
         stage.addEventListener(Event.RESIZE, onResize);
     }
 
-    function onResize(?event:Event):Void {
-        engine.setSize(stage.stageWidth, stage.stageHeight);
-    }
+    function onResize(?event:Event):Void engine.setSize(stage.stageWidth, stage.stageHeight);
 
-    function onActivate(?event:Event):Void {
-        engine.activate();
-        if (uiBody != null) engine.setKeyboardFocus(uiBody);
-    }
+    function onActivate(?event:Event):Void engine.activate();
 
     function onDeactivate(?event:Event):Void engine.deactivate();
 

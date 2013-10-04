@@ -1,3 +1,10 @@
+makeGame doesn't always clean things up properly?
+    startRobots auto-stops
+    Another call to makeGame fixes it
+
+TestPlayers don't always die
+    Perhaps their replenishables replenish too fast
+
 Rework the players stuff
     The Referee-Player interface should be based on messages
         For now, messages can be events or signals dispatched from a common source

@@ -229,39 +229,44 @@ class BoardBody extends Body {
         for (view in nodeViews) view.distance = -1;
 
         for (ike in 0...numPlayers) {
-            var pendingNodes:List<BoardNode> = new List<BoardNode>();
 
-            var node:BoardNode = headNodes[ike];
-            nodeViewsByNode[node].distance = 0;
             var maxDistance:Int = 0;
+            var node:BoardNode = headNodes[ike];
 
-            while (node != null) {
+            if (node != null) {
 
-                var distance:Int = nodeViewsByNode[node].distance;
+                nodeViewsByNode[node].distance = 0;
 
-                if (maxDistance < distance) maxDistance = distance;
+                var pendingNodes:List<BoardNode> = new List<BoardNode>();
 
-                for (neighborNode in node.orthoNeighbors()) {
-                    if (neighborNode != null && neighborNode.value[occupier_] == ike) {
-                        var neighborView:NodeView = nodeViewsByNode[neighborNode];
-                        if (neighborView.distance == -1) {
-                            neighborView.distance = distance + 2;
-                            pendingNodes.add(neighborNode);
+                while (node != null) {
+
+                    var distance:Int = nodeViewsByNode[node].distance;
+
+                    if (maxDistance < distance) maxDistance = distance;
+
+                    for (neighborNode in node.orthoNeighbors()) {
+                        if (neighborNode != null && neighborNode.value[occupier_] == ike) {
+                            var neighborView:NodeView = nodeViewsByNode[neighborNode];
+                            if (neighborView.distance == -1) {
+                                neighborView.distance = distance + 2;
+                                pendingNodes.add(neighborNode);
+                            }
                         }
                     }
-                }
 
-                for (neighborNode in node.diagNeighbors()) {
-                    if (neighborNode != null && neighborNode.value[occupier_] == ike) {
-                        var neighborView:NodeView = nodeViewsByNode[neighborNode];
-                        if (neighborView.distance == -1) {
-                            neighborView.distance = distance + 3;
-                            pendingNodes.add(neighborNode);
+                    for (neighborNode in node.diagNeighbors()) {
+                        if (neighborNode != null && neighborNode.value[occupier_] == ike) {
+                            var neighborView:NodeView = nodeViewsByNode[neighborNode];
+                            if (neighborView.distance == -1) {
+                                neighborView.distance = distance + 3;
+                                pendingNodes.add(neighborNode);
+                            }
                         }
                     }
-                }
 
-                node = pendingNodes.pop();
+                    node = pendingNodes.pop();
+                }
             }
 
             // trace([ike, maxDistance + 1]);

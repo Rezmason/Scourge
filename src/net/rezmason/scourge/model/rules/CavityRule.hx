@@ -44,78 +44,81 @@ class CavityRule extends Rule {
     }
 
     private function remapCavities(playerID:Int, maxFreshness:Int):Void {
+
         var player:AspectSet = getPlayer(playerID);
 
         // We destroy the existing cavity list
         var cavityFirst:Int = player[cavityFirst_];
         var oldCavityNodes:Map<Int, BoardNode> = new Map();
         if (cavityFirst != Aspect.NULL) {
-            oldCavityNodes = getNode(cavityFirst).boardListToMap(state.nodes, bodyNext_);
+            oldCavityNodes = getNode(cavityFirst).boardListToMap(state.nodes, cavityNext_);
             for (node in oldCavityNodes) clearCavityCell(node, maxFreshness);
             player[cavityFirst_] = Aspect.NULL;
         }
 
-        // No one cares about your cavities if you're dead
-        if (player[head_] == Aspect.NULL) return;
-
-        // Now for the fun part: finding all the cavity nodes.
-
         var cavityNodes:Array<BoardNode> = [];
-        var body:Array<BoardNode> = getNode(player[bodyFirst_]).boardListToArray(state.nodes, bodyNext_);
-        var head:BoardNode = getNode(player[head_]);
 
-        // We're going to search the board for ALL nodes UNTIL we have found all body nodes
-        // This takes advantage of the FILO search pattern of GridUtils.getGraph
+        // No one cares about your cavities if you're dead
+        if (player[head_] != Aspect.NULL) {
 
-        remainingNodes = body.length - 1;
-        var widePerimeter:Array<BoardNode> = head.getGraphSequence(true, isWithinPerimeter.bind(playerID));
+            // Now for the fun part: finding all the cavity nodes.
 
-        // After reversing the search results, they are sorted in the order of most-outside to least-outside
-        widePerimeter.reverse();
+            var body:Array<BoardNode> = getNode(player[bodyFirst_]).boardListToArray(state.nodes, bodyNext_);
+            var head:BoardNode = getNode(player[head_]);
 
-        var nodeIDs:Map<Int, Bool> = new Map();
-        for (node in widePerimeter) nodeIDs[node.value[nodeID_]] = true;
+            // We're going to search the board for ALL nodes UNTIL we have found all body nodes
+            // This takes advantage of the FILO search pattern of GridUtils.getGraph
 
-        var empties:Array<BoardNode> = [];
+            remainingNodes = body.length - 1;
+            var widePerimeter:Array<BoardNode> = head.getGraphSequence(true, isWithinPerimeter.bind(playerID));
 
-        // Searching from the outside in, we remove exposed empty nodes from the set
-        for (ike in 0...widePerimeter.length) {
+            // After reversing the search results, they are sorted in the order of most-outside to least-outside
+            widePerimeter.reverse();
 
-            var node:BoardNode = widePerimeter[ike];
+            var nodeIDs:Map<Int, Bool> = new Map();
+            for (node in widePerimeter) nodeIDs[node.value[nodeID_]] = true;
 
-            var occupier:Int = node.value[occupier_];
-            var isFilled:Int = node.value[isFilled_];
+            var empties:Array<BoardNode> = [];
 
-            // Dismiss filled nodes
-            if (isFilled == Aspect.TRUE) {
-                // remove enemy filled nodes from the nodeIDs
-                if (occupier != playerID) nodeIDs.remove(node.value[nodeID_]);
-            } else {
-                empties.push(node);
-            }
-        }
+            // Searching from the outside in, we remove exposed empty nodes from the set
+            for (ike in 0...widePerimeter.length) {
 
-        // Of those cells, we repeatedly remove cells which are in fact still exposed
-        // TODO: use getGraph for this instead
-        var lastLength:Int = 0;
-        while (empties.length != lastLength) {
-            lastLength = empties.length;
-            var newEmpties:Array<BoardNode> = [];
-            for (node in empties) {
-                newEmpties.push(node);
-                for (neighbor in node.orthoNeighbors()) {
-                    if (neighbor == null || !nodeIDs.exists(neighbor.value[nodeID_])) {
-                        nodeIDs.remove(node.value[nodeID_]);
-                        newEmpties.pop();
-                        break;
-                    }
+                var node:BoardNode = widePerimeter[ike];
+
+                var occupier:Int = node.value[occupier_];
+                var isFilled:Int = node.value[isFilled_];
+
+                // Dismiss filled nodes
+                if (isFilled == Aspect.TRUE) {
+                    // remove enemy filled nodes from the nodeIDs
+                    if (occupier != playerID) nodeIDs.remove(node.value[nodeID_]);
+                } else {
+                    empties.push(node);
                 }
             }
-            empties = newEmpties;
-        }
 
-        // The cavities are the nodes that remain and are empty
-        cavityNodes = empties;
+            // Of those cells, we repeatedly remove cells which are in fact still exposed
+            // TODO: use getGraph for this instead
+            var lastLength:Int = 0;
+            while (empties.length != lastLength) {
+                lastLength = empties.length;
+                var newEmpties:Array<BoardNode> = [];
+                for (node in empties) {
+                    newEmpties.push(node);
+                    for (neighbor in node.orthoNeighbors()) {
+                        if (neighbor == null || !nodeIDs.exists(neighbor.value[nodeID_])) {
+                            nodeIDs.remove(node.value[nodeID_]);
+                            newEmpties.pop();
+                            break;
+                        }
+                    }
+                }
+                empties = newEmpties;
+            }
+
+            // The cavities are the nodes that remain and are empty
+            cavityNodes = empties;
+        }
 
         if (cavityNodes.length > 0) {
 

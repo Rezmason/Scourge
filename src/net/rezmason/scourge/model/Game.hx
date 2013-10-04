@@ -143,13 +143,14 @@ class Game {
     }
 
     public function chooseMove(actionIndex:Int, moveIndex:Int = 0, isQuantum:Bool = false):Int {
-        if (actionIndex < 0 || actionIndex > actionIDs.length - 1)
-            throw 'Invalid action';
+
+        if (actionIndex < 0 || actionIndex > actionIDs.length - 1) throw 'Invalid action';
 
         var action:Rule = actions[actionIndex];
 
-        if (moveIndex < 0 || moveIndex > action.moves.length - 1)
+        if (moveIndex < 0 || moveIndex > action.moves.length - 1) {
             throw 'Invalid move for action ${actionIDs[actionIndex]}';
+        }
 
         if (isQuantum) action.chooseQuantumMove(moveIndex);
         else action.chooseMove(moveIndex);

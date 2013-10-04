@@ -6,7 +6,6 @@ import VisualAssert;
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.Types;
 import net.rezmason.scourge.model.aspects.BodyAspect;
-import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
@@ -77,7 +76,7 @@ class TurnRulesTest extends ScourgeRuleTest
     @Test
     public function forfeitTest():Void {
 
-        // Should kill and freshen body of current player
+        // Should unassign head of current player
 
         var forfeitRule:ForfeitRule = new ForfeitRule();
         makeState([forfeitRule], 4, TestBoards.oaf);
@@ -86,7 +85,6 @@ class TurnRulesTest extends ScourgeRuleTest
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
-        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
 
         var currentPlayer:Int = state.aspects[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
@@ -101,17 +99,15 @@ class TurnRulesTest extends ScourgeRuleTest
 
         forfeitRule.chooseMove();
 
-        VisualAssert.assert('player 0 is dead and gone', state.spitBoard(plan));
+        VisualAssert.assert('player 0 is still on the board', state.spitBoard(plan));
 
-        Assert.areEqual(Aspect.NULL, playerHead.value[occupier_]);
-        Assert.areEqual(0, playerHead.value[isFilled_]);
+        Assert.areEqual(Aspect.NULL, state.players[currentPlayer][head_]);
+        Assert.areEqual(currentPlayer, playerHead.value[occupier_]);
+        Assert.areEqual(Aspect.TRUE, playerHead.value[isFilled_]);
 
-        // Player 1 should be gone
+        // Player 0 should still be there, though
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
-        Assert.areEqual(0, numCells);
-
-        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        Assert.areEqual(Aspect.NULL, state.players[currentPlayer][bodyFirst_]);
+        Assert.areEqual(371, numCells);
     }
 
     @Test
@@ -128,7 +124,6 @@ class TurnRulesTest extends ScourgeRuleTest
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
-        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
 
         var currentPlayer:Int = state.aspects[currentPlayer_];

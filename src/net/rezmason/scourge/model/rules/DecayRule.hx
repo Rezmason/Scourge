@@ -22,13 +22,14 @@ class DecayRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
+    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
-    @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @player(BodyAspect.HEAD) var head_;
+    @player(BodyAspect.TOTAL_AREA) var totalArea_;
+    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
     private var cfg:DecayConfig;
@@ -48,7 +49,9 @@ class DecayRule extends Rule {
         var heads:Map<Int, BoardNode> = new Map();
         for (player in eachPlayer()) {
             var headIndex:Int = player[head_];
-            if (headIndex != Aspect.NULL) heads[headIndex] = getNode(headIndex);
+            if (headIndex != Aspect.NULL && getNode(headIndex).value[occupier_] == player[playerID_]) {
+                heads[headIndex] = getNode(headIndex);
+            }
         }
 
         // Use the heads as starting points for a flood fill of connected living cells
