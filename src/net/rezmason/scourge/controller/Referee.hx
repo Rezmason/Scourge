@@ -120,9 +120,9 @@ class Referee {
                     throw 'Player $playerIndex cannot act at this time!';
                 clearFloats();
                 game.chooseMove(action, move);
-                if (game.winner >= 0) game.end(); // TEMPORARY
                 refereeCall(getFloatsAction());
                 broadcastAndLog(event);
+                if (game.winner >= 0) endGame(); // TEMPORARY
             case RefereeAction(_):
                 throw 'Players can\'t send referee calls!';
             case Ready:

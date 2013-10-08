@@ -1,9 +1,4 @@
-makeGame doesn't always clean things up properly?
-    startRobots auto-stops
-    Another call to makeGame fixes it
-
-TestPlayers don't always die
-    Perhaps their replenishables replenish too fast
+Game sometimes ends seemingly prematurely
 
 Rework the players stuff
     The Referee-Player interface should be based on messages
@@ -18,9 +13,6 @@ NodeView and BoardBody
 
         Now, stop the pools from looping
             Drive the heartbeats by a timer
-
-    Also, cavities
-        Board symbol, player color
 
     Basics
         handleBoardUpdate function

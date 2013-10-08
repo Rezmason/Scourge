@@ -74,8 +74,6 @@ class TextDemo {
             }
         }
 
-        trace("Take turn");
-
         turnFuncs.push(func);
     }
 
@@ -111,10 +109,10 @@ class TextDemo {
 
         stopRobots("");
 
+        game = null;
+
         if (referee == null) referee = new Referee();
         else if (referee.gameBegun) referee.endGame();
-
-        game = null;
 
         var args:Array<String> = input.split(' ');
 
