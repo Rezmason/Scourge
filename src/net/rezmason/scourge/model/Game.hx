@@ -10,7 +10,6 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
 
 using Lambda;
-using Reflect;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Alphabetizer;
@@ -39,7 +38,7 @@ class Game {
         planner = new StatePlanner();
     }
 
-    public function begin(config:ScourgeConfig, randomFunction:Void->Float, annotateFunc:String->Void = null, savedState:SavedState = null):Int {
+    public function begin(config:ScourgeConfig, randomFunction:Void->Float, savedState:SavedState = null):Int {
 
         if (hasBegun)
             throw 'The game has already begun; it cannot begin again until you end it.';
@@ -48,9 +47,7 @@ class Game {
 
         var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, historian.history, historian.historyState);
         var basicRules:Map<String, Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
-        var combinedConfig:Dynamic<Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
-
-        if (annotateFunc != null) addAnnotations(annotateFunc, basicRules, combinedConfig);
+        var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
 
         var combinedRules:Map<String, Rule> = RuleFactory.combineRules(combinedConfig, basicRules);
 
@@ -207,24 +204,6 @@ class Game {
         historian.key.lock();
         for (action in actions) action.update();
         historian.key.unlock();
-    }
-
-    private function addAnnotations(annotateFunc:String->Void, basicRules:Map<String, Rule>, cfg:Dynamic<Array<String>>):Void {
-        var cfgFields:Array<String> = cfg.fields();
-        for (field in cfgFields) {
-            var ruleFields:Array<String> = cfg.field(field);
-            var lacedRuleFields:Array<String> = [];
-
-            for (ruleField in ruleFields) {
-                lacedRuleFields.push(ruleField);
-                var lacedField:String = 'annotate_' + ruleField;
-                lacedRuleFields.push(lacedField);
-                var annotateRule:Rule = new AnnotateRule(function() annotateFunc(ruleField));
-                basicRules[lacedField] = annotateRule;
-            }
-
-            cfg.setField(field, lacedRuleFields);
-        }
     }
 
     private function get_actionIDs():Array<String> { return actionIDs.copy(); }

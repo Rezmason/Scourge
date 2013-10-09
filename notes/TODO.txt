@@ -1,3 +1,6 @@
+Some stuff in ScourgeConfigFactory is stringly typed
+    It'd be neat to convert it to enums
+
 Game sometimes ends seemingly prematurely
 
 Rework the players stuff

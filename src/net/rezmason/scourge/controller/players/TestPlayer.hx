@@ -17,7 +17,6 @@ typedef TestHelper = Game->(Void->Void)->Dynamic;
 class TestPlayer extends Player {
 
     var helper:TestHelper;
-    var annotate:Bool;
 
     var dropIndex:Int;
     var pickIndex:Int;
@@ -30,17 +29,15 @@ class TestPlayer extends Player {
 
     var moves:Array<Array<Move>>;
 
-    public function new(index:Int, config:PlayerConfig, handler:Player->GameEvent->Void, helper:TestHelper, annotate:Bool):Void {
+    public function new(index:Int, config:PlayerConfig, handler:Player->GameEvent->Void, helper:TestHelper):Void {
         super(index, config, handler);
         this.helper = helper;
-        this.annotate = annotate;
     }
 
     var floats:Array<Float>;
 
     override private function prime():Void {
         floats = [];
-        //trace('PRIME');
     }
 
     override private function processEvent(event:GameEvent):Void {
@@ -63,8 +60,7 @@ class TestPlayer extends Player {
     }
 
     private function init(config:ScourgeConfig):Void {
-        //trace('INIT $index');
-        game.begin(config, retrieveRandomFloat, annotate ? handleAnnotation : null);
+        game.begin(config, retrieveRandomFloat);
 
         dropIndex = game.actionIDs.indexOf('dropAction');
         pickIndex = game.actionIDs.indexOf('pickAction');
@@ -77,8 +73,7 @@ class TestPlayer extends Player {
     }
 
     private function resume(savedGame:SavedGame):Void {
-        //trace('RESUME $index');
-        game.begin(savedGame.config, retrieveRandomFloat, annotate ? handleAnnotation : null, savedGame.state);
+        game.begin(savedGame.config, retrieveRandomFloat, savedGame.state);
     }
 
     private function getReady():Void {
@@ -87,17 +82,15 @@ class TestPlayer extends Player {
     }
 
     private function connect():Void {
-        //trace('CONNECT $index');
         delay(getReady);
     }
 
     private function disconnect():Void {
-        //trace('DISCONNECT $index');
         if (game.hasBegun) game.end();
     }
 
     private function play():Void {
-        //trace('PLAY $index');
+
         if (game.hasBegun) {
             if (game.winner >= 0) game.end(); // TEMPORARY
             else if (game.currentPlayer == index) delay(choose);
@@ -129,10 +122,5 @@ class TestPlayer extends Player {
 
     private inline function delay(func:Void->Void) {
         if (func != null && helper != null) helper(game, func);
-    }
-
-    private function handleAnnotation(sender:String):Void
-    {
-        //trace('${game.currentPlayer} : $sender \n ${game.spitBoard()}');
     }
 }

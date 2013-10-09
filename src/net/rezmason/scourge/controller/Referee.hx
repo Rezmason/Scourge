@@ -10,7 +10,6 @@ import net.rezmason.utils.SafeSerializer;
 import net.rezmason.utils.UnixTime;
 
 using Lambda;
-using Reflect;
 
 typedef RandGen = Void->Float;
 
@@ -135,7 +134,7 @@ class Referee {
         var wasBusy:Bool = busy;
         //trace('BUSY: BROADCAST');
         busy = true;
-        for (player in players) player.send(event.copy());
+        for (player in players) player.send(Reflect.copy(event));
         busy = wasBusy;
         //trace(busy ? 'STILL BUSY' : 'FREE');
     }

@@ -5,7 +5,6 @@ import net.rezmason.ropes.Types;
 import net.rezmason.utils.StringSort;
 
 using Lambda;
-using Reflect;
 using Type;
 
 class RuleFactory {
@@ -15,7 +14,7 @@ class RuleFactory {
         var rules:Map<String, Rule> = new Map();
 
         if (cfg != null) {
-            var cfgFields:Array<String> = cfg.fields();
+            var cfgFields:Array<String> = Reflect.fields(cfg);
             ArraySort.sort(cfgFields, StringSort.sort);
             for (field in cfgFields) {
                 //var ruleDef:Class<Rule> = cast ruleDefs[field].resolveClass();
@@ -23,7 +22,7 @@ class RuleFactory {
                 if (ruleDef == null) {
                     trace('Rule not found: $field');
                 } else {
-                    var args:Array<Dynamic> = [cfg.field(field)];
+                    var args:Array<Dynamic> = [Reflect.field(cfg, field)];
                     args.remove(null);
                     rules[field] = ruleDef.createInstance(args);
                 }
@@ -32,38 +31,41 @@ class RuleFactory {
         return rules;
     }
 
-    public static function combineRules(cfg:Dynamic<Array<String>>, basicRules:Map<String, Rule>):Map<String, Rule> {
+    public static function combineRules(cfg:Map<String, Array<String>>, basicRules:Map<String, Rule>):Map<String, Rule> {
         var combinedRules:Map<String, Rule> = new Map();
 
         if (cfg != null) {
 
             var ruleStack:Array<String> = [];
 
-            function makeJointRule(field:String):Rule {
-                ruleStack.push(field);
+            function makeJointRule(key:String):Rule {
+                ruleStack.push(key);
                 var rules:Array<Rule> = [];
-                var ruleFields:Array<String> = cfg.field(field);
-                for (ruleField in ruleFields) {
-                    if (ruleField == field) trace('Joint rule $field cannot contain itself.');
-                    else if (ruleStack.has(ruleField)) trace('Cyclical joint rule definition: $field and $ruleField');
-                    else if (basicRules.exists(ruleField)) rules.push(basicRules[ruleField]);
-                    else if (combinedRules.exists(ruleField)) rules.push(combinedRules[ruleField]);
-                    else if (cfg.hasField(ruleField)) rules.push(makeJointRule(ruleField));
-                    else trace('Rule not found: $ruleField');
+                var ruleNames:Array<String> = cfg[key];
+                for (ruleName in ruleNames) {
+                    if (ruleName == key) trace('Joint rule $key cannot contain itself.');
+                    else if (ruleStack.has(ruleName)) trace('Cyclical joint rule definition: $key and $ruleName');
+                    else if (basicRules.exists(ruleName)) rules.push(basicRules[ruleName]);
+                    else if (combinedRules.exists(ruleName)) rules.push(combinedRules[ruleName]);
+                    else if (cfg.exists(ruleName)) rules.push(makeJointRule(ruleName));
+                    else trace('Rule not found: $ruleName');
                 }
                 var jointRule:Rule = new JointRule(rules);
-                combinedRules[field] = jointRule;
+                combinedRules[key] = jointRule;
                 ruleStack.pop();
                 return jointRule;
             }
 
-            var cfgFields:Array<String> = cfg.fields();
-            ArraySort.sort(cfgFields, StringSort.sort);
-            for (field in cfgFields) {
-                if (basicRules.exists(field)) trace('Basic rule already exists with name: $field');
-                else if (!combinedRules.exists(field)) makeJointRule(field);
+            var cfgKeys:Array<String> = [];
+            for (key in cfg.keys()) cfgKeys.push(key);
+
+            ArraySort.sort(cfgKeys, StringSort.sort);
+            for (key in cfgKeys) {
+                if (basicRules.exists(key)) trace('Basic rule already exists with name: $key');
+                else if (!combinedRules.exists(key)) makeJointRule(key);
             }
         }
+
         return combinedRules;
     }
 }
