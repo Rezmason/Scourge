@@ -36,7 +36,7 @@ class RefereeTest {
 	#if neko @Ignore('Runs too slow on NekoVM') #end
 	@Test
 	public function serializeTest():Void {
-		playerCfgs = [{type:Test(null, false)}, {type:Test(null, false)}, {type:Test(null, false)}, {type:Test(null, false)}];
+		playerCfgs = [{type:Test(null)}, {type:Test(null)}, {type:Test(null)}, {type:Test(null)}];
 		referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
 
 		var savedGame = referee.saveGame();
@@ -67,7 +67,7 @@ class RefereeTest {
 			deferredCalls.push(func);
 		}
 
-		playerCfgs = [{type:Test(defer, true)}, {type:Test(defer, false)}, {type:Test(defer, false)}, {type:Test(defer, false)}];
+		playerCfgs = [{type:Test(defer)}, {type:Test(defer)}, {type:Test(defer)}, {type:Test(defer)}];
 
 		Assert.isFalse(referee.gameBegun);
 		referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());

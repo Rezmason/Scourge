@@ -37,4 +37,22 @@ class Siphon {
 
         return macro [$a{exprs}];
     }
+
+    macro public static function getClassName(classExpr) {
+        var clazz:String = null;
+        switch (classExpr.expr) {
+            case EField(expr, field): clazz = field;
+            case EConst(CIdent(field)): clazz = field;
+            case _: throw 'Siphon.getClassName only works with classes.';
+        }
+
+        try {
+            Context.getType(clazz);
+        } catch (error:Dynamic) {
+            trace(error);
+            clazz = null;
+        }
+
+        return macro $v{clazz};
+    }
 }

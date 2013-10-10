@@ -9,22 +9,23 @@ using Type;
 
 class RuleFactory {
 
-    public static function makeBasicRules(ruleDefs:Map<String, Class<Rule>>, cfg:Dynamic):Map<String, Rule> {
+    public static function makeBasicRules(ruleDefs:Map<String, Class<Rule>>, cfg:Map<String, Dynamic>):Map<String, Rule> {
 
         var rules:Map<String, Rule> = new Map();
 
         if (cfg != null) {
-            var cfgFields:Array<String> = Reflect.fields(cfg);
-            ArraySort.sort(cfgFields, StringSort.sort);
-            for (field in cfgFields) {
-                //var ruleDef:Class<Rule> = cast ruleDefs[field].resolveClass();
-                var ruleDef:Class<Rule> = ruleDefs[field];
+            var cfgKeys:Array<String> = [];
+            for (key in cfg.keys()) cfgKeys.push(key);
+            ArraySort.sort(cfgKeys, StringSort.sort);
+            for (key in cfgKeys) {
+                //var ruleDef:Class<Rule> = cast ruleDefs[key].resolveClass();
+                var ruleDef:Class<Rule> = ruleDefs[key];
                 if (ruleDef == null) {
-                    trace('Rule not found: $field');
+                    trace('Rule not found: $key');
                 } else {
-                    var args:Array<Dynamic> = [Reflect.field(cfg, field)];
+                    var args:Array<Dynamic> = [cfg[key]];
                     args.remove(null);
-                    rules[field] = ruleDef.createInstance(args);
+                    rules[key] = ruleDef.createInstance(args);
                 }
             }
         }

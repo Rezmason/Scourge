@@ -124,7 +124,7 @@ class TextDemo {
 
         var playerCfgs = [];
 
-        for (ike in 0...numPlayers) playerCfgs.push({type:Test(takeTurn, false)});
+        for (ike in 0...numPlayers) playerCfgs.push({type:Test(takeTurn)});
 
         var cfg = ScourgeConfigFactory.makeDefaultConfig();
         cfg.allowRotating = true;

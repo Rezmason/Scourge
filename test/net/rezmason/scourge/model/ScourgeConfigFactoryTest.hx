@@ -306,7 +306,7 @@ class ScourgeConfigFactoryTest
 	}
 
 	private function makeState():Void {
-		var ruleConfig:Dynamic = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, stateHistorian.history, stateHistorian.historyState);
+		var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, stateHistorian.history, stateHistorian.historyState);
 		basicRules = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
 		var basicRulesArray:Array<Rule> = [];
 		var demiurgicRules:StringMap<Rule> = new StringMap<Rule>();
