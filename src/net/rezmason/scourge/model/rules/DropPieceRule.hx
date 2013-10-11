@@ -19,10 +19,12 @@ using net.rezmason.utils.Pointers;
 
 typedef DropPieceConfig = {
     public var overlapSelf:Bool;
+    public var pieceTableIDs:Array<Int>;
     public var allowFlipping:Bool;
     public var allowRotating:Bool;
     public var growGraph:Bool;
     public var allowNowhere:Bool;
+    public var allowPiecePick:Bool; // if true, nothing in the game itself is left to chance
     public var orthoOnly:Bool;
     public var diagOnly:Bool;
     public var pieces:Pieces;
@@ -32,6 +34,7 @@ typedef DropPieceMove = {>Move,
     var targetNode:Int;
     var numAddedNodes:Int;
     var addedNodes:Map<Int, BoardNode>;
+    var pieceID:Int;
     var rotation:Int;
     var reflection:Int;
     var coord:IntCoord;
@@ -71,6 +74,7 @@ class DropPieceRule extends Rule {
             var nowhereMove:DropPieceMove = {
                 targetNode:Aspect.NULL,
                 coord:null,
+                pieceID:Aspect.NULL,
                 rotation:0,
                 reflection:0,
                 id:0,
@@ -81,7 +85,11 @@ class DropPieceRule extends Rule {
             dropMoves.push(cast nowhereMove);
         }
 
-        if (state.aspects[pieceTableID_] != Aspect.NULL) {
+        var pieceIDs:Array<Int> = [];
+        if (cfg.allowPiecePick) for (pieceID in cfg.pieceTableIDs) pieceIDs.push(pieceID);
+        else if (state.aspects[pieceTableID_] != Aspect.NULL) pieceIDs.push(state.aspects[pieceTableID_]);
+
+        for (pieceID in pieceIDs) {
 
             // get current player head
             var currentPlayer:Int = state.aspects[currentPlayer_];
@@ -90,7 +98,7 @@ class DropPieceRule extends Rule {
             // Find edge nodes of current player
             var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge).array();
 
-            var pieceGroup:PieceGroup = cfg.pieces.getPieceById(state.aspects[pieceTableID_]);
+            var pieceGroup:PieceGroup = cfg.pieces.getPieceById(pieceID);
             var pieceReflection:Int = state.aspects[pieceReflection_];
             var pieceRotation:Int = state.aspects[pieceRotation_];
 
@@ -146,6 +154,7 @@ class DropPieceRule extends Rule {
                                 dropMoves.push({
                                     targetNode:node.value[nodeID_],
                                     coord:homeCoord,
+                                    pieceID:pieceID,
                                     rotation:rotationIndex,
                                     reflection:reflectionIndex,
                                     id:dropMoves.length,
@@ -181,7 +190,7 @@ class DropPieceRule extends Rule {
         var player:AspectSet = getPlayer(currentPlayer);
 
         if (move.targetNode != Aspect.NULL) {
-            var pieceGroup:PieceGroup = cfg.pieces.getPieceById(state.aspects[pieceTableID_]);
+            var pieceGroup:PieceGroup = cfg.pieces.getPieceById(move.pieceID);
             var node:BoardNode = getNode(move.targetNode);
             var coords:Array<IntCoord> = pieceGroup[move.reflection][move.rotation][0];
             var homeCoord:IntCoord = move.coord;

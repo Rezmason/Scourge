@@ -10,6 +10,7 @@ import net.rezmason.scourge.model.aspects.SwapAspect;
 import net.rezmason.scourge.model.rules.*;
 import net.rezmason.scourge.model.Pieces;
 import net.rezmason.scourge.tools.Resource;
+import net.rezmason.scourge.model.ScourgeAction.*;
 
 typedef ReplenishableConfig = { prop:AspectProperty, amount:Int, period:Int, maxAmount:Int, }
 
@@ -17,13 +18,6 @@ class ScourgeConfigFactory {
 
     inline static var CLEAN_UP:String = 'cleanUp';
     inline static var WRAP_UP:String = 'wrapUp';
-
-    inline static var START_ACTION:String = 'startAction';
-    inline static var QUIT_ACTION:String = 'quitAction';
-    inline static var PICK_ACTION:String = 'pickAction';
-    inline static var DROP_ACTION:String = 'dropAction';
-    inline static var BITE_ACTION:String = 'biteAction';
-    inline static var SWAP_ACTION:String = 'swapAction';
 
     static var BUILD_BOARD:String        = Siphon.getClassName(BuildBoardRule);
     static var BUILD_PLAYERS:String      = Siphon.getClassName(BuildPlayersRule);
@@ -51,7 +45,7 @@ class ScourgeConfigFactory {
     public static function makeDemiurgicRuleList():Array<String> return [BUILD_STATE, BUILD_PLAYERS, BUILD_BOARD];
     public static function makeActionList(config:ScourgeConfig):Array<String> {
 
-        var actionList:Array<String> = [QUIT_ACTION, DROP_ACTION, PICK_ACTION];
+        var actionList:Array<String> = [QUIT_ACTION, DROP_ACTION/*, PICK_ACTION*/];
 
         if (config.maxSwaps > 0) actionList.push(SWAP_ACTION);
         if (config.maxBites > 0) actionList.push(BITE_ACTION);
@@ -114,7 +108,6 @@ class ScourgeConfigFactory {
             BUILD_BOARD => makeBuildBoardConfig(config, buildCfg),
             EAT_CELLS => makeEatCellsConfig(config),
             DECAY => makeDecayConfig(config),
-            PICK_PIECE => makePickPieceConfig(config, buildCfg, randomFunction),
             DROP_PIECE => makeDropPieceConfig(config),
             REPLENISH => makeReplenishConfig(config, buildCfg),
             SKIPS_EXHAUSTED => makeSkipsExhaustedConfig(config),
@@ -127,8 +120,9 @@ class ScourgeConfigFactory {
             //SPIT_BOARD => null,
         ];
 
+        if (!config.allowAllPieces) ruleConfig.set(PICK_PIECE, makePickPieceConfig(config, buildCfg, randomFunction));
         if (config.includeCavities) ruleConfig.set(CAVITY, null);
-        if (config.maxSwaps > 0) ruleConfig.set(SWAP_PIECE, makeSwapConfig(config));
+        if (!config.allowAllPieces && config.maxSwaps > 0) ruleConfig.set(SWAP_PIECE, makeSwapConfig(config));
         if (config.maxBites > 0) ruleConfig.set(BITE, makeBiteConfig(config));
 
         return ruleConfig;
@@ -142,13 +136,17 @@ class ScourgeConfigFactory {
 
             START_ACTION => [CLEAN_UP],
             QUIT_ACTION  => [FORFEIT, CLEAN_UP, WRAP_UP],
-            PICK_ACTION  => [PICK_PIECE],
             DROP_ACTION  => [DROP_PIECE, EAT_CELLS, CLEAN_UP, WRAP_UP, SKIPS_EXHAUSTED],
         ];
 
         if (config.includeCavities) combinedRuleConfig[CLEAN_UP].insert(1, CAVITY);
-        if (config.maxSwaps > 0)    combinedRuleConfig[SWAP_ACTION] = [SWAP_PIECE];
-        if (config.maxBites > 0)    combinedRuleConfig[BITE_ACTION] = [BITE, CLEAN_UP];
+        if (!config.allowAllPieces && config.maxSwaps > 0) combinedRuleConfig[SWAP_ACTION] = [SWAP_PIECE, PICK_PIECE];
+        if (config.maxBites > 0) combinedRuleConfig[BITE_ACTION] = [BITE, CLEAN_UP];
+
+        if (!config.allowAllPieces) {
+            combinedRuleConfig[START_ACTION].push(PICK_PIECE);
+            combinedRuleConfig[WRAP_UP].push(PICK_PIECE);
+        }
 
         return combinedRuleConfig;
     }
@@ -203,7 +201,6 @@ class ScourgeConfigFactory {
             pieceTableIDs:config.pieceTableIDs,
             allowFlipping:config.allowFlipping,
             allowRotating:config.allowRotating,
-            allowAll:config.allowAllPieces,
             hatSize:config.pieceHatSize,
             randomFunction:randomFunction,
             pieces:config.pieces,
@@ -213,10 +210,12 @@ class ScourgeConfigFactory {
     inline static function makeDropPieceConfig(config:ScourgeConfig) {
         return {
             overlapSelf:config.overlapSelf,
+            pieceTableIDs:config.pieceTableIDs,
             allowFlipping:config.allowFlipping,
             allowRotating:config.allowRotating,
             growGraph:config.growGraphWithDrop,
             allowNowhere:config.allowNowhereDrop,
+            allowPiecePick:config.allowAllPieces,
             orthoOnly:config.orthoDropOnly,
             diagOnly:config.diagDropOnly,
             pieces:config.pieces,

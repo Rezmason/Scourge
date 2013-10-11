@@ -7,6 +7,7 @@ import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 
 import net.rezmason.scourge.model.aspects.*;
+import net.rezmason.scourge.model.ScourgeAction.*;
 import net.rezmason.ropes.Types;
 
 using Lambda;
@@ -17,28 +18,16 @@ typedef TestHelper = Game->(Void->Void)->Dynamic;
 class TestPlayer extends Player {
 
     var helper:TestHelper;
-
-    var dropIndex:Int;
-    var pickIndex:Int;
-    var quitIndex:Int;
-
-    var swapIndex:Int;
-    var biteIndex:Int;
-
-    var indices:Array<Int>;
-
+    var actionIndices:Array<Int>;
     var moves:Array<Array<Move>>;
+    var floats:Array<Float>;
 
     public function new(index:Int, config:PlayerConfig, handler:Player->GameEvent->Void, helper:TestHelper):Void {
         super(index, config, handler);
         this.helper = helper;
     }
 
-    var floats:Array<Float>;
-
-    override private function prime():Void {
-        floats = [];
-    }
+    override private function prime():Void floats = [];
 
     override private function processEvent(event:GameEvent):Void {
         switch (event.type) {
@@ -61,53 +50,34 @@ class TestPlayer extends Player {
 
     private function init(config:ScourgeConfig):Void {
         game.begin(config, retrieveRandomFloat);
-
-        dropIndex = game.actionIDs.indexOf('dropAction');
-        pickIndex = game.actionIDs.indexOf('pickAction');
-        quitIndex = game.actionIDs.indexOf('quitAction');
-
-        swapIndex = game.actionIDs.indexOf('swapAction');
-        biteIndex = game.actionIDs.indexOf('biteAction');
-
-        indices = [pickIndex, dropIndex, pickIndex, swapIndex, biteIndex, quitIndex];
+        actionIndices = [DROP_ACTION, SWAP_ACTION, BITE_ACTION, QUIT_ACTION].map(game.actionIDs.indexOf);
     }
 
-    private function resume(savedGame:SavedGame):Void {
-        game.begin(savedGame.config, retrieveRandomFloat, savedGame.state);
-    }
+    private function resume(save:SavedGame):Void game.begin(save.config, retrieveRandomFloat, save.state);
 
     private function getReady():Void {
         ready = true;
         volley(Ready);
     }
 
-    private function connect():Void {
-        delay(getReady);
-    }
+    private function connect():Void delay(getReady);
 
-    private function disconnect():Void {
-        if (game.hasBegun) game.end();
-    }
+    private function disconnect():Void if (game.hasBegun) game.end();
 
     private function play():Void {
-
         if (game.hasBegun) {
             if (game.winner >= 0) game.end(); // TEMPORARY
             else if (game.currentPlayer == index) delay(choose);
         }
     }
 
-    private function appendFloats(moreFloats:Array<Float>):Void {
-        floats = floats.concat(moreFloats);
-    }
+    private function appendFloats(moreFloats:Array<Float>):Void floats = floats.concat(moreFloats);
 
-    private function retrieveRandomFloat():Float {
-        return floats.shift();
-    }
+    private function retrieveRandomFloat():Float return floats.shift();
 
     private function choose():Void {
         moves = game.getMoves();
-        for (index in indices) if (volleyRandomPlayerAction(index)) break;
+        for (index in actionIndices) if (volleyRandomPlayerAction(index)) break;
     }
 
     private inline function volleyRandomPlayerAction(index:Int):Bool {
@@ -116,11 +86,7 @@ class TestPlayer extends Player {
         return possible;
     }
 
-    private function volley(eventType:GameEventType):Void {
-        handler(this, {type:eventType, timeIssued:now()});
-    }
+    private function volley(eventType:GameEventType):Void handler(this, {type:eventType, timeIssued:now()});
 
-    private inline function delay(func:Void->Void) {
-        if (func != null && helper != null) helper(game, func);
-    }
+    private inline function delay(func:Void->Void) if (func != null && helper != null) helper(game, func);
 }

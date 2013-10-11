@@ -22,8 +22,8 @@ class PieceRulesTest extends ScourgeRuleTest
 {
     private static var PIECE_SIZE:Int = 4;
 
-	#if TIME_TESTS
-	var time:Float;
+    #if TIME_TESTS
+    var time:Float;
     #end
     var pieces:Pieces;
 
@@ -50,8 +50,8 @@ class PieceRulesTest extends ScourgeRuleTest
     // N                    Y                   36
     // Y                    Y                   72
 
-	@Test
-	public function placePieceScourgeRuleTestOrtho():Void {
+    @Test
+    public function placePieceScourgeRuleTestOrtho():Void {
 
         var testPieceCfg:TestPieceConfig = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
@@ -69,6 +69,8 @@ class PieceRulesTest extends ScourgeRuleTest
             orthoOnly:true,
             diagOnly:false,
             pieces:pieces,
+            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -96,7 +98,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var bodyNode:BoardNode = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
-	}
+    }
 
     @Test
     public function placePieceScourgeRuleTestOrthoNoSpace():Void {
@@ -118,6 +120,8 @@ class PieceRulesTest extends ScourgeRuleTest
             orthoOnly:true,
             diagOnly:false,
             pieces:pieces,
+            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.frozenPetri);
@@ -152,6 +156,8 @@ class PieceRulesTest extends ScourgeRuleTest
             orthoOnly:true,
             diagOnly:false,
             pieces:pieces,
+            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -189,6 +195,8 @@ class PieceRulesTest extends ScourgeRuleTest
             orthoOnly:true,
             diagOnly:false,
             pieces:pieces,
+            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -226,6 +234,8 @@ class PieceRulesTest extends ScourgeRuleTest
             orthoOnly:true,
             diagOnly:false,
             pieces:pieces,
+            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -263,6 +273,8 @@ class PieceRulesTest extends ScourgeRuleTest
             orthoOnly:true,
             diagOnly:false,
             pieces:pieces,
+            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -293,6 +305,8 @@ class PieceRulesTest extends ScourgeRuleTest
             orthoOnly:true,
             diagOnly:false,
             pieces:pieces,
+            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([dropRule], 1, TestBoards.emptyPetri);
@@ -325,7 +339,6 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:true,
-            allowAll:false,
             hatSize:hatSize,
             randomFunction:function() return 0,
             pieces:pieces,
@@ -357,7 +370,6 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieceTableIDs,
             allowFlipping:false,
             allowRotating:true,
-            allowAll:false,
             hatSize:3,
             randomFunction:function() return 0,
             pieces:pieces,
@@ -383,7 +395,6 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:false,
-            allowAll:false,
             hatSize:3,
             randomFunction:function() return 0,
             pieces:pieces,
@@ -418,6 +429,8 @@ class PieceRulesTest extends ScourgeRuleTest
             orthoOnly:false,
             diagOnly:true,
             pieces:pieces,
+            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
@@ -456,6 +469,8 @@ class PieceRulesTest extends ScourgeRuleTest
             orthoOnly:false,
             diagOnly:false,
             pieces:pieces,
+            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule(dropConfig);
         makeState([testPieceRule, dropRule], 1, TestBoards.flowerPetri);
@@ -472,36 +487,6 @@ class PieceRulesTest extends ScourgeRuleTest
 
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(5 + 4, numCells); // 9 cells for player 0
-    }
-
-    @Test
-    public function pickPieceTestFreePickins():Void {
-
-        var hatSize:Int = 3;
-        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4];
-        var pickPieceCfg:PickPieceConfig = {
-            buildCfg:{ history:history, historyState:historyState, },
-            pieceTableIDs:pieceTableIDs,
-            allowFlipping:true,
-            allowRotating:true,
-            allowAll:true,
-            hatSize:3,
-            randomFunction:function() return 0,
-            pieces:pieces,
-        };
-        var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceCfg);
-        makeState([pickPieceRule], 1, TestBoards.emptyPetri);
-
-        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
-
-        pickPieceRule.update();
-
-        for (ike in 0...hatSize + 1) {
-            Assert.areEqual(pieceTableIDs.length, pickPieceRule.moves.length);
-            pickPieceRule.chooseMove();
-            state.aspects[pieceTableID_] =  Aspect.NULL;
-            pickPieceRule.update();
-        }
     }
 
     @Test

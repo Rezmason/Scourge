@@ -16,100 +16,100 @@ import net.rezmason.scourge.controller.Types;
 using net.rezmason.scourge.model.BoardUtils;
 class RefereeTest {
 
-	var referee:Referee;
-	var playerCfgs:Array<PlayerConfig>;
+    var referee:Referee;
+    var playerCfgs:Array<PlayerConfig>;
 
-	public function new() {
+    public function new() {
 
-	}
+    }
 
-	@BeforeClass
-	public function beforeClass():Void {
-		referee = new Referee();
-	}
+    @BeforeClass
+    public function beforeClass():Void {
+        referee = new Referee();
+    }
 
-	@AfterClass
-	public function afterClass():Void {
+    @AfterClass
+    public function afterClass():Void {
 
-	}
+    }
 
-	#if neko @Ignore('Runs too slow on NekoVM') #end
-	@Test
-	public function serializeTest():Void {
-		playerCfgs = [{type:Test(null)}, {type:Test(null)}, {type:Test(null)}, {type:Test(null)}];
-		referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
+    #if neko @Ignore('Runs too slow on NekoVM') #end
+    @Test
+    public function serializeTest():Void {
+        playerCfgs = [{type:Test(null)}, {type:Test(null)}, {type:Test(null)}, {type:Test(null)}];
+        referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
 
-		var savedGame = referee.saveGame();
-		var data:String = savedGame.state.data;
+        var savedGame = referee.saveGame();
+        var data:String = savedGame.state.data;
 
-		var prevData:String = Resource.getString('tables/serializedState.txt');
-		if (prevData.charAt(prevData.length - 1) == '\n') prevData = prevData.substr(0, -1);
+        var prevData:String = Resource.getString('tables/serializedState.txt');
+        if (prevData.charAt(prevData.length - 1) == '\n') prevData = prevData.substr(0, -1);
 
-		// trace(prevData);
-		// trace(data);
+        // trace(prevData);
+        // trace(data);
 
-		var ike:Int = 0;
-		while (ike < prevData.length) {
-			Assert.areEqual('$ike: ' + prevData.substr(ike, 200), '$ike: ' + data.substr(ike, 200));
-			ike += 200;
-		}
+        var ike:Int = 0;
+        while (ike < prevData.length) {
+            Assert.areEqual('$ike: ' + prevData.substr(ike, 200), '$ike: ' + data.substr(ike, 200));
+            ike += 200;
+        }
 
-		// Assert.areEqual(prevData, data);
-	}
+        // Assert.areEqual(prevData, data);
+    }
 
-	#if neko @Ignore('Runs slow on NekoVM') #end
-	@Test
-	public function saveTest():Void {
+    #if neko @Ignore('Runs slow on NekoVM') #end
+    @Test
+    public function saveTest():Void {
 
-		var deferredCalls = [];
+        var deferredCalls = [];
 
-		function defer(game:Game, func:Void->Void) {
-			deferredCalls.push(func);
-		}
+        function defer(game:Game, func:Void->Void) {
+            deferredCalls.push(func);
+        }
 
-		playerCfgs = [{type:Test(defer)}, {type:Test(defer)}, {type:Test(defer)}, {type:Test(defer)}];
+        playerCfgs = [{type:Test(defer)}, {type:Test(defer)}, {type:Test(defer)}, {type:Test(defer)}];
 
-		Assert.isFalse(referee.gameBegun);
-		referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
-		Assert.isTrue(referee.gameBegun);
+        Assert.isFalse(referee.gameBegun);
+        referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
+        Assert.isTrue(referee.gameBegun);
 
-		for (ike in 0...10)
-		{
-			var oldDeferredCalls = deferredCalls;
-			deferredCalls = [];
-			var then = Timer.stamp();
-			//trace('$ike ${oldDeferredCalls.length} ${Std.int(then * 1000)}');
+        for (ike in 0...10)
+        {
+            var oldDeferredCalls = deferredCalls;
+            deferredCalls = [];
+            var then = Timer.stamp();
+            //trace('$ike ${oldDeferredCalls.length} ${Std.int(then * 1000)}');
 
-			for (call in oldDeferredCalls) {
-				call();
+            for (call in oldDeferredCalls) {
+                call();
 
-				var now = Timer.stamp();
-				//trace(Std.int((now - then) * 1000));
-				then = now;
-			}
-		}
+                var now = Timer.stamp();
+                //trace(Std.int((now - then) * 1000));
+                then = now;
+            }
+        }
 
-		var savedGame = referee.saveGame();
-		var board = referee.spitBoard();
+        var savedGame = referee.saveGame();
+        var board = referee.spitBoard();
 
-		//trace(board);
+        //trace(board);
 
-		var moves:String = referee.spitMoves();
-		// trace(moves);
+        var moves:String = referee.spitMoves();
+        // trace(moves);
 
-		// trace(referee.spitPlan());
+        // trace(referee.spitPlan());
 
-		referee.endGame();
-		Assert.isFalse(referee.gameBegun);
+        referee.endGame();
+        Assert.isFalse(referee.gameBegun);
 
-		referee.resumeGame(playerCfgs, randomFunction, savedGame);
-		Assert.isTrue(referee.gameBegun);
+        referee.resumeGame(playerCfgs, randomFunction, savedGame);
+        Assert.isTrue(referee.gameBegun);
 
-		Assert.areEqual(board, referee.spitBoard());
+        Assert.areEqual(board, referee.spitBoard());
 
-		referee.endGame();
-		Assert.isFalse(referee.gameBegun);
-	}
+        referee.endGame();
+        Assert.isFalse(referee.gameBegun);
+    }
 
-	private function randomFunction():Float { return 0; }
+    private function randomFunction():Float { return 0; }
 }

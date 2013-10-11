@@ -22,10 +22,10 @@ using net.rezmason.ropes.StatePlan;
 
 class StateHistorianTest {
 
-	#if TIME_TESTS
-	var time:Float;
+    #if TIME_TESTS
+    var time:Float;
 
-	@Before
+    @Before
     public function setup():Void {
         time = massive.munit.util.Timer.stamp();
     }
@@ -38,26 +38,26 @@ class StateHistorianTest {
     #end
 
 
-	@Test
-	public function transferAndCommitTest():Void {
+    @Test
+    public function transferAndCommitTest():Void {
 
-		var historian:StateHistorian = new StateHistorian();
+        var historian:StateHistorian = new StateHistorian();
 
-		var history:StateHistory = historian.history;
-		var historyState:State = historian.historyState;
-		var state:State = historian.state;
+        var history:StateHistory = historian.history;
+        var historyState:State = historian.historyState;
+        var state:State = historian.state;
 
-		var config = {
-			firstPlayer:0,
-			numPlayers:2,
-			circular:false,
-			initGrid:TestBoards.twoPlayerGrab,
+        var config = {
+            firstPlayer:0,
+            numPlayers:2,
+            circular:false,
+            initGrid:TestBoards.twoPlayerGrab,
 
             buildCfg: { history:history, historyState:historyState },
 
-			recursive:false,
-			eatHeads:true,
-			takeBodiesFromHeads:false,
+            recursive:false,
+            eatHeads:true,
+            takeBodiesFromHeads:false,
 
             pieceTableIDs:[0, 1, 2, 3, 4],
             allowFlipping:true,
@@ -66,10 +66,10 @@ class StateHistorianTest {
             hatSize:1,
             randomFunction:function() return 0,
             pieces:new Pieces(Resource.getString('tables/pieces.json.txt'))
-		}
+        }
 
         var buildStateRule:BuildStateRule = new BuildStateRule(cast config);
-		var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule(cast config);
+        var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule(cast config);
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(cast config);
         var eatRule:EatCellsRule = new EatCellsRule(cast config);
         var pickPieceRule:PickPieceRule = new PickPieceRule(cast config);
@@ -93,7 +93,7 @@ class StateHistorianTest {
             times.push(history.commit());
         }
 
-		pushChange();
+        pushChange();
 
         // Pick a few pieces
         for (ike in 0...10) {
@@ -101,23 +101,23 @@ class StateHistorianTest {
             pickPieceRule.chooseMove();
         }
 
-		// Freshen and eat body
+        // Freshen and eat body
 
         state.grabXY(7, 7).value[freshness_] = 1;
         state.grabXY(9, 7).value[freshness_] = 1;
         eatRule.chooseMove();
 
-		pushChange();
+        pushChange();
 
-		// Freshen and eat head
+        // Freshen and eat head
         state.grabXY(12, 6).value[freshness_] = 1;
-		eatRule.chooseMove();
+        eatRule.chooseMove();
 
-		pushChange();
+        pushChange();
 
-		// No change!
+        // No change!
 
-		pushChange();
+        pushChange();
 
         while (times.length > 0) {
             history.revert(times.pop());
@@ -125,5 +125,5 @@ class StateHistorianTest {
             Assert.areEqual(boards.pop(), state.spitBoard(plan));
             Assert.areEqual(extras.pop(), Std.string(state.extras));
         }
-	}
+    }
 }

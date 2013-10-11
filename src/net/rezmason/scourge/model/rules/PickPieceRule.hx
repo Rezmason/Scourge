@@ -15,7 +15,6 @@ typedef PickPieceConfig = {
     public var pieceTableIDs:Array<Int>; // The list of pieces available at any point in the game
     public var allowFlipping:Bool; // If false, the reflection is left to chance
     public var allowRotating:Bool; // If false, the rotation is left to chance
-    public var allowAll:Bool; // if true, nothing is left to chance
     public var hatSize:Int; // Number of pieces in the "hat" before it's refilled
     public var randomFunction:Void->Float; // Source of random numbers
     public var pieces:Pieces;
@@ -72,11 +71,7 @@ class PickPieceRule extends Rule {
     }
 
     override private function _update():Void {
-        if (cfg.allowAll) {
-            // The simplest system; the player can use any provided piece at any time
-            moves = cast allMoves.copy();
-            quantumMoves = [];
-        } else if (remakeHat()) {
+        if (remakeHat()) {
             // The hat's been refilled; all piece moves are available as quantum moves
             moves = [pickMove];
             quantumMoves = cast allMoves.copy();
@@ -96,21 +91,15 @@ class PickPieceRule extends Rule {
     }
 
     override private function _chooseMove(choice:Int):Void {
-
         var move:PickPieceMove = cast moves[choice];
-        if (cfg.allowAll) {
-            // The player's choice is selected
-            setPiece(move.pieceTableID, move.reflection, move.rotation);
-        } else {
-            // A selection is made randomly
-            if (remakeHat()) buildHat();
-            move = pickMoveFromHat();
-            setPiece(move.pieceTableID, move.reflection, move.rotation);
-        }
+        // A selection is made randomly
+        if (remakeHat()) buildHat();
+        move = pickMoveFromHat();
+        setPiece(move.pieceTableID, move.reflection, move.rotation);
     }
 
     override private function _chooseQuantumMove(choice:Int):Void {
-                // The player's choice is selected
+        // The player's choice is selected
         var move:PickPieceMove = cast moves[choice];
         if (remakeHat()) buildHat();
         pickMoveFromHat(move);
