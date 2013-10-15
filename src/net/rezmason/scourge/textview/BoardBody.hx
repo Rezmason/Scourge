@@ -290,7 +290,7 @@ class BoardBody extends Body {
             else if (hasPlayer) view.lift = -0.03;
             else view.lift = 0;
 
-            var code:Int = blankCode;
+            var code:Int = uiCode;
             var size:Float = 1;
             var color:Int = 0xFFFFFF;
             var isVisible:Bool = true;
@@ -306,9 +306,9 @@ class BoardBody extends Body {
                         code = headCode;
                         size = 1.2;
                     } else {
-                        // code = bodyCode;
+                        code = bodyCode;
                         // code = BODY_CHARS.charCodeAt(Std.random(Utf8.length(BODY_CHARS)));
-                        code = BODY_CHARS.charCodeAt(view.distance % Utf8.length(BODY_CHARS));
+                        // code = BODY_CHARS.charCodeAt(view.distance % Utf8.length(BODY_CHARS));
 
                         var numNeighbors:Int = 0;
                         for (direction in GridUtils.allDirections()) {

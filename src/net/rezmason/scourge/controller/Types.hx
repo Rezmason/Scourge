@@ -9,7 +9,7 @@ typedef PlayerConfig = {
 }
 
 enum PlayerType {
-    Test(helper:Game->(Void->Void)->Void);
+    Test(proxy:Game->(Void->Void)->Void);
     Human;
     Machine;
     Remote;

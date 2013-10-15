@@ -36,7 +36,10 @@ class RefereeTest {
     #if neko @Ignore('Runs too slow on NekoVM') #end
     @Test
     public function serializeTest():Void {
-        playerCfgs = [{type:Test(null)}, {type:Test(null)}, {type:Test(null)}, {type:Test(null)}];
+
+        function noop(game:Game, func:Void->Void) {}
+
+        playerCfgs = [{type:Test(noop)}, {type:Test(noop)}, {type:Test(noop)}, {type:Test(noop)}];
         referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
 
         var savedGame = referee.saveGame();

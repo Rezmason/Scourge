@@ -1,11 +1,14 @@
-Game sometimes ends seemingly prematurely
+MachinePlayer and Bot
+Make TestPlayer simpler
 
-Rework the players stuff
-    The Referee-Player interface should be based on messages
-        For now, messages can be events or signals dispatched from a common source
-    The Referee shouldn't create the players; some other code should
-        BotPlayers should be registered with the local ExpertSystem
-        Local HumanPlayers should be registered with the UI
+The Referee-Player interface should be based on messages
+    Instead of PlayerHandler and Player.send
+    For now, messages can be events or signals dispatched from a common source
+
+HumanPlayer
+    Hooks into view somehow; maybe a signal system
+
+Game logger, replay
 
 NodeView and BoardBody
 
