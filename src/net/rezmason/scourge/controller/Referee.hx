@@ -2,6 +2,8 @@ package net.rezmason.scourge.controller;
 
 import haxe.Timer;
 
+import msignal.Signal;
+
 import net.rezmason.ropes.Types;
 import net.rezmason.scourge.controller.Types;
 import net.rezmason.scourge.model.Game;
@@ -18,12 +20,15 @@ class Referee {
     var game:Game;
     var gameConfig:ScourgeConfig;
     var players:Array<Player>;
+    var spectators:Array<Spectator>;
     var gameTimer:Timer;
     var log:Array<GameEvent>;
     var allReady:Bool;
     var randGen:RandGen;
     var floats:Array<Float>;
     var busy:Bool;
+    var playerFactory:PlayerFactory;
+    var playSignal:Signal2<Player, GameEvent>;
 
     public var gameBegun(get, never):Bool;
     public var numPlayers(get, never):Int;
@@ -33,16 +38,22 @@ class Referee {
         allReady = false;
         busy = false;
         floats = [];
+        playerFactory = new PlayerFactory();
+        playSignal = new Signal2();
     }
 
-    public function beginGame(playerConfigs:Array<PlayerConfig>, randGen:RandGen, gameConfig:ScourgeConfig):Void {
-        if (playerConfigs.length != gameConfig.numPlayers)
-            throw 'Player config specifies ${playerConfigs.length} players: game config specifies ${gameConfig.numPlayers}';
+    public function beginGame(playerDefs:Array<PlayerDef>, spectators:Array<Spectator>, randGen:RandGen, gameConfig:ScourgeConfig):Void {
+        if (playerDefs.length != gameConfig.numPlayers)
+            throw 'Player config specifies ${playerDefs.length} players: game config specifies ${gameConfig.numPlayers}';
+
+        playSignal.add(handlePlaySignal);
 
         log = [];
         this.gameConfig = gameConfig;
         this.randGen = randGen;
-        players = PlayerFactory.makePlayers(playerConfigs, handlePlayerEvent);
+        players = playerFactory.makePlayers(playerDefs, playSignal);
+        if (spectators == null) spectators = [];
+        this.spectators = spectators;
         clearFloats();
         game.begin(gameConfig, generateRandomFloat);
         refereeCall(getFloatsAction());
@@ -50,13 +61,15 @@ class Referee {
         refereeCall(Connect);
     }
 
-    public function resumeGame(playerConfigs:Array<PlayerConfig>, randGen:RandGen, savedGame:SavedGame):Void {
-        if (playerConfigs.length != savedGame.config.numPlayers)
-            throw 'Player config specifies ${playerConfigs.length} players: saved game specifies ${savedGame.config.numPlayers}';
+    public function resumeGame(playerDefs:Array<PlayerDef>, spectators:Array<Spectator>, randGen:RandGen, savedGame:SavedGame):Void {
+        if (playerDefs.length != savedGame.config.numPlayers)
+            throw 'Player config specifies ${playerDefs.length} players: saved game specifies ${savedGame.config.numPlayers}';
 
         log = copyLog(savedGame.log);
         this.gameConfig = savedGame.config;
-        players = PlayerFactory.makePlayers(playerConfigs, handlePlayerEvent);
+        players = playerFactory.makePlayers(playerDefs, playSignal);
+        if (spectators == null) spectators = [];
+        this.spectators = spectators;
         game.begin(gameConfig, generateRandomFloat, savedGame.state);
 
         refereeCall(Resume(SafeSerializer.run(savedGame)));
@@ -67,6 +80,7 @@ class Referee {
         allReady = false;
         game.end();
         refereeCall(Disconnect);
+        playSignal.remove(handlePlaySignal);
         players = null;
     }
 
@@ -97,7 +111,7 @@ class Referee {
         return str + arr.join('\n') + '\n';
     }
 
-    private function handlePlayerEvent(player:Player, event:GameEvent):Void {
+    private function handlePlaySignal(player:Player, event:GameEvent):Void {
 
         if (busy)
             throw 'Players must not dispatch events synchronously!';
@@ -134,7 +148,8 @@ class Referee {
         var wasBusy:Bool = busy;
         //trace('BUSY: BROADCAST');
         busy = true;
-        for (player in players) player.send(Reflect.copy(event));
+        for (player in players) player.updateSignal.dispatch(Reflect.copy(event));
+        for (spectator in spectators) spectator.updateSignal.dispatch(Reflect.copy(event));
         busy = wasBusy;
         //trace(busy ? 'STILL BUSY' : 'FREE');
     }

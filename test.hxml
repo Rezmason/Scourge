@@ -1,7 +1,8 @@
 #Flash 9+
 -main TestMain
--lib munit
 -lib hamcrest
+-lib munit
+-lib msignal
 -cp src
 -debug
 -resource tables/pieces.json.txt@tables/pieces.json.txt
@@ -20,8 +21,9 @@
 
 # JavaScript
 -main TestMain
--lib munit
 -lib hamcrest
+-lib munit
+-lib msignal
 -cp src
 -debug
 -resource tables/pieces.json.txt@tables/pieces.json.txt
@@ -41,8 +43,9 @@
 # Neko
 
 -main TestMain
--lib munit
 -lib hamcrest
+-lib munit
+-lib msignal
 -cp src
 -debug
 -resource tables/pieces.json.txt@tables/pieces.json.txt

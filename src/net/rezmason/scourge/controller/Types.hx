@@ -4,14 +4,10 @@ import net.rezmason.ropes.Types.SavedState;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 
-typedef PlayerConfig = {
-    var type:PlayerType;
-}
-
-enum PlayerType {
+enum PlayerDef {
     Test(proxy:Game->(Void->Void)->Void);
     Human;
-    Machine;
+    Bot(difficulty:Int, period:Int);
     Remote;
 }
 

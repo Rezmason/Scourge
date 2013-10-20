@@ -14,10 +14,8 @@ import net.rezmason.utils.FlatFont;
 
 import net.rezmason.scourge.controller.Referee;
 import net.rezmason.scourge.controller.Types;
-import net.rezmason.scourge.model.Game;
+import net.rezmason.scourge.controller.SimpleSpectator;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
-
-import haxe.Timer;
 
 using Lambda;
 
@@ -35,11 +33,9 @@ class TextDemo {
     var uiBody:UIBody;
     var interpreter:Interpreter;
 
-    var game:Game;
     var referee:Referee;
+    var spectator:SimpleSpectator;
     var turnFuncs:Array<Void->Void>;
-
-    var robotTimer:Timer;
 
     public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
@@ -48,7 +44,6 @@ class TextDemo {
         engine = new Engine(utils, stage, fontTextures);
         engine.init(init);
         addListeners();
-        robotTimer = null;
     }
 
     function makeFontTextures(fonts:Map<String, FlatFont>):Void {
@@ -63,78 +58,41 @@ class TextDemo {
         makeScene();
     }
 
-    function takeTurn(game:Game, func:Void->Void):Void {
-        if (this.game == null) {
-            this.game = game;
-            turnFuncs = [];
-
-            if (boardBody != null) {
-                boardBody.attach(this.game, referee.numPlayers);
-                onResize();
-            }
-        }
-
-        turnFuncs.push(func);
-    }
-
-    function makeTurn():Void {
-        var funcs:Array<Void->Void> = turnFuncs.splice(0, turnFuncs.length);
-        funcs.reverse();
-
-        if (funcs.length > 0) {
-            while (funcs.length > 0) funcs.pop()();
-            boardBody.handleBoardUpdate();
-        } else {
-            trace("ROBOTS AUTO-STOPPED");
-            stopRobots("");
-        }
-    }
-
-    function startRobots(input:String):String {
-        stopRobots("");
-        if (referee == null) return "GAME DOES NOT EXIST";
-        robotTimer = new Timer(Std.parseInt(input.split(' ')[1]));
-        robotTimer.run = makeTurn;
-        makeTurn();
-        return "ROBOTS STARTED";
-    }
-
-    function stopRobots(input:String):String {
-        if (robotTimer != null) robotTimer.stop();
-        robotTimer = null;
-        return "ROBOTS STOPPED";
-    }
-
     function makeGame(input:String):String {
-
-        stopRobots("");
-
-        game = null;
 
         if (referee == null) referee = new Referee();
         else if (referee.gameBegun) referee.endGame();
 
+        if (spectator == null) spectator = new SimpleSpectator();
+        spectator.viewSignal.removeAll();
+
         var args:Array<String> = input.split(' ');
 
         var numPlayers:Int = Std.parseInt(args[1]);
-
         if (numPlayers > 8) numPlayers = 8;
-
         if (numPlayers < 2) numPlayers = 2;
 
-        var playerCfgs = [];
+        var playerDefs:Array<PlayerDef> = [];
+        var period:Int = 10;
+        while (playerDefs.length < numPlayers) playerDefs.push(Bot(0, period));
 
-        for (ike in 0...numPlayers) playerCfgs.push({type:Test(takeTurn)});
+        var spectators:Array<SimpleSpectator> = [spectator];
 
         var cfg = ScourgeConfigFactory.makeDefaultConfig();
         cfg.allowRotating = true;
         cfg.circular = args.has('circular');
         cfg.allowNowhereDrop = false;
-        cfg.numPlayers = playerCfgs.length;
+        cfg.numPlayers = playerDefs.length;
         cfg.includeCavities = true;
         // cfg.maxSwaps = 0;
         // cfg.maxBites = 0;
-        referee.beginGame(playerCfgs, randomFunction, cfg);
+        referee.beginGame(playerDefs, cast spectators, randomFunction, cfg);
+
+        if (boardBody != null) {
+            boardBody.attach(spectator.getGame(), referee.numPlayers);
+            onResize();
+            spectator.viewSignal.add(boardBody.handleBoardUpdate);
+        }
 
         return 'Starting a $numPlayers player game.';
     }
@@ -167,8 +125,6 @@ class TextDemo {
 
         //*
         interpreter = new Interpreter();
-        interpreter.addCommand("startRobots", startRobots);
-        interpreter.addCommand("stopRobots", stopRobots);
         interpreter.addCommand("runTests", runTests);
         interpreter.addCommand("setFont", setFont);
         interpreter.addCommand("makeGame", makeGame);

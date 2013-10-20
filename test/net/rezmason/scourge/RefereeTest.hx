@@ -17,7 +17,7 @@ using net.rezmason.scourge.model.BoardUtils;
 class RefereeTest {
 
     var referee:Referee;
-    var playerCfgs:Array<PlayerConfig>;
+    var playerDefs:Array<PlayerDef>;
 
     public function new() {
 
@@ -39,8 +39,8 @@ class RefereeTest {
 
         function noop(game:Game, func:Void->Void) {}
 
-        playerCfgs = [{type:Test(noop)}, {type:Test(noop)}, {type:Test(noop)}, {type:Test(noop)}];
-        referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
+        playerDefs = [Test(noop), Test(noop), Test(noop), Test(noop)];
+        referee.beginGame(playerDefs, null, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
 
         var savedGame = referee.saveGame();
         var data:String = savedGame.state.data;
@@ -70,10 +70,10 @@ class RefereeTest {
             deferredCalls.push(func);
         }
 
-        playerCfgs = [{type:Test(defer)}, {type:Test(defer)}, {type:Test(defer)}, {type:Test(defer)}];
+        playerDefs = [Test(defer), Test(defer), Test(defer), Test(defer)];
 
         Assert.isFalse(referee.gameBegun);
-        referee.beginGame(playerCfgs, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
+        referee.beginGame(playerDefs, null, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
         Assert.isTrue(referee.gameBegun);
 
         for (ike in 0...10)
@@ -105,7 +105,7 @@ class RefereeTest {
         referee.endGame();
         Assert.isFalse(referee.gameBegun);
 
-        referee.resumeGame(playerCfgs, randomFunction, savedGame);
+        referee.resumeGame(playerDefs, null, randomFunction, savedGame);
         Assert.isTrue(referee.gameBegun);
 
         Assert.areEqual(board, referee.spitBoard());

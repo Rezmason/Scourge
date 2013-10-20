@@ -116,7 +116,7 @@ class BoardBody extends Body {
 
     public function attach(game:Game, numPlayers:Int):Void {
 
-        if (this.game != game) detach();
+        detach();
         if (game == null) return;
 
         this.game = game;
@@ -223,6 +223,7 @@ class BoardBody extends Body {
     }
 
     public function handleBoardUpdate():Void {
+
         var itr:Int = 0;
         for (player in game.state.players) headNodes[itr++] = game.state.nodes[player[head_]];
 
