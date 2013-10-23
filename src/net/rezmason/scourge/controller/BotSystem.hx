@@ -3,6 +3,7 @@ package net.rezmason.scourge.controller;
 import haxe.Timer;
 import msignal.Signal;
 import net.rezmason.scourge.controller.Types;
+import net.rezmason.scourge.model.ScourgeConfig;
 
 class BotSystem extends PlayerSystem {
 
@@ -20,8 +21,8 @@ class BotSystem extends PlayerSystem {
         numBots = 0;
     }
 
-    public function createPlayer(index:Int, playSignal:Signal2<Player, GameEvent>, difficulty:Int, period:Int):Player {
-        var bot:BotPlayer = new BotPlayer(botSignal, index, difficulty, period);
+    public function createPlayer(index:Int, playSignal:Signal2<Player, GameEvent>, smarts:Smarts, period:Int):Player {
+        var bot:BotPlayer = new BotPlayer(botSignal, index, smarts, period);
         botsByIndex[index] = bot;
         this.playSignal = playSignal;
         numBots++;
@@ -56,13 +57,25 @@ class BotSystem extends PlayerSystem {
         }
     }
 
+    override private function init(config:ScourgeConfig):Void {
+        super.init(config);
+        for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game);
+    }
+
+    override private function resume(save:SavedGame):Void {
+        super.resume(save);
+        for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game);
+    }
+
     override private function connect():Void beat(announceReady);
     override private function disconnect():Void endGame();
     override private function play():Void beat(choose);
     override private function isMyTurn():Bool return game.hasBegun && game.winner < 0 && currentPlayer() != null;
 
     private function choose():Void {
-        var eventType:GameEventType = smarts.choose(game);
+        var playerSmarts:Smarts = botsByIndex[game.currentPlayer].smarts;
+        if (playerSmarts == null) playerSmarts = smarts;
+        var eventType:GameEventType = playerSmarts.choose(game);
         // trace('${game.currentPlayer} $eventType');
         volley(currentPlayer(), eventType);
     }

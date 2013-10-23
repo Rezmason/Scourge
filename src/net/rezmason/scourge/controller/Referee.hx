@@ -23,6 +23,7 @@ class Referee {
     var spectators:Array<Spectator>;
     var gameTimer:Timer;
     var log:Array<GameEvent>;
+    var floatsLog:Array<Float>;
     var allReady:Bool;
     var randGen:RandGen;
     var floats:Array<Float>;
@@ -30,6 +31,7 @@ class Referee {
     var playerFactory:PlayerFactory;
     var playSignal:Signal2<Player, GameEvent>;
 
+    public var lastGame(default, null):SavedGame;
     public var gameBegun(get, never):Bool;
     public var numPlayers(get, never):Int;
 
@@ -49,6 +51,7 @@ class Referee {
         playSignal.add(handlePlaySignal);
 
         log = [];
+        floatsLog = [];
         this.gameConfig = gameConfig;
         this.randGen = randGen;
         players = playerFactory.makePlayers(playerDefs, playSignal);
@@ -66,6 +69,7 @@ class Referee {
             throw 'Player config specifies ${playerDefs.length} players: saved game specifies ${savedGame.config.numPlayers}';
 
         log = copyLog(savedGame.log);
+        floatsLog = savedGame.floats.copy();
         this.gameConfig = savedGame.config;
         players = playerFactory.makePlayers(playerDefs, playSignal);
         if (spectators == null) spectators = [];
@@ -77,6 +81,7 @@ class Referee {
     }
 
     public function endGame():Void {
+        lastGame = saveGame();
         allReady = false;
         game.end();
         refereeCall(Disconnect);
@@ -87,7 +92,8 @@ class Referee {
     public function saveGame():SavedGame {
         refereeCall(Save);
         var savedLog:Array<GameEvent> = copyLog(log);
-        return {state:game.save(), log:savedLog, config:gameConfig, timeSaved:UnixTime.now()};
+        var savedFloats:Array<Float> = floatsLog.copy();
+        return {state:game.save(), log:savedLog, floats:savedFloats, config:gameConfig, timeSaved:UnixTime.now()};
     }
 
     public function spitBoard():String return game.spitBoard();
@@ -188,6 +194,7 @@ class Referee {
     private function generateRandomFloat():Float {
         var float:Float = randGen();
         floats.push(float);
+        floatsLog.push(float);
         return float;
     }
 

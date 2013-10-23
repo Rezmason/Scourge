@@ -7,7 +7,7 @@ import net.rezmason.scourge.model.ScourgeConfig;
 enum PlayerDef {
     Test(proxy:Game->(Void->Void)->Void);
     Human;
-    Bot(difficulty:Int, period:Int);
+    Bot(smarts:Smarts, period:Int);
     Remote;
 }
 
@@ -21,6 +21,7 @@ typedef GameEvent = {
 typedef SavedGame = {
     var state:SavedState;
     var log:Array<GameEvent>;
+    var floats:Array<Float>;
     var config:ScourgeConfig;
     var timeSaved:Int;
 }

@@ -12,9 +12,12 @@ import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.utils.FlatFont;
 
+import net.rezmason.scourge.controller.ReplaySmarts;
+import net.rezmason.scourge.controller.RandomSmarts;
 import net.rezmason.scourge.controller.Referee;
 import net.rezmason.scourge.controller.Types;
 import net.rezmason.scourge.controller.SimpleSpectator;
+import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
 
 using Lambda;
@@ -68,25 +71,43 @@ class TextDemo {
 
         var args:Array<String> = input.split(' ');
 
+        var circular:Bool = args.has('circular');
+
         var numPlayers:Int = Std.parseInt(args[1]);
         if (numPlayers > 8) numPlayers = 8;
         if (numPlayers < 2) numPlayers = 2;
 
+        var cfg:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
+        cfg.pieceTableIDs = cfg.pieces.getAllPieceIDsOfSize(4);
+        cfg.allowRotating = true;
+        cfg.circular = circular;
+        cfg.allowNowhereDrop = false;
+        cfg.numPlayers = numPlayers;
+        cfg.includeCavities = true;
+        cfg.maxSwaps = 0;
+        cfg.maxBites = 0;
+
         var playerDefs:Array<PlayerDef> = [];
-        var period:Int = 10;
-        while (playerDefs.length < numPlayers) playerDefs.push(Bot(0, period));
+        var botPeriod:Int = 10;
+        var randFunc:Void->Float = randomFunction;
+
+        if (args.has('replay')) {
+            if (referee.lastGame == null) return 'Referee has no replay.';
+            cfg = referee.lastGame.config;
+            numPlayers = cfg.numPlayers;
+            circular = cfg.circular;
+            var log:Array<GameEvent> = referee.lastGame.log.filter(playerActionsOnly);
+            var floats:Array<Float> = referee.lastGame.floats.copy();
+            randFunc = function() return floats.shift();
+
+            while (playerDefs.length < numPlayers) playerDefs.push(Bot(new ReplaySmarts(log), botPeriod));
+        } else {
+            while (playerDefs.length < numPlayers) playerDefs.push(Bot(new RandomSmarts(), botPeriod));
+        }
 
         var spectators:Array<SimpleSpectator> = [spectator];
 
-        var cfg = ScourgeConfigFactory.makeDefaultConfig();
-        cfg.allowRotating = true;
-        cfg.circular = args.has('circular');
-        cfg.allowNowhereDrop = false;
-        cfg.numPlayers = playerDefs.length;
-        cfg.includeCavities = true;
-        // cfg.maxSwaps = 0;
-        // cfg.maxBites = 0;
-        referee.beginGame(playerDefs, cast spectators, randomFunction, cfg);
+        referee.beginGame(playerDefs, cast spectators, randFunc, cfg);
 
         if (boardBody != null) {
             boardBody.attach(spectator.getGame(), referee.numPlayers);
@@ -97,8 +118,18 @@ class TextDemo {
         return 'Starting a $numPlayers player game.';
     }
 
+    function playerActionsOnly(event:GameEvent):Bool {
+        var isPlayerAction:Bool = false;
+        switch (event.type) {
+            case PlayerAction(action, move): isPlayerAction = true;
+            case _:
+        }
+        return isPlayerAction;
+    }
+
     function randomFunction():Float {
         return Math.random();
+        // return 0;
     }
 
     function setFont(input:String):String {
