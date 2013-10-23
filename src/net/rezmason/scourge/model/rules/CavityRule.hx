@@ -149,8 +149,7 @@ class CavityRule extends Rule {
     }
 
     inline function clearCavityCell(node:BoardNode, maxFreshness:Int):Void {
-        node.value[isFilled_] = Aspect.FALSE;
-        node.value[occupier_] = Aspect.NULL;
+        if (node.value[isFilled_] == Aspect.FALSE) node.value[occupier_] = Aspect.NULL;
         node.value[freshness_] = maxFreshness;
         node.removeNode(state.nodes, cavityNext_, cavityPrev_);
     }

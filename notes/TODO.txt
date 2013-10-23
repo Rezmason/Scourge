@@ -1,6 +1,3 @@
-Investigate endless loops
-    Seems to have something to do with DropPieceRule
-    Helps to set random to zero
 Investigate "gap" death problem
 Investigate early deaths
 
