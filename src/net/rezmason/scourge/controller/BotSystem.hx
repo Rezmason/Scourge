@@ -74,7 +74,6 @@ class BotSystem extends PlayerSystem {
 
     private function choose():Void {
         var playerSmarts:Smarts = botsByIndex[game.currentPlayer].smarts;
-        if (playerSmarts == null) playerSmarts = smarts;
         var eventType:GameEventType = playerSmarts.choose(game);
         // trace('${game.currentPlayer} $eventType');
         volley(currentPlayer(), eventType);

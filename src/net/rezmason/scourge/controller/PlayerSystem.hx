@@ -9,14 +9,12 @@ import net.rezmason.utils.UnixTime;
 
 class PlayerSystem {
 
-    private var smarts:Smarts;
     private var game:Game;
     private var floats:Array<Float>;
     private var playSignal:Signal2<Player, GameEvent>;
 
     function new():Void {
         game = new Game();
-        smarts = new Smarts();
         floats = [];
     }
 
@@ -39,19 +37,9 @@ class PlayerSystem {
         }
     }
 
-    private function init(config:ScourgeConfig):Void {
-        game.begin(config, retrieveRandomFloat);
-        smarts.init(game);
-    }
-
-    private function resume(save:SavedGame):Void {
-        game.begin(save.config, retrieveRandomFloat, save.state);
-        smarts.init(game);
-    }
-
-    private function endGame():Void {
-        game.end();
-    }
+    private function init(config:ScourgeConfig):Void game.begin(config, retrieveRandomFloat);
+    private function resume(save:SavedGame):Void game.begin(save.config, retrieveRandomFloat, save.state);
+    private function endGame():Void game.end();
 
     private function announceReady():Void throw "Override this.";
     private function connect():Void throw "Override this.";

@@ -33,6 +33,8 @@ class KillHeadlessBodyRule extends Rule {
 
     override private function _chooseMove(choice:Int):Void {
 
+        // trace(state.spitBoard(plan));
+
         var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
 
         // Check each player to see if they still have head nodes
@@ -59,6 +61,9 @@ class KillHeadlessBodyRule extends Rule {
         }
 
         state.aspects[maxFreshness_] = maxFreshness;
+
+        // trace(state.spitBoard(plan));
+        // trace('---');
     }
 
     function killCell(node:BoardNode, maxFreshness:Int):Void {
