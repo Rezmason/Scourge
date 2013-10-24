@@ -89,18 +89,19 @@ class DropPieceRule extends Rule {
         if (cfg.allowPiecePick) for (pieceID in cfg.pieceTableIDs) pieceIDs.push(pieceID);
         else if (state.aspects[pieceTableID_] != Aspect.NULL) pieceIDs.push(state.aspects[pieceTableID_]);
 
+        // get current player head
+        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var bodyNode:BoardNode = getNode(getPlayer(currentPlayer)[bodyFirst_]);
+
+        // Find edge nodes of current player
+        var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge);
+
+        var pieceReflection:Int = state.aspects[pieceReflection_];
+        var pieceRotation:Int = state.aspects[pieceRotation_];
+
         for (pieceID in pieceIDs) {
 
-            // get current player head
-            var currentPlayer:Int = state.aspects[currentPlayer_];
-            var bodyNode:BoardNode = getNode(getPlayer(currentPlayer)[bodyFirst_]);
-
-            // Find edge nodes of current player
-            var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge).array();
-
             var pieceGroup:PieceGroup = cfg.pieces.getPieceById(pieceID);
-            var pieceReflection:Int = state.aspects[pieceReflection_];
-            var pieceRotation:Int = state.aspects[pieceRotation_];
 
             // For each allowed reflection,
             var allowedReflectionIndex:Int = pieceReflection % pieceGroup.length;

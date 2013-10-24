@@ -78,7 +78,7 @@ class BiteRule extends Rule {
             var totalArea:Int = player[totalArea_];
             var bodyNode:BoardNode = getNode(player[bodyFirst_]);
             var body:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_);
-            var frontNodes:Array<BoardNode> = body.filter(isFront.bind(headIDs)).array();
+            var frontNodes:Array<BoardNode> = body.filter(isFront.bind(headIDs));
 
             // Grab the valid bites from immediate neighbors
 
