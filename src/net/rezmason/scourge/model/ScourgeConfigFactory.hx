@@ -36,7 +36,7 @@ class ScourgeConfigFactory {
     static var BITE:String               = Siphon.getClassName(BiteRule);
     static var SWAP_PIECE:String         = Siphon.getClassName(SwapPieceRule);
 
-    // static var SPIT_BOARD:String = Siphon.getClassName(SpitBoardRule);
+    // static var DEBUG:String = Siphon.getClassName(DebugRule);
 
     public static var ruleDefs:Map<String, Class<Rule>> = cast Siphon.getDefs('net.rezmason.scourge.model.rules', 'src', 'Rule');
 
@@ -117,7 +117,7 @@ class ScourgeConfigFactory {
             KILL_HEADLESS_BODY => null,
             ONE_LIVING_PLAYER => null,
 
-            //SPIT_BOARD => null,
+            // DEBUG => null,
         ];
 
         if (!config.allowAllPieces) ruleConfig.set(PICK_PIECE, makePickPieceConfig(config, buildCfg, randomFunction));

@@ -106,10 +106,12 @@ class EatCellsRule extends Rule {
             if (node != null) newNodesMap.remove(node.id);
         }
 
-        // Update cell in the eaten region
-        for (node in eatenNodes) bodyNode = eatCell(node, currentPlayer, maxFreshness++, bodyNode);
+        // Update cells in the eaten region
+        for (node in eatenNodes) {
+            node.value[occupier_] = currentPlayer;
+            node.value[freshness_] = maxFreshness++;
+        }
 
-        getPlayer(currentPlayer)[bodyFirst_] = bodyNode.value[nodeID_];
         state.aspects[maxFreshness_] = maxFreshness;
 
         // Clean up the bodyFirst and head pointers for opponent players
@@ -119,8 +121,14 @@ class EatCellsRule extends Rule {
 
             var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != Aspect.NULL) {
-                bodyNode = getNode(bodyFirst);
-                if (bodyNode.value[occupier_] != playerID) player[bodyFirst_] = Aspect.NULL;
+                var body:Array<BoardNode> = getNode(bodyFirst).boardListToArray(state.nodes, bodyNext_);
+                var revisedBody:Array<BoardNode> = [];
+                for (node in body) {
+                    if (node.value[isFilled_] == Aspect.TRUE && node.value[occupier_] == playerID) revisedBody.push(node);
+                }
+                revisedBody.chainByAspect(nodeID_, bodyNext_, bodyPrev_);
+                if (revisedBody.length > 0) player[bodyFirst_] = revisedBody[0].value[nodeID_];
+                else player[bodyFirst_] = Aspect.NULL;
             }
 
             var head:Int = player[head_];
@@ -129,6 +137,14 @@ class EatCellsRule extends Rule {
                 if (headNode.value[occupier_] != playerID) player[head_] = Aspect.NULL;
             }
         }
+
+        // Add the filled eaten nodes to the current player body
+        for (node in eatenNodes) {
+            if (node.value[isFilled_] == Aspect.TRUE) {
+                bodyNode = bodyNode.addNode(node, state.nodes, nodeID_, bodyNext_, bodyPrev_);
+            }
+        }
+        getPlayer(currentPlayer)[bodyFirst_] = bodyNode.value[nodeID_];
     }
 
     function getBody(playerID:Int):Array<BoardNode> {
@@ -143,12 +159,6 @@ class EatCellsRule extends Rule {
 
     function isFresh(node:BoardNode):Bool {
         return node.value[freshness_] > 0;
-    }
-
-    function eatCell(node:BoardNode, currentPlayer:Int, maxFreshness:Int, bodyNode:BoardNode):BoardNode {
-        node.value[occupier_] = currentPlayer;
-        node.value[freshness_] = maxFreshness;
-        return bodyNode.addNode(node, state.nodes, nodeID_, bodyNext_, bodyPrev_);
     }
 
     function directionsFor(ortho:Bool):Iterator<Int> {

@@ -1,6 +1,3 @@
-Investigate "gap" death problem
-    It's players' bodies that aren't getting cleaned up when they die
-
 HumanPlayer
     Hooks into view somehow; maybe a signal system
 
