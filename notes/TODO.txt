@@ -1,3 +1,13 @@
+Represent commands as some intermediary type - not strings, not intrinsic Style types
+    A list of elements
+        UIText sends [basic text element] at first
+        They send back and forth larger sequences as the user drills down into the auto-completion
+    Draw this out
+
+Get interpreter and UIText (and TextDemo) to use signals
+    UIText listens for post signals
+    Interpreter listens for command signals
+
 HumanPlayer
     Hooks into view somehow; maybe a signal system
 
@@ -42,16 +52,6 @@ Solidify text update behavior
     -scroll to the new bottom
 Scroll indicator (looks like meterstick)
 
-OpenFL native targets
-    resizing window and calling GL.drawElements crashes
-    no readPixels
-
-Render the scene ONCE each time interaction changes
-    On mouse/finger up after a drag (once there's no inertia)
-    On button click/tap
-    On first mouse move after a keystroke
-
-
 Piece view
 
 Implement noneuclidean walking and running
@@ -73,15 +73,10 @@ GDC articles
     http://www.gamasutra.com/view/news/189345/How_to_use_live_events_to_promote_your_game.php
     http://www.gamasutra.com/view/news/189353/Designing_without_a_pitch__An_FTL_postmortem.php
 
-TestPlayer
-HumanPlayer
-RemotePlayer
-MachinePlayer (local)
-
 Hey, this game is a Roguelike!
     Figure out what solutions they have to UI challenges
 
-Make renderer cross-platform
+Make renderer cross-platform (as in, test it on several devices)
     Oh boy...
 
 Checksums
@@ -100,9 +95,6 @@ And then SPEED EVERYTHING UP
 
 ExternalPlayer
 Turn durations
-    Special aspect I suppose
-
-GameView
 
 Coarse evaluation
     Number of nodes (filled and enclosed)
