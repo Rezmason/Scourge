@@ -265,14 +265,14 @@ class ScourgeConfigFactoryTest
 
         /*
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var enemyHead:BoardNode = state.nodes[state.players[1][head_]];
+        var enemyHead:BoardLocus = state.nodes[state.players[1][head_]];
 
         var drmoves:Array<DropPieceMove> = cast dropAction.moves;
         var bestMove:DropPieceMove = null;
         for (move in drmoves) {
             if (!move.duplicate) {
                 for (nodeID in move.addedNodes) {
-                    var node:BoardNode = state.nodes[nodeID];
+                    var node:BoardLocus = state.nodes[nodeID];
                     for (neighbor in node.allNeighbors()) {
                         if (neighbor == enemyHead) {
                             bestMove = move;

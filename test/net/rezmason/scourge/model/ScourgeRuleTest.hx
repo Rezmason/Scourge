@@ -80,9 +80,9 @@ class ScourgeRuleTest
         for (rule in rules) rule.prime(state, plan);
     }
 
-    private function testListLength(expectedLength:Int, first:BoardNode, next:AspectPtr, prev:AspectPtr):Int {
+    private function testListLength(expectedLength:Int, first:BoardLocus, next:AspectPtr, prev:AspectPtr):Int {
         var count:Int = 0;
-        var last:BoardNode = null;
+        var last:BoardLocus = null;
 
         for (node in first.iterate(state.nodes, next)) {
             count++;

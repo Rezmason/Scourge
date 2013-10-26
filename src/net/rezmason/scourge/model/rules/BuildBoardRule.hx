@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.Types;
-import net.rezmason.ropes.GridNode;
+import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
@@ -97,7 +97,7 @@ class BuildBoardRule extends Rule {
             coord.y = Std.int(coord.y + PADDING - minCoord.y);
         }
 
-        var grid:BoardNode = makeSquareGraph(boardWidth);
+        var grid:BoardLocus = makeSquareGraph(boardWidth);
         var hasInitGrid:Bool = cfg.initGrid != null && cfg.initGrid.length > 0;
         obstructGraphRim(grid);
         if (cfg.circular) encircleGraph(grid, boardWidth * 0.5 - RIM);
@@ -127,28 +127,28 @@ class BuildBoardRule extends Rule {
         return {x:maxX, y:maxY};
     }
 
-    inline function makeNode():BoardNode {
-        var node:BoardNode = new BoardNode(numNodes(), nodeAspectTemplate.copy());
+    inline function makeNode():BoardLocus {
+        var node:BoardLocus = new BoardLocus(numNodes(), nodeAspectTemplate.copy());
         node.value[ident_] = node.id;
         state.nodes.push(node);
 
         var histAspects:AspectSet = nodeAspectTemplate.map(cfg.buildCfg.history.alloc);
-        var histNode:BoardNode = new BoardNode(node.id, histAspects);
+        var histNode:BoardLocus = new BoardLocus(node.id, histAspects);
         cfg.buildCfg.historyState.nodes.push(histNode);
 
         return node;
     }
 
-    inline function makeSquareGraph(width:Int):BoardNode {
+    inline function makeSquareGraph(width:Int):BoardLocus {
 
         // Make a connected grid of nodes with default values
-        var node:BoardNode = makeNode();
+        var node:BoardLocus = makeNode();
         for (ike in 1...width) node = node.attach(makeNode(), Gr.e);
 
-        var row:BoardNode = node.run(Gr.w);
+        var row:BoardLocus = node.run(Gr.w);
         for (ike in 1...width) {
             for (column in row.walk(Gr.e)) {
-                var next:BoardNode = makeNode();
+                var next:BoardLocus = makeNode();
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);
@@ -161,19 +161,19 @@ class BuildBoardRule extends Rule {
         return node.run(Gr.nw).run(Gr.n).run(Gr.w);
     }
 
-    inline function obstructGraphRim(grid:BoardNode):Void {
+    inline function obstructGraphRim(grid:BoardLocus):Void {
         for (node in grid.walk(Gr.e)) node.value[isFilled_] = Aspect.TRUE;
         for (node in grid.walk(Gr.s)) node.value[isFilled_] = Aspect.TRUE;
         for (node in grid.run(Gr.s).walk(Gr.e)) node.value[isFilled_] = Aspect.TRUE;
         for (node in grid.run(Gr.e).walk(Gr.s)) node.value[isFilled_] = Aspect.TRUE;
     }
 
-    inline function populateGraphHeads(grid:BoardNode, headCoords:Array<XY>, plantHeads:Bool):Void {
+    inline function populateGraphHeads(grid:BoardLocus, headCoords:Array<XY>, plantHeads:Bool):Void {
         // Identify and change the occupier of each head node
 
         for (ike in 0...headCoords.length) {
             var coord:XY = headCoords[ike];
-            var head:BoardNode = grid.run(Gr.e, Std.int(coord.x)).run(Gr.s, Std.int(coord.y));
+            var head:BoardLocus = grid.run(Gr.e, Std.int(coord.x)).run(Gr.s, Std.int(coord.y));
             if (plantHeads) {
                 head.value[isFilled_] = Aspect.TRUE;
                 head.value[occupier_] = ike;
@@ -184,7 +184,7 @@ class BuildBoardRule extends Rule {
         }
     }
 
-    inline function encircleGraph(grid:BoardNode, radius:Float):Void {
+    inline function encircleGraph(grid:BoardLocus, radius:Float):Void {
         // Circular levels' cells are obstructed if they're too far from the board's center
 
         var y:Int = 0;
@@ -203,7 +203,7 @@ class BuildBoardRule extends Rule {
         }
     }
 
-    inline function initGraph(grid:BoardNode, initGrid:String, boardWidth:Int):Void {
+    inline function initGraph(grid:BoardLocus, initGrid:String, boardWidth:Int):Void {
 
         // Refer to the initGrid to assign initial values to nodes
 
@@ -231,7 +231,7 @@ class BuildBoardRule extends Rule {
 
     inline function populateGraphBodies():Void {
 
-        var bodies:Array<Array<BoardNode>> = [];
+        var bodies:Array<Array<BoardLocus>> = [];
         for (player in eachPlayer()) bodies.push([]);
 
         for (node in eachNode()) {
@@ -245,9 +245,9 @@ class BuildBoardRule extends Rule {
         }
 
         for (player in eachPlayer()) {
-            var body:Array<BoardNode> = bodies[getID(player)];
+            var body:Array<BoardLocus> = bodies[getID(player)];
             if (body.length > 0) {
-                var bodyFirstNode:BoardNode = body[0];
+                var bodyFirstNode:BoardLocus = body[0];
                 player[bodyFirst_] = getID(bodyFirstNode.value);
                 body.chainByAspect(ident_, bodyNext_, bodyPrev_);
             }

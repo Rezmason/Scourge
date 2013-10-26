@@ -56,7 +56,7 @@ class DecayRuleTest extends ScourgeRuleTest
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
-        var bodyNode:BoardNode = state.nodes[state.players[0][bodyFirst_]];
+        var bodyNode:BoardLocus = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
 
@@ -75,8 +75,8 @@ class DecayRuleTest extends ScourgeRuleTest
         makeState([decayRule], 1, TestBoards.loosePetri);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var head:BoardNode = state.nodes[state.players[0][head_]];
-        var bump:BoardNode = head.nw();
+        var head:BoardLocus = state.nodes[state.players[0][head_]];
+        var bump:BoardLocus = head.nw();
 
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);

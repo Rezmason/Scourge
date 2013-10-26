@@ -3,7 +3,7 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.GridNode;
+import net.rezmason.ropes.GridLocus;
 
 using net.rezmason.ropes.GridUtils;
 
@@ -29,11 +29,11 @@ class GridUtilsTest {
     public function rowTest():Void {
         nodeItr = 0;
 
-        var node:GridNode<Int> = makeNode();
-        var first:GridNode<Int> = node;
+        var node:GridLocus<Int> = makeNode();
+        var first:GridLocus<Int> = node;
         Assert.areEqual(0, node.value);
         for (i in 1...10) node = node.attach(makeNode(), Gr.e);
-        var last:GridNode<Int> = node;
+        var last:GridLocus<Int> = node;
         Assert.areEqual(10 - 1, node.run(Gr.e).value);
         Assert.areEqual(last, first.run(Gr.e));
         Assert.areEqual(first, last.run(Gr.w));
@@ -57,8 +57,8 @@ class GridUtilsTest {
 
     function underFiveOnly(val:Int, connection:Int):Bool { return val < 5; }
 
-    function makeNode():GridNode<Int> {
-        var node:GridNode<Int> = new GridNode<Int>(nodeItr, nodeItr);
+    function makeNode():GridLocus<Int> {
+        var node:GridLocus<Int> = new GridLocus<Int>(nodeItr, nodeItr);
         nodeItr++;
         return node;
     }

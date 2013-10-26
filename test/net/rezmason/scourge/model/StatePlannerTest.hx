@@ -4,7 +4,7 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.ropes.Aspect;
-import net.rezmason.ropes.GridNode;
+import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.State;

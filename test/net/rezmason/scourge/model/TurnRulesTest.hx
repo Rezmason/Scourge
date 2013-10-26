@@ -88,7 +88,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         var currentPlayer:Int = state.aspects[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
-        var playerHead:BoardNode = state.nodes[head];
+        var playerHead:BoardLocus = state.nodes[head];
 
         forfeitRule.update();
         var moves:Array<Move> = forfeitRule.moves;
@@ -128,7 +128,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         var currentPlayer:Int = state.aspects[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
-        var playerHead:BoardNode = state.nodes[head];
+        var playerHead:BoardLocus = state.nodes[head];
 
         playerHead.value[occupier_] = 1;
 

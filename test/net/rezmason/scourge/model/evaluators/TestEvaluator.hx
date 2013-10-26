@@ -20,7 +20,7 @@ class TestEvaluator extends Evaluator {
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var head:Int = state.players[currentPlayer][head_];
 
-        var playerHead:BoardNode = state.nodes[head];
+        var playerHead:BoardLocus = state.nodes[head];
 
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);

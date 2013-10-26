@@ -317,8 +317,8 @@ class BiteRuleTest extends ScourgeRuleTest
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var enemyHeadID:Int = state.players[1][head_];
-        var enemyHead:BoardNode = state.nodes[enemyHeadID];
-        var cavity:BoardNode = enemyHead.s().s().e();
+        var enemyHead:BoardLocus = state.nodes[enemyHeadID];
+        var cavity:BoardLocus = enemyHead.s().s().e();
         cavity.value[occupier_] = 1;
 
         VisualAssert.assert('two player bite with small cavity in player one', state.spitBoard(plan, true, freshnessBoardMod));
@@ -352,7 +352,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
-        var bodyNode:BoardNode = state.nodes[state.players[1][bodyFirst_]];
+        var bodyNode:BoardLocus = state.nodes[state.players[1][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(expectedSize, bodyNode, bodyNext_, bodyPrev_));
     }

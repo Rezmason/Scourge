@@ -2,7 +2,7 @@ package net.rezmason.scourge.model;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.Types;
-import net.rezmason.ropes.GridNode;
+import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlan;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
@@ -18,7 +18,7 @@ class BoardUtils {
 
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
-    public inline static function grabXY(state:State, east:Int, south:Int):BoardNode {
+    public inline static function grabXY(state:State, east:Int, south:Int):BoardLocus {
         return state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n).run(Gr.s, south).run(Gr.e, east);
     }
 
@@ -31,7 +31,7 @@ class BoardUtils {
 
         var str:String = '';
 
-        var grid:BoardNode = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n);
+        var grid:BoardLocus = state.nodes[0].run(Gr.nw).run(Gr.w).run(Gr.n);
 
         var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
@@ -69,27 +69,27 @@ class BoardUtils {
         return str;
     }
 
-    public inline static function iterate(_node:BoardNode, _nodes:Array<BoardNode>, _aspectPointer:AspectPtr):BoardNodeIterator {
-        return new BoardNodeIterator(_node, _nodes, _aspectPointer);
+    public inline static function iterate(_node:BoardLocus, _nodes:Array<BoardLocus>, _aspectPointer:AspectPtr):BoardLocusIterator {
+        return new BoardLocusIterator(_node, _nodes, _aspectPointer);
     }
 
-    public inline static function boardListToArray(_node:BoardNode, _nodes:Array<BoardNode>, _aspectPointer:AspectPtr):Array<BoardNode> {
-        var arr:Array<BoardNode> = [];
+    public inline static function boardListToArray(_node:BoardLocus, _nodes:Array<BoardLocus>, _aspectPointer:AspectPtr):Array<BoardLocus> {
+        var arr:Array<BoardLocus> = [];
         for (node in iterate(_node, _nodes, _aspectPointer)) arr.push(node);
         return arr;
     }
 
-    public inline static function boardListToMap(_node:BoardNode, _nodes:Array<BoardNode>, _aspectPointer:AspectPtr):Map<Int, BoardNode> {
-        var map:Map<Int, BoardNode> = new Map();
+    public inline static function boardListToMap(_node:BoardLocus, _nodes:Array<BoardLocus>, _aspectPointer:AspectPtr):Map<Int, BoardLocus> {
+        var map:Map<Int, BoardLocus> = new Map();
         for (node in iterate(_node, _nodes, _aspectPointer)) map[node.id] = node;
         return map;
     }
 
-    public inline static function removeNode(node:BoardNode, nodes:Array<BoardNode>, next:AspectPtr, prev:AspectPtr):BoardNode {
+    public inline static function removeNode(node:BoardLocus, nodes:Array<BoardLocus>, next:AspectPtr, prev:AspectPtr):BoardLocus {
         var nextNodeID:Int = node.value[next];
         var prevNodeID:Int = node.value[prev];
 
-        var nextNode:BoardNode = null;
+        var nextNode:BoardLocus = null;
 
         if (nextNodeID != Aspect.NULL) {
             node.value[next] = Aspect.NULL;
@@ -105,7 +105,7 @@ class BoardUtils {
         return nextNode;
     }
 
-    public inline static function addNode(node:BoardNode, addedNode:BoardNode, nodes:Array<BoardNode>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):BoardNode {
+    public inline static function addNode(node:BoardLocus, addedNode:BoardLocus, nodes:Array<BoardLocus>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):BoardLocus {
         var prevNodeID:Int = node.value[prev];
         var addedNodeID:Int = addedNode.value[id];
 
@@ -113,24 +113,24 @@ class BoardUtils {
         addedNode.value[prev] = prevNodeID;
         node.value[prev] = addedNodeID;
         if (prevNodeID != Aspect.NULL) {
-            var prevNode:BoardNode = nodes[prevNodeID];
+            var prevNode:BoardLocus = nodes[prevNodeID];
             prevNode.value[next] = addedNodeID;
         }
 
         return addedNode;
     }
 
-    public inline static function chainByAspect(nodes:Array<BoardNode>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):Void {
+    public inline static function chainByAspect(nodes:Array<BoardLocus>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):Void {
         nodes = nodes.copy();
         while (nodes.remove(null)) {}
 
         if (nodes.length > 0) {
-            var node:BoardNode = nodes[0];
+            var node:BoardLocus = nodes[0];
 
             node.value[prev] = Aspect.NULL;
 
             for (ike in 1...nodes.length) {
-                var nextNode:BoardNode = nodes[ike];
+                var nextNode:BoardLocus = nodes[ike];
                 node.value[next] = nextNode.value[id];
                 nextNode.value[prev] = node.value[id];
                 node = nextNode;
@@ -141,13 +141,13 @@ class BoardUtils {
     }
 }
 
-class BoardNodeIterator {
+class BoardLocusIterator {
 
-    private var node:BoardNode;
-    private var nodes:Array<BoardNode>;
+    private var node:BoardLocus;
+    private var nodes:Array<BoardLocus>;
     private var aspectPointer:AspectPtr;
 
-    public function new(_node:BoardNode, _nodes:Array<BoardNode>, _aspectPointer:AspectPtr):Void {
+    public function new(_node:BoardLocus, _nodes:Array<BoardLocus>, _aspectPointer:AspectPtr):Void {
         node = _node;
         nodes = _nodes;
         aspectPointer = _aspectPointer;
@@ -157,8 +157,8 @@ class BoardNodeIterator {
         return node != null;
     }
 
-    public function next():BoardNode {
-        var lastNode:BoardNode = node;
+    public function next():BoardLocus {
+        var lastNode:BoardLocus = node;
         var nodeIndex:Int = node.value[aspectPointer];
         if (nodeIndex == Aspect.NULL) node = null;
         else node = nodes[nodeIndex];

@@ -45,8 +45,8 @@ class EatCellsRule extends Rule {
 
         var currentPlayer:Int = state.aspects[currentPlayer_];
         var head:Int = getPlayer(currentPlayer)[head_];
-        var playerHead:BoardNode = getNode(head);
-        var bodyNode:BoardNode = getNode(getPlayer(currentPlayer)[bodyFirst_]);
+        var playerHead:BoardLocus = getNode(head);
+        var bodyNode:BoardLocus = getNode(getPlayer(currentPlayer)[bodyFirst_]);
         var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
 
         // List all the players' heads
@@ -56,23 +56,23 @@ class EatCellsRule extends Rule {
 
         // Find all fresh body nodes of the current player
 
-        var newNodes:List<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFresh).list();
+        var newNodes:List<BoardLocus> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFresh).list();
 
-        var newNodesMap:Map<Int, BoardNode> = new Map();
+        var newNodesMap:Map<Int, BoardLocus> = new Map();
         for (node in newNodes) newNodesMap[node.id] = node;
 
-        var eatenNodes:Map<Int, BoardNode> = new Map();
+        var eatenNodes:Map<Int, BoardLocus> = new Map();
 
         // We search space for uninterrupted regions of player cells that begin and end
         // with cells of the current player. We propagate these searches from cells
         // that have been freshly eaten, starting with the current player's fresh nodes
 
-        var node:BoardNode = newNodes.pop();
+        var node:BoardLocus = newNodes.pop();
         if (node != null) newNodesMap.remove(node.id);
         while (node != null) {
             // search in all directions
             for (direction in directionsFor(cfg.orthoOnly)) {
-                var pendingNodes:Array<BoardNode> = [];
+                var pendingNodes:Array<BoardLocus> = [];
                 for (scout in node.walk(direction)) {
                     if (scout == node) continue; // starting node
                     if (scout.value[isFilled_] > 0) {
@@ -118,8 +118,8 @@ class EatCellsRule extends Rule {
 
             var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != Aspect.NULL) {
-                var body:Array<BoardNode> = getNode(bodyFirst).boardListToArray(state.nodes, bodyNext_);
-                var revisedBody:Array<BoardNode> = [];
+                var body:Array<BoardLocus> = getNode(bodyFirst).boardListToArray(state.nodes, bodyNext_);
+                var revisedBody:Array<BoardLocus> = [];
                 for (node in body) {
                     if (node.value[isFilled_] == Aspect.TRUE && node.value[occupier_] == playerID) revisedBody.push(node);
                 }
@@ -130,7 +130,7 @@ class EatCellsRule extends Rule {
 
             var head:Int = player[head_];
             if (head != Aspect.NULL) {
-                var headNode:BoardNode = getNode(head);
+                var headNode:BoardLocus = getNode(head);
                 if (headNode.value[occupier_] != playerID) player[head_] = Aspect.NULL;
             }
         }
@@ -144,8 +144,8 @@ class EatCellsRule extends Rule {
         getPlayer(currentPlayer)[bodyFirst_] = getID(bodyNode.value);
     }
 
-    function getBody(playerID:Int):Array<BoardNode> {
-        var bodyNode:BoardNode = getNode(getPlayer(playerID)[bodyFirst_]);
+    function getBody(playerID:Int):Array<BoardLocus> {
+        var bodyNode:BoardLocus = getNode(getPlayer(playerID)[bodyFirst_]);
         return bodyNode.boardListToArray(state.nodes, bodyNext_);
     }
 
@@ -154,7 +154,7 @@ class EatCellsRule extends Rule {
         return me[occupier_] == you[occupier_];
     }
 
-    function isFresh(node:BoardNode):Bool {
+    function isFresh(node:BoardLocus):Bool {
         return node.value[freshness_] > 0;
     }
 

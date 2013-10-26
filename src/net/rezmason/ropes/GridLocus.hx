@@ -1,8 +1,8 @@
 package net.rezmason.ropes;
 
-class GridNode<T> {
+class GridLocus<T> {
     public var value(default, null):T;
-    public var neighbors(default, null):Array<GridNode<T>>;
+    public var neighbors(default, null):Array<GridLocus<T>>;
     public var headingOffsets(default, null):Array<Int>;
     public var id(default, null):Int;
 

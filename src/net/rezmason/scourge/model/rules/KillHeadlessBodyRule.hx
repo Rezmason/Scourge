@@ -44,13 +44,13 @@ class KillHeadlessBodyRule extends Rule {
 
             if (head != Aspect.NULL) {
                 var bodyFirst:Int = player[bodyFirst_];
-                var playerHead:BoardNode = getNode(head);
+                var playerHead:BoardLocus = getNode(head);
                 if (playerHead.value[occupier_] != playerID || playerHead.value[isFilled_] == Aspect.FALSE) {
 
                     // Destroy the head and body
 
                     player[head_] = Aspect.NULL;
-                    var bodyNode:BoardNode = getNode(bodyFirst);
+                    var bodyNode:BoardLocus = getNode(bodyFirst);
                     for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
                     player[bodyFirst_] = Aspect.NULL;
                 }
@@ -64,7 +64,7 @@ class KillHeadlessBodyRule extends Rule {
         // trace('---');
     }
 
-    function killCell(node:BoardNode, maxFreshness:Int):Void {
+    function killCell(node:BoardLocus, maxFreshness:Int):Void {
         node.value[isFilled_] = Aspect.FALSE;
         node.value[occupier_] = Aspect.NULL;
         node.value[freshness_] = maxFreshness;

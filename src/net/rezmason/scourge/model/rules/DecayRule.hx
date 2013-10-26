@@ -43,7 +43,7 @@ class DecayRule extends Rule {
 
         // Grab all the player heads
 
-        var heads:Map<Int, BoardNode> = new Map();
+        var heads:Map<Int, BoardLocus> = new Map();
         for (player in eachPlayer()) {
             var headIndex:Int = player[head_];
             if (headIndex != Aspect.NULL && getNode(headIndex).value[occupier_] == getID(player)) {
@@ -52,7 +52,7 @@ class DecayRule extends Rule {
         }
 
         // Use the heads as starting points for a flood fill of connected living cells
-        var livingBodyNeighbors:Map<Int, BoardNode> = heads.expandGraph(cfg.orthoOnly, isLivingBodyNeighbor);
+        var livingBodyNeighbors:Map<Int, BoardLocus> = heads.expandGraph(cfg.orthoOnly, isLivingBodyNeighbor);
 
         // Remove cells from player bodies
         for (player in eachPlayer()) {
@@ -79,12 +79,12 @@ class DecayRule extends Rule {
         return me[occupier_] == you[occupier_];
     }
 
-    function killCell(node:BoardNode, maxFreshness:Int, firstIndex:Int):Int {
+    function killCell(node:BoardLocus, maxFreshness:Int, firstIndex:Int):Int {
         node.value[isFilled_] = Aspect.FALSE;
         node.value[occupier_] = Aspect.NULL;
         node.value[freshness_] = maxFreshness;
 
-        var nextNode:BoardNode = node.removeNode(state.nodes, bodyNext_, bodyPrev_);
+        var nextNode:BoardLocus = node.removeNode(state.nodes, bodyNext_, bodyPrev_);
         if (firstIndex == getID(node.value)) {
             firstIndex = (nextNode == null) ? Aspect.NULL : getID(nextNode.value);
         }

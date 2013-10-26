@@ -2,7 +2,7 @@ package net.rezmason.ropes;
 
 import haxe.Serializer;
 import haxe.Unserializer;
-import net.rezmason.ropes.GridNode;
+import net.rezmason.ropes.GridLocus;
 
 using Lambda;
 using net.rezmason.utils.MapUtils;
@@ -12,7 +12,7 @@ typedef SpreadFilter<T> = T->T->Bool;
 class GridUtils {
 
     // Creates an iterator for walking along a grid in one direction
-    public inline static function walk<T> (node:GridNode<T>, direction:Int):GridWalker<T> {
+    public inline static function walk<T> (node:GridLocus<T>, direction:Int):GridWalker<T> {
         return new GridWalker<T>(node, direction);
     }
 
@@ -21,7 +21,7 @@ class GridUtils {
     public inline static function orthoDirections():Iterator<Int> { return [0, 2, 4, 6].iterator(); }
 
     // Returns the furthest reachable node from the given node in the specified direction
-    public inline static function run<T> (node:GridNode<T>, direction:Int, maxDist:Int = -1):GridNode<T> {
+    public inline static function run<T> (node:GridLocus<T>, direction:Int, maxDist:Int = -1):GridLocus<T> {
         var distance:Int = 0;
         while (node.neighbors[direction] != null && distance != maxDist) {
             node = node.neighbors[direction];
@@ -30,7 +30,7 @@ class GridUtils {
         return node;
     }
 
-    public inline static function attach<T> (node1:GridNode<T>, node2:GridNode<T>, directionForward:Int, directionBack:Int = -1):GridNode<T> {
+    public inline static function attach<T> (node1:GridLocus<T>, node2:GridLocus<T>, directionForward:Int, directionBack:Int = -1):GridLocus<T> {
         if (node1 != null) {
             node1.neighbors[directionForward] = node2;
             node1.headingOffsets[directionForward] = 0;
@@ -43,31 +43,31 @@ class GridUtils {
         return node2;
     }
 
-    public inline static function allNeighbors<T>(node:GridNode<T>):Array<GridNode<T>> {
+    public inline static function allNeighbors<T>(node:GridLocus<T>):Array<GridLocus<T>> {
         return node.neighbors;
     }
 
-    public inline static function orthoNeighbors<T>(node:GridNode<T>):Array<GridNode<T>> {
+    public inline static function orthoNeighbors<T>(node:GridLocus<T>):Array<GridLocus<T>> {
         return [n(node), e(node), s(node), w(node)];
     }
 
-    public inline static function diagNeighbors<T>(node:GridNode<T>):Array<GridNode<T>> {
+    public inline static function diagNeighbors<T>(node:GridLocus<T>):Array<GridLocus<T>> {
         return [ne(node), se(node), sw(node), nw(node)];
     }
 
-    public inline static function getGraph<T>(source:GridNode<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Map<Int, GridNode<T>> {
+    public inline static function getGraph<T>(source:GridLocus<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Map<Int, GridLocus<T>> {
         return expandGraph([source.id => source], orthoOnly, spreadFilter);
     }
 
-    public inline static function expandGraph<T>(sources:Map<Int, GridNode<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Map<Int, GridNode<T>> {
-        var nodes:Map<Int, GridNode<T>> = new Map();
+    public inline static function expandGraph<T>(sources:Map<Int, GridLocus<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Map<Int, GridLocus<T>> {
+        var nodes:Map<Int, GridLocus<T>> = new Map();
         nodes.absorb(sources);
-        var newNodes:List<GridNode<T>> = sources.list();
+        var newNodes:List<GridLocus<T>> = sources.list();
 
-        var node:GridNode<T> = newNodes.pop();
+        var node:GridLocus<T> = newNodes.pop();
         while (node != null) {
 
-            var neighbors:Array<GridNode<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
+            var neighbors:Array<GridLocus<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
 
             for (neighbor in neighbors) {
                 if (neighbor != null && !nodes.exists(neighbor.id) && (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
@@ -81,21 +81,21 @@ class GridUtils {
         return nodes;
     }
 
-    public inline static function getGraphSequence<T>(source:GridNode<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridNode<T>> {
+    public inline static function getGraphSequence<T>(source:GridLocus<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
         return expandGraphSequence([source], orthoOnly, spreadFilter);
     }
 
-    public inline static function expandGraphSequence<T>(sources:Array<GridNode<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridNode<T>> {
-        var nodes:Array<GridNode<T>> = sources.copy();
-        var newNodes:List<GridNode<T>> = sources.list();
+    public inline static function expandGraphSequence<T>(sources:Array<GridLocus<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
+        var nodes:Array<GridLocus<T>> = sources.copy();
+        var newNodes:List<GridLocus<T>> = sources.list();
 
-        var nodesByID:Map<Int, GridNode<T>> = new Map();
+        var nodesByID:Map<Int, GridLocus<T>> = new Map();
         for (node in nodes) nodesByID[node.id] = node;
 
-        var node:GridNode<T> = newNodes.pop();
+        var node:GridLocus<T> = newNodes.pop();
         while (node != null) {
 
-            var neighbors:Array<GridNode<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
+            var neighbors:Array<GridLocus<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
 
             for (neighbor in neighbors) {
                 if (neighbor != null && !nodesByID.exists(neighbor.id) && (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
@@ -110,7 +110,7 @@ class GridUtils {
         return nodes;
     }
 
-    public inline static function serializeGrid<T>(s:Serializer, sourceList:Array<GridNode<T>>):Void {
+    public inline static function serializeGrid<T>(s:Serializer, sourceList:Array<GridLocus<T>>):Void {
         var data:Array<Array<Dynamic>> = [];
 
         for (node in sourceList) {
@@ -125,16 +125,16 @@ class GridUtils {
         s.serialize(data);
     }
 
-    public inline static function unserializeGrid<T>(s:Unserializer):Array<GridNode<T>> {
+    public inline static function unserializeGrid<T>(s:Unserializer):Array<GridLocus<T>> {
         var data:Array<Array<Dynamic>> = s.unserialize();
 
-        var nodes:Array<GridNode<T>> = [];
+        var nodes:Array<GridLocus<T>> = [];
 
-        for (ike in 0...data.length) nodes.push(new GridNode<T>(ike, data[ike][0]));
+        for (ike in 0...data.length) nodes.push(new GridLocus<T>(ike, data[ike][0]));
         for (ike in 0...nodes.length) {
             var neighbors:Array<Null<Int>> = data[ike][1];
             var headingOffsets:Array<Null<Int>> = data[ike][2];
-            var node:GridNode<T> = nodes[ike];
+            var node:GridLocus<T> = nodes[ike];
             for (ike in 0...neighbors.length) if (neighbors[ike] != -1) node.neighbors[ike] = nodes[neighbors[ike]];
             for (ike in 0...headingOffsets.length) node.headingOffsets[ike] = headingOffsets[ike];
         }
@@ -143,22 +143,22 @@ class GridUtils {
     }
 
     // Shortcuts
-    public inline static function nw<T> (node:GridNode<T>):GridNode<T> { return node.neighbors[Gr.nw]; }
-    public inline static function  n<T> (node:GridNode<T>):GridNode<T> { return node.neighbors[Gr.n ]; }
-    public inline static function ne<T> (node:GridNode<T>):GridNode<T> { return node.neighbors[Gr.ne]; }
-    public inline static function  e<T> (node:GridNode<T>):GridNode<T> { return node.neighbors[Gr.e ]; }
-    public inline static function se<T> (node:GridNode<T>):GridNode<T> { return node.neighbors[Gr.se]; }
-    public inline static function  s<T> (node:GridNode<T>):GridNode<T> { return node.neighbors[Gr.s ]; }
-    public inline static function sw<T> (node:GridNode<T>):GridNode<T> { return node.neighbors[Gr.sw]; }
-    public inline static function  w<T> (node:GridNode<T>):GridNode<T> { return node.neighbors[Gr.w ]; }
+    public inline static function nw<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.nw]; }
+    public inline static function  n<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.n ]; }
+    public inline static function ne<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.ne]; }
+    public inline static function  e<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.e ]; }
+    public inline static function se<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.se]; }
+    public inline static function  s<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.s ]; }
+    public inline static function sw<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.sw]; }
+    public inline static function  w<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.w ]; }
 }
 
 class GridWalker<T> {
 
-    var node:GridNode<T>;
+    var node:GridLocus<T>;
     var direction:Int;
 
-    public function new(_node:GridNode<T>, _direction:Int):Void {
+    public function new(_node:GridLocus<T>, _direction:Int):Void {
         node = _node;
         direction = _direction;
     }
@@ -167,8 +167,8 @@ class GridWalker<T> {
         return node != null;
     }
 
-    public function next():GridNode<T> {
-        var lastNode:GridNode<T> = node;
+    public function next():GridLocus<T> {
+        var lastNode:GridLocus<T> = node;
         node = node.neighbors[direction];
         return lastNode;
     }

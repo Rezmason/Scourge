@@ -4,7 +4,7 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.ropes.Aspect;
-import net.rezmason.ropes.GridNode;
+import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.Types;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
@@ -58,7 +58,7 @@ class BoardRuleTest extends ScourgeRuleTest {
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
         var currentPlayer:Int = state.aspects[currentPlayer_];
 
-        var playerHead:BoardNode = state.nodes[state.players[currentPlayer][head_]];
+        var playerHead:BoardLocus = state.nodes[state.players[currentPlayer][head_]];
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);

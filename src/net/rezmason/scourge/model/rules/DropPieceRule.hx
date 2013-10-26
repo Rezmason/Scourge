@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
-import net.rezmason.ropes.GridNode;
+import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.PieceTypes;
@@ -32,7 +32,7 @@ typedef DropPieceConfig = {
 typedef DropPieceMove = {>Move,
     var targetNode:Int;
     var numAddedNodes:Int;
-    var addedNodes:Map<Int, BoardNode>;
+    var addedNodes:Map<Int, BoardLocus>;
     var pieceID:Int;
     var rotation:Int;
     var reflection:Int;
@@ -89,10 +89,10 @@ class DropPieceRule extends Rule {
 
         // get current player head
         var currentPlayer:Int = state.aspects[currentPlayer_];
-        var bodyNode:BoardNode = getNode(getPlayer(currentPlayer)[bodyFirst_]);
+        var bodyNode:BoardLocus = getNode(getPlayer(currentPlayer)[bodyFirst_]);
 
         // Find edge nodes of current player
-        var edgeNodes:Array<BoardNode> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge);
+        var edgeNodes:Array<BoardLocus> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFreeEdge);
 
         var pieceReflection:Int = state.aspects[pieceReflection_];
         var pieceRotation:Int = state.aspects[pieceRotation_];
@@ -134,10 +134,10 @@ class DropPieceRule extends Rule {
                             var valid:Bool = true;
 
                             var numAddedNodes:Int = 0;
-                            var addedNodes:Map<Int, BoardNode> = new Map();
+                            var addedNodes:Map<Int, BoardLocus> = new Map();
 
                             for (coord in rotation[0]) {
-                                var nodeAtCoord:BoardNode = walkNode(node, coord, homeCoord);
+                                var nodeAtCoord:BoardLocus = walkNode(node, coord, homeCoord);
                                 addedNodes[getID(nodeAtCoord.value)] = nodeAtCoord;
                                 numAddedNodes++;
                                 var occupier:Int = nodeAtCoord.value[occupier_];
@@ -190,12 +190,12 @@ class DropPieceRule extends Rule {
 
         if (move.targetNode != Aspect.NULL) {
             var pieceGroup:PieceGroup = cfg.pieces.getPieceById(move.pieceID);
-            var node:BoardNode = getNode(move.targetNode);
+            var node:BoardLocus = getNode(move.targetNode);
             var coords:Array<IntCoord> = pieceGroup[move.reflection][move.rotation][0];
             var homeCoord:IntCoord = move.coord;
             var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
 
-            var bodyNode:BoardNode = getNode(getPlayer(currentPlayer)[bodyFirst_]);
+            var bodyNode:BoardLocus = getNode(getPlayer(currentPlayer)[bodyFirst_]);
 
             for (coord in coords) bodyNode = fillAndOccupyCell(walkNode(node, coord, homeCoord), currentPlayer, maxFreshness, bodyNode);
             player[bodyFirst_] = getID(bodyNode.value);
@@ -210,11 +210,11 @@ class DropPieceRule extends Rule {
         state.aspects[pieceTableID_] = Aspect.NULL;
     }
 
-    inline function isFreeEdge(node:BoardNode):Bool {
+    inline function isFreeEdge(node:BoardLocus):Bool {
         return neighborsFor(node, cfg.orthoOnly).exists(isVacant);
     }
 
-    inline function isVacant(node:BoardNode):Bool {
+    inline function isVacant(node:BoardLocus):Bool {
         return node.value[isFilled_] == Aspect.FALSE;
     }
 
@@ -226,7 +226,7 @@ class DropPieceRule extends Rule {
         return val;
     }
 
-    inline function fillAndOccupyCell(node:BoardNode, currentPlayer:Int, maxFreshness, bodyNode:BoardNode):BoardNode {
+    inline function fillAndOccupyCell(node:BoardLocus, currentPlayer:Int, maxFreshness, bodyNode:BoardLocus):BoardLocus {
         var me:AspectSet = node.value;
         if (me[occupier_] != currentPlayer || me[isFilled_] == Aspect.FALSE) me[freshness_] = maxFreshness;
         me[occupier_] = currentPlayer;
@@ -235,7 +235,7 @@ class DropPieceRule extends Rule {
     }
 
     // A works-for-now function for translating piece coords into nodes accessible from a given starting point
-    inline function walkNode(node:BoardNode, fromCoord:IntCoord, toCoord:IntCoord):BoardNode {
+    inline function walkNode(node:BoardLocus, fromCoord:IntCoord, toCoord:IntCoord):BoardLocus {
         var dn:Int = 0;
         var dw:Int = 0;
         var de:Int = toCoord[0] - fromCoord[0];
@@ -254,7 +254,7 @@ class DropPieceRule extends Rule {
         return node.run(Gr.n, dn).run(Gr.s, ds).run(Gr.e, de).run(Gr.w, dw);
     }
 
-    inline function neighborsFor(node:BoardNode, ortho:Bool):Array<BoardNode> {
+    inline function neighborsFor(node:BoardLocus, ortho:Bool):Array<BoardLocus> {
         return ortho ? node.orthoNeighbors() : node.allNeighbors();
     }
 }

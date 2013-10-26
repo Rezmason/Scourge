@@ -9,7 +9,7 @@ class State {
 
     public var aspects(default, null):AspectSet;
     public var players(default, null):Array<AspectSet>;
-    public var nodes(default, null):Array<GridNode<AspectSet>>; // aka BoardNode
+    public var nodes(default, null):Array<GridLocus<AspectSet>>; // aka BoardLocus
     public var extras(default, null):Array<AspectSet>;
     public var key(default, set):PtrKey;
 
