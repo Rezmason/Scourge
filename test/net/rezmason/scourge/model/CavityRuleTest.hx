@@ -62,7 +62,7 @@ class CavityRuleTest extends ScourgeRuleTest
         var cavityFirst_:AspectPtr = plan.onPlayer(BodyAspect.CAVITY_FIRST);
         var cavityNext_:AspectPtr = plan.onNode(BodyAspect.CAVITY_NEXT);
         var cavityPrev_:AspectPtr = plan.onNode(BodyAspect.CAVITY_PREV);
-        var cavityNode:BoardLocus = state.nodes[state.players[0][cavityFirst_]];
+        var cavityNode:AspectSet = state.nodes[state.players[0][cavityFirst_]];
         Assert.areEqual(0, testListLength(numCavityCells, cavityNode, cavityNext_, cavityPrev_));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
@@ -77,7 +77,7 @@ class CavityRuleTest extends ScourgeRuleTest
         makeState([cavityRule], 1, TestBoards.cavityCity);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var head:BoardLocus = state.nodes[state.players[0][head_]];
+        var head:BoardLocus = state.loci[state.players[0][head_]];
         var bump:BoardLocus = head.run(Gr.s, 5);
 
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
@@ -113,7 +113,7 @@ class CavityRuleTest extends ScourgeRuleTest
         var cavityFirst_:AspectPtr = plan.onPlayer(BodyAspect.CAVITY_FIRST);
         var cavityNext_:AspectPtr = plan.onNode(BodyAspect.CAVITY_NEXT);
         var cavityPrev_:AspectPtr = plan.onNode(BodyAspect.CAVITY_PREV);
-        var cavityNode:BoardLocus = state.nodes[state.players[0][cavityFirst_]];
+        var cavityNode:AspectSet = state.nodes[state.players[0][cavityFirst_]];
         Assert.areEqual(0, testListLength(numCavityCells, cavityNode, cavityNext_, cavityPrev_));
 
         totalArea = state.players[0][totalArea_];

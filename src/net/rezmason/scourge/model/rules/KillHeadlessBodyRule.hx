@@ -9,8 +9,7 @@ import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
 
-//using net.rezmason.ropes.GridUtils;
-using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.Pointers;
 
 class KillHeadlessBodyRule extends Rule {
@@ -44,14 +43,14 @@ class KillHeadlessBodyRule extends Rule {
 
             if (head != Aspect.NULL) {
                 var bodyFirst:Int = player[bodyFirst_];
-                var playerHead:BoardLocus = getNode(head);
-                if (playerHead.value[occupier_] != playerID || playerHead.value[isFilled_] == Aspect.FALSE) {
+                var playerHead:AspectSet = getNode(head);
+                if (playerHead[occupier_] != playerID || playerHead[isFilled_] == Aspect.FALSE) {
 
                     // Destroy the head and body
 
                     player[head_] = Aspect.NULL;
-                    var bodyNode:BoardLocus = getNode(bodyFirst);
-                    for (node in bodyNode.boardListToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
+                    var bodyNode:AspectSet = getNode(bodyFirst);
+                    for (node in bodyNode.listToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
                     player[bodyFirst_] = Aspect.NULL;
                 }
             }
@@ -64,12 +63,12 @@ class KillHeadlessBodyRule extends Rule {
         // trace('---');
     }
 
-    function killCell(node:BoardLocus, maxFreshness:Int):Void {
-        node.value[isFilled_] = Aspect.FALSE;
-        node.value[occupier_] = Aspect.NULL;
-        node.value[freshness_] = maxFreshness;
+    function killCell(node:AspectSet, maxFreshness:Int):Void {
+        node[isFilled_] = Aspect.FALSE;
+        node[occupier_] = Aspect.NULL;
+        node[freshness_] = maxFreshness;
 
-        node.removeNode(state.nodes, bodyNext_, bodyPrev_);
+        node.removeSet(state.nodes, bodyNext_, bodyPrev_);
     }
 }
 

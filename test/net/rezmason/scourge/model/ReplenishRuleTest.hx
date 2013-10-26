@@ -94,9 +94,9 @@ class ReplenishRuleTest extends ScourgeRuleTest
             }
 
             for (node in state.nodes) {
-                Assert.areEqual(expectedValues1[index1], node.value[nodeValue1_]);
-                Assert.areEqual(expectedValues2[index2], node.value[nodeValue2_]);
-                Assert.areEqual(expectedValues3[index3], node.value[nodeValue3_]);
+                Assert.areEqual(expectedValues1[index1], node[nodeValue1_]);
+                Assert.areEqual(expectedValues2[index2], node[nodeValue2_]);
+                Assert.areEqual(expectedValues3[index3], node[nodeValue3_]);
             }
 
             replenishRule.chooseMove();

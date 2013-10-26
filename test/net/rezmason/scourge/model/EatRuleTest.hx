@@ -67,7 +67,7 @@ class EatRuleTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 6, numCells);
 
-        var bodyNode:BoardLocus = state.nodes[state.players[0][bodyFirst_]];
+        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -103,7 +103,7 @@ class EatRuleTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 6 + 1, numCells);
 
-        var bodyNode:BoardLocus = state.nodes[state.players[0][bodyFirst_]];
+        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -135,7 +135,7 @@ class EatRuleTest extends ScourgeRuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 13, numCells); // Eat everything
 
-        var bodyNode:BoardLocus = state.nodes[state.players[0][bodyFirst_]];
+        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -165,7 +165,7 @@ class EatRuleTest extends ScourgeRuleTest
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
-        var bodyNode:BoardLocus = state.nodes[state.players[0][bodyFirst_]];
+        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }
@@ -203,7 +203,7 @@ class EatRuleTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(76 + 14, numCells);
 
-        var bodyNode:BoardLocus = state.nodes[state.players[0][bodyFirst_]];
+        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
     }

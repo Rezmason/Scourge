@@ -65,9 +65,6 @@ class StatePlannerTest {
 
         // Make sure there's the right aspects on each node
         var nodeTestValue_:AspectPtr = plan.onNode(TestAspect.VALUE_1);
-
-        for (node in state.nodes) {
-            Assert.isNotNull(node.value[nodeTestValue_]);
-        }
+        for (node in state.nodes) Assert.isNotNull(node[nodeTestValue_]);
     }
 }

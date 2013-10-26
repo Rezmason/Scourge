@@ -8,7 +8,7 @@ import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
-using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.ropes.AspectUtils;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 
@@ -127,29 +127,31 @@ class BuildBoardRule extends Rule {
         return {x:maxX, y:maxY};
     }
 
-    inline function makeNode():BoardLocus {
+    inline function makeNodeAndLocus():BoardLocus {
         var id:Int = numNodes();
-        var node:BoardLocus = new BoardLocus(id, nodeAspectTemplate.copy());
-        node.value[ident_] = id;
+        var node:AspectSet = nodeAspectTemplate.copy();
+        node[ident_] = id;
         state.nodes.push(node);
 
-        var histAspects:AspectSet = nodeAspectTemplate.map(cfg.buildCfg.history.alloc);
-        var histNode:BoardLocus = new BoardLocus(id, histAspects);
+        var locus:BoardLocus = new BoardLocus(id, node);
+        state.loci.push(locus);
+
+        var histNode:AspectSet = nodeAspectTemplate.map(cfg.buildCfg.history.alloc);
         cfg.buildCfg.historyState.nodes.push(histNode);
 
-        return node;
+        return locus;
     }
 
     inline function makeSquareGraph(width:Int):BoardLocus {
 
         // Make a connected grid of nodes with default values
-        var node:BoardLocus = makeNode();
-        for (ike in 1...width) node = node.attach(makeNode(), Gr.e);
+        var locus:BoardLocus = makeNodeAndLocus();
+        for (ike in 1...width) locus = locus.attach(makeNodeAndLocus(), Gr.e);
 
-        var row:BoardLocus = node.run(Gr.w);
+        var row:BoardLocus = locus.run(Gr.w);
         for (ike in 1...width) {
             for (column in row.walk(Gr.e)) {
-                var next:BoardLocus = makeNode();
+                var next:BoardLocus = makeNodeAndLocus();
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);
@@ -159,14 +161,14 @@ class BuildBoardRule extends Rule {
         }
 
         // run to the northwest
-        return node.run(Gr.nw).run(Gr.n).run(Gr.w);
+        return locus.run(Gr.nw).run(Gr.n).run(Gr.w);
     }
 
     inline function obstructGraphRim(grid:BoardLocus):Void {
-        for (node in grid.walk(Gr.e)) node.value[isFilled_] = Aspect.TRUE;
-        for (node in grid.walk(Gr.s)) node.value[isFilled_] = Aspect.TRUE;
-        for (node in grid.run(Gr.s).walk(Gr.e)) node.value[isFilled_] = Aspect.TRUE;
-        for (node in grid.run(Gr.e).walk(Gr.s)) node.value[isFilled_] = Aspect.TRUE;
+        for (locus in grid.walk(Gr.e)) locus.value[isFilled_] = Aspect.TRUE;
+        for (locus in grid.walk(Gr.s)) locus.value[isFilled_] = Aspect.TRUE;
+        for (locus in grid.run(Gr.s).walk(Gr.e)) locus.value[isFilled_] = Aspect.TRUE;
+        for (locus in grid.run(Gr.e).walk(Gr.s)) locus.value[isFilled_] = Aspect.TRUE;
     }
 
     inline function populateGraphHeads(grid:BoardLocus, headCoords:Array<XY>, plantHeads:Bool):Void {
@@ -232,24 +234,24 @@ class BuildBoardRule extends Rule {
 
     inline function populateGraphBodies():Void {
 
-        var bodies:Array<Array<BoardLocus>> = [];
+        var bodies:Array<Array<AspectSet>> = [];
         for (player in eachPlayer()) bodies.push([]);
 
-        for (node in eachNode()) {
-            if (node.value[isFilled_] != Aspect.FALSE) {
-                var occupier:Int = node.value[occupier_];
+        for (locus in eachLocus()) {
+            if (locus.value[isFilled_] != Aspect.FALSE) {
+                var occupier:Int = locus.value[occupier_];
                 if (occupier != Aspect.NULL) {
                     if (bodies[occupier] == null) throw 'A node is owned by a player that doesn\'t exist: $occupier';
-                    else bodies[occupier].push(node);
+                    else bodies[occupier].push(locus.value);
                 }
             }
         }
 
         for (player in eachPlayer()) {
-            var body:Array<BoardLocus> = bodies[getID(player)];
+            var body:Array<AspectSet> = bodies[getID(player)];
             if (body.length > 0) {
-                var bodyFirstNode:BoardLocus = body[0];
-                player[bodyFirst_] = getID(bodyFirstNode.value);
+                var bodyFirstNode:AspectSet = body[0];
+                player[bodyFirst_] = getID(bodyFirstNode);
                 body.chainByAspect(ident_, bodyNext_, bodyPrev_);
             }
         }

@@ -263,30 +263,6 @@ class ScourgeConfigFactoryTest
         dropAction.update();
         dropAction.chooseMove(32); // drop, eat, kill
 
-        /*
-        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var enemyHead:BoardLocus = state.nodes[state.players[1][head_]];
-
-        var drmoves:Array<DropPieceMove> = cast dropAction.moves;
-        var bestMove:DropPieceMove = null;
-        for (move in drmoves) {
-            if (!move.duplicate) {
-                for (nodeID in move.addedNodes) {
-                    var node:BoardLocus = state.nodes[nodeID];
-                    for (neighbor in node.allNeighbors()) {
-                        if (neighbor == enemyHead) {
-                            bestMove = move;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (bestMove != null) break;
-        }
-
-        trace(bestMove);
-        */
-
         VisualAssert.assert('player zero dropped another L, ate player one\'s head and body; another cavity', state.spitBoard(plan));
 
         var winner_:AspectPtr = plan.onState(WinAspect.WINNER);

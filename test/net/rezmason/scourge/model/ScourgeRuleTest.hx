@@ -13,7 +13,7 @@ import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.BuildStateRule;
 import net.rezmason.scourge.model.rules.BuildPlayersRule;
 
-using net.rezmason.scourge.model.BoardUtils;
+using net.rezmason.ropes.AspectUtils;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 
@@ -80,9 +80,9 @@ class ScourgeRuleTest
         for (rule in rules) rule.prime(state, plan);
     }
 
-    private function testListLength(expectedLength:Int, first:BoardLocus, next:AspectPtr, prev:AspectPtr):Int {
+    private function testListLength(expectedLength:Int, first:AspectSet, next:AspectPtr, prev:AspectPtr):Int {
         var count:Int = 0;
-        var last:BoardLocus = null;
+        var last:AspectSet = null;
 
         for (node in first.iterate(state.nodes, next)) {
             count++;

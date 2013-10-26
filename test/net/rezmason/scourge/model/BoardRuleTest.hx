@@ -49,7 +49,6 @@ class BoardRuleTest extends ScourgeRuleTest {
 
         for (node in state.nodes) {
             Assert.isNotNull(node);
-            Assert.isNotNull(node.value[occupier_]);
         }
 
         VisualAssert.assert('Should appear to be four integers, equally spaced and equally distant from the edges of a box', state.spitBoard(plan));
@@ -58,7 +57,7 @@ class BoardRuleTest extends ScourgeRuleTest {
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
         var currentPlayer:Int = state.aspects[currentPlayer_];
 
-        var playerHead:BoardLocus = state.nodes[state.players[currentPlayer][head_]];
+        var playerHead:BoardLocus = state.loci[state.players[currentPlayer][head_]];
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);

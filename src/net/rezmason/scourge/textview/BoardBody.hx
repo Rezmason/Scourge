@@ -26,10 +26,12 @@ import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using net.rezmason.ropes.GridUtils;
+using net.rezmason.utils.Pointers;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class NodeView {
-    public var node:BoardLocus;
+    public var node:AspectSet;
+    public var locus:BoardLocus;
     public var boardGlyph:Glyph;
     public var uiGlyph:Glyph;
     public var x:Float;
@@ -81,13 +83,13 @@ class BoardBody extends Body {
     var numPlayers:Int;
     var game:Game;
     var nodeViews:Array<NodeView>;
-    var nodeViewsByNode:Map<BoardLocus, NodeView>;
 
+    var ident_:AspectPtr;
     var occupier_:AspectPtr;
     var isFilled_:AspectPtr;
     var head_:AspectPtr;
 
-    var headNodes:Array<BoardLocus>;
+    var headNodes:Array<AspectSet>;
 
     var wavePools:Array<WavePool>;
 
@@ -132,15 +134,15 @@ class BoardBody extends Body {
             }
         }
 
+        ident_ = Ptr.intToPointer(0, game.state.key);
         occupier_ = game.plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         isFilled_ = game.plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
         head_ = game.plan.playerAspectLookup[BodyAspect.HEAD.id];
 
-        var nodes:Array<BoardLocus> = game.state.nodes;
+        var nodes:Array<AspectSet> = game.state.nodes;
+        var loci:Array<BoardLocus> = game.state.loci;
 
         growTo(nodes.length * 2);
-
-        nodeViewsByNode = new Map();
 
         var minX:Float = 0;
         var maxX:Float = 0;
@@ -152,15 +154,14 @@ class BoardBody extends Body {
             var view:NodeView = nodeViews[ike];
             if (view == null) nodeViews[ike] = view = new NodeView();
             view.node = nodes[ike];
+            view.locus = loci[ike];
             view.boardGlyph = glyphs[ike * 2 + 0];
             view.uiGlyph = glyphs[ike * 2 + 1];
 
-            nodeViewsByNode[view.node] = view;
-
             for (direction in GridUtils.allDirections()) {
-                var neighborNode:BoardLocus = view.node.neighbors[direction];
+                var neighborLocus:BoardLocus = view.locus.neighbors[direction];
                 var neighborView:NodeView = null;
-                if (neighborNode != null) neighborView = nodeViewsByNode[neighborNode];
+                if (neighborLocus != null) neighborView = nodeViews[getID(neighborLocus.value)];
 
                 if (neighborView != null) {
 
@@ -215,10 +216,6 @@ class BoardBody extends Body {
 
         game = null;
         nodeViews = [];
-
-        for (key in nodeViewsByNode.keys()) nodeViewsByNode.remove(key);
-        nodeViewsByNode = null;
-
         headNodes = null;
     }
 
@@ -232,36 +229,36 @@ class BoardBody extends Body {
         for (ike in 0...numPlayers) {
 
             var maxDistance:Int = 0;
-            var node:BoardLocus = headNodes[ike];
+            var node:AspectSet = headNodes[ike];
 
             if (node != null) {
 
-                nodeViewsByNode[node].distance = 0;
-
-                var pendingNodes:List<BoardLocus> = new List<BoardLocus>();
+                nodeViews[getID(node)].distance = 0;
+                var pendingNodes:List<AspectSet> = new List<AspectSet>();
 
                 while (node != null) {
 
-                    var distance:Int = nodeViewsByNode[node].distance;
+                    var view:NodeView = nodeViews[getID(node)];
+                    var distance:Int = view.distance;
 
                     if (maxDistance < distance) maxDistance = distance;
 
-                    for (neighborNode in node.orthoNeighbors()) {
-                        if (neighborNode != null && neighborNode.value[occupier_] == ike) {
-                            var neighborView:NodeView = nodeViewsByNode[neighborNode];
+                    for (neighborLocus in view.locus.orthoNeighbors()) {
+                        if (neighborLocus != null && neighborLocus.value[occupier_] == ike) {
+                            var neighborView:NodeView = nodeViews[getID(neighborLocus.value)];
                             if (neighborView.distance == -1) {
                                 neighborView.distance = distance + 2;
-                                pendingNodes.add(neighborNode);
+                                pendingNodes.add(neighborLocus.value);
                             }
                         }
                     }
 
-                    for (neighborNode in node.diagNeighbors()) {
-                        if (neighborNode != null && neighborNode.value[occupier_] == ike) {
-                            var neighborView:NodeView = nodeViewsByNode[neighborNode];
+                    for (neighborLocus in view.locus.diagNeighbors()) {
+                        if (neighborLocus != null && neighborLocus.value[occupier_] == ike) {
+                            var neighborView:NodeView = nodeViews[getID(neighborLocus.value)];
                             if (neighborView.distance == -1) {
                                 neighborView.distance = distance + 3;
-                                pendingNodes.add(neighborNode);
+                                pendingNodes.add(neighborLocus.value);
                             }
                         }
                     }
@@ -278,10 +275,11 @@ class BoardBody extends Body {
 
         for (view in nodeViews) {
 
-            var node:BoardLocus = view.node;
+            var node:AspectSet = view.node;
+            var locus:BoardLocus = view.locus;
 
-            var playerID:Null<Int> = node.value[occupier_];
-            var isFilled:Bool = node.value[isFilled_] == Aspect.TRUE;
+            var playerID:Null<Int> = node[occupier_];
+            var isFilled:Bool = node[isFilled_] == Aspect.TRUE;
 
             var hasPlayer:Bool = playerID != Aspect.NULL;
 
@@ -313,8 +311,8 @@ class BoardBody extends Body {
 
                         var numNeighbors:Int = 0;
                         for (direction in GridUtils.allDirections()) {
-                            var neighborNode:BoardLocus = node.neighbors[direction];
-                            if (neighborNode != null && neighborNode.value[occupier_] == playerID) numNeighbors++;
+                            var neighborLocus:BoardLocus = locus.neighbors[direction];
+                            if (neighborLocus != null && neighborLocus.value[occupier_] == playerID) numNeighbors++;
                         }
                         size = (numNeighbors / 8) * 0.6 + 0.2;
                     }
@@ -328,9 +326,9 @@ class BoardBody extends Body {
                 } else {
                     isVisible = false;
                     for (direction in GridUtils.allDirections()) {
-                        var neighborNode:BoardLocus = node.neighbors[direction];
-                        if (neighborNode == null) continue;
-                        if (neighborNode.value[isFilled_] == Aspect.FALSE || neighborNode.value[occupier_] != Aspect.NULL) {
+                        var neighborLocus:BoardLocus = locus.neighbors[direction];
+                        if (neighborLocus == null) continue;
+                        if (neighborLocus.value[isFilled_] == Aspect.FALSE || neighborLocus.value[occupier_] != Aspect.NULL) {
                             isVisible = true;
                             break;
                         }
@@ -368,12 +366,14 @@ class BoardBody extends Body {
         for (view in wallNodeViews) {
             var itr:Int = 0;
             var flag:Int = 0;
-            for (neighborNode in view.node.orthoNeighbors()) {
+            for (neighborLocus in view.locus.orthoNeighbors()) {
+                var neighborNode:AspectSet = null;
+                if (neighborLocus != null) neighborNode = neighborLocus.value;
                 var val:Int =
-                    neighborNode != null &&
-                    nodeViewsByNode[neighborNode].isVisible &&
-                    neighborNode.value[isFilled_] == Aspect.TRUE &&
-                    neighborNode.value[occupier_] == Aspect.NULL
+                    neighborLocus != null &&
+                    nodeViews[getID(neighborNode)].isVisible &&
+                    neighborNode[isFilled_] == Aspect.TRUE &&
+                    neighborNode[occupier_] == Aspect.NULL
                     ? 1 : 0;
                 flag = flag | (val << itr);
                 itr++;
@@ -421,8 +421,8 @@ class BoardBody extends Body {
 
         for (pool in wavePools) pool.update(delta);
         for (view in nodeViews) {
-            var playerID:Int = view.node.value[occupier_];
-            if (playerID != Aspect.NULL && view.node.value[isFilled_] == Aspect.TRUE) {
+            var playerID:Int = view.node[occupier_];
+            if (playerID != Aspect.NULL && view.node[isFilled_] == Aspect.TRUE) {
                 var h:Float = wavePools[playerID].getHeightAtIndex(view.distance);
                 // view.boardGlyph.set_p(h * 0.08);
 
@@ -482,5 +482,9 @@ class BoardBody extends Body {
 
     inline function stopDrag():Void {
         dragging = false;
+    }
+
+    inline function getID(node:AspectSet):Int {
+        return node[ident_];
     }
 }

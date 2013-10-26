@@ -104,10 +104,9 @@ class ReplenishRule extends Rule {
     }
 
     override private function _chooseMove(choice:Int):Void {
-
-        updateReps(cfg.stateProperties, updateState);
-        updateReps(cfg.playerProperties, updatePlayers);
-        updateReps(cfg.nodeProperties, updateNodes);
+        updateReps(cfg.stateProperties, [state.aspects]);
+        updateReps(cfg.playerProperties, state.players);
+        updateReps(cfg.nodeProperties, state.nodes);
     }
 
     private function makeReplenishable(repCfg:ReplenishableConfig, lookup:AspectLookup):AspectSet {
@@ -127,7 +126,7 @@ class ReplenishRule extends Rule {
         return rep;
     }
 
-    private function updateReps(repCfgs:Array<ReplenishableConfig>, updateFunc:ReplenishableConfig->AspectPtr->Void):Void {
+    private function updateReps(repCfgs:Array<ReplenishableConfig>, aspectSets:Array<AspectSet>):Void {
         // Each replenishable gets its iterator incremented
         for (repCfg in repCfgs) {
             var replenishable:AspectSet = getExtra(repCfg.replenishableID);
@@ -137,37 +136,14 @@ class ReplenishRule extends Rule {
                 // Time for action! Resolve the pointer and update values at that location
                 step = 0;
                 var ptr:AspectPtr = AspectPtr.intToPointer(replenishable[repPropLookup_], state.key);
-                updateFunc(repCfg, ptr); // TODO: Do this with fewer function calls (and iterations)
+                for (aspectSet in aspectSets) {
+                    var value:Int = aspectSet[ptr];
+                    value += repCfg.amount;
+                    if (value > repCfg.maxAmount) value = repCfg.maxAmount;
+                    aspectSet[ptr] = value;
+                }
             }
             replenishable[repStep_] = step;
-        }
-    }
-
-    // Only one aspect set to update– the state's.
-    private function updateState(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
-        var value:Int = state.aspects[ptr];
-        value += repCfg.amount;
-        if (value > repCfg.maxAmount) value = repCfg.maxAmount;
-        state.aspects[ptr] = value;
-    }
-
-    // Update each player's aspect set
-    private function updatePlayers(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
-        for (player in eachPlayer()) {
-            var value:Int = player[ptr];
-            value += repCfg.amount;
-            if (value > repCfg.maxAmount) value = repCfg.maxAmount;
-            player[ptr] = value;
-        }
-    }
-
-    // Update each node's aspect set
-    private function updateNodes(repCfg:ReplenishableConfig, ptr:AspectPtr):Void {
-        for (node in eachNode()) {
-            var value:Int = node.value[ptr];
-            value += repCfg.amount;
-            if (value > repCfg.maxAmount) value = repCfg.maxAmount;
-            node.value[ptr] = value;
         }
     }
 }

@@ -2,8 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Rule;
 // import net.rezmason.scourge.model.aspects.BodyAspect;
-
-using net.rezmason.scourge.model.BoardUtils;
+// using net.rezmason.scourge.model.BoardUtils;
 
 class DebugRule extends Rule {
 

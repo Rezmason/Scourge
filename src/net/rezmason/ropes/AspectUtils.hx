@@ -8,14 +8,20 @@ using net.rezmason.utils.Pointers;
 
 class AspectUtils {
 
-    public inline static function iterate(me:AspectSet, list:Array<AspectSet>, _aspectPointer:AspectPtr):AspectSetIterator {
-        return new AspectSetIterator(me, list, _aspectPointer);
+    public inline static function iterate(me:AspectSet, list:Array<AspectSet>, itrPtr:AspectPtr):AspectSetIterator {
+        return new AspectSetIterator(me, list, itrPtr);
     }
 
-    public inline static function listToArray(me:AspectSet, list:Array<AspectSet>, _aspectPointer:AspectPtr):Array<AspectSet> {
+    public inline static function listToArray(me:AspectSet, list:Array<AspectSet>, itrPtr:AspectPtr):Array<AspectSet> {
         var arr:Array<AspectSet> = [];
-        for (me in iterate(me, list, _aspectPointer)) arr.push(me);
+        for (me in iterate(me, list, itrPtr)) arr.push(me);
         return arr;
+    }
+
+    public inline static function listToMap(me:AspectSet, list:Array<AspectSet>, itrPtr:AspectPtr, keyPtr:AspectPtr):Map<Int, AspectSet> {
+        var map:Map<Int, AspectSet> = new Map();
+        for (me in iterate(me, list, itrPtr)) map[me[keyPtr]] = me;
+        return map;
     }
 
     public inline static function removeSet(me:AspectSet, list:Array<AspectSet>, next:AspectPtr, prev:AspectPtr):AspectSet {
@@ -91,10 +97,10 @@ class AspectSetIterator {
     private var list:Array<AspectSet>;
     private var aspectPointer:AspectPtr;
 
-    public function new(_me:AspectSet, _list:Array<AspectSet>, _aspectPointer:AspectPtr):Void {
+    public function new(_me:AspectSet, _list:Array<AspectSet>, _itrPtr:AspectPtr):Void {
         me = _me;
         list = _list;
-        aspectPointer = _aspectPointer;
+        aspectPointer = _itrPtr;
     }
 
     public function hasNext():Bool {

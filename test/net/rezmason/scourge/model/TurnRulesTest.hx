@@ -88,7 +88,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         var currentPlayer:Int = state.aspects[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
-        var playerHead:BoardLocus = state.nodes[head];
+        var playerHead:AspectSet = state.nodes[head];
 
         forfeitRule.update();
         var moves:Array<Move> = forfeitRule.moves;
@@ -102,8 +102,8 @@ class TurnRulesTest extends ScourgeRuleTest
         VisualAssert.assert('player 0 is still on the board', state.spitBoard(plan));
 
         Assert.areEqual(Aspect.NULL, state.players[currentPlayer][head_]);
-        Assert.areEqual(currentPlayer, playerHead.value[occupier_]);
-        Assert.areEqual(Aspect.TRUE, playerHead.value[isFilled_]);
+        Assert.areEqual(currentPlayer, playerHead[occupier_]);
+        Assert.areEqual(Aspect.TRUE, playerHead[isFilled_]);
 
         // Player 0 should still be there, though
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -128,9 +128,9 @@ class TurnRulesTest extends ScourgeRuleTest
 
         var currentPlayer:Int = state.aspects[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
-        var playerHead:BoardLocus = state.nodes[head];
+        var playerHead:AspectSet = state.nodes[head];
 
-        playerHead.value[occupier_] = 1;
+        playerHead[occupier_] = 1;
 
         killHeadlessBodyRule.update();
         var moves:Array<Move> = killHeadlessBodyRule.moves;
