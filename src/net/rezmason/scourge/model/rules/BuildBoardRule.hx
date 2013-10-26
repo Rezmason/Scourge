@@ -5,7 +5,6 @@ import net.rezmason.ropes.Types;
 import net.rezmason.ropes.GridNode;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
-import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
@@ -39,12 +38,10 @@ class BuildBoardRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
-    @player(IdentityAspect.PLAYER_ID) var playerID_;
 
     public function new(cfg:BuildBoardConfig):Void {
         super();
@@ -132,7 +129,7 @@ class BuildBoardRule extends Rule {
 
     inline function makeNode():BoardNode {
         var node:BoardNode = new BoardNode(numNodes(), nodeAspectTemplate.copy());
-        node.value[nodeID_] = node.id;
+        node.value[ident_] = node.id;
         state.nodes.push(node);
 
         var histAspects:AspectSet = nodeAspectTemplate.map(cfg.buildCfg.history.alloc);
@@ -180,9 +177,9 @@ class BuildBoardRule extends Rule {
             if (plantHeads) {
                 head.value[isFilled_] = Aspect.TRUE;
                 head.value[occupier_] = ike;
-                getPlayer(ike)[head_] = head.value[nodeID_];
+                getPlayer(ike)[head_] = getID(head.value);
             } else if (head.value[isFilled_] == Aspect.TRUE && head.value[occupier_] == ike) {
-                getPlayer(ike)[head_] = head.value[nodeID_];
+                getPlayer(ike)[head_] = getID(head.value);
             }
         }
     }
@@ -248,11 +245,11 @@ class BuildBoardRule extends Rule {
         }
 
         for (player in eachPlayer()) {
-            var body:Array<BoardNode> = bodies[player[playerID_]];
+            var body:Array<BoardNode> = bodies[getID(player)];
             if (body.length > 0) {
                 var bodyFirstNode:BoardNode = body[0];
-                player[bodyFirst_] = bodyFirstNode.value[nodeID_];
-                body.chainByAspect(nodeID_, bodyNext_, bodyPrev_);
+                player[bodyFirst_] = getID(bodyFirstNode.value);
+                body.chainByAspect(ident_, bodyNext_, bodyPrev_);
             }
         }
     }

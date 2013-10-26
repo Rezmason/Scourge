@@ -1,3 +1,5 @@
+Separate "node" and "locus"
+
 Represent commands as some intermediary type - not strings, not intrinsic Style types
     A list of elements
         UIText sends [basic text element] at first

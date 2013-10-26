@@ -5,7 +5,6 @@ import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
-import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.BiteAspect;
@@ -38,7 +37,6 @@ class BiteRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
@@ -46,7 +44,6 @@ class BiteRule extends Rule {
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
@@ -86,7 +83,7 @@ class BiteRule extends Rule {
             for (node in frontNodes) {
                 for (neighbor in neighborsFor(node)) {
                     if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
-                        var move:BiteMove = generateMove(node.value[nodeID_], [neighbor.value[nodeID_]]);
+                        var move:BiteMove = generateMove(getID(node.value), [getID(neighbor.value)]);
                         if (!cfg.omnidirectional && cfg.baseReachOnThickness) {
                             // The baseReachOnThickness config param uses this data to determine how far to extend a bite
                             var backwards:Int = (node.neighbors.indexOf(neighbor) + 4) % 8;
@@ -122,8 +119,8 @@ class BiteRule extends Rule {
                         for (bitNodeID in move.bitNodes) {
                             var bitNode:BoardNode = getNode(bitNodeID);
                             for (neighbor in neighborsFor(bitNode)) {
-                                if (isValidEnemy(headIDs, currentPlayer, neighbor) && !move.bitNodes.has(neighbor.value[nodeID_])) {
-                                    newMoves.push(generateMove(move.targetNode, move.bitNodes.concat([neighbor.value[nodeID_]]), move));
+                                if (isValidEnemy(headIDs, currentPlayer, neighbor) && !move.bitNodes.has(getID(neighbor.value))) {
+                                    newMoves.push(generateMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move));
                                 }
                             }
                         }
@@ -134,7 +131,7 @@ class BiteRule extends Rule {
                         var direction:Int = getNode(move.targetNode).neighbors.indexOf(firstBitNode);
                         var neighbor:BoardNode = lastBitNode.neighbors[direction];
                         if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
-                            var nextMove:BiteMove = generateMove(move.targetNode, move.bitNodes.concat([neighbor.value[nodeID_]]), move);
+                            var nextMove:BiteMove = generateMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move);
                             nextMove.thickness = move.thickness;
                             newMoves.push(nextMove);
                         }
@@ -191,7 +188,7 @@ class BiteRule extends Rule {
             // Remove the appropriate cells from each player
 
             for (player in eachPlayer()) {
-                var bitNodes:Array<BoardNode> = bitNodesByPlayer[player[playerID_]];
+                var bitNodes:Array<BoardNode> = bitNodesByPlayer[getID(player)];
                 var bodyFirst:Int = player[bodyFirst_];
                 for (node in bitNodes) bodyFirst = killCell(node, maxFreshness++, bodyFirst);
                 player[bodyFirst_] = bodyFirst;
@@ -213,7 +210,7 @@ class BiteRule extends Rule {
         if (node.value[occupier_] == allegiance) val = false; // Can't be the current player
         else if (node.value[occupier_] == Aspect.NULL) val = false; // Can't be the current player
         else if (!cfg.biteThroughCavities && node.value[isFilled_] == Aspect.FALSE) val = false; // Must be filled, or must allow biting through a cavity
-        else if (!cfg.biteHeads && headIDs.has(node.value[nodeID_])) val = false;
+        else if (!cfg.biteHeads && headIDs.has(getID(node.value))) val = false;
 
         return val;
     }
@@ -242,7 +239,7 @@ class BiteRule extends Rule {
     inline function killCell(node:BoardNode, freshness:Int, firstIndex:Int):Int {
         if (node.value[isFilled_] == Aspect.TRUE) {
             var nextNode:BoardNode = node.removeNode(state.nodes, bodyNext_, bodyPrev_);
-            if (firstIndex == node.value[nodeID_]) firstIndex = nextNode == null ? Aspect.NULL : nextNode.value[nodeID_];
+            if (firstIndex == getID(node.value)) firstIndex = nextNode == null ? Aspect.NULL : getID(nextNode.value);
             node.value[isFilled_] = Aspect.FALSE;
         }
 

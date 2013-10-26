@@ -7,7 +7,6 @@ import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
-import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
@@ -45,7 +44,6 @@ class DropPieceRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
@@ -140,7 +138,7 @@ class DropPieceRule extends Rule {
 
                             for (coord in rotation[0]) {
                                 var nodeAtCoord:BoardNode = walkNode(node, coord, homeCoord);
-                                addedNodes[nodeAtCoord.value[nodeID_]] = nodeAtCoord;
+                                addedNodes[getID(nodeAtCoord.value)] = nodeAtCoord;
                                 numAddedNodes++;
                                 var occupier:Int = nodeAtCoord.value[occupier_];
                                 var isFilled:Int = nodeAtCoord.value[isFilled_];
@@ -153,7 +151,7 @@ class DropPieceRule extends Rule {
 
                             if (valid) {
                                 dropMoves.push({
-                                    targetNode:node.value[nodeID_],
+                                    targetNode:getID(node.value),
                                     coord:homeCoord,
                                     pieceID:pieceID,
                                     rotation:rotationIndex,
@@ -200,7 +198,7 @@ class DropPieceRule extends Rule {
             var bodyNode:BoardNode = getNode(getPlayer(currentPlayer)[bodyFirst_]);
 
             for (coord in coords) bodyNode = fillAndOccupyCell(walkNode(node, coord, homeCoord), currentPlayer, maxFreshness, bodyNode);
-            player[bodyFirst_] = bodyNode.value[nodeID_];
+            player[bodyFirst_] = getID(bodyNode.value);
 
             state.aspects[maxFreshness_] = maxFreshness;
 
@@ -233,7 +231,7 @@ class DropPieceRule extends Rule {
         if (me[occupier_] != currentPlayer || me[isFilled_] == Aspect.FALSE) me[freshness_] = maxFreshness;
         me[occupier_] = currentPlayer;
         me[isFilled_] = Aspect.TRUE;
-        return bodyNode.addNode(node, state.nodes, nodeID_, bodyNext_, bodyPrev_);
+        return bodyNode.addNode(node, state.nodes, ident_, bodyNext_, bodyPrev_);
     }
 
     // A works-for-now function for translating piece coords into nodes accessible from a given starting point

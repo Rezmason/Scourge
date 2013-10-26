@@ -5,7 +5,6 @@ import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
-import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
@@ -23,7 +22,6 @@ class KillHeadlessBodyRule extends Rule {
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
-    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
     public function new():Void {
@@ -40,7 +38,7 @@ class KillHeadlessBodyRule extends Rule {
         // Check each player to see if they still have head nodes
 
         for (player in eachPlayer()) {
-            var playerID:Int = player[playerID_];
+            var playerID:Int = getID(player);
 
             var head:Int = player[head_];
 

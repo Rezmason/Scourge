@@ -27,6 +27,7 @@ using net.rezmason.utils.Pointers;
 
     private var extraAspectTemplate:AspectSet;
     private var extraAspectLookup:AspectLookup;
+    private var ident_:AspectPtr;
 
     private function _prime():Void {}
     private function _update():Void {}
@@ -52,6 +53,8 @@ using net.rezmason.utils.Pointers;
     @:final public function prime(state:State, plan:StatePlan):Void {
         this.state = state;
         this.plan = plan;
+
+        ident_ = Ptr.intToPointer(0, state.key);
 
         var itr:Int = 0;
         for (id in extraAspectRequirements.keys().a2z()) {
@@ -107,6 +110,8 @@ using net.rezmason.utils.Pointers;
     @:final inline function buildHistExtra(history:StateHistory):AspectSet {
         return extraAspectTemplate.map(history.alloc);
     }
+
+    @:final inline function getID(aspectSet:AspectSet):Int { return aspectSet[ident_]; }
 
     // Are these still necessary?
     @:final inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup[prop.id]; }

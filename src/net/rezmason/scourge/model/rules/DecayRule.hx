@@ -5,7 +5,6 @@ import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
-import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
@@ -23,13 +22,11 @@ class DecayRule extends Rule {
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
-    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
     private var cfg:DecayConfig;
@@ -49,7 +46,7 @@ class DecayRule extends Rule {
         var heads:Map<Int, BoardNode> = new Map();
         for (player in eachPlayer()) {
             var headIndex:Int = player[head_];
-            if (headIndex != Aspect.NULL && getNode(headIndex).value[occupier_] == player[playerID_]) {
+            if (headIndex != Aspect.NULL && getNode(headIndex).value[occupier_] == getID(player)) {
                 heads[headIndex] = getNode(headIndex);
             }
         }
@@ -88,8 +85,8 @@ class DecayRule extends Rule {
         node.value[freshness_] = maxFreshness;
 
         var nextNode:BoardNode = node.removeNode(state.nodes, bodyNext_, bodyPrev_);
-        if (firstIndex == node.value[nodeID_]) {
-            firstIndex = (nextNode == null) ? Aspect.NULL : nextNode.value[nodeID_];
+        if (firstIndex == getID(node.value)) {
+            firstIndex = (nextNode == null) ? Aspect.NULL : getID(nextNode.value);
         }
         return firstIndex;
     }

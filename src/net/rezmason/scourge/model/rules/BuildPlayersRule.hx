@@ -4,7 +4,6 @@ import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.Types;
-import net.rezmason.scourge.model.aspects.IdentityAspect;
 
 using net.rezmason.utils.Pointers;
 
@@ -15,7 +14,6 @@ typedef BuildPlayersConfig = {
 
 class BuildPlayersRule extends Rule {
 
-    @player(IdentityAspect.PLAYER_ID) var playerID_;
 
     var playerAspectTemplate:AspectSet;
     var cfg:BuildPlayersConfig;
@@ -34,7 +32,7 @@ class BuildPlayersRule extends Rule {
 
     inline function makePlayer():AspectSet {
         var player:AspectSet = playerAspectTemplate.copy();
-        player[playerID_] = numPlayers();
+        player[ident_] = numPlayers();
         state.players.push(player);
         var histNode:AspectSet = playerAspectTemplate.map(cfg.buildCfg.history.alloc);
         cfg.buildCfg.historyState.players.push(histNode);

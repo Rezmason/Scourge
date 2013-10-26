@@ -3,7 +3,6 @@ package net.rezmason.scourge.model.rules;
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
-import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
 
@@ -16,7 +15,6 @@ typedef SkipsExhaustedConfig = {
 class SkipsExhaustedRule extends Rule {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @player(PlyAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
     @state(WinAspect.WINNER) var winner_;
 
@@ -49,7 +47,7 @@ class SkipsExhaustedRule extends Rule {
 
         if (stalemate) {
             for (player in eachPlayer()) {
-                var playerID:Int = player[playerID_];
+                var playerID:Int = getID(player);
                 var totalArea:Int = player[totalArea_];
 
                 if (totalArea > largestArea) largestPlayers = [playerID];

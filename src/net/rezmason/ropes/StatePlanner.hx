@@ -45,7 +45,7 @@ class StatePlanner {
     }
 
     function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet, key:PtrKey):Void {
-        var itr:Int = 0;
+        var itr:Int = 1; // Index 0 is reserved for the aspects' ID
         for (id in requirements.keys().a2z()) {
             var prop:AspectProperty = requirements[id];
             var ptr:AspectPtr = template.ptr(itr, key);

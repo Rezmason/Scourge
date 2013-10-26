@@ -6,7 +6,6 @@ import net.rezmason.ropes.Types;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
-import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
@@ -19,7 +18,6 @@ class CavityRule extends Rule {
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.CAVITY_NEXT) var cavityNext_;
     @node(BodyAspect.CAVITY_PREV) var cavityPrev_;
-    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
@@ -27,7 +25,6 @@ class CavityRule extends Rule {
     @player(BodyAspect.CAVITY_FIRST) var cavityFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
     var remainingNodes:Int;
@@ -39,7 +36,7 @@ class CavityRule extends Rule {
 
     override private function _chooseMove(choice:Int):Void {
         var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
-        for (player in eachPlayer()) remapCavities(player[playerID_], maxFreshness);
+        for (player in eachPlayer()) remapCavities(getID(player), maxFreshness);
         state.aspects[maxFreshness_] = maxFreshness;
     }
 
@@ -76,7 +73,7 @@ class CavityRule extends Rule {
             widePerimeter.reverse();
 
             var nodeIDs:Map<Int, Bool> = new Map();
-            for (node in widePerimeter) nodeIDs[node.value[nodeID_]] = true;
+            for (node in widePerimeter) nodeIDs[getID(node.value)] = true;
 
             var empties:Array<BoardNode> = [];
 
@@ -91,7 +88,7 @@ class CavityRule extends Rule {
                 // Dismiss filled nodes
                 if (isFilled == Aspect.TRUE) {
                     // remove enemy filled nodes from the nodeIDs
-                    if (occupier != playerID) nodeIDs.remove(node.value[nodeID_]);
+                    if (occupier != playerID) nodeIDs.remove(getID(node.value));
                 } else {
                     empties.push(node);
                 }
@@ -106,8 +103,8 @@ class CavityRule extends Rule {
                 for (node in empties) {
                     newEmpties.push(node);
                     for (neighbor in node.orthoNeighbors()) {
-                        if (neighbor == null || !nodeIDs.exists(neighbor.value[nodeID_])) {
-                            nodeIDs.remove(node.value[nodeID_]);
+                        if (neighbor == null || !nodeIDs.exists(getID(neighbor.value))) {
+                            nodeIDs.remove(getID(node.value));
                             newEmpties.pop();
                             break;
                         }
@@ -125,8 +122,8 @@ class CavityRule extends Rule {
             // Cavity nodes that haven't changed don't get freshened
             for (node in cavityNodes) createCavity(playerID, oldCavityNodes.exists(node.id) ? 0 : maxFreshness, node);
 
-            cavityNodes.chainByAspect(nodeID_, cavityNext_, cavityPrev_);
-            player[cavityFirst_] = cavityNodes[0].value[nodeID_];
+            cavityNodes.chainByAspect(ident_, cavityNext_, cavityPrev_);
+            player[cavityFirst_] = cavityNodes[0].value[ident_];
 
             // Cavities affect the player's total area:
             var totalArea:Int = player[totalArea_] + cavityNodes.length;

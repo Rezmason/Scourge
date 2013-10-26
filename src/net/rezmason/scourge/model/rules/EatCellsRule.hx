@@ -5,7 +5,6 @@ import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.Types;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
-import net.rezmason.scourge.model.aspects.IdentityAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 
@@ -26,13 +25,11 @@ class EatCellsRule extends Rule {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(IdentityAspect.NODE_ID) var nodeID_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
-    @player(IdentityAspect.PLAYER_ID) var playerID_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
@@ -83,14 +80,14 @@ class EatCellsRule extends Rule {
                         if (scoutOccupier == currentPlayer || eatenNodes.exists(scout.id)) {
                             // Add nodes to the eaten region
                             for (pendingNode in pendingNodes) {
-                                var playerID:Int = headIndices.indexOf(pendingNode.value[nodeID_]);
+                                var playerID:Int = headIndices.indexOf(getID(pendingNode.value));
                                 if (playerID != -1 && cfg.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
                                 else if (cfg.recursive && !newNodesMap.exists(pendingNode.id)) newNodes.add(pendingNode); // recursive eating
 
                                 eatenNodes[pendingNode.id] = pendingNode;
                             }
                             break;
-                        } else if (headIndices[scoutOccupier] == scout.value[nodeID_]) {
+                        } else if (headIndices[scoutOccupier] == getID(scout.value)) {
                             // Only eat heads if the config specifies this
                             if (cfg.eatHeads) pendingNodes.push(scout);
                             //else break;
@@ -116,7 +113,7 @@ class EatCellsRule extends Rule {
 
         // Clean up the bodyFirst and head pointers for opponent players
         for (player in eachPlayer()) {
-            var playerID:Int = player[playerID_];
+            var playerID:Int = getID(player);
             if (playerID == currentPlayer) continue;
 
             var bodyFirst:Int = player[bodyFirst_];
@@ -126,8 +123,8 @@ class EatCellsRule extends Rule {
                 for (node in body) {
                     if (node.value[isFilled_] == Aspect.TRUE && node.value[occupier_] == playerID) revisedBody.push(node);
                 }
-                revisedBody.chainByAspect(nodeID_, bodyNext_, bodyPrev_);
-                if (revisedBody.length > 0) player[bodyFirst_] = revisedBody[0].value[nodeID_];
+                revisedBody.chainByAspect(ident_, bodyNext_, bodyPrev_);
+                if (revisedBody.length > 0) player[bodyFirst_] = getID(revisedBody[0].value);
                 else player[bodyFirst_] = Aspect.NULL;
             }
 
@@ -141,10 +138,10 @@ class EatCellsRule extends Rule {
         // Add the filled eaten nodes to the current player body
         for (node in eatenNodes) {
             if (node.value[isFilled_] == Aspect.TRUE) {
-                bodyNode = bodyNode.addNode(node, state.nodes, nodeID_, bodyNext_, bodyPrev_);
+                bodyNode = bodyNode.addNode(node, state.nodes, ident_, bodyNext_, bodyPrev_);
             }
         }
-        getPlayer(currentPlayer)[bodyFirst_] = bodyNode.value[nodeID_];
+        getPlayer(currentPlayer)[bodyFirst_] = getID(bodyNode.value);
     }
 
     function getBody(playerID:Int):Array<BoardNode> {
