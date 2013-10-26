@@ -32,7 +32,7 @@ typedef DropPieceConfig = {
 typedef DropPieceMove = {>Move,
     var targetNode:Int;
     var numAddedNodes:Int;
-    var addedNodes:Map<Int, AspectSet>;
+    var addedNodes:Array<Int>;
     var pieceID:Int;
     var rotation:Int;
     var reflection:Int;
@@ -56,20 +56,16 @@ class DropPieceRule extends Rule {
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var cfg:DropPieceConfig;
+    private var nowhereMove:DropPieceMove;
+    private var movePool:Array<DropPieceMove>;
 
     public function new(cfg:DropPieceConfig):Void {
         super();
         this.cfg = cfg;
-    }
+        movePool = [];
 
-    override private function _update():Void {
-
-        var dropMoves:Array<DropPieceMove> = [];
-
-        // This allows the place-piece function to behave like a skip function
-        // Setting this to false also forces players to forfeit if they can't place a piece
         if (cfg.allowNowhere) {
-            var nowhereMove:DropPieceMove = {
+            nowhereMove = {
                 targetNode:Aspect.NULL,
                 coord:null,
                 pieceID:Aspect.NULL,
@@ -78,8 +74,21 @@ class DropPieceRule extends Rule {
                 id:0,
                 duplicate:false,
                 numAddedNodes:0,
-                addedNodes:new Map(),
+                addedNodes:[],
             };
+        }
+    }
+
+    override private function _update():Void {
+
+        moves.remove(nowhereMove);
+        for (move in moves) movePool.push(cast move);
+
+        var dropMoves:Array<DropPieceMove> = [];
+
+        // This allows the place-piece function to behave like a skip function
+        // Setting this to false also forces players to forfeit if they can't place a piece
+        if (cfg.allowNowhere) {
             dropMoves.push(cast nowhereMove);
         }
 
@@ -134,11 +143,13 @@ class DropPieceRule extends Rule {
                             var valid:Bool = true;
 
                             var numAddedNodes:Int = 0;
-                            var addedNodes:Map<Int, AspectSet> = new Map();
+                            var addedNodesByID:Map<Int, AspectSet> = new Map();
+                            var addedNodes:Array<Int> = [];
 
                             for (coord in rotation[0]) {
                                 var nodeAtCoord:AspectSet = walkLocus(getNodeLocus(node), coord, homeCoord).value;
-                                addedNodes[getID(nodeAtCoord)] = nodeAtCoord;
+                                addedNodesByID[getID(nodeAtCoord)] = nodeAtCoord;
+                                addedNodes.push(getID(nodeAtCoord));
                                 numAddedNodes++;
                                 var occupier:Int = nodeAtCoord[occupier_];
                                 var isFilled:Int = nodeAtCoord[isFilled_];
@@ -150,17 +161,17 @@ class DropPieceRule extends Rule {
                             }
 
                             if (valid) {
-                                dropMoves.push({
-                                    targetNode:getID(node),
-                                    coord:homeCoord,
-                                    pieceID:pieceID,
-                                    rotation:rotationIndex,
-                                    reflection:reflectionIndex,
-                                    id:dropMoves.length,
-                                    numAddedNodes:numAddedNodes,
-                                    addedNodes:addedNodes,
-                                    duplicate:false,
-                                });
+                                var dropMove:DropPieceMove = getMove();
+                                dropMove.targetNode = getID(node);
+                                dropMove.coord = homeCoord;
+                                dropMove.pieceID = pieceID;
+                                dropMove.rotation = rotationIndex;
+                                dropMove.reflection = reflectionIndex;
+                                dropMove.id = dropMoves.length;
+                                dropMove.numAddedNodes = numAddedNodes;
+                                dropMove.addedNodes = addedNodes;
+                                dropMove.duplicate = false;
+                                dropMoves.push(dropMove);
                             }
                         }
                     }
@@ -179,6 +190,24 @@ class DropPieceRule extends Rule {
         }
 
         moves = cast dropMoves;
+    }
+
+    inline function getMove():DropPieceMove {
+        var move:DropPieceMove = movePool.pop();
+        if (move == null) {
+            move = {
+                id:-1,
+                targetNode:Aspect.NULL,
+                pieceID:-1,
+                reflection:-1,
+                rotation:-1,
+                numAddedNodes:0,
+                addedNodes:null,
+                coord:null,
+                duplicate:false,
+            };
+        }
+        return move;
     }
 
     override private function _chooseMove(choice:Int):Void {
@@ -211,18 +240,34 @@ class DropPieceRule extends Rule {
     }
 
     inline function isFreeEdge(node:AspectSet):Bool {
-        return neighborsFor(getNodeLocus(node), cfg.orthoOnly).exists(isVacant);
-    }
+        var exists:Bool = false;
 
-    inline function isVacant(locus:BoardLocus):Bool {
-        return locus.value[isFilled_] == Aspect.FALSE;
+        for (neighbor in neighborsFor(getNodeLocus(node), cfg.orthoOnly)) {
+            if (neighbor.value[isFilled_] == Aspect.FALSE) {
+                exists = true;
+                break;
+            }
+        }
+
+        return exists;
     }
 
     inline function movesAreEqual(move1:DropPieceMove, move2:DropPieceMove):Bool {
         var val:Bool = true;
         //if (move1.targetNode != move2.targetNode) val = false;
-        if (move1.numAddedNodes != move2.numAddedNodes) val = false;
-        else for (addedNodeID in move1.addedNodes.keys()) if (!move2.addedNodes.exists(addedNodeID)) { val = false; break; }
+        if (move1.numAddedNodes != move2.numAddedNodes) {
+            val = false;
+        } else {
+            for (addedNodeID1 in move1.addedNodes) {
+                for (addedNodeID2 in move2.addedNodes) {
+                    if (addedNodeID1 == addedNodeID2) {
+                        val = false;
+                        break;
+                    }
+                    if (!val) break;
+                }
+            }
+        }
         return val;
     }
 

@@ -1,6 +1,3 @@
-Reduce model's memory footprint
-    Rules should pool their moves
-
 Represent commands as some intermediary type - not strings, not intrinsic Style types
     A list of elements
         UIText sends [basic text element] at first

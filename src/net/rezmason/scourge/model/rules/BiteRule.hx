@@ -48,11 +48,12 @@ class BiteRule extends Rule {
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var cfg:BiteConfig;
-    private var biteMoves:Array<BiteMove>;
+    private var movePool:Array<BiteMove>;
 
     public function new(cfg:BiteConfig):Void {
         super();
         this.cfg = cfg;
+        movePool = [];
     }
 
     override private function _prime():Void {
@@ -61,7 +62,9 @@ class BiteRule extends Rule {
 
     override private function _update():Void {
 
-        biteMoves = [];
+        for (move in moves) movePool.push(cast move);
+
+        var biteMoves:Array<BiteMove> = [];
 
         // get current player head
         var currentPlayer:Int = state.aspects[currentPlayer_];
@@ -84,7 +87,7 @@ class BiteRule extends Rule {
                 var locus:BoardLocus = getNodeLocus(node);
                 for (neighbor in neighborsFor(locus)) {
                     if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
-                        var move:BiteMove = generateMove(getID(node), [getID(neighbor.value)]);
+                        var move:BiteMove = getMove(getID(node), [getID(neighbor.value)]);
                         if (!cfg.omnidirectional && cfg.baseReachOnThickness) {
                             // The baseReachOnThickness config param uses this data to determine how far to extend a bite
                             var backwards:Int = (locus.neighbors.indexOf(neighbor) + 4) % 8;
@@ -121,7 +124,7 @@ class BiteRule extends Rule {
                             var bitLocus:BoardLocus = getLocus(bitNodeID);
                             for (neighbor in neighborsFor(bitLocus)) {
                                 if (isValidEnemy(headIDs, currentPlayer, neighbor) && !move.bitNodes.has(getID(neighbor.value))) {
-                                    newMoves.push(generateMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move));
+                                    newMoves.push(getMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move));
                                 }
                             }
                         }
@@ -132,7 +135,7 @@ class BiteRule extends Rule {
                         var direction:Int = getLocus(move.targetNode).neighbors.indexOf(firstBitLocus);
                         var neighbor:BoardLocus = lastBitLocus.neighbors[direction];
                         if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
-                            var nextMove:BiteMove = generateMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move);
+                            var nextMove:BiteMove = getMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move);
                             nextMove.thickness = move.thickness;
                             newMoves.push(nextMove);
                         }
@@ -215,15 +218,21 @@ class BiteRule extends Rule {
         return val;
     }
 
-    inline function generateMove(targetNodeID:Int, bitNodes:Array<Int>, relatedMove:BiteMove = null):BiteMove {
-        var move:BiteMove = {
-            id:-1,
-            targetNode:targetNodeID,
-            bitNodes:bitNodes,
-            relatedID:(relatedMove == null ? null : relatedMove.id),
-            thickness:1,
-            duplicate:false,
-        };
+    inline function getMove(targetNodeID:Int, bitNodes:Array<Int>, relatedMove:BiteMove = null):BiteMove {
+
+        var relatedID:Null<Int> = (relatedMove == null ? null : relatedMove.id);
+
+        var move:BiteMove = movePool.pop();
+        if (move == null) {
+            move = {id:-1, targetNode:targetNodeID, bitNodes:bitNodes, relatedID:null, thickness:1, duplicate:false};
+        } else {
+            move.id = -1;
+            move.targetNode = targetNodeID;
+            move.bitNodes = bitNodes;
+            move.relatedID = relatedID;
+            move.thickness = 1;
+            move.duplicate = false;
+        }
 
         return move;
     }
