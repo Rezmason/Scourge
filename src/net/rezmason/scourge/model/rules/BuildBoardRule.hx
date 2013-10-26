@@ -128,12 +128,13 @@ class BuildBoardRule extends Rule {
     }
 
     inline function makeNode():BoardLocus {
-        var node:BoardLocus = new BoardLocus(numNodes(), nodeAspectTemplate.copy());
-        node.value[ident_] = node.id;
+        var id:Int = numNodes();
+        var node:BoardLocus = new BoardLocus(id, nodeAspectTemplate.copy());
+        node.value[ident_] = id;
         state.nodes.push(node);
 
         var histAspects:AspectSet = nodeAspectTemplate.map(cfg.buildCfg.history.alloc);
-        var histNode:BoardLocus = new BoardLocus(node.id, histAspects);
+        var histNode:BoardLocus = new BoardLocus(id, histAspects);
         cfg.buildCfg.historyState.nodes.push(histNode);
 
         return node;

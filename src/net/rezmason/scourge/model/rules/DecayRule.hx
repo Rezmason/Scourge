@@ -62,7 +62,7 @@ class DecayRule extends Rule {
             var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != Aspect.NULL) {
                 for (node in getNode(bodyFirst).iterate(state.nodes, bodyNext_)) {
-                    if (!livingBodyNeighbors.exists(node.id)) bodyFirst = killCell(node, maxFreshness, bodyFirst);
+                    if (!livingBodyNeighbors.exists(getID(node.value))) bodyFirst = killCell(node, maxFreshness, bodyFirst);
                     else totalArea++;
                 }
             }

@@ -4,7 +4,8 @@ class GridLocus<T> {
     public var value(default, null):T;
     public var neighbors(default, null):Array<GridLocus<T>>;
     public var headingOffsets(default, null):Array<Int>;
-    public var id(default, null):Int;
+
+    @:allow(net.rezmason.ropes.GridUtils) var id:Int;
 
     public function new(id:Int, value:T):Void {
         this.value = value;

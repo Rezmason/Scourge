@@ -69,19 +69,19 @@ class BoardUtils {
         return str;
     }
 
-    public inline static function iterate(_node:BoardLocus, _nodes:Array<BoardLocus>, _aspectPointer:AspectPtr):BoardLocusIterator {
-        return new BoardLocusIterator(_node, _nodes, _aspectPointer);
+    public inline static function iterate(_node:BoardLocus, _nodes:Array<BoardLocus>, _itrPtr:AspectPtr):BoardLocusIterator {
+        return new BoardLocusIterator(_node, _nodes, _itrPtr);
     }
 
-    public inline static function boardListToArray(_node:BoardLocus, _nodes:Array<BoardLocus>, _aspectPointer:AspectPtr):Array<BoardLocus> {
+    public inline static function boardListToArray(_node:BoardLocus, _nodes:Array<BoardLocus>, _itrPtr:AspectPtr):Array<BoardLocus> {
         var arr:Array<BoardLocus> = [];
-        for (node in iterate(_node, _nodes, _aspectPointer)) arr.push(node);
+        for (node in iterate(_node, _nodes, _itrPtr)) arr.push(node);
         return arr;
     }
 
-    public inline static function boardListToMap(_node:BoardLocus, _nodes:Array<BoardLocus>, _aspectPointer:AspectPtr):Map<Int, BoardLocus> {
+    public inline static function boardListToMap(_node:BoardLocus, _nodes:Array<BoardLocus>, _itrPtr:AspectPtr, _keyPtr:AspectPtr):Map<Int, BoardLocus> {
         var map:Map<Int, BoardLocus> = new Map();
-        for (node in iterate(_node, _nodes, _aspectPointer)) map[node.id] = node;
+        for (node in iterate(_node, _nodes, _itrPtr)) map[node.value[_keyPtr]] = node;
         return map;
     }
 
@@ -145,12 +145,12 @@ class BoardLocusIterator {
 
     private var node:BoardLocus;
     private var nodes:Array<BoardLocus>;
-    private var aspectPointer:AspectPtr;
+    private var itrPtr:AspectPtr;
 
-    public function new(_node:BoardLocus, _nodes:Array<BoardLocus>, _aspectPointer:AspectPtr):Void {
+    public function new(_node:BoardLocus, _nodes:Array<BoardLocus>, _itrPtr:AspectPtr):Void {
         node = _node;
         nodes = _nodes;
-        aspectPointer = _aspectPointer;
+        itrPtr = _itrPtr;
     }
 
     public function hasNext():Bool {
@@ -159,7 +159,7 @@ class BoardLocusIterator {
 
     public function next():BoardLocus {
         var lastNode:BoardLocus = node;
-        var nodeIndex:Int = node.value[aspectPointer];
+        var nodeIndex:Int = node.value[itrPtr];
         if (nodeIndex == Aspect.NULL) node = null;
         else node = nodes[nodeIndex];
         return lastNode;

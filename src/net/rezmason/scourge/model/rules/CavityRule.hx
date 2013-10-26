@@ -48,7 +48,7 @@ class CavityRule extends Rule {
         var cavityFirst:Int = player[cavityFirst_];
         var oldCavityNodes:Map<Int, BoardLocus> = new Map();
         if (cavityFirst != Aspect.NULL) {
-            oldCavityNodes = getNode(cavityFirst).boardListToMap(state.nodes, cavityNext_);
+            oldCavityNodes = getNode(cavityFirst).boardListToMap(state.nodes, cavityNext_, ident_);
             for (node in oldCavityNodes) clearCavityCell(node, maxFreshness);
             player[cavityFirst_] = Aspect.NULL;
         }
@@ -120,7 +120,7 @@ class CavityRule extends Rule {
         if (cavityNodes.length > 0) {
 
             // Cavity nodes that haven't changed don't get freshened
-            for (node in cavityNodes) createCavity(playerID, oldCavityNodes.exists(node.id) ? 0 : maxFreshness, node);
+            for (node in cavityNodes) createCavity(playerID, oldCavityNodes.exists(getID(node.value)) ? 0 : maxFreshness, node);
 
             cavityNodes.chainByAspect(ident_, cavityNext_, cavityPrev_);
             player[cavityFirst_] = cavityNodes[0].value[ident_];

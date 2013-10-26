@@ -59,7 +59,7 @@ class EatCellsRule extends Rule {
         var newNodes:List<BoardLocus> = bodyNode.boardListToArray(state.nodes, bodyNext_).filter(isFresh).list();
 
         var newNodesMap:Map<Int, BoardLocus> = new Map();
-        for (node in newNodes) newNodesMap[node.id] = node;
+        for (node in newNodes) newNodesMap[getID(node.value)] = node;
 
         var eatenNodes:Map<Int, BoardLocus> = new Map();
 
@@ -68,7 +68,7 @@ class EatCellsRule extends Rule {
         // that have been freshly eaten, starting with the current player's fresh nodes
 
         var node:BoardLocus = newNodes.pop();
-        if (node != null) newNodesMap.remove(node.id);
+        if (node != null) newNodesMap.remove(getID(node.value));
         while (node != null) {
             // search in all directions
             for (direction in directionsFor(cfg.orthoOnly)) {
@@ -77,14 +77,14 @@ class EatCellsRule extends Rule {
                     if (scout == node) continue; // starting node
                     if (scout.value[isFilled_] > 0) {
                         var scoutOccupier:Int = scout.value[occupier_];
-                        if (scoutOccupier == currentPlayer || eatenNodes.exists(scout.id)) {
+                        if (scoutOccupier == currentPlayer || eatenNodes.exists(getID(scout.value))) {
                             // Add nodes to the eaten region
                             for (pendingNode in pendingNodes) {
                                 var playerID:Int = headIndices.indexOf(getID(pendingNode.value));
                                 if (playerID != -1 && cfg.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
-                                else if (cfg.recursive && !newNodesMap.exists(pendingNode.id)) newNodes.add(pendingNode); // recursive eating
+                                else if (cfg.recursive && !newNodesMap.exists(getID(pendingNode.value))) newNodes.add(pendingNode); // recursive eating
 
-                                eatenNodes[pendingNode.id] = pendingNode;
+                                eatenNodes[getID(pendingNode.value)] = pendingNode;
                             }
                             break;
                         } else if (headIndices[scoutOccupier] == getID(scout.value)) {
@@ -100,7 +100,7 @@ class EatCellsRule extends Rule {
                 }
             }
             node = newNodes.pop();
-            if (node != null) newNodesMap.remove(node.id);
+            if (node != null) newNodesMap.remove(getID(node.value));
         }
 
         // Update cells in the eaten region
