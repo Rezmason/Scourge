@@ -23,7 +23,6 @@ class BoardUtils {
     }
 
     public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:Map<String, String> = null):String {
-
         if (state.nodes.length == 0) return 'empty grid';
 
         if (otherNodeAspects == null) otherNodeAspects = new Map();
@@ -92,30 +91,21 @@ class BoardUtils {
 
         var nextNode:BoardNode = null;
 
-        var wasConnected:Bool = false;
-
         if (nextNodeID != Aspect.NULL) {
-            wasConnected = true;
+            node.value[next] = Aspect.NULL;
             nextNode = nodes[nextNodeID];
             nodes[nextNodeID].value[prev] = prevNodeID;
         }
 
         if (prevNodeID != Aspect.NULL) {
-            wasConnected = true;
-            nodes[prevNodeID].value[next] = nextNodeID;
-        }
-
-        if (wasConnected) {
-            node.value[next] = Aspect.NULL;
             node.value[prev] = Aspect.NULL;
+            nodes[prevNodeID].value[next] = nextNodeID;
         }
 
         return nextNode;
     }
 
     public inline static function addNode(node:BoardNode, addedNode:BoardNode, nodes:Array<BoardNode>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):BoardNode {
-        removeNode(addedNode, nodes, next, prev);
-
         var prevNodeID:Int = node.value[prev];
         var addedNodeID:Int = addedNode.value[id];
 
@@ -137,6 +127,8 @@ class BoardUtils {
         if (nodes.length > 0) {
             var node:BoardNode = nodes[0];
 
+            node.value[prev] = Aspect.NULL;
+
             for (ike in 1...nodes.length) {
                 var nextNode:BoardNode = nodes[ike];
                 node.value[next] = nextNode.value[id];
@@ -145,8 +137,6 @@ class BoardUtils {
             }
 
             node.value[next] = Aspect.NULL;
-            node = nodes[0];
-            node.value[prev] = Aspect.NULL;
         }
     }
 }
