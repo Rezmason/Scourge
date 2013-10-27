@@ -86,7 +86,7 @@ class BiteRule extends Rule {
             for (node in frontNodes) {
                 var locus:BoardLocus = getNodeLocus(node);
                 for (neighbor in neighborsFor(locus)) {
-                    if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
+                    if (isValidEnemy(headIDs, currentPlayer, neighbor.value)) {
                         var move:BiteMove = getMove(getID(node), [getID(neighbor.value)]);
                         if (!cfg.omnidirectional && cfg.baseReachOnThickness) {
                             // The baseReachOnThickness config param uses this data to determine how far to extend a bite
@@ -123,7 +123,7 @@ class BiteRule extends Rule {
                         for (bitNodeID in move.bitNodes) {
                             var bitLocus:BoardLocus = getLocus(bitNodeID);
                             for (neighbor in neighborsFor(bitLocus)) {
-                                if (isValidEnemy(headIDs, currentPlayer, neighbor) && !move.bitNodes.has(getID(neighbor.value))) {
+                                if (isValidEnemy(headIDs, currentPlayer, neighbor.value) && !move.bitNodes.has(getID(neighbor.value))) {
                                     newMoves.push(getMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move));
                                 }
                             }
@@ -134,7 +134,7 @@ class BiteRule extends Rule {
                         var lastBitLocus:BoardLocus = getLocus(move.bitNodes[move.bitNodes.length - 1]);
                         var direction:Int = getLocus(move.targetNode).neighbors.indexOf(firstBitLocus);
                         var neighbor:BoardLocus = lastBitLocus.neighbors[direction];
-                        if (isValidEnemy(headIDs, currentPlayer, neighbor)) {
+                        if (isValidEnemy(headIDs, currentPlayer, neighbor.value)) {
                             var nextMove:BiteMove = getMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move);
                             nextMove.thickness = move.thickness;
                             newMoves.push(nextMove);
@@ -203,17 +203,34 @@ class BiteRule extends Rule {
     }
 
     // "front" as in "battle front". Areas where the current player touches other players
+    /*
     inline function isFront(headIDs:Array<Int>, node:AspectSet):Bool {
         return neighborsFor(getNodeLocus(node)).exists(isValidEnemy.bind(headIDs, node[occupier_]));
     }
+    */
+
+    inline function isFront(headIDs:Array<Int>, node:AspectSet):Bool {
+        var exists:Bool = false;
+
+        var occupier:Int = node[occupier_];
+
+        for (neighbor in neighborsFor(getNodeLocus(node))) {
+            if (isValidEnemy(headIDs, occupier, neighbor.value)) {
+                exists = true;
+                break;
+            }
+        }
+
+        return exists;
+    }
 
     // Depending on the config, enemy nodes of different kinds can be bitten
-    inline function isValidEnemy(headIDs:Array<Int>, allegiance:Int, node:BoardLocus):Bool {
+    inline function isValidEnemy(headIDs:Array<Int>, allegiance:Int, node:AspectSet):Bool {
         var val:Bool = true;
-        if (node.value[occupier_] == allegiance) val = false; // Can't be the current player
-        else if (node.value[occupier_] == Aspect.NULL) val = false; // Can't be the current player
-        else if (!cfg.biteThroughCavities && node.value[isFilled_] == Aspect.FALSE) val = false; // Must be filled, or must allow biting through a cavity
-        else if (!cfg.biteHeads && headIDs.has(getID(node.value))) val = false;
+        if (node[occupier_] == allegiance) val = false; // Can't be the current player
+        else if (node[occupier_] == Aspect.NULL) val = false; // Can't be the current player
+        else if (!cfg.biteThroughCavities && node[isFilled_] == Aspect.FALSE) val = false; // Must be filled, or must allow biting through a cavity
+        else if (!cfg.biteHeads && headIDs.has(getID(node))) val = false;
 
         return val;
     }

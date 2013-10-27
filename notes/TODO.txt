@@ -1,5 +1,6 @@
 Represent commands as some intermediary type - not strings, not intrinsic Style types
     A list of elements
+        enums, actually
         UIText sends [basic text element] at first
         They send back and forth larger sequences as the user drills down into the auto-completion
     Draw this out

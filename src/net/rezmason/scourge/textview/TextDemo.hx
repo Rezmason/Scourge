@@ -84,8 +84,8 @@ class TextDemo {
         cfg.allowNowhereDrop = false;
         cfg.numPlayers = numPlayers;
         cfg.includeCavities = true;
-        cfg.maxSwaps = 0;
-        cfg.maxBites = 0;
+        // cfg.maxSwaps = 0;
+        // cfg.maxBites = 0;
 
         var playerDefs:Array<PlayerDef> = [];
         var botPeriod:Int = 10;
