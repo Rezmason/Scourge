@@ -7,7 +7,27 @@ import haxe.Timer;
 import Math.*;
 import Std.int;
 
-typedef Datum = { dx:Float, dy:Float, rad2:Float, row:Int, col:Int, pending:Bool, side:Int }
+class Datum {
+    public var dx:Float;
+    public var dy:Float;
+    public var rad2:Float;
+    public var row:Int;
+    public var col:Int;
+    public var pending:Bool;
+    public var side:Int;
+
+    public function new():Void {}
+
+    public function pop(row, col, dx, dy, rad2, pending, side):Void {
+        this.dx = dx;
+        this.dy = dy;
+        this.rad2 = rad2;
+        this.row = row;
+        this.col = col;
+        this.pending = pending;
+        this.side = side;
+    }
+}
 
 class SDF {
 
@@ -20,14 +40,16 @@ class SDF {
     var h:Int;
     var cutoff:Int;
     var offset:Int;
+    var pool:Vector<Datum>;
 
     var cbk:BitmapData->Void;
 
     static var queue:List<SDF> = new List();
     static var running:Bool = false;
+    static var _pool:Vector<Datum> = new Vector();
 
     public static function process(source:BitmapData, cutoff:Int, offset:Int, cbk:BitmapData->Void):Void {
-        queue.add(new SDF(source, cutoff, offset, cbk));
+        queue.add(new SDF(_pool, source, cutoff, offset, cbk));
         nextSDF();
     }
 
@@ -41,11 +63,12 @@ class SDF {
         }
     }
 
-    function new(source:BitmapData, cutoff:Int, offset:Int, cbk:BitmapData->Void):Void {
+    function new(pool:Vector<Datum>, source:BitmapData, cutoff:Int, offset:Int, cbk:BitmapData->Void):Void {
         this.cutoff = cutoff;
         this.offset = offset;
         this.cbk = cbk;
         this.source = source;
+        this.pool = pool;
     }
 
     function go():Void {
@@ -64,13 +87,14 @@ class SDF {
         for (row in 0...h) {
             dataMatrix[row] = new Vector();
             for (col in 0...w) {
-                var datum:Datum = null;
+                var datum:Datum = pool.pop();
+                if (datum == null) datum = new Datum();
                 if (source.getPixel32(col, row) & 0xFF > 0xF0) {
-                    datum = {row:row, col:col, dx:0, dy:0, rad2:0, pending:true, side:-1};
+                    datum.pop(row, col, 0, 0, 0, true, -1);
                     pendingData.push(datum);
                     innerData.push(datum);
                 } else {
-                    datum = {row:row, col:col, dx:NaN, dy:NaN, rad2:NaN, pending:false, side:1};
+                    datum.pop(row, col, NaN, NaN, NaN, false, 1);
                 }
                 dataMatrix[row][col] = datum;
                 allData.push(datum);
@@ -108,13 +132,14 @@ class SDF {
 
         for (datum in allData) {
             var distance:Float = cutoff + 1;
-            if (!isNaN(datum.rad2)) distance = sqrt(datum.rad2) * datum.side;
+            if (!_isNaN(datum.rad2)) distance = sqrt(datum.rad2) * datum.side;
             sdf.setPixel32(datum.col, datum.row, 0xFF000000 | int(distance + offset));
         }
 
         cbk(sdf);
         cbk = null;
 
+        for (datum in allData) pool.push(datum);
         running = false;
         nextSDF();
     }
@@ -125,39 +150,47 @@ class SDF {
         var row:Int = datum.row;
         var col:Int = datum.col;
 
-        if (col > 0    ) neighbors.push(dataMatrix[row][col - 1]);
-        if (col < w - 1) neighbors.push(dataMatrix[row][col + 1]);
-        if (row > 0    ) neighbors.push(dataMatrix[row - 1][col]);
-        if (row < h - 1) neighbors.push(dataMatrix[row + 1][col]);
+        var left:Bool = col > 0;
+        var right:Bool = col < w - 1;
+        var up:Bool = row > 0;
+        var down:Bool = row < h - 1;
 
-        if (col > 0     && row > 0    ) neighbors.push(dataMatrix[row - 1][col - 1]);
-        if (col < w - 1 && row > 0    ) neighbors.push(dataMatrix[row - 1][col + 1]);
-        if (col > 0     && row < h - 1) neighbors.push(dataMatrix[row + 1][col - 1]);
-        if (col < w - 1 && row < h - 1) neighbors.push(dataMatrix[row + 1][col + 1]);
+        if (left) neighbors.push(dataMatrix[row][col - 1]);
+        if (right) neighbors.push(dataMatrix[row][col + 1]);
+        if (up) neighbors.push(dataMatrix[row - 1][col]);
+        if (down) neighbors.push(dataMatrix[row + 1][col]);
+
+        if (left && up) neighbors.push(dataMatrix[row - 1][col - 1]);
+        if (right && up) neighbors.push(dataMatrix[row - 1][col + 1]);
+        if (left && down) neighbors.push(dataMatrix[row + 1][col - 1]);
+        if (right && down) neighbors.push(dataMatrix[row + 1][col + 1]);
 
         return neighbors;
     }
 
     function findPendingDistances(nextStep:Void->Void):Void {
 
-        var timer:Timer = new Timer(10);
+        var timer:Timer = new Timer(5);
 
         function tick():Void {
             var datum:Datum;
             var count:Int = 0;
-            while (count++ < 2000 && (datum = pendingData.shift()) != null) {
+            while (count++ < 4000 && (datum = pendingData.shift()) != null) {
                 datum.pending = false;
 
-                var newNeighbors:Array<Datum> = [];
+                var row:Int = datum.row;
+                var col:Int = datum.col;
+
+                var newNeighbors:Vector<Datum> = new Vector();
 
                 for (neighbor in neighborsFor(datum)) {
-                    if (isNaN(neighbor.rad2) && !neighbor.pending) {
+                    if (_isNaN(neighbor.rad2) && !neighbor.pending) {
                         newNeighbors.push(neighbor);
                     } else {
-                        var dx:Float = neighbor.dx + (neighbor.col - datum.col);
-                        var dy:Float = neighbor.dy + (neighbor.row - datum.row);
+                        var dx:Float = neighbor.dx + (neighbor.col - col);
+                        var dy:Float = neighbor.dy + (neighbor.row - row);
                         var rad2:Float = dx * dx + dy * dy;
-                        if (isNaN(datum.rad2) || rad2 < datum.rad2) {
+                        if (_isNaN(datum.rad2) || rad2 < datum.rad2) {
                             datum.dx = dx;
                             datum.dy = dy;
                             datum.rad2 = rad2;
@@ -187,4 +220,6 @@ class SDF {
         dest.copyPixels(src, src.rect, new Point(padding, padding), null, null, true);
         return dest;
     }
+
+    inline function _isNaN(i:Float):Bool return untyped __global__["isNaN"](i);
 }
