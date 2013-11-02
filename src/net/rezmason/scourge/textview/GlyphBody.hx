@@ -15,7 +15,11 @@ class GlyphBody extends Body {
 
     inline static var CHAR:String = 'Ω';
 
+    var time:Float;
+
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+
+        time = 0;
 
         super(bufferUtil, glyphTexture, redrawHitAreas);
 
@@ -35,5 +39,12 @@ class GlyphBody extends Body {
 
         transform.identity();
         transform.appendScale(1, -1, 1);
+    }
+
+    override public function update(delta:Float):Void {
+        time += delta;
+        glyphs[0].set_f((Math.sin(time) * 0.5) * 0.05 + 0.5);
+        glyphs[0].set_i((Math.sin(time * 0.5) * 0.5) * 1.0 + 0.5);
+        super.update(delta);
     }
 }

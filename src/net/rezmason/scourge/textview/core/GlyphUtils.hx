@@ -15,6 +15,7 @@ class GlyphUtils {
     inline static var uOff:Int = Almanac.U_OFFSET;
     inline static var vOff:Int = Almanac.V_OFFSET;
     inline static var iOff:Int = Almanac.I_OFFSET;
+    inline static var fOff:Int = Almanac.F_OFFSET;
 
     inline static var xOff:Int = Almanac.X_OFFSET;
     inline static var yOff:Int = Almanac.Y_OFFSET;
@@ -51,6 +52,9 @@ class GlyphUtils {
 
     public inline static function get_i(gl:G) { return gl.color[gl.id * cpg + iOff]; }
     public inline static function set_i(gl:G, v) { return pop4(gl.color, gl.id * cpg, iOff, cpv, v); }
+
+    public inline static function get_f(gl:G) { return gl.color[gl.id * cpg + fOff]; }
+    public inline static function set_f(gl:G, v) { return pop4(gl.color, gl.id * cpg, fOff, cpv, v); }
 
     public inline static function set_color(gl:G, r, g, b) {
         set_r(gl, r);

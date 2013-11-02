@@ -20,5 +20,6 @@ class Glyph {
         GlyphUtils.transfer(this, shape, color, paint);
         GlyphUtils.set_color(this, 1, 1, 1);
         GlyphUtils.set_s(this, 1);
+        GlyphUtils.set_f(this, 0.5);
     }
 }

@@ -4,6 +4,7 @@ import flash.geom.Matrix3D;
 
 import openfl.Assets.getText;
 
+import net.rezmason.scourge.textview.core.Almanac.*;
 import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.RenderMethod;
@@ -20,6 +21,7 @@ class PrettyMethod extends RenderMethod {
     var aColor:AttribsLocation;
     var aUV:AttribsLocation;
     var aVid:AttribsLocation;
+    var aFat:AttribsLocation;
     var uSampler:UniformLocation;
     var uGlyphMat:UniformLocation;
     var uCameraMat:UniformLocation;
@@ -53,6 +55,7 @@ class PrettyMethod extends RenderMethod {
         aColor  = programUtil.getAttribsLocation(program, 'aColor' );
         aUV     = programUtil.getAttribsLocation(program, 'aUV'    );
         aVid    = programUtil.getAttribsLocation(program, 'aVid'   );
+        aFat    = programUtil.getAttribsLocation(program, 'aFat'   );
 
         uSampler   = programUtil.getUniformLocation(program, 'uSampler'  );
         uGlyphMat  = programUtil.getUniformLocation(program, 'uGlyphMat' );
@@ -88,6 +91,7 @@ class PrettyMethod extends RenderMethod {
         programUtil.setVertexBufferAt(program, aColor,  colorBuffer, 0, 3); // aColor contains r,g,b
         programUtil.setVertexBufferAt(program, aUV,     colorBuffer, 3, 2); // aUV contains u,v
         programUtil.setVertexBufferAt(program, aVid,    colorBuffer, 5, 1); // aVid contains i
+        programUtil.setVertexBufferAt(program, aFat,    colorBuffer, 6, 1); // aFat contains f
     }
 }
 
