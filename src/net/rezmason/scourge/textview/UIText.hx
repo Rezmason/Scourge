@@ -37,38 +37,39 @@ class UIText {
     var systemOutput:String;
     var textIsDirty:Bool;
     var caretStyle:AnimatedStyle;
-    var interpreter:Interpreter;
 
     var inputHistory:Array<String>;
     var histItr:Int;
 
-    public function new(interpreter:Interpreter):Void {
+    var currentPlayerName:String;
+    var currentPlayerColor:Int;
 
-        this.interpreter = interpreter;
+    public function new():Void {
 
         styles = new StyleSet();
 
         numRows = 0;
         numCols = 0;
 
-        // blurb = '';
+        blurb = '';
         // blurb = [TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n");
         // blurb = Assets.getText("assets/not plus.txt");
         // blurb = Assets.getText("assets/enterprise.txt");
         // blurb = Assets.getText("assets/acid2.txt");
-        blurb = TestStrings.STYLED_TEXT;
+        // blurb = TestStrings.STYLED_TEXT;
         // blurb = "One. §{i:1}Two§{}.";x
 
         styles.extract(TestStrings.BREATHING_PROMPT_STYLE);
         styles.extract(TestStrings.CARET_STYLE);
         styles.extract(TestStrings.INPUT_STYLE);
 
-        caretStyle = cast styles.getStyleByName('caret');
+        setPlayer('rezmason', 0xFF3030);
 
-        prompt = '§{breathingprompt}Ω_rezmason§{} => §{}';
+        caretStyle = cast styles.getStyleByName('caret');
         caretStart = '§{caret}';
         caretEnd = '§{}';
         caretIndex = 0;
+
         systemInput = '';
         systemOutput = '\n';
         textIsDirty = false;
@@ -146,7 +147,18 @@ class UIText {
 
     public function setText(text:String):Void blurb = text;
 
-    public function setPrompt(text:String):Void prompt = text;
+    public function setPlayer(name:String, color:Int):Void {
+        currentPlayerName = name;
+        currentPlayerColor = color;
+
+        var r:Float = (color >> 16 & 0xFF) / 0xFF;
+        var g:Float = (color >> 8  & 0xFF) / 0xFF;
+        var b:Float = (color >> 0  & 0xFF) / 0xFF;
+
+        prompt =
+        '∂{name:promptHead, basis:breathingprompt, r:$r, g:$g, b:$b}Ω' +
+        '§{name:prompt, r:$r, g:$g, b:$b} $currentPlayerName§{} => §{}';
+    }
 
     inline function padLine(line:String):String {
 
@@ -239,7 +251,8 @@ class UIText {
                             if (length(systemInput) == 0) {
                                 systemOutput = '\n';
                             } else {
-                                systemOutput = '\n' + printCommand(interpreter.run(systemInput, false));
+                                systemOutput = '\n' + systemInput + '\n';
+                                // TODO: signal
                                 inputHistory.push(systemInput);
                                 histItr = inputHistory.length;
                             }
@@ -340,22 +353,6 @@ class UIText {
 
     inline function numScrollPositions():Int {
         return combinedTextLength < (numRows - 1) ? 1 : combinedTextLength - (numRows - 1) + 1;
-    }
-
-    inline function printCommand(command:Command):String {
-        var str:String = null;
-        switch (command) {
-            case EMPTY: str = '';
-            case ERROR(message): str = message + '\n';
-            case COMMIT(message): str = message + '\n';
-            case CHAT(message): str = message + '\n';
-            case LIST(filteredMoves):
-                if (filteredMoves.length == 0) str = 'No moves available. \n';
-                else str = '${filteredMoves.length} moves available:\n ${filteredMoves.join("\n")}\n';
-            case CUSTOM_COMMAND(name, output): str = '$name :: $output\n';
-        }
-
-        return str;
     }
 
     public inline function bottomPos():Float return numScrollPositions() - 1;

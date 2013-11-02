@@ -34,7 +34,6 @@ class TextDemo {
     var testBody:TestBody;
     var boardBody:BoardBody;
     var uiBody:UIBody;
-    var interpreter:Interpreter;
 
     var referee:Referee;
     var spectator:SimpleSpectator;
@@ -155,11 +154,13 @@ class TextDemo {
         /**/
 
         //*
-        interpreter = new Interpreter();
-        interpreter.addCommand("runTests", runTests);
-        interpreter.addCommand("setFont", setFont);
-        interpreter.addCommand("makeGame", makeGame);
-        uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, new UIText(interpreter));
+        // interpreter = new Interpreter();
+        // interpreter.addCommand("runTests", runTests);
+        // interpreter.addCommand("setFont", setFont);
+        // interpreter.addCommand("makeGame", makeGame);
+        var uiText:UIText = new UIText();
+        // TODO: signal handling
+        uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, uiText);
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
         uiBody.viewRect = uiRect;
         uiBody.padding = 0.025;
