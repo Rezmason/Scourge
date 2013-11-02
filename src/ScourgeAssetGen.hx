@@ -16,6 +16,7 @@ import flash.text.Font;
 import flash.net.FileReference;
 
 import net.rezmason.utils.FlatFont;
+import net.rezmason.utils.SDF;
 
 import net.rezmason.scourge.textview.TestStrings;
 
@@ -41,6 +42,8 @@ class ScourgeAssetGen {
         deploy(font1, "profont");
         deploy(font2, "source");
         deploy(font3, "full");
+
+        var sdf = new SDF();
     }
 
     static function deploy(font:FlatFont, id:String):Void {

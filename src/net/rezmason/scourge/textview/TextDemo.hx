@@ -147,13 +147,13 @@ class TextDemo {
         engine.addBody(testBody);
         /**/
 
-        //*
+        /*
         boardBody = new BoardBody(utils.bufferUtil, fontTextures['full_fog'], engine.invalidateMouse);
         boardBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(boardBody);
         /**/
 
-        //*
+        /*
         // interpreter = new Interpreter();
         // interpreter.addCommand("runTests", runTests);
         // interpreter.addCommand("setFont", setFont);
@@ -171,6 +171,9 @@ class TextDemo {
         var alphabetBody:Body = new AlphabetBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         engine.addBody(alphabetBody);
         /**/
+
+        var glyphBody:Body = new GlyphBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
+        engine.addBody(glyphBody);
 
         /*
         splashBody = new SplashBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);

@@ -1,3 +1,7 @@
+Signed distance fields for text
+    http://www.valvesoftware.com/publications/2007/SIGGRAPH2007_AlphaTestedMagnification.pdf
+    Then we can mess with glyph fatness!
+
 Represent commands as some intermediary type - not strings, not intrinsic Style types
     A list of elements
         enums, actually
