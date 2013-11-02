@@ -16,7 +16,6 @@ import flash.text.Font;
 import flash.net.FileReference;
 
 import net.rezmason.utils.FlatFont;
-import net.rezmason.utils.SDF;
 
 import net.rezmason.scourge.textview.TestStrings;
 
@@ -24,6 +23,9 @@ import net.rezmason.scourge.textview.TestStrings;
 @:font("assets/SourceCodePro_FontsOnly-1.013/TTF/SourceCodePro-Semibold.ttf") class SourceProFont extends Font {}
 
 class ScourgeAssetGen {
+
+    static var font1:FlatFont = null;
+    static var font2:FlatFont = null;
 
     public static function main():Void {
 
@@ -35,15 +37,23 @@ class ScourgeAssetGen {
             TestStrings.BOX_SYMBOLS,
         ].join("");
 
-        var font1:FlatFont = FlatFont.flatten(new ProFont(), 140, requiredString, 48, 48, 1);
-        var font2:FlatFont = FlatFont.flatten(new SourceProFont(), 140, requiredString, 48, 48, 1);
+        FlatFont.flatten(new ProFont(), 140, requiredString, 48, 48, 1, 10, function(ff) {
+            font1 = ff;
+            if (font1 != null && font2 != null) proceed();
+        });
+
+        FlatFont.flatten(new SourceProFont(), 140, requiredString, 48, 48, 1, 10, function(ff) {
+            font2 = ff;
+            if (font1 != null && font2 != null) proceed();
+        });
+    }
+
+    static function proceed():Void {
         var font3:FlatFont = FlatFont.combine(font1, [font2]);
 
         deploy(font1, "profont");
         deploy(font2, "source");
         deploy(font3, "full");
-
-        var sdf = new SDF();
     }
 
     static function deploy(font:FlatFont, id:String):Void {

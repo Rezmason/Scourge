@@ -13,10 +13,12 @@
 	<classpath name="src" />
 
 	<haxedef name="haxeJSON" />
+	<haxedef name="advanced-telemetry"/>
 	<compilerflag name="-debug" />
 
 	<haxelib name="openfl" />
 	<haxelib name="format" />
+
 
 	<!-- <ndll name="std" /> -->
 	<!-- <ndll name="regexp" /> -->
