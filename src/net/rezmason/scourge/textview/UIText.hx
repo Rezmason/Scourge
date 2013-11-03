@@ -56,7 +56,7 @@ class UIText {
         // blurb = Assets.getText("assets/not plus.txt");
         // blurb = Assets.getText("assets/enterprise.txt");
         // blurb = Assets.getText("assets/acid2.txt");
-        // blurb = TestStrings.STYLED_TEXT;
+        blurb = TestStrings.STYLED_TEXT;
         // blurb = "One. §{i:1}Two§{}.";x
 
         styles.extract(TestStrings.BREATHING_PROMPT_STYLE);

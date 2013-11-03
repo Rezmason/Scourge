@@ -37,12 +37,12 @@ class ScourgeAssetGen {
             TestStrings.BOX_SYMBOLS,
         ].join("");
 
-        FlatFont.flatten(new ProFont(), 300, requiredString, 72, 72, 1, 10, function(ff) {
+        FlatFont.flatten(new ProFont(), 300, requiredString, 72, 72, 1, 20, function(ff) {
             font1 = ff;
             if (font1 != null && font2 != null) proceed();
         });
 
-        FlatFont.flatten(new SourceProFont(), 300, requiredString, 72, 72, 1, 10, function(ff) {
+        FlatFont.flatten(new SourceProFont(), 300, requiredString, 72, 72, 1, 20, function(ff) {
             font2 = ff;
             if (font1 != null && font2 != null) proceed();
         });

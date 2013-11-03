@@ -14,6 +14,16 @@ import net.rezmason.gl.VertexBuffer;
 
 class PrettyMethod extends RenderMethod {
 
+    inline static var DERIV_MULT:Float =
+    #if flash
+        0.3
+    #elseif js
+        100
+    #else
+        50
+    #end
+    ;
+
     var aPos:AttribsLocation;
     var aCorner:AttribsLocation;
     var aScale:AttribsLocation;
@@ -23,6 +33,7 @@ class PrettyMethod extends RenderMethod {
     var aVid:AttribsLocation;
     var aFat:AttribsLocation;
     var uSampler:UniformLocation;
+    var uDerivMult:UniformLocation;
     var uGlyphMat:UniformLocation;
     var uCameraMat:UniformLocation;
     var uBodyMat:UniformLocation;
@@ -33,6 +44,8 @@ class PrettyMethod extends RenderMethod {
         programUtil.setProgram(program);
         programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         programUtil.setDepthTest(false);
+
+        programUtil.setFourProgramConstants(program, uDerivMult, [DERIV_MULT, 0, 0, 0]);
     }
 
     override public function deactivate():Void {
@@ -43,10 +56,16 @@ class PrettyMethod extends RenderMethod {
 
     override function composeShaders():Void {
         vertShader = getText('shaders/scourge_glyphs.vert');
-        #if !desktop
-            fragShader = 'precision mediump float;' + getText('shaders/scourge_glyphs_web.frag');
+
+        var pmf:String = 'precision mediump float;';
+        var derivatives:String = '#extension GL_OES_standard_derivatives : enable \n';
+        var frag:String = getText('shaders/scourge_glyphs.frag');
+
+        #if js
+            programUtil.enableExtension("OES_standard_derivatives");
+            fragShader = derivatives + pmf + frag;
         #else
-            fragShader = getText('shaders/scourge_glyphs.frag');
+            fragShader = frag;
         #end
     }
 
@@ -62,6 +81,7 @@ class PrettyMethod extends RenderMethod {
         aFat    = programUtil.getAttribsLocation(program, 'aFat'   );
 
         uSampler   = programUtil.getUniformLocation(program, 'uSampler'  );
+        uDerivMult = programUtil.getUniformLocation(program, 'uDerivMult');
         uGlyphMat  = programUtil.getUniformLocation(program, 'uGlyphMat' );
         uCameraMat = programUtil.getUniformLocation(program, 'uCameraMat');
         uBodyMat   = programUtil.getUniformLocation(program, 'uBodyMat'  );

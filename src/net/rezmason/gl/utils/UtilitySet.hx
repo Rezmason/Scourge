@@ -10,6 +10,8 @@ import flash.display.Stage;
 
 import net.rezmason.gl.utils.Util;
 
+using Lambda;
+
 class UtilitySet {
 
     public var textureUtil(default, null):TextureUtil;

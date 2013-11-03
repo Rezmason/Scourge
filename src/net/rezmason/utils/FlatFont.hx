@@ -14,6 +14,10 @@ import haxe.Utf8;
     import flash.text.engine.TextElement;
     import flash.text.engine.TextLine;
     import flash.text.Font;
+    import flash.utils.ByteArray;
+
+    import openfl.Assets.getBytes;
+    import net.rezmason.utils.TempAgency;
 #end
 
 using haxe.JSON;
@@ -34,15 +38,25 @@ typedef FlatFontJSON = {
     var missingChars:Dynamic;
 };
 
-class FlatFont {
+#if flash
+    typedef SerializedBitmap = {
+        var width:Int;
+        var height:Int;
+        var bytes:ByteArray;
+    }
+#end
 
-    inline static var SDF_OFFSET:Int = 0x80;
+class FlatFont {
 
     var bitmapData:BitmapData;
     var charCoords:Map<Int, CharCoord>;
     var missingChars:Array<Int>;
     var defaultCharCoord:CharCoord;
     var jsonString:String;
+
+    #if flash
+        static var sdfAgency:TempAgency<{source:SerializedBitmap, cutoff:Int}, SerializedBitmap>;
+    #end
 
     public var glyphWidth(default, null):Int;
     public var glyphHeight(default, null):Int;
@@ -53,6 +67,7 @@ class FlatFont {
     public var columnFraction(default, null):Float;
 
     public function new(bitmapData:BitmapData, jsonString:String):Void {
+
         this.bitmapData = bitmapData;
         bdWidth = bitmapData.width;
         bdHeight = bitmapData.height;
@@ -128,6 +143,8 @@ class FlatFont {
     #if flash
     public static function flatten(font:Font, fontSize:Int, charString:String, glyphWidth:Int, glyphHeight:Int, spacing:Int, cutoff:Int, cbk:FlatFont->Void):Void {
 
+        if (sdfAgency == null) sdfAgency = new TempAgency(getBytes("flash_workers/SDFWorker.swf"));
+
         if (fontSize < 1) fontSize = 72;
         if (glyphWidth  < 0) glyphWidth  = 1;
         if (glyphHeight < 0) glyphHeight = 1;
@@ -194,8 +211,9 @@ class FlatFont {
         var numSDFs:Int = 0;
 
         function proceed():Void {
+
             var width:Int = largestPowerOfTwo(Std.int(Math.max(glyphWidth * numColumns, glyphHeight * numRows)));
-            var bitmapData:BitmapData = new BitmapData(width, width, true, 0xFF000000 | (SDF_OFFSET + cutoff));
+            var bitmapData:BitmapData = new BitmapData(width, width, true, 0xFF0000FF);
 
             var x:Int = 0;
             var y:Int = 0;
@@ -230,9 +248,13 @@ class FlatFont {
             cbk (new FlatFont(bitmapData, json.stringify()));
         }
 
-        function addSDF(index:Int, sdf:BitmapData):Void {
+        function addSDF(index:Int, sdf:SerializedBitmap):Void {
             numSDFs++;
-            bds[index] = sdf;
+
+            var bd:BitmapData = new BitmapData(sdf.width, sdf.height, true, 0x0);
+            bd.setPixels(bd.rect, sdf.bytes);
+
+            bds[index] = bd;
             trace('$index: $numSDFs / $numChars');
             if (numSDFs == numChars) proceed();
         }
@@ -240,7 +262,9 @@ class FlatFont {
         for (ike in 0...numChars) {
             var bd:BitmapData = glyphBD.clone();
             bd.draw(glyphs[ike], glyphMat, null, BlendMode.NORMAL, null, true);
-            SDF.process(bd, cutoff, SDF_OFFSET, addSDF.bind(ike));
+
+            var sb:SerializedBitmap = {width:bd.width, height:bd.height, bytes:bd.getPixels(bd.rect)};
+            sdfAgency.addWork({source:sb, cutoff:cutoff}, addSDF.bind(ike));
         }
     }
     #end

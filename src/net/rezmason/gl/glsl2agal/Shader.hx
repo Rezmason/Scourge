@@ -34,6 +34,7 @@ class Shader {
     var constTable:Map<Int, Vector<Float>>;
 
     function new(agal:AGALOutput) {
+
         type = agal.type;
         var json:Dynamic = agal.json;
         populateVarTable(json.varnames);
@@ -54,7 +55,7 @@ class Shader {
     }
 
     inline function setup(context3D:Context3D):Void {
-        for (index in constTable.keys()) setUniformFromVector(context3D, index, constTable[index]);
+        for (index in constTable.keys()) setUniformFromVector(context3D, index, constTable[index], 1);
     }
 
     inline function setUniformFromMatrix(context3D:Context3D, index:Int, matrix:Matrix3D, transposedMatrix:Bool = false):Void {
@@ -62,14 +63,14 @@ class Shader {
     }
 
     // expect 4 values
-    inline function setUniformFromByteArray(context3D, index:Int, data:ByteArray, byteArrayOffset:Int):Void {
+    inline function setUniformFromByteArray(context3D:Context3D, index:Int, data:ByteArray, byteArrayOffset:Int):Void {
         context3D.setProgramConstantsFromByteArray(type, index, 1, data, byteArrayOffset);
     }
 
     // TODO do not use vector but use 4 float arguments ?
     // for now it only use the first 4 float in the vector
-    inline function setUniformFromVector(context3D:Context3D, index:Int, vector:Vector<Float>):Void {
-        context3D.setProgramConstantsFromVector(type, index, vector, 1);
+    inline function setUniformFromVector(context3D:Context3D, index:Int, vector:Vector<Float>, count:Int):Void {
+        context3D.setProgramConstantsFromVector(type, index, vector, count);
     }
 
     inline function getRegisterIndex(name:String):Int {

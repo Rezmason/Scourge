@@ -12,7 +12,7 @@ class StyleUtils {
         INPUT_STYLE => InputStyle,
     ];
 
-    public inline static function defaultStyleTag():Dynamic return {r:1, g:1, b:1, i:0, s:1, p:0};
+    public inline static function defaultStyleTag():Dynamic return {r:1, g:1, b:1, i:0, f:0.5, s:1, p:0};
 
     public inline static function parseTag(input:String):Dynamic {
 

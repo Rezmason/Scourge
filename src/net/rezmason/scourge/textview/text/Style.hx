@@ -18,7 +18,7 @@ class Style {
     var mouseID:Int;
     var paint:Int;
 
-    static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 's', 'p'];
+    static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 'f', 's', 'p'];
 
     public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
         values = new Map<String, Dynamic>();
@@ -52,12 +52,14 @@ class Style {
         var g:Float = basics[1];
         var b:Float = basics[2];
         var i:Float = basics[3];
-        var s:Float = basics[4];
-        var p:Float = basics[5];
+        var f:Float = basics[4];
+        var s:Float = basics[5];
+        var p:Float = basics[6];
 
         for (glyph in glyphs) {
             glyph.set_color(r, g, b);
             glyph.set_i(i);
+            glyph.set_f(f);
             glyph.set_s(s);
             glyph.set_p(p);
         }

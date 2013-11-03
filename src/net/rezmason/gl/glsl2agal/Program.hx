@@ -8,6 +8,8 @@ import flash.display3D.Program3D;
 import flash.display3D.VertexBuffer3D;
 import flash.display3D.textures.Texture;
 import flash.geom.Matrix3D;
+import flash.utils.ByteArray;
+import flash.Vector;
 
 import net.rezmason.gl.glsl2agal.Types;
 import net.rezmason.utils.TempAgency;
@@ -91,6 +93,7 @@ class Program {
     public inline function getUniformLocation(name:String):Int {
         var flag:Int = vertexShader.hasVar(name) ? 0 : 1;
         var index:Int = (flag == 0 ? vertexShader : fragmentShader).getRegisterIndex(name);
+
         return makeLoc(index, flag);
     }
 
@@ -99,12 +102,14 @@ class Program {
         else fragmentShader.setUniformFromMatrix(context3D, getLocIndex(loc), matrix, transposedMatrix);
     }
 
-    public inline function setVertexUniformFromMatrix(loc:Int, matrix:Matrix3D, transposedMatrix:Bool = false):Void {
-        vertexShader.setUniformFromMatrix(context3D, getLocIndex(loc), matrix, transposedMatrix);
+    public inline function setUniformFromVector(loc:Int, vec:Vector<Float>, count:Int):Void {
+        if (getLocFlag(loc) == 0) vertexShader.setUniformFromVector(context3D, getLocIndex(loc), vec, count);
+        else fragmentShader.setUniformFromVector(context3D, getLocIndex(loc), vec, count);
     }
 
-    public inline function setFragmentUniformFromMatrix(loc:Int, matrix:Matrix3D, transposedMatrix:Bool = false):Void {
-        fragmentShader.setUniformFromMatrix(context3D, getLocIndex(loc), matrix, transposedMatrix);
+    public inline function setUniformFromByteArray(loc:Int, data:ByteArray, offset:Int):Void {
+        if (getLocFlag(loc) == 0) vertexShader.setUniformFromByteArray(context3D, getLocIndex(loc), data, offset);
+        else fragmentShader.setUniformFromByteArray(context3D, getLocIndex(loc), data, offset);
     }
 
     // TODO set from vector and byte array

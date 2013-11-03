@@ -2,9 +2,11 @@ package net.rezmason.gl.utils;
 
 import flash.geom.Matrix3D;
 #if flash
+    import flash.display.Stage;
     import flash.display3D.Context3DCompareMode;
     import flash.display3D.Context3DProgramType;
     import flash.display3D.Context3DVertexBufferFormat;
+    import flash.Vector;
 #else
     import openfl.gl.GL;
     import openfl.gl.GLShader;
@@ -24,7 +26,17 @@ class ProgramUtil extends Util {
             FLOAT_3,
             FLOAT_4,
         ];
+
+        var vec:Vector<Float>;
     #end
+
+    public function new(view:View, context:Context):Void {
+        super(view, context);
+
+        #if flash
+            vec = new Vector();
+        #end
+    }
 
     public inline function loadProgram(vertSource:String, fragSource:String, onLoaded:Program->Void):Void {
 
@@ -72,6 +84,19 @@ class ProgramUtil extends Util {
             program.setUniformFromMatrix(location, matrix, true);
         #else
             GL.uniformMatrix3D(location, false, matrix);
+        #end
+    }
+
+    public inline function setFourProgramConstants(program:Program, location:UniformLocation, vals:Array<Float>):Void {
+
+        #if flash
+            for (i in 0...4) vec[i] = vals[i];
+        #end
+
+        #if flash
+            program.setUniformFromVector(location, vec, 1);
+        #else
+            GL.uniform4f(location, vals[0], vals[1], vals[2], vals[3]);
         #end
     }
 
@@ -145,6 +170,12 @@ class ProgramUtil extends Util {
             return program.getAttribLocation(name);
         #else
             return GL.getAttribLocation(program, name);
+        #end
+    }
+
+    public inline function enableExtension(extName:String):Void {
+        #if !flash
+            GL.getExtension(extName);
         #end
     }
 }

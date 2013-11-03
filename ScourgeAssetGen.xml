@@ -3,7 +3,7 @@
 
 	<meta title="Scourge Asset Generator" description="" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" />
 
-	<app title="Scourge Asset Generator" file="ScourgeAssetGen" main="ScourgeAssetGen" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" />
+	<app title="Scourge Asset Generator" file="ScourgeAssetGen" main="ScourgeAssetGen" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="11.4" />
 
 	<window width="800" height="600" fps="30" orientation="portrait" background="#000000" resizable="true" />
 	<window width="0" height="0" if="fullscreen" />
@@ -13,8 +13,8 @@
 	<classpath name="src" />
 
 	<haxedef name="haxeJSON" />
-	<haxedef name="advanced-telemetry"/>
-	<compilerflag name="-debug" />
+
+	<assets path="flash_workers/flash/bin" rename="flash_workers" if="flash" />
 
 	<haxelib name="openfl" />
 	<haxelib name="format" />
