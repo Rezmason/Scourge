@@ -43,7 +43,11 @@ class PrettyMethod extends RenderMethod {
 
     override function composeShaders():Void {
         vertShader = getText('shaders/scourge_glyphs.vert');
-        fragShader = #if !desktop 'precision mediump float;' + #end getText('shaders/scourge_glyphs.frag');
+        #if !desktop
+            fragShader = 'precision mediump float;' + getText('shaders/scourge_glyphs_web.frag');
+        #else
+            fragShader = getText('shaders/scourge_glyphs.frag');
+        #end
     }
 
     override function connectToShaders():Void {

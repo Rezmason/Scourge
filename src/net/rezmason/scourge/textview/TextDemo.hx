@@ -141,7 +141,7 @@ class TextDemo {
 
     function makeScene():Void {
 
-        //*
+        /*
         testBody = new TestBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         testBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(testBody);

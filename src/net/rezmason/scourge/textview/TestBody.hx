@@ -104,12 +104,15 @@ class TestBody extends Body {
         for (ike in 0...glyphs.length) {
             var glyph:Glyph = glyphs[ike];
 
-            var d:Float = glyph.get_z();
-            var p:Float = (Math.cos(time * 4 + d * 20) * 0.5 + 1) * 0.4;
-            var s:Float = (Math.cos(time * 4 + d * 30) * 0.5 + 1) * 2.0;
+            var d1:Float = glyph.get_z();
+            var d2:Float = glyph.get_y();
+            var p:Float = (Math.cos(time * 4 + d1 * 20) * 0.500 + 1) * 0.4;
+            var s:Float = (Math.cos(time * 4 + d1 * 30) * 0.200 + 1) * 2.0;
+            var f:Float = (Math.cos(time * 4 + d2 * 10) * 0.040 + 0) + 0.5;
 
             glyph.set_p(p);
             glyph.set_s(s);
+            glyph.set_f(f);
         }
 
         super.update(delta);

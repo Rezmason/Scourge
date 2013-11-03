@@ -15,6 +15,7 @@ class Scourge {
     static var utils:UtilitySet;
 
     public static function main():Void {
+        #if flash Lib.redirectTraces(); #end
         trace('\n${TestStrings.SPLASH}');
 
         fonts = new Map();

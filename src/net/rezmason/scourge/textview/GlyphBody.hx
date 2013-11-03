@@ -44,7 +44,7 @@ class GlyphBody extends Body {
     override public function update(delta:Float):Void {
         time += delta;
         glyphs[0].set_f((Math.sin(time) * 0.5) * 0.05 + 0.5);
-        glyphs[0].set_i((Math.sin(time * 0.5) * 0.5) * 1.0 + 0.5);
+        // glyphs[0].set_i((Math.sin(time * 0.5) * 0.5) * 1.0 + 0.5);
         super.update(delta);
     }
 }
