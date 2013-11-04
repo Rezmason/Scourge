@@ -16,6 +16,7 @@ import flash.text.Font;
 import flash.net.FileReference;
 
 import net.rezmason.utils.FlatFont;
+import net.rezmason.utils.FlatFontGenerator;
 
 import net.rezmason.scourge.textview.TestStrings;
 
@@ -37,19 +38,19 @@ class ScourgeAssetGen {
             TestStrings.BOX_SYMBOLS,
         ].join("");
 
-        FlatFont.flatten(new ProFont(), 300, requiredString, 72, 72, 1, 20, function(ff) {
+        FlatFontGenerator.flatten(new ProFont(), 300, requiredString, 72, 72, 1, 20, function(ff) {
             font1 = ff;
             if (font1 != null && font2 != null) proceed();
         });
 
-        FlatFont.flatten(new SourceProFont(), 300, requiredString, 72, 72, 1, 20, function(ff) {
+        FlatFontGenerator.flatten(new SourceProFont(), 300, requiredString, 72, 72, 1, 20, function(ff) {
             font2 = ff;
             if (font1 != null && font2 != null) proceed();
         });
     }
 
     static function proceed():Void {
-        var font3:FlatFont = FlatFont.combine(font1, [font2]);
+        var font3:FlatFont = FlatFontGenerator.combine(font1, [font2]);
 
         deploy(font1, "profont");
         deploy(font2, "source");
