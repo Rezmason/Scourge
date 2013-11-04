@@ -157,11 +157,12 @@ class FlatFont {
 
         for (char in charString.split('')) {
             if (!requiredChars.exists(char)) {
+                numChars++;
                 if (font.hasGlyphs(char)) {
-                    numChars++;
                     requiredChars[char] = true;
                 } else {
                     missingChars.push(char.charCodeAt(0));
+                    requiredChars[char] = false;
                 }
             }
         }
@@ -252,6 +253,7 @@ class FlatFont {
             numSDFs++;
 
             var bd:BitmapData = new BitmapData(sdf.width, sdf.height, true, 0x0);
+            sdf.bytes.position = 0;
             bd.setPixels(bd.rect, sdf.bytes);
 
             bds[index] = bd;
