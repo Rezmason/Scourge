@@ -57,13 +57,13 @@ class PrettyMethod extends RenderMethod {
     override function composeShaders():Void {
         vertShader = getText('shaders/scourge_glyphs.vert');
 
-        var pmf:String = 'precision mediump float;';
-        var derivatives:String = '#extension GL_OES_standard_derivatives : enable \n';
         var frag:String = getText('shaders/scourge_glyphs.frag');
 
-        #if js
+        #if flash
+            fragShader = getText('shaders/scourge_glyphs_flash.frag');
+        #elseif js
             programUtil.enableExtension("OES_standard_derivatives");
-            fragShader = derivatives + pmf + frag;
+            fragShader = '#extension GL_OES_standard_derivatives : enable \n precision mediump float;' + frag;
         #else
             fragShader = frag;
         #end

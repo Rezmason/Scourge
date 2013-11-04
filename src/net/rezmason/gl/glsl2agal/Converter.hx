@@ -23,7 +23,7 @@ class Converter {
     static function convert(input:GLSLInput):AGALOutput {
         var type:String = cast input.type;
         var source = input.source;
-        var json = haxe.JSON.Json.parse((new nme.display3D.shaders.GlslToAgal(source, type)).compile());
+        var json = haxe.JSON.Json.parse((new nme.display3D.shaders.GlslToAgal(source, type, true, true)).compile());
         var assembler = new com.adobe.utils.AGALMiniAssembler();
         assembler.assemble(type, json.agalasm);
         return {type:input.type, json:json, nativeShader:assembler.agalcode};
