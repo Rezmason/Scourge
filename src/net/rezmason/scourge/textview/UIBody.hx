@@ -2,18 +2,12 @@ package net.rezmason.scourge.textview;
 
 import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
-import flash.system.Capabilities;
-import flash.ui.Keyboard;
-
-import haxe.Utf8;
 
 import net.rezmason.gl.utils.BufferUtil;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.Interaction;
-import net.rezmason.scourge.textview.text.Sigil.STYLE_CODE;
-import net.rezmason.scourge.textview.text.Style;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -59,7 +53,7 @@ class UIBody extends Body {
         numRows = 0;
         numCols = 0;
 
-        letterbox = false;
+        scaleMode = EXACT_FIT;
 
         this.uiText = uiText;
     }
@@ -104,25 +98,19 @@ class UIBody extends Body {
 
     override public function interact(id:Int, interaction:Interaction):Void {
         switch (interaction) {
-            case MOUSE(type, x, y):
+            case MOUSE(type, x, y) if (dragging || id == 0):
                 if (dragging) {
                     switch (type) {
-                        case DROP, CLICK:
-                            dragging = false;
-                        case ENTER, EXIT, MOVE:
-                            glideTextToPos(dragStartPos + (dragStartY - y) * (numRows - 1));
+                        case DROP, CLICK: dragging = false;
+                        case ENTER, EXIT, MOVE: glideTextToPos(dragStartPos + (dragStartY - y) * (numRows - 1));
                         case _:
                     }
-                } else if (id == 0) {
-                    if (type == MOUSE_DOWN) {
-                        dragging = true;
-                        dragStartY = y;
-                        dragStartPos = currentScrollPos;
-                    }
-                } else {
-                    uiText.interact(id, interaction);
+                } else if (id == 0 && type == MOUSE_DOWN) {
+                    dragging = true;
+                    dragStartY = y;
+                    dragStartPos = currentScrollPos;
                 }
-            case KEYBOARD(type, key, char, shift, alt, ctrl): uiText.interact(id, interaction);
+            case _: uiText.interact(id, interaction);
         }
     }
 
@@ -139,35 +127,10 @@ class UIBody extends Body {
     }
 
     inline function setScrollPos(pos:Float):Void {
-
         currentScrollPos = pos;
-
         var scrollStartIndex:Int = Std.int(currentScrollPos);
-        var id:Int = 0;
-        var pageSegment:Array<String> = uiText.getPageSegment(scrollStartIndex);
-        var styleIndex:Int = uiText.getLineStyleIndex(scrollStartIndex);
-
-        uiText.resetStyledGlyphs();
-
-        var currentStyle:Style = uiText.getStyleByIndex(styleIndex);
-        for (line in pageSegment) {
-            var index:Int = 0;
-            for (index in 0...Utf8.length(line)) {
-                var charCode:Int = Utf8.charCodeAt(line, index);
-                if (charCode == STYLE_CODE) {
-                    currentStyle = uiText.getStyleByIndex(++styleIndex);
-                } else {
-                    var glyph:Glyph = glyphs[id++];
-                    glyph.set_char(charCode, glyphTexture.font);
-                    currentStyle.addGlyph(glyph);
-                    glyph.set_z(0);
-                }
-            }
-        }
-
-        uiText.updateStyledGlyphs(0);
+        uiText.stylePage(scrollStartIndex, glyphs, glyphTexture.font);
         taperScrollEdges();
-
         transform.identity();
         transform.append(baseTransform);
         transform.appendTranslation(0, (currentScrollPos - scrollStartIndex) / (numRows - 1), 0);

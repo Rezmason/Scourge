@@ -4,21 +4,25 @@ import flash.display.Stage;
 import flash.events.Event;
 import flash.geom.Rectangle;
 
+import msignal.Signal;
+
 import massive.munit.TestRunner;
 
 import net.rezmason.gl.utils.UtilitySet;
+import net.rezmason.scourge.controller.RandomSmarts;
+import net.rezmason.scourge.controller.Referee;
+import net.rezmason.scourge.controller.ReplaySmarts;
+import net.rezmason.scourge.controller.SimpleSpectator;
+import net.rezmason.scourge.controller.Types;
+import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
+import net.rezmason.scourge.textview.TestStrings;
 import net.rezmason.utils.FlatFont;
 
-import net.rezmason.scourge.controller.ReplaySmarts;
-import net.rezmason.scourge.controller.RandomSmarts;
-import net.rezmason.scourge.controller.Referee;
-import net.rezmason.scourge.controller.Types;
-import net.rezmason.scourge.controller.SimpleSpectator;
-import net.rezmason.scourge.model.ScourgeConfig;
-import net.rezmason.scourge.model.ScourgeConfigFactory;
+import openfl.Assets;
 
 using Lambda;
 
@@ -38,6 +42,8 @@ class TextDemo {
     var referee:Referee;
     var spectator:SimpleSpectator;
     var turnFuncs:Array<Void->Void>;
+
+    var uiText:UIText;
 
     public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
@@ -154,17 +160,30 @@ class TextDemo {
         /**/
 
         //*
+
         // interpreter = new Interpreter();
         // interpreter.addCommand("runTests", runTests);
         // interpreter.addCommand("setFont", setFont);
         // interpreter.addCommand("makeGame", makeGame);
-        var uiText:UIText = new UIText();
+
+        uiText = new UIText();
+        uiText.hintSignal.add(onHintSignal);
+        uiText.execSignal.add(onExecSignal);
+
+        // uiText.setText ([TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n"));
+        // uiText.setText (Assets.getText("assets/not plus.txt"));
+        // uiText.setText (Assets.getText("assets/enterprise.txt"));
+        // uiText.setText (Assets.getText("assets/acid2.txt"));
+        // uiText.setText (TestStrings.STYLED_TEXT);
+        // uiText.setText ("One. §{i:1}Two§{}.";)
+
         // TODO: signal handling
         uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, uiText);
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
         uiBody.viewRect = uiRect;
         uiBody.padding = 0.025;
         engine.addBody(uiBody);
+
         /**/
 
         /*
@@ -174,12 +193,13 @@ class TextDemo {
 
         /*
         var glyphBody:Body = new GlyphBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
-        glyphBody.viewRect = new Rectangle(0, 0, 0.6, 1);
+        // glyphBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(glyphBody);
         /**/
 
         /*
         splashBody = new SplashBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
+        splashBody.viewRect = new Rectangle(0, 0, 1, 0.3);
         engine.addBody(splashBody);
         /**/
 
@@ -205,6 +225,14 @@ class TextDemo {
         runner.completionHandler = function(b) trace(client.output);
         runner.run([TestSuite]);
         return "Running tests";
+    }
+
+    function onHintSignal(tokens:Array<InputToken>):Void {
+        uiText.receiveInput([]);
+    }
+
+    function onExecSignal(tokens:Array<InputToken>):Void {
+        uiText.receiveInput([]);
     }
 
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();

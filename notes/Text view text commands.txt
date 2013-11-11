@@ -1,0 +1,64 @@
+Text view text commands
+
+BEGIN
+    HINT:
+        Params
+            Name
+            Circular
+            Players
+    MAIN:
+        Begins game (p)
+QUIT
+    MAIN:
+        Confirm quit button
+CONFIRM_QUIT:
+    MAIN:
+        Output of STAT command
+DIE
+    MAIN:
+        Kills player
+LIST
+    MAIN:
+        lists each available action (as a button) and shows how many of each there are
+STAT
+    MAIN:
+        lists the each player, indicating whether they're alive and what state they have
+GRAPH
+    MAIN:
+        displays the player sizes over time as an ASCII graph
+BITE
+    HINT:
+        Params
+            Origin <abcdef>
+            ^Bit region <abcdef, ^abcdef, ^abcdef...>
+        [Remaining bites]
+    MAIN:
+        Takes a bite (p)
+        Output of STAT command
+    SHORT:
+        Outputs a list of buttons based on "command level"
+            Hovering over a button shows ui for that move
+            Clicking a button types in that move
+SWAP
+    HINT:
+        [Remaining swaps]
+    MAIN:
+        Swaps player piece (p)
+        Output of STAT command
+DROP
+    HINT:
+        Params
+            Piece ID (Optional)
+            ^Reflection / Rotation <uiop>
+            ^Origin <abcdef>
+            ^Run <wasdqezc>
+    MAIN:
+        Drops player piece (p)
+        Output of STAT command
+    SHORT:
+        Outputs a list of buttons based on "command level"
+            Hovering over a button shows ui for that move
+            Clicking a button types in that move
+TALK
+    MAIN:
+        Posts string in "chat" (p)

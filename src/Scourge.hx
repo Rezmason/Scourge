@@ -5,7 +5,7 @@ import flash.Lib;
 
 import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.utils.FlatFont;
-import net.rezmason.scourge.textview.TestStrings;
+import net.rezmason.scourge.textview.Strings;
 
 import net.rezmason.scourge.textview.waves.*;
 
@@ -16,7 +16,7 @@ class Scourge {
 
     public static function main():Void {
         #if flash Lib.redirectTraces(); #end
-        trace('\n${TestStrings.SPLASH}');
+        trace('\n${Strings.SPLASH}');
 
         fonts = new Map();
         for (name in ['source', 'profont', 'full']) {

@@ -17,7 +17,7 @@ class TestBody extends Body {
 
     inline static var COLOR_RANGE:Int = 6;
     inline static var CHARS:String =
-        TestStrings.ALPHANUMERICS +
+        Strings.ALPHANUMERICS +
     '';
 
     var time:Float;

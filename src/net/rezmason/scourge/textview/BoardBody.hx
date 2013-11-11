@@ -61,7 +61,7 @@ class BoardBody extends Body {
     static var TEAM_CAVITY_COLORS:Array<Int> = [0x990040, 0x997800, 0x109900, 0x007099, 0x993000, 0x700099, 0x001099, 0x303030, ];
     static var BOARD_COLOR:Int = 0x303030;
     static var WALL_COLOR:Int = 0x606060;
-    static var BODY_CHARS:String = TestStrings.ALPHANUMERICS;
+    static var BODY_CHARS:String = Strings.ALPHANUMERICS;
 
     var dragging:Bool;
     var dragX:Float;
@@ -379,7 +379,7 @@ class BoardBody extends Body {
                 itr++;
             }
 
-            var code:Int = Utf8.charCodeAt(TestStrings.BOX_SYMBOLS, flag);
+            var code:Int = Utf8.charCodeAt(Strings.BOX_SYMBOLS, flag);
 
             view.boardGlyph.set_s(0.7);
             view.boardGlyph.set_char(code, glyphTexture.font);

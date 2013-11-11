@@ -1,6 +1,7 @@
 package net.rezmason.scourge.textview.core;
 
 import flash.geom.Matrix3D;
+import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import flash.Vector;
@@ -20,11 +21,12 @@ class Body {
     public var glyphTransform:Matrix3D;
     public var numGlyphs(default, null):Int;
     public var glyphTexture(default, set):GlyphTexture;
-    public var letterbox(default, null):Bool;
+    public var scaleMode(default, null):BodyScaleMode;
     public var catchMouseInRect(default, null):Bool;
     public var viewRect(default, set):Rectangle;
 
     var trueNumGlyphs:Int;
+    var vanishingPoint:Point;
 
     var redrawHitAreas:Void->Void;
     var projection:Matrix3D;
@@ -38,13 +40,14 @@ class Body {
         this.bufferUtil = bufferUtil;
         this.redrawHitAreas = redrawHitAreas;
         if (this.redrawHitAreas == null) redrawHitAreas = function() {};
-        letterbox = true;
+        scaleMode = SHOW_ALL;
         catchMouseInRect = true;
         glyphs = [];
         this.glyphTexture = glyphTexture;
         viewRect = DEFAULT_VIEW_RECT;
 
         projection = makeProjection();
+        vanishingPoint = new Point();
 
         numGlyphs = 0;
         trueNumGlyphs = 0;
@@ -125,13 +128,17 @@ class Body {
         cameraRect.height *= 2;
 
         camera.identity();
+        camera.append(scaleModeBox(rect, stageWidth, stageHeight));
         camera.appendScale(cameraRect.width, cameraRect.height, 1);
         camera.appendTranslation((cameraRect.left + cameraRect.right) * 0.5, (cameraRect.top + cameraRect.bottom) * -0.5, 0);
 
         camera.appendTranslation(0, 0, 1); // Set the camera back one unit
         camera.append(projection); // Apply perspective
-        adjustVP(rect);
-        if (letterbox) applyLetterbox(rect, stageWidth, stageHeight);
+
+        vanishingPoint.x = (rect.left + rect.right) * 0.5;
+        vanishingPoint.y = (rect.top + rect.bottom) * 0.5;
+
+        applyVP(0, 0);
     }
 
     public function update(delta:Float):Void {
@@ -161,19 +168,42 @@ class Body {
         return rect;
     }
 
-    inline function adjustVP(rect:Rectangle):Void {
+    inline function applyVP(x:Float, y:Float):Void {
         var rawData:Vector<Float> = camera.rawData;
-        rawData[8] += (rect.left + rect.right  - 1);
-        rawData[9] -= (rect.top  + rect.bottom - 1);
+        rawData[8] =  ((x + vanishingPoint.x) * 2 - 1);
+        rawData[9] = -((y + vanishingPoint.y) * 2 - 1);
         camera.rawData = rawData;
     }
 
-    inline function applyLetterbox(rect:Rectangle, stageWidth:Float, stageHeight:Float):Void {
-        var letterbox:Matrix3D = new Matrix3D();
-        var boxRatio:Float = (rect.width / rect.height) * stageWidth / stageHeight;
-        if (boxRatio < 1) letterbox.appendScale(1, boxRatio, 1);
-        else letterbox.appendScale(1 / boxRatio, 1, 1);
-        camera.prepend(letterbox);
+    inline function scaleModeBox(rect:Rectangle, stageWidth:Float, stageHeight:Float):Matrix3D {
+        var box:Matrix3D = new Matrix3D();
+
+        var doubleRatio:Float = (rect.width / rect.height) * (stageWidth / stageHeight);
+
+        switch (scaleMode) {
+            case EXACT_FIT:
+                // Distort the aspect ratio to fit the body in the rectangle
+                box.appendScale(1, 1, 1);
+            case NO_BORDER:
+                // Scale the body uniformly to match the dimension of the largest side of the screen
+                if (doubleRatio > 1) box.appendScale(1, doubleRatio, 1);
+                else box.appendScale(1 / doubleRatio, 1, 1);
+            case NO_SCALE:
+                // Perform no scaling logic
+                box.appendScale(rect.width / stageWidth, rect.height / stageHeight, 1);
+            case SHOW_ALL:
+                // Scale the body uniformly to match the dimension of the smallest side of the screen
+                if (doubleRatio < 1) box.appendScale(1, doubleRatio, 1);
+                else box.appendScale(1 / doubleRatio, 1, 1);
+            case WIDTH_FIT:
+                // Scale the body uniformly to match the width of the screen
+                box.appendScale(1, doubleRatio, 1);
+            case HEIGHT_FIT:
+                // Scale the body uniformly to match the height of the screen
+                box.appendScale(1 / doubleRatio, 1, 1);
+        }
+
+        return box;
     }
 
     inline function setGlyphScale(sX:Float, sY:Float):Void {

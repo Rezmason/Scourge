@@ -1,12 +1,16 @@
 package net.rezmason.scourge.textview;
 
+import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
+import flash.geom.Vector3D;
 
 import net.rezmason.gl.utils.BufferUtil;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
+import net.rezmason.scourge.textview.core.BodyScaleMode;
 import net.rezmason.scourge.textview.core.GlyphTexture;
+import net.rezmason.scourge.textview.core.Interaction;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -37,6 +41,8 @@ class SplashBody extends Body {
 
     var glyphTowers:Array<Array<Glyph>>;
 
+    var baseCamera:Matrix3D;
+
     var time:Float;
     var lines:Array<String>;
 
@@ -44,15 +50,17 @@ class SplashBody extends Body {
 
         super(bufferUtil, glyphTexture, redrawHitAreas);
 
+        baseCamera = new Matrix3D();
+
+        scaleMode = WIDTH_FIT;
+
         time = 0;
 
-        lines = TestStrings.SPLASH.split('\n');
+        lines = Strings.SPLASH.split('\n');
         lines.pop();
         lines.pop();
 
         growTo(3 * lines.length * lines[0].length);
-
-        catchMouseInRect = false;
 
         var numRows:Int = lines.length;
         var numCols:Int = lines[0].length;
@@ -66,9 +74,9 @@ class SplashBody extends Body {
 
             for (col in 0...numCols) {
 
-                var x:Float = ((col + 0.5) / numCols - 0.5) * 2;
-                var y:Float = ((row + 0.5) / numRows - 0.5) * 0.3;
-                var z:Float = 0.2;
+                var x:Float = ((col + 0.5) / numCols - 0.5);
+                var y:Float = ((row + 0.5) / numRows - 0.5) * 0.15;
+                var z:Float = 0.;
 
                 if (lines[row].charAt(col) == ' ') continue;
 
@@ -89,17 +97,16 @@ class SplashBody extends Body {
 
                     glyphTower.push(glyph);
 
-                    glyph.set_shape(x, y, z, s, 0);
+                    glyph.set_shape(x, y, z, 1, 0);
                     glyph.set_color(r, g, b);
                     glyph.set_i(0);
                     glyph.set_char(charCode, glyphTexture.font);
                     glyph.set_paint(glyph.id | id << 16);
 
-                    z -= 0.03;
-                    s *= 1.4;
-                    r *= 0.3;
-                    g *= 0.3;
-                    b *= 0.3;
+                    z += 0.01;
+                    r *= 0.2;
+                    g *= 0.2;
+                    b *= 0.2;
 
                     glyphID++;
                 }
@@ -109,19 +116,31 @@ class SplashBody extends Body {
         }
 
         transform.appendScale(1, -1, 1);
+        transform.appendScale(0.9, 0.9, 0.9);
+        transform.appendRotation(20, Vector3D.X_AXIS);
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
         super.adjustLayout(stageWidth, stageHeight);
 
-        var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
+        // baseCamera.copyFrom(camera);
 
-        var screenSize:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
-        var rectSize:Float = Math.min(rect.width * stageWidth, rect.height * stageHeight) / screenSize;
-        var glyphWidth:Float = rectSize * 0.065;
+        var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
+        var glyphWidth:Float = rect.width * 0.03;
 
         setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
+
+    /*
+    override public function interact(id:Int, interaction:Interaction):Void {
+        var glyph:Glyph = glyphs[id];
+        switch (interaction) {
+            case MOUSE(MOVE, x, y):
+                applyVP(x - 0.5, y - 0.5);
+            case _:
+        }
+    }
+    */
 
     //*
     override public function update(delta:Float):Void {
@@ -132,19 +151,23 @@ class SplashBody extends Body {
             var topGlyph:Glyph = glyphTower[0];
 
             var d:Float = ike / glyphTowers.length;
-            var p:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.03 + 0.015;
-            var s:Float = (Math.cos(time * 3 + d * 300) * 0.5 + 1) * 0.25 + 0.75;
+            var p:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.001;
+            var f:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.4 + 0.1;
+            var s:Float = (Math.cos(time * 3 + d * 300) * 0.5 + 1) * 0.1 + 0.9;
 
             //var rgb:RGB = hsv2rgb(hues[ike] + s * 0.1);
 
             for (glyph in glyphTower) {
                 glyph.set_p(p);
-                glyph.set_s(s);
-                s *= 1.4;
+                glyph.set_f(f);
+                glyph.set_s(s * (glyph.get_z() + 1));
+                s *= 2;
             }
 
             //glyph.set_color(rgb.r, rgb.g, rgb.b);
         }
+
+        // transform.appendRotation(1, Vector3D.X_AXIS);
 
         super.update(delta);
     }

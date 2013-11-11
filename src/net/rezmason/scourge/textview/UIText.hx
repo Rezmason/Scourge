@@ -2,18 +2,25 @@ package net.rezmason.scourge.textview;
 
 import flash.ui.Keyboard;
 
-import haxe.Utf8;
-import haxe.io.Bytes;
-import openfl.Assets;
+import msignal.Signal;
 
-import net.rezmason.scourge.textview.TestStrings;
+import haxe.Utf8;
+
 import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.text.AnimatedStyle;
 import net.rezmason.scourge.textview.text.Sigil.STYLE;
+import net.rezmason.scourge.textview.text.Sigil.STYLE_CODE;
 import net.rezmason.scourge.textview.text.Style;
 import net.rezmason.scourge.textview.text.StyleSet;
+import net.rezmason.utils.FlatFont;
+
+using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class UIText {
+
+    public var hintSignal(default, null):Signal1<Array<InputToken>>;
+    public var execSignal(default, null):Signal1<Array<InputToken>>;
 
     var numRows:Int;
     var numCols:Int;
@@ -37,6 +44,7 @@ class UIText {
     var systemOutput:String;
     var textIsDirty:Bool;
     var caretStyle:AnimatedStyle;
+    var inputTokens:Array<InputToken>;
 
     var inputHistory:Array<String>;
     var histItr:Int;
@@ -52,16 +60,10 @@ class UIText {
         numCols = 0;
 
         blurb = '';
-        // blurb = [TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n");
-        // blurb = Assets.getText("assets/not plus.txt");
-        // blurb = Assets.getText("assets/enterprise.txt");
-        // blurb = Assets.getText("assets/acid2.txt");
-        blurb = TestStrings.STYLED_TEXT;
-        // blurb = "One. §{i:1}Two§{}.";x
 
-        styles.extract(TestStrings.BREATHING_PROMPT_STYLE);
-        styles.extract(TestStrings.CARET_STYLE);
-        styles.extract(TestStrings.INPUT_STYLE);
+        styles.extract(Strings.BREATHING_PROMPT_STYLE);
+        styles.extract(Strings.CARET_STYLE);
+        styles.extract(Strings.INPUT_STYLE);
 
         setPlayer('rezmason', 0xFF3030);
 
@@ -74,8 +76,12 @@ class UIText {
         systemOutput = '\n';
         textIsDirty = false;
 
+        inputTokens = [];
         inputHistory = [];
         histItr = 1;
+
+        hintSignal = new Signal1();
+        execSignal = new Signal1();
 
         updateDirtyText(true);
     }
@@ -93,6 +99,36 @@ class UIText {
         this.numRows = numRows;
         this.numCols = numCols;
         this.textIsDirty = true;
+    }
+
+    public function stylePage(startIndex:Int, glyphs:Array<Glyph>, font:FlatFont):Void {
+        var id:Int = 0;
+        var pageSegment:Array<String> = getPageSegment(startIndex);
+        var styleIndex:Int = getLineStyleIndex(startIndex);
+
+        resetStyledGlyphs();
+
+        var currentStyle:Style = getStyleByIndex(styleIndex);
+
+        for (line in pageSegment) {
+            var index:Int = 0;
+            for (index in 0...Utf8.length(line)) {
+                var charCode:Int = Utf8.charCodeAt(line, index);
+                if (charCode == STYLE_CODE) {
+                    currentStyle = getStyleByIndex(++styleIndex);
+                } else {
+                    // this is why setScrollPos is in UIBody
+                    // It could be passed in
+                    var glyph:Glyph = glyphs[id++];
+                    glyph.set_char(charCode, font);
+                    currentStyle.addGlyph(glyph);
+                    glyph.set_z(0);
+                    //
+                }
+            }
+        }
+
+        updateStyledGlyphs(0);
     }
 
     public function updateDirtyText(force:Bool = false):Bool {
@@ -221,103 +257,123 @@ class UIText {
 
     public function interact(id:Int, interaction:Interaction):Void {
         switch (interaction) {
-            case KEYBOARD(type, key, char, shift, alt, ctrl):
-                if (type == KEY_DOWN || type == KEY_REPEAT) {
-                    switch (key) {
-                        case Keyboard.BACKSPACE:
-                            // delete command
+            case KEYBOARD(type, key, char, shift, alt, ctrl) if (type == KEY_DOWN || type == KEY_REPEAT):
+                switch (key) {
+                    case Keyboard.BACKSPACE: handleBackspace(alt, ctrl);
+                    case Keyboard.ENTER: handleEnter();
+                    case Keyboard.ESCAPE: handleEscape();
+                    case Keyboard.LEFT: handleLeft(alt, ctrl);
+                    case Keyboard.RIGHT: handleRight(alt, ctrl);
+                    case Keyboard.UP: handleUp();
+                    case Keyboard.DOWN: handleDown();
+                    case Keyboard.TAB: handleTab();
+                    case _:
+                        var left:String = sub(systemInput, 0, caretIndex);
+                        var right:String = sub(systemInput, caretIndex);
 
-                            var left:String = sub(systemInput, 0, caretIndex);
-                            var right:String = sub(systemInput, caretIndex);
-
-                            if (length(left) > 0) {
-                                var lim:Int = -1;
-
-                                if (ctrl) lim = 0;
-                                // TODO: alt-delete
-                                else lim = length(left) - 1;
-
-                                if (lim == -1) lim = 0;
-
-                                left = sub(left, 0, lim);
-                                caretIndex = lim;
-                            }
-
+                        if (char > 0) {
+                            left += String.fromCharCode(char);
+                            caretIndex++;
                             systemInput = left + right;
                             textIsDirty = true;
-
-                        case Keyboard.ENTER:
-                            blurb += systemOutput + prompt + systemInput;
-                            if (length(systemInput) == 0) {
-                                systemOutput = '\n';
-                            } else {
-                                systemOutput = '\n' + systemInput + '\n';
-                                // TODO: signal
-                                inputHistory.push(systemInput);
-                                histItr = inputHistory.length;
-                            }
-                            systemInput = '';
-                            caretIndex = 0;
-                            textIsDirty = true;
-                        case Keyboard.ESCAPE:
-                            if (length(systemInput) > 0) {
-                                textIsDirty = true;
-                                systemInput = '';
-                                caretIndex = 0;
-                            }
-                        case Keyboard.LEFT:
-                            caretIndex--;
-                            if (caretIndex < 0) {
-                                caretIndex = 0;
-                            }
-                            textIsDirty = true;
-                            // TODO: alt-left
-                            // TODO: ctrl-left
-                            // TODO: input spans
-                        case Keyboard.RIGHT:
-                            caretIndex++;
-                            if (caretIndex > length(systemInput)) {
-                                caretIndex = length(systemInput);
-                            }
-                            textIsDirty = true;
-                            // TODO: alt-right
-                            // TODO: ctrl-left
-                            // TODO: input spans
-                        case Keyboard.UP:
-                            if (inputHistory.length > 0) {
-                                if (histItr > 0) histItr--;
-                                systemInput = inputHistory[histItr];
-                                caretIndex = systemInput.length;
-                                textIsDirty = true;
-                            }
-                        case Keyboard.DOWN:
-                            if (inputHistory.length > 0) {
-                                if (histItr < inputHistory.length) histItr++;
-                                if (histItr == inputHistory.length) systemInput = '';
-                                else systemInput = inputHistory[histItr];
-                                caretIndex = systemInput.length;
-                                textIsDirty = true;
-                            }
-                        case _:
-                            var left:String = sub(systemInput, 0, caretIndex);
-                            var right:String = sub(systemInput, caretIndex);
-
-                            if (char > 0) {
-                                left += String.fromCharCode(char);
-                                caretIndex++;
-                                systemInput = left + right;
-                                textIsDirty = true;
-                            }
-                    }
+                        }
                 }
-            case MOUSE(type, x, y):
-                if (id != 0) {
-                    var targetStyle:Style = styles.getStyleByMouseID(id);
-                    if (targetStyle != null) {
-                        targetStyle.interact(type);
-                        if (type == CLICK) trace('${targetStyle.name} clicked!');
-                    }
+            case MOUSE(type, x, y) if (id != 0):
+                var targetStyle:Style = styles.getStyleByMouseID(id);
+                if (targetStyle != null) {
+                    targetStyle.interact(type);
+                    if (type == CLICK) trace('${targetStyle.name} clicked!');
                 }
+            case _:
+        }
+    }
+
+    public function receiveInput(tokens:Array<InputToken>):Void {
+        trace(tokens);
+    }
+
+    inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
+        var left:String = sub(systemInput, 0, caretIndex);
+        var right:String = sub(systemInput, caretIndex);
+
+        if (length(left) > 0) {
+            var lim:Int = -1;
+
+            if (ctrl) lim = 0;
+            // TODO: alt-delete
+            else lim = length(left) - 1;
+
+            if (lim == -1) lim = 0;
+
+            left = sub(left, 0, lim);
+            caretIndex = lim;
+        }
+
+        systemInput = left + right;
+        textIsDirty = true;
+    }
+
+    inline function handleEnter():Void {
+        blurb += systemOutput + prompt + systemInput;
+        if (length(systemInput) == 0) {
+            systemOutput = '\n';
+        } else {
+            systemOutput = '\n' + systemInput + '\n';
+            execSignal.dispatch(inputTokens);
+            inputHistory.push(systemInput);
+            histItr = inputHistory.length;
+        }
+        systemInput = '';
+        caretIndex = 0;
+        textIsDirty = true;
+    }
+
+    inline function handleTab():Void {
+        if (length(systemInput) > 0) {
+            hintSignal.dispatch(inputTokens);
+        }
+    }
+
+    inline function handleEscape():Void {
+        if (length(systemInput) > 0) {
+            textIsDirty = true;
+            systemInput = '';
+            caretIndex = 0;
+        }
+    }
+
+    inline function handleLeft(alt:Bool, ctrl:Bool):Void {
+        caretIndex--;
+        if (caretIndex < 0) caretIndex = 0;
+        textIsDirty = true;
+        // TODO: alt-left
+        // TODO: ctrl-left
+    }
+
+    inline function handleRight(alt:Bool, ctrl:Bool):Void {
+        caretIndex++;
+        if (caretIndex > length(systemInput)) caretIndex = length(systemInput);
+        textIsDirty = true;
+        // TODO: alt-right
+        // TODO: ctrl-left
+    }
+
+    inline function handleUp():Void {
+        if (inputHistory.length > 0) {
+            if (histItr > 0) histItr--;
+            systemInput = inputHistory[histItr];
+            caretIndex = systemInput.length;
+            textIsDirty = true;
+        }
+    }
+
+    inline function handleDown():Void {
+        if (inputHistory.length > 0) {
+            if (histItr < inputHistory.length) histItr++;
+            if (histItr == inputHistory.length) systemInput = '';
+            else systemInput = inputHistory[histItr];
+            caretIndex = systemInput.length;
+            textIsDirty = true;
         }
     }
 

@@ -1,18 +1,4 @@
-ScourgeAssetGen isn't merging fonts
-
-Represent commands as some intermediary type - not strings, not intrinsic Style types
-    A list of elements
-        enums, actually
-        UIText sends [basic text element] at first
-        They send back and forth larger sequences as the user drills down into the auto-completion
-    Draw this out
-
-Get interpreter and UIText (and TextDemo) to use signals
-    UIText listens for post signals
-    Interpreter listens for command signals
-
-HumanPlayer
-    Hooks into view somehow; maybe a signal system
+Human play (see todo)
 
 NodeView and BoardBody
 
@@ -36,32 +22,20 @@ NodeView and BoardBody
     Orchestrate changes in the game
         Test that board state is properly handled
 
-Command interpreter
-
-InputStyle use
-    UIText keeps track of "input spans"
-        The indices of the open tag, the body text and the close tag
-    Clicking on an input should move the caret
-        Text insertion should be as easy as appending to the input span's text value and recompositing
-    Clicking past the line should move the caret to the end of the line
-        We need to guarantee that there is always something to click here
-    Option-left and option-right should move the caret as well
-
-Solidify text update behavior
-    If:
-        the user WAS at the bottom, or
-        the user IS past the bottom, or
-        the new text IS the result of interaction,
-    -scroll to the new bottom
-Scroll indicator (looks like meterstick)
-
-Piece view
+"Frame"
+    White box drawing characters with piece in the middle
+    Symbols on the corners
+        H-flip, V-flip, C-rot, CC-rot
+        Animation would be nice
+    Swipeable
 
 Implement noneuclidean walking and running
     add() function should create heading data
     walk() and run() functions should operate on heading data
     heading data should be available after a walk
     Turtle?
+
+It'd be fun to make a branch that renders glyphs as points
 
 Finalize ROPES classes
 
@@ -139,36 +113,10 @@ Later
     Destination goal rule
     Allow goal rules to apply to specific players
 
-
-New UI
-
-    Switch back to MISO font
-    Data indicators
-
-    Icons
-    Color Transform
-
-    Game board
-
-    Slime
-    Hoo boy
-
-    Piece
-    Piece Panning
-    Bites
-    Bite panning
-    Bite tracks
-
-    Player info
-    hover for mouse
-    Press for touch
-
-    Touch mode
-    Swipe gesture instead of click for auto expand
-    Press instead of hover for hint
-    Mouse mode
-    Board doesn't zoom for chop
-    No swiping at all?
+Metaballs should be simpler now
+    Particles are added-together blurcles
+    Screen-size quad gets textured and shaded in another pass
+    Third pass renders the "real geom" and then overlays the metaballs on top
 
 Texture synthesis
     Dots
