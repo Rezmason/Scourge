@@ -17,10 +17,17 @@ import net.rezmason.utils.FlatFont;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
+typedef FrozenInteraction = {
+    var id:Int;
+    var interaction:Interaction;
+}
+
 class UIText {
 
-    public var hintSignal(default, null):Signal1<Array<InputToken>>;
-    public var execSignal(default, null):Signal1<Array<InputToken>>;
+    public var hintSignal(default, null):Signal2<Array<TextToken>, {t:Int, c:Int}>;
+    public var execSignal(default, null):Signal1<Array<TextToken>>;
+
+    public var frozen(get, set):Bool;
 
     var numRows:Int;
     var numCols:Int;
@@ -40,17 +47,22 @@ class UIText {
     var caretStart:String;
     var caretEnd:String;
     var caretIndex:Int;
-    var systemInput:String;
-    var systemOutput:String;
+    var tokenIndex:Int;
+    var inputString:String;
+    var outputString:String;
     var textIsDirty:Bool;
     var caretStyle:AnimatedStyle;
-    var inputTokens:Array<InputToken>;
+    var inputTokens:Array<TextToken>;
+    var outputTokens:Array<TextToken>;
 
-    var inputHistory:Array<String>;
+    var inputHistory:Array<Array<TextToken>>;
     var histItr:Int;
 
     var currentPlayerName:String;
     var currentPlayerColor:Int;
+
+    var frozenQueue:List<FrozenInteraction>;
+    var _frozen:Bool;
 
     public function new():Void {
 
@@ -70,18 +82,22 @@ class UIText {
         caretStyle = cast styles.getStyleByName('caret');
         caretStart = '§{caret}';
         caretEnd = '§{}';
-        caretIndex = 0;
 
-        systemInput = '';
-        systemOutput = '\n';
+        caretIndex = 0;
+        tokenIndex = 0;
+
+        inputString = '';
+        outputString = '\n';
         textIsDirty = false;
 
         inputTokens = [];
         inputHistory = [];
         histItr = 1;
 
-        hintSignal = new Signal1();
+        hintSignal = new Signal2();
         execSignal = new Signal1();
+
+        frozenQueue = new List();
 
         updateDirtyText(true);
     }
@@ -139,16 +155,18 @@ class UIText {
 
             if (!force) textIsDirty = false;
 
-            var left:String = sub(systemInput, 0, caretIndex);
-            var mid:String = sub(systemInput, caretIndex, 1);
-            var right:String = sub(systemInput, caretIndex + 1);
+            /*
+            var left:String = sub(inputString, 0, caretIndex);
+            var mid:String = sub(inputString, caretIndex, 1);
+            var right:String = sub(inputString, caretIndex + 1);
 
             if (mid == '') mid = ' ';
 
             if (mid == ' ') caretStyle.start();
             else caretStyle.stop();
+            */
 
-            combinedText = blurb + systemOutput + prompt + left + caretStart + mid + caretEnd + right;
+            combinedText = blurb + outputString + prompt + inputString/*left + caretStart + mid + caretEnd + right*/;
             combinedText = swapTabsWithSpaces(combinedText);
 
             if (numRows * numCols > 0) {
@@ -256,6 +274,9 @@ class UIText {
     }
 
     public function interact(id:Int, interaction:Interaction):Void {
+
+        if (frozen) frozenQueue.add({id:id, interaction:interaction});
+
         switch (interaction) {
             case KEYBOARD(type, key, char, shift, alt, ctrl) if (type == KEY_DOWN || type == KEY_REPEAT):
                 switch (key) {
@@ -267,16 +288,7 @@ class UIText {
                     case Keyboard.UP: handleUp();
                     case Keyboard.DOWN: handleDown();
                     case Keyboard.TAB: handleTab();
-                    case _:
-                        var left:String = sub(systemInput, 0, caretIndex);
-                        var right:String = sub(systemInput, caretIndex);
-
-                        if (char > 0) {
-                            left += String.fromCharCode(char);
-                            caretIndex++;
-                            systemInput = left + right;
-                            textIsDirty = true;
-                        }
+                    case _: handleChar(char);
                 }
             case MOUSE(type, x, y) if (id != 0):
                 var targetStyle:Style = styles.getStyleByMouseID(id);
@@ -288,13 +300,30 @@ class UIText {
         }
     }
 
-    public function receiveInput(tokens:Array<InputToken>):Void {
-        trace(tokens);
+    public function receiveHint(input:Array<TextToken>, tokenIndex:Int, caretIndex:Int, output:Array<TextToken>):Void {
+        /*
+        if (input != null) this.inputTokens = input;
+        this.outputTokens = output;
+        */
+        trace("HINT");
+        trace(input);
+        trace('$tokenIndex $caretIndex');
+        trace(output);
+    }
+
+    public function receiveExec(input:Array<TextToken>, output:Array<TextToken>):Void {
+        trace("EXEC");
+        trace(input);
+        trace(output);
     }
 
     inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
-        var left:String = sub(systemInput, 0, caretIndex);
-        var right:String = sub(systemInput, caretIndex);
+
+        // Only erases text; doesn't erase empty tokens
+
+        /*
+        var left:String = sub(inputString, 0, caretIndex);
+        var right:String = sub(inputString, caretIndex);
 
         if (length(left) > 0) {
             var lim:Int = -1;
@@ -309,51 +338,58 @@ class UIText {
             caretIndex = lim;
         }
 
-        systemInput = left + right;
+        inputString = left + right;
         textIsDirty = true;
+        */
     }
 
     inline function handleEnter():Void {
-        blurb += systemOutput + prompt + systemInput;
-        if (length(systemInput) == 0) {
-            systemOutput = '\n';
+        blurb += outputString + prompt + inputString;
+        if (length(inputString) == 0) {
+            outputString = '\n';
         } else {
-            systemOutput = '\n' + systemInput + '\n';
+            outputString = '\n' + inputString + '\n';
             execSignal.dispatch(inputTokens);
-            inputHistory.push(systemInput);
+            inputHistory.push(inputTokens.copy());
             histItr = inputHistory.length;
         }
-        systemInput = '';
-        caretIndex = 0;
+        inputTokens = [];
+        // inputString = '';
+        // caretIndex = 0;
         textIsDirty = true;
     }
 
     inline function handleTab():Void {
-        if (length(systemInput) > 0) {
-            hintSignal.dispatch(inputTokens);
+        if (length(inputString) > 0) {
+            hintSignal.dispatch(inputTokens, {t:tokenIndex, c:caretIndex});
         }
     }
 
     inline function handleEscape():Void {
-        if (length(systemInput) > 0) {
+        if (length(inputString) > 0) {
+            inputTokens = [];
+            //inputString = '';
+            // caretIndex = 0;
             textIsDirty = true;
-            systemInput = '';
-            caretIndex = 0;
         }
     }
 
     inline function handleLeft(alt:Bool, ctrl:Bool):Void {
+        /*
         caretIndex--;
         if (caretIndex < 0) caretIndex = 0;
         textIsDirty = true;
+        */
         // TODO: alt-left
         // TODO: ctrl-left
     }
 
     inline function handleRight(alt:Bool, ctrl:Bool):Void {
+        /*
         caretIndex++;
-        if (caretIndex > length(systemInput)) caretIndex = length(systemInput);
+        if (caretIndex > length(inputString)) caretIndex = length(inputString);
         textIsDirty = true;
+        */
         // TODO: alt-right
         // TODO: ctrl-left
     }
@@ -361,8 +397,9 @@ class UIText {
     inline function handleUp():Void {
         if (inputHistory.length > 0) {
             if (histItr > 0) histItr--;
-            systemInput = inputHistory[histItr];
-            caretIndex = systemInput.length;
+            inputTokens = inputHistory[histItr].copy();
+            // inputString;
+            // caretIndex = inputString.length;
             textIsDirty = true;
         }
     }
@@ -370,11 +407,26 @@ class UIText {
     inline function handleDown():Void {
         if (inputHistory.length > 0) {
             if (histItr < inputHistory.length) histItr++;
-            if (histItr == inputHistory.length) systemInput = '';
-            else systemInput = inputHistory[histItr];
-            caretIndex = systemInput.length;
+            if (histItr == inputHistory.length) inputTokens = [];
+            else inputTokens = inputHistory[histItr].copy();
+            // inputString;
+            // caretIndex = inputString.length;
             textIsDirty = true;
         }
+    }
+
+    inline function handleChar(char:Int):Void {
+        /*
+        var left:String = sub(inputString, 0, caretIndex);
+        var right:String = sub(inputString, caretIndex);
+
+        if (char > 0) {
+            left += String.fromCharCode(char);
+            caretIndex++;
+            inputString = left + right;
+            textIsDirty = true;
+        }
+        */
     }
 
     public function getPageSegment(index:Int):Array<String> return page.slice(index, index + numRows);
@@ -429,5 +481,28 @@ class UIText {
         var output:Int = 0;
         if (input != '') output = Utf8.length(input);
         return output;
+    }
+
+    inline function get_frozen():Bool return _frozen;
+
+    inline function set_frozen(val:Bool):Bool {
+        if (_frozen && !val) {
+            _frozen = false;
+            while (!frozenQueue.isEmpty()) {
+                var leftovers:FrozenInteraction = frozenQueue.pop();
+                interact(leftovers.id, leftovers.interaction);
+            }
+        }
+        _frozen = val;
+        return val;
+    }
+
+    inline function isTokenModifiable(token:TextToken):Bool {
+        return switch (token) {
+            case PLAIN_TEXT(text): true;
+            case EMPTY_CAPSULE(type, caption): true;
+            case INCOMPLETE_CAPSULE(type, valid): true;
+            case _: false;
+        }
     }
 }

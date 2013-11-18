@@ -2,6 +2,7 @@ package net.rezmason.scourge.textview;
 
 import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
+import flash.system.Capabilities;
 
 import net.rezmason.gl.utils.BufferUtil;
 import net.rezmason.scourge.textview.core.Body;
@@ -169,8 +170,7 @@ class UIBody extends Body {
             var dpi:Null<Float> = Reflect.field(flash.Lib.current.loaderInfo.parameters, 'dpi');
             if (dpi == null) dpi = NATIVE_DPI;
             return dpi;
-        #elseif js return Capabilities.screenDPI;
-        #else return NATIVE_DPI;
+        #else return Capabilities.screenDPI;
         #end
     }
 }

@@ -1,23 +1,25 @@
-Represent commands as some intermediary type - not strings, not intrinsic Style types
-    Text view text commands
+UIText
+    System input and output should be InputToken systems
 
-    A list of elements
-        enums, actually
-        UIText sends [basic text element] at first
-        They send back and forth larger sequences as the user drills down into the auto-completion
+        Caret is now a token index and a char index
+            handleBackspace
+            handleLeft / handleRight
+            handleChar
+        No more of this string shit
+        Write an inline function that turns an InputToken into a String
 
-    Draw this out
-        Command names "tokenize" after space
-            Caret can't enter them, can only delete them
-                Deleting them deletes their other text
-        Hint text is "tokenized"
-            Caret can't *reach* it
-        Button text is obvious, fortunately
-            Buttons past the "immediate output" are made inactive by UIText
+Command interpreter
+    Generates input and output tokens from input tokens
+    Implement everything in "Text view text commands.txt"
 
-Revisit UIText
-    Kinda long...
-    UIText.interact should be "ignorable" signal
+Check out the user stories
+    Command names "tokenize" after space
+        Caret can't enter them, can only delete them
+            Deleting them deletes their other text
+    Hint text is "tokenized"
+        Caret can't *reach* it
+    Button text is obvious, fortunately
+        Buttons past the "immediate output" are made inactive by UIText
 
 Solidify text update behavior
     If:
@@ -26,8 +28,6 @@ Solidify text update behavior
         the new text IS the result of interaction,
     -scroll to the new bottom
 Scroll indicator (looks like meterstick)
-
-Command interpreter
 
 InputStyle use
     UIText keeps track of "input spans"
@@ -38,9 +38,7 @@ InputStyle use
         We need to guarantee that there is always something to click here
     Option-left and option-right should move the caret as well
 
-Get interpreter and UIText (and TextDemo) to use signals
-    UIText listens for post signals
-    Interpreter listens for command signals
+
 
 HumanPlayer
     Hooks into view somehow; maybe a signal system

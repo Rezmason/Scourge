@@ -147,7 +147,7 @@ class TextDemo {
 
     function makeScene():Void {
 
-        //*
+        /*
         testBody = new TestBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         testBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(testBody);
@@ -179,7 +179,7 @@ class TextDemo {
 
         // TODO: signal handling
         uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, uiText);
-        var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1);
+        var uiRect:Rectangle = new Rectangle(0, 0, 1, 1); // 0.6, 0, 0.4, 1
         uiBody.viewRect = uiRect;
         uiBody.padding = 0.025;
         engine.addBody(uiBody);
@@ -227,12 +227,12 @@ class TextDemo {
         return "Running tests";
     }
 
-    function onHintSignal(tokens:Array<InputToken>):Void {
-        uiText.receiveInput([]);
+    function onHintSignal(tokens:Array<TextToken>, indices:{t:Int, c:Int}):Void {
+        uiText.receiveHint(tokens, indices.t, indices.c, []);
     }
 
-    function onExecSignal(tokens:Array<InputToken>):Void {
-        uiText.receiveInput([]);
+    function onExecSignal(tokens:Array<TextToken>):Void {
+        uiText.receiveExec(tokens, []);
     }
 
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();
