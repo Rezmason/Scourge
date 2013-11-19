@@ -143,10 +143,10 @@ class UIBody extends Body {
         var glyph:Glyph;
         for (col in 0...numCols) {
             glyph = glyphs[col];
-            glyph.set_color(glyph.get_r() * (1 - offset), glyph.get_g() * (1 - offset), glyph.get_b() * (1 - offset));
+            glyph.set_color(Colors.mult(glyph.get_color(), 1 - offset));
 
             glyph = glyphs[lastRow + col];
-            glyph.set_color(glyph.get_r() * offset, glyph.get_g() * offset, glyph.get_b() * offset);
+            glyph.set_color(Colors.mult(glyph.get_color(), offset));
         }
     }
 

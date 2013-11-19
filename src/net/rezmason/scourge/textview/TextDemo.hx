@@ -182,7 +182,7 @@ class TextDemo {
         uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, uiText);
         var uiRect:Rectangle = new Rectangle(0, 0, 1, 1); // 0.6, 0, 0.4, 1
         uiBody.viewRect = uiRect;
-        uiBody.padding = 0.025;
+        uiBody.padding = 0.0125;
         engine.addBody(uiBody);
 
         /**/
@@ -229,16 +229,19 @@ class TextDemo {
     }
 
     function onHintSignal(tokens:Array<TextToken>, indices:{t:Int, c:Int}):Void {
+
+        if (tokens.length == 1 && tokens[0].text == '') return;
+
         uiText.receiveHint(tokens, indices.t, indices.c, [
-            {text:"One", type:PLAIN_TEXT},
+            {text:"One", type:PLAIN_TEXT, color:Colors.white()},
             {text:"Two", type:SHORTCUT([
-                {text:"", type:CAPSULE(NODE_CODE, "Two insert", true)},
-            ])},
+                {text:"", type:CAPSULE(NODE_CODE, "Two insert", true), color:Colors.white()},
+            ]), color:Colors.white()},
         ]);
     }
 
     function onExecSignal(tokens:Array<TextToken>):Void {
-        haxe.Timer.delay(function() uiText.receiveExec(tokens, [{text:"Done.", type:PLAIN_TEXT}], true), 100);
+        haxe.Timer.delay(function() uiText.receiveExec([{text:"Done.", type:PLAIN_TEXT, color:Colors.white()}], true), 100);
     }
 
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();

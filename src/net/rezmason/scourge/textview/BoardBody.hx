@@ -57,10 +57,9 @@ class BoardBody extends Body {
 
     inline static var COLOR_RANGE:Int = 6;
 
-    static var TEAM_COLORS:Array<Int> =        [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ];
-    static var TEAM_CAVITY_COLORS:Array<Int> = [0x990040, 0x997800, 0x109900, 0x007099, 0x993000, 0x700099, 0x001099, 0x303030, ];
-    static var BOARD_COLOR:Int = 0x303030;
-    static var WALL_COLOR:Int = 0x606060;
+    static var TEAM_COLORS:Array<Color> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Colors.fromHex);
+    static var BOARD_COLOR:Color = Colors.fromHex(0x303030);
+    static var WALL_COLOR:Color = Colors.fromHex(0x606060);
     static var BODY_CHARS:String = Strings.ALPHANUMERICS;
 
     var dragging:Bool;
@@ -291,7 +290,7 @@ class BoardBody extends Body {
 
             var code:Int = uiCode;
             var size:Float = 1;
-            var color:Int = 0xFFFFFF;
+            var color:Color = Colors.white();
             var isVisible:Bool = true;
             var glow:Float = 0;
             var wiggleX:Float = 0;
@@ -340,7 +339,7 @@ class BoardBody extends Body {
                     if (isVisible) wallNodeViews.push(view);
                 }
             } else if (hasPlayer) {
-                color = TEAM_CAVITY_COLORS[playerID % TEAM_CAVITY_COLORS.length];
+                color = Colors.mult(TEAM_COLORS[playerID % TEAM_COLORS.length], 0.6);
                 glow = 0.05;
                 code = boardCode;
                 size = 0.5;
@@ -353,7 +352,7 @@ class BoardBody extends Body {
             view.size = size;
             view.wiggleX = wiggleX;
             view.wiggleY = wiggleY;
-            colorGlyph(view.boardGlyph, color);
+            view.boardGlyph.set_color(color);
             view.boardGlyph.set_i(glow);
             view.boardGlyph.set_x(view.x * view.curve + view.wiggleX);
             view.boardGlyph.set_y(view.y * view.curve + view.wiggleX);
@@ -389,14 +388,6 @@ class BoardBody extends Body {
     public function handleUIUpdate():Void {
         // Interpret info from UI
 
-    }
-
-    inline function colorGlyph(glyph:Glyph, color:Int):Void {
-        glyph.set_color(
-            (color >> 16 & 0xFF) / 0xFF,
-            (color >> 8  & 0xFF) / 0xFF,
-            (color >> 0  & 0xFF) / 0xFF
-        );
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {

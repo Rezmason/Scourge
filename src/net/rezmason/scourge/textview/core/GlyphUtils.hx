@@ -56,10 +56,24 @@ class GlyphUtils {
     public inline static function get_f(gl:G) { return gl.color[gl.id * cpg + fOff]; }
     public inline static function set_f(gl:G, v) { return pop4(gl.color, gl.id * cpg, fOff, cpv, v); }
 
-    public inline static function set_color(gl:G, r, g, b) {
+    public inline static function set_rgb(gl:G, r, g, b) {
         set_r(gl, r);
         set_g(gl, g);
         set_b(gl, b);
+    }
+
+    public inline static function get_color(gl:G):Color {
+        return {
+            r: get_r(gl),
+            g: get_g(gl),
+            b: get_b(gl),
+        };
+    }
+
+    public inline static function set_color(gl:G, color:Color) {
+        set_r(gl, color.r);
+        set_g(gl, color.g);
+        set_b(gl, color.b);
     }
 
     // Shape

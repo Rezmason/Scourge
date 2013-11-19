@@ -14,8 +14,6 @@ import net.rezmason.scourge.textview.core.Interaction;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-typedef SplashColor = { r:Float, g:Float, b:Float, };
-
 class SplashBody extends Body {
 
     /*
@@ -29,7 +27,7 @@ class SplashBody extends Body {
         {r:0.37, g:0.37, b:0.37}
     */
 
-    static var colors = [
+    static var SPLASH_COLORS = [
         'S' => {r:1.00, g:0.00, b:0.56},
         'C' => {r:1.00, g:0.78, b:0.00},
         'O' => {r:0.18, g:1.00, b:0.00},
@@ -82,11 +80,8 @@ class SplashBody extends Body {
 
                 var charCode:Int = lines[row].charCodeAt(col);
 
-                var color:SplashColor = colors[lines[row].charAt(col)];
+                var color:Color = SPLASH_COLORS[lines[row].charAt(col)];
                 if (color == null) color = {r:1, g:1, b:1};
-                var r:Float = color.r;
-                var g:Float = color.g;
-                var b:Float = color.b;
 
                 var s:Float = 1;
 
@@ -98,15 +93,13 @@ class SplashBody extends Body {
                     glyphTower.push(glyph);
 
                     glyph.set_shape(x, y, z, 1, 0);
-                    glyph.set_color(r, g, b);
+                    glyph.set_color(color);
                     glyph.set_i(0);
                     glyph.set_char(charCode, glyphTexture.font);
                     glyph.set_paint(glyph.id | id << 16);
 
                     z += 0.01;
-                    r *= 0.2;
-                    g *= 0.2;
-                    b *= 0.2;
+                    color = Colors.mult(color, 0.2);
 
                     glyphID++;
                 }

@@ -16,7 +16,7 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class GlyphBody extends Body {
 
-    static var COLORS:Array<Int> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ];
+    static var COLORS:Array<Color> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Colors.fromHex);
     inline static var TWEEN_LENGTH:Float = 1.5;
     inline static var WAIT_LENGTH:Float = 2;
     inline static var FADE_AMT:Float = 0;
@@ -43,7 +43,7 @@ class GlyphBody extends Body {
         growTo(1);
 
         glyphs[0].set_char(Utf8.charCodeAt(CHARS, currentCharIndex), glyphTexture.font);
-        colorGlyph(glyphs[0], COLORS[currentColor]);
+        glyphs[0].set_color(COLORS[currentColor]);
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
@@ -51,14 +51,6 @@ class GlyphBody extends Body {
         setGlyphScale(0.8, 0.8 * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
         transform.identity();
         transform.appendScale(1, -1, 1);
-    }
-
-    inline function colorGlyph(glyph:Glyph, color:Int, mult:Float = 1):Void {
-        glyph.set_color(
-            ((color >> 16 & 0xFF) / 0xFF) * mult,
-            ((color >> 8  & 0xFF) / 0xFF) * mult,
-            ((color >> 0  & 0xFF) / 0xFF) * mult
-        );
     }
 
     override public function update(delta:Float):Void {
@@ -79,7 +71,7 @@ class GlyphBody extends Body {
         var val:Float = tweens[currentPhase](percent);
         val = tweenData[currentPhase][0] * (1 - val) + tweenData[currentPhase][1] * val;
         glyphs[0].set_f(val * 0.5);
-        colorGlyph(glyphs[0], COLORS[currentColor], val * (1 + FADE_AMT) - FADE_AMT);
+        glyphs[0].set_color(Colors.mult(COLORS[currentColor], val * (1 + FADE_AMT) - FADE_AMT));
 
         super.update(delta);
     }

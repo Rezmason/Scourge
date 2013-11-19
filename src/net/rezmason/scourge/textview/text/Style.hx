@@ -57,7 +57,7 @@ class Style {
         var p:Float = basics[6];
 
         for (glyph in glyphs) {
-            glyph.set_color(r, g, b);
+            glyph.set_rgb(r, g, b);
             glyph.set_i(i);
             glyph.set_f(f);
             glyph.set_s(s);

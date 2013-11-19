@@ -71,7 +71,7 @@ class TestBody extends Body {
             var b:Float = ramp(z + 0.5);
 
             glyph.set_shape(x, y, z, 1, 0);
-            glyph.set_color(r, g, b);
+            glyph.set_rgb(r, g, b);
             glyph.set_i(i);
             glyph.set_char(charCode, glyphTexture.font);
             glyph.set_paint(glyph.id | id << 16);
@@ -154,7 +154,7 @@ class TestBody extends Body {
     }
 
     inline function setGlobalColor(r:Float, g:Float, b:Float):Void {
-        for (glyph in glyphs) glyph.set_color(r, g, b);
+        for (glyph in glyphs) glyph.set_rgb(r, g, b);
     }
 
     inline function setGlobalChar(charCode:Int):Void {

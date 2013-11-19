@@ -12,10 +12,10 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 class AlphabetBody extends Body {
 
     inline static var CHARS:String =
-        TestStrings.ALPHANUMERICS +
-        TestStrings.SYMBOLS +
-        TestStrings.WEIRD_SYMBOLS +
-        TestStrings.BOX_SYMBOLS +
+        Strings.ALPHANUMERICS +
+        Strings.SYMBOLS +
+        Strings.WEIRD_SYMBOLS +
+        Strings.BOX_SYMBOLS +
     '';
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
@@ -43,7 +43,7 @@ class AlphabetBody extends Body {
             var charCode:Int = CHARS.charCodeAt(ike % CHARS.length);
 
             glyph.set_shape(x, y, 0, 1, 0);
-            glyph.set_color(1, 1, 1);
+            glyph.set_rgb(1, 1, 1);
             glyph.set_i(0.2);
             glyph.set_char(charCode, glyphTexture.font);
             glyph.set_paint(glyph.id | id << 16);

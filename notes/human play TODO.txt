@@ -1,11 +1,15 @@
 UIText
-    Display the hints
-    Display the exec output
     Style the tokens differently
         InputStyle
     Alt left and alt right to go between tokens
     Token clicking ought to work too
         Shortcuts
+
+Regions
+    mainText - non-interactive
+    outputString - interactive
+    prompt - interactive
+    hint - interactive
 
 Solidify text update behavior
     If:
@@ -13,7 +17,6 @@ Solidify text update behavior
         the user IS past the bottom, or
         the new text IS the result of interaction,
     -scroll to the new bottom
-Scroll indicator (looks like meterstick)
 
 Command interpreter
     Generates input and output tokens from input tokens

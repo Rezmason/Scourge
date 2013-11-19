@@ -54,11 +54,13 @@ class UIText {
     var caretIndex:Int;
     var tokenIndex:Int;
     var outputString:String;
+    var hintString:String;
     var textIsDirty:Bool;
     var caretStyle:AnimatedStyle;
     var waitStyle:AnimatedStyle;
     var inputTokens:Array<TextToken>;
     var outputTokens:Array<TextToken>;
+    var hintTokens:Array<TextToken>;
 
     var inputHistory:Array<Array<TextToken>>;
     var histItr:Int;
@@ -98,9 +100,13 @@ class UIText {
         tokenIndex = 0;
 
         outputString = '';
+        hintString = '';
         textIsDirty = false;
 
-        inputTokens = [{text:'', type:PLAIN_TEXT}];
+        outputTokens = [];
+        hintTokens = [];
+
+        inputTokens = [{text:'', type:PLAIN_TEXT, color:Colors.white()}];
         inputHistory = [];
         histItr = 1;
 
@@ -175,8 +181,16 @@ class UIText {
             } else {
                 combinedText += prompt;
                 for (ike in 0...inputTokens.length) {
-                    combinedText += stringifyToken(inputTokens[ike], ike == tokenIndex ? caretIndex : -1);
+                    var index:Int = ike == tokenIndex ? caretIndex : -1;
+                    combinedText += stringifyToken(inputTokens[ike], index);
                 }
+
+                if (hintTokens.length > 0) {
+                    combinedText += '\n\t';
+                    for (token in hintTokens) combinedText += stringifyToken(token, -1, true);
+                }
+
+                combinedText += '\n';
                 combinedText = swapTabsWithSpaces(combinedText);
             }
 
@@ -311,26 +325,24 @@ class UIText {
         }
     }
 
-    public function receiveHint(input:Array<TextToken>, tokenIndex:Int, caretIndex:Int, output:Array<TextToken>):Void {
-        /*
-        if (input != null) this.inputTokens = input;
-        this.outputTokens = output;
-        */
-        trace("HINT");
-        trace(input);
-        trace('$tokenIndex $caretIndex');
-        trace(output);
+    public function receiveHint(input:Array<TextToken>, tokenIndex:Int, caretIndex:Int, hint:Array<TextToken>):Void {
+        this.inputTokens = input;
+        this.tokenIndex = tokenIndex;
+        this.caretIndex = caretIndex;
+        this.hintTokens = hint;
         textIsDirty = true;
     }
 
-    public function receiveExec(input:Array<TextToken>, output:Array<TextToken>, done:Bool):Void {
+    public function receiveExec(output:Array<TextToken>, done:Bool):Void {
         if (done) {
             frozen = false;
             waiting = false;
         }
-        trace("EXEC");
-        trace(input);
-        trace(output);
+
+        this.outputTokens = output;
+        outputString = '';
+        for (token in outputTokens) outputString += stringifyToken(token);
+        outputString += '\n';
         textIsDirty = true;
     }
 
@@ -352,7 +364,7 @@ class UIText {
         }
 
         inputTokens[tokenIndex].text = left + right;
-        requestHint();
+        refreshHint();
         textIsDirty = true;
     }
 
@@ -363,7 +375,7 @@ class UIText {
 
         var isEmpty:Bool = inputTokens.length == 1 && length(inputTokens[0].text) == 0;
 
-        mainText += prompt + inputString + '\n';
+        mainText += outputString + prompt + inputString + '\n';
         if (!isEmpty) {
             execSignal.dispatch(inputTokens);
             frozen = true;
@@ -371,10 +383,12 @@ class UIText {
             inputHistory.push(inputTokens.copy());
             histItr = inputHistory.length;
         }
-        inputTokens = [{text:'', type:PLAIN_TEXT}];
+        inputTokens = [{text:'', type:PLAIN_TEXT, color:Colors.white()}];
+        hintTokens = [];
+        outputTokens = [];
+        outputString = '';
         caretIndex = 0;
         tokenIndex = 0;
-        requestHint();
         textIsDirty = true;
     }
 
@@ -383,10 +397,10 @@ class UIText {
     }
 
     inline function handleEscape():Void {
-        inputTokens = [{text:'', type:PLAIN_TEXT}];
+        inputTokens = [{text:'', type:PLAIN_TEXT, color:Colors.white()}];
         caretIndex = 0;
         tokenIndex = 0;
-        requestHint();
+        refreshHint();
         textIsDirty = true;
     }
 
@@ -395,7 +409,7 @@ class UIText {
         if (caretIndex < 0) {
             if (!prevToken()) caretIndex = 0;
         }
-        requestHint();
+        refreshHint();
         textIsDirty = true;
         // TODO: alt-left
         // TODO: ctrl-left
@@ -407,7 +421,7 @@ class UIText {
         if (caretIndex > len) {
             if (!nextToken()) caretIndex = len;
         }
-        requestHint();
+        refreshHint();
         textIsDirty = true;
         // TODO: alt-right
         // TODO: ctrl-left
@@ -437,7 +451,7 @@ class UIText {
             inputTokens = inputHistory[histItr].copy();
             tokenIndex = inputTokens.length - 1;
             caretIndex = length(inputTokens[tokenIndex].text);
-            requestHint();
+            refreshHint();
             textIsDirty = true;
         }
     }
@@ -445,11 +459,11 @@ class UIText {
     inline function handleDown():Void {
         if (inputHistory.length > 0) {
             if (histItr < inputHistory.length) histItr++;
-            if (histItr == inputHistory.length) inputTokens = [{text:'', type:PLAIN_TEXT}];
+            if (histItr == inputHistory.length) inputTokens = [{text:'', type:PLAIN_TEXT, color:Colors.white()}];
             else inputTokens = inputHistory[histItr].copy();
             tokenIndex = inputTokens.length - 1;
             caretIndex = length(inputTokens[tokenIndex].text);
-            requestHint();
+            refreshHint();
             textIsDirty = true;
         }
     }
@@ -457,7 +471,7 @@ class UIText {
     inline function handleChar(char:Int):Void {
         if (char > 0) {
 
-            if (inputTokens[tokenIndex] == null) inputTokens.push({text:'', type:PLAIN_TEXT});
+            if (inputTokens[tokenIndex] == null) inputTokens.push({text:'', type:PLAIN_TEXT, color:Colors.white()});
 
             var left:String = sub(inputTokens[tokenIndex].text, 0, caretIndex);
             var right:String = sub(inputTokens[tokenIndex].text, caretIndex);
@@ -465,7 +479,7 @@ class UIText {
             left += String.fromCharCode(char);
             caretIndex++;
             inputTokens[tokenIndex].text = left + right;
-            requestHint();
+            refreshHint();
             textIsDirty = true;
         }
     }
@@ -524,7 +538,7 @@ class UIText {
         return output;
     }
 
-    inline function stringifyToken(token:TextToken, caretIndex:Int = -1):String {
+    inline function stringifyToken(token:TextToken, caretIndex:Int = -1, isHint:Bool = false):String {
         var str:String = '';
 
         if (caretIndex >= 0) {
@@ -559,5 +573,8 @@ class UIText {
         return val;
     }
 
-    inline function requestHint():Void hintSignal.dispatch(inputTokens, {t:tokenIndex, c:caretIndex});
+    inline function refreshHint():Void {
+        hintTokens = [];
+        hintSignal.dispatch(inputTokens, {t:tokenIndex, c:caretIndex});
+    }
 }
