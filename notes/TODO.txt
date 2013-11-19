@@ -1,5 +1,8 @@
 Human play (see todo)
 
+Depth of field in frag shader?
+    Already got the vZ and deriv
+
 NodeView and BoardBody
 
     Throb

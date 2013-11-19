@@ -182,15 +182,14 @@ class UIText {
                 combinedText += prompt;
                 for (ike in 0...inputTokens.length) {
                     var index:Int = ike == tokenIndex ? caretIndex : -1;
-                    combinedText += stringifyToken(inputTokens[ike], index);
+                    combinedText += stringifyToken(inputTokens[ike], index, false, true);
                 }
 
                 if (hintTokens.length > 0) {
                     combinedText += '\n\t';
-                    for (token in hintTokens) combinedText += stringifyToken(token, -1, true);
+                    for (token in hintTokens) combinedText += stringifyToken(token, -1, true, true);
                 }
 
-                combinedText += '\n';
                 combinedText = swapTabsWithSpaces(combinedText);
             }
 
@@ -341,7 +340,7 @@ class UIText {
 
         this.outputTokens = output;
         outputString = '';
-        for (token in outputTokens) outputString += stringifyToken(token);
+        for (token in outputTokens) outputString += stringifyToken(token, -1, false, true);
         outputString += '\n';
         textIsDirty = true;
     }
@@ -370,12 +369,15 @@ class UIText {
 
     inline function handleEnter():Void {
         var inputString:String = '';
-        for (token in inputTokens) inputString += stringifyToken(token);
-        trace(inputString);
+        for (token in inputTokens) inputString += stringifyToken(token, -1, false, false);
 
         var isEmpty:Bool = inputTokens.length == 1 && length(inputTokens[0].text) == 0;
 
-        mainText += outputString + prompt + inputString + '\n';
+        var oldOutputString:String = '';
+        for (token in outputTokens) oldOutputString += stringifyToken(token, -1, false, false);
+        if (length(oldOutputString) > 0) oldOutputString += '\n';
+
+        mainText += oldOutputString + prompt + inputString + '\n';
         if (!isEmpty) {
             execSignal.dispatch(inputTokens);
             frozen = true;
@@ -538,7 +540,7 @@ class UIText {
         return output;
     }
 
-    inline function stringifyToken(token:TextToken, caretIndex:Int = -1, isHint:Bool = false):String {
+    inline function stringifyToken(token:TextToken, caretIndex:Int, isHint:Bool, isEnabled:Bool):String {
         var str:String = '';
 
         if (caretIndex >= 0) {

@@ -4,12 +4,7 @@ UIText
     Alt left and alt right to go between tokens
     Token clicking ought to work too
         Shortcuts
-
-Regions
-    mainText - non-interactive
-    outputString - interactive
-    prompt - interactive
-    hint - interactive
+        Buttons should become non-interactive when they enter the main text
 
 Solidify text update behavior
     If:
