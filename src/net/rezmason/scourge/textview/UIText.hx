@@ -46,18 +46,14 @@ class UIText {
 
     var mainText:String;
     var prompt:String;
-    var waitIndicator:String;
-    var waitStart:String;
-    var waitEnd:String;
     var caretStart:String;
-    var caretEnd:String;
+    var styleEnd:String;
     var caretIndex:Int;
     var tokenIndex:Int;
     var outputString:String;
     var hintString:String;
     var textIsDirty:Bool;
     var caretStyle:AnimatedStyle;
-    var waitStyle:AnimatedStyle;
     var inputTokens:Array<TextToken>;
     var outputTokens:Array<TextToken>;
     var hintTokens:Array<TextToken>;
@@ -71,6 +67,8 @@ class UIText {
     var frozenQueue:List<FrozenInteraction>;
     var _frozen:Bool;
 
+    var padLineSigilCount:Int;
+
     public function new():Void {
 
         styles = new StyleSet();
@@ -82,19 +80,15 @@ class UIText {
 
         styles.extract(Strings.BREATHING_PROMPT_STYLE);
         styles.extract(Strings.CARET_STYLE);
-        styles.extract(Strings.WAIT_STYLE);
+        styles.extract(Strings.WAIT_STYLES);
         styles.extract(Strings.INPUT_STYLE);
+
+        styleEnd = '§{}';
 
         setPlayer('rezmason', 0xFF3030);
 
-        waitStyle = cast styles.getStyleByName('wait');
-        waitStart = '§{wait}';
-        waitEnd = '§{}';
-        waitIndicator = ' ${waitStart} • • • ${waitEnd} ';
-
         caretStyle = cast styles.getStyleByName('caret');
         caretStart = '§{caret}';
-        caretEnd = '§{}';
 
         caretIndex = 0;
         tokenIndex = 0;
@@ -146,18 +140,16 @@ class UIText {
 
         for (line in pageSegment) {
             var index:Int = 0;
-            for (index in 0...Utf8.length(line)) {
+
+            for (index in 0...length(line)) {
                 var charCode:Int = Utf8.charCodeAt(line, index);
                 if (charCode == STYLE_CODE) {
                     currentStyle = getStyleByIndex(++styleIndex);
                 } else {
-                    // this is why setScrollPos is in UIBody
-                    // It could be passed in
                     var glyph:Glyph = glyphs[id++];
                     glyph.set_char(charCode, font);
                     currentStyle.addGlyph(glyph);
                     glyph.set_z(0);
-                    //
                 }
             }
         }
@@ -173,11 +165,12 @@ class UIText {
 
             if (!force) textIsDirty = false;
 
-            combinedText = mainText + outputString;
+            combinedText = mainText;
+            if (length(mainText) > 0) combinedText += '\n';
+            combinedText += outputString;
 
             if (waiting) {
-                combinedText += waitIndicator;
-                waitStyle.start();
+                combinedText += Strings.WAIT_INDICATOR;
             } else {
                 combinedText += prompt;
                 for (ike in 0...inputTokens.length) {
@@ -223,7 +216,10 @@ class UIText {
 
     public function updateStyledGlyphs(delta:Float):Void styles.updateGlyphs(delta);
 
-    public function setText(text:String):Void mainText = text;
+    public function setText(text:String):Void {
+        mainText = text;
+        textIsDirty = true;
+    }
 
     public function setPlayer(name:String, color:Int):Void {
         currentPlayerName = name;
@@ -235,24 +231,18 @@ class UIText {
 
         prompt =
         '∂{name:promptHead, basis:breathingprompt, r:$r, g:$g, b:$b}Ω' +
-        '§{name:prompt, r:$r, g:$g, b:$b} $currentPlayerName§{} => §{}';
+        '§{name:prompt, r:$r, g:$g, b:$b} $currentPlayerName§{}' + Strings.PROMPT + styleEnd;
     }
 
     inline function padLine(line:String):String {
-
-        var count:Int = 0;
-        var right:String = line;
-        while (length(right) > 0) {
-            var sigilIndex:Int = right.indexOf(STYLE);
-            if (sigilIndex == -1) break;
-            right = sub(right, sigilIndex + 1);
-            count++;
-        }
+        padLineSigilCount = 0;
+        Utf8.iter(line, checkForSigil);
 
         // Pads a string until its length, ignoring sigils, is numCols
-        line = rpad(line, ' ', numCols + count);
-        return line;
+        return rpad(line, ' ', numCols + padLineSigilCount);
     }
+
+    inline function checkForSigil(char:Int):Void if (char == STYLE_CODE) padLineSigilCount++;
 
     inline function wrapLines(s:String) {
 
@@ -377,7 +367,8 @@ class UIText {
         for (token in outputTokens) oldOutputString += stringifyToken(token, -1, false, false);
         if (length(oldOutputString) > 0) oldOutputString += '\n';
 
-        mainText += oldOutputString + prompt + inputString + '\n';
+        if (length(mainText) > 0) mainText += '\n';
+        mainText += oldOutputString + prompt + inputString;
         if (!isEmpty) {
             execSignal.dispatch(inputTokens);
             frozen = true;
@@ -553,7 +544,7 @@ class UIText {
             if (mid == ' ') caretStyle.start();
             else caretStyle.stop();
 
-            str = left + caretStart + mid + caretEnd + right;
+            str = left + caretStart + mid + styleEnd + right;
         } else {
             str = token.text;
         }

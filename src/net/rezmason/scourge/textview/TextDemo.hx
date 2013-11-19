@@ -171,12 +171,12 @@ class TextDemo {
         uiText.hintSignal.add(onHintSignal);
         uiText.execSignal.add(onExecSignal);
 
-        // uiText.setText ([TestStrings.SYMBOLS + " " + TestStrings.WEIRD_SYMBOLS, TestStrings.SPLASH, TestStrings.BOARD].join("\n\n"));
-        // uiText.setText (Assets.getText("assets/not plus.txt"));
-        // uiText.setText (Assets.getText("assets/enterprise.txt"));
-        // uiText.setText (Assets.getText("assets/acid2.txt"));
-        // uiText.setText (TestStrings.STYLED_TEXT);
-        // uiText.setText ("One. §{i:1}Two§{}.";)
+        // uiText.setText(Assets.getText("assets/not plus.txt"));
+        // uiText.setText(Assets.getText("assets/enterprise.txt"));
+        // uiText.setText(Assets.getText("assets/acid2.txt"));
+        // uiText.setText('\n§{}§{}');
+        uiText.setText(TestStrings.STYLED_TEXT);
+        // uiText.setText("One. §{i:1}Two§{}.";)
 
         // TODO: signal handling
         uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, uiText);

@@ -17,9 +17,9 @@ class TestStrings {
     'This is another §{test2}test§{}.\n' +
     '§{name:whatever3g:1,  p:0.05               , basis:test}This is a third test!§{}\n' +
     '\n\n' +
-    '§{name:merp1, p: 0.00, r:0}UP§{}\n\n' +
-    '§{name:merp2, p:-0.01, g:0}OVER§{}\n\n' +
-    '§{name:merp3, p: 0.01, b:0}DOWN§{}\n\n' +
+    '§{name:merp1, p: 0.00, r:0, f:0.5}UP§{}\n\n' +
+    '§{name:merp2, p:-0.01, g:0, f:0.6}OVER§{}\n\n' +
+    '§{name:merp3, p: 0.01, b:0, f:0.4}DOWN§{}\n\n' +
     '∂{name:animation, period:1, frames:[merp1, merp2, merp3]}DANCE, DAMN IT§{}\n' +
     'µ{name:button, up:merp1, over:merp2, down:merp3, period:0.2, i:1}  BUTTON TIME  §{}\n' +
     '\n' +
