@@ -8,6 +8,7 @@ import msignal.Signal;
 
 import massive.munit.TestRunner;
 
+import net.rezmason.scourge.textview.TextToken;
 import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.scourge.controller.RandomSmarts;
 import net.rezmason.scourge.controller.Referee;
@@ -228,11 +229,16 @@ class TextDemo {
     }
 
     function onHintSignal(tokens:Array<TextToken>, indices:{t:Int, c:Int}):Void {
-        uiText.receiveHint(tokens, indices.t, indices.c, []);
+        uiText.receiveHint(tokens, indices.t, indices.c, [
+            {text:"One", type:PLAIN_TEXT},
+            {text:"Two", type:SHORTCUT([
+                {text:"", type:CAPSULE(NODE_CODE, "Two insert", true)},
+            ])},
+        ]);
     }
 
     function onExecSignal(tokens:Array<TextToken>):Void {
-        uiText.receiveExec(tokens, []);
+        haxe.Timer.delay(function() uiText.receiveExec(tokens, [{text:"Done.", type:PLAIN_TEXT}], true), 100);
     }
 
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();

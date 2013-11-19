@@ -6,6 +6,7 @@ import msignal.Signal;
 
 import haxe.Utf8;
 
+import net.rezmason.scourge.textview.TextToken;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.text.AnimatedStyle;
@@ -28,6 +29,7 @@ class UIText {
     public var execSignal(default, null):Signal1<Array<TextToken>>;
 
     public var frozen(get, set):Bool;
+    var waiting:Bool;
 
     var numRows:Int;
     var numCols:Int;
@@ -42,16 +44,19 @@ class UIText {
     var page:Array<String>;
     var lineStyleIndices:Array<Int>;
 
-    var blurb:String;
+    var mainText:String;
     var prompt:String;
+    var waitIndicator:String;
+    var waitStart:String;
+    var waitEnd:String;
     var caretStart:String;
     var caretEnd:String;
     var caretIndex:Int;
     var tokenIndex:Int;
-    var inputString:String;
     var outputString:String;
     var textIsDirty:Bool;
     var caretStyle:AnimatedStyle;
+    var waitStyle:AnimatedStyle;
     var inputTokens:Array<TextToken>;
     var outputTokens:Array<TextToken>;
 
@@ -71,13 +76,19 @@ class UIText {
         numRows = 0;
         numCols = 0;
 
-        blurb = '';
+        mainText = '';
 
         styles.extract(Strings.BREATHING_PROMPT_STYLE);
         styles.extract(Strings.CARET_STYLE);
+        styles.extract(Strings.WAIT_STYLE);
         styles.extract(Strings.INPUT_STYLE);
 
         setPlayer('rezmason', 0xFF3030);
+
+        waitStyle = cast styles.getStyleByName('wait');
+        waitStart = '§{wait}';
+        waitEnd = '§{}';
+        waitIndicator = ' ${waitStart} • • • ${waitEnd} ';
 
         caretStyle = cast styles.getStyleByName('caret');
         caretStart = '§{caret}';
@@ -86,11 +97,10 @@ class UIText {
         caretIndex = 0;
         tokenIndex = 0;
 
-        inputString = '';
-        outputString = '\n';
+        outputString = '';
         textIsDirty = false;
 
-        inputTokens = [];
+        inputTokens = [{text:'', type:PLAIN_TEXT}];
         inputHistory = [];
         histItr = 1;
 
@@ -98,6 +108,8 @@ class UIText {
         execSignal = new Signal1();
 
         frozenQueue = new List();
+        frozen = false;
+        waiting = false;
 
         updateDirtyText(true);
     }
@@ -155,19 +167,18 @@ class UIText {
 
             if (!force) textIsDirty = false;
 
-            /*
-            var left:String = sub(inputString, 0, caretIndex);
-            var mid:String = sub(inputString, caretIndex, 1);
-            var right:String = sub(inputString, caretIndex + 1);
+            combinedText = mainText + outputString;
 
-            if (mid == '') mid = ' ';
-
-            if (mid == ' ') caretStyle.start();
-            else caretStyle.stop();
-            */
-
-            combinedText = blurb + outputString + prompt + inputString/*left + caretStart + mid + caretEnd + right*/;
-            combinedText = swapTabsWithSpaces(combinedText);
+            if (waiting) {
+                combinedText += waitIndicator;
+                waitStyle.start();
+            } else {
+                combinedText += prompt;
+                for (ike in 0...inputTokens.length) {
+                    combinedText += stringifyToken(inputTokens[ike], ike == tokenIndex ? caretIndex : -1);
+                }
+                combinedText = swapTabsWithSpaces(combinedText);
+            }
 
             if (numRows * numCols > 0) {
 
@@ -199,7 +210,7 @@ class UIText {
 
     public function updateStyledGlyphs(delta:Float):Void styles.updateGlyphs(delta);
 
-    public function setText(text:String):Void blurb = text;
+    public function setText(text:String):Void mainText = text;
 
     public function setPlayer(name:String, color:Int):Void {
         currentPlayerName = name;
@@ -309,21 +320,23 @@ class UIText {
         trace(input);
         trace('$tokenIndex $caretIndex');
         trace(output);
+        textIsDirty = true;
     }
 
-    public function receiveExec(input:Array<TextToken>, output:Array<TextToken>):Void {
+    public function receiveExec(input:Array<TextToken>, output:Array<TextToken>, done:Bool):Void {
+        if (done) {
+            frozen = false;
+            waiting = false;
+        }
         trace("EXEC");
         trace(input);
         trace(output);
+        textIsDirty = true;
     }
 
     inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
-
-        // Only erases text; doesn't erase empty tokens
-
-        /*
-        var left:String = sub(inputString, 0, caretIndex);
-        var right:String = sub(inputString, caretIndex);
+        var left:String = sub(inputTokens[tokenIndex].text, 0, caretIndex);
+        var right:String = sub(inputTokens[tokenIndex].text, caretIndex);
 
         if (length(left) > 0) {
             var lim:Int = -1;
@@ -338,68 +351,93 @@ class UIText {
             caretIndex = lim;
         }
 
-        inputString = left + right;
+        inputTokens[tokenIndex].text = left + right;
+        requestHint();
         textIsDirty = true;
-        */
     }
 
     inline function handleEnter():Void {
-        blurb += outputString + prompt + inputString;
-        if (length(inputString) == 0) {
-            outputString = '\n';
-        } else {
-            outputString = '\n' + inputString + '\n';
+        var inputString:String = '';
+        for (token in inputTokens) inputString += stringifyToken(token);
+        trace(inputString);
+
+        var isEmpty:Bool = inputTokens.length == 1 && length(inputTokens[0].text) == 0;
+
+        mainText += prompt + inputString + '\n';
+        if (!isEmpty) {
             execSignal.dispatch(inputTokens);
+            frozen = true;
+            waiting = true;
             inputHistory.push(inputTokens.copy());
             histItr = inputHistory.length;
         }
-        inputTokens = [];
-        // inputString = '';
-        // caretIndex = 0;
+        inputTokens = [{text:'', type:PLAIN_TEXT}];
+        caretIndex = 0;
+        tokenIndex = 0;
+        requestHint();
         textIsDirty = true;
     }
 
     inline function handleTab():Void {
-        if (length(inputString) > 0) {
-            hintSignal.dispatch(inputTokens, {t:tokenIndex, c:caretIndex});
-        }
+
     }
 
     inline function handleEscape():Void {
-        if (length(inputString) > 0) {
-            inputTokens = [];
-            //inputString = '';
-            // caretIndex = 0;
-            textIsDirty = true;
-        }
+        inputTokens = [{text:'', type:PLAIN_TEXT}];
+        caretIndex = 0;
+        tokenIndex = 0;
+        requestHint();
+        textIsDirty = true;
     }
 
     inline function handleLeft(alt:Bool, ctrl:Bool):Void {
-        /*
         caretIndex--;
-        if (caretIndex < 0) caretIndex = 0;
+        if (caretIndex < 0) {
+            if (!prevToken()) caretIndex = 0;
+        }
+        requestHint();
         textIsDirty = true;
-        */
         // TODO: alt-left
         // TODO: ctrl-left
     }
 
     inline function handleRight(alt:Bool, ctrl:Bool):Void {
-        /*
         caretIndex++;
-        if (caretIndex > length(inputString)) caretIndex = length(inputString);
+        var len:Int = length(inputTokens[tokenIndex].text);
+        if (caretIndex > len) {
+            if (!nextToken()) caretIndex = len;
+        }
+        requestHint();
         textIsDirty = true;
-        */
         // TODO: alt-right
         // TODO: ctrl-left
+    }
+
+    inline function prevToken():Bool {
+        var feasible:Bool = tokenIndex > 0;
+        if (feasible) {
+            tokenIndex--;
+            caretIndex = length(inputTokens[tokenIndex].text);
+        }
+        return feasible;
+    }
+
+    inline function nextToken():Bool {
+        var feasible:Bool = tokenIndex < inputTokens.length - 1;
+        if (feasible) {
+            tokenIndex++;
+            caretIndex = 0;
+        }
+        return feasible;
     }
 
     inline function handleUp():Void {
         if (inputHistory.length > 0) {
             if (histItr > 0) histItr--;
             inputTokens = inputHistory[histItr].copy();
-            // inputString;
-            // caretIndex = inputString.length;
+            tokenIndex = inputTokens.length - 1;
+            caretIndex = length(inputTokens[tokenIndex].text);
+            requestHint();
             textIsDirty = true;
         }
     }
@@ -407,26 +445,29 @@ class UIText {
     inline function handleDown():Void {
         if (inputHistory.length > 0) {
             if (histItr < inputHistory.length) histItr++;
-            if (histItr == inputHistory.length) inputTokens = [];
+            if (histItr == inputHistory.length) inputTokens = [{text:'', type:PLAIN_TEXT}];
             else inputTokens = inputHistory[histItr].copy();
-            // inputString;
-            // caretIndex = inputString.length;
+            tokenIndex = inputTokens.length - 1;
+            caretIndex = length(inputTokens[tokenIndex].text);
+            requestHint();
             textIsDirty = true;
         }
     }
 
     inline function handleChar(char:Int):Void {
-        /*
-        var left:String = sub(inputString, 0, caretIndex);
-        var right:String = sub(inputString, caretIndex);
-
         if (char > 0) {
+
+            if (inputTokens[tokenIndex] == null) inputTokens.push({text:'', type:PLAIN_TEXT});
+
+            var left:String = sub(inputTokens[tokenIndex].text, 0, caretIndex);
+            var right:String = sub(inputTokens[tokenIndex].text, caretIndex);
+
             left += String.fromCharCode(char);
             caretIndex++;
-            inputString = left + right;
+            inputTokens[tokenIndex].text = left + right;
+            requestHint();
             textIsDirty = true;
         }
-        */
     }
 
     public function getPageSegment(index:Int):Array<String> return page.slice(index, index + numRows);
@@ -483,6 +524,27 @@ class UIText {
         return output;
     }
 
+    inline function stringifyToken(token:TextToken, caretIndex:Int = -1):String {
+        var str:String = '';
+
+        if (caretIndex >= 0) {
+            var left:String = sub(token.text, 0, caretIndex);
+            var mid:String = sub(token.text, caretIndex, 1);
+            var right:String = sub(token.text, caretIndex + 1);
+
+            if (mid == '') mid = ' ';
+
+            if (mid == ' ') caretStyle.start();
+            else caretStyle.stop();
+
+            str = left + caretStart + mid + caretEnd + right;
+        } else {
+            str = token.text;
+        }
+
+        return str;
+    }
+
     inline function get_frozen():Bool return _frozen;
 
     inline function set_frozen(val:Bool):Bool {
@@ -497,12 +559,5 @@ class UIText {
         return val;
     }
 
-    inline function isTokenModifiable(token:TextToken):Bool {
-        return switch (token) {
-            case PLAIN_TEXT(text): true;
-            case EMPTY_CAPSULE(type, caption): true;
-            case INCOMPLETE_CAPSULE(type, valid): true;
-            case _: false;
-        }
-    }
+    inline function requestHint():Void hintSignal.dispatch(inputTokens, {t:tokenIndex, c:caretIndex});
 }
