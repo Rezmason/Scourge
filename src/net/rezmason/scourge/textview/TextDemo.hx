@@ -37,6 +37,7 @@ class TextDemo {
     var fontTextures:Map<String, GlyphTexture>;
     var splashBody:Body;
     var testBody:TestBody;
+    #if flash var videoBody:VideoBody; #end
     var boardBody:BoardBody;
     var uiBody:UIBody;
 
@@ -152,6 +153,13 @@ class TextDemo {
         testBody = new TestBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         testBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(testBody);
+        /**/
+
+        //*
+        #if flash
+        videoBody = new VideoBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
+        engine.addBody(videoBody);
+        #end
         /**/
 
         /*
