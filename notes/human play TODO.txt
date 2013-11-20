@@ -1,7 +1,13 @@
+Separate UIText from ConsoleText
+
+Command interpreter
+    Wire it up in TextDemo
+    Generates input and output tokens from input tokens
+    Implement everything in "Text view text commands.txt"
+
 UIText
     Style the tokens differently
         InputStyle
-    Alt left and alt right to go between tokens
     Token clicking ought to work too
         Shortcuts
         Buttons should become non-interactive when they enter the main text
@@ -12,10 +18,6 @@ Solidify text update behavior
         the user IS past the bottom, or
         the new text IS the result of interaction,
     -scroll to the new bottom
-
-Command interpreter
-    Generates input and output tokens from input tokens
-    Implement everything in "Text view text commands.txt"
 
 Check out the user stories
     Command names "tokenize" after space

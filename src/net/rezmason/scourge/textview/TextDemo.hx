@@ -44,7 +44,7 @@ class TextDemo {
     var spectator:SimpleSpectator;
     var turnFuncs:Array<Void->Void>;
 
-    var uiText:UIText;
+    var console:ConsoleText;
 
     public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
@@ -167,19 +167,19 @@ class TextDemo {
         // interpreter.addCommand("setFont", setFont);
         // interpreter.addCommand("makeGame", makeGame);
 
-        uiText = new UIText();
-        uiText.hintSignal.add(onHintSignal);
-        uiText.execSignal.add(onExecSignal);
+        console = new ConsoleText();
+        console.hintSignal.add(onHintSignal);
+        console.execSignal.add(onExecSignal);
 
-        // uiText.setText(Assets.getText("assets/not plus.txt"));
-        // uiText.setText(Assets.getText("assets/enterprise.txt"));
-        // uiText.setText(Assets.getText("assets/acid2.txt"));
-        // uiText.setText('\n§{}§{}');
-        uiText.setText(TestStrings.STYLED_TEXT);
-        // uiText.setText("One. §{i:1}Two§{}.";)
+        // console.setText(Assets.getText("assets/not plus.txt"));
+        // console.setText(Assets.getText("assets/enterprise.txt"));
+        // console.setText(Assets.getText("assets/acid2.txt"));
+        // console.setText('\n§{}§{}');
+        // console.setText(TestStrings.STYLED_TEXT);
+        // console.setText("One. §{i:1}Two§{}.";)
 
         // TODO: signal handling
-        uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, uiText);
+        uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, console);
         var uiRect:Rectangle = new Rectangle(0, 0, 1, 1); // 0.6, 0, 0.4, 1
         uiBody.viewRect = uiRect;
         uiBody.padding = 0.0125;
@@ -232,7 +232,7 @@ class TextDemo {
 
         if (tokens.length == 1 && tokens[0].text == '') return;
 
-        uiText.receiveHint(tokens, indices.t, indices.c, [
+        console.receiveHint(tokens, indices.t, indices.c, [
             {text:"One", type:PLAIN_TEXT, color:Colors.white()},
             {text:"Two", type:SHORTCUT([
                 {text:"", type:CAPSULE(NODE_CODE, "Two insert", true), color:Colors.white()},
@@ -241,7 +241,7 @@ class TextDemo {
     }
 
     function onExecSignal(tokens:Array<TextToken>):Void {
-        haxe.Timer.delay(function() uiText.receiveExec([{text:"Done.", type:PLAIN_TEXT, color:Colors.white()}], true), 100);
+        haxe.Timer.delay(function() console.receiveExec([{text:"Done.", type:PLAIN_TEXT, color:Colors.white()}], true), 100);
     }
 
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();
