@@ -32,7 +32,7 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 class NodeView {
     public var node:AspectSet;
     public var locus:BoardLocus;
-    public var boardGlyph:Glyph;
+    public var boardGlyphs:Array<Glyph>;
     public var uiGlyph:Glyph;
     public var x:Float;
     public var y:Float;
@@ -55,7 +55,7 @@ class NodeView {
 
 class BoardBody extends Body {
 
-    inline static var COLOR_RANGE:Int = 6;
+    inline static var BOARD_GLYPHS_PER_NODE:Int = 2;
 
     static var TEAM_COLORS:Array<Color> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Colors.fromHex);
     static var BOARD_COLOR:Color = Colors.fromHex(0x303030);
@@ -78,6 +78,7 @@ class BoardBody extends Body {
     var headCode:Int;
     var uiCode:Int;
     var blankCode:Int;
+    var fatCode:Int;
 
     var numPlayers:Int;
     var game:Game;
@@ -108,6 +109,7 @@ class BoardBody extends Body {
         headCode = Utf8.charCodeAt('Ω', 0);
         uiCode = Utf8.charCodeAt('', 0);
         blankCode = Utf8.charCodeAt(' ', 0);
+        fatCode = Utf8.charCodeAt('!', 0);
 
         boardScale = 1;
 
@@ -141,7 +143,7 @@ class BoardBody extends Body {
         var nodes:Array<AspectSet> = game.state.nodes;
         var loci:Array<BoardLocus> = game.state.loci;
 
-        growTo(nodes.length * 2);
+        growTo(nodes.length * (BOARD_GLYPHS_PER_NODE + 1));
 
         var minX:Float = 0;
         var maxX:Float = 0;
@@ -154,8 +156,9 @@ class BoardBody extends Body {
             if (view == null) nodeViews[ike] = view = new NodeView();
             view.node = nodes[ike];
             view.locus = loci[ike];
-            view.boardGlyph = glyphs[ike * 2 + 0];
-            view.uiGlyph = glyphs[ike * 2 + 1];
+            view.uiGlyph = glyphs[ike * 2 + 0];
+            view.boardGlyphs = [];
+            for (jen in 0...BOARD_GLYPHS_PER_NODE) view.boardGlyphs.push(glyphs[ike * 2 + 1 + jen]);
 
             for (direction in GridUtils.allDirections()) {
                 var neighborLocus:BoardLocus = view.locus.neighbors[direction];
@@ -216,6 +219,7 @@ class BoardBody extends Body {
         game = null;
         nodeViews = [];
         headNodes = null;
+        for (glyph in glyphs) glyph.reset();
     }
 
     public function handleBoardUpdate():Void {
@@ -232,7 +236,7 @@ class BoardBody extends Body {
 
             if (node != null) {
 
-                nodeViews[getID(node)].distance = 0;
+                nodeViews[getID(node)].distance = -2;
                 var pendingNodes:List<AspectSet> = new List<AspectSet>();
 
                 while (node != null) {
@@ -271,6 +275,7 @@ class BoardBody extends Body {
         }
 
         var wallNodeViews:Array<NodeView> = [];
+        var bodyNodeViews:Array<NodeView> = [];
 
         for (view in nodeViews) {
 
@@ -296,6 +301,8 @@ class BoardBody extends Body {
             var wiggleX:Float = 0;
             var wiggleY:Float = 0;
 
+            if (view.distance < 0) view.distance = 0;
+
             if (isFilled) {
                 if (hasPlayer) {
                     color = TEAM_COLORS[playerID % TEAM_COLORS.length];
@@ -304,7 +311,7 @@ class BoardBody extends Body {
                         code = headCode;
                         size = 1.2;
                     } else {
-                        code = bodyCode;
+                        // code = bodyCode;
                         // code = BODY_CHARS.charCodeAt(Std.random(Utf8.length(BODY_CHARS)));
                         // code = BODY_CHARS.charCodeAt(view.distance % Utf8.length(BODY_CHARS));
 
@@ -314,6 +321,8 @@ class BoardBody extends Body {
                             if (neighborLocus != null && neighborLocus.value[occupier_] == playerID) numNeighbors++;
                         }
                         size = (numNeighbors / 8) * 0.6 + 0.2;
+
+                        bodyNodeViews.push(view);
                     }
 
                     wiggleX = view.wiggleX;
@@ -352,13 +361,21 @@ class BoardBody extends Body {
             view.size = size;
             view.wiggleX = wiggleX;
             view.wiggleY = wiggleY;
-            view.boardGlyph.set_color(color);
-            view.boardGlyph.set_i(glow);
-            view.boardGlyph.set_x(view.x * view.curve + view.wiggleX);
-            view.boardGlyph.set_y(view.y * view.curve + view.wiggleX);
-            view.boardGlyph.set_z(view.z + view.lift);
-            view.boardGlyph.set_s(size);
-            view.boardGlyph.set_char(code, glyphTexture.font);
+
+            var z:Float = view.z;
+
+            for (glyph in view.boardGlyphs) {
+                glyph.set_color(color);
+                glyph.set_f(0.5 + glow);
+                glyph.set_x(view.x * view.curve + view.wiggleX);
+                glyph.set_y(view.y * view.curve + view.wiggleX);
+                glyph.set_z(z + view.lift);
+                glyph.set_s(size);
+                glyph.set_char(code, glyphTexture.font);
+
+                z += 0.04;
+                color = Colors.mult(color, code == wallCode ? 0.5 : 0.2);
+            }
             view.isVisible = isVisible;
         }
 
@@ -380,8 +397,35 @@ class BoardBody extends Body {
 
             var code:Int = Utf8.charCodeAt(Strings.BOX_SYMBOLS, flag);
 
-            view.boardGlyph.set_s(0.7);
-            view.boardGlyph.set_char(code, glyphTexture.font);
+            for (glyph in view.boardGlyphs) {
+                glyph.set_s(0.7);
+                glyph.set_char(code, glyphTexture.font);
+            }
+        }
+
+        for (view in bodyNodeViews) {
+            var itr:Int = 0;
+            var flag:Int = 0;
+            var playerID:Null<Int> = view.node[occupier_];
+            for (neighborLocus in view.locus.orthoNeighbors()) {
+                var neighborNode:AspectSet = null;
+                if (neighborLocus != null) neighborNode = neighborLocus.value;
+                var val:Int =
+                    neighborLocus != null &&
+                    nodeViews[getID(neighborNode)].isVisible &&
+                    neighborNode[isFilled_] == Aspect.TRUE &&
+                    neighborNode[occupier_] == playerID
+                    ? 1 : 0;
+                flag = flag | (val << itr);
+                itr++;
+            }
+
+            var code:Int = Utf8.charCodeAt(Strings.BODY_GLYPHS, flag);
+            if (code == fatCode) code = BODY_CHARS.charCodeAt(view.distance % Utf8.length(BODY_CHARS));
+
+            for (glyph in view.boardGlyphs) {
+                glyph.set_char(code, glyphTexture.font);
+            }
         }
     }
 
@@ -417,11 +461,20 @@ class BoardBody extends Body {
                 var h:Float = wavePools[playerID].getHeightAtIndex(view.distance);
                 // view.boardGlyph.set_p(h * 0.08);
 
-                view.boardGlyph.set_x(view.x * view.curve + view.wiggleX * (1 + h * 2));
-                view.boardGlyph.set_y(view.y * view.curve + view.wiggleY * (1 + h * 2));
+                var z:Float = view.z;
+                var s:Float = view.size - h * 0.2;
 
-                view.boardGlyph.set_z(view.z + view.lift + h * 0.05);
-                view.boardGlyph.set_s(view.size - h * 0.2);
+                for (glyph in view.boardGlyphs) {
+                    glyph.set_x(view.x * view.curve + view.wiggleX * (1 + h * 2));
+                    glyph.set_y(view.y * view.curve + view.wiggleY * (1 + h * 2));
+                    glyph.set_z(z + view.lift + h * 0.05);
+                    glyph.set_s(s);
+                    glyph.set_f(0.5 - h * 0.2);
+
+                    z += 0.04;
+                    s *= 2;
+                }
+
             }
         }
 
