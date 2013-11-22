@@ -2,6 +2,8 @@ package net.rezmason.scourge.textview;
 
 import haxe.Utf8;
 
+import msignal.Signal;
+
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.text.Sigil.STYLE;
@@ -16,6 +18,8 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 class UIText {
 
     inline static var LINE_TOKEN:String = '¬¬¬';
+
+    public var clickSignal(default, null):Signal1<String>;
 
     var numRows:Int;
     var numCols:Int;
@@ -40,6 +44,7 @@ class UIText {
         mainText = '';
         styleEnd = '§{}';
         textIsDirty = false;
+        clickSignal = new Signal1();
     }
 
     public inline function getStyleByIndex(index:Int):Style {
@@ -190,7 +195,7 @@ class UIText {
                 var targetStyle:Style = styles.getStyleByMouseID(id);
                 if (targetStyle != null) {
                     targetStyle.interact(type);
-                    if (type == CLICK) trace('${targetStyle.name} clicked!');
+                    if (type == CLICK) clickSignal.dispatch(targetStyle.name);
                 }
             case _:
         }

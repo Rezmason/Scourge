@@ -1,16 +1,18 @@
-Separate UIText from ConsoleText
+Backspace, tokens and interpreter
+    Figure the flow out
 
-Command interpreter
-    Wire it up in TextDemo
-    Generates input and output tokens from input tokens
-    Implement everything in "Text view text commands.txt"
+Package the console
+    Types
 
 UIText
     Style the tokens differently
         InputStyle
     Token clicking ought to work too
+        Clicking on an input token should move the carets
         Shortcuts
         Buttons should become non-interactive when they enter the main text
+
+Implement everything from "Text view text commands.txt" in Interpreter
 
 Solidify text update behavior
     If:

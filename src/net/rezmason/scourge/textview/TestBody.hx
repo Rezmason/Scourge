@@ -3,6 +3,7 @@ package net.rezmason.scourge.textview;
 import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
+import flash.ui.Keyboard;
 
 import net.rezmason.gl.utils.BufferUtil;
 
@@ -29,13 +30,11 @@ class TestBody extends Body {
     var rawTransform:Matrix3D;
     var setBackTransform:Matrix3D;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, numGlyphs:Int = 2400):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, num:Int = 2400):Void {
 
         super(bufferUtil, glyphTexture, redrawHitAreas);
 
         time = 0;
-
-        growTo(numGlyphs); // 40000, 240
 
         dragging = false;
         dragStartTransform = new Matrix3D();
@@ -45,6 +44,12 @@ class TestBody extends Body {
         setBackTransform = rawTransform.clone();
         setBackTransform.appendTranslation(0, 0, 0.5);
         transform.copyFrom(setBackTransform);
+
+        setSize(num); // 40000, 240
+    }
+
+    inline function setSize(num:Int):Void {
+        growTo(num);
 
         var dTheta:Float = Math.PI * (3 - Math.sqrt(5));
         var dZ:Float = 2 / (this.numGlyphs + 1);
@@ -130,7 +135,13 @@ class TestBody extends Body {
                     case _:
                 }
             case KEYBOARD(type, key, char, shift, alt, ctrl):
-                if (type == KEY_DOWN) setGlobalChar(char);
+                if (type == KEY_DOWN) {
+                    switch (key) {
+                        case Keyboard.LEFT:  setSize(Std.int(numGlyphs * (shift ? 0.666 : 0.9)));
+                        case Keyboard.RIGHT: setSize(Std.int(numGlyphs * (shift ? 1.500 : 1.1)));
+                        case _: setGlobalChar(char);
+                    }
+                }
         }
     }
 

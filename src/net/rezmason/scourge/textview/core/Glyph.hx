@@ -18,8 +18,6 @@ class Glyph {
     function new(id:Int, shape:VertexArray, color:VertexArray, paint:VertexArray):Void {
         this.id = id;
         GlyphUtils.transfer(this, shape, color, paint);
-        GlyphUtils.set_rgb(this, 1, 1, 1);
-        GlyphUtils.set_s(this, 1);
-        GlyphUtils.set_f(this, 0.5);
+        GlyphUtils.reset(this);
     }
 }

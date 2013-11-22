@@ -4,11 +4,8 @@ import flash.display.Stage;
 import flash.events.Event;
 import flash.geom.Rectangle;
 
-import msignal.Signal;
-
 import massive.munit.TestRunner;
 
-import net.rezmason.scourge.textview.TextToken;
 import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.scourge.controller.RandomSmarts;
 import net.rezmason.scourge.controller.Referee;
@@ -20,10 +17,7 @@ import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
-import net.rezmason.scourge.textview.TestStrings;
 import net.rezmason.utils.FlatFont;
-
-import openfl.Assets;
 
 using Lambda;
 
@@ -37,7 +31,7 @@ class TextDemo {
     var fontTextures:Map<String, GlyphTexture>;
     var splashBody:Body;
     var testBody:TestBody;
-    #if flash var videoBody:VideoBody; #end
+    // #if flash var videoBody:VideoBody; #end
     var boardBody:BoardBody;
     var uiBody:UIBody;
 
@@ -46,6 +40,7 @@ class TextDemo {
     var turnFuncs:Array<Void->Void>;
 
     var console:ConsoleText;
+    var interpreter:Interpreter;
 
     public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
@@ -155,14 +150,14 @@ class TextDemo {
         engine.addBody(testBody);
         /**/
 
-        //*
+        /*
         #if flash
         videoBody = new VideoBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
         engine.addBody(videoBody);
         #end
         /**/
 
-        /*
+        //*
         boardBody = new BoardBody(utils.bufferUtil, fontTextures['full_fog'], engine.invalidateMouse);
         boardBody.viewRect = new Rectangle(0, 0, 0.6, 1);
         engine.addBody(boardBody);
@@ -170,14 +165,14 @@ class TextDemo {
 
         //*
 
-        // interpreter = new Interpreter();
-        // interpreter.addCommand("runTests", runTests);
-        // interpreter.addCommand("setFont", setFont);
-        // interpreter.addCommand("makeGame", makeGame);
-
         console = new ConsoleText();
-        console.hintSignal.add(onHintSignal);
-        console.execSignal.add(onExecSignal);
+
+        interpreter = new Interpreter();
+        interpreter.connectToConsole(console);
+
+        interpreter.addCommand('runTests', new TextCommand(runTests));
+        interpreter.addCommand('setFont', new TextCommand(setFont));
+        interpreter.addCommand('makeGame', new TextCommand(makeGame));
 
         // console.setText(Assets.getText("assets/not plus.txt"));
         // console.setText(Assets.getText("assets/enterprise.txt"));
@@ -187,12 +182,12 @@ class TextDemo {
         // console.setText("One. §{i:1}Two§{}.";)
 
         // TODO: signal handling
+        //*
         uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, console);
-        var uiRect:Rectangle = new Rectangle(0, 0, 1, 1); // 0.6, 0, 0.4, 1
+        var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1); // 0.6, 0, 0.4, 1
         uiBody.viewRect = uiRect;
         uiBody.padding = 0.0125;
         engine.addBody(uiBody);
-
         /**/
 
         /*
@@ -231,25 +226,9 @@ class TextDemo {
     function runTests(input:String):String {
         var client = new SimpleTestClient();
         var runner:TestRunner = new TestRunner(client);
-        runner.completionHandler = function(b) trace(client.output);
+        runner.completionHandler = function(b) {};
         runner.run([TestSuite]);
-        return "Running tests";
-    }
-
-    function onHintSignal(tokens:Array<TextToken>, indices:{t:Int, c:Int}):Void {
-
-        if (tokens.length == 1 && tokens[0].text == '') return;
-
-        console.receiveHint(tokens, indices.t, indices.c, [
-            {text:"One", type:PLAIN_TEXT, color:Colors.white()},
-            {text:"Two", type:SHORTCUT([
-                {text:"", type:CAPSULE(NODE_CODE, "Two insert", true), color:Colors.white()},
-            ]), color:Colors.white()},
-        ]);
-    }
-
-    function onExecSignal(tokens:Array<TextToken>):Void {
-        haxe.Timer.delay(function() console.receiveExec([{text:"Done.", type:PLAIN_TEXT, color:Colors.white()}], true), 100);
+        return client.output;
     }
 
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();

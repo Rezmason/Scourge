@@ -57,7 +57,10 @@ class BodySegment {
             var glyph:Glyph = null;
             if (donor != null) {
                 glyph = donor._trueGlyphs[ike];
-                if (glyph != null) glyph.transfer(shapeVertices, colorVertices, paintVertices);
+                if (glyph != null) {
+                    glyph.transfer(shapeVertices, colorVertices, paintVertices);
+                    glyph.reset();
+                }
             }
 
             if (glyph == null) glyph = new Glyph(ike, shapeVertices, colorVertices, paintVertices);

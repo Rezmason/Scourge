@@ -2,6 +2,8 @@ package net.rezmason.scourge.textview;
 
 import flash.ui.Keyboard;
 
+import haxe.Timer;
+
 import msignal.Signal;
 
 import net.rezmason.scourge.textview.core.Interaction;
@@ -92,6 +94,11 @@ class ConsoleText extends UIText {
     }
 
     override function combineText():String {
+        /*
+        trace(inputTokens.map(stringifyToken.bind(_, -1, false, true)).join('|'));
+        trace('$tokenIndex $caretIndex');
+        */
+
         var combinedText:String = mainText;
         if (length(mainText) > 0) combinedText += '\n';
         combinedText += outputString;
@@ -102,12 +109,12 @@ class ConsoleText extends UIText {
             combinedText += prompt;
             for (ike in 0...inputTokens.length) {
                 var index:Int = ike == tokenIndex ? caretIndex : -1;
-                combinedText += stringifyToken(inputTokens[ike], index, false, true);
+                combinedText += stringifyToken(inputTokens[ike], index, false, true) + ' ';
             }
 
             if (hintTokens.length > 0) {
                 combinedText += '\n\t';
-                for (token in hintTokens) combinedText += stringifyToken(token, -1, true, true);
+                for (token in hintTokens) combinedText += stringifyToken(token, -1, true, true) + ' ';
             }
         }
 
@@ -176,7 +183,7 @@ class ConsoleText extends UIText {
             inputTokens[tokenIndex].text = left + right;
         }
 
-        refreshHint();
+        dispatchHintSignal();
         textIsDirty = true;
     }
 
@@ -193,7 +200,7 @@ class ConsoleText extends UIText {
         if (length(mainText) > 0) mainText += '\n';
         mainText += oldOutputString + prompt + inputString;
         if (!isEmpty) {
-            execSignal.dispatch(inputTokens);
+            dispatchExecSignal();
             frozen = true;
             waiting = true;
             inputHistory.push(inputTokens.copy());
@@ -216,7 +223,7 @@ class ConsoleText extends UIText {
         inputTokens = [{text:'', type:PLAIN_TEXT, color:Colors.white()}];
         caretIndex = 0;
         tokenIndex = 0;
-        refreshHint();
+        dispatchHintSignal();
         textIsDirty = true;
     }
 
@@ -232,7 +239,7 @@ class ConsoleText extends UIText {
                 if (!prevToken()) caretIndex = 0;
             }
         }
-        refreshHint();
+        dispatchHintSignal();
         textIsDirty = true;
     }
 
@@ -249,7 +256,7 @@ class ConsoleText extends UIText {
                 if (!nextToken()) caretIndex = len;
             }
         }
-        refreshHint();
+        dispatchHintSignal();
         textIsDirty = true;
     }
 
@@ -277,7 +284,7 @@ class ConsoleText extends UIText {
             inputTokens = inputHistory[histItr].copy();
             tokenIndex = inputTokens.length - 1;
             caretIndex = length(inputTokens[tokenIndex].text);
-            refreshHint();
+            dispatchHintSignal();
             textIsDirty = true;
         }
     }
@@ -289,7 +296,7 @@ class ConsoleText extends UIText {
             else inputTokens = inputHistory[histItr].copy();
             tokenIndex = inputTokens.length - 1;
             caretIndex = length(inputTokens[tokenIndex].text);
-            refreshHint();
+            dispatchHintSignal();
             textIsDirty = true;
         }
     }
@@ -304,7 +311,7 @@ class ConsoleText extends UIText {
             left += String.fromCharCode(char);
             caretIndex++;
             inputTokens[tokenIndex].text = left + right;
-            refreshHint();
+            dispatchHintSignal();
             textIsDirty = true;
         }
     }
@@ -344,8 +351,18 @@ class ConsoleText extends UIText {
         return val;
     }
 
-    inline function refreshHint():Void {
-        hintTokens = [];
-        hintSignal.dispatch(inputTokens, {t:tokenIndex, c:caretIndex});
+    inline function dispatchHintSignal():Void {
+        var tokens:Array<TextToken> = inputTokens.copy();
+        var indices = {t:tokenIndex, c:caretIndex};
+        Timer.delay(function() {
+            hintTokens = [];
+            textIsDirty = true;
+            hintSignal.dispatch(inputTokens, indices);
+        }, 10);
+    }
+
+    inline function dispatchExecSignal():Void {
+        var tokens:Array<TextToken> = inputTokens.copy();
+        Timer.delay(function() execSignal.dispatch(tokens), 10);
     }
 }
