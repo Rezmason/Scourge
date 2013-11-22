@@ -17,6 +17,10 @@ import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
+import net.rezmason.scourge.textview.console.ConsoleText;
+import net.rezmason.scourge.textview.console.Interpreter;
+import net.rezmason.scourge.textview.console.TextCommand;
+
 import net.rezmason.utils.FlatFont;
 
 using Lambda;

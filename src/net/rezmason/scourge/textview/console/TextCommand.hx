@@ -1,6 +1,6 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.console;
 
-import net.rezmason.scourge.textview.TokenType;
+import net.rezmason.scourge.textview.console.Types;
 
 class TextCommand extends ConsoleCommand {
 

@@ -1,9 +1,6 @@
 Backspace, tokens and interpreter
     Figure the flow out
 
-Package the console
-    Types
-
 UIText
     Style the tokens differently
         InputStyle

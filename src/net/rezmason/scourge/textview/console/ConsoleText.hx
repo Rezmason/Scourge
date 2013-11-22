@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.console;
 
 import flash.ui.Keyboard;
 
@@ -6,6 +6,7 @@ import haxe.Timer;
 
 import msignal.Signal;
 
+import net.rezmason.scourge.textview.console.Types;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.AnimatedStyle;
 import net.rezmason.utils.Utf8Utils.*;

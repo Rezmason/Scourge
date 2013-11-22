@@ -1,7 +1,8 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.console;
 
 import haxe.Utf8;
 
+import net.rezmason.scourge.textview.console.Types;
 import net.rezmason.utils.Utf8Utils.*;
 
 private typedef Indices = {

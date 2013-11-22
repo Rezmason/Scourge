@@ -1,12 +1,6 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.console;
 
-typedef HintCallback = Array<TextToken> -> Int -> Int -> Array<TextToken> -> Void;
-typedef ExecCallback = Array<TextToken> -> Bool -> Void;
-
-private typedef Indices = {
-    var t:Int;
-    var c:Int;
-}
+import net.rezmason.scourge.textview.console.Types;
 
 class ConsoleCommand {
 
