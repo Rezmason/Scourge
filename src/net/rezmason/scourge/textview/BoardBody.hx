@@ -309,7 +309,7 @@ class BoardBody extends Body {
                     glow = 0.15;
                     if (headNodes[playerID] == node) {
                         code = headCode;
-                        size = 1.2;
+                        size = 1.5;
                     } else {
                         // code = bodyCode;
                         // code = BODY_CHARS.charCodeAt(Std.random(Utf8.length(BODY_CHARS)));
@@ -374,7 +374,7 @@ class BoardBody extends Body {
                 glyph.set_char(code, glyphTexture.font);
 
                 z += 0.04;
-                color = Colors.mult(color, code == wallCode ? 0.5 : 0.2);
+                color = Colors.mult(color, code == wallCode ? 0.5 : 0.1);
             }
             view.isVisible = isVisible;
         }
