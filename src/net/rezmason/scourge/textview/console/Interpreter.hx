@@ -5,15 +5,9 @@ import haxe.Utf8;
 import net.rezmason.scourge.textview.console.Types;
 import net.rezmason.utils.Utf8Utils.*;
 
-private typedef Indices = {
-    var t:Int;
-    var c:Int;
-}
-
 class Interpreter {
 
-    inline static var NO_MATCHING_COMMAND:String = 'No command matches that name.';
-    inline static var COMMAND_NOT_FOUND:String = 'No command has that name.';
+    inline static var UNRECOGNIZED_COMMAND:String = 'Unrecognized command.';
 
     var console:ConsoleText;
     var commandsByName:Map<String, ConsoleCommand>;
@@ -48,21 +42,23 @@ class Interpreter {
         commandsByName.remove(name);
     }
 
-    function onHintSignal(tokens:Array<TextToken>, indices:Indices):Void {
+    function onHintSignal(tokens:Array<TextToken>, info:InputInfo):Void {
         var commandName:String = tokens[0].text;
         if (tokens.length == 1) {
+
             while (charAt(commandName, 0) == ' ') commandName = sub(commandName, 1);
-            if (commandName == '') return;
 
             tokens[0].text = commandName;
 
             if (charAt(commandName, length(commandName) - 1) == ' ') {
                 commandName = sub(commandName, 0, length(commandName) - 1);
                 tokens[0].text = commandName;
-                tokens.push({text:'', type:PLAIN_TEXT, color:Colors.white()});
-                indices.t = 1;
-                indices.c = 0;
-                commandsByName[commandName].getHint(tokens, indices, console.receiveHint);
+                tokens.push({text:'', type:PLAIN_TEXT});
+                info.tokenIndex = 1;
+                info.caretIndex = 0;
+                var command:ConsoleCommand = commandsByName[commandName];
+                if (command == null) errorHint(tokens, info, UNRECOGNIZED_COMMAND);
+                else command.getHint(tokens, info, console.receiveHint);
             } else {
                 var potentialNames:Array<String> = [];
                 for (name in commandsByName.keys()) {
@@ -75,37 +71,44 @@ class Interpreter {
                         hintTokens.push({
                             text:name,
                             type:SHORTCUT([
-                                {text:'$name ', type:PLAIN_TEXT, color:Colors.white()}
+                                {text:'$name ', type:PLAIN_TEXT}
                             ]),
                             color:Colors.blue()
                         });
                     }
-                    console.receiveHint(tokens, indices.t, indices.c, hintTokens);
+                    console.receiveHint(tokens, info.tokenIndex, info.caretIndex, hintTokens);
                 } else {
-                    errorHint(tokens, indices, NO_MATCHING_COMMAND);
+                    errorHint(tokens, info, UNRECOGNIZED_COMMAND);
                 }
             }
-        } else if (commandsByName.exists(commandName)) {
-            commandsByName[commandName].getHint(tokens, indices, console.receiveHint);
         } else {
-            errorHint(tokens, indices, COMMAND_NOT_FOUND);
+            if (commandsByName.exists(commandName)) {
+                commandsByName[commandName].getHint(tokens, info, console.receiveHint);
+            } else {
+                // Default behavior: tokens get cleaned up in response to changes
+                if (info.char != '' && info.tokenIndex < tokens.length - 1) {
+                    tokens = tokens.slice(0, info.tokenIndex + 1);
+                }
+
+                errorHint(tokens, info, UNRECOGNIZED_COMMAND);
+            }
         }
     }
 
     function onExecSignal(tokens:Array<TextToken>):Void {
         var commandName:String = tokens[0].text;
 
-        // console.receiveExec([{text:"Done.", type:PLAIN_TEXT, color:Colors.white()}], true);
+        // console.receiveExec([{text:"Done.", type:PLAIN_TEXT}], true);
         if (commandsByName.exists(commandName)) {
             commandsByName[commandName].getExec(tokens, console.receiveExec);
         } else {
-            errorExec(COMMAND_NOT_FOUND);
+            errorExec(UNRECOGNIZED_COMMAND);
         }
     }
 
-    function errorHint(tokens:Array<TextToken>, indices:Indices, message:String):Void {
+    function errorHint(tokens:Array<TextToken>, info:InputInfo, message:String):Void {
         for (token in tokens) token.color = Colors.red();
-        console.receiveHint(tokens, indices.t, indices.c, [{text:message, type:PLAIN_TEXT, color:Colors.red()}]);
+        console.receiveHint(tokens, info.tokenIndex, info.caretIndex, [{text:message, type:PLAIN_TEXT, color:Colors.red()}]);
     }
 
     function errorExec(message:String):Void {

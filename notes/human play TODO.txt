@@ -1,6 +1,3 @@
-Backspace, tokens and interpreter
-    Figure the flow out
-
 UIText
     Style the tokens differently
         InputStyle

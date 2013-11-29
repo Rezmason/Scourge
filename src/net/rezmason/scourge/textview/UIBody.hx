@@ -27,6 +27,9 @@ class UIBody extends Body {
     var gliding:Bool;
     var lastRedrawPos:Float;
 
+    var caretGlyph:Glyph;
+    var caretGlyphID:Int;
+
     var dragging:Bool;
     var dragStartY:Float;
     var dragStartPos:Float;
@@ -69,6 +72,8 @@ class UIBody extends Body {
         updateGlide();
         uiText.updateStyledGlyphs(delta);
         taperScrollEdges();
+        positionCaret();
+
         super.update(delta);
     }
 
@@ -84,12 +89,15 @@ class UIBody extends Body {
 
         setGlyphScale(rect.width / numCols * 2, rect.height / (numRows - 1) * 2);
 
-        growTo(numRows * numCols);
+        growTo(numRows * numCols + 1);
+
+        caretGlyph = glyphs[numGlyphs - 1];
 
         lastRedrawPos = Math.NaN;
         reorderGlyphs();
 
         uiText.adjustLayout(numRows, numCols);
+        uiText.styleCaret(caretGlyph, glyphTexture.font);
     }
 
     function glideTextToPos(pos:Float):Void {
@@ -115,6 +123,18 @@ class UIBody extends Body {
         }
     }
 
+    inline function positionCaret():Void {
+        var caretGlyphGuide:Glyph = null;
+        if (caretGlyphID != -1) {
+            caretGlyphGuide = glyphs[caretGlyphID - 1];
+        }
+
+        if (caretGlyphGuide != null) {
+            var x:Float = caretGlyphGuide.get_x() + 0.5 / numCols;
+            caretGlyph.set_pos(x, caretGlyphGuide.get_y(), caretGlyphGuide.get_z());
+        }
+    }
+
     inline function reorderGlyphs():Void {
         var id:Int = 0;
         for (row in 0...numRows) {
@@ -130,23 +150,30 @@ class UIBody extends Body {
     inline function setScrollPos(pos:Float):Void {
         currentScrollPos = pos;
         var scrollStartIndex:Int = Std.int(currentScrollPos);
-        uiText.stylePage(scrollStartIndex, glyphs, glyphTexture.font);
+        caretGlyphID = uiText.stylePage(scrollStartIndex, glyphs, caretGlyph, glyphTexture.font);
         taperScrollEdges();
+        positionCaret();
         transform.identity();
         transform.append(baseTransform);
         transform.appendTranslation(0, (currentScrollPos - scrollStartIndex) / (numRows - 1), 0);
     }
 
     inline function taperScrollEdges():Void {
+        var caretGlyphGuide:Glyph = null;
+        if (caretGlyphID != -1) {
+            caretGlyphGuide = glyphs[caretGlyphID];
+        }
         var offset:Float = ((currentScrollPos % 1) + 1) % 1;
         var lastRow:Int = (numRows - 1) * numCols;
         var glyph:Glyph;
         for (col in 0...numCols) {
             glyph = glyphs[col];
             glyph.set_color(Colors.mult(glyph.get_color(), 1 - offset));
+            if (glyph == caretGlyphGuide) caretGlyph.set_color(Colors.mult(caretGlyph.get_color(), 1 - offset));
 
             glyph = glyphs[lastRow + col];
             glyph.set_color(Colors.mult(glyph.get_color(), offset));
+            if (glyph == caretGlyphGuide) caretGlyph.set_color(Colors.mult(caretGlyph.get_color(), offset));
         }
     }
 

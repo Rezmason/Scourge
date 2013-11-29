@@ -6,8 +6,7 @@ import msignal.Signal;
 
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Glyph;
-import net.rezmason.scourge.textview.text.Sigil.STYLE;
-import net.rezmason.scourge.textview.text.Sigil.STYLE_CODE;
+import net.rezmason.scourge.textview.text.Sigil;
 import net.rezmason.scourge.textview.text.Style;
 import net.rezmason.scourge.textview.text.StyleSet;
 import net.rezmason.utils.FlatFont;
@@ -62,32 +61,42 @@ class UIText {
         this.textIsDirty = true;
     }
 
-    public function stylePage(startIndex:Int, glyphs:Array<Glyph>, font:FlatFont):Void {
+    public function stylePage(startIndex:Int, glyphs:Array<Glyph>, caretGlyph:Glyph, font:FlatFont):Int {
         var id:Int = 0;
         var pageSegment:Array<String> = getPageSegment(startIndex);
         var styleIndex:Int = getLineStyleIndex(startIndex);
 
         resetStyledGlyphs();
+        styleCaret(caretGlyph, font);
 
         var currentStyle:Style = getStyleByIndex(styleIndex);
+
+        var caretGlyphID:Int = -1;
 
         for (line in pageSegment) {
             var index:Int = 0;
 
             for (index in 0...length(line)) {
                 var charCode:Int = Utf8.charCodeAt(line, index);
-                if (charCode == STYLE_CODE) {
-                    currentStyle = getStyleByIndex(++styleIndex);
-                } else {
-                    var glyph:Glyph = glyphs[id++];
-                    glyph.set_char(charCode, font);
-                    currentStyle.addGlyph(glyph);
-                    glyph.set_z(0);
+                switch (charCode) {
+                    case Sigil.STYLE_CODE:
+                        styleIndex++;
+                        currentStyle = getStyleByIndex(styleIndex);
+                    case Sigil.CARET_CODE:
+                        caretGlyphID = id;
+                    case _:
+                        var glyph:Glyph = glyphs[id];
+                        glyph.set_char(charCode, font);
+                        currentStyle.addGlyph(glyph);
+                        glyph.set_z(0);
+                        id++;
                 }
             }
         }
 
         updateStyledGlyphs(0);
+
+        return caretGlyphID;
     }
 
     public function updateDirtyText(force:Bool = false):Bool {
@@ -115,7 +124,7 @@ class UIText {
                 var lineStyleIndex:Int = 0;
                 lineStyleIndices = [lineStyleIndex];
                 for (line in page) {
-                    lineStyleIndex += line.split(STYLE).length - 1;
+                    lineStyleIndex += line.split(Sigil.STYLE).length - 1;
                     lineStyleIndices.push(lineStyleIndex);
                 }
             }
@@ -133,6 +142,8 @@ class UIText {
         textIsDirty = true;
     }
 
+    public function styleCaret(caretGlyph:Glyph, font:FlatFont):Void {}
+
     function combineText():String return mainText;
 
     inline function padLine(line:String):String {
@@ -143,7 +154,7 @@ class UIText {
         return rpad(line, ' ', numCols + padLineSigilCount);
     }
 
-    inline function checkForSigil(char:Int):Void if (char == STYLE_CODE) padLineSigilCount++;
+    inline function checkForSigil(char:Int):Void if (char == Sigil.STYLE_CODE) padLineSigilCount++;
 
     inline function wrapLines(s:String) {
 
@@ -159,7 +170,7 @@ class UIText {
             var len:Int = right.length;
             var line:String = '';
             line = sub(right, 0, numCols - count);
-            var sigilIndex:Int = line.indexOf(STYLE);
+            var sigilIndex:Int = line.indexOf(Sigil.STYLE);
             if (sigilIndex == -1) {
                 left = left + line;
                 wrappedLines.push(padLine(left));
@@ -175,7 +186,7 @@ class UIText {
             } else {
                 line = right.substr(0, sigilIndex);
                 if (sigilIndex > 0) left = left + line;
-                left = left + STYLE;
+                left = left + Sigil.STYLE;
                 right = right.substr(sigilIndex, right.length);
                 if (length(right) > 1) right = sub(right, 1);
                 else right = '';

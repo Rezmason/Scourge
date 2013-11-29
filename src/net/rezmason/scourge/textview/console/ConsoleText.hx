@@ -3,42 +3,45 @@ package net.rezmason.scourge.textview.console;
 import flash.ui.Keyboard;
 
 import haxe.Timer;
+import haxe.Utf8;
 
 import msignal.Signal;
 
 import net.rezmason.scourge.textview.console.Types;
+import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.text.Sigil;
 import net.rezmason.scourge.textview.text.AnimatedStyle;
+import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-typedef FrozenInteraction = {
-    var id:Int;
-    var interaction:Interaction;
-}
+private typedef FrozenInteraction = { id:Int, interaction:Interaction };
+private typedef HistEntry = { val:Array<TextToken>, ?next:HistEntry, ?prev:HistEntry };
 
 class ConsoleText extends UIText {
 
-    public var hintSignal(default, null):Signal2<Array<TextToken>, {t:Int, c:Int}>;
+    public var hintSignal(default, null):Signal2<Array<TextToken>, InputInfo>;
     public var execSignal(default, null):Signal1<Array<TextToken>>;
 
     public var frozen(get, set):Bool;
     var waiting:Bool;
 
+    var caretStyle:AnimatedStyle;
+
     var prompt:String;
-    var caretStart:String;
-    var caretIndex:Int;
+    var caretIndex(default, set):Int;
+    var caretCharCode:Int;
     var tokenIndex:Int;
     var outputString:String;
     var hintString:String;
-    var caretStyle:AnimatedStyle;
     var inputTokens:Array<TextToken>;
     var outputTokens:Array<TextToken>;
     var hintTokens:Array<TextToken>;
 
-    var inputHistory:Array<Array<TextToken>>;
-    var histItr:Int;
+    var lastHistEntry:HistEntry;
+    var curHistEntry:HistEntry;
 
     var currentPlayerName:String;
     var currentPlayerColor:Int;
@@ -58,7 +61,7 @@ class ConsoleText extends UIText {
         setPlayer('rezmason', 0xFF3030);
 
         caretStyle = cast styles.getStyleByName('caret');
-        caretStart = '§{caret}';
+        caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
 
         caretIndex = 0;
         tokenIndex = 0;
@@ -69,9 +72,9 @@ class ConsoleText extends UIText {
         outputTokens = [];
         hintTokens = [];
 
-        inputTokens = [{text:'', type:PLAIN_TEXT, color:Colors.white()}];
-        inputHistory = [];
-        histItr = 1;
+        lastHistEntry = {val:[blankToken()]};
+        curHistEntry = lastHistEntry;
+        inputTokens = curHistEntry.val.map(copyToken);
 
         hintSignal = new Signal2();
         execSignal = new Signal1();
@@ -79,6 +82,13 @@ class ConsoleText extends UIText {
         frozenQueue = new List();
         frozen = false;
         waiting = false;
+    }
+
+    override public function styleCaret(caretGlyph:Glyph, font:FlatFont):Void {
+        caretStyle.removeAllGlyphs();
+        caretStyle.addGlyph(caretGlyph);
+        caretGlyph.set_char(caretCharCode, font);
+        this.textIsDirty = true;
     }
 
     public function setPlayer(name:String, color:Int):Void {
@@ -95,33 +105,22 @@ class ConsoleText extends UIText {
     }
 
     override function combineText():String {
-        /*
-        trace(inputTokens.map(stringifyToken.bind(_, -1, false, true)).join('|'));
-        trace('$tokenIndex $caretIndex');
-        */
-
         var combinedText:String = mainText;
+
         if (length(mainText) > 0) combinedText += '\n';
+
         combinedText += outputString;
 
         if (waiting) {
             combinedText += Strings.WAIT_INDICATOR;
         } else {
             combinedText += prompt;
-            for (ike in 0...inputTokens.length) {
-                var index:Int = ike == tokenIndex ? caretIndex : -1;
-                combinedText += stringifyToken(inputTokens[ike], index, false, true) + ' ';
-            }
-
-            if (hintTokens.length > 0) {
-                combinedText += '\n\t';
-                for (token in hintTokens) combinedText += stringifyToken(token, -1, true, true) + ' ';
-            }
+            combinedText += printTokens(inputTokens, '[', ']', ' ', tokenIndex, caretIndex);
+            combinedText += printTokens(hintTokens, '\n\t<', '>', ' ');
         }
 
         return combinedText;
     }
-
 
     override public function interact(id:Int, interaction:Interaction):Void {
 
@@ -133,8 +132,8 @@ class ConsoleText extends UIText {
                     case Keyboard.BACKSPACE: handleBackspace(alt, ctrl);
                     case Keyboard.ENTER: handleEnter();
                     case Keyboard.ESCAPE: handleEscape();
-                    case Keyboard.LEFT: handleLeft(alt, ctrl);
-                    case Keyboard.RIGHT: handleRight(alt, ctrl);
+                    case Keyboard.LEFT: handleCaretNudge(alt, ctrl, true);
+                    case Keyboard.RIGHT: handleCaretNudge(alt, ctrl);
                     case Keyboard.UP: handleUp();
                     case Keyboard.DOWN: handleDown();
                     case Keyboard.TAB: handleTab();
@@ -159,17 +158,21 @@ class ConsoleText extends UIText {
         }
 
         this.outputTokens = output;
-        outputString = '';
-        for (token in outputTokens) outputString += stringifyToken(token, -1, false, true);
-        outputString += '\n';
+        outputString = printTokens(outputTokens, '(', ')', ' ') + '\n';
         textIsDirty = true;
     }
 
     inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
-            inputTokens = [{text:'', type:PLAIN_TEXT, color:Colors.white()}];
-            caretIndex = 0;
-            tokenIndex = 0;
+            loadInputFromHistEntry(lastHistEntry);
+        } else if (alt) {
+            // Essentially an alt-left. Commands are responsible for "resetting" the input tokens,
+            // and they can tell from the input info that this change was due to a backspace op.
+            if (tokenIndex > 0) {
+                tokenIndex--;
+                caretIndex = length(inputTokens[tokenIndex].text);
+                textIsDirty = true;
+            }
         } else {
             var left:String = sub(inputTokens[tokenIndex].text, 0, caretIndex);
             var right:String = sub(inputTokens[tokenIndex].text, caretIndex);
@@ -182,159 +185,121 @@ class ConsoleText extends UIText {
             }
 
             inputTokens[tokenIndex].text = left + right;
+            textIsDirty = true;
         }
 
-        dispatchHintSignal();
-        textIsDirty = true;
+        dispatchHintSignal(Strings.BACKSPACE());
     }
 
     inline function handleEnter():Void {
-        var inputString:String = '';
-        for (token in inputTokens) inputString += stringifyToken(token, -1, false, false);
-
         var isEmpty:Bool = inputTokens.length == 1 && length(inputTokens[0].text) == 0;
 
-        var oldOutputString:String = '';
-        for (token in outputTokens) oldOutputString += stringifyToken(token, -1, false, false);
-        if (length(oldOutputString) > 0) oldOutputString += '\n';
-
         if (length(mainText) > 0) mainText += '\n';
-        mainText += oldOutputString + prompt + inputString;
+
+        var oldOutputString:String = printTokens(outputTokens, '(', ')', ' ');
+        mainText += oldOutputString;
+        if (length(oldOutputString) > 0) mainText += '\n';
+
+        mainText += prompt + printTokens(inputTokens, '[', ']', ' ');
+
         if (!isEmpty) {
-            dispatchExecSignal();
             frozen = true;
             waiting = true;
-            inputHistory.push(inputTokens.copy());
-            histItr = inputHistory.length;
+            appendHistEntry(inputTokens);
+            dispatchExecSignal();
         }
-        inputTokens = [{text:'', type:PLAIN_TEXT, color:Colors.white()}];
+
+        loadInputFromHistEntry(lastHistEntry);
         hintTokens = [];
         outputTokens = [];
         outputString = '';
-        caretIndex = 0;
-        tokenIndex = 0;
-        textIsDirty = true;
     }
 
-    inline function handleTab():Void {
-        // I dunno
-    }
+    inline function handleTab():Void dispatchHintSignal();
 
     inline function handleEscape():Void {
-        inputTokens = [{text:'', type:PLAIN_TEXT, color:Colors.white()}];
-        caretIndex = 0;
-        tokenIndex = 0;
+        loadInputFromHistEntry(lastHistEntry);
         dispatchHintSignal();
-        textIsDirty = true;
     }
 
-    inline function handleLeft(alt:Bool, ctrl:Bool):Void {
+    inline function handleCaretNudge(alt:Bool, ctrl:Bool, nudgeLeft:Bool = false):Void {
+
+        var tokenLimit:Int = nudgeLeft ? 0 : inputTokens.length - 1;
+        var sign:Int = nudgeLeft ? -1 : 1;
+
         if (ctrl) {
-            tokenIndex = 0;
+            tokenIndex = tokenLimit;
             caretIndex = length(inputTokens[tokenIndex].text);
         } else if (alt) {
-            prevToken();
+            if (tokenIndex * sign < tokenLimit * sign) {
+                tokenIndex += sign;
+                caretIndex = length(inputTokens[tokenIndex].text);
+            }
         } else {
-            caretIndex--;
-            if (caretIndex < 0) {
-                if (!prevToken()) caretIndex = 0;
+            caretIndex += sign;
+            var charIndex:Int = nudgeLeft ? 0 : length(inputTokens[tokenIndex].text);
+            if (caretIndex * sign > charIndex * sign) {
+                if (tokenIndex * sign < tokenLimit * sign) {
+                    tokenIndex += sign;
+                    caretIndex = nudgeLeft ? length(inputTokens[tokenIndex].text) : 0;
+                } else {
+                    caretIndex = charIndex;
+                }
             }
         }
         dispatchHintSignal();
         textIsDirty = true;
-    }
-
-    inline function handleRight(alt:Bool, ctrl:Bool):Void {
-        if (ctrl) {
-            tokenIndex = inputTokens.length - 1;
-            caretIndex = length(inputTokens[tokenIndex].text);
-        } else if (alt) {
-            nextToken();
-        } else {
-            caretIndex++;
-            var len:Int = length(inputTokens[tokenIndex].text);
-            if (caretIndex > len) {
-                if (!nextToken()) caretIndex = len;
-            }
-        }
-        dispatchHintSignal();
-        textIsDirty = true;
-    }
-
-    inline function prevToken():Bool {
-        var feasible:Bool = tokenIndex > 0;
-        if (feasible) {
-            tokenIndex--;
-            caretIndex = length(inputTokens[tokenIndex].text);
-        }
-        return feasible;
-    }
-
-    inline function nextToken():Bool {
-        var feasible:Bool = tokenIndex < inputTokens.length - 1;
-        if (feasible) {
-            tokenIndex++;
-            caretIndex = 0;
-        }
-        return feasible;
     }
 
     inline function handleUp():Void {
-        if (inputHistory.length > 0) {
-            if (histItr > 0) histItr--;
-            inputTokens = inputHistory[histItr].copy();
-            tokenIndex = inputTokens.length - 1;
-            caretIndex = length(inputTokens[tokenIndex].text);
-            dispatchHintSignal();
-            textIsDirty = true;
-        }
+        loadInputFromHistEntry(curHistEntry.prev);
+        dispatchHintSignal();
     }
 
     inline function handleDown():Void {
-        if (inputHistory.length > 0) {
-            if (histItr < inputHistory.length) histItr++;
-            if (histItr == inputHistory.length) inputTokens = [{text:'', type:PLAIN_TEXT, color:Colors.white()}];
-            else inputTokens = inputHistory[histItr].copy();
-            tokenIndex = inputTokens.length - 1;
-            caretIndex = length(inputTokens[tokenIndex].text);
-            dispatchHintSignal();
-            textIsDirty = true;
-        }
+        loadInputFromHistEntry(curHistEntry.next);
+        dispatchHintSignal();
     }
 
-    inline function handleChar(char:Int):Void {
-        if (char > 0) {
-            if (inputTokens[tokenIndex] == null) inputTokens.push({text:'', type:PLAIN_TEXT, color:Colors.white()});
+    inline function appendHistEntry(tokens:Array<TextToken>):Void {
+        var histEntry:HistEntry = {val:tokens.map(copyToken), prev:lastHistEntry.prev, next:lastHistEntry};
+        if (lastHistEntry.prev != null) lastHistEntry.prev.next = histEntry;
+        lastHistEntry.prev = histEntry;
+    }
+
+    inline function loadInputFromHistEntry(histEntry:HistEntry):Void {
+        if (histEntry != null) curHistEntry = histEntry;
+        inputTokens = curHistEntry.val.map(copyToken);
+        tokenIndex = inputTokens.length - 1;
+        caretIndex = length(inputTokens[tokenIndex].text);
+        textIsDirty = true;
+    }
+
+    inline function handleChar(charCode:Int):Void {
+        if (charCode > 0) {
+            if (inputTokens[tokenIndex] == null) inputTokens.push(blankToken());
 
             var left:String = sub(inputTokens[tokenIndex].text, 0, caretIndex);
             var right:String = sub(inputTokens[tokenIndex].text, caretIndex);
 
-            left += String.fromCharCode(char);
+            var char:String = String.fromCharCode(charCode);
+            left += char;
             caretIndex++;
             inputTokens[tokenIndex].text = left + right;
-            dispatchHintSignal();
+            dispatchHintSignal(char);
             textIsDirty = true;
         }
     }
 
-    inline function stringifyToken(token:TextToken, caretIndex:Int, isHint:Bool, isEnabled:Bool):String {
+    inline function printTokens(tokens:Array<TextToken>, left:String, right:String, sep:String = ' ', tokenIndex:Int = -1, caretIndex:Int = -1):String {
         var str:String = '';
-
-        if (caretIndex >= 0) {
-            var left:String = sub(token.text, 0, caretIndex);
-            var mid:String = sub(token.text, caretIndex, 1);
-            var right:String = sub(token.text, caretIndex + 1);
-
-            if (mid == '') mid = ' ';
-
-            if (mid == ' ') caretStyle.start();
-            else caretStyle.stop();
-
-            str = left + caretStart + mid + styleEnd + right;
-        } else {
-            str = token.text;
+        for (ike in 0...tokens.length) {
+            var tokenStr:String = tokens[ike].text;
+            if (ike == tokenIndex && caretIndex >= 0) {
+                tokenStr = sub(tokenStr, 0, caretIndex) + Sigil.CARET + sub(tokenStr, caretIndex);
+            }
+            str += left + tokenStr + right + sep;
         }
-
         return str;
     }
 
@@ -352,18 +317,27 @@ class ConsoleText extends UIText {
         return val;
     }
 
-    inline function dispatchHintSignal():Void {
-        var tokens:Array<TextToken> = inputTokens.copy();
-        var indices = {t:tokenIndex, c:caretIndex};
+    inline function dispatchHintSignal(char:String = ''):Void {
+        var tokens:Array<TextToken> = inputTokens.map(copyToken);
+        var info:InputInfo = {tokenIndex:tokenIndex, caretIndex:caretIndex, char:char};
         Timer.delay(function() {
             hintTokens = [];
             textIsDirty = true;
-            hintSignal.dispatch(inputTokens, indices);
-        }, 10);
+            hintSignal.dispatch(inputTokens, info);
+        }, 1);
     }
 
     inline function dispatchExecSignal():Void {
-        var tokens:Array<TextToken> = inputTokens.copy();
-        Timer.delay(function() execSignal.dispatch(tokens), 10);
+        var tokens:Array<TextToken> = inputTokens.map(copyToken);
+        Timer.delay(function() execSignal.dispatch(tokens), 1);
+    }
+
+    inline static function blankToken():TextToken return {text:'', type:PLAIN_TEXT};
+
+    function copyToken(token:TextToken):TextToken return {text:token.text, type:token.type, color:token.color};
+
+    inline function set_caretIndex(val:Int):Int {
+        caretStyle.start(0);
+        return this.caretIndex = val;
     }
 }

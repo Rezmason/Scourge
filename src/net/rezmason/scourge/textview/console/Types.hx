@@ -15,13 +15,14 @@ enum CommandCodeType {
 typedef TextToken = {
     var text:String;
     var type:TokenType;
-    var color:Color;
+    @:optional var color:Color;
 }
 
 typedef HintCallback = Array<TextToken> -> Int -> Int -> Array<TextToken> -> Void;
 typedef ExecCallback = Array<TextToken> -> Bool -> Void;
 
-typedef Indices = {
-    var t:Int;
-    var c:Int;
+typedef InputInfo = {
+    var tokenIndex:Int;
+    var caretIndex:Int;
+    var char:String;
 }

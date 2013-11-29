@@ -8,7 +8,7 @@ class ConsoleCommand {
 
     }
 
-    public function getHint(tokens:Array<TextToken>, indices:Indices, callback:HintCallback):Void {
+    public function getHint(tokens:Array<TextToken>, info:InputInfo, callback:HintCallback):Void {
 
     }
 

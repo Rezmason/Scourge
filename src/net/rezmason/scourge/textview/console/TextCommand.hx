@@ -11,8 +11,8 @@ class TextCommand extends ConsoleCommand {
         this.func = func;
     }
 
-    override public function getHint(tokens:Array<TextToken>, indices, callback):Void {
-        callback(tokens, indices.t, indices.c, []);
+    override public function getHint(tokens:Array<TextToken>, info:InputInfo, callback:HintCallback):Void {
+        callback(tokens, info.tokenIndex, info.caretIndex, []);
     }
 
     override public function getExec(tokens:Array<TextToken>, callback):Void {
