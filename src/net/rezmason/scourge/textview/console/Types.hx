@@ -15,7 +15,7 @@ enum CommandCodeType {
 typedef TextToken = {
     var text:String;
     var type:TokenType;
-    @:optional var color:Color;
+    @:optional var styleName:String;
 }
 
 typedef HintCallback = Array<TextToken> -> Int -> Int -> Array<TextToken> -> Void;

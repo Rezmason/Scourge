@@ -4,8 +4,10 @@ import net.rezmason.scourge.textview.console.Types;
 
 class ConsoleCommand {
 
-    public function new():Void {
+    public var tokenStyles(default, null):String;
 
+    public function new():Void {
+        tokenStyles = '';
     }
 
     public function getHint(tokens:Array<TextToken>, info:InputInfo, callback:HintCallback):Void {

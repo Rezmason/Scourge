@@ -34,8 +34,6 @@ class UIText {
     var styleEnd:String;
     var textIsDirty:Bool;
 
-    var padLineSigilCount:Int;
-
     public function new():Void {
         styles = new StyleSet();
         numRows = 0;
@@ -44,6 +42,8 @@ class UIText {
         styleEnd = '§{}';
         textIsDirty = false;
         clickSignal = new Signal1();
+
+
     }
 
     public inline function getStyleByIndex(index:Int):Style {
@@ -147,54 +147,44 @@ class UIText {
     function combineText():String return mainText;
 
     inline function padLine(line:String):String {
-        padLineSigilCount = 0;
-        Utf8.iter(line, checkForSigil);
+        var count:Int = 0;
+
+        function check(char:Int):Void {
+           if (char == Sigil.STYLE_CODE || char == Sigil.CARET_CODE) count++;
+        }
+
+        Utf8.iter(line, check);
 
         // Pads a string until its length, ignoring sigils, is numCols
-        return rpad(line, ' ', numCols + padLineSigilCount);
+        return rpad(line, ' ', numCols + count);
     }
 
-    inline function checkForSigil(char:Int):Void if (char == Sigil.STYLE_CODE) padLineSigilCount++;
-
-    inline function wrapLines(s:String) {
+    inline function wrapLines(s:String):String {
 
         // Splits a line into an array of lines whose length, ignoring sigils, is numCols
 
-        var left:String = '';
-        var right:String = s;
-
         var wrappedLines:Array<String> = [];
-
+        var index:Int = 0;
+        var lastIndex:Int = 0;
         var count:Int = 0;
-        while (right.length > 0) {
-            var len:Int = right.length;
-            var line:String = '';
-            line = sub(right, 0, numCols - count);
-            var sigilIndex:Int = line.indexOf(Sigil.STYLE);
-            if (sigilIndex == -1) {
-                left = left + line;
-                wrappedLines.push(padLine(left));
-                left = '';
-                if (numCols - count < right.length) {
-                    right = sub(right, numCols - count);
-                    left = '';
-                } else {
-                    right = '';
-                    left = null;
+
+        function checkChar(char:Int):Void {
+            if (char != Sigil.STYLE_CODE && char != Sigil.CARET_CODE) {
+                count++;
+                if (count == numCols + 1) {
+                    wrappedLines.push(sub(s, lastIndex, index - lastIndex));
+                    lastIndex = index;
+                    count = 1;
                 }
-                count = 0;
-            } else {
-                line = right.substr(0, sigilIndex);
-                if (sigilIndex > 0) left = left + line;
-                left = left + Sigil.STYLE;
-                right = right.substr(sigilIndex, right.length);
-                if (length(right) > 1) right = sub(right, 1);
-                else right = '';
-                count += length(line);
             }
+            index++;
         }
 
-        if (left != null) wrappedLines.push(padLine(left));
+        Utf8.iter(s, checkChar);
+        if (wrappedLines.length == 0 || count > 0) {
+            wrappedLines.push(sub(s, lastIndex, index - lastIndex));
+        }
+        wrappedLines = wrappedLines.map(padLine);
 
         return wrappedLines.join(LINE_TOKEN);
     }
@@ -226,7 +216,7 @@ class UIText {
                 left = left + right;
                 right = '';
             } else {
-                left = left + right.substr(0, tabIndex) + '    ';
+                left = left + right.substr(0, tabIndex) + '     ';
                 right = right.substr(tabIndex, right.length);
                 right = sub(right, 1);
             }

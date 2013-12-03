@@ -62,3 +62,8 @@ DROP
 TALK
     MAIN:
         Posts string in "chat" (p)
+
+FEEL
+    MAIN:
+        Compares second token to list of "expressions" that board body is capable of
+        If one matches, it outputs "Expressing xxx" and the board performs that expression

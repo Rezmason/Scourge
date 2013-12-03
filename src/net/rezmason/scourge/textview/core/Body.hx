@@ -118,9 +118,7 @@ class Body {
 
     public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
 
-        var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
-
-        var cameraRect:Rectangle = rect.clone();
+        var cameraRect:Rectangle = viewRect.clone();
         cameraRect.offset(-0.5, -0.5);
         cameraRect.x *= 2;
         cameraRect.y *= 2;
@@ -128,15 +126,15 @@ class Body {
         cameraRect.height *= 2;
 
         camera.identity();
-        camera.append(scaleModeBox(rect, stageWidth, stageHeight));
+        camera.append(scaleModeBox(viewRect, stageWidth, stageHeight));
         camera.appendScale(cameraRect.width, cameraRect.height, 1);
         camera.appendTranslation((cameraRect.left + cameraRect.right) * 0.5, (cameraRect.top + cameraRect.bottom) * -0.5, 0);
 
         camera.appendTranslation(0, 0, 1); // Set the camera back one unit
         camera.append(projection); // Apply perspective
 
-        vanishingPoint.x = (rect.left + rect.right) * 0.5;
-        vanishingPoint.y = (rect.top + rect.bottom) * 0.5;
+        vanishingPoint.x = (viewRect.left + viewRect.right) * 0.5;
+        vanishingPoint.y = (viewRect.top + viewRect.bottom) * 0.5;
 
         applyVP(0, 0);
     }
@@ -158,15 +156,6 @@ class Body {
         trace(str);
     }
     */
-
-    inline function sanitizeLayoutRect(stageWidth:Float, stageHeight:Float, rect:Rectangle):Rectangle {
-        rect = rect.clone();
-        if (stageWidth  == 0) stageWidth  = 1;
-        if (stageHeight == 0) stageHeight = 1;
-        if (rect.width  == 0) rect.width  = 1 / stageWidth;
-        if (rect.height == 0) rect.height = 1 / stageHeight;
-        return rect;
-    }
 
     inline function applyVP(x:Float, y:Float):Void {
         var rawData:Vector<Float> = camera.rawData;
@@ -224,6 +213,7 @@ class Body {
 
     inline function set_viewRect(rect:Rectangle):Rectangle {
         if (rect == null) rect = DEFAULT_VIEW_RECT;
+        if (rect.width <= 0 || rect.height <= 0) throw 'Body view rects cannot be null.';
         viewRect = rect;
         return rect;
     }

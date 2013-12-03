@@ -8,14 +8,22 @@ class TextCommand extends ConsoleCommand {
 
     public function new(func:String->String):Void {
         super();
+        // tokenStyles = '';
         this.func = func;
     }
 
     override public function getHint(tokens:Array<TextToken>, info:InputInfo, callback:HintCallback):Void {
+        if (tokens.length == 1) {
+            // Let's move the caret to a new token.
+            tokens.push({text:'', type:PLAIN_TEXT});
+            info.tokenIndex = 1;
+            info.caretIndex = 0;
+        }
+
         callback(tokens, info.tokenIndex, info.caretIndex, []);
     }
 
-    override public function getExec(tokens:Array<TextToken>, callback):Void {
-        callback([{text:func(tokens.map(function(tok):String return tok.text).join(' ')), type:PLAIN_TEXT, color:Colors.blue()}], true);
+    override public function getExec(tokens:Array<TextToken>, callback:ExecCallback):Void {
+        callback([{text:func(tokens.map(function(tok):String return tok.text).join(' ')), type:PLAIN_TEXT}], true);
     }
 }

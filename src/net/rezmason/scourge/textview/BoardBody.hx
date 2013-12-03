@@ -437,10 +437,8 @@ class BoardBody extends Body {
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
         super.adjustLayout(stageWidth, stageHeight);
 
-        var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
-
         var screenSize:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
-        var rectSize:Float = Math.min(rect.width * stageWidth, rect.height * stageHeight) / screenSize;
+        var rectSize:Float = Math.min(viewRect.width * stageWidth, viewRect.height * stageHeight) / screenSize;
 
         var glyphWidth:Float = rectSize * 0.1 * boardScale;
         var glyphScreenRatio:Float = glyphTexture.font.glyphRatio * stageWidth / stageHeight;

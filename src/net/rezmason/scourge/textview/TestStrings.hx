@@ -23,7 +23,7 @@ class TestStrings {
     '∂{name:animation, period:1, frames:[merp1, merp2, merp3]}DANCE, DAMN IT§{}\n' +
     'µ{name:button, up:merp1, over:merp2, down:merp3, period:0.2, i:1}  BUTTON TIME  §{}\n' +
     '\n' +
-    'µ{name:button2, basis:button}  ANOTHER BUTTON  §{}\n' +
+    'µ{name:button2, basis:button, r:0}  ANOTHER BUTTON  §{}\n' +
     '\n' +
     'µ{button}  BUTTON TIME AGAIN  §{}\n' +
     '§{name:broken, r:hello}ABCD§{}';

@@ -19,7 +19,7 @@ class Strings {
         '∂{name:wait_b,period:0.6,frames:[_w2,_w1,_w2],r:0.5,g:0.5,b:0.5}' +
         '∂{name:wait_c,period:0.6,frames:[_w2,_w2,_w1],r:0.5,g:0.5,b:0.5}';
     public inline static var BREATHING_PROMPT_STYLE:String = '§{name:_br1,f:0.2}§{name:_br2,f:0.6}∂{name:breathingprompt,period:3.5,frames:[_br1,_br2], s:1.7}';
-    public inline static var INPUT_STYLE:String = '§{name:hint1,r:0.6,g:0.6,b:0.6,s:0.7}§{name:valid1,p:0.01}§{name:invalid1,p:-0.01}«{name:input1, hint:hint1, valid:valid1, invalid:invalid1, period:1}';
+    public inline static var CAPSULE_STYLE:String = '§{name:hint1,r:0.6,g:0.6,b:0.6,s:0.7}§{name:valid1,p:0.01}§{name:invalid1,p:-0.01}«{name:input1, hint:hint1, valid:valid1, invalid:invalid1, period:1}';
 
     public inline static var CARET_CHAR:String = '|';
     public inline static var WAIT_INDICATOR:String = ' §{wait_a}•§{} §{wait_b}•§{} §{wait_c}•§{} ';

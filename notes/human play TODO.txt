@@ -1,19 +1,20 @@
-UIText
-    Style the tokens differently
-        InputStyle
-    Token clicking ought to work too
-        Clicking on an input token should move the carets
-        Shortcuts
-        Buttons should become non-interactive when they enter the main text
+One style per token, with template bases
+    Interpreter and commands produce styles that inherit from their template styles
+    UIText broadcasts clicks to interpreter, which routes them to the proper command
+
+Style the tokens differently
+    Style type should depend on token type
+        PLAIN_TEXT style is typed to Style
+        SHORTCUT style is typed to ButtonStyle
+            Wire it up to a helper.bind(token) function
+        CAPSULE style is typed to InputStyle
+            Rely on InputStyle to do its work; just set its state
+Token clicking ought to work too
+    Clicking on an input token should move the carets
+    Shortcuts
+    Buttons should become non-interactive when they enter the main text
 
 Implement everything from "Text view text commands.txt" in Interpreter
-
-Solidify text update behavior
-    If:
-        the user WAS at the bottom, or
-        the user IS past the bottom, or
-        the new text IS the result of interaction,
-    -scroll to the new bottom
 
 Check out the user stories
     Command names "tokenize" after space

@@ -12,6 +12,9 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.Sigil;
 import net.rezmason.scourge.textview.text.AnimatedStyle;
+import net.rezmason.scourge.textview.text.Style;
+import net.rezmason.scourge.textview.text.ButtonStyle;
+import net.rezmason.scourge.textview.text.InputStyle;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
 
@@ -56,9 +59,8 @@ class ConsoleText extends UIText {
         styles.extract(Strings.BREATHING_PROMPT_STYLE);
         styles.extract(Strings.CARET_STYLE);
         styles.extract(Strings.WAIT_STYLES);
-        styles.extract(Strings.INPUT_STYLE);
 
-        setPlayer('rezmason', 0xFF3030);
+        setPlayer('rezmason', 0x30FF00);
 
         caretStyle = cast styles.getStyleByName('caret');
         caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
@@ -84,11 +86,12 @@ class ConsoleText extends UIText {
         waiting = false;
     }
 
+    public inline function declareStyles(dec:String):Void styles.extract(dec);
+
     override public function styleCaret(caretGlyph:Glyph, font:FlatFont):Void {
         caretStyle.removeAllGlyphs();
         caretStyle.addGlyph(caretGlyph);
         caretGlyph.set_char(caretCharCode, font);
-        this.textIsDirty = true;
     }
 
     public function setPlayer(name:String, color:Int):Void {
@@ -99,9 +102,11 @@ class ConsoleText extends UIText {
         var g:Float = (color >> 8  & 0xFF) / 0xFF;
         var b:Float = (color >> 0  & 0xFF) / 0xFF;
 
+        var promptStyleName:String = 'prompt_' + currentPlayerName + Math.random();
+
         prompt =
-        '∂{name:promptHead, basis:breathingprompt, r:$r, g:$g, b:$b}Ω' +
-        '§{name:prompt, r:$r, g:$g, b:$b} $currentPlayerName§{}' + Strings.PROMPT + styleEnd;
+        '∂{name:head_$promptStyleName, basis:breathingprompt, r:$r, g:$g, b:$b}Ω' +
+        '§{name:$promptStyleName, r:$r, g:$g, b:$b} $currentPlayerName§{}' + Strings.PROMPT + styleEnd;
     }
 
     override function combineText():String {
@@ -114,9 +119,9 @@ class ConsoleText extends UIText {
         if (waiting) {
             combinedText += Strings.WAIT_INDICATOR;
         } else {
-            combinedText += prompt;
-            combinedText += printTokens(inputTokens, '[', ']', ' ', tokenIndex, caretIndex);
-            combinedText += printTokens(hintTokens, '\n\t<', '>', ' ');
+            combinedText += prompt + printTokens(inputTokens, ' ', tokenIndex, caretIndex);
+            combinedText += '\n'; // Always added, because there's always input
+            if (hintTokens.length > 0) combinedText += '\t' + printTokens(hintTokens, '\n\t');
         }
 
         return combinedText;
@@ -158,7 +163,8 @@ class ConsoleText extends UIText {
         }
 
         this.outputTokens = output;
-        outputString = printTokens(outputTokens, '(', ')', ' ') + '\n';
+        if (outputTokens.length > 0) outputString = '\t' + printTokens(outputTokens, '\n\t') + '\n';
+        else outputString = '';
         textIsDirty = true;
     }
 
@@ -196,11 +202,11 @@ class ConsoleText extends UIText {
 
         if (length(mainText) > 0) mainText += '\n';
 
-        var oldOutputString:String = printTokens(outputTokens, '(', ')', ' ');
+        var oldOutputString:String = '';
+        if (outputTokens.length > 0) oldOutputString = '\t' + printTokens(outputTokens, '\n\t') + '\n';
         mainText += oldOutputString;
-        if (length(oldOutputString) > 0) mainText += '\n';
 
-        mainText += prompt + printTokens(inputTokens, '[', ']', ' ');
+        mainText += prompt + printTokens(inputTokens, ' ');
 
         if (!isEmpty) {
             frozen = true;
@@ -291,16 +297,41 @@ class ConsoleText extends UIText {
         }
     }
 
-    inline function printTokens(tokens:Array<TextToken>, left:String, right:String, sep:String = ' ', tokenIndex:Int = -1, caretIndex:Int = -1):String {
-        var str:String = '';
-        for (ike in 0...tokens.length) {
-            var tokenStr:String = tokens[ike].text;
-            if (ike == tokenIndex && caretIndex >= 0) {
-                tokenStr = sub(tokenStr, 0, caretIndex) + Sigil.CARET + sub(tokenStr, caretIndex);
-            }
-            str += left + tokenStr + right + sep;
+    inline function printTokens(tokens:Array<TextToken>, sep:String, tokenIndex:Int = -1, caretIndex:Int = -1):String {
+        var strings:Array<String> = tokens.map(styleToken);
+        if (tokenIndex != -1 && caretIndex != -1) {
+            var token:TextToken = copyToken(tokens[tokenIndex]);
+            token.text = sub(token.text, 0, caretIndex) + Sigil.CARET + sub(token.text, caretIndex);
+            strings[tokenIndex] = styleToken(token);
         }
-        return str;
+        return strings.join(sep);
+    }
+
+    inline function styleToken(token:TextToken):String {
+        var str:String = '';
+
+        var styleName:String = token.styleName;
+        var styleTag:String = styleEnd;
+        var style:Style = styles.getStyleByName(styleName);
+        if (styleName != null && style != null) {
+            var sigil:String = '';
+            switch (token.type) {
+                case SHORTCUT(insert):
+                    var buttonStyle:ButtonStyle = cast style;
+                    sigil = Sigil.BUTTON_STYLE;
+                    // TODO
+                case CAPSULE(type, name, valid):
+                    var inputStyle:InputStyle = cast style;
+                    sigil = Sigil.INPUT_STYLE;
+                    // TODO
+                case _:
+                    sigil = (Std.is(style, AnimatedStyle) ? Sigil.ANIMATED_STYLE : Sigil.STYLE);
+            }
+            styleTag = '$sigil{$styleName}';
+        } else {
+            styleTag = styleEnd;
+        }
+        return styleTag + token.text + styleEnd;
     }
 
     inline function get_frozen():Bool return _frozen;
@@ -320,11 +351,9 @@ class ConsoleText extends UIText {
     inline function dispatchHintSignal(char:String = ''):Void {
         var tokens:Array<TextToken> = inputTokens.map(copyToken);
         var info:InputInfo = {tokenIndex:tokenIndex, caretIndex:caretIndex, char:char};
-        Timer.delay(function() {
-            hintTokens = [];
-            textIsDirty = true;
-            hintSignal.dispatch(inputTokens, info);
-        }, 1);
+        hintTokens = [];
+        textIsDirty = true;
+        hintSignal.dispatch(inputTokens, info);
     }
 
     inline function dispatchExecSignal():Void {
@@ -334,7 +363,7 @@ class ConsoleText extends UIText {
 
     inline static function blankToken():TextToken return {text:'', type:PLAIN_TEXT};
 
-    function copyToken(token:TextToken):TextToken return {text:token.text, type:token.type, color:token.color};
+    function copyToken(token:TextToken):TextToken return {text:token.text, type:token.type, styleName:token.styleName};
 
     inline function set_caretIndex(val:Int):Int {
         caretStyle.start(0);

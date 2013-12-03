@@ -16,11 +16,15 @@ class UIBody extends Body {
 
     inline static var glideEase:Float = 0.6;
     inline static var NATIVE_DPI:Float = 96;
-    inline static var GLYPH_HEIGHT_IN_POINTS:Float = 18;
+    inline static var DEFAULT_GLYPH_HEIGHT_IN_POINTS:Float = 18;
 
-    var glyphWidthInPixels :Float;
+    var glyphHeightInPoints:Float;
+    var glyphWidthInPixels:Float;
     var glyphHeightInPixels:Float;
     var baseTransform:Matrix3D;
+
+    var viewPixelWidth:Float;
+    var viewPixelHeight:Float;
 
     var currentScrollPos:Float;
     var glideGoal:Float;
@@ -39,8 +43,6 @@ class UIBody extends Body {
 
     var uiText:UIText;
 
-    public var padding:Float;
-
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, uiText:UIText):Void {
 
         super(bufferUtil, glyphTexture, redrawHitAreas);
@@ -48,7 +50,8 @@ class UIBody extends Body {
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
 
-        glyphHeightInPixels = GLYPH_HEIGHT_IN_POINTS * getScreenDPI() / NATIVE_DPI;
+        glyphHeightInPoints = DEFAULT_GLYPH_HEIGHT_IN_POINTS;
+        glyphHeightInPixels = glyphHeightInPoints * getScreenDPI() / NATIVE_DPI;
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
 
         currentScrollPos = Math.NaN;
@@ -60,6 +63,18 @@ class UIBody extends Body {
         scaleMode = EXACT_FIT;
 
         this.uiText = uiText;
+    }
+
+    public function setFontSize(size:Float):Bool {
+        var worked:Bool = false;
+        if (!Math.isNaN(size) && size >= 14 && size <= 72) {
+            worked = true;
+            glyphHeightInPoints = size;
+            glyphHeightInPixels = glyphHeightInPoints * getScreenDPI() / NATIVE_DPI;
+            glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
+            resize();
+        }
+        return worked;
     }
 
     override public function update(delta:Float):Void {
@@ -78,26 +93,10 @@ class UIBody extends Body {
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
-
-        viewRect.inflate(-padding, -padding);
         super.adjustLayout(stageWidth, stageHeight);
-        var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
-        viewRect.inflate(padding, padding);
-
-        numRows = Std.int(rect.height * stageHeight / glyphHeightInPixels) + 1;
-        numCols = Std.int(rect.width  * stageWidth  / glyphWidthInPixels );
-
-        setGlyphScale(rect.width / numCols * 2, rect.height / (numRows - 1) * 2);
-
-        growTo(numRows * numCols + 1);
-
-        caretGlyph = glyphs[numGlyphs - 1];
-
-        lastRedrawPos = Math.NaN;
-        reorderGlyphs();
-
-        uiText.adjustLayout(numRows, numCols);
-        uiText.styleCaret(caretGlyph, glyphTexture.font);
+        viewPixelHeight = viewRect.height * stageHeight;
+        viewPixelWidth  = viewRect.width  * stageWidth;
+        resize();
     }
 
     function glideTextToPos(pos:Float):Void {
@@ -132,7 +131,26 @@ class UIBody extends Body {
         if (caretGlyphGuide != null) {
             var x:Float = caretGlyphGuide.get_x() + 0.5 / numCols;
             caretGlyph.set_pos(x, caretGlyphGuide.get_y(), caretGlyphGuide.get_z());
+        } else {
+            caretGlyph.set_z(1);
         }
+    }
+
+    inline function resize():Void {
+        numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
+        numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
+
+        setGlyphScale(viewRect.width / numCols * 2, viewRect.height / (numRows - 1) * 2);
+
+        growTo(numRows * numCols + 1);
+
+        caretGlyph = glyphs[numGlyphs - 1];
+
+        lastRedrawPos = Math.NaN;
+        reorderGlyphs();
+
+        uiText.adjustLayout(numRows, numCols);
+        uiText.styleCaret(caretGlyph, glyphTexture.font);
     }
 
     inline function reorderGlyphs():Void {

@@ -1,5 +1,7 @@
 package net.rezmason.scourge.textview;
 
+import openfl.Assets;
+
 import flash.display.Stage;
 import flash.events.Event;
 import flash.geom.Rectangle;
@@ -90,8 +92,9 @@ class TextDemo {
         cfg.allowNowhereDrop = false;
         cfg.numPlayers = numPlayers;
         cfg.includeCavities = true;
-        // cfg.maxSwaps = 0;
-        // cfg.maxBites = 0;
+
+        cfg.maxSwaps = 0;
+        cfg.maxBites = 0;
 
         var playerDefs:Array<PlayerDef> = [];
         var botPeriod:Int = 10;
@@ -146,6 +149,23 @@ class TextDemo {
         return 'Font set to $fontName';
     }
 
+    function setFontSize(input:String):String {
+        var size:Float = Std.parseFloat(input.split(' ')[1]);
+        if (!uiBody.setFontSize(size)) {
+            return '$size is an invalid font size.';
+        }
+        return 'Font size set to $size.';
+    }
+
+    function setName(input:String):String {
+        var args:Array<String> = input.split(' ');
+        var name:String = args[1];
+        var color:Int = 0xFFFFFF;
+        if (args[2] != null) color = Std.parseInt(args[2]);
+        console.setPlayer(name, color);
+        return 'Done.';
+    }
+
     function makeScene():Void {
 
         /*
@@ -176,6 +196,8 @@ class TextDemo {
 
         interpreter.addCommand('runTests', new TextCommand(runTests));
         interpreter.addCommand('setFont', new TextCommand(setFont));
+        interpreter.addCommand('setFontSize', new TextCommand(setFontSize));
+        interpreter.addCommand('setName', new TextCommand(setName));
         interpreter.addCommand('makeGame', new TextCommand(makeGame));
 
         // console.setText(Assets.getText("assets/not plus.txt"));
@@ -189,8 +211,8 @@ class TextDemo {
         //*
         uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, console);
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1); // 0.6, 0, 0.4, 1
+        uiRect.inflate(-0.0125, -0.0125);
         uiBody.viewRect = uiRect;
-        uiBody.padding = 0.0125;
         engine.addBody(uiBody);
         /**/
 
