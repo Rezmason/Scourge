@@ -34,7 +34,6 @@ class Engine {
     var mouseDownTarget:Body;
     var mouseMethod:RenderMethod;
     var prettyMethod:RenderMethod;
-    var renderer:Renderer;
     var mainOutputBuffer:OutputBuffer;
 
     var onReady:Void->Void;
@@ -93,7 +92,6 @@ class Engine {
         keyboardSystem = new KeyboardSystem(stage, interact);
         mouseDownTarget = null;
         // stage.addChild(mouseSystem.view);
-        renderer = new Renderer(utils.drawUtil);
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         addListeners();
 
@@ -108,11 +106,39 @@ class Engine {
     }
 
     function onRender(width:Int, height:Int):Void {
-        if (active) renderer.render(bodies, prettyMethod, mainOutputBuffer);
+        if (active) render(prettyMethod, mainOutputBuffer);
     }
 
     function renderMouse():Void {
-        renderer.render(bodies, mouseMethod, mouseSystem.outputBuffer);
+        render(mouseMethod, mouseSystem.outputBuffer);
+    }
+
+    function render(method:RenderMethod, outputBuffer:OutputBuffer):Void {
+
+        if (method == null) {
+            trace('Null method.');
+            return;
+        }
+
+        method.activate();
+
+        utils.drawUtil.setOutputBuffer(outputBuffer);
+        utils.drawUtil.clear(method.backgroundColor);
+
+        for (body in bodies) {
+            if (body.numGlyphs == 0) continue;
+            method.setMatrices(body.camera, body.transform);
+            method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
+
+            for (segment in body.segments) {
+                method.setSegment(segment);
+                utils.drawUtil.drawTriangles(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+            }
+        }
+
+        method.setSegment(null);
+        method.deactivate();
+        utils.drawUtil.finishOutputBuffer(outputBuffer);
     }
 
     public function setSize(width:Int, height:Int):Void {
