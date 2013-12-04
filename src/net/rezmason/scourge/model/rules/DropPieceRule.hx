@@ -58,11 +58,13 @@ class DropPieceRule extends Rule {
     private var cfg:DropPieceConfig;
     private var nowhereMove:DropPieceMove;
     private var movePool:Array<DropPieceMove>;
+    private var allMoves:Array<DropPieceMove>;
 
     public function new(cfg:DropPieceConfig):Void {
         super();
         this.cfg = cfg;
         movePool = [];
+        allMoves = [];
 
         if (cfg.allowNowhere) {
             nowhereMove = {
@@ -80,9 +82,6 @@ class DropPieceRule extends Rule {
     }
 
     override private function _update():Void {
-
-        moves.remove(nowhereMove);
-        for (move in moves) movePool.push(cast move);
 
         var dropMoves:Array<DropPieceMove> = [];
 
@@ -206,6 +205,7 @@ class DropPieceRule extends Rule {
                 coord:null,
                 duplicate:false,
             };
+            allMoves.push(move);
         }
         return move;
     }
@@ -238,6 +238,8 @@ class DropPieceRule extends Rule {
 
         state.aspects[pieceTableID_] = Aspect.NULL;
     }
+
+    override private function _collectMoves():Void movePool = allMoves.copy();
 
     inline function isFreeEdge(node:AspectSet):Bool {
         var exists:Bool = false;

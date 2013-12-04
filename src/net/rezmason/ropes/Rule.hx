@@ -32,6 +32,7 @@ using net.rezmason.utils.Pointers;
     private function _prime():Void {}
     private function _update():Void {}
     private function _chooseMove(choice:Int):Void {}
+    private function _collectMoves():Void {}
     private function _chooseQuantumMove(choice:Int):Void {}
 
     private function __initReqs():Void {}
@@ -87,6 +88,10 @@ using net.rezmason.utils.Pointers;
             else trace('${myName()} choosing move $choice');
         #end
         _chooseMove(choice);
+    }
+
+    @:final public function collectMoves():Void {
+        _collectMoves();
     }
 
     @:final public function chooseQuantumMove(choice:Int):Void {

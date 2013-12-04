@@ -36,6 +36,8 @@ class JointRule extends Rule {
         #if ROPES_VERBOSE trace('}'); #end
     }
 
+    override private function _collectMoves():Void rules[0].collectMoves();
+
     override private function _chooseQuantumMove(choice:Int):Void {
         #if ROPES_VERBOSE trace('{'); #end
 

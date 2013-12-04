@@ -102,11 +102,6 @@ class Game {
             historian.key.unlock();
             startAction.chooseMove();
         }
-        /*
-        var startAction = combinedRules[ScourgeConfigFactory.makeStartAction(]);
-        startAction.update();
-        startAction.chooseMove();
-        */
 
         updateAll();
 
@@ -139,7 +134,7 @@ class Game {
         return allQuantumMoves;
     }
 
-    public function chooseMove(actionIndex:Int, moveIndex:Int = 0, isQuantum:Bool = false):Int {
+    public function chooseMove(actionIndex:Int, moveIndex:Int = 0, isQuantum:Bool = false, cleanUp:Bool = true):Int {
 
         if (actionIndex < 0 || actionIndex > actionIDs.length - 1) throw 'Invalid action';
 
@@ -152,17 +147,8 @@ class Game {
         if (isQuantum) action.chooseQuantumMove(moveIndex);
         else action.chooseMove(moveIndex);
 
-        updateAll();
-        return pushHist();
-    }
+        if (cleanUp) collectAllMoves();
 
-    public function chooseDefaultMove():Int {
-        for (action in defaultActions) {
-            if (action.moves.length > 0) {
-                action.chooseMove();
-                break;
-            }
-        }
         updateAll();
         return pushHist();
     }
@@ -203,6 +189,12 @@ class Game {
     private function updateAll():Void {
         historian.key.lock();
         for (action in actions) action.update();
+        historian.key.unlock();
+    }
+
+    private function collectAllMoves():Void {
+        historian.key.lock();
+        for (action in actions) action.collectMoves();
         historian.key.unlock();
     }
 

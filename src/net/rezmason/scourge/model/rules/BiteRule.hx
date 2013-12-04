@@ -49,11 +49,13 @@ class BiteRule extends Rule {
 
     private var cfg:BiteConfig;
     private var movePool:Array<BiteMove>;
+    private var allMoves:Array<BiteMove>;
 
     public function new(cfg:BiteConfig):Void {
         super();
         this.cfg = cfg;
         movePool = [];
+        allMoves = [];
     }
 
     override private function _prime():Void {
@@ -61,8 +63,6 @@ class BiteRule extends Rule {
     }
 
     override private function _update():Void {
-
-        for (move in moves) movePool.push(cast move);
 
         var biteMoves:Array<BiteMove> = [];
 
@@ -202,6 +202,8 @@ class BiteRule extends Rule {
         }
     }
 
+    override private function _collectMoves():Void movePool = allMoves.copy();
+
     // "front" as in "battle front". Areas where the current player touches other players
     /*
     inline function isFront(headIDs:Array<Int>, node:AspectSet):Bool {
@@ -242,6 +244,7 @@ class BiteRule extends Rule {
         var move:BiteMove = movePool.pop();
         if (move == null) {
             move = {id:-1, targetNode:targetNodeID, bitNodes:bitNodes, relatedID:null, thickness:1, duplicate:false};
+            allMoves.push(move);
         } else {
             move.id = -1;
             move.targetNode = targetNodeID;
