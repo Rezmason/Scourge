@@ -3,9 +3,13 @@ package net.rezmason.scourge.textview.core;
 import flash.display.Stage;
 import flash.events.KeyboardEvent;
 
+import msignal.Signal;
+
 import net.rezmason.scourge.textview.core.Interaction;
 
 class KeyboardSystem {
+
+    public var interact(default, null):Signal2<InteractionSource, Interaction>;
 
     #if (!flash && !js)
         var shiftKeyCount:Int;
@@ -13,13 +17,12 @@ class KeyboardSystem {
         var ctrlKeyCount:Int;
     #end
 
-    var interact:InteractFunction;
     var keysDown:Map<Int, Bool>;
     var stage:Stage;
     public var focusBodyID:Int;
 
-    public function new(stage:Stage, interact:InteractFunction):Void {
-        this.interact = interact;
+    public function new(stage:Stage):Void {
+        interact = new Signal2();
         keysDown = new Map();
         this.stage = stage;
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
@@ -94,7 +97,7 @@ class KeyboardSystem {
 
         // trace(keyCode, charCode, shiftKey, altKey, ctrlKey);
 
-        if (!ignore) interact(focusBodyID, -1, KEYBOARD(type, keyCode, charCode, shiftKey, altKey, ctrlKey));
+        if (!ignore) interact.dispatch({bodyID:focusBodyID, glyphID:-1}, KEYBOARD(type, keyCode, charCode, shiftKey, altKey, ctrlKey));
     }
 
 }

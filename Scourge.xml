@@ -48,10 +48,8 @@
 	<!-- <haxelib name="hxsl" /> -->
 	<!-- <haxelib name="actuate" /> -->
 
-	<assets path="assets/flatfonts" />
-	<assets path="assets" include="not plus.txt"/>
-	<assets path="assets" include="enterprise.txt"/>
-	<assets path="assets" include="acid2.txt"/>
+	<assets path="assets/flatfonts" rename="flatfonts" />
+	<assets path="assets/exampletext" rename="exampletext" />
 
 	<!-- <ndll name="std" /> -->
 	<!-- <ndll name="regexp" /> -->

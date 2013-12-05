@@ -479,7 +479,7 @@ class BoardBody extends Body {
         super.update(delta);
     }
 
-    override public function interact(id:Int, interaction:Interaction):Void {
+    override public function receiveInteraction(id:Int, interaction:Interaction):Void {
         var glyph:Glyph = glyphs[id];
         switch (interaction) {
             case MOUSE(type, x, y):

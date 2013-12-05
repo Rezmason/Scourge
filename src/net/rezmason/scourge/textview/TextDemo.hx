@@ -166,6 +166,18 @@ class TextDemo {
         return 'Done.';
     }
 
+    function print(input:String):String {
+        var strName:String = input.substr(input.indexOf(' ') + 1);
+        var str:String = Assets.getText('exampletext/$strName.txt');
+        if (str == null) str = 'String $strName not found.';
+        return str;
+
+        // console.setText(Assets.getText("exampletext/not plus.txt"));
+        // console.setText(Assets.getText("exampletext/enterprise.txt"));
+        // console.setText(Assets.getText("exampletext/acid2.txt"));
+        // console.setText(Assets.getText("exampletext/styled text.txt"));
+    }
+
     function makeScene():Void {
 
         /*
@@ -199,13 +211,7 @@ class TextDemo {
         interpreter.addCommand('setFontSize', new TextCommand(setFontSize));
         interpreter.addCommand('setName', new TextCommand(setName));
         interpreter.addCommand('makeGame', new TextCommand(makeGame));
-
-        // console.setText(Assets.getText("assets/not plus.txt"));
-        // console.setText(Assets.getText("assets/enterprise.txt"));
-        // console.setText(Assets.getText("assets/acid2.txt"));
-        // console.setText('\n§{}§{}');
-        // console.setText(TestStrings.STYLED_TEXT);
-        // console.setText("One. §{i:1}Two§{}.";)
+        interpreter.addCommand('print', new TextCommand(print));
 
         // TODO: signal handling
         //*

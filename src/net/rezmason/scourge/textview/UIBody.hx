@@ -104,7 +104,7 @@ class UIBody extends Body {
         glideGoal = Math.round(Math.max(0, Math.min(uiText.bottomPos(), pos)));
     }
 
-    override public function interact(id:Int, interaction:Interaction):Void {
+    override public function receiveInteraction(id:Int, interaction:Interaction):Void {
         switch (interaction) {
             case MOUSE(type, x, y) if (dragging || id == 0):
                 if (dragging) {
@@ -118,7 +118,7 @@ class UIBody extends Body {
                     dragStartY = y;
                     dragStartPos = currentScrollPos;
                 }
-            case _: uiText.interact(id, interaction);
+            case _: uiText.receiveInteraction(id, interaction);
         }
     }
 

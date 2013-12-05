@@ -48,8 +48,8 @@ class InputStyle extends DynamicStyle {
         super.updateGlyphs(delta);
     }
 
-    override public function interact(type:MouseInteractionType):Void {
-        super.interact(type);
+    override public function receiveInteraction(type:MouseInteractionType):Void {
+        super.receiveInteraction(type);
         // TODO
     }
 

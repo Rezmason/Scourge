@@ -1,0 +1,19 @@
+§{r:1,g :-0,b:  0,  name:test}§{                                                   name:test2}§{r:0,                  basis:test,                  name:test3}§{name:whatever,g:1,                  basis:test5}§{name:anim1, r:1, g:0, b:0, p:-0.01}§{name:anim2, r:1, g:1, b:0, p:-0.02}§{name:anim3, r:1, g:1, b:1, p:-0.03}§{}This is a §{test}test§{}.
+∂{name:whatever2,period:2, frames:[anim1,anim2,anim3]}eeeeee§{}
+This is another §{test2}test§{}.
+§{name:whatever3g:1,  p:0.05               , basis:test}This is a third test!§{}
+
+
+§{name:merp1, p: 0.00, r:0, f:0.5}UP§{}
+
+§{name:merp2, p:-0.01, g:0, f:0.6}OVER§{}
+
+§{name:merp3, p: 0.01, b:0, f:0.4}DOWN§{}
+
+∂{name:animation, period:1, frames:[merp1, merp2, merp3]}DANCE, DAMN IT§{}
+µ{name:button, up:merp1, over:merp2, down:merp3, period:0.2, i:1}  BUTTON TIME  §{}
+
+µ{name:button2, basis:button, r:0}  ANOTHER BUTTON  §{}
+
+µ{button}  BUTTON TIME AGAIN  §{}
+§{name:broken, r:hello}ABCD§{}

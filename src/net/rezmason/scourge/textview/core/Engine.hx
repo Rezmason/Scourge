@@ -6,6 +6,7 @@ import haxe.Timer;
 
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.utils.UtilitySet;
+import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.rendermethods.*;
 import net.rezmason.utils.FlatFont;
 
@@ -88,8 +89,12 @@ class Engine {
     function onMethodLoaded():Void if (prettyMethod.program != null && mouseMethod.program != null) initScene();
 
     function initScene():Void {
-        mouseSystem = new MouseSystem(utils.drawUtil, stage, renderMouse, interact);
-        keyboardSystem = new KeyboardSystem(stage, interact);
+        mouseSystem = new MouseSystem(utils.drawUtil, stage, renderMouse);
+        keyboardSystem = new KeyboardSystem(stage);
+
+        mouseSystem.interact.add(handleInteraction);
+        keyboardSystem.interact.add(handleInteraction);
+
         mouseDownTarget = null;
         // stage.addChild(mouseSystem.view);
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
@@ -184,8 +189,10 @@ class Engine {
 
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();
 
-    function interact(bodyID:Int, glyphID:Int, interaction:Interaction):Void {
+    function handleInteraction(source:InteractionSource, interaction:Interaction):Void {
 
+        var bodyID:Int = source.bodyID;
+        var glyphID:Int = source.glyphID;
         var target:Body = null;
 
         if (bodyID >= 0 && bodyID < bodies.length) target = bodies[bodyID];
@@ -224,6 +231,6 @@ class Engine {
             case _:
         }
 
-        if (target != null) target.interact(glyphID, interaction);
+        if (target != null) target.receiveInteraction(glyphID, interaction);
     }
 }

@@ -10,6 +10,8 @@ import flash.utils.ByteArray;
 import flash.Vector;
 // import flash.external.ExternalInterface;
 
+import msignal.Signal;
+
 import net.rezmason.gl.utils.DrawUtil;
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.Types;
@@ -23,11 +25,11 @@ class MouseSystem {
     public var outputBuffer(default, null):OutputBuffer;
     // public var view(get, null):Sprite;
     public var invalid(default, null):Bool;
+    public var interact(default, null):Signal2<InteractionSource, Interaction>;
     var data:ReadbackData;
     var bitmapData:BitmapData;
     // var _view:MouseView;
 
-    var interact:InteractFunction;
     var update:Void->Void;
     var hoverRawID:Int;
     var pressRawID:Int;
@@ -36,11 +38,11 @@ class MouseSystem {
     var height:Int;
     var drawUtil:DrawUtil;
 
-    public function new(drawUtil:DrawUtil, target:EventDispatcher, update:Void->Void, interact:InteractFunction):Void {
+    public function new(drawUtil:DrawUtil, target:EventDispatcher, update:Void->Void):Void {
         // _view = new MouseView(0.2, 1);
         // _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
-        this.interact = interact;
+        interact = new Signal2();
         this.drawUtil = drawUtil;
         this.update = update;
 
@@ -203,7 +205,7 @@ class MouseSystem {
     inline function sendInteraction(rawID:Int, event:MouseEvent, type:MouseInteractionType):Void {
         var bodyID:Int = rawID >> 16 & 0xFF;
         var glyphID:Int = rawID & 0xFFFF;
-        if (bodyID >= 0) interact(bodyID, glyphID, MOUSE(type, event.stageX, event.stageY));
+        if (bodyID >= 0) interact.dispatch({bodyID:bodyID, glyphID:glyphID}, MOUSE(type, event.stageX, event.stageY));
     }
 
     /*

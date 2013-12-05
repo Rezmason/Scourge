@@ -127,7 +127,7 @@ class ConsoleText extends UIText {
         return combinedText;
     }
 
-    override public function interact(id:Int, interaction:Interaction):Void {
+    override public function receiveInteraction(id:Int, interaction:Interaction):Void {
 
         if (frozen) frozenQueue.add({id:id, interaction:interaction});
 
@@ -144,7 +144,7 @@ class ConsoleText extends UIText {
                     case Keyboard.TAB: handleTab();
                     case _: handleChar(char);
                 }
-            case _: super.interact(id, interaction);
+            case _: super.receiveInteraction(id, interaction);
         }
     }
 
@@ -341,7 +341,7 @@ class ConsoleText extends UIText {
             _frozen = false;
             while (!frozenQueue.isEmpty()) {
                 var leftovers:FrozenInteraction = frozenQueue.pop();
-                interact(leftovers.id, leftovers.interaction);
+                receiveInteraction(leftovers.id, leftovers.interaction);
             }
         }
         _frozen = val;

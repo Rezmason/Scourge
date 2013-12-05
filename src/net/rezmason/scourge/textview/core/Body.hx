@@ -143,7 +143,7 @@ class Body {
         for (segment in segments) segment.update();
     }
 
-    public function interact(id:Int, interaction:Interaction):Void {
+    public function receiveInteraction(id:Int, interaction:Interaction):Void {
 
     }
 

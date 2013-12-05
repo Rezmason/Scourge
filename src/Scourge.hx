@@ -20,7 +20,7 @@ class Scourge {
 
         fonts = new Map();
         for (name in ['source', 'profont', 'full']) {
-            var path = 'assets/flatfonts/${name}_flat';
+            var path = 'flatfonts/${name}_flat';
             fonts[name] = new FlatFont(getBitmapData('$path.png'), getText('$path.json'));
         }
 

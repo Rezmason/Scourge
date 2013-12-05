@@ -125,7 +125,7 @@ class SplashBody extends Body {
     }
 
     /*
-    override public function interact(id:Int, interaction:Interaction):Void {
+    override public function receiveInteraction(id:Int, interaction:Interaction):Void {
         var glyph:Glyph = glyphs[id];
         switch (interaction) {
             case MOUSE(MOVE, x, y):

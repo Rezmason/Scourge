@@ -1,6 +1,9 @@
 package net.rezmason.scourge.textview.core;
 
-typedef InteractFunction = Int->Int->Interaction->Void;
+typedef InteractionSource = {
+    var bodyID:Int;
+    var glyphID:Int;
+}
 
 enum Interaction {
     KEYBOARD(type:KeyboardInteractionType, key:Int, char:Int, shift:Bool, alt:Bool, ctrl:Bool);

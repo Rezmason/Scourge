@@ -65,7 +65,7 @@ class Style {
         }
     }
 
-    public function interact(type:MouseInteractionType):Void {
+    public function receiveInteraction(type:MouseInteractionType):Void {
 
     }
 

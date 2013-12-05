@@ -53,7 +53,7 @@ class ButtonStyle extends DynamicStyle {
         super.updateGlyphs(delta);
     }
 
-    override public function interact(type:MouseInteractionType):Void {
+    override public function receiveInteraction(type:MouseInteractionType):Void {
 
         if (type == MOVE) return;
 

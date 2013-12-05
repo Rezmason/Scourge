@@ -189,13 +189,13 @@ class UIText {
         return wrappedLines.join(LINE_TOKEN);
     }
 
-    public function interact(id:Int, interaction:Interaction):Void {
+    public function receiveInteraction(id:Int, interaction:Interaction):Void {
 
         switch (interaction) {
             case MOUSE(type, x, y) if (id != 0):
                 var targetStyle:Style = styles.getStyleByMouseID(id);
                 if (targetStyle != null) {
-                    targetStyle.interact(type);
+                    targetStyle.receiveInteraction(type);
                     if (type == CLICK) clickSignal.dispatch(targetStyle.name);
                 }
             case _:
