@@ -1,9 +1,9 @@
 package net.rezmason.scourge.controller;
 
-import msignal.Signal;
 import net.rezmason.scourge.controller.Types;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.utils.Zig;
 
 typedef TestProxy = Game->(Void->Void)->Void;
 
@@ -16,16 +16,16 @@ class TestPlayer extends PlayerSystem implements Player {
     private var smarts:Smarts;
 
     @:allow(net.rezmason.scourge.controller.Referee)
-    private var updateSignal:Signal1<GameEvent>;
+    private var updateSignal:Zig<GameEvent->Void>;
 
-    public function new(index:Int, playSignal:Signal2<Player, GameEvent>, proxy:TestProxy):Void {
+    public function new(index:Int, playSignal:Zig<Player->GameEvent->Void>, proxy:TestProxy):Void {
         super();
         this.index = index;
         this.playSignal = playSignal;
         this.proxy = proxy;
         smarts = new RandomSmarts();
 
-        updateSignal = new Signal1();
+        updateSignal = new Zig();
         updateSignal.add(function(event:GameEvent):Void processGameEventType(event.type));
     }
 

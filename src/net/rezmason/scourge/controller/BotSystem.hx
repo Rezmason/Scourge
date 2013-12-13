@@ -1,14 +1,14 @@
 package net.rezmason.scourge.controller;
 
 import haxe.Timer;
-import msignal.Signal;
 import net.rezmason.scourge.controller.Types;
 import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.utils.Zig;
 
 class BotSystem extends PlayerSystem {
 
     private var botsByIndex:Map<Int, BotPlayer>;
-    private var botSignal:Signal2<Int, GameEvent>;
+    private var botSignal:Zig<Int->GameEvent->Void>;
     private var ballots:Array<GameEvent>;
     private var numBots:Int;
 
@@ -16,12 +16,12 @@ class BotSystem extends PlayerSystem {
         super();
 
         botsByIndex = new Map();
-        botSignal = new Signal2();
+        botSignal = new Zig();
         botSignal.add(onBotSignal);
         numBots = 0;
     }
 
-    public function createPlayer(index:Int, playSignal:Signal2<Player, GameEvent>, smarts:Smarts, period:Int):Player {
+    public function createPlayer(index:Int, playSignal:Zig<Player->GameEvent->Void>, smarts:Smarts, period:Int):Player {
         var bot:BotPlayer = new BotPlayer(botSignal, index, smarts, period);
         botsByIndex[index] = bot;
         this.playSignal = playSignal;

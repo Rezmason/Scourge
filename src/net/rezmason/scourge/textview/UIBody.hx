@@ -43,9 +43,9 @@ class UIBody extends Body {
 
     var uiText:UIText;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, uiText:UIText):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, uiText:UIText):Void {
 
-        super(bufferUtil, glyphTexture, redrawHitAreas);
+        super(bufferUtil, glyphTexture);
 
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
@@ -82,6 +82,7 @@ class UIBody extends Body {
         if (!dragging && uiText.updateDirtyText()) {
             if (Math.isNaN(currentScrollPos)) setScrollPos(uiText.bottomPos());
             glideTextToPos(uiText.bottomPos());
+            redrawHitSignal.dispatch();
         }
 
         updateGlide();
@@ -204,7 +205,7 @@ class UIBody extends Body {
                 setScrollPos(glideGoal);
                 if (lastRedrawPos != glideGoal) {
                     lastRedrawPos = glideGoal;
-                    redrawHitAreas();
+                    redrawHitSignal.dispatch();
                 }
             }
         }

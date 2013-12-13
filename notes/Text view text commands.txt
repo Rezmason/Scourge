@@ -1,5 +1,9 @@
 Text view text commands
 
+SAY
+    MAIN:
+        Posts string in "chat" (p)
+
 BEGIN
     HINT:
         Params
@@ -8,12 +12,18 @@ BEGIN
             Players
     MAIN:
         Begins game (p)
+END
+    MAIN:
+        Confirm end button
+CONFIRM_END:
+    MAIN:
+        Ends the game
 QUIT
     MAIN:
         Confirm quit button
 CONFIRM_QUIT:
     MAIN:
-        Output of STAT command
+        Exits the app
 DIE
     MAIN:
         Kills player
@@ -59,10 +69,6 @@ DROP
         Outputs a list of buttons based on "command level"
             Hovering over a button shows ui for that move
             Clicking a button types in that move
-TALK
-    MAIN:
-        Posts string in "chat" (p)
-
 FEEL
     MAIN:
         Compares second token to list of "expressions" that board body is capable of

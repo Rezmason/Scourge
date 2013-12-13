@@ -44,9 +44,9 @@ class SplashBody extends Body {
     var time:Float;
     var lines:Array<String>;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
 
-        super(bufferUtil, glyphTexture, redrawHitAreas);
+        super(bufferUtil, glyphTexture);
 
         baseCamera = new Matrix3D();
 
@@ -117,10 +117,7 @@ class SplashBody extends Body {
         super.adjustLayout(stageWidth, stageHeight);
 
         // baseCamera.copyFrom(camera);
-
-        var rect:Rectangle = sanitizeLayoutRect(stageWidth, stageHeight, viewRect);
-        var glyphWidth:Float = rect.width * 0.03;
-
+        var glyphWidth:Float = viewRect.width * 0.03;
         setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
 

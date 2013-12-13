@@ -2,14 +2,13 @@ package net.rezmason.scourge.controller;
 
 import haxe.Timer;
 
-import msignal.Signal;
-
 import net.rezmason.ropes.Types;
 import net.rezmason.scourge.controller.Types;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.SafeSerializer;
 import net.rezmason.utils.UnixTime;
+import net.rezmason.utils.Zig;
 
 using Lambda;
 
@@ -29,7 +28,7 @@ class Referee {
     var floats:Array<Float>;
     var busy:Bool;
     var playerFactory:PlayerFactory;
-    var playSignal:Signal2<Player, GameEvent>;
+    var playSignal:Zig<Player->GameEvent->Void>;
 
     public var lastGame(default, null):SavedGame;
     public var gameBegun(get, never):Bool;
@@ -41,7 +40,7 @@ class Referee {
         busy = false;
         floats = [];
         playerFactory = new PlayerFactory();
-        playSignal = new Signal2();
+        playSignal = new Zig();
     }
 
     public function beginGame(playerDefs:Array<PlayerDef>, spectators:Array<Spectator>, randGen:RandGen, gameConfig:ScourgeConfig):Void {

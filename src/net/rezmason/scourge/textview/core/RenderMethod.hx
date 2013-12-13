@@ -3,6 +3,8 @@ package net.rezmason.scourge.textview.core;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 
+import net.rezmason.utils.Zig;
+
 import net.rezmason.gl.utils.ProgramUtil;
 import net.rezmason.gl.Program;
 
@@ -13,19 +15,19 @@ class RenderMethod {
 
     public var program(default, null):Program;
     public var backgroundColor(default, null):Int;
+    public var loadedSignal:Zig<Void->Void>;
     var programUtil:ProgramUtil;
     var glyphMat:Matrix3D;
     var glyphMag:Float;
     var vertShader:String;
     var fragShader:String;
 
-    var onLoaded:Void->Void;
+    function new():Void {
+        loadedSignal = new Zig<Void->Void>();
+    }
 
-    function new():Void {}
-
-    public function load(programUtil:ProgramUtil, onLoaded:Void->Void):Void {
+    public function load(programUtil:ProgramUtil):Void {
         this.programUtil = programUtil;
-        this.onLoaded = onLoaded;
 
         init();
         composeShaders();
@@ -36,8 +38,7 @@ class RenderMethod {
     function onProgramLoaded(program:Program):Void {
         this.program = program;
         connectToShaders();
-        this.onLoaded();
-        this.onLoaded = null;
+        loadedSignal.dispatch();
     }
 
     public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void { }

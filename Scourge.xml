@@ -38,8 +38,6 @@
 	<!-- <haxedef name="dce" value="no" if="flash"/> -->
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 
-	<haxelib name="msignal" />
-
 	<haxelib name="openfl" />
 
 	<set name="custom-html5-backend" />

@@ -2,7 +2,6 @@ package net.rezmason.scourge.textview;
 
 import haxe.Utf8;
 
-import msignal.Signal;
 
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Glyph;
@@ -11,6 +10,7 @@ import net.rezmason.scourge.textview.text.Style;
 import net.rezmason.scourge.textview.text.StyleSet;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
+import net.rezmason.utils.Zig;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -18,7 +18,7 @@ class UIText {
 
     inline static var LINE_TOKEN:String = '¬¬¬';
 
-    public var clickSignal(default, null):Signal1<String>;
+    public var clickSignal(default, null):Zig<String->Void>;
 
     var numRows:Int;
     var numCols:Int;
@@ -41,7 +41,7 @@ class UIText {
         mainText = '';
         styleEnd = '§{}';
         textIsDirty = false;
-        clickSignal = new Signal1();
+        clickSignal = new Zig();
 
 
     }

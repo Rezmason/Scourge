@@ -1,5 +1,7 @@
 package net.rezmason.scourge.textview;
 
+import haxe.Utf8;
+
 import net.rezmason.gl.utils.BufferUtil;
 
 import net.rezmason.scourge.textview.core.Glyph;
@@ -18,9 +20,9 @@ class AlphabetBody extends Body {
         Strings.BOX_SYMBOLS +
     '';
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
 
-        super(bufferUtil, glyphTexture, redrawHitAreas);
+        super(bufferUtil, glyphTexture);
 
         var totalChars:Int = CHARS.length;
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));
@@ -40,7 +42,7 @@ class AlphabetBody extends Body {
             var x:Float = ((col + 0.5) / numCols - 0.5);
             var y:Float = ((row + 0.5) / numRows    - 0.5);
 
-            var charCode:Int = CHARS.charCodeAt(ike % CHARS.length);
+            var charCode:Int = Utf8.charCodeAt(CHARS, ike % CHARS.length);
 
             glyph.set_shape(x, y, 0, 1, 0);
             glyph.set_rgb(1, 1, 1);
@@ -52,7 +54,7 @@ class AlphabetBody extends Body {
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
         super.adjustLayout(stageWidth, stageHeight);
-        setGlyphScale(0.05, 0.05 * stageWidth / stageHeight);
+        setGlyphScale(0.05, 0.05 * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
 
         transform.identity();
         transform.appendScale(1, -1, 1);

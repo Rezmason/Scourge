@@ -93,9 +93,9 @@ class BoardBody extends Body {
 
     var wavePools:Array<WavePool>;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
 
-        super(bufferUtil, glyphTexture, redrawHitAreas);
+        super(bufferUtil, glyphTexture);
 
         dragging = false;
         dragStartTransform = new Matrix3D();

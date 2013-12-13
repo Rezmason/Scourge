@@ -1,17 +1,17 @@
 package net.rezmason.scourge.controller;
 
 import haxe.Unserializer;
-import msignal.Signal;
 import net.rezmason.scourge.controller.Types;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.UnixTime;
+import net.rezmason.utils.Zig;
 
 class PlayerSystem {
 
     private var game:Game;
     private var floats:Array<Float>;
-    private var playSignal:Signal2<Player, GameEvent>;
+    private var playSignal:Zig<Player->GameEvent->Void>;
 
     function new():Void {
         game = new Game();

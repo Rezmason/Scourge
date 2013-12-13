@@ -3,13 +3,12 @@ package net.rezmason.scourge.textview.core;
 import flash.display.Stage;
 import flash.events.KeyboardEvent;
 
-import msignal.Signal;
-
 import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.utils.Zig;
 
 class KeyboardSystem {
 
-    public var interact(default, null):Signal2<InteractionSource, Interaction>;
+    public var interact(default, null):Zig<InteractionSource->Interaction->Void>;
 
     #if (!flash && !js)
         var shiftKeyCount:Int;
@@ -22,7 +21,7 @@ class KeyboardSystem {
     public var focusBodyID:Int;
 
     public function new(stage:Stage):Void {
-        interact = new Signal2();
+        interact = new Zig();
         keysDown = new Map();
         this.stage = stage;
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);

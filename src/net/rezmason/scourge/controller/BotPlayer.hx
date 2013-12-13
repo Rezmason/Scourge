@@ -1,7 +1,7 @@
 package net.rezmason.scourge.controller;
 
-import msignal.Signal;
 import net.rezmason.scourge.controller.Types;
+import net.rezmason.utils.Zig;
 
 @:allow(net.rezmason.scourge.controller.BotSystem)
 class BotPlayer implements Player {
@@ -13,14 +13,14 @@ class BotPlayer implements Player {
     private var period:Int;
 
     @:allow(net.rezmason.scourge.controller.Referee)
-    private var updateSignal:Signal1<GameEvent>;
+    private var updateSignal:Zig<GameEvent->Void>;
 
-    private function new(signal:Signal2<Int, GameEvent>, index:Int, smarts:Smarts, period:Int):Void {
+    private function new(signal:Zig<Int->GameEvent->Void>, index:Int, smarts:Smarts, period:Int):Void {
         this.index = index;
         this.smarts = smarts;
         this.period = period;
 
-        updateSignal = new Signal1();
+        updateSignal = new Zig();
         updateSignal.add(signal.dispatch.bind(index));
     }
 

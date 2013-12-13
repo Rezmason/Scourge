@@ -1,3 +1,5 @@
+Text commands are boring. Make more interesting ones.
+
 One style per token, with template bases
     Interpreter and commands produce styles that inherit from their template styles
     UIText broadcasts clicks to interpreter, which routes them to the proper command
@@ -13,8 +15,6 @@ Token clicking ought to work too
     Clicking on an input token should move the carets
     Shortcuts
     Buttons should become non-interactive when they enter the main text
-
-Implement everything from "Text view text commands.txt" in Interpreter
 
 Check out the user stories
     Command names "tokenize" after space

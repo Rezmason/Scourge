@@ -32,14 +32,14 @@ class GlyphBody extends Body {
     var currentPhase:Int;
     var currentColor:Int;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
 
         currentCharIndex = 0;
         currentPhase = 1;
         phaseTime = 0;
         currentColor = 0;
 
-        super(bufferUtil, glyphTexture, redrawHitAreas);
+        super(bufferUtil, glyphTexture);
         growTo(1);
 
         glyphs[0].set_char(Utf8.charCodeAt(CHARS, currentCharIndex), glyphTexture.font);

@@ -48,12 +48,16 @@ class TextDemo {
     var console:ConsoleText;
     var interpreter:Interpreter;
 
+    var currentBody:Body;
+    var currentBodyViewRect:Rectangle;
+
     public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
         this.utils = utils;
         this.stage = stage;
         makeFontTextures(fonts);
         engine = new Engine(utils, stage, fontTextures);
-        engine.init(init);
+        engine.readySignal.add(init);
+        engine.init();
         addListeners();
     }
 
@@ -124,6 +128,8 @@ class TextDemo {
             spectator.viewSignal.add(boardBody.handleBoardUpdate);
         }
 
+        setCurrentBody(boardBody);
+
         return 'Starting a $numPlayers player game.';
     }
 
@@ -171,35 +177,32 @@ class TextDemo {
         var str:String = Assets.getText('exampletext/$strName.txt');
         if (str == null) str = 'String $strName not found.';
         return str;
+    }
 
-        // console.setText(Assets.getText("exampletext/not plus.txt"));
-        // console.setText(Assets.getText("exampletext/enterprise.txt"));
-        // console.setText(Assets.getText("exampletext/acid2.txt"));
-        // console.setText(Assets.getText("exampletext/styled text.txt"));
+    function show(input:String):String {
+        var bodyName:String = input.substr(input.indexOf(' ') + 1);
+        var body:Body = null;
+        switch (bodyName.toLowerCase()) {
+            case 'test': body = testBody;
+            case 'splash': body = splashBody;
+            case 'board': body = boardBody;
+        }
+        var str:String = null;
+        if (body == null) str = '"$bodyName" not found.';
+        else str = 'Showing "$bodyName"';
+
+        if (body != null) setCurrentBody(body);
+
+        return str;
     }
 
     function makeScene():Void {
 
-        /*
-        testBody = new TestBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
-        testBody.viewRect = new Rectangle(0, 0, 0.6, 1);
-        engine.addBody(testBody);
-        /**/
+        testBody = new TestBody(utils.bufferUtil, fontTextures['full']);
 
-        /*
-        #if flash
-        videoBody = new VideoBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
-        engine.addBody(videoBody);
-        #end
-        /**/
+        // #if flash engine.addBody(new VideoBody(utils.bufferUtil, fontTextures['full'])); #end
 
-        //*
-        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full_fog'], engine.invalidateMouse);
-        boardBody.viewRect = new Rectangle(0, 0, 0.6, 1);
-        engine.addBody(boardBody);
-        /**/
-
-        //*
+        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full_fog']);
 
         console = new ConsoleText();
 
@@ -212,35 +215,30 @@ class TextDemo {
         interpreter.addCommand('setName', new TextCommand(setName));
         interpreter.addCommand('makeGame', new TextCommand(makeGame));
         interpreter.addCommand('print', new TextCommand(print));
+        interpreter.addCommand('show', new TextCommand(show));
 
         // TODO: signal handling
         //*
-        uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse, console);
+        uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], console);
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1); // 0.6, 0, 0.4, 1
         uiRect.inflate(-0.0125, -0.0125);
         uiBody.viewRect = uiRect;
         engine.addBody(uiBody);
         /**/
 
-        /*
-        var alphabetBody:Body = new AlphabetBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
-        engine.addBody(alphabetBody);
-        /**/
+        // engine.addBody(new AlphabetBody(utils.bufferUtil, fontTextures['full']));
+        // engine.addBody(new GlyphBody(utils.bufferUtil, fontTextures['full']));
 
-        /*
-        var glyphBody:Body = new GlyphBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
-        // glyphBody.viewRect = new Rectangle(0, 0, 0.6, 1);
-        engine.addBody(glyphBody);
-        /**/
-
-        /*
-        splashBody = new SplashBody(utils.bufferUtil, fontTextures['full'], engine.invalidateMouse);
+        splashBody = new SplashBody(utils.bufferUtil, fontTextures['full']);
         splashBody.viewRect = new Rectangle(0, 0, 1, 0.3);
-        engine.addBody(splashBody);
-        /**/
+        // engine.addBody(splashBody);
+
+        currentBodyViewRect = new Rectangle(0, 0, 0.6, 1);
 
         onResize();
         onActivate();
+
+        setCurrentBody(boardBody);
     }
 
     function addListeners():Void {
@@ -261,6 +259,17 @@ class TextDemo {
         runner.completionHandler = function(b) {};
         runner.run([TestSuite]);
         return client.output;
+    }
+
+    function setCurrentBody(body:Body):Void {
+        if (currentBody != body) {
+            if (currentBody != null) engine.removeBody(currentBody);
+            currentBody = body;
+            if (currentBody != null) {
+                currentBody.viewRect = currentBodyViewRect;
+                engine.addBody(currentBody);
+            }
+        }
     }
 
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();

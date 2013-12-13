@@ -5,8 +5,6 @@ import flash.ui.Keyboard;
 import haxe.Timer;
 import haxe.Utf8;
 
-import msignal.Signal;
-
 import net.rezmason.scourge.textview.console.Types;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
@@ -17,6 +15,7 @@ import net.rezmason.scourge.textview.text.ButtonStyle;
 import net.rezmason.scourge.textview.text.InputStyle;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
+import net.rezmason.utils.Zig;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -25,8 +24,8 @@ private typedef HistEntry = { val:Array<TextToken>, ?next:HistEntry, ?prev:HistE
 
 class ConsoleText extends UIText {
 
-    public var hintSignal(default, null):Signal2<Array<TextToken>, InputInfo>;
-    public var execSignal(default, null):Signal1<Array<TextToken>>;
+    public var hintSignal(default, null):Zig<Array<TextToken>->InputInfo->Void>;
+    public var execSignal(default, null):Zig<Array<TextToken>->Void>;
 
     public var frozen(get, set):Bool;
     var waiting:Bool;
@@ -78,8 +77,8 @@ class ConsoleText extends UIText {
         curHistEntry = lastHistEntry;
         inputTokens = curHistEntry.val.map(copyToken);
 
-        hintSignal = new Signal2();
-        execSignal = new Signal1();
+        hintSignal = new Zig();
+        execSignal = new Zig();
 
         frozenQueue = new List();
         frozen = false;

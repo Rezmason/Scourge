@@ -10,11 +10,10 @@ import flash.utils.ByteArray;
 import flash.Vector;
 // import flash.external.ExternalInterface;
 
-import msignal.Signal;
-
 import net.rezmason.gl.utils.DrawUtil;
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.Types;
+import net.rezmason.utils.Zig;
 
 import net.rezmason.scourge.textview.core.Interaction;
 
@@ -25,12 +24,12 @@ class MouseSystem {
     public var outputBuffer(default, null):OutputBuffer;
     // public var view(get, null):Sprite;
     public var invalid(default, null):Bool;
-    public var interact(default, null):Signal2<InteractionSource, Interaction>;
+    public var interact(default, null):Zig<InteractionSource->Interaction->Void>;
+    public var updateSignal(default, null):Zig<Void->Void>;
     var data:ReadbackData;
     var bitmapData:BitmapData;
     // var _view:MouseView;
 
-    var update:Void->Void;
     var hoverRawID:Int;
     var pressRawID:Int;
     var lastMoveEvent:MouseEvent;
@@ -38,13 +37,13 @@ class MouseSystem {
     var height:Int;
     var drawUtil:DrawUtil;
 
-    public function new(drawUtil:DrawUtil, target:EventDispatcher, update:Void->Void):Void {
+    public function new(drawUtil:DrawUtil, target:EventDispatcher):Void {
         // _view = new MouseView(0.2, 1);
         // _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
-        interact = new Signal2();
+        interact = new Zig();
         this.drawUtil = drawUtil;
-        this.update = update;
+        updateSignal = new Zig<Void->Void>();
 
         target.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         target.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
@@ -81,9 +80,7 @@ class MouseSystem {
         }
     }
 
-    public function invalidate():Void {
-        invalid = true;
-    }
+    public function invalidate():Void invalid = true;
 
     function getRawID(x:Float, y:Float):Int {
 
@@ -160,7 +157,7 @@ class MouseSystem {
             outputBuffer.resize(width, height);
             if (data == null) data = drawUtil.createReadbackData(width * height * 4);
 
-            update();
+            updateSignal.dispatch();
             drawUtil.readBack(outputBuffer, width, height, data);
             // fartBD();
 

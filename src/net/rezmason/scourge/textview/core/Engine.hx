@@ -9,6 +9,7 @@ import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.rendermethods.*;
 import net.rezmason.utils.FlatFont;
+import net.rezmason.utils.Zig;
 
 using Lambda;
 
@@ -20,7 +21,7 @@ class Engine {
     public var width(default, null):Int;
     public var height(default, null):Int;
     public var ready(default, null):Bool;
-    public var invalidateMouse(get, null):Void->Void;
+    public var readySignal(default, null):Zig<Void->Void>;
 
     var updateTimer:Timer;
     var lastTimeStamp:Float;
@@ -37,11 +38,10 @@ class Engine {
     var prettyMethod:RenderMethod;
     var mainOutputBuffer:OutputBuffer;
 
-    var onReady:Void->Void;
-
     public function new(utils:UtilitySet, stage:Stage, fontTextures:Map<String, GlyphTexture>):Void {
         active = false;
         ready = false;
+        readySignal = new Zig<Void->Void>();
         this.utils = utils;
         this.stage = stage;
         this.fontTextures = fontTextures;
@@ -53,29 +53,30 @@ class Engine {
         holes = [];
     }
 
-    public function init(onReady:Void->Void):Void {
+    public function init():Void {
         if (ready) {
-            onReady();
+            readySignal.dispatch();
         } else {
-            this.onReady = onReady;
-
             prettyMethod = new PrettyMethod();
             mouseMethod = new MouseMethod();
 
-            prettyMethod.load(utils.programUtil, onMethodLoaded);
-            mouseMethod.load(utils.programUtil, onMethodLoaded);
+            prettyMethod.loadedSignal.add(onMethodLoaded);
+            mouseMethod.loadedSignal.add(onMethodLoaded);
+
+            prettyMethod.load(utils.programUtil);
+            mouseMethod.load(utils.programUtil);
         }
     }
 
     public function set_framerate(f:Float):Float return framerate = (f >= 0 ? f : 0);
-
-    public inline function get_invalidateMouse():Void->Void return mouseSystem.invalidate;
 
     public function addBody(body:Body):Void {
         if (!bodies.has(body)) {
             var hole:Int = holes.length > 0 ? holes.pop() : bodies.length;
             body.setID(hole);
             bodies[hole] = body;
+            body.redrawHitSignal.add(mouseSystem.invalidate);
+            body.adjustLayout(width, height);
         }
     }
 
@@ -83,13 +84,15 @@ class Engine {
         if (bodies[body.id] == body) {
             holes.push(body.id);
             bodies[body.id] = null;
+            body.redrawHitSignal.remove(mouseSystem.invalidate);
         }
     }
 
     function onMethodLoaded():Void if (prettyMethod.program != null && mouseMethod.program != null) initScene();
 
     function initScene():Void {
-        mouseSystem = new MouseSystem(utils.drawUtil, stage, renderMouse);
+        mouseSystem = new MouseSystem(utils.drawUtil, stage);
+        mouseSystem.updateSignal.add(renderMouse);
         keyboardSystem = new KeyboardSystem(stage);
 
         mouseSystem.interact.add(handleInteraction);
@@ -100,9 +103,10 @@ class Engine {
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         addListeners();
 
-        ready = true;
-        if (onReady != null) onReady();
-        onReady = null;
+        if (!ready) {
+            ready = true;
+            readySignal.dispatch();
+        }
     }
 
     function addListeners():Void {

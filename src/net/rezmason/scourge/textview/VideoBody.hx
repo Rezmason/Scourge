@@ -35,9 +35,9 @@ class VideoBody extends Body {
 
     var time:Float;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
 
-        super(bufferUtil, glyphTexture, redrawHitAreas);
+        super(bufferUtil, glyphTexture);
 
         scaleMode = WIDTH_FIT;
 

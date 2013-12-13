@@ -18,10 +18,10 @@ import flash.net.FileReference;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.FlatFontGenerator;
 
-import net.rezmason.scourge.textview.TestStrings;
+import net.rezmason.scourge.textview.Strings;
 
-@:font("assets/ProFontX.ttf") class ProFont extends Font {}
-@:font("assets/SourceCodePro_FontsOnly-1.013/TTF/SourceCodePro-Semibold.ttf") class SourceProFont extends Font {}
+@:font("assets/fonts/ProFontX.ttf") class ProFont extends Font {}
+@:font("assets/fonts/SourceCodePro_FontsOnly-1.013/TTF/SourceCodePro-Semibold.ttf") class SourceProFont extends Font {}
 
 class ScourgeAssetGen {
 
@@ -31,11 +31,11 @@ class ScourgeAssetGen {
     public static function main():Void {
 
         var requiredString:String = [
-            TestStrings.ALPHANUMERICS,
-            TestStrings.PUNCTUATION,
-            TestStrings.SYMBOLS,
-            TestStrings.WEIRD_SYMBOLS,
-            TestStrings.BOX_SYMBOLS,
+            Strings.ALPHANUMERICS,
+            Strings.PUNCTUATION,
+            Strings.SYMBOLS,
+            Strings.WEIRD_SYMBOLS,
+            Strings.BOX_SYMBOLS,
         ].join("");
 
         FlatFontGenerator.flatten(new ProFont(), 300, requiredString, 72, 72, 1, 20, function(ff) {

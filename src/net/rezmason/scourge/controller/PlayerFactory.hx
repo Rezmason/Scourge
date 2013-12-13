@@ -1,8 +1,7 @@
 package net.rezmason.scourge.controller;
 
-import msignal.Signal;
-
 import net.rezmason.scourge.controller.Types;
+import net.rezmason.utils.Zig;
 
 using Lambda;
 
@@ -12,7 +11,7 @@ class PlayerFactory {
 
     }
 
-    public function makePlayers(defs:Array<PlayerDef>, signal:Signal2<Player, GameEvent>):Array<Player> {
+    public function makePlayers(defs:Array<PlayerDef>, signal:Zig<Player->GameEvent->Void>):Array<Player> {
         var players:Array<Player> = [];
 
         var botSystem:BotSystem = null;

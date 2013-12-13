@@ -9,6 +9,7 @@ import net.rezmason.scourge.textview.Strings;
 
 import net.rezmason.scourge.textview.waves.*;
 
+
 class Scourge {
 
     static var fonts:Map<String, FlatFont>;

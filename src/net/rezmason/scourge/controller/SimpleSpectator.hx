@@ -1,19 +1,19 @@
 package net.rezmason.scourge.controller;
 
-import msignal.Signal;
 import net.rezmason.scourge.controller.Types.GameEvent;
 import net.rezmason.scourge.model.Game;
+import net.rezmason.utils.Zig;
 
 class SimpleSpectator extends PlayerSystem implements Spectator {
 
-    public var updateSignal(default, null):Signal1<GameEvent>;
-    public var viewSignal(default, null):Signal0;
+    public var updateSignal(default, null):Zig<GameEvent->Void>;
+    public var viewSignal(default, null):Zig<Void->Void>;
 
     public function new():Void {
         super();
-        updateSignal = new Signal1();
+        updateSignal = new Zig();
         updateSignal.add(onUpdate);
-        viewSignal = new Signal0();
+        viewSignal = new Zig();
     }
 
     public function getGame():Game return game;

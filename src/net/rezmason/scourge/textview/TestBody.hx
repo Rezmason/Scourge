@@ -30,9 +30,9 @@ class TestBody extends Body {
     var rawTransform:Matrix3D;
     var setBackTransform:Matrix3D;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void, num:Int = 2400):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, num:Int = 2400):Void {
 
-        super(bufferUtil, glyphTexture, redrawHitAreas);
+        super(bufferUtil, glyphTexture);
 
         time = 0;
 

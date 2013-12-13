@@ -7,6 +7,7 @@ import flash.geom.Vector3D;
 import flash.Vector;
 
 import net.rezmason.gl.utils.BufferUtil;
+import net.rezmason.utils.Zig;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -24,22 +25,21 @@ class Body {
     public var scaleMode(default, null):BodyScaleMode;
     public var catchMouseInRect(default, null):Bool;
     public var viewRect(default, set):Rectangle;
+    public var redrawHitSignal(default, null):Zig<Void->Void>;
 
     var trueNumGlyphs:Int;
     var vanishingPoint:Point;
 
-    var redrawHitAreas:Void->Void;
     var projection:Matrix3D;
 
     public var glyphs:Array<Glyph>;
 
     var bufferUtil:BufferUtil;
 
-    function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, redrawHitAreas:Void->Void):Void {
+    function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+        redrawHitSignal = new Zig<Void->Void>();
         id = 0;
         this.bufferUtil = bufferUtil;
-        this.redrawHitAreas = redrawHitAreas;
-        if (this.redrawHitAreas == null) redrawHitAreas = function() {};
         scaleMode = SHOW_ALL;
         catchMouseInRect = true;
         glyphs = [];
@@ -63,8 +63,8 @@ class Body {
 
     @:allow(net.rezmason.scourge.textview.core)
     function setID(id:Int):Void {
-        this.id = id << 16;
-        for (glyph in glyphs) glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id);
+        this.id = id;
+        for (glyph in glyphs) glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id << 16);
     }
 
     function growTo(numGlyphs:Int):Void {
