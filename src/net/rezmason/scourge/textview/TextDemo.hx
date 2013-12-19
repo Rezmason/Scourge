@@ -58,7 +58,6 @@ class TextDemo {
         engine = new Engine(utils, stage, fontTextures);
         engine.readySignal.add(init);
         engine.init();
-        addListeners();
     }
 
     function makeFontTextures(fonts:Map<String, FlatFont>):Void {
@@ -70,6 +69,7 @@ class TextDemo {
     }
 
     function init():Void {
+        addListeners();
         makeScene();
     }
 

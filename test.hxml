@@ -7,6 +7,7 @@
 -debug
 -resource tables/pieces.json.txt@tables/pieces.json.txt
 -resource tables/serializedState.txt@tables/serializedState.txt
+-resource workers/TestWorker.swf
 #-D VISUAL_TEST
 #-D TIME_TESTS
 -D USE_POINTERS
@@ -15,7 +16,7 @@
 #-D ROPES_MACRO_VERBOSE
 
 -cp test
--swf-version 9
+-swf-version 11.4
 -swf build/as3_test.swf
 --next
 
@@ -28,6 +29,7 @@
 -debug
 -resource tables/pieces.json.txt@tables/pieces.json.txt
 -resource tables/serializedState.txt@tables/serializedState.txt
+-resource workers/TestWorker.js
 #-D VISUAL_TEST
 #-D TIME_TESTS
 -D USE_POINTERS

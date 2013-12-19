@@ -4,6 +4,7 @@ import flash.display.BitmapData;
 import flash.geom.Matrix;
 
 import haxe.Utf8;
+import haxe.io.Bytes;
 
 import flash.display.BlendMode;
 import flash.geom.Rectangle;
@@ -15,7 +16,6 @@ import flash.text.engine.TextLine;
 import flash.text.Font;
 import flash.utils.ByteArray;
 
-import openfl.Assets.getBytes;
 import net.rezmason.utils.TempAgency;
 
 import net.rezmason.utils.FlatFont;
@@ -37,7 +37,7 @@ class FlatFontGenerator {
 
     public static function flatten(font:Font, fontSize:Int, charString:String, glyphWidth:Int, glyphHeight:Int, spacing:Int, cutoff:Int, cbk:FlatFont->Void):Void {
 
-        if (sdfAgency == null) sdfAgency = new TempAgency(getBytes("flash_workers/SDFWorker.swf"));
+        if (sdfAgency == null) sdfAgency = new TempAgency(getBytes('workers/SDFWorker.swf'));
 
         if (fontSize < 1) fontSize = 72;
         if (glyphWidth  < 0) glyphWidth  = 1;
@@ -218,5 +218,13 @@ class FlatFontGenerator {
         var output:Int = 1;
         while (output < input) output = output * 2;
         return output;
+    }
+
+    inline static function getBytes(id:String):Bytes {
+        #if openfl
+            return Bytes.ofData(openfl.Assets.getBytes(id));
+        #else
+            return haxe.Resource.getBytes(id);
+        #end
     }
 }

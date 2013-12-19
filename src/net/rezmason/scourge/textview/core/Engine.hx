@@ -71,6 +71,7 @@ class Engine {
     public function set_framerate(f:Float):Float return framerate = (f >= 0 ? f : 0);
 
     public function addBody(body:Body):Void {
+        readyCheck();
         if (!bodies.has(body)) {
             var hole:Int = holes.length > 0 ? holes.pop() : bodies.length;
             body.setID(hole);
@@ -81,6 +82,7 @@ class Engine {
     }
 
     public function removeBody(body:Body):Void {
+        readyCheck();
         if (bodies[body.id] == body) {
             holes.push(body.id);
             bodies[body.id] = null;
@@ -151,6 +153,7 @@ class Engine {
     }
 
     public function setSize(width:Int, height:Int):Void {
+        readyCheck();
         this.width = width;
         this.height = height;
         for (body in bodies) body.adjustLayout(width, height);
@@ -159,6 +162,7 @@ class Engine {
     }
 
     public function activate():Void {
+        readyCheck();
         if (active) return;
         active = true;
 
@@ -171,6 +175,7 @@ class Engine {
     }
 
     public function deactivate():Void {
+        readyCheck();
         if (!active) return;
         active = false;
         updateTimer.stop();
@@ -179,6 +184,7 @@ class Engine {
     }
 
     public function setKeyboardFocus(body:Body):Void {
+        readyCheck();
         if (bodies.has(body)) keyboardSystem.focusBodyID = body.id;
     }
 
@@ -237,4 +243,6 @@ class Engine {
 
         if (target != null) target.receiveInteraction(glyphID, interaction);
     }
+
+    inline function readyCheck():Void if (!ready) throw "Engine hasn't initialized yet.";
 }

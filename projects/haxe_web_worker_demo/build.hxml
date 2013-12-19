@@ -1,0 +1,7 @@
+-main TestWorker
+-js testworker.js
+
+--next
+-main BasicWorkerTest
+-resource testworker.js
+-js basicworkertest.js

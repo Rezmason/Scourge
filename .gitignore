@@ -6,5 +6,5 @@ junk
 tables/*.n
 tables/*.json
 Export
-flash_workers/flash/haxe
+workers
 dump

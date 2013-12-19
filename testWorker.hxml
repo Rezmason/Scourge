@@ -1,0 +1,16 @@
+-main net.rezmason.utils.TestWorker
+-swf workers/TestWorker.swf
+-swf-version 11.4
+-cp test
+-cp src
+#-debug
+-dce no
+
+--next
+
+-main net.rezmason.utils.TestWorker
+-js workers/TestWorker.js
+-cp test
+-cp src
+#-debug
+-dce no

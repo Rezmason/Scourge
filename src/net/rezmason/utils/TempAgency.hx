@@ -1,71 +1,70 @@
 package net.rezmason.utils;
 
-import flash.events.Event;
-import flash.utils.ByteArray;
-import flash.system.MessageChannel;
-import flash.system.Worker;
-import flash.system.WorkerDomain;
-import haxe.Timer;
+import haxe.io.Bytes;
 
-class TempAgency<T, U> {
+#if flash
+    import flash.events.Event;
+    import haxe.Timer;
+#end
+
+class TempAgency<T, U> extends BasicWorkerAgency<T, U> {
 
     var queue:Array<U->Void>;
     var started:Bool;
 
-    var worker:Worker;
-    var incoming:MessageChannel;
-    var outgoing:MessageChannel;
-    var shutdownTime:Int;
-    var shutdownTimer:Timer;
+    var countdownTime:Int;
+    var countdownTimer:Timer;
+    var complainLoudly:Bool;
 
-    public function new(bytes:ByteArray, shutdownTime:Int = 5000):Void {
-        this.shutdownTime = shutdownTime;
+    public function new(bytes:Bytes, countdownTime:Int = 5000, complainLoudly:Bool = false):Void {
+        this.countdownTime = countdownTime;
+        this.complainLoudly = complainLoudly;
         started = false;
         queue = [];
-
-        worker = WorkerDomain.current.createWorker(bytes);
-        incoming = worker.createMessageChannel(Worker.current);
-        outgoing = Worker.current.createMessageChannel(worker);
-        worker.setSharedProperty("incoming", outgoing);
-        worker.setSharedProperty("outgoing", incoming);
-        incoming.addEventListener(Event.CHANNEL_MESSAGE, onIncoming);
+        super(bytes);
         startup();
     }
 
     public function addWork(work:T, recip:U->Void):Void {
         queue.push(recip);
-        outgoing.send(work);
-        cancelShutdown();
+        send(work);
+        cancelCountdown();
         startup();
     }
 
-    function onIncoming(event:Event):Void {
-        while (incoming.messageAvailable) queue.shift()(incoming.receive());
-        if (queue.length == 0) beginShutdown();
+    override function onIncoming(event:Event):Void {
+        while (incoming.messageAvailable) {
+            var data:Dynamic = incoming.receive();
+            if (Reflect.hasField(data, '__error')) onErrorIncoming(data.__error);
+            else queue.shift()(data);
+        }
+        if (queue.length == 0) beginCountdown();
     }
 
-    inline function startup():Void {
+    override function onErrorIncoming(error:Dynamic):Void if (complainLoudly) throw error;
+
+    function startup():Void {
         if (!started) {
             started = true;
-            worker.start();
+            start();
         }
     }
 
-    inline function beginShutdown():Void {
-        shutdownTimer = new Timer(shutdownTime);
-        shutdownTimer.run = onShutdown;
+    inline function beginCountdown():Void {
+        countdownTimer = new Timer(countdownTime);
+        countdownTimer.run = onCountdown;
     }
 
-    inline function onShutdown():Void {
-        shutdownTimer = null;
-        worker.terminate();
+    inline function onCountdown():Void {
+        countdownTimer = null;
+        die();
         started = false;
     }
 
-    inline function cancelShutdown():Void {
-        if (shutdownTimer != null) {
-            shutdownTimer.stop();
-            shutdownTimer = null;
+    inline function cancelCountdown():Void {
+        if (countdownTimer != null) {
+            countdownTimer.stop();
+            countdownTimer = null;
         }
     }
 }

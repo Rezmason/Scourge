@@ -1,3 +1,15 @@
+Minion
+
+    Project injector
+
+    C++ thread worker
+        The agency cannot receive data through Tread.readMessage
+        So pass each worker a callback to call instead
+        Remember to then to Thread.readMessage(true) in the worker
+
+ScourgeAssetGen
+    If you have multiple workers operating off a queue, it'll get done faster
+
 Oh jesus christ
     http://www.clicktorelease.com/code/bumpy-metaballs/
 
