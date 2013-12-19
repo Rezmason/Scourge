@@ -206,7 +206,7 @@ using net.rezmason.utils.Pointers;
         fields.push(overrider('__initPtrs', assignments, pos));
 
         #if ROPES_MACRO_VERBOSE
-            neko.Lib.print(msg);
+            Sys.print(msg);
         #end
 
         return fields;

@@ -9,7 +9,7 @@ using Lambda;
 
 class MadProps {
 
-    macro public static function giveProps(metatag:String) {
+    macro public static function giveProps(metatag:String):Expr {
         var fields = Context.getLocalClass().get().fields.get().filter(function (f) return f.meta.has(metatag));
         var names = fields.map(function (f) return macro $v{f.name});
         return macro [$a{names}];

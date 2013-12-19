@@ -20,6 +20,8 @@ class Converter {
 
     static var worker:TempWorker<GLSLInput, AGALOutput> = new TempWorker(convert);
 
+    static function main():Void {}
+
     static function convert(input:GLSLInput):AGALOutput {
         var type:String = cast input.type;
         var source = input.source;

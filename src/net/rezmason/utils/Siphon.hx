@@ -8,7 +8,7 @@ import sys.FileSystem;
 
 class Siphon {
 
-    macro public static function getDefs(pkg:String = null, base:String = null, classFilter:String = null) {
+    macro public static function getDefs(pkg:String = null, base:String = null, classFilter:String = null):Expr {
 
         var exprs:Array<Expr> = [];
 

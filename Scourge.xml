@@ -27,7 +27,7 @@
 	<!-- <haxedef name="ROPES_VERBOSE" /> -->
 	<!-- <haxedef name="ROPES_MACRO_VERBOSE" /> -->
 
-	<assets path="flash_workers/flash/bin" rename="flash_workers" if="flash" />
+	<assets path="flash_workers" rename="flash_workers" if="flash" />
 	<haxedef name="stage3d" if="flash" />
 	<haxedef name="glsl2agal" if="flash" />
 
@@ -42,9 +42,6 @@
 
 	<set name="custom-html5-backend" />
 	<haxelib name="openfl-html5-revised" if="html5" />
-
-	<!-- <haxelib name="hxsl" /> -->
-	<!-- <haxelib name="actuate" /> -->
 
 	<assets path="assets/flatfonts" rename="flatfonts" />
 	<assets path="assets/exampletext" rename="exampletext" />

@@ -1,3 +1,6 @@
+Oh jesus christ
+    http://www.clicktorelease.com/code/bumpy-metaballs/
+
 Human play (see todo)
 
 Depth of field in frag shader?

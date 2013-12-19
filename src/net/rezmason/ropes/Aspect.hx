@@ -49,7 +49,7 @@ import net.rezmason.ropes.Types;
         msg += '\n';
 
         #if ROPES_MACRO_VERBOSE
-            neko.Lib.print(msg);
+            Sys.print(msg);
         #end
 
         return fields;

@@ -1,0 +1,6 @@
+-main net.rezmason.utils.SDF
+-swf flash_workers/SDFWorker.swf
+-swf-version 11.4
+-cp src
+#-debug
+-dce no

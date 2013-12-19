@@ -51,6 +51,8 @@ class SDF {
 
     static var worker:TempWorker<{source:SerializedBitmap, cutoff:Int}, SerializedBitmap> = new TempWorker(process);
 
+    static function main():Void {}
+
     static function process(input:{source:SerializedBitmap, cutoff:Int}):SerializedBitmap {
         var bd:BitmapData = new BitmapData(input.source.width, input.source.height, true, 0x0);
         bd.setPixels(bd.rect, input.source.bytes);
