@@ -1,7 +1,4 @@
 Minion
-
-    Project injector
-
     C++ thread worker
         The agency cannot receive data through Tread.readMessage
         So pass each worker a callback to call instead

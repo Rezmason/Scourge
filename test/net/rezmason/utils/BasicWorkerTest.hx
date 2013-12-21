@@ -79,8 +79,7 @@ class BasicWorkerTest
         var onError:Void->Void;
 
         public function new(onReceive:String->Void, onError:Void->Void):Void {
-            var ext:String = #if flash 'swf' #elseif js 'js' #end ;
-            super(Resource.getBytes('workers/TestWorker.$ext'));
+            super(Minion.makeMinion('testWorker.hxml'));
             this.onReceive = onReceive;
             this.onError = onError;
         }

@@ -1,3 +1,4 @@
+##MINION##
 -main net.rezmason.utils.SDF
 -swf workers/SDFWorker.swf
 -swf-version 11.4

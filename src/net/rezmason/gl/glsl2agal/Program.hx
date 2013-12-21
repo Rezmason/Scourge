@@ -1,7 +1,5 @@
 package net.rezmason.gl.glsl2agal;
 
-import haxe.io.Bytes;
-
 import flash.display3D.Context3D;
 import flash.display3D.Context3DProgramType;
 import flash.display3D.Context3DVertexBufferFormat;
@@ -13,6 +11,7 @@ import flash.utils.ByteArray;
 import flash.Vector;
 
 import net.rezmason.gl.glsl2agal.Types;
+import net.rezmason.utils.Minion;
 import net.rezmason.utils.TempAgency;
 
 /**
@@ -39,7 +38,7 @@ class Program {
 
     public static function load(context3D:Context3D, vertSource:String, fragSource:String, onLoaded:Program->Void):Void {
 
-        if (agency == null) agency = new TempAgency(getBytes('workers/GLSL2AGALConverter.swf'));
+        if (agency == null) agency = new TempAgency(Minion.makeMinion('glsl2agal.hxml'));
 
         var vertShader:Shader = null;
         var fragShader:Shader = null;
@@ -127,12 +126,4 @@ class Program {
     inline function makeLoc(index:Int, flag:Int):Int return ((flag & 0xFF) << 24) | (index & 0x00FFFFFF);
     inline function getLocFlag(loc:Int):Int return (loc >> 24) & 0xFF;
     inline function getLocIndex(loc:Int):Int return loc & 0x00FFFFFF;
-
-    inline static function getBytes(id:String):Bytes {
-        #if openfl
-            return Bytes.ofData(openfl.Assets.getBytes(id));
-        #else
-            return haxe.Resource.getBytes(id);
-        #end
-    }
 }

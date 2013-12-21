@@ -1,3 +1,4 @@
+##MINION##
 -main net.rezmason.utils.TestWorker
 -swf workers/TestWorker.swf
 -swf-version 11.4
@@ -8,6 +9,7 @@
 
 --next
 
+##MINION##
 -main net.rezmason.utils.TestWorker
 -js workers/TestWorker.js
 -cp test
