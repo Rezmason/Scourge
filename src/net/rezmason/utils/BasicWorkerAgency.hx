@@ -3,11 +3,20 @@ package net.rezmason.utils;
 import haxe.io.Bytes;
 
 #if flash
-    import flash.events.Event;
-    import flash.utils.ByteArray;
     import flash.system.MessageChannel;
     import flash.system.Worker;
     import flash.system.WorkerDomain;
+#elseif cpp
+    import cpp.vm.Thread;
+#elseif neko
+    import neko.vm.Thread;
+#end
+
+#if (flash || js)
+    typedef Core<T, U> = Bytes;
+#elseif (neko || cpp)
+    typedef Core<T, U> = Class<BasicWorker<T, U>>;
+    typedef Worker = Thread;
 #end
 
 class BasicWorkerAgency<T, U> {
@@ -19,19 +28,21 @@ class BasicWorkerAgency<T, U> {
         var outgoing:MessageChannel;
     #end
 
-    public function new(bytes:Bytes):Void {
+    public function new(core:Core<T, U>):Void {
         #if flash
-            worker = WorkerDomain.current.createWorker(bytes.getData());
+            worker = WorkerDomain.current.createWorker(core.getData());
             incoming = worker.createMessageChannel(Worker.current);
             outgoing = Worker.current.createMessageChannel(worker);
-            worker.setSharedProperty("incoming", outgoing);
-            worker.setSharedProperty("outgoing", incoming);
-            incoming.addEventListener(Event.CHANNEL_MESSAGE, onIncoming);
+            worker.setSharedProperty('incoming', outgoing);
+            worker.setSharedProperty('outgoing', incoming);
+            incoming.addEventListener('channelMessage', onIncoming);
         #elseif js
-            var blob = new Blob([bytes.toString()]);
+            var blob = new Blob([core.toString()]);
             var url:String = untyped __js__('window').URL.createObjectURL(blob);
             worker = new Worker(url);
             worker.addEventListener('message', onIncoming);
+        #elseif (neko || cpp)
+            worker = encloseInstance(core, onIncoming);
         #end
     }
 
@@ -44,6 +55,8 @@ class BasicWorkerAgency<T, U> {
     public function die():Void {
         #if (flash || js)
             worker.terminate();
+        #elseif (neko || cpp)
+            worker.sendMessage('__die__');
         #end
     }
 
@@ -52,17 +65,18 @@ class BasicWorkerAgency<T, U> {
             outgoing.send(data);
         #elseif js
             worker.postMessage(data);
+        #elseif (neko || cpp)
+            worker.sendMessage(data);
         #end
     }
 
     function receive(data:U):Void {}
 
-    function onIncoming(event:Dynamic):Void {
-        var data:Dynamic = null;
+    function onIncoming(data:Dynamic):Void {
         #if flash
             data = incoming.receive();
         #elseif js
-            data = event.data;
+            data = data.data;
         #end
 
         if (Reflect.hasField(data, '__error')) onErrorIncoming(data.__error);
@@ -70,6 +84,22 @@ class BasicWorkerAgency<T, U> {
     }
 
     function onErrorIncoming(error:Dynamic):Void throw error;
+
+    #if (neko || cpp)
+        static function encloseInstance<T, U>(clazz:Class<BasicWorker<T, U>>, incoming:Dynamic->Void):Thread {
+            function func():Void {
+                var __clazz:Class<BasicWorker<T, U>> = Thread.readMessage(true);
+                var instance:BasicWorker<T, U> = Type.createInstance(__clazz, []);
+                instance.breathe();
+            }
+
+            var thread:Thread = Thread.create(func);
+            thread.sendMessage(clazz);
+            thread.sendMessage(incoming);
+
+            return thread;
+        }
+    #end
 }
 
 #if js

@@ -4,10 +4,10 @@ package net.rezmason.utils;
     import flash.events.Event;
     import flash.system.MessageChannel;
     import flash.system.Worker;
-#end
-
-#if flash
-    typedef Boss = Worker;
+#elseif cpp
+    import cpp.vm.Thread;
+#elseif neko
+    import neko.vm.Thread;
 #end
 
 class BasicWorker<T, U> {
@@ -17,16 +17,22 @@ class BasicWorker<T, U> {
         var outgoing:MessageChannel;
     #elseif js
         var self:Dynamic;
+    #elseif (neko || cpp)
+        var dead:Bool;
+        var outgoing:U->Void;
     #end
 
     public function new():Void {
         #if flash
-            incoming = Boss.current.getSharedProperty('incoming');
-            outgoing = Boss.current.getSharedProperty('outgoing');
+            incoming = Worker.current.getSharedProperty('incoming');
+            outgoing = Worker.current.getSharedProperty('outgoing');
             incoming.addEventListener(Event.CHANNEL_MESSAGE, onIncoming);
         #elseif js
             self = untyped __js__('self');
             self.onmessage = onIncoming;
+        #elseif (neko || cpp)
+            dead = false;
+            outgoing = Thread.readMessage(true);
         #end
     }
 
@@ -35,6 +41,8 @@ class BasicWorker<T, U> {
             outgoing.send(data);
         #elseif js
             self.postMessage(data);
+        #elseif (neko || cpp)
+            outgoing(data);
         #end
     }
 
@@ -44,16 +52,30 @@ class BasicWorker<T, U> {
             outgoing.send(data);
         #elseif js
             self.postMessage(data);
+        #elseif (neko || cpp)
+            outgoing(data);
         #end
     }
 
-    @:final function onIncoming(event:Dynamic):Void {
+    @:final function onIncoming(data:Dynamic):Void {
         #if flash
-            receive(incoming.receive());
+            data = incoming.receive();
         #elseif js
-            receive(event.data);
+            data = data.data;
+        #elseif (neko || cpp)
+            if (data == '__die__') {
+                dead = true;
+                return;
+            }
         #end
+
+        receive(data);
     }
 
     function receive(data:T):Void {}
+
+    #if (neko || cpp)
+        @:allow(net.rezmason.utils.BasicWorkerAgency)
+        function breathe():Void while (!dead) onIncoming(Thread.readMessage(true));
+    #end
 }
