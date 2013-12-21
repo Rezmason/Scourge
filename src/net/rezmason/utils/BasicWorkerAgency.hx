@@ -89,8 +89,9 @@ class BasicWorkerAgency<T, U> {
         static function encloseInstance<T, U>(clazz:Class<BasicWorker<T, U>>, incoming:Dynamic->Void):Thread {
             function func():Void {
                 var __clazz:Class<BasicWorker<T, U>> = Thread.readMessage(true);
+                var __outgoing:U->Void = Thread.readMessage(true);
                 var instance:BasicWorker<T, U> = Type.createInstance(__clazz, []);
-                instance.breathe();
+                instance.breathe(Thread.readMessage.bind(true), __outgoing);
             }
 
             var thread:Thread = Thread.create(func);

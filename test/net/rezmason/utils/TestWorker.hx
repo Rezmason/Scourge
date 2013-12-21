@@ -2,9 +2,7 @@ package net.rezmason.utils;
 
 class TestWorker extends BasicWorker<Int, String> {
 
-    #if (flash || js)
-        static var worker:TestWorker = new TestWorker();
-    #end
+    static var worker:TestWorker = new TestWorker();
 
     static function main():Void {}
 

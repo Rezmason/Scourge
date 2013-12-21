@@ -1,13 +1,8 @@
 package net.rezmason.utils;
 
 #if flash
-    import flash.events.Event;
     import flash.system.MessageChannel;
     import flash.system.Worker;
-#elseif cpp
-    import cpp.vm.Thread;
-#elseif neko
-    import neko.vm.Thread;
 #end
 
 class BasicWorker<T, U> {
@@ -26,13 +21,12 @@ class BasicWorker<T, U> {
         #if flash
             incoming = Worker.current.getSharedProperty('incoming');
             outgoing = Worker.current.getSharedProperty('outgoing');
-            incoming.addEventListener(Event.CHANNEL_MESSAGE, onIncoming);
+            incoming.addEventListener('channelMessage', onIncoming);
         #elseif js
             self = untyped __js__('self');
             self.onmessage = onIncoming;
         #elseif (neko || cpp)
             dead = false;
-            outgoing = Thread.readMessage(true);
         #end
     }
 
@@ -76,6 +70,9 @@ class BasicWorker<T, U> {
 
     #if (neko || cpp)
         @:allow(net.rezmason.utils.BasicWorkerAgency)
-        function breathe():Void while (!dead) onIncoming(Thread.readMessage(true));
+        function breathe(fetch:Void->T, outgoing:U->Void):Void {
+            this.outgoing = outgoing;
+            while (!dead) onIncoming(fetch());
+        }
     #end
 }

@@ -1,8 +1,5 @@
-Minion
-    C++ thread worker
-        The agency cannot receive data through Tread.readMessage
-        So pass each worker a callback to call instead
-        Remember to then to Thread.readMessage(true) in the worker
+Minion API
+    Can static instancing be provided in a macro?
 
 ScourgeAssetGen
     If you have multiple workers operating off a queue, it'll get done faster
