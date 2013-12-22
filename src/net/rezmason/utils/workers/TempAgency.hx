@@ -2,10 +2,7 @@ package net.rezmason.utils.workers;
 
 import haxe.io.Bytes;
 
-#if flash
-    import flash.events.Event;
-    import haxe.Timer;
-#end
+import haxe.Timer;
 
 class TempAgency<T, U> extends BasicBoss<T, U> {
 
@@ -32,12 +29,14 @@ class TempAgency<T, U> extends BasicBoss<T, U> {
         startup();
     }
 
-    override function onIncoming(event:Event):Void {
-        while (incoming.messageAvailable) {
-            var data:Dynamic = incoming.receive();
-            if (Reflect.hasField(data, '__error')) onErrorIncoming(data.__error);
-            else queue.shift()(data);
+    #if flash
+        override function onIncoming(data:Dynamic):Void {
+            while (incoming.messageAvailable) super.onIncoming(data);
         }
+    #end
+
+    override function receive(data:U):Void {
+        queue.shift()(data);
         if (queue.length == 0) beginCountdown();
     }
 
