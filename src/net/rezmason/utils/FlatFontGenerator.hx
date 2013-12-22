@@ -15,9 +15,9 @@ import flash.text.engine.TextLine;
 import flash.text.Font;
 import flash.utils.ByteArray;
 
-import net.rezmason.utils.TempAgency;
-import net.rezmason.utils.Minion;
 import net.rezmason.utils.FlatFont;
+import net.rezmason.utils.workers.TempAgency;
+import net.rezmason.utils.workers.Golem;
 
 using haxe.JSON;
 
@@ -36,7 +36,7 @@ class FlatFontGenerator {
 
     public static function flatten(font:Font, fontSize:Int, charString:String, glyphWidth:Int, glyphHeight:Int, spacing:Int, cutoff:Int, cbk:FlatFont->Void):Void {
 
-        if (sdfAgency == null) sdfAgency = new TempAgency(Minion.makeMinion('SDFWorker.hxml'));
+        if (sdfAgency == null) sdfAgency = new TempAgency(Golem.rise('SDFWorker.hxml'));
 
         if (fontSize < 1) fontSize = 72;
         if (glyphWidth  < 0) glyphWidth  = 1;

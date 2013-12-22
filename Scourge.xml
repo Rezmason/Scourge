@@ -27,9 +27,6 @@
 	<!-- <haxedef name="ROPES_VERBOSE" /> -->
 	<!-- <haxedef name="ROPES_MACRO_VERBOSE" /> -->
 
-	<assets path="workers" rename="workers" include="*.swf" if="flash" />
-	<assets path="workers" rename="workers" include="*.js" if="js" />
-
 	<haxedef name="stage3d" if="flash" />
 	<haxedef name="glsl2agal" if="flash" />
 

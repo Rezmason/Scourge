@@ -1,7 +1,7 @@
 package net.rezmason.gl.glsl2agal;
 
 import net.rezmason.gl.glsl2agal.Types;
-import net.rezmason.utils.BasicWorker;
+import net.rezmason.utils.workers.BasicWorker;
 
 /**
 

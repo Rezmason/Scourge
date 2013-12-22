@@ -7,7 +7,7 @@ import flash.geom.Point;
 import flash.utils.ByteArray;
 import flash.Vector;
 import haxe.Timer;
-import net.rezmason.utils.BasicWorker;
+import net.rezmason.utils.workers.BasicWorker;
 
 class Datum {
     public var dx:Float;

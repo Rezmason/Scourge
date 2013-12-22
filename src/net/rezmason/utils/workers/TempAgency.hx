@@ -1,4 +1,4 @@
-package net.rezmason.utils;
+package net.rezmason.utils.workers;
 
 import haxe.io.Bytes;
 
@@ -7,7 +7,7 @@ import haxe.io.Bytes;
     import haxe.Timer;
 #end
 
-class TempAgency<T, U> extends BasicWorkerAgency<T, U> {
+class TempAgency<T, U> extends BasicBoss<T, U> {
 
     var queue:Array<U->Void>;
     var started:Bool;

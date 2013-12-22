@@ -1,5 +1,4 @@
-ScourgeAssetGen
-    If you have multiple workers operating off a queue, it'll get done faster
+TempAgency could spawn multiple workers
 
 Oh jesus christ
     http://www.clicktorelease.com/code/bumpy-metaballs/

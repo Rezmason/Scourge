@@ -1,8 +1,8 @@
-##MINION##
+##GOLEM##
 -main net.rezmason.gl.glsl2agal.Converter
 -swf-lib flash_libs/glsl2agal.swf
 -swf-lib flash_libs/agalminiassembler.swf
--swf workers/GLSL2AGALConverter.swf
+-swf golems/GLSL2AGALConverter.swf
 -swf-version 11.4
 -cp src
 #-debug

@@ -14,8 +14,6 @@
 
 	<haxedef name="haxeJSON" />
 
-	<assets path="workers" rename="workers" if="flash" />
-
 	<haxelib name="openfl" />
 	<haxelib name="format" />
 

@@ -11,8 +11,8 @@ import flash.utils.ByteArray;
 import flash.Vector;
 
 import net.rezmason.gl.glsl2agal.Types;
-import net.rezmason.utils.Minion;
-import net.rezmason.utils.TempAgency;
+import net.rezmason.utils.workers.Golem;
+import net.rezmason.utils.workers.TempAgency;
 
 /**
 
@@ -38,7 +38,7 @@ class Program {
 
     public static function load(context3D:Context3D, vertSource:String, fragSource:String, onLoaded:Program->Void):Void {
 
-        if (agency == null) agency = new TempAgency(Minion.makeMinion('glsl2agal.hxml'));
+        if (agency == null) agency = new TempAgency(Golem.rise('glsl2agal.hxml'));
 
         var vertShader:Shader = null;
         var fragShader:Shader = null;

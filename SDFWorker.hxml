@@ -1,6 +1,6 @@
-##MINION##
+##GOLEM##
 -main net.rezmason.utils.SDFWorker
--swf workers/SDFWorker.swf
+-swf golems/SDFWorker.swf
 -swf-version 11.4
 -cp src
 #-debug

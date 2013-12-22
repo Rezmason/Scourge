@@ -1,4 +1,4 @@
-package net.rezmason.utils;
+package net.rezmason.utils.workers;
 
 #if flash
     import flash.system.MessageChannel;
@@ -11,7 +11,7 @@ package net.rezmason.utils;
     using Lambda;
 #end
 
-#if !macro @:autoBuild(net.rezmason.utils.BasicWorker.build()) #end class BasicWorker<T, U> {
+#if !macro @:autoBuild(net.rezmason.utils.workers.BasicWorker.build()) #end class BasicWorker<T, U> {
 
     #if flash
         var incoming:MessageChannel;
@@ -75,7 +75,7 @@ package net.rezmason.utils;
     function receive(data:T):Void {}
 
     #if (neko || cpp)
-        @:allow(net.rezmason.utils.BasicWorkerAgency)
+        @:allow(net.rezmason.utils.workers.BasicBoss)
         function breathe(fetch:Void->T, outgoing:U->Void):Void {
             this.outgoing = outgoing;
             while (!dead) onIncoming(fetch());

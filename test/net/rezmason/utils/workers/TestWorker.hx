@@ -1,4 +1,4 @@
-package net.rezmason.utils;
+package net.rezmason.utils.workers;
 
 class TestWorker extends BasicWorker<Int, String> {
 

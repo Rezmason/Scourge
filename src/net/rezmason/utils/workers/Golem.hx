@@ -1,4 +1,4 @@
-package net.rezmason.utils;
+package net.rezmason.utils.workers;
 
 #if macro
     import haxe.io.Path;
@@ -9,23 +9,23 @@ package net.rezmason.utils;
     using Lambda;
 #end
 
-class Minion {
+class Golem {
 
-    static var minions:Array<String> = [];
+    #if macro static var golems:Array<String> = []; #end
 
-    macro public static function makeMinion(buildPath:String):Expr {
+    macro public static function rise(buildPath:String):Expr {
 
         var key:String = 'main';
         if (Context.defined('flash')) key = 'swf';
         else if (Context.defined('js')) key = 'js';
 
-        if (!FileSystem.exists(buildPath)) throw 'Minion "$buildPath" not found.';
+        if (!FileSystem.exists(buildPath)) throw 'Golem "$buildPath" not found.';
 
         var outputPath:String = null;
         var properBuild:String = null;
         for (build in File.getContent(buildPath).split('\n--next').map(cleanStr)) {
             var args:Array<String> = build.split('\n').map(cleanStr);
-            if (!args.has('##MINION##')) continue;
+            if (!args.has('##GOLEM##')) continue;
 
             for (arg in args) {
                 if (arg.indexOf('-$key ') == 0) {
@@ -42,7 +42,7 @@ class Minion {
             }
         }
 
-        if (outputPath == null) throw 'Minion "$buildPath" has no $key argument.';
+        if (outputPath == null) throw 'Golem "$buildPath" has no $key argument.';
 
         if (key == 'main') {
 
@@ -51,16 +51,16 @@ class Minion {
         } else {
 
             var path:Path = new Path(buildPath);
-            var minionID:String = 'MINION__$buildPath';
+            var minionID:String = 'GOLEM__$buildPath';
 
-            if (!minions.has(buildPath)) {
-                minions.push(buildPath);
+            if (!golems.has(buildPath)) {
+                golems.push(buildPath);
                 var origin:String = Sys.getCwd();
                 if (path.dir != null) Sys.setCwd(path.dir);
-                Sys.command('haxe', properBuild.split(' ').map(cleanStr).concat(['-D', 'MINION']));
+                Sys.command('haxe', properBuild.split(' ').map(cleanStr).concat(['-D', 'GOLEM']));
                 Sys.setCwd (origin);
                 if (path.dir != null) outputPath = Path.addTrailingSlash(path.dir) + outputPath;
-                if (!FileSystem.exists(outputPath)) throw 'Minion "$buildPath" output not found. Build failed?';
+                if (!FileSystem.exists(outputPath)) throw 'Golem "$buildPath" output not found. Build failed?';
                 Context.addResource(minionID, File.getBytes(outputPath));
             }
 

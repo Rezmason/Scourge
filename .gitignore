@@ -6,5 +6,5 @@ junk
 tables/*.n
 tables/*.json
 Export
-workers
+golems
 dump

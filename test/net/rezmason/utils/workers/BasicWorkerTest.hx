@@ -1,11 +1,9 @@
-package net.rezmason.utils;
+package net.rezmason.utils.workers;
 
 import haxe.Resource;
 
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
-
-import net.rezmason.utils.BasicWorkerAgency;
 
 class BasicWorkerTest
 {
@@ -67,13 +65,13 @@ class BasicWorkerTest
     }
 }
 
-class TestWorkerAgency extends BasicWorkerAgency<Int, String> {
+class TestWorkerAgency extends BasicBoss<Int, String> {
 
     var onReceive:String->Void;
     var onError:Void->Void;
 
     public function new(onReceive:String->Void, onError:Void->Void):Void {
-        super(Minion.makeMinion('testWorker.hxml'));
+        super(Golem.rise('testWorker.hxml'));
         this.onReceive = onReceive;
         this.onError = onError;
     }

@@ -1,6 +1,6 @@
-##MINION##
--main net.rezmason.utils.TestWorker
--swf workers/TestWorker.swf
+##GOLEM##
+-main net.rezmason.utils.workers.TestWorker
+-swf golems/TestWorker.swf
 -swf-version 11.4
 -cp test
 -cp src
@@ -9,9 +9,9 @@
 
 --next
 
-##MINION##
--main net.rezmason.utils.TestWorker
--js workers/TestWorker.js
+##GOLEM##
+-main net.rezmason.utils.workers.TestWorker
+-js golems/TestWorker.js
 -cp test
 -cp src
 #-debug

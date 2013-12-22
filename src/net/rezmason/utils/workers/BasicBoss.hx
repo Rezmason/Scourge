@@ -1,4 +1,4 @@
-package net.rezmason.utils;
+package net.rezmason.utils.workers;
 
 import haxe.io.Bytes;
 
@@ -19,7 +19,7 @@ import haxe.io.Bytes;
     typedef Worker = Thread;
 #end
 
-class BasicWorkerAgency<T, U> {
+class BasicBoss<T, U> {
 
     var worker:Worker;
 
