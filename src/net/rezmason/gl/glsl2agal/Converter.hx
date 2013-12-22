@@ -1,7 +1,7 @@
 package net.rezmason.gl.glsl2agal;
 
 import net.rezmason.gl.glsl2agal.Types;
-import net.rezmason.utils.TempWorker;
+import net.rezmason.utils.BasicWorker;
 
 /**
 
@@ -16,11 +16,9 @@ import net.rezmason.utils.TempWorker;
 
 **/
 
-class Converter {
+class Converter extends BasicWorker<GLSLInput, AGALOutput> {
 
-    static var worker:TempWorker<GLSLInput, AGALOutput> = new TempWorker(convert);
-
-    static function main():Void {}
+    override function receive(data:GLSLInput):Void send(convert(data));
 
     static function convert(input:GLSLInput):AGALOutput {
         var type:String = cast input.type;

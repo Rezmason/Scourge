@@ -1,11 +1,10 @@
-Minion API
-    Can static instancing be provided in a macro?
-
 ScourgeAssetGen
     If you have multiple workers operating off a queue, it'll get done faster
 
 Oh jesus christ
     http://www.clicktorelease.com/code/bumpy-metaballs/
+
+Move game into a Worker
 
 Human play (see todo)
 

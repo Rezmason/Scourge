@@ -5,7 +5,13 @@ package net.rezmason.utils;
     import flash.system.Worker;
 #end
 
-class BasicWorker<T, U> {
+#if macro
+    import haxe.macro.Context;
+    import haxe.macro.Expr;
+    using Lambda;
+#end
+
+#if !macro @:autoBuild(net.rezmason.utils.BasicWorker.build()) #end class BasicWorker<T, U> {
 
     #if flash
         var incoming:MessageChannel;
@@ -75,4 +81,49 @@ class BasicWorker<T, U> {
             while (!dead) onIncoming(fetch());
         }
     #end
+
+    macro public static function build():Array<Field> {
+        var fields:Array<Field> = Context.getBuildFields();
+        var path:Array<String> = Context.getLocalClass().get().module.split('.');
+        var packageName:Array<String> = path.copy();
+        var className:String = packageName.pop();
+
+
+        for (field in fields) {
+            if (field.name == 'main' && field.access.has(AStatic)) {
+                throw 'Classes that extend BasicWorker cannot declare a static main function.';
+            }
+
+            switch (field.kind) {
+                case FFun(func) if (field.name == 'new' && func.args.length > 0): {
+                    throw 'Classes that extend BasicWorker cannot have constructor arguments.';
+                }
+                case _:
+            }
+        }
+
+        // main function
+        fields.unshift({
+            name:'main',
+            access:[APublic, AStatic],
+            kind:FFun({
+                params:[],
+                args:[],
+                ret:null,
+                expr:macro instance = Type.createInstance($p{path}, []),
+            }),
+            pos:Context.currentPos(),
+        });
+
+        // instance variable
+        fields.unshift({
+            name:'instance',
+            access:[AStatic],
+            kind:FVar(null, macro null),
+            pos:Context.currentPos(),
+        });
+
+
+        return fields;
+    }
 }

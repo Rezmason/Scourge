@@ -7,7 +7,7 @@ import flash.geom.Point;
 import flash.utils.ByteArray;
 import flash.Vector;
 import haxe.Timer;
-import net.rezmason.utils.TempWorker;
+import net.rezmason.utils.BasicWorker;
 
 class Datum {
     public var dx:Float;
@@ -37,6 +37,22 @@ typedef SerializedBitmap = {
     var bytes:ByteArray;
 }
 
+typedef Work = {source:SerializedBitmap, cutoff:Int};
+
+class SDFWorker extends BasicWorker<Work, SerializedBitmap> {
+    override function receive(data:Work):Void {
+        #if debug
+            try {
+                send(SDF.process(data));
+            } catch (error:Dynamic) {
+                sendError(error);
+            }
+        #else
+            send(SDF.process(data));
+        #end
+    }
+}
+
 class SDF {
 
     var pendingData:Vector<Datum>;
@@ -49,11 +65,7 @@ class SDF {
     var cutoff:Int;
     var output:BitmapData;
 
-    static var worker:TempWorker<{source:SerializedBitmap, cutoff:Int}, SerializedBitmap> = new TempWorker(process);
-
-    static function main():Void {}
-
-    static function process(input:{source:SerializedBitmap, cutoff:Int}):SerializedBitmap {
+    public static function process(input:Work):SerializedBitmap {
         var bd:BitmapData = new BitmapData(input.source.width, input.source.height, true, 0x0);
         bd.setPixels(bd.rect, input.source.bytes);
 

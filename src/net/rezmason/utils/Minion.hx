@@ -57,7 +57,7 @@ class Minion {
                 minions.push(buildPath);
                 var origin:String = Sys.getCwd();
                 if (path.dir != null) Sys.setCwd(path.dir);
-                Sys.command('haxe', properBuild.split(' ').map(cleanStr));
+                Sys.command('haxe', properBuild.split(' ').map(cleanStr).concat(['-D', 'MINION']));
                 Sys.setCwd (origin);
                 if (path.dir != null) outputPath = Path.addTrailingSlash(path.dir) + outputPath;
                 if (!FileSystem.exists(outputPath)) throw 'Minion "$buildPath" output not found. Build failed?';
