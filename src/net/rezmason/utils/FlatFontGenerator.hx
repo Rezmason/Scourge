@@ -36,7 +36,10 @@ class FlatFontGenerator {
 
     public static function flatten(font:Font, fontSize:Int, charString:String, glyphWidth:Int, glyphHeight:Int, spacing:Int, cutoff:Int, cbk:FlatFont->Void):Void {
 
-        if (sdfAgency == null) sdfAgency = new TempAgency(Golem.rise('SDFWorker.hxml'));
+        if (sdfAgency == null) {
+            sdfAgency = new TempAgency(Golem.rise('SDFWorker.hxml'), 10);
+            sdfAgency.onDone = sdfAgency.die;
+        }
 
         if (fontSize < 1) fontSize = 72;
         if (glyphWidth  < 0) glyphWidth  = 1;

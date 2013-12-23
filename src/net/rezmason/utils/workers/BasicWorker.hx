@@ -11,7 +11,7 @@ package net.rezmason.utils.workers;
     using Lambda;
 #end
 
-#if !macro @:autoBuild(net.rezmason.utils.workers.BasicWorker.build()) #end class BasicWorker<T, U> {
+#if !macro @:autoBuild(net.rezmason.utils.workers.BasicWorker.build()) #end class BasicWorker<TInput, TOutput> {
 
     #if flash
         var incoming:MessageChannel;
@@ -19,9 +19,10 @@ package net.rezmason.utils.workers;
     #elseif js
         var self:Dynamic;
     #elseif (neko || cpp)
-        var dead:Bool;
-        var outgoing:U->Void;
+        var outgoing:TOutput->Void;
     #end
+
+    var dead:Bool;
 
     public function new():Void {
         #if flash
@@ -31,12 +32,12 @@ package net.rezmason.utils.workers;
         #elseif js
             self = untyped __js__('self');
             self.onmessage = onIncoming;
-        #elseif (neko || cpp)
-            dead = false;
         #end
+
+        dead = false;
     }
 
-    @:final function send(data:U):Void {
+    @:final function send(data:TOutput):Void {
         #if flash
             outgoing.send(data);
         #elseif js
@@ -72,11 +73,11 @@ package net.rezmason.utils.workers;
         receive(data);
     }
 
-    function receive(data:T):Void {}
+    function receive(data:TInput):Void {}
 
     #if (neko || cpp)
         @:allow(net.rezmason.utils.workers.BasicBoss)
-        function breathe(fetch:Void->T, outgoing:U->Void):Void {
+        function breathe(fetch:Void->TInput, outgoing:TOutput->Void):Void {
             this.outgoing = outgoing;
             while (!dead) onIncoming(fetch());
         }

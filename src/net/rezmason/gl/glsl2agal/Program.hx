@@ -38,7 +38,10 @@ class Program {
 
     public static function load(context3D:Context3D, vertSource:String, fragSource:String, onLoaded:Program->Void):Void {
 
-        if (agency == null) agency = new TempAgency(Golem.rise('glsl2agal.hxml'));
+        if (agency == null) {
+            agency = new TempAgency(Golem.rise('glsl2agal.hxml'), 2);
+            // agency.onDone = agency.die;
+        }
 
         var vertShader:Shader = null;
         var fragShader:Shader = null;
