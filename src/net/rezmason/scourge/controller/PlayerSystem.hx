@@ -12,6 +12,7 @@ class PlayerSystem {
     private var game:Game;
     private var floats:Array<Float>;
     private var playSignal:Zig<Player->GameEvent->Void>;
+    private var onAlert:Void->Void;
 
     function new():Void {
         game = new Game();
@@ -37,8 +38,8 @@ class PlayerSystem {
         }
     }
 
-    private function init(config:ScourgeConfig):Void game.begin(config, retrieveRandomFloat);
-    private function resume(save:SavedGame):Void game.begin(save.config, retrieveRandomFloat, save.state);
+    private function init(config:ScourgeConfig):Void game.begin(config, retrieveRandomFloat, onAlert);
+    private function resume(save:SavedGame):Void game.begin(save.config, retrieveRandomFloat, onAlert, save.state);
     private function endGame():Void game.end();
 
     private function announceReady():Void throw "Override this.";

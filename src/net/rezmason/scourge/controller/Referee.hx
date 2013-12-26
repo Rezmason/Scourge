@@ -57,7 +57,7 @@ class Referee {
         if (spectators == null) spectators = [];
         this.spectators = spectators;
         clearFloats();
-        game.begin(gameConfig, generateRandomFloat);
+        game.begin(gameConfig, generateRandomFloat, null);
         refereeCall(getFloatsAction());
         refereeCall(Init(SafeSerializer.run(gameConfig)));
         refereeCall(Connect);
@@ -73,7 +73,7 @@ class Referee {
         players = playerFactory.makePlayers(playerDefs, playSignal);
         if (spectators == null) spectators = [];
         this.spectators = spectators;
-        game.begin(gameConfig, generateRandomFloat, savedGame.state);
+        game.begin(gameConfig, generateRandomFloat, null, savedGame.state);
 
         refereeCall(Resume(SafeSerializer.run(savedGame)));
         refereeCall(Connect);

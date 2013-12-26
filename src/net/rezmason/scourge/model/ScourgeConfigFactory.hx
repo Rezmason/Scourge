@@ -36,7 +36,7 @@ class ScourgeConfigFactory {
     static var BITE:String               = Siphon.getClassName(BiteRule);
     static var SWAP_PIECE:String         = Siphon.getClassName(SwapPieceRule);
 
-    // static var DEBUG:String = Siphon.getClassName(DebugRule);
+    static var ALERT:String              = Siphon.getClassName(AlertRule);
 
     public static var ruleDefs:Map<String, Class<Rule>> = cast Siphon.getDefs('net.rezmason.scourge.model.rules', 'src', 'Rule');
 
@@ -99,7 +99,7 @@ class ScourgeConfigFactory {
         };
     }
 
-    public static function makeRuleConfig(config:ScourgeConfig, randomFunction:Void->Float, history:StateHistory, historyState:State):Map<String, Dynamic> {
+    public static function makeRuleConfig(config:ScourgeConfig, randomFunction:Void->Float, alertFunction:Void->Void, history:StateHistory, historyState:State):Map<String, Dynamic> {
         var buildCfg:BuildConfig = makeBuildConfig(history, historyState);
 
         var ruleConfig:Map<String, Dynamic> = [
@@ -118,17 +118,19 @@ class ScourgeConfigFactory {
             ONE_LIVING_PLAYER => null,
 
             // DEBUG => null,
+            ALERT => null,
         ];
 
         if (!config.allowAllPieces) ruleConfig.set(PICK_PIECE, makePickPieceConfig(config, buildCfg, randomFunction));
         if (config.includeCavities) ruleConfig.set(CAVITY, null);
         if (!config.allowAllPieces && config.maxSwaps > 0) ruleConfig.set(SWAP_PIECE, makeSwapConfig(config));
         if (config.maxBites > 0) ruleConfig.set(BITE, makeBiteConfig(config));
+        ruleConfig.set(ALERT, makeAlertConfig(alertFunction));
 
         return ruleConfig;
     }
 
-    public static function makeCombinedRuleCfg(config:ScourgeConfig):Map<String, Array<String>> {
+    public static function makeCombinedRuleCfg(config:ScourgeConfig, alert:Bool = false):Map<String, Array<String>> {
 
         var combinedRuleConfig:Map<String, Array<String>> = [
             CLEAN_UP => [DECAY, KILL_HEADLESS_BODY, ONE_LIVING_PLAYER],
@@ -136,17 +138,19 @@ class ScourgeConfigFactory {
 
             START_ACTION => [CLEAN_UP],
             QUIT_ACTION  => [FORFEIT, CLEAN_UP, WRAP_UP],
-            DROP_ACTION  => [DROP_PIECE, EAT_CELLS, CLEAN_UP, WRAP_UP, SKIPS_EXHAUSTED],
+            DROP_ACTION  => [DROP_PIECE, ALERT, EAT_CELLS, ALERT, CLEAN_UP, WRAP_UP, SKIPS_EXHAUSTED],
         ];
 
         if (config.includeCavities) combinedRuleConfig[CLEAN_UP].insert(1, CAVITY);
         if (!config.allowAllPieces && config.maxSwaps > 0) combinedRuleConfig[SWAP_ACTION] = [SWAP_PIECE, PICK_PIECE];
-        if (config.maxBites > 0) combinedRuleConfig[BITE_ACTION] = [BITE, CLEAN_UP];
+        if (config.maxBites > 0) combinedRuleConfig[BITE_ACTION] = [BITE, ALERT, CLEAN_UP];
 
         if (!config.allowAllPieces) {
             combinedRuleConfig[START_ACTION].push(PICK_PIECE);
             combinedRuleConfig[WRAP_UP].push(PICK_PIECE);
         }
+
+        if (!alert) for (config in combinedRuleConfig) while (config.remove(ALERT)) {};
 
         return combinedRuleConfig;
     }
@@ -245,7 +249,7 @@ class ScourgeConfigFactory {
     inline static function makeSkipsExhaustedConfig(config:ScourgeConfig) {
         return {
             maxSkips:config.maxSkips,
-        }
+        };
     }
 
     inline static function makeReplenishConfig(config:ScourgeConfig, buildCfg:BuildConfig) {
@@ -270,6 +274,12 @@ class ScourgeConfigFactory {
             stateProperties:stateReplenishProperties,
             playerProperties:[],
             nodeProperties:[],
+        };
+    }
+
+    inline static function makeAlertConfig(alertFunction:Void->Void) {
+        return {
+            alertFunction:alertFunction,
         };
     }
 }

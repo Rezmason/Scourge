@@ -14,6 +14,7 @@ class SimpleSpectator extends PlayerSystem implements Spectator {
         updateSignal = new Zig();
         updateSignal.add(onUpdate);
         viewSignal = new Zig();
+        onAlert = viewSignal.dispatch;
     }
 
     public function getGame():Game return game;

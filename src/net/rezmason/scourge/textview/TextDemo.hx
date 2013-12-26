@@ -82,12 +82,15 @@ class TextDemo {
         spectator.viewSignal.removeAll();
 
         var args:Array<String> = input.split(' ');
+        args.shift();
 
-        var circular:Bool = args.has('circular');
-
-        var numPlayers:Int = Std.parseInt(args[1]);
+        var numPlayers:Int = Std.parseInt(args.shift());
         if (numPlayers > 8) numPlayers = 8;
         if (numPlayers < 2) numPlayers = 2;
+
+        var botPeriod:Int = Std.parseInt(args.shift());
+
+        var circular:Bool = args.has('-circular');
 
         var cfg:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
         cfg.pieceTableIDs = cfg.pieces.getAllPieceIDsOfSize(4);
@@ -101,7 +104,6 @@ class TextDemo {
         cfg.maxBites = 0;
 
         var playerDefs:Array<PlayerDef> = [];
-        var botPeriod:Int = 10;
         var randFunc:Void->Float = randomFunction;
 
         if (args.has('replay')) {

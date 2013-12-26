@@ -1,9 +1,9 @@
-TempAgency could spawn multiple workers
-
-Oh jesus christ
-    http://www.clicktorelease.com/code/bumpy-metaballs/
-
-Move game into a Worker
+Move smarts and game into Workers
+    Because there's all kinds of smarts, they all go into the worker
+        Use an Enum to specify which smarts to use
+    Come up with an interface
+        Remember, all parameters must be simply serializable
+        Still, this has mostly been done.
 
 Human play (see todo)
 
@@ -106,21 +106,19 @@ A.I. thoughts
 
 Later
 
-    Rule-Option Paradigm Entity System
-    Create tic tac toe example for ROPES
-    Create readme and license files for ROPES
-    Migrate tests to tic tac toe
-    Move ROPES to a haxe lib
+    Package the Rule Oriented Paradigm Entity System so other people can use it
 
-    Maybe turn nodes into aspects
-    Store their neighbors on them
+        'Tie down your game design'
+        'Constraints can be a good thing'
 
-    Level Editing
-    Just a bunch of rules, aha
+        Create tic tac toe example for ROPES
+        Create readme and license files for ROPES
+        Migrate tests to tic tac toe
+        Move ROPES to a haxe lib
 
-    Infinite board
-    Expand board when placing a piece
-    Tough?
+    Level Editing - Just a bunch of demiurgic rules
+
+    Lazy board - only represents nodes near players, expands when necessary
 
     Destination goal rule
     Allow goal rules to apply to specific players
@@ -129,6 +127,11 @@ Metaballs should be simpler now
     Particles are added-together blurcles
     Screen-size quad gets textured and shaded in another pass
     Third pass renders the "real geom" and then overlays the metaballs on top
+
+Alternative: 2D metaballs in displacement map
+    Vertex shader:
+        - combines displacement map with normal map to increase height (with a curve)
+        - passes info to fragment shader; transition from surface to slime might be different for texture than for geom
 
 Texture synthesis
     Dots
