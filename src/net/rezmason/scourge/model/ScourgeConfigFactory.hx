@@ -31,12 +31,10 @@ class ScourgeConfigFactory {
     static var KILL_HEADLESS_BODY:String = Siphon.getClassName(KillHeadlessBodyRule);
     static var PICK_PIECE:String         = Siphon.getClassName(PickPieceRule);
     static var REPLENISH:String          = Siphon.getClassName(ReplenishRule);
-    static var SKIPS_EXHAUSTED:String    = Siphon.getClassName(SkipsExhaustedRule);
+    static var STALEMATE:String    = Siphon.getClassName(StalemateRule);
     static var ONE_LIVING_PLAYER:String  = Siphon.getClassName(OneLivingPlayerRule);
     static var BITE:String               = Siphon.getClassName(BiteRule);
     static var SWAP_PIECE:String         = Siphon.getClassName(SwapPieceRule);
-
-    static var ALERT:String              = Siphon.getClassName(AlertRule);
 
     public static var ruleDefs:Map<String, Class<Rule>> = cast Siphon.getDefs('net.rezmason.scourge.model.rules', 'src', 'Rule');
 
@@ -99,7 +97,7 @@ class ScourgeConfigFactory {
         };
     }
 
-    public static function makeRuleConfig(config:ScourgeConfig, randomFunction:Void->Float, alertFunction:Void->Void, history:StateHistory, historyState:State):Map<String, Dynamic> {
+    public static function makeRuleConfig(config:ScourgeConfig, randomFunction:Void->Float, history:StateHistory, historyState:State):Map<String, Dynamic> {
         var buildCfg:BuildConfig = makeBuildConfig(history, historyState);
 
         var ruleConfig:Map<String, Dynamic> = [
@@ -110,27 +108,23 @@ class ScourgeConfigFactory {
             DECAY => makeDecayConfig(config),
             DROP_PIECE => makeDropPieceConfig(config),
             REPLENISH => makeReplenishConfig(config, buildCfg),
-            SKIPS_EXHAUSTED => makeSkipsExhaustedConfig(config),
+            STALEMATE => makeSkipsExhaustedConfig(config),
 
             END_TURN => null,
             FORFEIT => null,
             KILL_HEADLESS_BODY => null,
             ONE_LIVING_PLAYER => null,
-
-            // DEBUG => null,
-            ALERT => null,
         ];
 
         if (!config.allowAllPieces) ruleConfig.set(PICK_PIECE, makePickPieceConfig(config, buildCfg, randomFunction));
         if (config.includeCavities) ruleConfig.set(CAVITY, null);
         if (!config.allowAllPieces && config.maxSwaps > 0) ruleConfig.set(SWAP_PIECE, makeSwapConfig(config));
         if (config.maxBites > 0) ruleConfig.set(BITE, makeBiteConfig(config));
-        ruleConfig.set(ALERT, makeAlertConfig(alertFunction));
 
         return ruleConfig;
     }
 
-    public static function makeCombinedRuleCfg(config:ScourgeConfig, alert:Bool = false):Map<String, Array<String>> {
+    public static function makeCombinedRuleCfg(config:ScourgeConfig):Map<String, Array<String>> {
 
         var combinedRuleConfig:Map<String, Array<String>> = [
             CLEAN_UP => [DECAY, KILL_HEADLESS_BODY, ONE_LIVING_PLAYER],
@@ -138,19 +132,17 @@ class ScourgeConfigFactory {
 
             START_ACTION => [CLEAN_UP],
             QUIT_ACTION  => [FORFEIT, CLEAN_UP, WRAP_UP],
-            DROP_ACTION  => [DROP_PIECE, ALERT, EAT_CELLS, ALERT, CLEAN_UP, WRAP_UP, SKIPS_EXHAUSTED],
+            DROP_ACTION  => [DROP_PIECE, EAT_CELLS, CLEAN_UP, WRAP_UP, STALEMATE],
         ];
 
         if (config.includeCavities) combinedRuleConfig[CLEAN_UP].insert(1, CAVITY);
         if (!config.allowAllPieces && config.maxSwaps > 0) combinedRuleConfig[SWAP_ACTION] = [SWAP_PIECE, PICK_PIECE];
-        if (config.maxBites > 0) combinedRuleConfig[BITE_ACTION] = [BITE, ALERT, CLEAN_UP];
+        if (config.maxBites > 0) combinedRuleConfig[BITE_ACTION] = [BITE, CLEAN_UP];
 
         if (!config.allowAllPieces) {
             combinedRuleConfig[START_ACTION].push(PICK_PIECE);
             combinedRuleConfig[WRAP_UP].push(PICK_PIECE);
         }
-
-        if (!alert) for (config in combinedRuleConfig) while (config.remove(ALERT)) {};
 
         return combinedRuleConfig;
     }

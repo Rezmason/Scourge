@@ -237,6 +237,7 @@ class DropPieceRule extends Rule {
         }
 
         state.aspects[pieceTableID_] = Aspect.NULL;
+        signalEvent();
     }
 
     override private function _collectMoves():Void movePool = allMoves.copy();

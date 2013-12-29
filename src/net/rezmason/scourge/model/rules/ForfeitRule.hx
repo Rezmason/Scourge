@@ -17,6 +17,7 @@ class ForfeitRule extends Rule {
 
     override private function _chooseMove(choice:Int):Void {
         getPlayer(state.aspects[currentPlayer_])[head_] = Aspect.NULL;
+        signalEvent();
     }
 }
 

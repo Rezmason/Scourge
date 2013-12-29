@@ -96,6 +96,7 @@ class PickPieceRule extends Rule {
         if (remakeHat()) buildHat();
         move = pickMoveFromHat();
         setPiece(move.pieceTableID, move.reflection, move.rotation);
+        signalEvent();
     }
 
     override private function _chooseQuantumMove(choice:Int):Void {

@@ -38,16 +38,16 @@ class Game {
         planner = new StatePlanner();
     }
 
-    public function begin(config:ScourgeConfig, randomFunction:Void->Float, alertFunction:Void->Void, savedState:SavedState = null):Int {
+    public function begin(config:ScourgeConfig, randomFunction:Void->Float, alertFunction:String->Void, savedState:SavedState = null):Int {
 
         if (hasBegun)
             throw 'The game has already begun; it cannot begin again until you end it.';
 
         // Build the game from the config
 
-        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, alertFunction, historian.history, historian.historyState);
+        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, historian.history, historian.historyState);
         var basicRules:Map<String, Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
-        var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config, alertFunction != null);
+        var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
 
         var combinedRules:Map<String, Rule> = RuleFactory.combineRules(combinedConfig, basicRules);
 
@@ -71,8 +71,8 @@ class Game {
         // Prime the rules with the state and plan
 
         // demiurgic ones go first
-        for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules[key].prime(state, plan);
-        for (rule in basicRulesArray) rule.prime(state, plan);
+        for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules[key].prime(state, plan, alertFunction);
+        for (rule in basicRulesArray) rule.prime(state, plan, alertFunction);
 
         // Grab some aspect pointers so we can quickly evaluate the state
 

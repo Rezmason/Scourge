@@ -42,6 +42,7 @@ class EndTurnRule extends Rule {
 
         state.aspects[currentPlayer_] = playerID;
         state.aspects[maxFreshness_] = 0;
+        signalEvent();
     }
 }
 

@@ -142,6 +142,7 @@ class EatCellsRule extends Rule {
             }
         }
         getPlayer(currentPlayer)[bodyFirst_] = getID(bodyNode);
+        signalEvent();
     }
 
     function getBody(playerID:Int):Array<AspectSet> {

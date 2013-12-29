@@ -77,7 +77,7 @@ class ScourgeRuleTest
         rules.unshift(buildStateRule);
 
         plan = new StatePlanner().planState(state, rules);
-        for (rule in rules) rule.prime(state, plan);
+        for (rule in rules) rule.prime(state, plan, null);
     }
 
     private function testListLength(expectedLength:Int, first:AspectSet, next:AspectPtr, prev:AspectPtr):Int {

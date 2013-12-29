@@ -127,7 +127,7 @@ class TextDemo {
         if (boardBody != null) {
             boardBody.attach(spectator.getGame(), referee.numPlayers);
             onResize();
-            spectator.viewSignal.add(boardBody.handleBoardUpdate);
+            spectator.viewSignal.add(boardBody.invalidateBoard);
         }
 
         setCurrentBody(boardBody);

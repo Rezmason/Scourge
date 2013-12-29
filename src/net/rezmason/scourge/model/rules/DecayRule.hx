@@ -72,6 +72,7 @@ class DecayRule extends Rule {
         }
 
         state.aspects[maxFreshness_] = maxFreshness;
+        signalEvent();
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {

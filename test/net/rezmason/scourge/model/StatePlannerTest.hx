@@ -50,7 +50,7 @@ class StatePlannerTest {
         var state:State = new State(key);
         var plan:StatePlan = planner.planState(state, rules);
 
-        for (rule in rules) if (rule != null) rule.prime(state, plan);
+        for (rule in rules) if (rule != null) rule.prime(state, plan, null);
 
         // Make sure there's the right aspects on the state
 

@@ -80,6 +80,8 @@ class BoardBody extends Body {
     var blankCode:Int;
     var fatCode:Int;
 
+    var invalid:Bool;
+
     var numPlayers:Int;
     var game:Game;
     var nodeViews:Array<NodeView>;
@@ -115,6 +117,7 @@ class BoardBody extends Body {
 
         nodeViews = [];
         wavePools = [];
+        invalid = false;
     }
 
     public function attach(game:Game, numPlayers:Int):Void {
@@ -210,7 +213,7 @@ class BoardBody extends Body {
         transform.append(homeTransform);
 
         headNodes = [];
-        handleBoardUpdate();
+        invalidateBoard();
     }
 
     public function detach():Void {
@@ -222,8 +225,12 @@ class BoardBody extends Body {
         for (glyph in glyphs) glyph.reset();
     }
 
-    public function handleBoardUpdate():Void {
+    public function invalidateBoard(?cause:String):Void {
+        trace(cause);
+        invalid = true;
+    }
 
+    private function updateBoard():Void {
         var itr:Int = 0;
         for (player in game.state.players) headNodes[itr++] = game.state.nodes[player[head_]];
 
@@ -450,6 +457,11 @@ class BoardBody extends Body {
             rawTransform.interpolateTo(plainTransform, 0.1);
             transform.copyFrom(rawTransform);
             transform.append(homeTransform);
+        }
+
+        if (invalid) {
+            updateBoard();
+            invalid = false;
         }
 
         for (pool in wavePools) pool.update(delta);

@@ -45,6 +45,7 @@ class SwapPieceRule extends Rule {
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
         getPlayer(currentPlayer)[numSwaps_] = numSwaps - 1;
         state.aspects[pieceTableID_] = Aspect.NULL;
+        signalEvent();
     }
 }
 

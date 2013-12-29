@@ -37,6 +37,9 @@ using net.rezmason.utils.Pointers;
 
     private function __initReqs():Void {}
     private function __initPtrs():Void {}
+    private function signalEvent():Void {}
+
+    var onSignal:String->Void;
 
     function new():Void {
         demiurgic = false;
@@ -51,9 +54,10 @@ using net.rezmason.utils.Pointers;
         __initReqs();
     }
 
-    @:final public function prime(state:State, plan:StatePlan):Void {
+    @:final public function prime(state:State, plan:StatePlan, onSignal:String->Void):Void {
         this.state = state;
         this.plan = plan;
+        this.onSignal = onSignal;
 
         ident_ = Ptr.intToPointer(0, state.key);
 
@@ -158,12 +162,15 @@ using net.rezmason.utils.Pointers;
         'update',
         'chooseMove',
         'chooseQuantumMove',
+        'signalEvent',
     ];
     #end
 
     macro public static function build():Array<Field> {
 
-        var msg:String = 'Building ${Context.getLocalClass().get().name}  ';
+        var className:String = Context.getLocalClass().get().name;
+
+        var msg:String = 'Building $className  ';
 
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
@@ -202,8 +209,11 @@ using net.rezmason.utils.Pointers;
 
         msg += '\n';
 
+        var signalEventBody:Expr = macro if (onSignal != null) onSignal($v{className});
+
         fields.push(overrider('__initReqs', declarations, pos));
         fields.push(overrider('__initPtrs', assignments, pos));
+        fields.push(overrider('signalEvent', [signalEventBody], pos));
 
         #if ROPES_MACRO_VERBOSE
             Sys.print(msg);

@@ -7,7 +7,7 @@ import net.rezmason.utils.Zig;
 class SimpleSpectator extends PlayerSystem implements Spectator {
 
     public var updateSignal(default, null):Zig<GameEvent->Void>;
-    public var viewSignal(default, null):Zig<Void->Void>;
+    public var viewSignal(default, null):Zig<String->Void>;
 
     public function new():Void {
         super();
@@ -21,8 +21,11 @@ class SimpleSpectator extends PlayerSystem implements Spectator {
 
     private function onUpdate(event:GameEvent):Void {
         processGameEventType(event.type);
-        // trace(event.type);
-        viewSignal.dispatch();
+
+        switch (event.type) {
+            case PlayerAction(action, move): viewSignal.dispatch('Player event');
+            case _:
+        }
     }
 
     override private function connect():Void {}

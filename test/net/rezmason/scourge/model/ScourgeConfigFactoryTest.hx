@@ -270,7 +270,7 @@ class ScourgeConfigFactoryTest
     }
 
     private function makeState():Void {
-        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, null, stateHistorian.history, stateHistorian.historyState);
+        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, stateHistorian.history, stateHistorian.historyState);
         basicRules = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
         var basicRulesArray:Array<Rule> = [];
         var demiurgicRules:StringMap<Rule> = new StringMap<Rule>();
@@ -286,8 +286,8 @@ class ScourgeConfigFactoryTest
         combinedRules = RuleFactory.combineRules(ScourgeConfigFactory.makeCombinedRuleCfg(config), basicRules);
 
         plan = new StatePlanner().planState(state, rules);
-        for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules.get(key).prime(state, plan);
-        for (rule in basicRulesArray) rule.prime(state, plan);
+        for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules.get(key).prime(state, plan, null);
+        for (rule in basicRulesArray) rule.prime(state, plan, null);
         startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
         biteAction = combinedRules.get('biteAction');
         swapAction = combinedRules.get('swapAction');

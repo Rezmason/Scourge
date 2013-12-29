@@ -107,6 +107,7 @@ class ReplenishRule extends Rule {
         updateReps(cfg.stateProperties, [state.aspects]);
         updateReps(cfg.playerProperties, state.players);
         updateReps(cfg.nodeProperties, state.nodes);
+        signalEvent();
     }
 
     private function makeReplenishable(repCfg:ReplenishableConfig, lookup:AspectLookup):AspectSet {

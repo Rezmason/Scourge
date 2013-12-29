@@ -200,6 +200,8 @@ class BiteRule extends Rule {
             state.aspects[maxFreshness_] = maxFreshness;
             getPlayer(currentPlayer)[numBites_] = numBites;
         }
+
+        signalEvent();
     }
 
     override private function _collectMoves():Void movePool = allMoves.copy();

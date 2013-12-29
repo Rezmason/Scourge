@@ -13,7 +13,7 @@ import net.rezmason.scourge.model.rules.EndTurnRule;
 import net.rezmason.scourge.model.rules.ForfeitRule;
 import net.rezmason.scourge.model.rules.KillHeadlessBodyRule;
 import net.rezmason.scourge.model.rules.OneLivingPlayerRule;
-import net.rezmason.scourge.model.rules.SkipsExhaustedRule;
+import net.rezmason.scourge.model.rules.StalemateRule;
 import net.rezmason.scourge.model.rules.DropPieceRule;
 import net.rezmason.scourge.model.rules.TestPieceRule;
 
@@ -150,8 +150,8 @@ class TurnRulesTest extends ScourgeRuleTest
     public function skipsExhaustedTest():Void {
 
         // Create a four-player game with a max skip of five times
-        var skipsExhaustedRule:SkipsExhaustedRule = new SkipsExhaustedRule({maxSkips:5});
-        makeState([skipsExhaustedRule], 4);
+        var stalemateRule:StalemateRule = new StalemateRule({maxSkips:5});
+        makeState([stalemateRule], 4);
 
         var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
@@ -164,8 +164,8 @@ class TurnRulesTest extends ScourgeRuleTest
             player[totalArea_] = 4 - ike;
         }
 
-        skipsExhaustedRule.update();
-        skipsExhaustedRule.chooseMove();
+        stalemateRule.update();
+        stalemateRule.chooseMove();
         Assert.areEqual(Aspect.NULL, state.aspects[winner_]);
 
         // Have each player skip one more time, then check for a winner
@@ -176,8 +176,8 @@ class TurnRulesTest extends ScourgeRuleTest
             player[totalArea_] = 4 - ike;
         }
 
-        skipsExhaustedRule.update();
-        skipsExhaustedRule.chooseMove();
+        stalemateRule.update();
+        stalemateRule.chooseMove();
         Assert.areEqual(3, state.aspects[winner_]);
     }
 

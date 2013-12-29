@@ -12,7 +12,7 @@ class PlayerSystem {
     private var game:Game;
     private var floats:Array<Float>;
     private var playSignal:Zig<Player->GameEvent->Void>;
-    private var onAlert:Void->Void;
+    private var onAlert:String->Void;
 
     function new():Void {
         game = new Game();

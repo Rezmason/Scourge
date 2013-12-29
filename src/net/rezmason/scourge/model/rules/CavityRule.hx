@@ -37,6 +37,7 @@ class CavityRule extends Rule {
         var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
         for (player in eachPlayer()) remapCavities(getID(player), maxFreshness);
         state.aspects[maxFreshness_] = maxFreshness;
+        signalEvent();
     }
 
     private function remapCavities(playerID:Int, maxFreshness:Int):Void {

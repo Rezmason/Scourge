@@ -12,7 +12,7 @@ typedef SkipsExhaustedConfig = {
     var maxSkips:Int;
 }
 
-class SkipsExhaustedRule extends Rule {
+class StalemateRule extends Rule {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @player(PlyAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
