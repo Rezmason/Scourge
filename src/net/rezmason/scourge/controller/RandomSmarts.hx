@@ -33,8 +33,8 @@ class RandomSmarts extends Smarts {
     private function attempt(actionIndex:Int):GameEventType {
         var type:GameEventType = null;
         var possible:Bool = actionIndex != -1 && moves[actionIndex].length > 0;
-        if (possible) type = PlayerAction(actionIndex, random(moves[actionIndex].length));
-        // if (possible) type = PlayerAction(actionIndex, 0);
+        if (possible) type = PlayerAction(SubmitMove(actionIndex, random(moves[actionIndex].length)));
+        // if (possible) type = PlayerAction(SubmitMove(actionIndex, 0));
         return type;
     }
 }

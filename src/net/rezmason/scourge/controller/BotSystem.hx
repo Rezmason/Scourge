@@ -53,17 +53,17 @@ class BotSystem extends PlayerSystem {
     override private function announceReady():Void {
         for (bot in botsByIndex) {
             bot.ready = true;
-            volley(bot, Ready);
+            volley(bot, PlayerAction(Ready));
         }
     }
 
-    override private function init(config:ScourgeConfig):Void {
-        super.init(config);
-        for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game);
+    override private function updateGame(actionIndex:Int, move:Int):Void {
+        super.updateGame(actionIndex, move);
+        for (bot in botsByIndex) volley(bot, PlayerAction(Synced));
     }
 
-    override private function resume(save:SavedGame):Void {
-        super.resume(save);
+    override private function init(configData:String, saveData:String):Void {
+        super.init(configData, saveData);
         for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game);
     }
 

@@ -1,6 +1,7 @@
 package net.rezmason.scourge.controller;
 
 import haxe.Unserializer;
+import net.rezmason.ropes.Types;
 import net.rezmason.scourge.controller.Types;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
@@ -21,25 +22,30 @@ class PlayerSystem {
 
     private function processGameEventType(type:GameEventType):Void {
         switch (type) {
-            case PlayerAction(action, move):
-                if (game.hasBegun) updateGame(action, move);
-                if (isMyTurn()) play();
+            case PlayerAction(action):
+                switch (action) {
+                    case SubmitMove(action, move):
+                        if (game.hasBegun) updateGame(action, move);
+                        // if (isMyTurn()) play();
+                    case _:
+                }
             case RefereeAction(action):
                 switch (action) {
-                    case AllReady: if (isMyTurn()) play();
+                    case AllReady | AllSynced: if (isMyTurn()) play();
                     case Connect: connect();
                     case Disconnect: disconnect();
-                    case Init(data): init(Unserializer.run(data));
+                    case Init(configData, saveData): init(configData, saveData);
                     case RandomFloats(data): appendFloats(Unserializer.run(data));
-                    case Resume(data): resume(Unserializer.run(data));
                     case Save:
                 }
-            case Ready:
         }
     }
 
-    private function init(config:ScourgeConfig):Void game.begin(config, retrieveRandomFloat, onAlert);
-    private function resume(save:SavedGame):Void game.begin(save.config, retrieveRandomFloat, onAlert, save.state);
+    private function init(configData:String, saveData:String):Void {
+        var savedState:SavedState = saveData != null ? Unserializer.run(saveData).state : null;
+        game.begin(Unserializer.run(configData), retrieveRandomFloat, onAlert, savedState);
+    }
+
     private function endGame():Void game.end();
 
     private function announceReady():Void throw "Override this.";

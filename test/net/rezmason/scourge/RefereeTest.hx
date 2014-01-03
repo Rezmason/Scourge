@@ -73,7 +73,8 @@ class RefereeTest {
         playerDefs = [Test(defer), Test(defer), Test(defer), Test(defer)];
 
         Assert.isFalse(referee.gameBegun);
-        referee.beginGame(playerDefs, null, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
+        var config:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
+        referee.beginGame(playerDefs, null, randomFunction, config);
         Assert.isTrue(referee.gameBegun);
 
         for (ike in 0...10)
@@ -105,7 +106,7 @@ class RefereeTest {
         referee.endGame();
         Assert.isFalse(referee.gameBegun);
 
-        referee.resumeGame(playerDefs, null, randomFunction, savedGame);
+        referee.resumeGame(playerDefs, null, randomFunction, config, savedGame);
         Assert.isTrue(referee.gameBegun);
 
         Assert.areEqual(board, referee.spitBoard());

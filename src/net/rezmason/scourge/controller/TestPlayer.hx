@@ -11,6 +11,7 @@ class TestPlayer extends PlayerSystem implements Player {
 
     public var index(default, null):Int;
     public var ready(default, null):Bool;
+    public var synced(default, null):Bool;
 
     private var proxy:TestProxy;
     private var smarts:Smarts;
@@ -24,6 +25,7 @@ class TestPlayer extends PlayerSystem implements Player {
         this.playSignal = playSignal;
         this.proxy = proxy;
         smarts = new RandomSmarts();
+        synced = true; // TestPlayer is always synced
 
         updateSignal = new Zig();
         updateSignal.add(function(event:GameEvent):Void processGameEventType(event.type));
@@ -31,16 +33,16 @@ class TestPlayer extends PlayerSystem implements Player {
 
     override private function announceReady():Void {
         ready = true;
-        volley(this, Ready);
+        volley(this, PlayerAction(Ready));
     }
 
-    override private function init(config:ScourgeConfig):Void {
-        super.init(config);
-        smarts.init(game);
+    override private function updateGame(actionIndex:Int, move:Int):Void {
+        super.updateGame(actionIndex, move);
+        volley(this, PlayerAction(Synced));
     }
 
-    override private function resume(save:SavedGame):Void {
-        super.resume(save);
+    override private function init(configData:String, saveData:String):Void {
+        super.init(configData, saveData);
         smarts.init(game);
     }
 

@@ -1,9 +1,16 @@
-Move smarts and game into Workers
-    Because there's all kinds of smarts, they all go into the worker
-        Use an Enum to specify which smarts to use
-    Come up with an interface
-        Remember, all parameters must be simply serializable
-        Still, this has mostly been done.
+Narrative step
+    Add "narrativePeriod" and "movePeriod"
+
+Clean up Referee
+    Merge "init" and "resume"
+    Use an enum
+    Somehow replays broke
+
+Move the logic into a Worker
+
+Board and narrative
+
+Narrative step
 
 Human play (see todo)
 

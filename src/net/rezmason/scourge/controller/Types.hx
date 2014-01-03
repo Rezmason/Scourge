@@ -22,22 +22,26 @@ typedef SavedGame = {
     var state:SavedState;
     var log:Array<GameEvent>;
     var floats:Array<Float>;
-    var config:ScourgeConfig;
     var timeSaved:Int;
 }
 
 enum GameEventType {
-    PlayerAction(action:Int, move:Int);
-    Ready;
+    PlayerAction(action:PlayerActionType);
     RefereeAction(action:RefereeActionType);
+}
+
+enum PlayerActionType {
+    SubmitMove(action:Int, move:Int);
+    Ready;
+    Synced;
 }
 
 enum RefereeActionType {
     AllReady;
+    AllSynced;
     Connect;
     Disconnect;
-    Resume(savedState:String);
     Save;
-    Init(config:String);
+    Init(config:String, ?savedState:String);
     RandomFloats(floats:String);
 }

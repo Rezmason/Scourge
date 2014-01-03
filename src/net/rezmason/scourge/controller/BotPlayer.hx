@@ -8,6 +8,7 @@ class BotPlayer implements Player {
 
     public var index(default, null):Int;
     public var ready(default, null):Bool;
+    public var synced(default, null):Bool;
 
     private var smarts:Smarts;
     private var period:Int;
@@ -19,6 +20,8 @@ class BotPlayer implements Player {
         this.index = index;
         this.smarts = smarts;
         this.period = period;
+
+        synced = true; // BotPlayer is always synced
 
         updateSignal = new Zig();
         updateSignal.add(signal.dispatch.bind(index));

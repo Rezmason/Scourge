@@ -108,7 +108,7 @@ class TextDemo {
 
         if (args.has('replay')) {
             if (referee.lastGame == null) return 'Referee has no replay.';
-            cfg = referee.lastGame.config;
+            cfg = referee.lastGameConfig;
             numPlayers = cfg.numPlayers;
             circular = cfg.circular;
             var log:Array<GameEvent> = referee.lastGame.log.filter(playerActionsOnly);
@@ -138,7 +138,7 @@ class TextDemo {
     function playerActionsOnly(event:GameEvent):Bool {
         var isPlayerAction:Bool = false;
         switch (event.type) {
-            case PlayerAction(action, move): isPlayerAction = true;
+            case PlayerAction(SubmitMove(action, move)): isPlayerAction = true;
             case _:
         }
         return isPlayerAction;

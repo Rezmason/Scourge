@@ -23,7 +23,7 @@ class SimpleSpectator extends PlayerSystem implements Spectator {
         processGameEventType(event.type);
 
         switch (event.type) {
-            case PlayerAction(action, move): viewSignal.dispatch('Player event');
+            case PlayerAction(SubmitMove(action, move)): viewSignal.dispatch('Player event');
             case _:
         }
     }

@@ -24,6 +24,7 @@ class Referee {
     var log:Array<GameEvent>;
     var floatsLog:Array<Float>;
     var allReady:Bool;
+    var allSynced:Bool;
     var randGen:RandGen;
     var floats:Array<Float>;
     var busy:Bool;
@@ -31,12 +32,14 @@ class Referee {
     var playSignal:Zig<Player->GameEvent->Void>;
 
     public var lastGame(default, null):SavedGame;
+    public var lastGameConfig(default, null):ScourgeConfig;
     public var gameBegun(get, never):Bool;
     public var numPlayers(get, never):Int;
 
     public function new():Void {
         game = new Game();
         allReady = false;
+        allSynced = true;
         busy = false;
         floats = [];
         playerFactory = new PlayerFactory();
@@ -63,25 +66,27 @@ class Referee {
         refereeCall(Connect);
     }
 
-    public function resumeGame(playerDefs:Array<PlayerDef>, spectators:Array<Spectator>, randGen:RandGen, savedGame:SavedGame):Void {
-        if (playerDefs.length != savedGame.config.numPlayers)
-            throw 'Player config specifies ${playerDefs.length} players: saved game specifies ${savedGame.config.numPlayers}';
+    public function resumeGame(playerDefs:Array<PlayerDef>, spectators:Array<Spectator>, randGen:RandGen, gameConfig:ScourgeConfig, savedGame:SavedGame):Void {
+        if (playerDefs.length != gameConfig.numPlayers)
+            throw 'Player config specifies ${playerDefs.length} players: saved game specifies ${gameConfig.numPlayers}';
 
         log = copyLog(savedGame.log);
         floatsLog = savedGame.floats.copy();
-        this.gameConfig = savedGame.config;
+        this.gameConfig = gameConfig;
         players = playerFactory.makePlayers(playerDefs, playSignal);
         if (spectators == null) spectators = [];
         this.spectators = spectators;
         game.begin(gameConfig, generateRandomFloat, null, savedGame.state);
 
-        refereeCall(Resume(SafeSerializer.run(savedGame)));
+        refereeCall(Init(SafeSerializer.run(gameConfig), SafeSerializer.run(savedGame)));
         refereeCall(Connect);
     }
 
     public function endGame():Void {
         lastGame = saveGame();
+        lastGameConfig = gameConfig;
         allReady = false;
+        allSynced = true;
         game.end();
         refereeCall(Disconnect);
         playSignal.remove(handlePlaySignal);
@@ -92,7 +97,7 @@ class Referee {
         refereeCall(Save);
         var savedLog:Array<GameEvent> = copyLog(log);
         var savedFloats:Array<Float> = floatsLog.copy();
-        return {state:game.save(), log:savedLog, floats:savedFloats, config:gameConfig, timeSaved:UnixTime.now()};
+        return {state:game.save(), log:savedLog, floats:savedFloats, timeSaved:UnixTime.now()};
     }
 
     public function spitBoard():String return game.spitBoard();
@@ -118,11 +123,7 @@ class Referee {
 
     private function handlePlaySignal(player:Player, event:GameEvent):Void {
 
-        if (busy)
-            throw 'Players must not dispatch events synchronously!';
-
-        if (!gameBegun)
-            throw 'Game has not begun!';
+        if (!gameBegun) throw 'Game has not begun!';
 
         var playerIndex:Int = players.indexOf(player);
 
@@ -133,18 +134,26 @@ class Referee {
         event.timeReceived = UnixTime.now();
 
         switch (event.type) {
-            case PlayerAction(action, move):
-                if (game.currentPlayer != playerIndex)
-                    throw 'Player $playerIndex cannot act at this time!';
-                clearFloats();
-                game.chooseMove(action, move);
-                refereeCall(getFloatsAction());
-                broadcastAndLog(event);
-                if (game.winner >= 0) endGame(); // TEMPORARY
-            case RefereeAction(_):
-                throw 'Players can\'t send referee calls!';
-            case Ready:
-                readyCheck();
+            case PlayerAction(actionType):
+                switch (actionType) {
+                    case SubmitMove(action, move):
+                        if (busy) {
+                            throw 'Players must not submit moves synchronously!';
+                        }
+
+                        if (game.currentPlayer != playerIndex) {
+                            throw 'Player $playerIndex cannot act at this time!';
+                        }
+                        clearFloats();
+                        game.chooseMove(action, move);
+                        refereeCall(getFloatsAction());
+                        allSynced = false;
+                        broadcastAndLog(event);
+                        if (game.winner >= 0) endGame(); // TEMPORARY
+                    case Ready: readyCheck();
+                    case Synced: syncCheck();
+                }
+            case RefereeAction(_): throw 'Players can\'t send referee calls!';
         }
     }
 
@@ -166,7 +175,6 @@ class Referee {
     private function readyCheck():Void {
         if (allReady) return;
         var wasBusy:Bool = busy;
-        //trace('BUSY: READY CHECK');
         busy = true;
         allReady = true;
         for (player in players) {
@@ -179,7 +187,23 @@ class Referee {
         if (allReady) refereeCall(AllReady);
 
         busy = wasBusy;
-        //trace(busy ? 'STILL BUSY' : 'FREE');
+    }
+
+    private function syncCheck():Void {
+        if (allSynced) return;
+        var wasBusy:Bool = busy;
+        busy = true;
+        allSynced = true;
+        for (player in players) {
+            if (!player.synced) {
+                allSynced = false;
+                break;
+            }
+        }
+
+        if (allSynced) refereeCall(AllSynced);
+
+        busy = wasBusy;
     }
 
     private inline static function copyLog(source:Array<GameEvent>):Array<GameEvent> {

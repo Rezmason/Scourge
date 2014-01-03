@@ -25,7 +25,7 @@ class ReplaySmarts extends Smarts {
             type = null;
         }
 
-        if (type == null) type = PlayerAction(actionIndicesByAction[QUIT_ACTION], 0);
+        if (type == null) type = PlayerAction(SubmitMove(actionIndicesByAction[QUIT_ACTION], 0));
         // trace(type);
         return type;
     }
