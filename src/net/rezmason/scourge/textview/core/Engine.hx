@@ -27,8 +27,7 @@ class Engine {
     var lastTimeStamp:Float;
 
     var utils:UtilitySet;
-    var bodies:Array<Body>;
-    var holes:Array<Int>;
+    var bodiesByID:Map<Int, Body>;
     var fontTextures:Map<String, GlyphTexture>;
 
     var mouseSystem:MouseSystem;
@@ -49,8 +48,7 @@ class Engine {
         width = 1;
         height = 1;
         framerate = 1000 / 30;
-        bodies = [];
-        holes = [];
+        bodiesByID = new Map();
     }
 
     public function init():Void {
@@ -72,10 +70,8 @@ class Engine {
 
     public function addBody(body:Body):Void {
         readyCheck();
-        if (!bodies.has(body)) {
-            var hole:Int = holes.length > 0 ? holes.pop() : bodies.length;
-            body.setID(hole);
-            bodies[hole] = body;
+        if (bodiesByID[body.id] == null) {
+            bodiesByID[body.id] = body;
             body.redrawHitSignal.add(mouseSystem.invalidate);
             body.adjustLayout(width, height);
         }
@@ -83,9 +79,8 @@ class Engine {
 
     public function removeBody(body:Body):Void {
         readyCheck();
-        if (bodies[body.id] == body) {
-            holes.push(body.id);
-            bodies[body.id] = null;
+        if (bodiesByID[body.id] == body) {
+            bodiesByID.remove(body.id);
             body.redrawHitSignal.remove(mouseSystem.invalidate);
         }
     }
@@ -136,7 +131,7 @@ class Engine {
         utils.drawUtil.setOutputBuffer(outputBuffer);
         utils.drawUtil.clear(method.backgroundColor);
 
-        for (body in bodies) {
+        for (body in bodiesByID) {
             if (body.numGlyphs == 0) continue;
             method.setMatrices(body.camera, body.transform);
             method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
@@ -156,7 +151,7 @@ class Engine {
         readyCheck();
         this.width = width;
         this.height = height;
-        for (body in bodies) body.adjustLayout(width, height);
+        for (body in bodiesByID) body.adjustLayout(width, height);
         mouseSystem.setSize(width, height);
         mainOutputBuffer.resize(width, height);
     }
@@ -185,15 +180,15 @@ class Engine {
 
     public function setKeyboardFocus(body:Body):Void {
         readyCheck();
-        if (bodies.has(body)) keyboardSystem.focusBodyID = body.id;
+        if (bodiesByID[body.id] == body) keyboardSystem.focusBodyID = body.id;
     }
 
-    public function eachBody():Iterator<Body> return bodies.iterator();
+    public function eachBody():Iterator<Body> return bodiesByID.iterator();
 
     function onTimer():Void {
         var timeStamp:Float = Timer.stamp();
         var delta:Float = timeStamp - lastTimeStamp;
-        for (body in bodies) body.update(delta);
+        for (body in bodiesByID) body.update(delta);
         lastTimeStamp = timeStamp;
     }
 
@@ -203,9 +198,7 @@ class Engine {
 
         var bodyID:Int = source.bodyID;
         var glyphID:Int = source.glyphID;
-        var target:Body = null;
-
-        if (bodyID >= 0 && bodyID < bodies.length) target = bodies[bodyID];
+        var target:Body = bodiesByID[bodyID];
 
         switch (interaction) {
             case MOUSE(type, oX, oY):
@@ -215,7 +208,7 @@ class Engine {
                         target = mouseDownTarget;
                         mouseDownTarget = null;
                     } else {
-                        for (body in bodies) {
+                        for (body in bodiesByID) {
                             if (!body.catchMouseInRect) continue;
                             if (body.viewRect.contains(oX / stage.stageWidth, oY / stage.stageHeight)) {
                                 glyphID = -1;

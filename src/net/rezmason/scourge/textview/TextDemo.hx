@@ -35,9 +35,7 @@ class TextDemo {
 
     var utils:UtilitySet;
     var fontTextures:Map<String, GlyphTexture>;
-    var splashBody:Body;
-    var testBody:TestBody;
-    // #if flash var videoBody:VideoBody; #end
+    var bodiesByName:Map<String, Body>;
     var boardBody:BoardBody;
     var uiBody:UIBody;
 
@@ -70,7 +68,8 @@ class TextDemo {
 
     function init():Void {
         addListeners();
-        makeScene();
+        makeInterpreter();
+        makeBodies();
     }
 
     function makeGame(input:String):String {
@@ -183,12 +182,7 @@ class TextDemo {
 
     function show(input:String):String {
         var bodyName:String = input.substr(input.indexOf(' ') + 1);
-        var body:Body = null;
-        switch (bodyName.toLowerCase()) {
-            case 'test': body = testBody;
-            case 'splash': body = splashBody;
-            case 'board': body = boardBody;
-        }
+        var body:Body = bodiesByName[bodyName.toLowerCase()];
         var str:String = null;
         if (body == null) str = '"$bodyName" not found.';
         else str = 'Showing "$bodyName"';
@@ -198,16 +192,8 @@ class TextDemo {
         return str;
     }
 
-    function makeScene():Void {
-
-        testBody = new TestBody(utils.bufferUtil, fontTextures['full']);
-
-        // #if flash engine.addBody(new VideoBody(utils.bufferUtil, fontTextures['full'])); #end
-
-        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full_fog']);
-
+    function makeInterpreter():Void {
         console = new ConsoleText();
-
         interpreter = new Interpreter();
         interpreter.connectToConsole(console);
 
@@ -218,35 +204,39 @@ class TextDemo {
         interpreter.addCommand('makeGame', new TextCommand(makeGame));
         interpreter.addCommand('print', new TextCommand(print));
         interpreter.addCommand('show', new TextCommand(show));
+    }
 
-        // TODO: signal handling
-        //*
+    function makeBodies():Void {
+        currentBodyViewRect = new Rectangle(0, 0, 0.6, 1);
+        bodiesByName = new Map();
+
+        boardBody = new BoardBody(utils.bufferUtil, fontTextures['full_fog']);
+        bodiesByName['board'] = cast boardBody;
+
+        var splashBody = new SplashBody(utils.bufferUtil, fontTextures['full']);
+        splashBody.viewRect = new Rectangle(0, 0, 1, 0.3);
+        bodiesByName['splash'] = cast splashBody;
+
+        bodiesByName['alphabet'] = cast new AlphabetBody(utils.bufferUtil, fontTextures['full']);
+        bodiesByName['sdf'] = cast new GlyphBody(utils.bufferUtil, fontTextures['full']);
+        bodiesByName['test'] = cast new TestBody(utils.bufferUtil, fontTextures['full']);
+        // #if flash bodiesByName['video'] = new VideoBody(utils.bufferUtil, fontTextures['full']); #end
+
         uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], console);
         var uiRect:Rectangle = new Rectangle(0.6, 0, 0.4, 1); // 0.6, 0, 0.4, 1
         uiRect.inflate(-0.0125, -0.0125);
         uiBody.viewRect = uiRect;
         engine.addBody(uiBody);
-        /**/
-
-        // engine.addBody(new AlphabetBody(utils.bufferUtil, fontTextures['full']));
-        // engine.addBody(new GlyphBody(utils.bufferUtil, fontTextures['full']));
-
-        splashBody = new SplashBody(utils.bufferUtil, fontTextures['full']);
-        splashBody.viewRect = new Rectangle(0, 0, 1, 0.3);
-        // engine.addBody(splashBody);
-
-        currentBodyViewRect = new Rectangle(0, 0, 0.6, 1);
-
-        onResize();
-        onActivate();
-
-        setCurrentBody(boardBody);
     }
 
     function addListeners():Void {
         stage.addEventListener(Event.ACTIVATE, onActivate);
         stage.addEventListener(Event.DEACTIVATE, onDeactivate);
         stage.addEventListener(Event.RESIZE, onResize);
+
+        // these kind of already happened, so we just trigger them
+        onResize();
+        onActivate();
     }
 
     function onResize(?event:Event):Void engine.setSize(stage.stageWidth, stage.stageHeight);

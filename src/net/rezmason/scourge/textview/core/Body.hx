@@ -13,7 +13,8 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class Body {
 
-    static var DEFAULT_VIEW_RECT:Rectangle = new Rectangle(0, 0, 1, 1);
+    inline static function DEFAULT_VIEW_RECT():Rectangle return new Rectangle(0, 0, 1, 1);
+    static var _ids:Int = 0;
 
     public var segments(default, null):Array<BodySegment>;
     public var id(default, null):Int;
@@ -38,13 +39,13 @@ class Body {
 
     function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
         redrawHitSignal = new Zig<Void->Void>();
-        id = 0;
+        id = ++_ids;
         this.bufferUtil = bufferUtil;
         scaleMode = SHOW_ALL;
         catchMouseInRect = true;
         glyphs = [];
         this.glyphTexture = glyphTexture;
-        viewRect = DEFAULT_VIEW_RECT;
+        viewRect = DEFAULT_VIEW_RECT();
 
         projection = makeProjection();
         vanishingPoint = new Point();
@@ -59,12 +60,6 @@ class Body {
         camera = new Matrix3D();
         glyphTransform = new Matrix3D();
         glyphTransform.appendScale(0.0001, 0.0001, 1); // Prevents blowouts
-    }
-
-    @:allow(net.rezmason.scourge.textview.core)
-    function setID(id:Int):Void {
-        this.id = id;
-        for (glyph in glyphs) glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id << 16);
     }
 
     function growTo(numGlyphs:Int):Void {
@@ -112,8 +107,8 @@ class Body {
 
         this.numGlyphs = numGlyphs;
 
-        setID(id >> 16);
         for (ike in numGlyphs...trueNumGlyphs) glyphs[ike].set_s(0);
+        for (glyph in glyphs) glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id << 16);
     }
 
     public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
@@ -212,7 +207,7 @@ class Body {
     }
 
     inline function set_viewRect(rect:Rectangle):Rectangle {
-        if (rect == null) rect = DEFAULT_VIEW_RECT;
+        if (rect == null) rect = DEFAULT_VIEW_RECT();
         if (rect.width <= 0 || rect.height <= 0) throw 'Body view rects cannot be null.';
         viewRect = rect;
         return rect;

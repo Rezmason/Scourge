@@ -46,7 +46,7 @@ class AlphabetBody extends Body {
 
             glyph.set_shape(x, y, 0, 1, 0);
             glyph.set_rgb(1, 1, 1);
-            glyph.set_i(0.2);
+            glyph.set_i(0.1);
             glyph.set_char(charCode, glyphTexture.font);
             glyph.set_paint(glyph.id | id << 16);
         }
@@ -65,11 +65,11 @@ class AlphabetBody extends Body {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {
-                    case ENTER: glyph.set_s(2);
-                    case EXIT: glyph.set_s(1);
-                    case MOUSE_DOWN: glyph.set_i(1);
-                    case MOUSE_UP, DROP: glyph.set_i(0);
-                    case CLICK: glyph.set_b(1 - glyph.get_b());
+                    case ENTER: glyph.set_f(0.7);
+                    case EXIT: glyph.set_f(0.5);
+                    case MOUSE_DOWN: glyph.set_p(0.01);
+                    case MOUSE_UP, DROP: glyph.set_p(0);
+                    case CLICK: glyph.set_s(3 - glyph.get_s());
                     case _:
                 }
             case KEYBOARD(type, key, char, shift, alt, ctrl):
