@@ -55,6 +55,7 @@ class StalemateRule extends Rule {
             }
 
             state.aspects[winner_] = largestPlayers.pop();
+            signalEvent();
         }
     }
 }

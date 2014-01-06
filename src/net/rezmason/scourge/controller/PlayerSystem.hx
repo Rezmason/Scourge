@@ -12,10 +12,14 @@ class PlayerSystem {
 
     private var game:Game;
     private var floats:Array<Float>;
-    private var playSignal:Zig<Player->GameEvent->Void>;
+    private var playSignal:PlaySignal;
     private var onAlert:String->Void;
+    private var syncPeriod:Null<Float>;
+    private var movePeriod:Null<Float>;
 
-    function new():Void {
+    function new(syncPeriod:Null<Float>, movePeriod:Null<Float>):Void {
+        this.syncPeriod = syncPeriod;
+        this.movePeriod = movePeriod;
         game = new Game();
         floats = [];
     }

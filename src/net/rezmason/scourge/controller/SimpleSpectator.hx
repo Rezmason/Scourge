@@ -9,8 +9,8 @@ class SimpleSpectator extends PlayerSystem implements Spectator {
     public var updateSignal(default, null):Zig<GameEvent->Void>;
     public var viewSignal(default, null):Zig<String->Void>;
 
-    public function new():Void {
-        super();
+    public function new(syncPeriod:Null<Float>, movePeriod:Null<Float>):Void {
+        super(syncPeriod, movePeriod);
         updateSignal = new Zig();
         updateSignal.add(onUpdate);
         viewSignal = new Zig();

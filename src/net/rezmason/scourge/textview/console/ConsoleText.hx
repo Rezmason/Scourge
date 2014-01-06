@@ -28,7 +28,8 @@ class ConsoleText extends UIText {
     public var execSignal(default, null):Zig<Array<TextToken>->Void>;
 
     public var frozen(get, set):Bool;
-    var waiting:Bool;
+    var hintingPreExecution:Bool;
+    var executing:Bool;
 
     var caretStyle:AnimatedStyle;
 
@@ -61,7 +62,7 @@ class ConsoleText extends UIText {
 
         setPlayer('rezmason', 0x30FF00);
 
-        caretStyle = cast styles.getStyleByName('caret');
+        caretStyle = cast styles.getStyleByName(Strings.CARET_STYLENAME);
         caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
 
         caretIndex = 0;
@@ -82,7 +83,8 @@ class ConsoleText extends UIText {
 
         frozenQueue = new List();
         frozen = false;
-        waiting = false;
+        executing = false;
+        hintingPreExecution = false;
     }
 
     public inline function declareStyles(dec:String):Void styles.extract(dec);
@@ -104,7 +106,7 @@ class ConsoleText extends UIText {
         var promptStyleName:String = 'prompt_' + currentPlayerName + Math.random();
 
         prompt =
-        '∂{name:head_$promptStyleName, basis:breathingprompt, r:$r, g:$g, b:$b}Ω' +
+        '∂{name:head_$promptStyleName, basis:${Strings.BREATHING_PROMPT_STYLENAME}, r:$r, g:$g, b:$b}Ω' +
         '§{name:$promptStyleName, r:$r, g:$g, b:$b} $currentPlayerName§{}' + Strings.PROMPT + styleEnd;
     }
 
@@ -115,7 +117,7 @@ class ConsoleText extends UIText {
 
         combinedText += outputString;
 
-        if (waiting) {
+        if (executing) {
             combinedText += Strings.WAIT_INDICATOR;
         } else {
             combinedText += prompt + printTokens(inputTokens, ' ', tokenIndex, caretIndex);
@@ -152,13 +154,20 @@ class ConsoleText extends UIText {
         this.tokenIndex = tokenIndex;
         this.caretIndex = caretIndex;
         this.hintTokens = hint;
+
+        if (hintingPreExecution) {
+            hintingPreExecution = false;
+            if (frozen) frozen = false;
+            onExecHint();
+        }
+
         textIsDirty = true;
     }
 
     public function receiveExec(output:Array<TextToken>, done:Bool):Void {
         if (done) {
             frozen = false;
-            waiting = false;
+            executing = false;
         }
 
         this.outputTokens = output;
@@ -197,6 +206,14 @@ class ConsoleText extends UIText {
     }
 
     inline function handleEnter():Void {
+        tokenIndex = inputTokens.length - 1;
+        frozen = true;
+        hintingPreExecution = true;
+        dispatchHintSignal(' ');
+    }
+
+    private function onExecHint():Void {
+
         var isEmpty:Bool = inputTokens.length == 1 && length(inputTokens[0].text) == 0;
 
         if (length(mainText) > 0) mainText += '\n';
@@ -209,7 +226,7 @@ class ConsoleText extends UIText {
 
         if (!isEmpty) {
             frozen = true;
-            waiting = true;
+            executing = true;
             appendHistEntry(inputTokens);
             dispatchExecSignal();
         }

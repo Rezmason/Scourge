@@ -22,12 +22,16 @@ import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.console.ConsoleText;
 import net.rezmason.scourge.textview.console.Interpreter;
 import net.rezmason.scourge.textview.console.TextCommand;
+import net.rezmason.scourge.textview.console.ArgsCommand;
 
 import net.rezmason.utils.FlatFont;
 
 using Lambda;
 
 class TextDemo {
+
+    static var playKeyHints:Array<String> = ['numPlayers', 'botPeriod'];
+    static var playFlagHints:Array<String> = ['replay', 'circular'];
 
     var engine:Engine;
 
@@ -72,56 +76,64 @@ class TextDemo {
         makeBodies();
     }
 
-    function makeGame(input:String):String {
+    function playGame(keyValuePairs:Map<String, String>, flags:Array<String>):String {
+
+        var syncPeriod:Float = 1;
+        var movePeriod:Float = 10;
 
         if (referee == null) referee = new Referee();
         else if (referee.gameBegun) referee.endGame();
 
-        if (spectator == null) spectator = new SimpleSpectator();
+        if (spectator == null) spectator = new SimpleSpectator(syncPeriod, movePeriod);
         spectator.viewSignal.removeAll();
 
-        var args:Array<String> = input.split(' ');
-        args.shift();
+        var isReplay:Bool = flags.has('replay');
 
-        var numPlayers:Int = Std.parseInt(args.shift());
+        var numPlayers:Int = Std.parseInt(keyValuePairs['numPlayers']);
         if (numPlayers > 8) numPlayers = 8;
         if (numPlayers < 2) numPlayers = 2;
 
-        var botPeriod:Int = Std.parseInt(args.shift());
+        var botPeriod:Int = Std.parseInt(keyValuePairs['botPeriod']);
 
-        var circular:Bool = args.has('-circular');
+        var circular:Bool = flags.has('circular');
 
         var cfg:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
         cfg.pieceTableIDs = cfg.pieces.getAllPieceIDsOfSize(4);
         cfg.allowRotating = true;
         cfg.circular = circular;
-        cfg.allowNowhereDrop = false;
+        cfg.allowNowhereDrop = true;
         cfg.numPlayers = numPlayers;
         cfg.includeCavities = true;
 
         cfg.maxSwaps = 0;
         cfg.maxBites = 0;
+        cfg.maxSkips = 3;
 
         var playerDefs:Array<PlayerDef> = [];
-        var randFunc:Void->Float = randomFunction;
+        var randGen:Void->Float = randomFunction;
 
-        if (args.has('replay')) {
+        if (isReplay) {
             if (referee.lastGame == null) return 'Referee has no replay.';
             cfg = referee.lastGameConfig;
             numPlayers = cfg.numPlayers;
             circular = cfg.circular;
             var log:Array<GameEvent> = referee.lastGame.log.filter(playerActionsOnly);
             var floats:Array<Float> = referee.lastGame.floats.copy();
-            randFunc = function() return floats.shift();
+            randGen = function() return floats.shift();
 
             while (playerDefs.length < numPlayers) playerDefs.push(Bot(new ReplaySmarts(log), botPeriod));
         } else {
             while (playerDefs.length < numPlayers) playerDefs.push(Bot(new RandomSmarts(), botPeriod));
         }
 
-        var spectators:Array<SimpleSpectator> = [spectator];
-
-        referee.beginGame(playerDefs, cast spectators, randFunc, cfg);
+        referee.beginGame({
+            playerDefs:playerDefs,
+            spectators:[spectator],
+            randGen:randGen,
+            gameConfig:cfg,
+            syncPeriod:syncPeriod,
+            movePeriod:movePeriod,
+        });
 
         if (boardBody != null) {
             boardBody.attach(spectator.getGame(), referee.numPlayers);
@@ -201,7 +213,9 @@ class TextDemo {
         interpreter.addCommand('setFont', new TextCommand(setFont));
         interpreter.addCommand('setFontSize', new TextCommand(setFontSize));
         interpreter.addCommand('setName', new TextCommand(setName));
-        interpreter.addCommand('makeGame', new TextCommand(makeGame));
+        // interpreter.addCommand('play', new TextCommand(playGame));
+        // interpreter.addCommand('replay', new TextCommand(playGame));
+        interpreter.addCommand('play', new ArgsCommand(playGame, playKeyHints, playFlagHints));
         interpreter.addCommand('print', new TextCommand(print));
         interpreter.addCommand('show', new TextCommand(show));
     }

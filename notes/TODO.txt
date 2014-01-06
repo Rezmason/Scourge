@@ -1,18 +1,7 @@
-Narrative step
-    Add "narrativePeriod" and "movePeriod"
-
-Clean up Referee
-    Merge "init" and "resume"
-    Use an enum
-    Somehow replays broke
-
-Move the logic into a Worker
-
-Board and narrative
-
-Narrative step
-
 Human play (see todo)
+Move the logic into a Worker
+Get referee to handle situations where a player takes too long to sync or move
+    "Player has been replaced with a bot of Level N"
 
 Depth of field in frag shader?
     Already got the vZ and deriv

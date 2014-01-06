@@ -62,6 +62,7 @@ class BoardBody extends Body {
     static var WALL_COLOR:Color = Colors.fromHex(0x606060);
     static var BODY_CHARS:String = Strings.ALPHANUMERICS;
 
+    /*
     var dragging:Bool;
     var dragX:Float;
     var dragY:Float;
@@ -69,6 +70,7 @@ class BoardBody extends Body {
     var rawTransform:Matrix3D;
     var homeTransform:Matrix3D;
     var plainTransform:Matrix3D;
+    */
 
     var boardScale:Float;
 
@@ -93,17 +95,20 @@ class BoardBody extends Body {
 
     var headNodes:Array<AspectSet>;
 
-    var wavePools:Array<WavePool>;
+    // wave pools - disabled
+    // var wavePools:Array<WavePool>;
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
 
         super(bufferUtil, glyphTexture);
 
+        /*
         dragging = false;
         dragStartTransform = new Matrix3D();
         rawTransform = new Matrix3D();
         homeTransform = new Matrix3D();
         plainTransform = new Matrix3D();
+        */
 
         boardCode = Utf8.charCodeAt('¤', 0);
         wallCode = Utf8.charCodeAt('#', 0);
@@ -116,7 +121,8 @@ class BoardBody extends Body {
         boardScale = 1;
 
         nodeViews = [];
-        wavePools = [];
+        // wave pools - disabled
+        // wavePools = [];
         invalid = false;
     }
 
@@ -128,15 +134,17 @@ class BoardBody extends Body {
         this.game = game;
         this.numPlayers = numPlayers;
 
+        // wave pools - disabled
+        /*
         for (ike in 0...numPlayers) {
             if (wavePools[ike] == null) {
                 wavePools[ike] = new WavePool(1);
                 wavePools[ike].addRipple(new Ripple(WaveFunctions.bolus, 1, 4., 0.5, 20));
-                wavePools[ike].addRipple(new Ripple(WaveFunctions.bolus, 0.5, 16., 0.5, 5));
             } else {
                 wavePools[ike].size = 1;
             }
         }
+        */
 
         ident_ = Ptr.intToPointer(0, game.state.key);
         occupier_ = game.plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
@@ -195,9 +203,14 @@ class BoardBody extends Body {
         var centerY:Float = (minY + maxY) * 0.5;
 
         boardScale = 18 / (maxX - minX);
+        /*
         homeTransform.identity();
         homeTransform.appendScale(boardScale, boardScale, boardScale);
         homeTransform.appendTranslation(0, 0, 0.5);
+        */
+        transform.identity();
+        transform.appendScale(boardScale, boardScale, boardScale);
+        transform.appendTranslation(0, 0, 0.5);
 
         for (view in nodeViews) {
             var x:Float = (view.x - centerX) * 0.065;
@@ -209,8 +222,10 @@ class BoardBody extends Body {
             view.z = z;
         }
 
+        /*
         transform = rawTransform.clone();
         transform.append(homeTransform);
+        */
 
         headNodes = [];
         invalidateBoard();
@@ -226,7 +241,7 @@ class BoardBody extends Body {
     }
 
     public function invalidateBoard(?cause:String):Void {
-        trace(cause);
+        // trace(cause);
         invalid = true;
     }
 
@@ -277,8 +292,8 @@ class BoardBody extends Body {
                 }
             }
 
-            // trace([ike, maxDistance + 1]);
-            wavePools[ike].size = maxDistance + 1;
+            // wave pools - disabled
+            // wavePools[ike].size = maxDistance + 1;
         }
 
         var wallNodeViews:Array<NodeView> = [];
@@ -318,7 +333,7 @@ class BoardBody extends Body {
                         code = headCode;
                         size = 1.5;
                     } else {
-                        // code = bodyCode;
+                        code = bodyCode;
                         // code = BODY_CHARS.charCodeAt(Std.random(Utf8.length(BODY_CHARS)));
                         // code = BODY_CHARS.charCodeAt(view.distance % Utf8.length(BODY_CHARS));
 
@@ -335,8 +350,8 @@ class BoardBody extends Body {
                     wiggleX = view.wiggleX;
                     wiggleY = view.wiggleY;
 
-                    if (wiggleX == 0) wiggleX = (Math.random() * 2 - 1) * 0.01;
-                    if (wiggleY == 0) wiggleY = (Math.random() * 2 - 1) * 0.01;
+                    // if (wiggleX == 0) wiggleX = (Math.random() * 2 - 1) * 0.01;
+                    // if (wiggleY == 0) wiggleY = (Math.random() * 2 - 1) * 0.01;
 
                 } else {
                     isVisible = false;
@@ -410,6 +425,7 @@ class BoardBody extends Body {
             }
         }
 
+        /*
         for (view in bodyNodeViews) {
             var itr:Int = 0;
             var flag:Int = 0;
@@ -434,6 +450,7 @@ class BoardBody extends Body {
                 glyph.set_char(code, glyphTexture.font);
             }
         }
+        */
     }
 
     public function handleUIUpdate():Void {
@@ -453,17 +470,21 @@ class BoardBody extends Body {
     }
 
     override public function update(delta:Float):Void {
+        /*
         if (!dragging) {
             rawTransform.interpolateTo(plainTransform, 0.1);
             transform.copyFrom(rawTransform);
             transform.append(homeTransform);
         }
+        */
 
         if (invalid) {
             updateBoard();
             invalid = false;
         }
 
+        // wave pools - disabled
+        /*
         for (pool in wavePools) pool.update(delta);
         for (view in nodeViews) {
             var playerID:Int = view.node[occupier_];
@@ -487,6 +508,7 @@ class BoardBody extends Body {
 
             }
         }
+        */
 
         super.update(delta);
     }
@@ -496,15 +518,16 @@ class BoardBody extends Body {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {
-                    case MOUSE_DOWN: startDrag(x, y);
-                    case MOUSE_UP, DROP: stopDrag();
-                    case MOVE, ENTER, EXIT: if (dragging) updateDrag(x, y);
+                    case MOUSE_DOWN: //startDrag(x, y);
+                    case MOUSE_UP, DROP: //stopDrag();
+                    case MOVE, ENTER, EXIT: //if (dragging) updateDrag(x, y);
                     case _:
                 }
             case _:
         }
     }
 
+    /*
     inline function startDrag(x:Float, y:Float):Void {
         dragging = true;
         dragStartTransform.copyFrom(rawTransform);
@@ -537,6 +560,7 @@ class BoardBody extends Body {
     inline function stopDrag():Void {
         dragging = false;
     }
+    */
 
     inline function getID(node:AspectSet):Int {
         return node[ident_];

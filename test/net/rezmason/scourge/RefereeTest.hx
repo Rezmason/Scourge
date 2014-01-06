@@ -40,7 +40,8 @@ class RefereeTest {
         function noop(game:Game, func:Void->Void) {}
 
         playerDefs = [Test(noop), Test(noop), Test(noop), Test(noop)];
-        referee.beginGame(playerDefs, null, randomFunction, ScourgeConfigFactory.makeDefaultConfig());
+        var config:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
+        referee.beginGame({playerDefs:playerDefs, randGen:randGen, gameConfig:config});
 
         var savedGame = referee.saveGame();
         var data:String = savedGame.state.data;
@@ -74,7 +75,8 @@ class RefereeTest {
 
         Assert.isFalse(referee.gameBegun);
         var config:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
-        referee.beginGame(playerDefs, null, randomFunction, config);
+        var refereeParams = {playerDefs:playerDefs, randGen:randGen, gameConfig:config, savedGame:null};
+        referee.beginGame(refereeParams);
         Assert.isTrue(referee.gameBegun);
 
         for (ike in 0...10)
@@ -93,7 +95,7 @@ class RefereeTest {
             }
         }
 
-        var savedGame = referee.saveGame();
+        refereeParams.savedGame = referee.saveGame();
         var board = referee.spitBoard();
 
         //trace(board);
@@ -106,7 +108,7 @@ class RefereeTest {
         referee.endGame();
         Assert.isFalse(referee.gameBegun);
 
-        referee.resumeGame(playerDefs, null, randomFunction, config, savedGame);
+        referee.beginGame(refereeParams);
         Assert.isTrue(referee.gameBegun);
 
         Assert.areEqual(board, referee.spitBoard());
@@ -115,5 +117,5 @@ class RefereeTest {
         Assert.isFalse(referee.gameBegun);
     }
 
-    private function randomFunction():Float { return 0; }
+    private function randGen():Float { return 0; }
 }

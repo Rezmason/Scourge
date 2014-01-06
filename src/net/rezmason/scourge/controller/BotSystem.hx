@@ -12,8 +12,8 @@ class BotSystem extends PlayerSystem {
     private var ballots:Array<GameEvent>;
     private var numBots:Int;
 
-    public function new():Void {
-        super();
+    public function new(syncPeriod:Null<Float>, movePeriod:Null<Float>):Void {
+        super(syncPeriod, movePeriod);
 
         botsByIndex = new Map();
         botSignal = new Zig();
@@ -21,7 +21,7 @@ class BotSystem extends PlayerSystem {
         numBots = 0;
     }
 
-    public function createPlayer(index:Int, playSignal:Zig<Player->GameEvent->Void>, smarts:Smarts, period:Int):Player {
+    public function createPlayer(index:Int, playSignal:PlaySignal, smarts:Smarts, period:Int):Player {
         var bot:BotPlayer = new BotPlayer(botSignal, index, smarts, period);
         botsByIndex[index] = bot;
         this.playSignal = playSignal;

@@ -27,4 +27,18 @@ class Utf8Utils {
         if (input != '') output = Utf8.length(input);
         return output;
     }
+
+    public inline static function trim(input:String, char:String = ' '):String {
+        return ltrim(rtrim(input, char), char);
+    }
+
+    public inline static function ltrim(input:String, char:String = ' '):String {
+        while (charAt(input, 0) == char) input = sub(input, 1);
+        return input;
+    }
+
+    public inline static function rtrim(input:String, char:String = ' '):String {
+        while (charAt(input, length(input) - 1) == char) input = sub(input, 0, length(input) - 1);
+        return input;
+    }
 }

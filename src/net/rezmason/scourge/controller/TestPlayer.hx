@@ -19,8 +19,8 @@ class TestPlayer extends PlayerSystem implements Player {
     @:allow(net.rezmason.scourge.controller.Referee)
     private var updateSignal:Zig<GameEvent->Void>;
 
-    public function new(index:Int, playSignal:Zig<Player->GameEvent->Void>, proxy:TestProxy):Void {
-        super();
+    public function new(index:Int, playSignal:PlaySignal, proxy:TestProxy, syncPeriod:Null<Float>, movePeriod:Null<Float>):Void {
+        super(syncPeriod, movePeriod);
         this.index = index;
         this.playSignal = playSignal;
         this.proxy = proxy;

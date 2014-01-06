@@ -12,7 +12,15 @@ import net.rezmason.utils.Zig;
 
 using Lambda;
 
-typedef RandGen = Void->Float;
+typedef RefereeParams = {
+    var playerDefs:Array<PlayerDef>;
+    var randGen:Void->Float;
+    var gameConfig:ScourgeConfig;
+    @:optional var spectators:Array<Spectator>;
+    @:optional var savedGame:SavedGame;
+    @:optional var syncPeriod:Float;
+    @:optional var movePeriod:Float;
+}
 
 class Referee {
 
@@ -25,11 +33,13 @@ class Referee {
     var floatsLog:Array<Float>;
     var allReady:Bool;
     var allSynced:Bool;
-    var randGen:RandGen;
+    var randGen:Void->Float;
     var floats:Array<Float>;
     var busy:Bool;
     var playerFactory:PlayerFactory;
-    var playSignal:Zig<Player->GameEvent->Void>;
+    var playSignal:PlaySignal;
+    var syncPeriod:Null<Float>;
+    var movePeriod:Null<Float>;
 
     public var lastGame(default, null):SavedGame;
     public var lastGameConfig(default, null):ScourgeConfig;
@@ -46,39 +56,41 @@ class Referee {
         playSignal = new Zig();
     }
 
-    public function beginGame(playerDefs:Array<PlayerDef>, spectators:Array<Spectator>, randGen:RandGen, gameConfig:ScourgeConfig):Void {
-        if (playerDefs.length != gameConfig.numPlayers)
-            throw 'Player config specifies ${playerDefs.length} players: game config specifies ${gameConfig.numPlayers}';
+    public function beginGame(params:RefereeParams):Void {
+
+        if (params.playerDefs.length != params.gameConfig.numPlayers) {
+            throw 'Player config specifies ${params.playerDefs.length} players: ' +
+                'game config specifies ${params.gameConfig.numPlayers}';
+        }
 
         playSignal.add(handlePlaySignal);
 
+        var savedGame:SavedGame = params.savedGame;
+        var serializedSavedGame:String = null;
+        var savedGameState:SavedState = null;
+
         log = [];
         floatsLog = [];
-        this.gameConfig = gameConfig;
-        this.randGen = randGen;
-        players = playerFactory.makePlayers(playerDefs, playSignal);
-        if (spectators == null) spectators = [];
-        this.spectators = spectators;
+
+        if (savedGame != null) {
+            log = copyLog(savedGame.log);
+            floatsLog = savedGame.floats.copy();
+            serializedSavedGame = SafeSerializer.run(savedGame);
+            savedGameState = savedGame.state;
+        }
+
+        gameConfig = params.gameConfig;
+        randGen = params.randGen;
+        syncPeriod = params.syncPeriod;
+        movePeriod = params.movePeriod;
+        spectators = params.spectators;
+        // Not sure if this belongs here.
+        players = playerFactory.makePlayers(params.playerDefs, playSignal, syncPeriod, movePeriod);
         clearFloats();
-        game.begin(gameConfig, generateRandomFloat, null);
+
+        game.begin(params.gameConfig, generateRandomFloat, null, savedGameState);
         refereeCall(getFloatsAction());
-        refereeCall(Init(SafeSerializer.run(gameConfig)));
-        refereeCall(Connect);
-    }
-
-    public function resumeGame(playerDefs:Array<PlayerDef>, spectators:Array<Spectator>, randGen:RandGen, gameConfig:ScourgeConfig, savedGame:SavedGame):Void {
-        if (playerDefs.length != gameConfig.numPlayers)
-            throw 'Player config specifies ${playerDefs.length} players: saved game specifies ${gameConfig.numPlayers}';
-
-        log = copyLog(savedGame.log);
-        floatsLog = savedGame.floats.copy();
-        this.gameConfig = gameConfig;
-        players = playerFactory.makePlayers(playerDefs, playSignal);
-        if (spectators == null) spectators = [];
-        this.spectators = spectators;
-        game.begin(gameConfig, generateRandomFloat, null, savedGame.state);
-
-        refereeCall(Init(SafeSerializer.run(gameConfig), SafeSerializer.run(savedGame)));
+        refereeCall(Init(SafeSerializer.run(params.gameConfig), serializedSavedGame));
         refereeCall(Connect);
     }
 
@@ -163,7 +175,9 @@ class Referee {
         //trace('BUSY: BROADCAST');
         busy = true;
         for (player in players) player.updateSignal.dispatch(Reflect.copy(event));
-        for (spectator in spectators) spectator.updateSignal.dispatch(Reflect.copy(event));
+        if (spectators != null) {
+            for (spectator in spectators) spectator.updateSignal.dispatch(Reflect.copy(event));
+        }
         busy = wasBusy;
         //trace(busy ? 'STILL BUSY' : 'FREE');
     }
