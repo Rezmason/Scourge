@@ -42,7 +42,9 @@ class ArgsCommand extends ConsoleCommand {
             tokens.push({text:'', type:PLAIN_TEXT});
             info.tokenIndex = 1;
             info.caretIndex = 0;
-        } else if (info.tokenIndex > 0) {
+        }
+
+        if (info.tokenIndex > 0) {
 
             if (info.char != '' && tokens.length > info.tokenIndex + 1) {
                 tokens.splice(info.tokenIndex + 1, tokens.length);
@@ -51,6 +53,7 @@ class ArgsCommand extends ConsoleCommand {
             var currentToken:TextToken = tokens[info.tokenIndex];
             var currentArg:String = ltrim(currentToken.text);
             var completed:Bool = false;
+            var showAllHints:Bool = false;
 
             // Is this a key/flag or a value?
             var upairedKeyCount:Int = 0;
@@ -74,14 +77,17 @@ class ArgsCommand extends ConsoleCommand {
 
             if (upairedKeyCount == 0) {
                 // keys and flags
+
                 if (completed) {
-                    if (flagHints.has(currentArg)) currentToken.styleName = FLAG_STYLENAME;
-                    else if (keyHints.has(currentArg)) currentToken.styleName = KEY_STYLENAME;
-                    else errorMessage = UNRECOGNIZED_PARAM;
+                    if (flagHints.has(currentArg)) {
+                        currentToken.styleName = FLAG_STYLENAME;
+                        showAllHints = true;
+                    } else if (keyHints.has(currentArg)) {
+                        currentToken.styleName = KEY_STYLENAME;
+                    }
                 } else {
                     var matchingKeyHints:Array<String> = keyHints.filter(hintMatchesArg.bind(_, currentArg));
                     var matchingFlagHints:Array<String> = flagHints.filter(hintMatchesArg.bind(_, currentArg));
-
                     if (matchingFlagHints.length > 0) hintTokens = hintTokens.concat(matchingFlagHints.map(hintToToken.bind(_, FLAG_STYLENAME)));
                     if ( matchingKeyHints.length > 0) hintTokens = hintTokens.concat( matchingKeyHints.map(hintToToken.bind(_,  KEY_STYLENAME)));
                     if (hintTokens.length == 0) errorMessage = UNRECOGNIZED_PARAM;
@@ -89,6 +95,7 @@ class ArgsCommand extends ConsoleCommand {
             } else {
                 // values
                 currentToken.styleName = VALUE_STYLENAME;
+                if (completed) showAllHints = true;
             }
 
             if (errorMessage != null) {
@@ -98,6 +105,11 @@ class ArgsCommand extends ConsoleCommand {
                 tokens.push({text:'', type:PLAIN_TEXT});
                 info.tokenIndex++;
                 info.caretIndex = 0;
+
+                if (showAllHints) {
+                    hintTokens = hintTokens.concat(flagHints.map(hintToToken.bind(_, FLAG_STYLENAME)));
+                    hintTokens = hintTokens.concat( keyHints.map(hintToToken.bind(_,  KEY_STYLENAME)));
+                }
             }
         }
 
