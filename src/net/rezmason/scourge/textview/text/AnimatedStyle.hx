@@ -10,14 +10,13 @@ class AnimatedStyle extends DynamicStyle {
     var easeFunc:Float->Float;
     var playing:Bool;
 
-    static var animationFields:Array<String> = ['period', 'phase', 'frames'];
+    static var animationFields:Array<String> = ['period', 'phase', 'frames', 'ease'];
 
     public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
         period = null;
         phase = null;
         time = 0;
         playing = true;
-        easeFunc = Quad.easeInOut;
         super(name, basis, initValues, mouseID);
         for (field in animationFields) values[field] = Reflect.field(initValues, field);
     }
@@ -73,6 +72,9 @@ class AnimatedStyle extends DynamicStyle {
 
         period = Math.abs(period);
         phase = ((phase % period) + period) % period;
+
+        easeFunc = Style.easeLibrary[cast values['ease']];
+        if (easeFunc == null) easeFunc = Quad.easeInOut;
 
         super.flatten();
     }

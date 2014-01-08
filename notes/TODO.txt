@@ -1,12 +1,13 @@
-Style the tokens differently
-    Style type should depend on token type
-        PLAIN_TEXT style is typed to Style
-        SHORTCUT style is typed to ButtonStyle
-            Wire it up to a helper.bind(token) function
-        CAPSULE style is typed to InputStyle
-            Rely on InputStyle to do its work; just set its state
+ease param for button, input and animated styles
 
-Token clicking ought to work too
+Style type should depend on token type
+    PLAIN_TEXT style is typed to Style
+    SHORTCUT style is typed to ButtonStyle
+        Wire it up to a helper.bind(token) function
+    CAPSULE style is typed to InputStyle
+        Rely on InputStyle to do its work; just set its state
+
+Token clicking
     Clicking on an input token should move the carets
     Shortcuts
         UIText broadcasts clicks to interpreter, which routes them to the proper command

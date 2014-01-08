@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.text;
 
-import net.kawa.tween.easing.*;
+import net.kawa.tween.easing.Quad;
 
 import net.rezmason.scourge.textview.core.Interaction;
 
@@ -17,12 +17,11 @@ class InputStyle extends DynamicStyle {
     var toIndex:Int;
     var ratio:Float;
 
-    static var inputFields:Array<String> = ['hint', 'valid', 'invalid', 'period'];
+    static var inputFields:Array<String> = ['hint', 'valid', 'invalid', 'period', 'ease'];
 
     public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
         period = null;
         time = 0;
-        easeFunc = Quad.easeInOut;
         fromIndex = 0;
         toIndex = 0;
         ratio = 1;
@@ -67,6 +66,8 @@ class InputStyle extends DynamicStyle {
         period = values['period'];
         if (period == null) period = 1;
         period = Math.abs(period);
+        easeFunc = Style.easeLibrary[cast values['ease']];
+        if (easeFunc == null) easeFunc = Quad.easeInOut;
         super.flatten();
     }
 }

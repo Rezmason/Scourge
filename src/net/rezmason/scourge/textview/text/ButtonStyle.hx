@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.text;
 
-import net.kawa.tween.easing.*;
+import net.kawa.tween.easing.Quad;
 
 import net.rezmason.scourge.textview.core.Interaction;
 
@@ -20,12 +20,11 @@ class ButtonStyle extends DynamicStyle {
     var mouseIsOver:Bool;
     var mouseIsDown:Bool;
 
-    static var buttonFields:Array<String> = ['up', 'over', 'down', 'period'];
+    static var buttonFields:Array<String> = ['up', 'over', 'down', 'period', 'ease'];
 
     public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
         period = null;
         time = 0;
-        easeFunc = Quad.easeInOut;
         fromIndex = 0;
         toIndex = 0;
         mouseIsOver = false;
@@ -94,6 +93,8 @@ class ButtonStyle extends DynamicStyle {
         period = values['period'];
         if (period == null) period = 1;
         period = Math.abs(period);
+        easeFunc = Style.easeLibrary[cast values['ease']];
+        if (easeFunc == null) easeFunc = Quad.easeInOut;
         super.flatten();
     }
 }

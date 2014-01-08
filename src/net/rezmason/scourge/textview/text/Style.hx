@@ -2,6 +2,7 @@ package net.rezmason.scourge.textview.text;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.utils.Siphon;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -17,6 +18,8 @@ class Style {
     var glyphs:Array<Glyph>;
     var mouseID:Int;
     var paint:Int;
+
+    static var easeLibrary:Map<String, Float->Float> = makeEaseLibrary();
 
     static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 'f', 's', 'p'];
 
@@ -92,5 +95,20 @@ class Style {
     public function flatten():Void {
         basics = [];
         for (ike in 0...styleFields.length) basics[ike] = Std.parseFloat('${values[styleFields[ike]]}');
+    }
+
+    static function makeEaseLibrary():Map<String, Float->Float> {
+        var lib:Map<String, Float->Float> = new Map();
+
+        var easeClasses:Map<String, Class<Dynamic>> = cast Siphon.getDefs('net.kawa.tween.easing', 'src');
+
+        for (key in easeClasses.keys()) {
+            var clazz = easeClasses[key];
+            for (field in Type.getClassFields(clazz)) {
+                var easeFunc:Dynamic = cast Reflect.field(clazz, field);
+                if (Reflect.isFunction(easeFunc)) lib['${key}_$field'] = cast easeFunc;
+            }
+        }
+        return lib;
     }
 }
