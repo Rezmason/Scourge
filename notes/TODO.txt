@@ -1,4 +1,32 @@
-Human play (see todo)
+Style the tokens differently
+    Style type should depend on token type
+        PLAIN_TEXT style is typed to Style
+        SHORTCUT style is typed to ButtonStyle
+            Wire it up to a helper.bind(token) function
+        CAPSULE style is typed to InputStyle
+            Rely on InputStyle to do its work; just set its state
+
+Token clicking ought to work too
+    Clicking on an input token should move the carets
+    Shortcuts
+        UIText broadcasts clicks to interpreter, which routes them to the proper command
+    Buttons should become non-interactive when they enter the main text
+        Replace button styles with their up states
+        Replace input styles similarly
+
+Support input types
+    RotationNotation
+        ~/[yuio]*/i
+    NodeCode
+        ~/[\da-f]*/i
+    CrawlScrawl
+        ~/[qweasdzxc]*/i
+
+Implement all non-play text commands
+
+Human players, GUISystem
+    Implement all text commands
+
 Move the logic into a Worker
 Get referee to handle situations where a player takes too long to sync or move
     "Player has been replaced with a bot of Level N"

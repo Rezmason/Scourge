@@ -192,13 +192,15 @@ class ConsoleText extends UIText {
             var right:String = sub(inputTokens[tokenIndex].text, caretIndex);
 
             if (length(left) > 0) {
-                var lim:Int = alt ? 0 : length(left) - 1;
-                if (lim == -1) lim = 0;
-                left = sub(left, 0, lim);
-                caretIndex = lim;
+                left = sub(left, 0, length(left) - 1);
+                caretIndex--;
+                inputTokens[tokenIndex].text = left + right;
+            } else {
+                tokenIndex--;
+                caretIndex = length(inputTokens[tokenIndex].text);
             }
 
-            inputTokens[tokenIndex].text = left + right;
+
             textIsDirty = true;
         }
 

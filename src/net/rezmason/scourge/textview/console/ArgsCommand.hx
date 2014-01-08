@@ -50,30 +50,42 @@ class ArgsCommand extends ConsoleCommand {
                 tokens.splice(info.tokenIndex + 1, tokens.length);
             }
 
+            var usedKeyHints:Map<String, Bool> = new Map();
+            var usedFlagHints:Map<String, Bool> = new Map();
+
             var currentToken:TextToken = tokens[info.tokenIndex];
-            var currentArg:String = ltrim(currentToken.text);
+            var currentArg:String = currentToken.text;
             var completed:Bool = false;
             var showAllHints:Bool = false;
-
-            // Is this a key/flag or a value?
-            var upairedKeyCount:Int = 0;
-            for (ike in 1...info.tokenIndex) {
-                switch (tokens[ike].styleName) {
-                    case KEY_STYLENAME: upairedKeyCount++;
-                    case VALUE_STYLENAME: upairedKeyCount--;
-                    case _:
-                }
-            }
-
             var errorMessage:String = null;
 
             if (info.char == ' ') {
                 currentArg = rtrim(currentArg);
                 currentToken.text = currentArg;
-                if (length(currentArg) > 0) completed = true;
+                info.caretIndex = length(currentArg);
+                if (length(currentArg) > 0 && currentToken.styleName != Strings.ERROR_HINT_STYLENAME) {
+                    completed = true;
+                }
             }
 
-            currentToken.styleName = null;
+            var remainingKeyHints:Array<String> = keyHints.copy();
+            var remainingFlagHints:Array<String> = flagHints.copy();
+
+            // Is this a key/flag or a value?
+            var upairedKeyCount:Int = 0;
+            for (ike in 1...info.tokenIndex) {
+                switch (tokens[ike].styleName) {
+                    case KEY_STYLENAME:
+                        upairedKeyCount++;
+                        remainingKeyHints.remove(tokens[ike].text);
+                    case VALUE_STYLENAME:
+                        upairedKeyCount--;
+                    case FLAG_STYLENAME:
+                        remainingFlagHints.remove(tokens[ike].text);
+                }
+            }
+
+            if (info.char != '') currentToken.styleName = null;
 
             if (upairedKeyCount == 0) {
                 // keys and flags
@@ -81,16 +93,18 @@ class ArgsCommand extends ConsoleCommand {
                 if (completed) {
                     if (flagHints.has(currentArg)) {
                         currentToken.styleName = FLAG_STYLENAME;
+                        remainingFlagHints.remove(currentArg);
                         showAllHints = true;
                     } else if (keyHints.has(currentArg)) {
                         currentToken.styleName = KEY_STYLENAME;
+                        remainingKeyHints.remove(currentArg);
                     }
                 } else {
-                    var matchingKeyHints:Array<String> = keyHints.filter(hintMatchesArg.bind(_, currentArg));
-                    var matchingFlagHints:Array<String> = flagHints.filter(hintMatchesArg.bind(_, currentArg));
+                    var matchingKeyHints:Array<String> = remainingKeyHints.filter(hintMatchesArg.bind(_, currentArg));
+                    var matchingFlagHints:Array<String> = remainingFlagHints.filter(hintMatchesArg.bind(_, currentArg));
                     if (matchingFlagHints.length > 0) hintTokens = hintTokens.concat(matchingFlagHints.map(hintToToken.bind(_, FLAG_STYLENAME)));
                     if ( matchingKeyHints.length > 0) hintTokens = hintTokens.concat( matchingKeyHints.map(hintToToken.bind(_,  KEY_STYLENAME)));
-                    if (hintTokens.length == 0) errorMessage = UNRECOGNIZED_PARAM;
+                    if (hintTokens.length == 0 && length(currentArg) > 0) errorMessage = UNRECOGNIZED_PARAM;
                 }
             } else {
                 // values
@@ -107,8 +121,8 @@ class ArgsCommand extends ConsoleCommand {
                 info.caretIndex = 0;
 
                 if (showAllHints) {
-                    hintTokens = hintTokens.concat(flagHints.map(hintToToken.bind(_, FLAG_STYLENAME)));
-                    hintTokens = hintTokens.concat( keyHints.map(hintToToken.bind(_,  KEY_STYLENAME)));
+                    hintTokens = hintTokens.concat( remainingKeyHints.map(hintToToken.bind(_,  KEY_STYLENAME)));
+                    hintTokens = hintTokens.concat(remainingFlagHints.map(hintToToken.bind(_, FLAG_STYLENAME)));
                 }
             }
         }

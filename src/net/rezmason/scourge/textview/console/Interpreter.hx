@@ -50,6 +50,10 @@ class Interpreter {
 
     function onHintSignal(tokens:Array<TextToken>, info:InputInfo):Void {
 
+        if (info.char != '' && tokens.length > info.tokenIndex + 1) {
+            tokens.splice(info.tokenIndex + 1, tokens.length);
+        }
+
         var commandName:String = tokens[0].text;
         if (tokens.length == 1) {
 
@@ -64,7 +68,7 @@ class Interpreter {
                 // We trim that space on the end.
                 commandName = rtrim(commandName);
                 tokens[0].text = commandName;
-                info.caretIndex--;
+                info.caretIndex = length(commandName);
 
                 // Does the command name match any registered command?
                 var command:ConsoleCommand = commandsByName[commandName];
