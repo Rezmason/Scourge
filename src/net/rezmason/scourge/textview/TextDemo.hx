@@ -19,7 +19,7 @@ import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
-import net.rezmason.scourge.textview.console.ConsoleText;
+import net.rezmason.scourge.textview.console.ConsoleUIMediator;
 import net.rezmason.scourge.textview.console.Interpreter;
 import net.rezmason.scourge.textview.console.TextCommand;
 import net.rezmason.scourge.textview.console.ArgsCommand;
@@ -47,7 +47,7 @@ class TextDemo {
     var spectator:SimpleSpectator;
     var turnFuncs:Array<Void->Void>;
 
-    var console:ConsoleText;
+    var console:ConsoleUIMediator;
     var interpreter:Interpreter;
 
     var currentBody:Body;
@@ -189,7 +189,12 @@ class TextDemo {
         var strName:String = input.substr(input.indexOf(' ') + 1);
         var str:String = Assets.getText('exampletext/$strName.txt');
         if (str == null) str = 'String $strName not found.';
-        return str;
+        return '\n$str';
+    }
+
+    function clear(input:String):String {
+        console.setText('');
+        return '';
     }
 
     function show(input:String):String {
@@ -205,7 +210,7 @@ class TextDemo {
     }
 
     function makeInterpreter():Void {
-        console = new ConsoleText();
+        console = new ConsoleUIMediator();
         interpreter = new Interpreter();
         interpreter.connectToConsole(console);
 
@@ -218,6 +223,7 @@ class TextDemo {
         interpreter.addCommand('play', new ArgsCommand(playGame, playKeyHints, playFlagHints));
         interpreter.addCommand('print', new TextCommand(print));
         interpreter.addCommand('show', new TextCommand(show));
+        interpreter.addCommand('clear', new TextCommand(clear));
     }
 
     function makeBodies():Void {

@@ -2,7 +2,7 @@ package net.rezmason.scourge.textview.text;
 
 import net.kawa.tween.easing.*;
 
-class AnimatedStyle extends DynamicStyle {
+class AnimatedStyle extends Style {
 
     public var time(default, set):Float;
     var period:Null<Float>;
@@ -12,13 +12,13 @@ class AnimatedStyle extends DynamicStyle {
 
     static var animationFields:Array<String> = ['period', 'phase', 'frames', 'ease'];
 
-    public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
+    public function new(dec:Dynamic, ?mouseID:Int):Void {
         period = null;
         phase = null;
         time = 0;
         playing = true;
-        super(name, basis, initValues, mouseID);
-        for (field in animationFields) values[field] = Reflect.field(initValues, field);
+        super(dec, mouseID);
+        for (field in animationFields) values[field] = Reflect.field(dec, field);
     }
 
     public function start(time:Float = 0):Void {

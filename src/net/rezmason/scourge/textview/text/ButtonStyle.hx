@@ -4,7 +4,7 @@ import net.kawa.tween.easing.Quad;
 
 import net.rezmason.scourge.textview.core.Interaction;
 
-class ButtonStyle extends DynamicStyle {
+class ButtonStyle extends Style {
 
     inline static var UP_FRAME:Int = 0;
     inline static var OVER_FRAME:Int = 1;
@@ -22,7 +22,7 @@ class ButtonStyle extends DynamicStyle {
 
     static var buttonFields:Array<String> = ['up', 'over', 'down', 'period', 'ease'];
 
-    public function new(?name:String, ?basis:String, ?initValues:Dynamic, ?mouseID:Int):Void {
+    public function new(dec:Dynamic, ?mouseID:Int):Void {
         period = null;
         time = 0;
         fromIndex = 0;
@@ -30,10 +30,10 @@ class ButtonStyle extends DynamicStyle {
         mouseIsOver = false;
         mouseIsDown = false;
         ratio = 1;
-        super(name, basis, initValues, mouseID);
+        super(dec, mouseID);
         if (mouseID == null) mouseID = 0;
         this.mouseID = mouseID;
-        for (field in buttonFields) values[field] = Reflect.field(initValues, field);
+        for (field in buttonFields) values[field] = Reflect.field(dec, field);
     }
 
     override public function inherit(parent:Style):Void {

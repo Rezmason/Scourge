@@ -12,7 +12,7 @@ import net.rezmason.scourge.textview.text.Sigil;
 import net.rezmason.scourge.textview.text.AnimatedStyle;
 import net.rezmason.scourge.textview.text.Style;
 import net.rezmason.scourge.textview.text.ButtonStyle;
-import net.rezmason.scourge.textview.text.InputStyle;
+// import net.rezmason.scourge.textview.text.InputStyle;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
 import net.rezmason.utils.Zig;
@@ -22,7 +22,7 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 private typedef FrozenInteraction = { id:Int, interaction:Interaction };
 private typedef HistEntry = { val:Array<TextToken>, ?next:HistEntry, ?prev:HistEntry };
 
-class ConsoleText extends UIText {
+class ConsoleUIMediator extends UIMediator {
 
     public var hintSignal(default, null):Zig<Array<TextToken>->InputInfo->Void>;
     public var execSignal(default, null):Zig<Array<TextToken>->Void>;
@@ -56,13 +56,13 @@ class ConsoleText extends UIText {
 
         super();
 
-        styles.extract(Strings.BREATHING_PROMPT_STYLE);
-        styles.extract(Strings.CARET_STYLE);
-        styles.extract(Strings.WAIT_STYLES);
+        document.loadStyles(Strings.BREATHING_PROMPT_STYLE);
+        document.loadStyles(Strings.CARET_STYLE);
+        document.loadStyles(Strings.WAIT_STYLES);
 
         setPlayer('rezmason', 0x30FF00);
 
-        caretStyle = cast styles.getStyleByName(Strings.CARET_STYLENAME);
+        caretStyle = cast document.getStyleByName(Strings.CARET_STYLENAME);
         caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
 
         caretIndex = 0;
@@ -87,7 +87,7 @@ class ConsoleText extends UIText {
         hintingPreExecution = false;
     }
 
-    public inline function declareStyles(dec:String):Void styles.extract(dec);
+    public inline function loadStyles(dec:String):Void document.loadStyles(dec);
 
     override public function styleCaret(caretGlyph:Glyph, font:FlatFont):Void {
         caretStyle.removeAllGlyphs();
@@ -111,6 +111,7 @@ class ConsoleText extends UIText {
     }
 
     override function combineText():String {
+
         var combinedText:String = mainText;
 
         if (length(mainText) > 0) combinedText += '\n';
@@ -161,7 +162,7 @@ class ConsoleText extends UIText {
             onExecHint();
         }
 
-        textIsDirty = true;
+        isDirty = true;
     }
 
     public function receiveExec(output:Array<TextToken>, done:Bool):Void {
@@ -170,10 +171,12 @@ class ConsoleText extends UIText {
             executing = false;
         }
 
-        this.outputTokens = output;
-        if (outputTokens.length > 0) outputString = '\t' + printTokens(outputTokens, '\n\t') + '\n';
+        outputTokens = output;
+        if (outputTokens.length > 0 && length(outputTokens.map(stringFromToken).join('')) > 0) {
+            outputString = '\t${printTokens(outputTokens, "\n\t")}\n';
+        }
         else outputString = '';
-        textIsDirty = true;
+        isDirty = true;
     }
 
     inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
@@ -185,7 +188,7 @@ class ConsoleText extends UIText {
             if (tokenIndex > 0) {
                 tokenIndex--;
                 caretIndex = length(inputTokens[tokenIndex].text);
-                textIsDirty = true;
+                isDirty = true;
             }
         } else {
             var left:String = sub(inputTokens[tokenIndex].text, 0, caretIndex);
@@ -195,13 +198,13 @@ class ConsoleText extends UIText {
                 left = sub(left, 0, length(left) - 1);
                 caretIndex--;
                 inputTokens[tokenIndex].text = left + right;
-            } else {
+            } else if (tokenIndex > 0) {
                 tokenIndex--;
                 caretIndex = length(inputTokens[tokenIndex].text);
             }
 
 
-            textIsDirty = true;
+            isDirty = true;
         }
 
         dispatchHintSignal(Strings.BACKSPACE());
@@ -221,7 +224,9 @@ class ConsoleText extends UIText {
         if (length(mainText) > 0) mainText += '\n';
 
         var oldOutputString:String = '';
-        if (outputTokens.length > 0) oldOutputString = '\t' + printTokens(outputTokens, '\n\t') + '\n';
+        if (outputTokens.length > 0 && length(outputTokens.map(stringFromToken).join('')) > 0) {
+            oldOutputString = '\t${printTokens(outputTokens, "\n\t")}\n';
+        }
         mainText += oldOutputString;
 
         mainText += prompt + printTokens(inputTokens, ' ');
@@ -272,7 +277,7 @@ class ConsoleText extends UIText {
             }
         }
         dispatchHintSignal();
-        textIsDirty = true;
+        isDirty = true;
     }
 
     inline function handleUp():Void {
@@ -296,7 +301,7 @@ class ConsoleText extends UIText {
         inputTokens = curHistEntry.val.map(copyToken);
         tokenIndex = inputTokens.length - 1;
         caretIndex = length(inputTokens[tokenIndex].text);
-        textIsDirty = true;
+        isDirty = true;
     }
 
     inline function handleChar(charCode:Int):Void {
@@ -311,7 +316,7 @@ class ConsoleText extends UIText {
             caretIndex++;
             inputTokens[tokenIndex].text = left + right;
             dispatchHintSignal(char);
-            textIsDirty = true;
+            isDirty = true;
         }
     }
 
@@ -330,7 +335,7 @@ class ConsoleText extends UIText {
 
         var styleName:String = token.styleName;
         var styleTag:String = styleEnd;
-        var style:Style = styles.getStyleByName(styleName);
+        var style:Style = document.getStyleByName(styleName);
         if (styleName != null && style != null) {
             var sigil:String = '';
             switch (token.type) {
@@ -338,10 +343,12 @@ class ConsoleText extends UIText {
                     var buttonStyle:ButtonStyle = cast style;
                     sigil = Sigil.BUTTON_STYLE;
                     // TODO
+                /*
                 case CAPSULE(type, name, valid):
                     var inputStyle:InputStyle = cast style;
                     sigil = Sigil.INPUT_STYLE;
                     // TODO
+                */
                 case _:
                     sigil = (Std.is(style, AnimatedStyle) ? Sigil.ANIMATED_STYLE : Sigil.STYLE);
             }
@@ -370,7 +377,7 @@ class ConsoleText extends UIText {
         var tokens:Array<TextToken> = inputTokens.map(copyToken);
         var info:InputInfo = {tokenIndex:tokenIndex, caretIndex:caretIndex, char:char};
         hintTokens = [];
-        textIsDirty = true;
+        isDirty = true;
         hintSignal.dispatch(inputTokens, info);
     }
 
@@ -378,6 +385,8 @@ class ConsoleText extends UIText {
         var tokens:Array<TextToken> = inputTokens.map(copyToken);
         Timer.delay(function() execSignal.dispatch(tokens), 1);
     }
+
+    inline function stringFromToken(token:TextToken):String return token.text;
 
     inline static function blankToken():TextToken return {text:'', type:PLAIN_TEXT};
 

@@ -1,32 +1,35 @@
-ease param for button, input and animated styles
+Style refactoring
+    Separate Span from Style
+        Span just has glyphs, a mouse ID, and a reference to a Style
+    Isolate behaviors from Style subclasses
+        AnimatedBehavior
+        ButtonBehavior
+    Style is the state
 
-Style type should depend on token type
-    PLAIN_TEXT style is typed to Style
-    SHORTCUT style is typed to ButtonStyle
-        Wire it up to a helper.bind(token) function
-    CAPSULE style is typed to InputStyle
-        Rely on InputStyle to do its work; just set its state
+    Separate styles from style subscribers and state - aka 'spans'
+        Tags currently represent spans associated with a style
+            Styles are extracted from declarative tags
+    Then profile it in Flash
 
+Style the tokens
+    Spans will have to be constantly created
+        Pooled, maybe, but still
+Type the tokens
+    Replace most of the plain text
 Token clicking
-    Clicking on an input token should move the carets
-    Shortcuts
-        UIText broadcasts clicks to interpreter, which routes them to the proper command
-    Buttons should become non-interactive when they enter the main text
-        Replace button styles with their up states
-        Replace input styles similarly
+    Clicking on a capsule token should move the carets
+    UIText broadcasts clicks to interpreter, which routes them to the proper command
+    Replace styles in main text with their non-interactive states
 
 Support input types
-    RotationNotation
-        ~/[yuio]*/i
-    NodeCode
-        ~/[\da-f]*/i
-    CrawlScrawl
-        ~/[qweasdzxc]*/i
+    RotationNotation:   ~/[yuio]*/i
+    NodeCode:           ~/[\da-f]*/i
+    CrawlScrawl:        ~/[qweasdzxc]*/i
 
 Implement all non-play text commands
 
 Human players, GUISystem
-    Implement all text commands
+    Implement all play text commands
 
 Move the logic into a Worker
 Get referee to handle situations where a player takes too long to sync or move
@@ -170,3 +173,15 @@ Game starts as a primer
     History of game states and commands allows player to better understand how games progress
 
 Contact Jason Whong?
+
+http://twitter.com/CPriestman/status/422042402484801537
+    When announcing a game:
+    Game name
+    Website
+    Images
+    Trailer
+    Contact details
+    Description
+    Platforms
+    Studio name
+    Estimated release date

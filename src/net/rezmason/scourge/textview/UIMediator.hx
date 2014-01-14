@@ -2,29 +2,28 @@ package net.rezmason.scourge.textview;
 
 import haxe.Utf8;
 
-
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.text.Sigil;
 import net.rezmason.scourge.textview.text.Style;
-import net.rezmason.scourge.textview.text.StyleSet;
+import net.rezmason.scourge.textview.text.Document;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
 import net.rezmason.utils.Zig;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class UIText {
+class UIMediator {
 
     inline static var LINE_TOKEN:String = '¬¬¬';
 
     public var clickSignal(default, null):Zig<String->Void>;
+    public var isDirty(default, null):Bool;
 
     var numRows:Int;
     var numCols:Int;
 
-    var stylesByIndex:Array<Style>;
-    var styles:StyleSet;
+    var document:Document;
 
     var pageLength:Int;
     var page:Array<String>;
@@ -32,33 +31,21 @@ class UIText {
 
     var mainText:String;
     var styleEnd:String;
-    var textIsDirty:Bool;
 
     public function new():Void {
-        styles = new StyleSet();
+        document = new Document();
         numRows = 0;
         numCols = 0;
         mainText = '';
         styleEnd = '§{}';
-        textIsDirty = false;
+        isDirty = false;
         clickSignal = new Zig();
-
-
-    }
-
-    public inline function getStyleByIndex(index:Int):Style {
-        return stylesByIndex[index] != null ? stylesByIndex[index] : styles.defaultStyle;
-    }
-
-    inline function extractFromText(input:String, refreshStyles:Bool = false):String {
-        stylesByIndex = [];
-        return styles.extract(input, stylesByIndex, refreshStyles);
     }
 
     public function adjustLayout(numRows:Int, numCols:Int):Void {
         this.numRows = numRows;
         this.numCols = numCols;
-        this.textIsDirty = true;
+        this.isDirty = true;
     }
 
     public function stylePage(startIndex:Int, glyphs:Array<Glyph>, caretGlyph:Glyph, font:FlatFont):Int {
@@ -69,7 +56,7 @@ class UIText {
         resetStyledGlyphs();
         styleCaret(caretGlyph, font);
 
-        var currentStyle:Style = getStyleByIndex(styleIndex);
+        var currentStyle:Style = document.getStyleByIndex(styleIndex);
 
         var caretGlyphID:Int = -1;
 
@@ -81,7 +68,7 @@ class UIText {
                 switch (charCode) {
                     case Sigil.STYLE_CODE:
                         styleIndex++;
-                        currentStyle = getStyleByIndex(styleIndex);
+                        currentStyle = document.getStyleByIndex(styleIndex);
                     case Sigil.CARET_CODE:
                         caretGlyphID = id;
                     case _:
@@ -99,19 +86,19 @@ class UIText {
         return caretGlyphID;
     }
 
-    public function updateDirtyText(force:Bool = false):Bool {
+    public function updateDirtyText(force:Bool = false):Void {
+        isDirty = isDirty || force;
 
-        var updating:Bool = force || textIsDirty;
+        if (isDirty) {
 
-        if (updating) {
-
-            if (!force) textIsDirty = false;
+            isDirty = false;
 
             if (numRows * numCols > 0) {
 
                 // Simplify the combined text and wrap it to new lines as we construct the page
 
-                page = extractFromText(swapTabsWithSpaces(combineText()), false).split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
+                document.setText(swapTabsWithSpaces(combineText()));
+                page = document.styledText.split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
 
                 // Add blank lines to the end, to reach the minimum page length (numRows)
 
@@ -129,17 +116,15 @@ class UIText {
                 }
             }
         }
-
-        return updating;
     }
 
-    public function resetStyledGlyphs():Void styles.removeAllGlyphs();
+    public function resetStyledGlyphs():Void document.removeAllGlyphs();
 
-    public function updateStyledGlyphs(delta:Float):Void styles.updateGlyphs(delta);
+    public function updateStyledGlyphs(delta:Float):Void document.updateGlyphs(delta);
 
     public function setText(text:String):Void {
         mainText = text;
-        textIsDirty = true;
+        isDirty = true;
     }
 
     public function styleCaret(caretGlyph:Glyph, font:FlatFont):Void {}
@@ -193,7 +178,7 @@ class UIText {
 
         switch (interaction) {
             case MOUSE(type, x, y) if (id != 0):
-                var targetStyle:Style = styles.getStyleByMouseID(id);
+                var targetStyle:Style = document.getStyleByMouseID(id);
                 if (targetStyle != null) {
                     targetStyle.receiveInteraction(type);
                     if (type == CLICK) clickSignal.dispatch(targetStyle.name);

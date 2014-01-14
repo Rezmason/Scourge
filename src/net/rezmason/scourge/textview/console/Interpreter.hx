@@ -13,14 +13,14 @@ class Interpreter {
         '§{name:hintOver, p:-0.01, f:0.6}' +
         '§{name:hintDown, p: 0.01, f:0.4}';
 
-    var console:ConsoleText;
+    var console:ConsoleUIMediator;
     var commandsByName:Map<String, ConsoleCommand>;
 
     public function new():Void {
         commandsByName = new Map();
     }
 
-    public function connectToConsole(console:ConsoleText):Void {
+    public function connectToConsole(console:ConsoleUIMediator):Void {
         if (this.console == console) return;
         disconnectFromConsole();
         this.console = console;
@@ -28,8 +28,8 @@ class Interpreter {
         console.execSignal.add(onExecSignal);
         console.clickSignal.add(onClickSignal);
 
-        console.declareStyles(Strings.ERROR_STYLES + HINT_BUTTON_STYLE_ELEMENTS);
-        for (command in commandsByName) console.declareStyles(command.tokenStyles);
+        console.loadStyles(Strings.ERROR_STYLES + HINT_BUTTON_STYLE_ELEMENTS);
+        for (command in commandsByName) console.loadStyles(command.tokenStyles);
     }
 
     public function disconnectFromConsole():Void {
@@ -43,7 +43,7 @@ class Interpreter {
 
     public function addCommand(name:String, command:ConsoleCommand):Void {
         commandsByName[name] = command;
-        if (console != null) console.declareStyles(command.tokenStyles);
+        if (console != null) console.loadStyles(command.tokenStyles);
     }
 
     public function removeCommand(name:String):Void commandsByName.remove(name);

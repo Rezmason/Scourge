@@ -41,9 +41,9 @@ class UIBody extends Body {
     var numRows:Int;
     var numCols:Int;
 
-    var uiText:UIText;
+    var uiMediator:UIMediator;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, uiText:UIText):Void {
+    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, uiMediator:UIMediator):Void {
 
         super(bufferUtil, glyphTexture);
 
@@ -62,7 +62,7 @@ class UIBody extends Body {
 
         scaleMode = EXACT_FIT;
 
-        this.uiText = uiText;
+        this.uiMediator = uiMediator;
     }
 
     public function setFontSize(size:Float):Bool {
@@ -79,14 +79,15 @@ class UIBody extends Body {
 
     override public function update(delta:Float):Void {
 
-        if (!dragging && uiText.updateDirtyText()) {
-            if (Math.isNaN(currentScrollPos)) setScrollPos(uiText.bottomPos());
-            glideTextToPos(uiText.bottomPos());
+        if (!dragging && uiMediator.isDirty) {
+            uiMediator.updateDirtyText();
+            if (Math.isNaN(currentScrollPos)) setScrollPos(uiMediator.bottomPos());
+            glideTextToPos(uiMediator.bottomPos());
             redrawHitSignal.dispatch();
         }
 
         updateGlide();
-        uiText.updateStyledGlyphs(delta);
+        uiMediator.updateStyledGlyphs(delta);
         taperScrollEdges();
         positionCaret();
 
@@ -102,7 +103,7 @@ class UIBody extends Body {
 
     function glideTextToPos(pos:Float):Void {
         gliding = true;
-        glideGoal = Math.round(Math.max(0, Math.min(uiText.bottomPos(), pos)));
+        glideGoal = Math.round(Math.max(0, Math.min(uiMediator.bottomPos(), pos)));
     }
 
     override public function receiveInteraction(id:Int, interaction:Interaction):Void {
@@ -119,7 +120,7 @@ class UIBody extends Body {
                     dragStartY = y;
                     dragStartPos = currentScrollPos;
                 }
-            case _: uiText.receiveInteraction(id, interaction);
+            case _: uiMediator.receiveInteraction(id, interaction);
         }
     }
 
@@ -150,8 +151,8 @@ class UIBody extends Body {
         lastRedrawPos = Math.NaN;
         reorderGlyphs();
 
-        uiText.adjustLayout(numRows, numCols);
-        uiText.styleCaret(caretGlyph, glyphTexture.font);
+        uiMediator.adjustLayout(numRows, numCols);
+        uiMediator.styleCaret(caretGlyph, glyphTexture.font);
     }
 
     inline function reorderGlyphs():Void {
@@ -169,7 +170,7 @@ class UIBody extends Body {
     inline function setScrollPos(pos:Float):Void {
         currentScrollPos = pos;
         var scrollStartIndex:Int = Std.int(currentScrollPos);
-        caretGlyphID = uiText.stylePage(scrollStartIndex, glyphs, caretGlyph, glyphTexture.font);
+        caretGlyphID = uiMediator.stylePage(scrollStartIndex, glyphs, caretGlyph, glyphTexture.font);
         taperScrollEdges();
         positionCaret();
         transform.identity();
