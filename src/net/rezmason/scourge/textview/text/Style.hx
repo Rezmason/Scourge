@@ -9,40 +9,30 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 class Style {
 
     var values:Map<String, Dynamic>;
-    var basics:Array<Float>;
     var stateStyles:Array<Style>;
     var states:Array<Array<Float>>;
 
+    public var isInteractive(default, null):Bool;
     public var name(default, null):String;
     public var basis(default, null):String;
-
-    var glyphs:Array<Glyph>;
-    var mouseID:Int;
-    var paint:Int;
 
     static var easeLibrary:Map<String, Float->Float> = makeEaseLibrary();
 
     static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 'f', 's', 'p'];
 
-    public function new(dec:Dynamic, ?mouseID:Int):Void {
+    public function new(dec:Dynamic):Void {
         stateStyles = [];
         values = new Map<String, Dynamic>();
         for (field in styleFields) values[field] = cast Reflect.field(dec, field);
         this.name = dec.name;
         this.basis = dec.basis;
-        this.mouseID = 0;
-        glyphs = [];
+        isInteractive = false;
     }
 
-    public function addGlyph(glyph:Glyph):Void {
-        if (glyphs.length == 0) paint = (glyph.get_paint() & 0xFF0000) | (mouseID & 0xFFFF);
-        glyph.set_paint(paint);
-        glyphs.push(glyph);
-    }
+    public function updateSpan(span:Span, delta:Float):Void {
 
-    public function removeAllGlyphs():Void glyphs = [];
-
-    public function updateGlyphs(delta:Float):Void {
+        var glyphs = span.glyphs;
+        var basics = span.basics;
 
         if (glyphs.length == 0) return;
 
@@ -63,7 +53,7 @@ class Style {
         }
     }
 
-    public function receiveInteraction(type:MouseInteractionType):Void {
+    public function handleSpanInteraction(span:Span, type:MouseInteractionType):Void {
 
     }
 
@@ -116,16 +106,16 @@ class Style {
         }
 
         if (hasNoStates) states = null;
+    }
 
-        basics = [];
-
-        for (ike in 0...styleFields.length) basics[ike] = Std.parseFloat('${values[styleFields[ike]]}');
+    public function initializeSpan(span:Span):Void {
+        for (ike in 0...styleFields.length) span.basics[ike] = Std.parseFloat('${values[styleFields[ike]]}');
     }
 
     private function connectStates(bases:Map<String, Style>, stateNames:Array<String>):Void {
         if (stateNames.length > 0) {
             for (ike in 0...stateNames.length) {
-                var stateStyle:Style = new Style('${name}_$ike');
+                var stateStyle:Style = new Style({name:'${name}_$ike'});
                 if (stateNames[ike] == null || bases[stateNames[ike]] == null) stateStyle.inherit(this);
                 else stateStyle.inherit(bases[stateNames[ike]]);
                 stateStyle.inherit(bases['']);
@@ -136,8 +126,9 @@ class Style {
         }
     }
 
-    private function interpolateGlyphs(state1:Int, state2:Int, ratio:Float):Void {
+    private function interpolateSpan(span:Span, state1:Int, state2:Int, ratio:Float):Void {
         if (states == null) return;
+        var basics = span.basics;
         for (ike in 0...states.length) {
             var fieldValues:Array<Float> = states[ike];
             if (fieldValues != null) basics[ike] = fieldValues[state1] * (1 - ratio) + fieldValues[state2] * ratio;

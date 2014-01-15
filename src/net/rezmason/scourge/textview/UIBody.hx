@@ -87,7 +87,7 @@ class UIBody extends Body {
         }
 
         updateGlide();
-        uiMediator.updateStyledGlyphs(delta);
+        uiMediator.updateSpans(delta);
         taperScrollEdges();
         positionCaret();
 

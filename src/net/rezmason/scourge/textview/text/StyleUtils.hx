@@ -8,7 +8,7 @@ using Lambda;
 typedef ParsedOutput = {
     var text:String;
     var newStyles:Array<Style>;
-    var stylesByIndex:Array<Style>;
+    var spans:Array<Span>;
 }
 
 class StyleUtils {
@@ -19,14 +19,21 @@ class StyleUtils {
         STYLE => Style,
         ANIMATED_STYLE => AnimatedStyle,
         BUTTON_STYLE => ButtonStyle,
-        // INPUT_STYLE => InputStyle,
+    ];
+
+    public static var spanStateTypes:Map<String, Class<SpanState>> = [
+        STYLE => SpanState,
+        ANIMATED_STYLE => AnimatedSpanState,
+        BUTTON_STYLE => ButtonSpanState,
     ];
 
     public inline static function defaultStyleTag():Dynamic return {name:'', r:1, g:1, b:1, i:0, f:0.5, s:1, p:0};
 
-    public static inline function parse(input:String, lookup:Map<String, Style>, nextMouseID:Int):ParsedOutput {
+    public static inline function parse(input:String, lookup:Map<String, Style>, spanIndex:Int = -1):ParsedOutput {
         var newStyles:Array<Style> = [];
-        var stylesByIndex:Array<Style> = [defaultStyle];
+        var spans:Array<Span> = [];
+
+        if (spanIndex >= 0) spans.push(new Span(defaultStyle, 0));
 
         var left:String = '';
         var right:String = input;
@@ -36,11 +43,11 @@ class StyleUtils {
 
             // Find the next sigil
 
-            for (sigil in [STYLE, ANIMATED_STYLE, BUTTON_STYLE, INPUT_STYLE]) {
+            for (sigil in [STYLE, ANIMATED_STYLE, BUTTON_STYLE]) {
                 var index:Int = right.indexOf(sigil);
                 if (index != -1 && (startIndex == -1 || startIndex > index)) {
                     startIndex = index;
-                    styleType = StyleUtils.styleTypes[sigil];
+                    styleType = styleTypes[sigil];
                 }
             }
 
@@ -55,13 +62,18 @@ class StyleUtils {
 
                 var endIndex:Int = right.indexOf('}');
                 if (endIndex != -1) {
-                    var style:Style = makeStyle(styleType, right.substr(0, endIndex + 1), lookup, nextMouseID);
+                    var style:Style = makeStyle(styleType, right.substr(0, endIndex + 1), lookup);
                     if (style != defaultStyle && lookup[style.name] == null) {
                         lookup[style.name] = style;
                         newStyles.push(style);
-                        nextMouseID++;
                     }
-                    stylesByIndex.push(style);
+
+                    if (spanIndex != -1) {
+                        var mouseID:Int = style.isInteractive ? spanIndex : 0;
+                        spanIndex++;
+                        spans.push(new Span(style, mouseID));
+                    }
+
                     right = right.substr(endIndex, right.length);
                     right = Utf8.sub(right, 1, Utf8.length(right));
                 }
@@ -98,27 +110,29 @@ class StyleUtils {
             style.flatten();
         }
 
+        for (span in spans) span.initialize();
+
         // trace('${newStyles.length} styles created.');
 
-        return {text:left + right, newStyles:newStyles, stylesByIndex:stylesByIndex};
+        return {text:left + right, newStyles:newStyles, spans:spans};
     }
 
-    public inline static function makeStyle(styleType:Class<Style>, input:String, lookup:Map<String, Style>, index:Int):Style {
+    public inline static function makeStyle(styleType:Class<Style>, input:String, lookup:Map<String, Style>):Style {
 
         input = Utf8.sub(input, 1, Utf8.length(input)    ); // Remove leading  '{'
         input = Utf8.sub(input, 0, Utf8.length(input) - 1); // Remove trailing '}'
 
-        var name:String = input.indexOf(':') == -1 ? input : StyleUtils.parseName(input);
+        var name:String = input.indexOf(':') == -1 ? input : parseName(input);
         if (name == null) throw 'Style declaration must include name, chief: ( $input )';
 
         var style:Style = lookup[name];
-        if (style == null) style = Type.createInstance(styleType, [StyleUtils.parseTag(input), index]);
+        if (style == null) style = Type.createInstance(styleType, [parseTag(input)]);
 
         return style;
     }
 
     public inline static function makeDefaultStyle():Style {
-        var style:Style = new Style(StyleUtils.defaultStyleTag());
+        var style:Style = new Style(defaultStyleTag());
         style.flatten();
         return style;
     }

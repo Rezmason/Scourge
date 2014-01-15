@@ -4,31 +4,34 @@ import net.kawa.tween.easing.*;
 
 class AnimatedStyle extends Style {
 
-    public var time(default, set):Float;
     var period:Null<Float>;
     var phase:Null<Float>;
     var easeFunc:Float->Float;
-    var playing:Bool;
 
     static var animationFields:Array<String> = ['period', 'phase', 'frames', 'ease'];
 
-    public function new(dec:Dynamic, ?mouseID:Int):Void {
+    public function new(dec:Dynamic):Void {
         period = null;
         phase = null;
-        time = 0;
-        playing = true;
-        super(dec, mouseID);
+        super(dec);
         for (field in animationFields) values[field] = Reflect.field(dec, field);
     }
 
-    public function start(time:Float = 0):Void {
-        this.time = time % period;
-        playing = true;
+    public function startSpan(span:Span, time:Float = 0):Void {
+        var state:AnimatedSpanState = cast span.state;
+        state.time = time % period;
+        state.playing = true;
     }
 
-    public function stop():Void {
-        this.time = 0;
-        playing = false;
+    public function stopSpan(span:Span):Void {
+        var state:AnimatedSpanState = cast span.state;
+        state.time = 0;
+        state.playing = false;
+    }
+
+    override public function initializeSpan(span:Span):Void {
+        span.state = new AnimatedSpanState();
+        super.initializeSpan(span);
     }
 
     override public function inherit(parent:Style):Void {
@@ -36,23 +39,25 @@ class AnimatedStyle extends Style {
         super.inherit(parent);
     }
 
-    override public function updateGlyphs(delta:Float):Void {
+    override public function updateSpan(span:Span, delta:Float):Void {
 
-        if (playing) {
-            time = (time + delta) % period;
+        var state:AnimatedSpanState = cast span.state;
+
+        if (state.playing) {
+            state.time = (state.time + delta) % period;
         }
 
         var numFrames:Int = stateStyles.length;
         if (numFrames < 1) numFrames = 1;
 
-        var playhead:Float = time / period * numFrames;
+        var playhead:Float = state.time / period * numFrames;
         var fromIndex:Int = Std.int(Math.floor(playhead));
         var toIndex:Int = Std.int(Math.ceil(playhead) % numFrames);
         var ratio:Float = easeFunc((playhead + phase) % 1);
 
-        interpolateGlyphs(fromIndex, toIndex, ratio);
+        interpolateSpan(span, fromIndex, toIndex, ratio);
 
-        super.updateGlyphs(delta);
+        super.updateSpan(span, delta);
     }
 
     override public function toString():String return '${super.toString()}, frames:${values["frames"]}';
@@ -77,11 +82,5 @@ class AnimatedStyle extends Style {
         if (easeFunc == null) easeFunc = Quad.easeInOut;
 
         super.flatten();
-    }
-
-    inline function set_time(value:Float):Float {
-        if (Math.isNaN(value)) value = 0;
-        time = value;
-        return time;
     }
 }

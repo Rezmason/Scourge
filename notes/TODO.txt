@@ -1,15 +1,13 @@
 Style refactoring
-    Separate Span from Style
-        Span just has glyphs, a mouse ID, and a reference to a Style
-    Isolate behaviors from Style subclasses
-        AnimatedBehavior
-        ButtonBehavior
-    Style is the state
-
-    Separate styles from style subscribers and state - aka 'spans'
-        Tags currently represent spans associated with a style
-            Styles are extracted from declarative tags
-    Then profile it in Flash
+    Architectural cleanup
+        What don't I like?
+            Spans aren't pooled at all.
+            Well, SpanStates are awkward.
+            Also, glyph paint is oddly applied.
+            Also, ConsoleUIMediator has to jump through hoops to initialize the caret
+            Also, Document should support appending text, not just setting it
+    Click signal
+        How do we map spans to tokens?
 
 Style the tokens
     Spans will have to be constantly created

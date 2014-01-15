@@ -5,11 +5,11 @@ import haxe.Utf8;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.text.Sigil;
+import net.rezmason.scourge.textview.text.Span;
 import net.rezmason.scourge.textview.text.Style;
 import net.rezmason.scourge.textview.text.Document;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
-import net.rezmason.utils.Zig;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -17,7 +17,6 @@ class UIMediator {
 
     inline static var LINE_TOKEN:String = '¬¬¬';
 
-    public var clickSignal(default, null):Zig<String->Void>;
     public var isDirty(default, null):Bool;
 
     var numRows:Int;
@@ -39,7 +38,6 @@ class UIMediator {
         mainText = '';
         styleEnd = '§{}';
         isDirty = false;
-        clickSignal = new Zig();
     }
 
     public function adjustLayout(numRows:Int, numCols:Int):Void {
@@ -51,12 +49,12 @@ class UIMediator {
     public function stylePage(startIndex:Int, glyphs:Array<Glyph>, caretGlyph:Glyph, font:FlatFont):Int {
         var id:Int = 0;
         var pageSegment:Array<String> = getPageSegment(startIndex);
-        var styleIndex:Int = getLineStyleIndex(startIndex);
+        var spanIndex:Int = getLineStyleIndex(startIndex);
 
-        resetStyledGlyphs();
+        resetSpans();
         styleCaret(caretGlyph, font);
 
-        var currentStyle:Style = document.getStyleByIndex(styleIndex);
+        var currentSpan:Span = document.getSpanByIndex(spanIndex);
 
         var caretGlyphID:Int = -1;
 
@@ -67,21 +65,21 @@ class UIMediator {
                 var charCode:Int = Utf8.charCodeAt(line, index);
                 switch (charCode) {
                     case Sigil.STYLE_CODE:
-                        styleIndex++;
-                        currentStyle = document.getStyleByIndex(styleIndex);
+                        spanIndex++;
+                        currentSpan = document.getSpanByIndex(spanIndex);
                     case Sigil.CARET_CODE:
                         caretGlyphID = id;
                     case _:
                         var glyph:Glyph = glyphs[id];
                         glyph.set_char(charCode, font);
-                        currentStyle.addGlyph(glyph);
+                        currentSpan.addGlyph(glyph);
                         glyph.set_z(0);
                         id++;
                 }
             }
         }
 
-        updateStyledGlyphs(0);
+        updateSpans(0);
 
         return caretGlyphID;
     }
@@ -118,9 +116,9 @@ class UIMediator {
         }
     }
 
-    public function resetStyledGlyphs():Void document.removeAllGlyphs();
+    public function resetSpans():Void document.removeAllGlyphs();
 
-    public function updateStyledGlyphs(delta:Float):Void document.updateGlyphs(delta);
+    public function updateSpans(delta:Float):Void document.updateSpans(delta);
 
     public function setText(text:String):Void {
         mainText = text;
@@ -178,11 +176,8 @@ class UIMediator {
 
         switch (interaction) {
             case MOUSE(type, x, y) if (id != 0):
-                var targetStyle:Style = document.getStyleByMouseID(id);
-                if (targetStyle != null) {
-                    targetStyle.receiveInteraction(type);
-                    if (type == CLICK) clickSignal.dispatch(targetStyle.name);
-                }
+                var targetSpan:Span = document.getSpanByIndex(id);
+                if (targetSpan != null) targetSpan.receiveInteraction(type);
             case _:
         }
     }

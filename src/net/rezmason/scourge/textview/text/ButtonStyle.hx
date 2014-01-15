@@ -11,29 +11,20 @@ class ButtonStyle extends Style {
     inline static var DOWN_FRAME:Int = 2;
 
     var period:Null<Float>;
-    var time:Float;
     var easeFunc:Float->Float;
-    var fromIndex:Int;
-    var toIndex:Int;
-    var ratio:Float;
-
-    var mouseIsOver:Bool;
-    var mouseIsDown:Bool;
 
     static var buttonFields:Array<String> = ['up', 'over', 'down', 'period', 'ease'];
 
-    public function new(dec:Dynamic, ?mouseID:Int):Void {
+    public function new(dec:Dynamic):Void {
         period = null;
-        time = 0;
-        fromIndex = 0;
-        toIndex = 0;
-        mouseIsOver = false;
-        mouseIsDown = false;
-        ratio = 1;
-        super(dec, mouseID);
-        if (mouseID == null) mouseID = 0;
-        this.mouseID = mouseID;
+        super(dec);
+        isInteractive = true;
         for (field in buttonFields) values[field] = Reflect.field(dec, field);
+    }
+
+    override public function initializeSpan(span:Span):Void {
+        span.state = new ButtonSpanState();
+        super.initializeSpan(span);
     }
 
     override public function inherit(parent:Style):Void {
@@ -41,39 +32,42 @@ class ButtonStyle extends Style {
         super.inherit(parent);
     }
 
-    override public function updateGlyphs(delta:Float):Void {
-        if (time < period) {
-            time = time + delta;
-            if (time > period) time = period;
-            ratio = easeFunc(time / period);
-            interpolateGlyphs(fromIndex, toIndex, ratio);
+    override public function updateSpan(span:Span, delta:Float):Void {
+        var state:ButtonSpanState = cast span.state;
+
+        if (state.time < period) {
+            state.time = state.time + delta;
+            if (state.time > period) state.time = period;
+            state.ratio = easeFunc(state.time / period);
+            interpolateSpan(span, state.fromIndex, state.toIndex, state.ratio);
         }
 
-        super.updateGlyphs(delta);
+        super.updateSpan(span, delta);
     }
 
-    override public function receiveInteraction(type:MouseInteractionType):Void {
+    override public function handleSpanInteraction(span:Span, type:MouseInteractionType):Void {
+        var state:ButtonSpanState = cast span.state;
 
         if (type == MOVE) return;
 
-        var nextIndex:Int = toIndex;
+        var nextIndex:Int = state.toIndex;
 
         switch (type) {
-            case ENTER: mouseIsOver = true;
-            case EXIT: mouseIsOver = false;
-            case MOUSE_DOWN: mouseIsDown = true;
-            case MOUSE_UP, DROP: mouseIsDown = false;
+            case ENTER: state.mouseIsOver = true;
+            case EXIT: state.mouseIsOver = false;
+            case MOUSE_DOWN: state.mouseIsDown = true;
+            case MOUSE_UP, DROP: state.mouseIsDown = false;
             case _:
         }
 
-        if (mouseIsOver && mouseIsDown) nextIndex = DOWN_FRAME;
-        else if (!mouseIsOver && !mouseIsDown) nextIndex = UP_FRAME;
+        if (state.mouseIsOver && state.mouseIsDown) nextIndex = DOWN_FRAME;
+        else if (!state.mouseIsOver && !state.mouseIsDown) nextIndex = UP_FRAME;
         else nextIndex = OVER_FRAME;
 
-        if (nextIndex != toIndex) {
-            fromIndex = toIndex;
-            toIndex = nextIndex;
-            time = 0;
+        if (nextIndex != state.toIndex) {
+            state.fromIndex = state.toIndex;
+            state.toIndex = nextIndex;
+            state.time = 0;
         }
     }
 

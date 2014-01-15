@@ -26,7 +26,6 @@ class Interpreter {
         this.console = console;
         console.hintSignal.add(onHintSignal);
         console.execSignal.add(onExecSignal);
-        console.clickSignal.add(onClickSignal);
 
         console.loadStyles(Strings.ERROR_STYLES + HINT_BUTTON_STYLE_ELEMENTS);
         for (command in commandsByName) console.loadStyles(command.tokenStyles);
@@ -36,7 +35,6 @@ class Interpreter {
         if (this.console != null) {
             console.hintSignal.remove(onHintSignal);
             console.execSignal.remove(onExecSignal);
-            console.clickSignal.remove(onClickSignal);
             this.console = null;
         }
     }

@@ -10,6 +10,7 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.Sigil;
 import net.rezmason.scourge.textview.text.AnimatedStyle;
+import net.rezmason.scourge.textview.text.Span;
 import net.rezmason.scourge.textview.text.Style;
 import net.rezmason.scourge.textview.text.ButtonStyle;
 // import net.rezmason.scourge.textview.text.InputStyle;
@@ -32,6 +33,7 @@ class ConsoleUIMediator extends UIMediator {
     var executing:Bool;
 
     var caretStyle:AnimatedStyle;
+    var caretSpan:Span;
 
     var prompt:String;
     var caretIndex(default, set):Int;
@@ -63,6 +65,8 @@ class ConsoleUIMediator extends UIMediator {
         setPlayer('rezmason', 0x30FF00);
 
         caretStyle = cast document.getStyleByName(Strings.CARET_STYLENAME);
+        caretSpan = new Span(caretStyle, 0);
+        caretSpan.initialize();
         caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
 
         caretIndex = 0;
@@ -90,8 +94,8 @@ class ConsoleUIMediator extends UIMediator {
     public inline function loadStyles(dec:String):Void document.loadStyles(dec);
 
     override public function styleCaret(caretGlyph:Glyph, font:FlatFont):Void {
-        caretStyle.removeAllGlyphs();
-        caretStyle.addGlyph(caretGlyph);
+        caretSpan.removeAllGlyphs();
+        caretSpan.addGlyph(caretGlyph);
         caretGlyph.set_char(caretCharCode, font);
     }
 
@@ -148,6 +152,11 @@ class ConsoleUIMediator extends UIMediator {
                 }
             case _: super.receiveInteraction(id, interaction);
         }
+    }
+
+    override public function updateSpans(delta:Float):Void {
+        caretSpan.update(delta);
+        super.updateSpans(delta);
     }
 
     public function receiveHint(input:Array<TextToken>, tokenIndex:Int, caretIndex:Int, hint:Array<TextToken>):Void {
@@ -393,7 +402,7 @@ class ConsoleUIMediator extends UIMediator {
     function copyToken(token:TextToken):TextToken return {text:token.text, type:token.type, styleName:token.styleName};
 
     inline function set_caretIndex(val:Int):Int {
-        caretStyle.start(0);
+        caretStyle.startSpan(caretSpan, 0);
         return this.caretIndex = val;
     }
 }
