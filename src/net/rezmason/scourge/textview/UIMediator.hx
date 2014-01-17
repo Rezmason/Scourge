@@ -84,7 +84,7 @@ class UIMediator {
         return caretGlyphID;
     }
 
-    public function updateDirtyText(force:Bool = false):Void {
+    public function updateDirtyText(force:Bool = false, bodyPaint:Int):Void {
         isDirty = isDirty || force;
 
         if (isDirty) {
@@ -95,8 +95,8 @@ class UIMediator {
 
                 // Simplify the combined text and wrap it to new lines as we construct the page
 
-                document.setText(swapTabsWithSpaces(combineText()));
-                page = document.styledText.split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
+                document.setText(swapTabsWithSpaces(combineText()), bodyPaint);
+                page = document.getStyledText().split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
 
                 // Add blank lines to the end, to reach the minimum page length (numRows)
 
@@ -173,13 +173,16 @@ class UIMediator {
     }
 
     public function receiveInteraction(id:Int, interaction:Interaction):Void {
-
         switch (interaction) {
             case MOUSE(type, x, y) if (id != 0):
-                var targetSpan:Span = document.getSpanByIndex(id);
-                if (targetSpan != null) targetSpan.receiveInteraction(type);
+                var targetSpan:Span = document.getSpanByMouseID(id);
+                if (targetSpan != null) handleSpanMouseInteraction(targetSpan, type);
             case _:
         }
+    }
+
+    function handleSpanMouseInteraction(span:Span, type:MouseInteractionType):Void {
+        span.receiveInteraction(type);
     }
 
     public function getPageSegment(index:Int):Array<String> return page.slice(index, index + numRows);

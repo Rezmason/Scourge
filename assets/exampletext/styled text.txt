@@ -11,9 +11,9 @@ This is another §{test2}test§{}.
 §{name:merp3, p: 0.01, b:0, f:0.4}DOWN§{}
 
 ∂{name:animation, period:1, frames:[merp1, merp2, merp3]}DANCE, DAMN IT§{}
-µ{name:button, up:merp1, over:merp2, down:merp3, period:0.2, i:1}  BUTTON TIME  §{}
+µ{name:button, up:merp1, over:merp2, down:merp3, period:0.2, i:1, id:button1}  BUTTON TIME  §{}
 
-µ{name:button2, basis:button, r:0}  ANOTHER BUTTON  §{}
+µ{name:button2, basis:button, r:0, id:button2}  ANOTHER BUTTON  §{}
 
-µ{button}  BUTTON TIME AGAIN  §{}
+µ{name:button, id:button3}  BUTTON TIME AGAIN  §{}
 §{name:broken, r:hello}ABCD§{}

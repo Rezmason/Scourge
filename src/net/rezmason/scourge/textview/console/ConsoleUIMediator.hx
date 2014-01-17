@@ -6,14 +6,14 @@ import haxe.Timer;
 import haxe.Utf8;
 
 import net.rezmason.scourge.textview.console.Types;
+import net.rezmason.scourge.textview.text.AnimatedStyle;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.Sigil;
-import net.rezmason.scourge.textview.text.AnimatedStyle;
+import net.rezmason.scourge.textview.text.Parser;
 import net.rezmason.scourge.textview.text.Span;
 import net.rezmason.scourge.textview.text.Style;
 import net.rezmason.scourge.textview.text.ButtonStyle;
-// import net.rezmason.scourge.textview.text.InputStyle;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
 import net.rezmason.utils.Zig;
@@ -59,14 +59,13 @@ class ConsoleUIMediator extends UIMediator {
         super();
 
         document.loadStyles(Strings.BREATHING_PROMPT_STYLE);
-        document.loadStyles(Strings.CARET_STYLE);
         document.loadStyles(Strings.WAIT_STYLES);
 
         setPlayer('rezmason', 0x30FF00);
 
-        caretStyle = cast document.getStyleByName(Strings.CARET_STYLENAME);
-        caretSpan = new Span(caretStyle, 0);
-        caretSpan.initialize();
+        for (span in Parser.parse(Strings.CARET_STYLE).spans) if (Std.is(span.style, AnimatedStyle)) caretSpan = span;
+        caretStyle = cast caretSpan.style;
+
         caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
 
         caretIndex = 0;
@@ -152,6 +151,11 @@ class ConsoleUIMediator extends UIMediator {
                 }
             case _: super.receiveInteraction(id, interaction);
         }
+    }
+
+    override function handleSpanMouseInteraction(span:Span, type:MouseInteractionType):Void {
+        super.handleSpanMouseInteraction(span, type);
+        // trace('${span.id} $type');
     }
 
     override public function updateSpans(delta:Float):Void {
@@ -352,12 +356,6 @@ class ConsoleUIMediator extends UIMediator {
                     var buttonStyle:ButtonStyle = cast style;
                     sigil = Sigil.BUTTON_STYLE;
                     // TODO
-                /*
-                case CAPSULE(type, name, valid):
-                    var inputStyle:InputStyle = cast style;
-                    sigil = Sigil.INPUT_STYLE;
-                    // TODO
-                */
                 case _:
                     sigil = (Std.is(style, AnimatedStyle) ? Sigil.ANIMATED_STYLE : Sigil.STYLE);
             }

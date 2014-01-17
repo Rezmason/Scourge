@@ -1,14 +1,3 @@
-Style refactoring
-    Architectural cleanup
-        What don't I like?
-            Spans aren't pooled at all.
-            Well, SpanStates are awkward.
-            Also, glyph paint is oddly applied.
-            Also, ConsoleUIMediator has to jump through hoops to initialize the caret
-            Also, Document should support appending text, not just setting it
-    Click signal
-        How do we map spans to tokens?
-
 Style the tokens
     Spans will have to be constantly created
         Pooled, maybe, but still

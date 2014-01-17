@@ -108,7 +108,7 @@ class Style {
         if (hasNoStates) states = null;
     }
 
-    public function initializeSpan(span:Span):Void {
+    public function connectSpan(span:Span):Void {
         for (ike in 0...styleFields.length) span.basics[ike] = Std.parseFloat('${values[styleFields[ike]]}');
     }
 

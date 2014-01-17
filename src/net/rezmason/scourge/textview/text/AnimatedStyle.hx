@@ -2,6 +2,11 @@ package net.rezmason.scourge.textview.text;
 
 import net.kawa.tween.easing.*;
 
+typedef AnimatedSpanState = {
+    var time:Float;
+    var playing:Bool;
+}
+
 class AnimatedStyle extends Style {
 
     var period:Null<Float>;
@@ -29,9 +34,9 @@ class AnimatedStyle extends Style {
         state.playing = false;
     }
 
-    override public function initializeSpan(span:Span):Void {
-        span.state = new AnimatedSpanState();
-        super.initializeSpan(span);
+    override public function connectSpan(span:Span):Void {
+        span.state = {time:0, playing:true};
+        super.connectSpan(span);
     }
 
     override public function inherit(parent:Style):Void {

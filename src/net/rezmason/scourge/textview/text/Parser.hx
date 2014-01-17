@@ -5,35 +5,30 @@ import net.rezmason.scourge.textview.text.Sigil.*;
 
 using Lambda;
 
-typedef ParsedOutput = {
-    var text:String;
-    var newStyles:Array<Style>;
-    var spans:Array<Span>;
-}
+class Parser {
 
-class StyleUtils {
+    static var defaultStyle(default, null):Style = makeDefaultStyle();
 
-    public static var defaultStyle(default, null):Style = makeDefaultStyle();
-
-    public static var styleTypes:Map<String, Class<Style>> = [
+    static var styleTypes:Map<String, Class<Style>> = [
         STYLE => Style,
         ANIMATED_STYLE => AnimatedStyle,
         BUTTON_STYLE => ButtonStyle,
     ];
 
-    public static var spanStateTypes:Map<String, Class<SpanState>> = [
-        STYLE => SpanState,
-        ANIMATED_STYLE => AnimatedSpanState,
-        BUTTON_STYLE => ButtonSpanState,
-    ];
+    public inline static function getEmptyOutput():ParsedOutput {
+        return {input:'', output:'', spans:[], interactiveSpans:[], styles:[''=>defaultStyle], recycledSpans:[]};
+    }
 
-    public inline static function defaultStyleTag():Dynamic return {name:'', r:1, g:1, b:1, i:0, f:0.5, s:1, p:0};
-
-    public static inline function parse(input:String, lookup:Map<String, Style>, spanIndex:Int = -1):ParsedOutput {
+    public static inline function parse(input:String, styles:Map<String, Style> = null, startMouseID:Int = 0, recycledSpans:Array<Span> = null):ParsedOutput {
         var newStyles:Array<Style> = [];
         var spans:Array<Span> = [];
+        var interactiveSpans:Array<Span> = [null];
+        var currentMouseID:Int = startMouseID + 1;
 
-        if (spanIndex >= 0) spans.push(new Span(defaultStyle, 0));
+        if (styles == null) styles = [''=>defaultStyle];
+        if (recycledSpans == null) recycledSpans = [];
+
+        spans.push(getSpan(recycledSpans, defaultStyle, startMouseID));
 
         var left:String = '';
         var right:String = input;
@@ -62,16 +57,25 @@ class StyleUtils {
 
                 var endIndex:Int = right.indexOf('}');
                 if (endIndex != -1) {
-                    var style:Style = makeStyle(styleType, right.substr(0, endIndex + 1), lookup);
-                    if (style != defaultStyle && lookup[style.name] == null) {
-                        lookup[style.name] = style;
+
+                    var guts:String = right.substr(0, endIndex + 1);
+                    guts = Utf8.sub(guts, 1, Utf8.length(guts)    ); // Remove leading  '{'
+                    guts = Utf8.sub(guts, 0, Utf8.length(guts) - 1); // Remove trailing '}'
+
+                    var tag:Dynamic = guts.indexOf(':') == -1 ? {name:guts} : parseTag(guts);
+
+                    var style:Style = getStyle(styleType, tag, styles);
+                    if (style != defaultStyle && styles[style.name] == null) {
+                        styles[style.name] = style;
                         newStyles.push(style);
                     }
 
-                    if (spanIndex != -1) {
-                        var mouseID:Int = style.isInteractive ? spanIndex : 0;
-                        spanIndex++;
-                        spans.push(new Span(style, mouseID));
+                    var span:Span = getSpan(recycledSpans, style, style.isInteractive ? currentMouseID : startMouseID, tag.id);
+                    spans.push(span);
+
+                    if (style.isInteractive) {
+                        interactiveSpans.push(span);
+                        currentMouseID++;
                     }
 
                     right = right.substr(endIndex, right.length);
@@ -95,49 +99,50 @@ class StyleUtils {
                     throw 'Cyclical style dependency, pal: ( $dependencyStack )';
                 }
 
-                style = lookup[style.basis];
+                style = styles[style.basis];
                 if (style == null) break;
             }
 
             while (dependencyStack.length > 0) {
-                style = lookup[dependencyStack.pop()];
-                if (style.basis != null) style.inherit(lookup[style.basis]);
+                style = styles[dependencyStack.pop()];
+                if (style.basis != null) style.inherit(styles[style.basis]);
             }
         }
 
         for (style in newStyles) {
-            style.connectBases(lookup);
+            style.connectBases(styles);
             style.flatten();
         }
 
-        for (span in spans) span.initialize();
+        for (span in spans) span.connect();
 
         // trace('${newStyles.length} styles created.');
 
-        return {text:left + right, newStyles:newStyles, spans:spans};
+        return {input:input, output:left + right, styles:styles, spans:spans, interactiveSpans:interactiveSpans, recycledSpans:recycledSpans};
     }
 
-    public inline static function makeStyle(styleType:Class<Style>, input:String, lookup:Map<String, Style>):Style {
-
-        input = Utf8.sub(input, 1, Utf8.length(input)    ); // Remove leading  '{'
-        input = Utf8.sub(input, 0, Utf8.length(input) - 1); // Remove trailing '}'
-
-        var name:String = input.indexOf(':') == -1 ? input : parseName(input);
-        if (name == null) throw 'Style declaration must include name, chief: ( $input )';
-
-        var style:Style = lookup[name];
-        if (style == null) style = Type.createInstance(styleType, [parseTag(input)]);
-
+    inline static function getStyle(styleType:Class<Style>, tag:Dynamic, styles:Map<String, Style>):Style {
+        if (tag.name == null) throw 'Style declaration must include name, chief: ( $tag )';
+        var style:Style = styles[cast tag.name];
+        if (style == null) style = Type.createInstance(styleType, [tag]);
         return style;
     }
 
-    public inline static function makeDefaultStyle():Style {
+    inline static function getSpan(recycledSpans:Array<Span>, style:Style, mouseID:Int, id:String = null):Span {
+        var span:Span = recycledSpans.pop();
+        if (span == null) span = new Span();
+        else span.reset();
+        span.init(style, mouseID, id);
+        return span;
+    }
+
+    inline static function makeDefaultStyle():Style {
         var style:Style = new Style(defaultStyleTag());
         style.flatten();
         return style;
     }
 
-    public inline static function parseTag(input:String):Dynamic {
+    inline static function parseTag(input:String):Dynamic {
 
         var tag:Dynamic = {};
         var left:String = '';
@@ -203,7 +208,7 @@ class StyleUtils {
         return tag;
     }
 
-    public inline static function parseName(input:String):String {
+    inline static function parseName(input:String):String {
         var output:String = null;
         var index:Int = input.indexOf('name');
         if (index != -1) {
@@ -215,4 +220,6 @@ class StyleUtils {
         }
         return output;
     }
+
+    inline static function defaultStyleTag():Dynamic return {name:'', r:1, g:1, b:1, i:0, f:0.5, s:1, p:0};
 }

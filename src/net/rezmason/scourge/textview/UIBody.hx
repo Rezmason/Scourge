@@ -41,11 +41,15 @@ class UIBody extends Body {
     var numRows:Int;
     var numCols:Int;
 
+    var bodyPaint:Int;
+
     var uiMediator:UIMediator;
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, uiMediator:UIMediator):Void {
 
         super(bufferUtil, glyphTexture);
+
+        bodyPaint = id << 16;
 
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
@@ -80,7 +84,7 @@ class UIBody extends Body {
     override public function update(delta:Float):Void {
 
         if (!dragging && uiMediator.isDirty) {
-            uiMediator.updateDirtyText();
+            uiMediator.updateDirtyText(bodyPaint);
             if (Math.isNaN(currentScrollPos)) setScrollPos(uiMediator.bottomPos());
             glideTextToPos(uiMediator.bottomPos());
             redrawHitSignal.dispatch();

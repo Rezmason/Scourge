@@ -4,6 +4,15 @@ import net.kawa.tween.easing.Quad;
 
 import net.rezmason.scourge.textview.core.Interaction;
 
+typedef ButtonSpanState = {
+    var time:Float;
+    var fromIndex:Int;
+    var toIndex:Int;
+    var ratio:Float;
+    var mouseIsOver:Bool;
+    var mouseIsDown:Bool;
+}
+
 class ButtonStyle extends Style {
 
     inline static var UP_FRAME:Int = 0;
@@ -22,9 +31,9 @@ class ButtonStyle extends Style {
         for (field in buttonFields) values[field] = Reflect.field(dec, field);
     }
 
-    override public function initializeSpan(span:Span):Void {
-        span.state = new ButtonSpanState();
-        super.initializeSpan(span);
+    override public function connectSpan(span:Span):Void {
+        span.state = {time:0, fromIndex:0, toIndex:0, mouseIsOver:false, mouseIsDown:false, ratio:1};
+        super.connectSpan(span);
     }
 
     override public function inherit(parent:Style):Void {
