@@ -1,6 +1,6 @@
 Replace styles in main text with their non-interactive states
 Support input restriction
-import net.rezmason.scourge.textview.core.Interaction;
+Suppoprt hint hovering
 Implement all non-play text commands
 
 Human players, GUISystem

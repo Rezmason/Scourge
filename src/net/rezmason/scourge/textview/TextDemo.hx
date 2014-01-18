@@ -30,7 +30,7 @@ using Lambda;
 
 class TextDemo {
 
-    static var playKeyHints:Array<String> = ['numPlayers', 'botPeriod'];
+    static var playKeyHints:Array<String> = ['playerPattern', 'botPeriod'];
     static var playFlagHints:Array<String> = ['replay', 'circular'];
 
     var engine:Engine;
@@ -89,9 +89,15 @@ class TextDemo {
 
         var isReplay:Bool = flags.has('replay');
 
-        var numPlayers:Int = Std.parseInt(keyValuePairs['numPlayers']);
+        var playerPatternString:String = keyValuePairs['playerPattern'];
+        if (playerPatternString == null) playerPatternString = 'bb';
+        var playerPattern:Array<String> = playerPatternString.split('');
+        var numPlayers:Int = playerPattern.length;
         if (numPlayers > 8) numPlayers = 8;
         if (numPlayers < 2) numPlayers = 2;
+
+        if (playerPattern.length > numPlayers) playerPattern = playerPattern.slice(0, numPlayers);
+        while (playerPattern.length < numPlayers) playerPattern.push('b');
 
         var botPeriod:Int = Std.parseInt(keyValuePairs['botPeriod']);
 
@@ -123,7 +129,11 @@ class TextDemo {
 
             while (playerDefs.length < numPlayers) playerDefs.push(Bot(new ReplaySmarts(log), botPeriod));
         } else {
-            while (playerDefs.length < numPlayers) playerDefs.push(Bot(new RandomSmarts(), botPeriod));
+            while (playerDefs.length < numPlayers) {
+                var char:String = playerPattern[playerDefs.length];
+                var pdef = (char == 'b' ? Bot(new RandomSmarts(), botPeriod) : Human);
+                playerDefs.push(pdef);
+            }
         }
 
         referee.beginGame({
