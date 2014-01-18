@@ -16,4 +16,7 @@ This is another §{test2}test§{}.
 µ{name:button2, basis:button, r:0, id:button2}  ANOTHER BUTTON  §{}
 
 µ{name:button, id:button3}  BUTTON TIME AGAIN  §{}
+
+µ{name:input, id:blerp}BEDEEP§{}
+
 §{name:broken, r:hello}ABCD§{}

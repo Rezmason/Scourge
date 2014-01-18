@@ -25,7 +25,7 @@ class ButtonStyle extends Style {
     static var buttonFields:Array<String> = ['up', 'over', 'down', 'period', 'ease'];
 
     public function new(dec:Dynamic):Void {
-        period = null;
+        period = 0;
         super(dec);
         isInteractive = true;
         for (field in buttonFields) values[field] = Reflect.field(dec, field);
@@ -44,10 +44,11 @@ class ButtonStyle extends Style {
     override public function updateSpan(span:Span, delta:Float):Void {
         var state:ButtonSpanState = cast span.state;
 
-        if (state.time < period) {
+        if (state.time < period || period == 0) {
             state.time = state.time + delta;
             if (state.time > period) state.time = period;
             state.ratio = easeFunc(state.time / period);
+            if (period == 0) state.ratio = 1;
             interpolateSpan(span, state.fromIndex, state.toIndex, state.ratio);
         }
 
@@ -87,6 +88,7 @@ class ButtonStyle extends Style {
         frames[UP_FRAME] = values['up'];
         frames[OVER_FRAME] = values['over'];
         frames[DOWN_FRAME] = values['down'];
+        if (frames[UP_FRAME] == null) frames[UP_FRAME] = '';
         if (frames[OVER_FRAME] == null) frames[OVER_FRAME] = frames[UP_FRAME];
         if (frames[DOWN_FRAME] == null) frames[DOWN_FRAME] = frames[OVER_FRAME];
         connectStates(bases, frames);

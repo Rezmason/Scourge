@@ -7,4 +7,5 @@ typedef ParsedOutput = {
     var interactiveSpans:Array<Span>;
     var styles:Map<String, Style>;
     var recycledSpans:Array<Span>;
+    var spansByStyleName:Map<String, Array<Span>>;
 }

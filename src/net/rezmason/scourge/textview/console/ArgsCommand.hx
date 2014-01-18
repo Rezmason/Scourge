@@ -9,9 +9,9 @@ class ArgsCommand extends ConsoleCommand {
 
     inline static var UNRECOGNIZED_PARAM:String = 'Unrecognized parameter.';
     inline static var STYLES:String =
-            '§{name:key,  r:0.5, g:1.0, b:1.0}' +
-            '§{name:val,  r:1.0, g:0.5, b:1.0}' +
-            '§{name:flag, r:1.0, g:1.0, b:0.5}';
+            'µ{name:key,  basis:__input, r:0.5, g:1.0, b:1.0}' +
+            'µ{name:val,  basis:__input, r:1.0, g:0.5, b:1.0}' +
+            'µ{name:flag, basis:__input, r:1.0, g:1.0, b:0.5}';
     inline static var KEY_STYLENAME:String = 'key';
     inline static var VALUE_STYLENAME:String = 'val';
     inline static var FLAG_STYLENAME:String = 'flag';
@@ -39,7 +39,7 @@ class ArgsCommand extends ConsoleCommand {
 
         if (tokens.length == 1) {
             // Let's move the caret to a new token.
-            tokens.push({text:'', type:PLAIN_TEXT});
+            tokens.push({text:''});
             info.tokenIndex = 1;
             info.caretIndex = 0;
         }
@@ -49,6 +49,11 @@ class ArgsCommand extends ConsoleCommand {
             if (info.char != '' && tokens.length > info.tokenIndex + 1) {
                 tokens.splice(info.tokenIndex + 1, tokens.length);
             }
+
+            var prevTokens:Array<TextToken> = tokens.copy();
+            prevTokens.pop();
+            var flagHintToToken:String->TextToken = hintToToken.bind(prevTokens, _, FLAG_STYLENAME);
+            var keyHintToToken :String->TextToken = hintToToken.bind(prevTokens, _,  KEY_STYLENAME);
 
             var usedKeyHints:Map<String, Bool> = new Map();
             var usedFlagHints:Map<String, Bool> = new Map();
@@ -102,8 +107,8 @@ class ArgsCommand extends ConsoleCommand {
                 } else {
                     var matchingKeyHints:Array<String> = remainingKeyHints.filter(hintMatchesArg.bind(_, currentArg));
                     var matchingFlagHints:Array<String> = remainingFlagHints.filter(hintMatchesArg.bind(_, currentArg));
-                    if (matchingFlagHints.length > 0) hintTokens = hintTokens.concat(matchingFlagHints.map(hintToToken.bind(_, FLAG_STYLENAME)));
-                    if ( matchingKeyHints.length > 0) hintTokens = hintTokens.concat( matchingKeyHints.map(hintToToken.bind(_,  KEY_STYLENAME)));
+                    if (matchingFlagHints.length > 0) hintTokens = hintTokens.concat(matchingFlagHints.map(flagHintToToken));
+                    if ( matchingKeyHints.length > 0) hintTokens = hintTokens.concat( matchingKeyHints.map(keyHintToToken));
                     if (hintTokens.length == 0 && length(currentArg) > 0) errorMessage = UNRECOGNIZED_PARAM;
                 }
             } else {
@@ -114,15 +119,15 @@ class ArgsCommand extends ConsoleCommand {
 
             if (errorMessage != null) {
                 currentToken.styleName = Strings.ERROR_HINT_STYLENAME;
-                hintTokens = [{text:errorMessage, type:PLAIN_TEXT, styleName:Strings.ERROR_HINT_STYLENAME}];
+                hintTokens = [{text:errorMessage, styleName:Strings.ERROR_HINT_STYLENAME}];
             } else if (completed) {
-                tokens.push({text:'', type:PLAIN_TEXT});
+                tokens.push({text:''});
                 info.tokenIndex++;
                 info.caretIndex = 0;
 
                 if (showAllHints) {
-                    hintTokens = hintTokens.concat( remainingKeyHints.map(hintToToken.bind(_,  KEY_STYLENAME)));
-                    hintTokens = hintTokens.concat(remainingFlagHints.map(hintToToken.bind(_, FLAG_STYLENAME)));
+                    hintTokens = hintTokens.concat( remainingKeyHints.map(keyHintToToken));
+                    hintTokens = hintTokens.concat(remainingFlagHints.map(flagHintToToken));
                 }
             }
         }
@@ -134,9 +139,10 @@ class ArgsCommand extends ConsoleCommand {
 
     function hintMatchesArg(hint:String, arg:String):Bool return hint.indexOf(arg) == 0;
 
-    function hintToToken(hint:String, styleName:String = null):TextToken {
-        var token:TextToken =  {text:hint, type:PLAIN_TEXT};
+    function hintToToken(tokens:Array<TextToken>, hint:String, styleName:String = null):TextToken {
+        var token:TextToken =  {text:hint, authorID:id};
         if (styleName != null) token.styleName = styleName;
+        token.payload = tokens.concat([token, {text:''}]);
         return token;
     }
 
@@ -153,7 +159,7 @@ class ArgsCommand extends ConsoleCommand {
         var output:TextToken = null;
 
         if (hintTokens.length > 0 && hintTokens[0].styleName == Strings.ERROR_HINT_STYLENAME) {
-            output = {text:hintTokens[0].text, type:PLAIN_TEXT, styleName:Strings.ERROR_EXEC_STYLENAME};
+            output = {text:hintTokens[0].text, styleName:Strings.ERROR_EXEC_STYLENAME};
         } else {
             var keyValuePairs:Map<String, String> = new Map();
             var flags:Array<String> = [];
@@ -169,7 +175,7 @@ class ArgsCommand extends ConsoleCommand {
                 }
             }
 
-            output = {text:func(keyValuePairs, flags), type:PLAIN_TEXT};
+            output = {text:func(keyValuePairs, flags)};
         }
 
         callback([output], true);

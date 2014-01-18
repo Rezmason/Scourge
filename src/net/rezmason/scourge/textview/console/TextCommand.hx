@@ -15,7 +15,7 @@ class TextCommand extends ConsoleCommand {
     override public function getHint(tokens:Array<TextToken>, info:InputInfo, callback:HintCallback):Void {
         if (tokens.length == 1) {
             // Let's move the caret to a new token.
-            tokens.push({text:'', type:PLAIN_TEXT});
+            tokens.push({text:''});
             info.tokenIndex = 1;
             info.caretIndex = 0;
         }
@@ -24,6 +24,6 @@ class TextCommand extends ConsoleCommand {
     }
 
     override public function getExec(tokens:Array<TextToken>, callback:ExecCallback):Void {
-        callback([{text:func(tokens.map(function(tok):String return tok.text).join(' ')), type:PLAIN_TEXT}], true);
+        callback([{text:func(tokens.map(function(tok):String return tok.text).join(' '))}], true);
     }
 }

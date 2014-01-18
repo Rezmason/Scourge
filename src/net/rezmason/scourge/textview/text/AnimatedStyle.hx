@@ -12,24 +12,29 @@ class AnimatedStyle extends Style {
     var period:Null<Float>;
     var phase:Null<Float>;
     var easeFunc:Float->Float;
+    var time:Float;
+    var persistentState:AnimatedSpanState;
 
-    static var animationFields:Array<String> = ['period', 'phase', 'frames', 'ease'];
+    static var animationFields:Array<String> = ['period', 'phase', 'frames', 'ease', 'persist'];
 
     public function new(dec:Dynamic):Void {
         period = null;
         phase = null;
+        time = 0;
         super(dec);
         for (field in animationFields) values[field] = Reflect.field(dec, field);
     }
 
     public function startSpan(span:Span, time:Float = 0):Void {
-        var state:AnimatedSpanState = cast span.state;
+        var state:AnimatedSpanState = persistentState;
+        if (state == null) state =  cast span.state;
         state.time = time % period;
         state.playing = true;
     }
 
     public function stopSpan(span:Span):Void {
-        var state:AnimatedSpanState = cast span.state;
+        var state:AnimatedSpanState = persistentState;
+        if (state == null) state =  cast span.state;
         state.time = 0;
         state.playing = false;
     }
@@ -44,12 +49,17 @@ class AnimatedStyle extends Style {
         super.inherit(parent);
     }
 
+    override public function update(spans:Array<Span>, delta:Float):Void {
+        if (persistentState != null) updateState(persistentState, delta);
+        for (span in spans) updateSpan(span, delta);
+    }
+
     override public function updateSpan(span:Span, delta:Float):Void {
 
-        var state:AnimatedSpanState = cast span.state;
-
-        if (state.playing) {
-            state.time = (state.time + delta) % period;
+        var state:AnimatedSpanState = persistentState;
+        if (state == null) {
+            state = cast span.state;
+            updateState(cast span.state, delta);
         }
 
         var numFrames:Int = stateStyles.length;
@@ -63,6 +73,10 @@ class AnimatedStyle extends Style {
         interpolateSpan(span, fromIndex, toIndex, ratio);
 
         super.updateSpan(span, delta);
+    }
+
+    inline function updateState(state:AnimatedSpanState, delta:Float):Void {
+        if (state.playing) state.time = (state.time + delta) % period;
     }
 
     override public function toString():String return '${super.toString()}, frames:${values["frames"]}';
@@ -85,6 +99,8 @@ class AnimatedStyle extends Style {
 
         easeFunc = Style.easeLibrary[cast values['ease']];
         if (easeFunc == null) easeFunc = Quad.easeInOut;
+
+        if (values['persist'] == 'true') persistentState = {time:0, playing:true};
 
         super.flatten();
     }

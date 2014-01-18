@@ -25,8 +25,13 @@ private typedef HistEntry = { val:Array<TextToken>, ?next:HistEntry, ?prev:HistE
 
 class ConsoleUIMediator extends UIMediator {
 
+    inline static var INPUT_PREFIX:String = '__input_';
+    inline static var OUTPUT_PREFIX:String = '__output_';
+    inline static var HINT_PREFIX:String = '__hint_';
+
     public var hintSignal(default, null):Zig<Array<TextToken>->InputInfo->Void>;
     public var execSignal(default, null):Zig<Array<TextToken>->Void>;
+    public var buttonSignal(default, null):Zig<TextToken->MouseInteractionType->Void>;
 
     public var frozen(get, set):Bool;
     var hintingPreExecution:Bool;
@@ -58,8 +63,12 @@ class ConsoleUIMediator extends UIMediator {
 
         super();
 
-        document.loadStyles(Strings.BREATHING_PROMPT_STYLE);
-        document.loadStyles(Strings.WAIT_STYLES);
+        document.loadStyles([
+            Strings.BREATHING_PROMPT_STYLE,
+            Strings.WAIT_STYLES,
+            Strings.INPUT_STYLE,
+            Strings.ERROR_STYLES,
+        ].join(''));
 
         setPlayer('rezmason', 0x30FF00);
 
@@ -83,6 +92,7 @@ class ConsoleUIMediator extends UIMediator {
 
         hintSignal = new Zig();
         execSignal = new Zig();
+        buttonSignal = new Zig();
 
         frozenQueue = new List();
         frozen = false;
@@ -124,9 +134,9 @@ class ConsoleUIMediator extends UIMediator {
         if (executing) {
             combinedText += Strings.WAIT_INDICATOR;
         } else {
-            combinedText += prompt + printTokens(inputTokens, ' ', tokenIndex, caretIndex);
+            combinedText += prompt + printTokens(INPUT_PREFIX, inputTokens, ' ', tokenIndex, caretIndex);
             combinedText += '\n'; // Always added, because there's always input
-            if (hintTokens.length > 0) combinedText += '\t' + printTokens(hintTokens, '\n\t');
+            if (hintTokens.length > 0) combinedText += '\t' + printTokens(HINT_PREFIX, hintTokens, '\n\t');
         }
 
         return combinedText;
@@ -155,11 +165,36 @@ class ConsoleUIMediator extends UIMediator {
 
     override function handleSpanMouseInteraction(span:Span, type:MouseInteractionType):Void {
         super.handleSpanMouseInteraction(span, type);
-        // trace('${span.id} $type');
+        if (span.id.indexOf(INPUT_PREFIX) == 0) {
+            for (ike in 0...inputTokens.length) {
+                if (inputTokens[ike].id == span.id) {
+                    if (type == MOUSE_DOWN || type == MOUSE_UP) {
+                        tokenIndex = ike;
+                        caretIndex = length(inputTokens[tokenIndex].text);
+                        isDirty = true;
+                    }
+                    break;
+                }
+            }
+        } else if (span.id.indexOf(OUTPUT_PREFIX) == 0) {
+            for (token in outputTokens) {
+                if (token.id == span.id) {
+                    buttonSignal.dispatch(token, type);
+                    break;
+                }
+            }
+        } else if (span.id.indexOf(HINT_PREFIX) == 0) {
+            for (token in hintTokens) {
+                if (token.id == span.id) {
+                    buttonSignal.dispatch(token, type);
+                    break;
+                }
+            }
+        }
     }
 
     override public function updateSpans(delta:Float):Void {
-        caretSpan.update(delta);
+        caretStyle.updateSpan(caretSpan, delta);
         super.updateSpans(delta);
     }
 
@@ -168,6 +203,9 @@ class ConsoleUIMediator extends UIMediator {
         this.tokenIndex = tokenIndex;
         this.caretIndex = caretIndex;
         this.hintTokens = hint;
+
+        for (token in inputTokens) if (token.styleName == null) token.styleName = Strings.INPUT_STYLENAME;
+        for (token in  hintTokens) if (token.styleName == null) token.styleName = Strings.INPUT_STYLENAME;
 
         if (hintingPreExecution) {
             hintingPreExecution = false;
@@ -186,7 +224,7 @@ class ConsoleUIMediator extends UIMediator {
 
         outputTokens = output;
         if (outputTokens.length > 0 && length(outputTokens.map(stringFromToken).join('')) > 0) {
-            outputString = '\t${printTokens(outputTokens, "\n\t")}\n';
+            outputString = '\t${printTokens(OUTPUT_PREFIX, outputTokens, "\n\t")}\n';
         }
         else outputString = '';
         isDirty = true;
@@ -238,11 +276,11 @@ class ConsoleUIMediator extends UIMediator {
 
         var oldOutputString:String = '';
         if (outputTokens.length > 0 && length(outputTokens.map(stringFromToken).join('')) > 0) {
-            oldOutputString = '\t${printTokens(outputTokens, "\n\t")}\n';
+            oldOutputString = '\t${printTokens(OUTPUT_PREFIX, outputTokens, "\n\t")}\n';
         }
         mainText += oldOutputString;
 
-        mainText += prompt + printTokens(inputTokens, ' ');
+        mainText += prompt + printTokens(INPUT_PREFIX, inputTokens, ' ');
 
         if (!isEmpty) {
             frozen = true;
@@ -257,7 +295,10 @@ class ConsoleUIMediator extends UIMediator {
         outputString = '';
     }
 
-    inline function handleTab():Void dispatchHintSignal();
+    inline function handleTab():Void {
+        if (hintTokens.length > 0) buttonSignal.dispatch(hintTokens[0], CLICK);
+        else dispatchHintSignal();
+    }
 
     inline function handleEscape():Void {
         loadInputFromHistEntry(lastHistEntry);
@@ -333,7 +374,8 @@ class ConsoleUIMediator extends UIMediator {
         }
     }
 
-    inline function printTokens(tokens:Array<TextToken>, sep:String, tokenIndex:Int = -1, caretIndex:Int = -1):String {
+    inline function printTokens(idPrefix:String, tokens:Array<TextToken>, sep:String, tokenIndex:Int = -1, caretIndex:Int = -1):String {
+        for (ike in 0...tokens.length) tokens[ike].id = idPrefix + ike;
         var strings:Array<String> = tokens.map(styleToken);
         if (tokenIndex != -1 && caretIndex != -1) {
             var token:TextToken = copyToken(tokens[tokenIndex]);
@@ -345,23 +387,10 @@ class ConsoleUIMediator extends UIMediator {
 
     inline function styleToken(token:TextToken):String {
         var str:String = '';
-
-        var styleName:String = token.styleName;
         var styleTag:String = styleEnd;
-        var style:Style = document.getStyleByName(styleName);
-        if (styleName != null && style != null) {
-            var sigil:String = '';
-            switch (token.type) {
-                case SHORTCUT(insert):
-                    var buttonStyle:ButtonStyle = cast style;
-                    sigil = Sigil.BUTTON_STYLE;
-                    // TODO
-                case _:
-                    sigil = (Std.is(style, AnimatedStyle) ? Sigil.ANIMATED_STYLE : Sigil.STYLE);
-            }
-            styleTag = '$sigil{$styleName}';
-        } else {
-            styleTag = styleEnd;
+        var styleName:String = token.styleName;
+        if (styleName != null && document.getStyleByName(styleName) != null) {
+            styleTag = Sigil.BUTTON_STYLE + '{name:$styleName, id:${token.id}}';
         }
         return styleTag + token.text + styleEnd;
     }
@@ -395,9 +424,17 @@ class ConsoleUIMediator extends UIMediator {
 
     inline function stringFromToken(token:TextToken):String return token.text;
 
-    inline static function blankToken():TextToken return {text:'', type:PLAIN_TEXT};
+    inline static function blankToken():TextToken return {text:'', styleName:Strings.INPUT_STYLENAME};
 
-    function copyToken(token:TextToken):TextToken return {text:token.text, type:token.type, styleName:token.styleName};
+    function copyToken(token:TextToken):TextToken {
+        var copy:TextToken = {text:token.text};
+        copy.id = token.id;
+        copy.authorID = token.authorID;
+        copy.styleName = token.styleName;
+        copy.restriction = token.restriction;
+        copy.payload = token.payload;
+        return copy;
+    }
 
     inline function set_caretIndex(val:Int):Int {
         caretStyle.startSpan(caretSpan, 0);

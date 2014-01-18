@@ -12,7 +12,12 @@ abstract Document(ParsedOutput) {
     public inline function getSpanByMouseID(id:Int):Span return this.interactiveSpans[id];
     public inline function getStyleByName(name:String):Style return this.styles[name];
     public inline function removeAllGlyphs():Void  for (span in this.spans) span.removeAllGlyphs();
-    public inline function updateSpans(delta:Float):Void for (span in this.spans) span.update(delta);
+
+    public inline function updateSpans(delta:Float):Void {
+        for (key in this.spansByStyleName.keys()) {
+            this.styles[key].update(this.spansByStyleName[key], delta);
+        }
+    }
 
     public inline function appendText(input:String, bodyPaint):Void {
         var that:ParsedOutput = Parser.parse(input, this.styles, bodyPaint, this.recycledSpans);

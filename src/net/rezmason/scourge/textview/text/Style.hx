@@ -29,7 +29,11 @@ class Style {
         isInteractive = false;
     }
 
-    public function updateSpan(span:Span, delta:Float):Void {
+    public function update(spans:Array<Span>, delta:Float):Void {
+        for (span in spans) updateSpan(span, delta);
+    }
+
+    function updateSpan(span:Span, delta:Float):Void {
 
         var glyphs = span.glyphs;
         var basics = span.basics;
@@ -111,6 +115,8 @@ class Style {
     public function connectSpan(span:Span):Void {
         for (ike in 0...styleFields.length) span.basics[ike] = Std.parseFloat('${values[styleFields[ike]]}');
     }
+
+    public inline function getStaticStateStyle():Style return (stateStyles.length > 0 ? stateStyles[0] : this);
 
     private function connectStates(bases:Map<String, Style>, stateNames:Array<String>):Void {
         if (stateNames.length > 0) {

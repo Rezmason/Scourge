@@ -16,7 +16,7 @@ class Parser {
     ];
 
     public inline static function getEmptyOutput():ParsedOutput {
-        return {input:'', output:'', spans:[], interactiveSpans:[], styles:[''=>defaultStyle], recycledSpans:[]};
+        return {input:'', output:'', spans:[], interactiveSpans:[], styles:[''=>defaultStyle], recycledSpans:[], spansByStyleName:[''=>[]]};
     }
 
     public static inline function parse(input:String, styles:Map<String, Style> = null, startMouseID:Int = 0, recycledSpans:Array<Span> = null):ParsedOutput {
@@ -24,11 +24,15 @@ class Parser {
         var spans:Array<Span> = [];
         var interactiveSpans:Array<Span> = [null];
         var currentMouseID:Int = startMouseID + 1;
+        var spansByStyleName:Map<String, Array<Span>> = new Map();
 
         if (styles == null) styles = [''=>defaultStyle];
+        for (style in styles) spansByStyleName[style.name] = [];
         if (recycledSpans == null) recycledSpans = [];
 
-        spans.push(getSpan(recycledSpans, defaultStyle, startMouseID));
+        var initSpan:Span = getSpan(recycledSpans, defaultStyle, startMouseID);
+        spans.push(initSpan);
+        spansByStyleName[''].push(initSpan);
 
         var left:String = '';
         var right:String = input;
@@ -67,11 +71,13 @@ class Parser {
                     var style:Style = getStyle(styleType, tag, styles);
                     if (style != defaultStyle && styles[style.name] == null) {
                         styles[style.name] = style;
+                        spansByStyleName[style.name] = [];
                         newStyles.push(style);
                     }
 
                     var span:Span = getSpan(recycledSpans, style, style.isInteractive ? currentMouseID : startMouseID, tag.id);
                     spans.push(span);
+                    spansByStyleName[style.name].push(span);
 
                     if (style.isInteractive) {
                         interactiveSpans.push(span);
@@ -118,7 +124,15 @@ class Parser {
 
         // trace('${newStyles.length} styles created.');
 
-        return {input:input, output:left + right, styles:styles, spans:spans, interactiveSpans:interactiveSpans, recycledSpans:recycledSpans};
+        return {
+            input:input,
+            output:left + right,
+            styles:styles,
+            spans:spans,
+            interactiveSpans:interactiveSpans,
+            recycledSpans:recycledSpans,
+            spansByStyleName:spansByStyleName
+        };
     }
 
     inline static function getStyle(styleType:Class<Style>, tag:Dynamic, styles:Map<String, Style>):Style {
@@ -206,19 +220,6 @@ class Parser {
         }
 
         return tag;
-    }
-
-    inline static function parseName(input:String):String {
-        var output:String = null;
-        var index:Int = input.indexOf('name');
-        if (index != -1) {
-            output = Utf8.sub(input, index, input.length);
-            var splitIndex:Int = output.indexOf(':');
-            output = Utf8.sub(output, splitIndex + 1, output.length);
-            splitIndex = output.indexOf(',');
-            if (splitIndex != -1) output = Utf8.sub(output, 0, splitIndex);
-        }
-        return output;
     }
 
     inline static function defaultStyleTag():Dynamic return {name:'', r:1, g:1, b:1, i:0, f:0.5, s:1, p:0};

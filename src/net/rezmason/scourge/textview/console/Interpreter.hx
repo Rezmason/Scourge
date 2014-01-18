@@ -2,6 +2,7 @@ package net.rezmason.scourge.textview.console;
 
 import haxe.Utf8;
 
+import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.console.Types;
 import net.rezmason.utils.Utf8Utils.*;
 
@@ -15,9 +16,11 @@ class Interpreter {
 
     var console:ConsoleUIMediator;
     var commandsByName:Map<String, ConsoleCommand>;
+    var commandsByID:Map<Int, ConsoleCommand>;
 
     public function new():Void {
         commandsByName = new Map();
+        commandsByID = new Map();
     }
 
     public function connectToConsole(console:ConsoleUIMediator):Void {
@@ -26,8 +29,9 @@ class Interpreter {
         this.console = console;
         console.hintSignal.add(onHintSignal);
         console.execSignal.add(onExecSignal);
+        console.buttonSignal.add(onButtonSignal);
 
-        console.loadStyles(Strings.ERROR_STYLES + HINT_BUTTON_STYLE_ELEMENTS);
+        console.loadStyles(HINT_BUTTON_STYLE_ELEMENTS);
         for (command in commandsByName) console.loadStyles(command.tokenStyles);
     }
 
@@ -35,16 +39,24 @@ class Interpreter {
         if (this.console != null) {
             console.hintSignal.remove(onHintSignal);
             console.execSignal.remove(onExecSignal);
+            console.buttonSignal.remove(onButtonSignal);
             this.console = null;
         }
     }
 
     public function addCommand(name:String, command:ConsoleCommand):Void {
         commandsByName[name] = command;
+        commandsByID[command.id] = command;
         if (console != null) console.loadStyles(command.tokenStyles);
     }
 
-    public function removeCommand(name:String):Void commandsByName.remove(name);
+    public function removeCommand(name:String):Void {
+        var command:ConsoleCommand = commandsByName[name];
+        if (command != null) {
+            commandsByName.remove(name);
+            commandsByID.remove(command.id);
+        }
+    }
 
     function onHintSignal(tokens:Array<TextToken>, info:InputInfo):Void {
 
@@ -90,19 +102,19 @@ class Interpreter {
                 // We make a shortcut for each match.
                 var hintTokens:Array<TextToken> = [];
                 for (name in potentialNames) {
-                    hintTokens.push({
+                    var token:TextToken = {
                         text:name,
-                        type:SHORTCUT([
-                            {text:'$name ', type:PLAIN_TEXT}
-                        ]),
-                        styleName:'potentialNameHint'
-                    });
+                        styleName:commandsByName[name].nameStyle,
+                        authorID:-1
+                    };
+                    token.payload = [token, {text:''}];
+                    hintTokens.push(token);
                 }
                 tokens[0].styleName = null;
                 console.receiveHint(tokens, info.tokenIndex, info.caretIndex, hintTokens);
             } else {
                 // No matches; we tell the user.
-                errorHint(tokens, info, UNRECOGNIZED_COMMAND);
+                sendErrorHint(tokens, info, UNRECOGNIZED_COMMAND);
             }
         } else {
             if (commandsByName.exists(commandName)) {
@@ -117,7 +129,7 @@ class Interpreter {
                 info.tokenIndex = 0;
                 info.caretIndex = length(tokens[0].text);
 
-                errorHint(tokens, info, UNRECOGNIZED_COMMAND);
+                sendErrorHint(tokens, info, UNRECOGNIZED_COMMAND);
             }
         }
     }
@@ -126,16 +138,46 @@ class Interpreter {
         var commandName:String = tokens[0].text;
         var command:ConsoleCommand = commandsByName[commandName];
         if (command != null) command.getExec(tokens, console.receiveExec);
-        else errorExec(UNRECOGNIZED_COMMAND);
+        else sendErrorExec(UNRECOGNIZED_COMMAND);
     }
 
-    function errorHint(tokens:Array<TextToken>, info:InputInfo, message:String):Void {
-        for (token in tokens) token.styleName = Strings.ERROR_HINT_STYLENAME;
-        console.receiveHint(tokens, info.tokenIndex, info.caretIndex, [{text:message, type:PLAIN_TEXT}]);
+    function onButtonSignal(token:TextToken, type:MouseInteractionType):Void {
+
+        var command:ConsoleCommand = null;
+        var authorID:Null<Int> = token.authorID;
+        if (authorID == -1) {
+            switch (type) {
+                case CLICK: sendShortcutInput(resolveTokenShortcut(token));
+                case _:
+            }
+        } else if (authorID != null && authorID >= 0) {
+            command = commandsByID[token.authorID];
+        }
+
+        if (command != null) {
+            switch (type) {
+                case CLICK: sendShortcutInput(command.resolveTokenShortcut(token));
+                case _:
+            }
+        }
     }
 
-    function errorExec(message:String):Void {
-        console.receiveExec([{text:message, type:PLAIN_TEXT, styleName:Strings.ERROR_EXEC_STYLENAME}], true);
+    function resolveTokenShortcut(token:TextToken):Array<TextToken> {
+        return token.payload;
+    }
+
+    function sendShortcutInput(tokens:Array<TextToken>):Void {
+        var info:InputInfo = {tokenIndex:tokens.length - 1, caretIndex: length(tokens[tokens.length - 1].text), char:''};
+        commandsByName[tokens[0].text].getHint(tokens, info, console.receiveHint);
+    }
+
+    function sendErrorHint(tokens:Array<TextToken>, info:InputInfo, message:String):Void {
+        for (token in tokens) token.styleName = Strings.ERROR_INPUT_STYLENAME;
+        console.receiveHint(tokens, info.tokenIndex, info.caretIndex, [{text:message, styleName:Strings.ERROR_HINT_STYLENAME}]);
+    }
+
+    function sendErrorExec(message:String):Void {
+        console.receiveExec([{text:message, styleName:Strings.ERROR_EXEC_STYLENAME}], true);
     }
 
     function onClickSignal(name:String):Void {

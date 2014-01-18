@@ -45,6 +45,5 @@ class Span {
 
     public inline function connect():Void style.connectSpan(this);
     public inline function removeAllGlyphs():Void glyphs = [];
-    public inline function update(delta:Float):Void style.updateSpan(this, delta);
     public inline function receiveInteraction(type:MouseInteractionType):Void style.handleSpanInteraction(this, type);
 }

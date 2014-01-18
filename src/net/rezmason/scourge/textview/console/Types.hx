@@ -1,21 +1,18 @@
 package net.rezmason.scourge.textview.console;
 
-enum TokenType {
-    PLAIN_TEXT;
-    SHORTCUT(insert:Array<TextToken>);
-    CAPSULE(type:CommandCodeType, name:String, valid:Bool);
-}
-
-enum CommandCodeType {
-    ROTATION_NOTATION;
-    NODE_CODE;
-    CRAWL_SCRAWL;
+class CommandCodeRestriction {
+    public inline static var ROTATION_NOTATION:String = 'yuioYUIO';
+    public inline static var NODE_CODE:String = '01234567890abcdefABCDEF';
+    public inline static var CRAWL_SCRAWL:String = 'qweasdzxcQWEASDZXC';
 }
 
 typedef TextToken = {
     var text:String;
-    var type:TokenType;
     @:optional var styleName:String;
+    @:optional var restriction:String;
+    @:optional var payload:Dynamic;
+    @:optional var id:String;
+    @:optional var authorID:Int;
 }
 
 typedef HintCallback = Array<TextToken> -> Int -> Int -> Array<TextToken> -> Void;

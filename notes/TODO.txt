@@ -1,18 +1,6 @@
-Style the tokens
-    Spans will have to be constantly created
-        Pooled, maybe, but still
-Type the tokens
-    Replace most of the plain text
-Token clicking
-    Clicking on a capsule token should move the carets
-    UIText broadcasts clicks to interpreter, which routes them to the proper command
-    Replace styles in main text with their non-interactive states
-
-Support input types
-    RotationNotation:   ~/[yuio]*/i
-    NodeCode:           ~/[\da-f]*/i
-    CrawlScrawl:        ~/[qweasdzxc]*/i
-
+Replace styles in main text with their non-interactive states
+Support input restriction
+import net.rezmason.scourge.textview.core.Interaction;
 Implement all non-play text commands
 
 Human players, GUISystem
