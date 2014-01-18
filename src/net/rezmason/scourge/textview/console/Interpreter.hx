@@ -157,6 +157,8 @@ class Interpreter {
         if (command != null) {
             switch (type) {
                 case CLICK: sendShortcutInput(command.resolveTokenShortcut(token));
+                case ENTER: command.handleHintHover(token, true);
+                case EXIT: command.handleHintHover(token, false);
                 case _:
             }
         }

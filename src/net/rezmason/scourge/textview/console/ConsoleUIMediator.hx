@@ -361,15 +361,17 @@ class ConsoleUIMediator extends UIMediator {
     inline function handleChar(charCode:Int):Void {
         if (charCode > 0) {
             if (inputTokens[tokenIndex] == null) inputTokens.push(blankToken());
-
-            var left:String = sub(inputTokens[tokenIndex].text, 0, caretIndex);
-            var right:String = sub(inputTokens[tokenIndex].text, caretIndex);
-
             var char:String = String.fromCharCode(charCode);
-            left += char;
-            caretIndex++;
-            inputTokens[tokenIndex].text = left + right;
-            dispatchHintSignal(char);
+            var restriction:String = inputTokens[tokenIndex].restriction;
+            if (restriction == null || restriction.indexOf(char) != -1) {
+                var left:String = sub(inputTokens[tokenIndex].text, 0, caretIndex);
+                var right:String = sub(inputTokens[tokenIndex].text, caretIndex);
+
+                left += char;
+                caretIndex++;
+                inputTokens[tokenIndex].text = left + right;
+                dispatchHintSignal(char);
+            }
             isDirty = true;
         }
     }

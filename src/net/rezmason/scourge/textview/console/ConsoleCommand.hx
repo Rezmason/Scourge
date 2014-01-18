@@ -27,4 +27,8 @@ class ConsoleCommand {
     public function resolveTokenShortcut(token:TextToken):Array<TextToken> {
         return token.payload;
     }
+
+    public function handleHintHover(token:TextToken, isHovering:Bool):Void {
+
+    }
 }

@@ -31,7 +31,7 @@ class UIMediator {
     var mainText:String;
     var styleEnd:String;
 
-    public function new():Void {
+    function new():Void {
         document = new Document();
         numRows = 0;
         numCols = 0;
@@ -48,10 +48,10 @@ class UIMediator {
 
     public function stylePage(startIndex:Int, glyphs:Array<Glyph>, caretGlyph:Glyph, font:FlatFont):Int {
         var id:Int = 0;
-        var pageSegment:Array<String> = getPageSegment(startIndex);
-        var spanIndex:Int = getLineStyleIndex(startIndex);
+        var pageSegment:Array<String> = page.slice(startIndex, startIndex + numRows);
+        var spanIndex:Int = lineStyleIndices[startIndex];
 
-        resetSpans();
+        document.removeAllGlyphs();
         styleCaret(caretGlyph, font);
 
         var currentSpan:Span = document.getSpanByIndex(spanIndex);
@@ -115,8 +115,6 @@ class UIMediator {
             }
         }
     }
-
-    public function resetSpans():Void document.removeAllGlyphs();
 
     public function updateSpans(delta:Float):Void document.updateSpans(delta);
 
@@ -184,10 +182,6 @@ class UIMediator {
     function handleSpanMouseInteraction(span:Span, type:MouseInteractionType):Void {
         span.receiveInteraction(type);
     }
-
-    public function getPageSegment(index:Int):Array<String> return page.slice(index, index + numRows);
-
-    public function getLineStyleIndex(index:Int):Int return lineStyleIndices[index];
 
     inline function swapTabsWithSpaces(input:String):String {
         var left:String = '';

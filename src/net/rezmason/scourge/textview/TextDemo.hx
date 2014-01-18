@@ -32,6 +32,7 @@ class TextDemo {
 
     static var playKeyHints:Array<String> = ['playerPattern', 'botPeriod'];
     static var playFlagHints:Array<String> = ['replay', 'circular'];
+    static var playKeyRestrictions:Map<String, String> = ['playerPattern' => 'bh'];
 
     var engine:Engine;
 
@@ -230,7 +231,7 @@ class TextDemo {
         interpreter.addCommand('setName', new TextCommand(setName));
         // interpreter.addCommand('play', new TextCommand(playGame));
         // interpreter.addCommand('replay', new TextCommand(playGame));
-        interpreter.addCommand('play', new ArgsCommand(playGame, playKeyHints, playFlagHints));
+        interpreter.addCommand('play', new ArgsCommand(playGame, playKeyHints, playFlagHints, playKeyRestrictions));
         interpreter.addCommand('print', new TextCommand(print));
         interpreter.addCommand('show', new TextCommand(show));
         interpreter.addCommand('clear', new TextCommand(clear));

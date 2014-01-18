@@ -5,6 +5,8 @@ import net.rezmason.utils.Utf8Utils.*;
 
 using Lambda;
 
+typedef Func = Map<String, String>->Array<String>->String;
+
 class ArgsCommand extends ConsoleCommand {
 
     inline static var UNRECOGNIZED_PARAM:String = 'Unrecognized parameter.';
@@ -19,12 +21,14 @@ class ArgsCommand extends ConsoleCommand {
     var func:Map<String, String>->Array<String>->String;
     var keyHints:Array<String>;
     var flagHints:Array<String>;
+    var keyRestrictions:Map<String, String>;
 
-    public function new(func:Map<String, String>->Array<String>->String, keyHints:Array<String>, flagHints:Array<String>):Void {
+    public function new(func:Func, keyHints:Array<String>, flagHints:Array<String>, keyRestrictions:Map<String, String>):Void {
         super();
         this.func = func;
         this.keyHints = keyHints;
         this.flagHints = flagHints;
+        this.keyRestrictions = keyRestrictions;
         tokenStyles = STYLES;
     }
 
@@ -142,7 +146,7 @@ class ArgsCommand extends ConsoleCommand {
     function hintToToken(tokens:Array<TextToken>, hint:String, styleName:String = null):TextToken {
         var token:TextToken =  {text:hint, authorID:id};
         if (styleName != null) token.styleName = styleName;
-        token.payload = tokens.concat([token, {text:''}]);
+        token.payload = tokens.concat([token, {text:'', restriction:keyRestrictions[hint]}]);
         return token;
     }
 

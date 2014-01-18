@@ -1,6 +1,8 @@
-Replace styles in main text with their non-interactive states
-Support input restriction
-Suppoprt hint hovering
+Reduce the amount of work for the Parser
+    Separate content into different docs
+        Old doc is just the main text
+        New doc is the output, input and hints
+Make old doc non-interactive
 Implement all non-play text commands
 
 Human players, GUISystem
