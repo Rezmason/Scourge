@@ -81,6 +81,10 @@ class Style {
         inherit(bases['']);
     }
 
+    public function removeInteraction(span:Span):Void {
+
+    }
+
     public function flatten():Void {
 
         states = [];
@@ -115,8 +119,6 @@ class Style {
     public function connectSpan(span:Span):Void {
         for (ike in 0...styleFields.length) span.basics[ike] = Std.parseFloat('${values[styleFields[ike]]}');
     }
-
-    public inline function getStaticStateStyle():Style return (stateStyles.length > 0 ? stateStyles[0] : this);
 
     private function connectStates(bases:Map<String, Style>, stateNames:Array<String>):Void {
         if (stateNames.length > 0) {

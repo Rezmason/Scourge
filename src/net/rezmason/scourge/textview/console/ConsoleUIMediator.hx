@@ -6,14 +6,9 @@ import haxe.Timer;
 import haxe.Utf8;
 
 import net.rezmason.scourge.textview.console.Types;
-import net.rezmason.scourge.textview.text.AnimatedStyle;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
-import net.rezmason.scourge.textview.text.Sigil;
-import net.rezmason.scourge.textview.text.Parser;
-import net.rezmason.scourge.textview.text.Span;
-import net.rezmason.scourge.textview.text.Style;
-import net.rezmason.scourge.textview.text.ButtonStyle;
+import net.rezmason.scourge.textview.text.*;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
 import net.rezmason.utils.Zig;
@@ -45,7 +40,6 @@ class ConsoleUIMediator extends UIMediator {
     var caretCharCode:Int;
     var tokenIndex:Int;
     var outputString:String;
-    var hintString:String;
     var inputTokens:Array<TextToken>;
     var outputTokens:Array<TextToken>;
     var hintTokens:Array<TextToken>;
@@ -59,11 +53,32 @@ class ConsoleUIMediator extends UIMediator {
     var frozenQueue:List<FrozenInteraction>;
     var _frozen:Bool;
 
+    var interactiveDoc:Document;
+    var appendedDoc:Document;
+
+    var addedText:String;
+
+    var isLogDocDirty:Bool;
+    var isLogDocAppended:Bool;
+    var isInteractiveDocDirty:Bool;
+
     public function new():Void {
 
         super();
 
-        document.loadStyles([
+        interactiveDoc = new Document();
+        interactiveDoc.shareWith(compositeDoc);
+
+        appendedDoc = new Document();
+        appendedDoc.shareWith(compositeDoc);
+
+        isLogDocDirty = false;
+        isLogDocAppended = false;
+        isInteractiveDocDirty = false;
+
+        addedText = '';
+
+        loadStyles([
             Strings.BREATHING_PROMPT_STYLE,
             Strings.WAIT_STYLES,
             Strings.INPUT_STYLE,
@@ -81,7 +96,6 @@ class ConsoleUIMediator extends UIMediator {
         tokenIndex = 0;
 
         outputString = '';
-        hintString = '';
 
         outputTokens = [];
         hintTokens = [];
@@ -98,9 +112,11 @@ class ConsoleUIMediator extends UIMediator {
         frozen = false;
         executing = false;
         hintingPreExecution = false;
+
+        isInteractiveDocDirty = true;
     }
 
-    public inline function loadStyles(dec:String):Void document.loadStyles(dec);
+    public inline function loadStyles(dec:String):Void compositeDoc.loadStyles(dec);
 
     override public function styleCaret(caretGlyph:Glyph, font:FlatFont):Void {
         caretSpan.removeAllGlyphs();
@@ -120,26 +136,47 @@ class ConsoleUIMediator extends UIMediator {
 
         prompt =
         '∂{name:head_$promptStyleName, basis:${Strings.BREATHING_PROMPT_STYLENAME}, r:$r, g:$g, b:$b}Ω' +
-        '§{name:$promptStyleName, r:$r, g:$g, b:$b} $currentPlayerName§{}' + Strings.PROMPT + styleEnd;
+        '§{name:$promptStyleName, r:$r, g:$g, b:$b} $currentPlayerName§{}' + Strings.PROMPT + '§{}';
     }
 
-    override function combineText():String {
+    override function combineDocs():Void {
 
-        var combinedText:String = mainText;
-
-        if (length(mainText) > 0) combinedText += '\n';
-
-        combinedText += outputString;
-
-        if (executing) {
-            combinedText += Strings.WAIT_INDICATOR;
-        } else {
-            combinedText += prompt + printTokens(INPUT_PREFIX, inputTokens, ' ', tokenIndex, caretIndex);
-            combinedText += '\n'; // Always added, because there's always input
-            if (hintTokens.length > 0) combinedText += '\t' + printTokens(HINT_PREFIX, hintTokens, '\n\t');
+        if (isLogDocDirty) {
+            isLogDocDirty = false;
+            logDoc.setText(swapTabsWithSpaces(mainText));
         }
 
-        return combinedText;
+        if (isLogDocAppended) {
+            isLogDocAppended = false;
+
+            mainText += addedText;
+            appendedDoc.setText(swapTabsWithSpaces(addedText));
+            appendedDoc.removeInteraction();
+            logDoc.append(appendedDoc);
+            appendedDoc.clear();
+            appendedDoc.shareWith(logDoc);
+            addedText = '';
+        }
+
+        if (isInteractiveDocDirty) {
+            isInteractiveDocDirty = false;
+
+            var interactiveText:String = (length(mainText) > 0 ? '\n' : '') + outputString;
+
+            if (executing) {
+                interactiveText += Strings.WAIT_INDICATOR;
+            } else {
+                interactiveText += prompt + printTokens(INPUT_PREFIX, inputTokens, ' ', tokenIndex, caretIndex);
+                interactiveText += '\n'; // Always added, because there's always input
+                if (hintTokens.length > 0) interactiveText += '\t' + printTokens(HINT_PREFIX, hintTokens, '\n\t');
+            }
+
+            interactiveDoc.setText(swapTabsWithSpaces(interactiveText));
+        }
+
+        compositeDoc.clear();
+        compositeDoc.append(logDoc);
+        compositeDoc.append(interactiveDoc);
     }
 
     override public function receiveInteraction(id:Int, interaction:Interaction):Void {
@@ -172,6 +209,7 @@ class ConsoleUIMediator extends UIMediator {
                         tokenIndex = ike;
                         caretIndex = length(inputTokens[tokenIndex].text);
                         isDirty = true;
+                        isInteractiveDocDirty = true;
                     }
                     break;
                 }
@@ -214,6 +252,7 @@ class ConsoleUIMediator extends UIMediator {
         }
 
         isDirty = true;
+        isInteractiveDocDirty = true;
     }
 
     public function receiveExec(output:Array<TextToken>, done:Bool):Void {
@@ -228,6 +267,21 @@ class ConsoleUIMediator extends UIMediator {
         }
         else outputString = '';
         isDirty = true;
+        isInteractiveDocDirty = true;
+    }
+
+    public function addToText(text:String):Void {
+        addedText += text;
+        isDirty = true;
+        isLogDocAppended = true;
+    }
+
+    public function clearText():Void {
+        mainText = '';
+        addedText = '';
+        isDirty = true;
+        isLogDocDirty = true;
+        isLogDocAppended = false;
     }
 
     inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
@@ -240,6 +294,7 @@ class ConsoleUIMediator extends UIMediator {
                 tokenIndex--;
                 caretIndex = length(inputTokens[tokenIndex].text);
                 isDirty = true;
+                isInteractiveDocDirty = true;
             }
         } else {
             var left:String = sub(inputTokens[tokenIndex].text, 0, caretIndex);
@@ -256,6 +311,7 @@ class ConsoleUIMediator extends UIMediator {
 
 
             isDirty = true;
+            isInteractiveDocDirty = true;
         }
 
         dispatchHintSignal(Strings.BACKSPACE());
@@ -272,15 +328,14 @@ class ConsoleUIMediator extends UIMediator {
 
         var isEmpty:Bool = inputTokens.length == 1 && length(inputTokens[0].text) == 0;
 
-        if (length(mainText) > 0) mainText += '\n';
+        var lastInteractiveText:String = (length(mainText) > 0 ? '\n' : '');
 
         var oldOutputString:String = '';
         if (outputTokens.length > 0 && length(outputTokens.map(stringFromToken).join('')) > 0) {
             oldOutputString = '\t${printTokens(OUTPUT_PREFIX, outputTokens, "\n\t")}\n';
         }
-        mainText += oldOutputString;
-
-        mainText += prompt + printTokens(INPUT_PREFIX, inputTokens, ' ');
+        lastInteractiveText += oldOutputString;
+        lastInteractiveText += prompt + printTokens(INPUT_PREFIX, inputTokens, ' ');
 
         if (!isEmpty) {
             frozen = true;
@@ -288,6 +343,8 @@ class ConsoleUIMediator extends UIMediator {
             appendHistEntry(inputTokens);
             dispatchExecSignal();
         }
+
+        addToText(lastInteractiveText);
 
         loadInputFromHistEntry(lastHistEntry);
         hintTokens = [];
@@ -332,6 +389,7 @@ class ConsoleUIMediator extends UIMediator {
         }
         dispatchHintSignal();
         isDirty = true;
+        isInteractiveDocDirty = true;
     }
 
     inline function handleUp():Void {
@@ -356,6 +414,7 @@ class ConsoleUIMediator extends UIMediator {
         tokenIndex = inputTokens.length - 1;
         caretIndex = length(inputTokens[tokenIndex].text);
         isDirty = true;
+        isInteractiveDocDirty = true;
     }
 
     inline function handleChar(charCode:Int):Void {
@@ -363,7 +422,7 @@ class ConsoleUIMediator extends UIMediator {
             if (inputTokens[tokenIndex] == null) inputTokens.push(blankToken());
             var char:String = String.fromCharCode(charCode);
             var restriction:String = inputTokens[tokenIndex].restriction;
-            if (restriction == null || restriction.indexOf(char) != -1) {
+            if (char == ' ' || restriction == null || restriction.indexOf(char) != -1) {
                 var left:String = sub(inputTokens[tokenIndex].text, 0, caretIndex);
                 var right:String = sub(inputTokens[tokenIndex].text, caretIndex);
 
@@ -373,6 +432,7 @@ class ConsoleUIMediator extends UIMediator {
                 dispatchHintSignal(char);
             }
             isDirty = true;
+            isInteractiveDocDirty = true;
         }
     }
 
@@ -389,12 +449,12 @@ class ConsoleUIMediator extends UIMediator {
 
     inline function styleToken(token:TextToken):String {
         var str:String = '';
-        var styleTag:String = styleEnd;
+        var styleTag:String = '§{}';
         var styleName:String = token.styleName;
-        if (styleName != null && document.getStyleByName(styleName) != null) {
+        if (styleName != null && compositeDoc.getStyleByName(styleName) != null) {
             styleTag = Sigil.BUTTON_STYLE + '{name:$styleName, id:${token.id}}';
         }
-        return styleTag + token.text + styleEnd;
+        return styleTag + token.text + '§{}';
     }
 
     inline function get_frozen():Bool return _frozen;
@@ -416,6 +476,7 @@ class ConsoleUIMediator extends UIMediator {
         var info:InputInfo = {tokenIndex:tokenIndex, caretIndex:caretIndex, char:char};
         hintTokens = [];
         isDirty = true;
+        isInteractiveDocDirty = true;
         hintSignal.dispatch(inputTokens, info);
     }
 

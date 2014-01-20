@@ -17,6 +17,7 @@ class Span {
 
     var glyphs:Array<Glyph>;
     var mouseID:Int;
+    var isInteractive:Bool;
     var state:SpanState;
 
     public function new():Void {
@@ -28,22 +29,45 @@ class Span {
         style = null;
         glyphs = null;
         basics = null;
+        isInteractive = true;
     }
 
     public function init(style:Style, mouseID:Int, id:String):Void {
-        this.mouseID = mouseID;
         this.style = style;
         this.id = id;
         glyphs = [];
         basics = [];
+        setMouseID(mouseID);
     }
 
     public inline function addGlyph(glyph:Glyph):Void {
-        glyph.set_paint(mouseID);
+        paintGlyph(glyph, isInteractive ? mouseID : 0);
         glyphs.push(glyph);
     }
+
+    public inline function setMouseID(mouseID:Int):Void {
+        this.mouseID = mouseID & 0x00FFFF;
+        if (isInteractive) for (glyph in glyphs) paintGlyph(glyph, mouseID);
+    }
+
+    public inline function setInteractive(val:Bool):Void {
+        if (isInteractive != val) {
+            isInteractive = val;
+            for (glyph in glyphs) paintGlyph(glyph, isInteractive ? mouseID : 0);
+        }
+    }
+
+    inline function paintGlyph(glyph:Glyph, val:Int):Void glyph.set_paint((glyph.get_paint() & 0xFF0000) | val);
 
     public inline function connect():Void style.connectSpan(this);
     public inline function removeAllGlyphs():Void glyphs = [];
     public inline function receiveInteraction(type:MouseInteractionType):Void style.handleSpanInteraction(this, type);
+
+    public inline function copyTo(otherSpan:Span):Span {
+        if (otherSpan == null) otherSpan = new Span();
+        otherSpan.init(style, mouseID, id);
+        otherSpan.connect();
+        otherSpan.isInteractive = isInteractive;
+        return otherSpan;
+    }
 }

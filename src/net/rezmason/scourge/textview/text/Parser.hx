@@ -15,8 +15,9 @@ class Parser {
         BUTTON_STYLE => ButtonStyle,
     ];
 
-    public inline static function getEmptyOutput():ParsedOutput {
-        return {input:'', output:'', spans:[], interactiveSpans:[], styles:[''=>defaultStyle], recycledSpans:[], spansByStyleName:[''=>[]]};
+    public inline static function makeEmptyOutput():ParsedOutput {
+        var span:Span = getSpan();
+        return {input:'', output:'§', spans:[span], interactiveSpans:[], styles:[''=>defaultStyle], recycledSpans:[], spansByStyleName:[''=>[span]]};
     }
 
     public static inline function parse(input:String, styles:Map<String, Style> = null, startMouseID:Int = 0, recycledSpans:Array<Span> = null):ParsedOutput {
@@ -54,7 +55,6 @@ class Parser {
 
             if (startIndex != -1) {
                 if (startIndex > 0) left = left + right.substr(0, startIndex);
-                left = left + STYLE;
 
                 right = right.substr(startIndex, right.length);
                 right = Utf8.sub(right, 1, Utf8.length(right));
@@ -75,17 +75,29 @@ class Parser {
                         newStyles.push(style);
                     }
 
-                    var span:Span = getSpan(recycledSpans, style, style.isInteractive ? currentMouseID : startMouseID, tag.id);
-                    spans.push(span);
-                    spansByStyleName[style.name].push(span);
-
-                    if (style.isInteractive) {
-                        interactiveSpans.push(span);
-                        currentMouseID++;
-                    }
-
                     right = right.substr(endIndex, right.length);
                     right = Utf8.sub(right, 1, Utf8.length(right));
+
+                    var skipSpan:Bool = false;
+                    for (sigil in [STYLE, ANIMATED_STYLE, BUTTON_STYLE]) {
+                        if (right.indexOf(sigil) == 0) {
+                            skipSpan = true;
+                            break;
+                        }
+                    }
+
+                    if (!skipSpan) {
+                        var span:Span = getSpan(recycledSpans, style, style.isInteractive ? currentMouseID : startMouseID, tag.id);
+                        spans.push(span);
+                        spansByStyleName[style.name].push(span);
+
+                        if (style.isInteractive) {
+                            interactiveSpans.push(span);
+                            currentMouseID++;
+                        }
+
+                        left = left + STYLE;
+                    }
                 }
             } else {
                 break;
@@ -142,9 +154,10 @@ class Parser {
         return style;
     }
 
-    inline static function getSpan(recycledSpans:Array<Span>, style:Style, mouseID:Int, id:String = null):Span {
-        var span:Span = recycledSpans.pop();
+    inline static function getSpan(recycledSpans:Array<Span> = null, style:Style = null, mouseID:Int = 0, id:String = null):Span {
+        var span:Span = (recycledSpans == null ? null : recycledSpans.pop());
         if (span == null) span = new Span();
+        if (style == null) style = defaultStyle;
         else span.reset();
         span.init(style, mouseID, id);
         return span;

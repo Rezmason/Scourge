@@ -204,7 +204,7 @@ class TextDemo {
     }
 
     function clear(input:String):String {
-        console.setText('');
+        console.clearText();
         return '';
     }
 

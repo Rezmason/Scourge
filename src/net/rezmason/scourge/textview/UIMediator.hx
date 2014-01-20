@@ -4,10 +4,7 @@ import haxe.Utf8;
 
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Glyph;
-import net.rezmason.scourge.textview.text.Sigil;
-import net.rezmason.scourge.textview.text.Span;
-import net.rezmason.scourge.textview.text.Style;
-import net.rezmason.scourge.textview.text.Document;
+import net.rezmason.scourge.textview.text.*;
 import net.rezmason.utils.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
 
@@ -22,21 +19,21 @@ class UIMediator {
     var numRows:Int;
     var numCols:Int;
 
-    var document:Document;
+    var logDoc:Document;
+    var compositeDoc:Document;
 
     var pageLength:Int;
     var page:Array<String>;
     var lineStyleIndices:Array<Int>;
 
     var mainText:String;
-    var styleEnd:String;
-
     function new():Void {
-        document = new Document();
+        mainText = '';
+        logDoc = new Document();
+        compositeDoc = new Document();
+        compositeDoc.shareWith(logDoc);
         numRows = 0;
         numCols = 0;
-        mainText = '';
-        styleEnd = '§{}';
         isDirty = false;
     }
 
@@ -51,10 +48,10 @@ class UIMediator {
         var pageSegment:Array<String> = page.slice(startIndex, startIndex + numRows);
         var spanIndex:Int = lineStyleIndices[startIndex];
 
-        document.removeAllGlyphs();
+        compositeDoc.removeAllGlyphs();
         styleCaret(caretGlyph, font);
 
-        var currentSpan:Span = document.getSpanByIndex(spanIndex);
+        var currentSpan:Span = compositeDoc.getSpanByIndex(spanIndex);
 
         var caretGlyphID:Int = -1;
 
@@ -66,7 +63,7 @@ class UIMediator {
                 switch (charCode) {
                     case Sigil.STYLE_CODE:
                         spanIndex++;
-                        currentSpan = document.getSpanByIndex(spanIndex);
+                        currentSpan = compositeDoc.getSpanByIndex(spanIndex);
                     case Sigil.CARET_CODE:
                         caretGlyphID = id;
                     case _:
@@ -95,8 +92,8 @@ class UIMediator {
 
                 // Simplify the combined text and wrap it to new lines as we construct the page
 
-                document.setText(swapTabsWithSpaces(combineText()), bodyPaint);
-                page = document.getStyledText().split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
+                combineDocs();
+                page = compositeDoc.output.split('\n').map(wrapLines).join(LINE_TOKEN).split(LINE_TOKEN);
 
                 // Add blank lines to the end, to reach the minimum page length (numRows)
 
@@ -116,7 +113,7 @@ class UIMediator {
         }
     }
 
-    public function updateSpans(delta:Float):Void document.updateSpans(delta);
+    public function updateSpans(delta:Float):Void compositeDoc.updateSpans(delta);
 
     public function setText(text:String):Void {
         mainText = text;
@@ -125,7 +122,9 @@ class UIMediator {
 
     public function styleCaret(caretGlyph:Glyph, font:FlatFont):Void {}
 
-    function combineText():String return mainText;
+    function combineDocs():Void {
+        compositeDoc.setText(swapTabsWithSpaces(mainText));
+    }
 
     inline function padLine(line:String):String {
         var count:Int = 0;
@@ -173,7 +172,7 @@ class UIMediator {
     public function receiveInteraction(id:Int, interaction:Interaction):Void {
         switch (interaction) {
             case MOUSE(type, x, y) if (id != 0):
-                var targetSpan:Span = document.getSpanByMouseID(id);
+                var targetSpan:Span = compositeDoc.getSpanByMouseID(id);
                 if (targetSpan != null) handleSpanMouseInteraction(targetSpan, type);
             case _:
         }
