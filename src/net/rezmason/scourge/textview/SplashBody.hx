@@ -142,7 +142,7 @@ class SplashBody extends Body {
 
             var d:Float = ike / glyphTowers.length;
             var p:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.001;
-            var f:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.4 + 0.1;
+            var f:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.3 + 0.1;
             var s:Float = (Math.cos(time * 3 + d * 300) * 0.5 + 1) * 0.1 + 0.9;
 
             //var rgb:RGB = hsv2rgb(hues[ike] + s * 0.1);

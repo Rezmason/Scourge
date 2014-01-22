@@ -1,7 +1,9 @@
-Implement all non-play text commands
+Expand TextCommand output to Array<Token>
+Expand ArgsCommand output to Array<Token>
+Support output hints
 
 Human players, GUISystem
-    Implement all play text commands
+    Implement play text commands
 
 Move the logic into a Worker
 Get referee to handle situations where a player takes too long to sync or move

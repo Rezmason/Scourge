@@ -220,6 +220,17 @@ class TextDemo {
         return str;
     }
 
+    #if (neko || cpp)
+        function quit(input:String):String {
+            return 'Are you sure you want to quit Scourge?';
+        }
+
+        function confirmQuit(input:String):String {
+            Sys.exit(0);
+            return '';
+        }
+    #end
+
     function makeInterpreter():Void {
         console = new ConsoleUIMediator();
         interpreter = new Interpreter();
@@ -229,12 +240,14 @@ class TextDemo {
         interpreter.addCommand('setFont', new TextCommand(setFont));
         interpreter.addCommand('setFontSize', new TextCommand(setFontSize));
         interpreter.addCommand('setName', new TextCommand(setName));
-        // interpreter.addCommand('play', new TextCommand(playGame));
-        // interpreter.addCommand('replay', new TextCommand(playGame));
         interpreter.addCommand('play', new ArgsCommand(playGame, playKeyHints, playFlagHints, playKeyRestrictions));
         interpreter.addCommand('print', new TextCommand(print));
         interpreter.addCommand('show', new TextCommand(show));
         interpreter.addCommand('clear', new TextCommand(clear));
+        #if (neko || cpp)
+            interpreter.addCommand('quit', new TextCommand(quit));
+            interpreter.addCommand('confirm_quit', new TextCommand(confirmQuit, true));
+        #end
     }
 
     function makeBodies():Void {
