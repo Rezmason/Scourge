@@ -146,7 +146,7 @@ class ArgsCommand extends ConsoleCommand {
     function hintToToken(tokens:Array<TextToken>, hint:String, styleName:String = null):TextToken {
         var token:TextToken =  {text:hint, authorID:id};
         if (styleName != null) token.styleName = styleName;
-        token.payload = tokens.concat([token, {text:'', restriction:keyRestrictions[hint]}]);
+        token.hintData = {tokens:tokens.concat([token, {text:'', restriction:keyRestrictions[hint]}])};
         return token;
     }
 

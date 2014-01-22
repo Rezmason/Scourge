@@ -495,7 +495,7 @@ class ConsoleUIMediator extends UIMediator {
         copy.authorID = token.authorID;
         copy.styleName = token.styleName;
         copy.restriction = token.restriction;
-        copy.payload = token.payload;
+        copy.hintData = token.hintData;
         return copy;
     }
 

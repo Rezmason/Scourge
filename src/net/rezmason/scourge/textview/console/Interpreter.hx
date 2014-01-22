@@ -112,7 +112,7 @@ class Interpreter {
                         styleName:commandsByName[name].nameStyle,
                         authorID:-1
                     };
-                    token.payload = [token, {text:''}];
+                    token.hintData = {tokens:[token, {text:''}]};
                     hintTokens.push(token);
                 }
                 tokens[0].styleName = null;
@@ -152,7 +152,7 @@ class Interpreter {
         var authorID:Null<Int> = token.authorID;
         if (authorID == -1) {
             switch (type) {
-                case CLICK: sendShortcutInput(resolveTokenShortcut(token));
+                case CLICK: handleClickedShortcut(token);
                 case _:
             }
         } else if (authorID != null && authorID >= 0) {
@@ -161,7 +161,7 @@ class Interpreter {
 
         if (command != null) {
             switch (type) {
-                case CLICK: sendShortcutInput(command.resolveTokenShortcut(token));
+                case CLICK: handleClickedShortcut(token);
                 case ENTER: command.handleHintHover(token, true);
                 case EXIT: command.handleHintHover(token, false);
                 case _:
@@ -169,13 +169,13 @@ class Interpreter {
         }
     }
 
-    function resolveTokenShortcut(token:TextToken):Array<TextToken> {
-        return token.payload;
-    }
-
-    function sendShortcutInput(tokens:Array<TextToken>):Void {
-        var info:InputInfo = {tokenIndex:tokens.length - 1, caretIndex: length(tokens[tokens.length - 1].text), char:''};
-        commandsByName[tokens[0].text].getHint(tokens, info, console.receiveHint);
+    function handleClickedShortcut(token:TextToken):Void {
+        if (token.hintData != null) {
+            var instant:Bool = token.hintData.instant;
+            var tokens:Array<TextToken> = token.hintData.tokens;
+            var info:InputInfo = {tokenIndex:tokens.length - 1, caretIndex: length(tokens[tokens.length - 1].text), char:''};
+            commandsByName[tokens[0].text].getHint(tokens, info, console.receiveHint);
+        }
     }
 
     function sendErrorHint(tokens:Array<TextToken>, info:InputInfo, message:String):Void {

@@ -10,9 +10,14 @@ typedef TextToken = {
     var text:String;
     @:optional var styleName:String;
     @:optional var restriction:String;
-    @:optional var payload:Dynamic;
+    @:optional var hintData:HintData;
     @:optional var id:String;
     @:optional var authorID:Int;
+}
+
+typedef HintData = {
+    var tokens:Array<TextToken>;
+    @:optional var instant:Bool;
 }
 
 typedef HintCallback = Array<TextToken> -> Int -> Int -> Array<TextToken> -> Void;
