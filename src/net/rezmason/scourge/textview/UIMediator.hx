@@ -68,9 +68,9 @@ class UIMediator {
                         caretGlyphID = id;
                     case _:
                         var glyph:Glyph = glyphs[id];
-                        glyph.set_char(charCode, font);
-                        currentSpan.addGlyph(glyph);
-                        glyph.set_z(0);
+                            glyph.set_char(charCode, font);
+                            currentSpan.addGlyph(glyph);
+                            glyph.set_z(0);
                         id++;
                 }
             }
@@ -143,27 +143,47 @@ class UIMediator {
 
         // Splits a line into an array of lines whose length, ignoring sigils, is numCols
 
+        var charCodes:Array<Int> = [];
+        Utf8.iter(s, charCodes.push);
+
         var wrappedLines:Array<String> = [];
         var index:Int = 0;
         var lastIndex:Int = 0;
         var count:Int = 0;
+        var lastSpaceIndex:Int = -1;
+        var countFromLastSpaceIndex:Int = 0;
+        var len:Int = charCodes.length;
+        var spaceChar:Int = ' '.charCodeAt(0);
 
-        function checkChar(char:Int):Void {
+        while (index < len) {
+            var char:Int = charCodes[index];
             if (char != Sigil.STYLE_CODE && char != Sigil.CARET_CODE) {
                 count++;
-                if (count == numCols + 1) {
-                    wrappedLines.push(sub(s, lastIndex, index - lastIndex));
-                    lastIndex = index;
-                    count = 1;
+                countFromLastSpaceIndex++;
+                if (char == spaceChar) {
+                    lastSpaceIndex = index + 1;
+                    countFromLastSpaceIndex = 0;
+                }
+                if (count > numCols) {
+                    if (lastSpaceIndex != -1 && countFromLastSpaceIndex > 0) {
+                        wrappedLines.push(sub(s, lastIndex, lastSpaceIndex - lastIndex));
+                        lastIndex = lastSpaceIndex;
+                        count = countFromLastSpaceIndex;
+                        lastSpaceIndex = -1;
+                    } else {
+                        wrappedLines.push(sub(s, lastIndex, index - lastIndex));
+                        lastIndex = index;
+                        count = 1;
+                    }
                 }
             }
             index++;
         }
 
-        Utf8.iter(s, checkChar);
         if (wrappedLines.length == 0 || count > 0) {
             wrappedLines.push(sub(s, lastIndex, index - lastIndex));
         }
+
         wrappedLines = wrappedLines.map(padLine);
 
         return wrappedLines.join(LINE_TOKEN);

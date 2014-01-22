@@ -18,6 +18,8 @@ class UIBody extends Body {
     inline static var NATIVE_DPI:Float = 96;
     inline static var DEFAULT_GLYPH_HEIGHT_IN_POINTS:Float = 18;
 
+    var spaceCode:Int;
+
     var glyphHeightInPoints:Float;
     var glyphWidthInPixels:Float;
     var glyphHeightInPixels:Float;
@@ -33,6 +35,7 @@ class UIBody extends Body {
 
     var caretGlyph:Glyph;
     var caretGlyphID:Int;
+    var caretGlyphGuide:Glyph;
 
     var dragging:Bool;
     var dragStartY:Float;
@@ -50,6 +53,7 @@ class UIBody extends Body {
         super(bufferUtil, glyphTexture);
 
         bodyPaint = id << 16;
+        spaceCode = ' '.charCodeAt(0);
 
         baseTransform = new Matrix3D();
         baseTransform.appendScale(1, -1, 1);
@@ -92,8 +96,8 @@ class UIBody extends Body {
 
         updateGlide();
         uiMediator.updateSpans(delta);
+        findAndPositionCaret();
         taperScrollEdges();
-        positionCaret();
 
         super.update(delta);
     }
@@ -128,15 +132,45 @@ class UIBody extends Body {
         }
     }
 
-    inline function positionCaret():Void {
-        var caretGlyphGuide:Glyph = null;
+    inline function findAndPositionCaret():Void {
+        caretGlyphGuide = null;
+
         if (caretGlyphID != -1) {
-            caretGlyphGuide = glyphs[caretGlyphID - 1];
+            var leftGlyph:Glyph = glyphs[caretGlyphID - 1];
+            var rightGlyph:Glyph = glyphs[caretGlyphID];
+
+            if (leftGlyph != null || rightGlyph != null) {
+                if (leftGlyph == null) {
+                    caretGlyphGuide = rightGlyph;
+                } else if (rightGlyph == null) {
+                    caretGlyphGuide =  leftGlyph;
+                } else {
+                    var  leftCodeIsSpace:Bool =  leftGlyph.get_char() == spaceCode;
+                    var rightCodeIsSpace:Bool = rightGlyph.get_char() == spaceCode;
+                    if (!leftCodeIsSpace || !rightCodeIsSpace) {
+                        if (leftCodeIsSpace) {
+                            caretGlyphGuide = rightGlyph;
+                        } else if (rightCodeIsSpace) {
+                            caretGlyphGuide =  leftGlyph;
+                        } else {
+                            caretGlyphGuide = leftGlyph;
+                        }
+                    } else {
+                        caretGlyphGuide = leftGlyph;
+                    }
+                }
+            }
+
+            if (caretGlyphGuide == leftGlyph) {
+                caretGlyph.set_x(caretGlyphGuide.get_x() + 0.5 / numCols);
+            } else if (caretGlyphGuide == rightGlyph) {
+                caretGlyph.set_x(caretGlyphGuide.get_x() - 0.5 / numCols);
+            }
         }
 
         if (caretGlyphGuide != null) {
-            var x:Float = caretGlyphGuide.get_x() + 0.5 / numCols;
-            caretGlyph.set_pos(x, caretGlyphGuide.get_y(), caretGlyphGuide.get_z());
+            caretGlyph.set_y(caretGlyphGuide.get_y());
+            caretGlyph.set_z(caretGlyphGuide.get_z());
         } else {
             caretGlyph.set_z(1);
         }
@@ -175,18 +209,14 @@ class UIBody extends Body {
         currentScrollPos = pos;
         var scrollStartIndex:Int = Std.int(currentScrollPos);
         caretGlyphID = uiMediator.stylePage(scrollStartIndex, glyphs, caretGlyph, glyphTexture.font);
+        findAndPositionCaret();
         taperScrollEdges();
-        positionCaret();
         transform.identity();
         transform.append(baseTransform);
         transform.appendTranslation(0, (currentScrollPos - scrollStartIndex) / (numRows - 1), 0);
     }
 
     inline function taperScrollEdges():Void {
-        var caretGlyphGuide:Glyph = null;
-        if (caretGlyphID != -1) {
-            caretGlyphGuide = glyphs[caretGlyphID];
-        }
         var offset:Float = ((currentScrollPos % 1) + 1) % 1;
         var lastRow:Int = (numRows - 1) * numCols;
         var glyph:Glyph;
