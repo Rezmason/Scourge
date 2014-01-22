@@ -1,10 +1,13 @@
 package net.rezmason.scourge.textview.console;
 
 import haxe.Utf8;
+import haxe.ds.ArraySort;
+import net.rezmason.utils.StringSort;
 
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.console.Types;
 import net.rezmason.utils.Utf8Utils.*;
+
 
 class Interpreter {
 
@@ -99,6 +102,7 @@ class Interpreter {
             }
 
             if (potentialNames.length > 0) {
+                ArraySort.sort(potentialNames, StringSort.sort);
                 // We make a shortcut for each match.
                 var hintTokens:Array<TextToken> = [];
                 for (name in potentialNames) {
