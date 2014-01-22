@@ -23,8 +23,8 @@ class ArgsCommand extends ConsoleCommand {
     var flagHints:Array<String>;
     var keyRestrictions:Map<String, String>;
 
-    public function new(func:Func, keyHints:Array<String>, flagHints:Array<String>, keyRestrictions:Map<String, String>):Void {
-        super();
+    public function new(func:Func, keyHints:Array<String>, flagHints:Array<String>, keyRestrictions:Map<String, String>, hidden:Bool = false):Void {
+        super(hidden);
         this.func = func;
         this.keyHints = keyHints;
         this.flagHints = flagHints;

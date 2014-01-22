@@ -6,8 +6,8 @@ class TextCommand extends ConsoleCommand {
 
     var func:String->String;
 
-    public function new(func:String->String):Void {
-        super();
+    public function new(func:String->String, hidden:Bool = false):Void {
+        super(hidden);
         // tokenStyles = '';
         this.func = func;
     }

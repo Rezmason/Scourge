@@ -102,6 +102,7 @@ class Interpreter {
                 // We make a shortcut for each match.
                 var hintTokens:Array<TextToken> = [];
                 for (name in potentialNames) {
+                    if (commandsByName[name].hidden) continue;
                     var token:TextToken = {
                         text:name,
                         styleName:commandsByName[name].nameStyle,
