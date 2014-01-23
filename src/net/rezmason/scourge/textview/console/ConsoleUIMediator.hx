@@ -5,7 +5,7 @@ import flash.ui.Keyboard;
 import haxe.Timer;
 import haxe.Utf8;
 
-import net.rezmason.scourge.textview.console.Types;
+import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.*;

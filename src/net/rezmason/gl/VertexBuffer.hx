@@ -5,7 +5,7 @@ package net.rezmason.gl;
 #else
     import openfl.gl.GL;
     import openfl.gl.GLBuffer;
-    import net.rezmason.gl.Types;
+    import net.rezmason.gl.Data;
 
     class VertexBuffer {
 

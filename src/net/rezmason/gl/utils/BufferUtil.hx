@@ -1,6 +1,6 @@
 package net.rezmason.gl.utils;
 
-import net.rezmason.gl.Types;
+import net.rezmason.gl.Data;
 import net.rezmason.gl.utils.Util;
 
 class BufferUtil extends Util {

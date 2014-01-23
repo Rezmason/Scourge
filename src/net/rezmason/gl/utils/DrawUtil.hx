@@ -8,7 +8,7 @@ import flash.geom.Rectangle;
 import openfl.gl.GL;
 
 import net.rezmason.gl.utils.Util;
-import net.rezmason.gl.Types;
+import net.rezmason.gl.Data;
 
 using Lambda;
 

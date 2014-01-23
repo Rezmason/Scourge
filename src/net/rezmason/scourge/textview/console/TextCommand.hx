@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.console;
 
-import net.rezmason.scourge.textview.console.Types;
+import net.rezmason.scourge.textview.console.ConsoleTypes;
 
 class TextCommand extends ConsoleCommand {
 

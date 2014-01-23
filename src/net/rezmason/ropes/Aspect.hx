@@ -3,7 +3,7 @@ package net.rezmason.ropes;
 #if macro
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 #end
 
 #if !macro @:autoBuild(net.rezmason.ropes.Aspect.build()) #end class Aspect {

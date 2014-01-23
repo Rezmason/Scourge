@@ -1,6 +1,6 @@
 package net.rezmason.ropes;
 
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;

@@ -13,7 +13,7 @@ import net.rezmason.scourge.controller.RandomSmarts;
 import net.rezmason.scourge.controller.Referee;
 import net.rezmason.scourge.controller.ReplaySmarts;
 import net.rezmason.scourge.controller.SimpleSpectator;
-import net.rezmason.scourge.controller.Types;
+import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.textview.core.Body;

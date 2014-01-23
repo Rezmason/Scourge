@@ -1,6 +1,6 @@
 package net.rezmason.scourge.controller;
 
-import net.rezmason.scourge.controller.Types;
+import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
 
 class Smarts {

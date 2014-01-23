@@ -7,7 +7,7 @@ import flash.geom.Vector3D;
 
 import net.rezmason.gl.utils.*;
 import net.rezmason.gl.*;
-import net.rezmason.gl.Types;
+import net.rezmason.gl.Data;
 import net.rezmason.scourge.textview.core.*;
 import net.rezmason.utils.FlatFont;
 

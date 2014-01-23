@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import net.rezmason.gl.Types;
+import net.rezmason.gl.Data;
 
 @:allow(net.rezmason.scourge.textview.core.BodySegment)
 @:allow(net.rezmason.scourge.textview.core.GlyphUtils)

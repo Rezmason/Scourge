@@ -5,7 +5,7 @@ import haxe.ds.StringMap;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlanner;

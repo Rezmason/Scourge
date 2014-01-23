@@ -18,7 +18,7 @@ import net.rezmason.scourge.textview.waves.Ripple;
 import net.rezmason.scourge.textview.waves.WaveFunctions;
 
 import net.rezmason.ropes.Aspect;
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.aspects.BodyAspect;

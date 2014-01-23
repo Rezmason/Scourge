@@ -2,8 +2,8 @@ package net.rezmason.scourge.controller;
 
 import Std.random;
 
-import net.rezmason.ropes.Types.Move;
-import net.rezmason.scourge.controller.Types;
+import net.rezmason.ropes.RopesTypes.Move;
+import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeAction.*;
 

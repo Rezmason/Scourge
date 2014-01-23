@@ -2,8 +2,8 @@ package net.rezmason.scourge.controller;
 
 import haxe.Timer;
 
-import net.rezmason.ropes.Types;
-import net.rezmason.scourge.controller.Types;
+import net.rezmason.ropes.RopesTypes;
+import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.SafeSerializer;

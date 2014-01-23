@@ -3,7 +3,7 @@ package net.rezmason.ropes;
 import haxe.ds.ArraySort;
 
 import net.rezmason.ropes.GridLocus;
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.Aspect;
 
 using Lambda;

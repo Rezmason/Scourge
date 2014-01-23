@@ -8,7 +8,7 @@ import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.RenderMethod;
 import net.rezmason.gl.BlendFactor;
-import net.rezmason.gl.Types;
+import net.rezmason.gl.Data;
 import net.rezmason.gl.VertexBuffer;
 
 class MouseMethod extends RenderMethod {

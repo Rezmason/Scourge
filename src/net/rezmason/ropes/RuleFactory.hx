@@ -1,7 +1,7 @@
 package net.rezmason.ropes;
 
 import haxe.ds.ArraySort;
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 import net.rezmason.utils.StringSort;
 
 using Lambda;

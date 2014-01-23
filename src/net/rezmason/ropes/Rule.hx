@@ -7,7 +7,7 @@ import haxe.macro.Expr;
 using Lambda;
 #end
 
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;
@@ -197,7 +197,7 @@ using net.rezmason.utils.Pointers;
                     declarations.push(macro $i{kindRequirements}.set($aspect.id, $aspect));
                     assignments.push(macro $i{name} = $p{[lkpSources[kind], kindLookup]}[$aspect.id]);
 
-                    field.kind = FVar(macro :net.rezmason.ropes.Types.AspectPtr, null);
+                    field.kind = FVar(macro :net.rezmason.ropes.RopesTypes.AspectPtr, null);
                     field.access.remove(AStatic);
 
                     msg += kind.charAt(0);

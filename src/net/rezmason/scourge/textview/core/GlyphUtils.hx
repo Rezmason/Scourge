@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import net.rezmason.gl.Types;
+import net.rezmason.gl.Data;
 
 import net.rezmason.utils.FatChar;
 import net.rezmason.utils.FlatFont;

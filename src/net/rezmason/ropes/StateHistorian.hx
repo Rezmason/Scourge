@@ -1,7 +1,7 @@
 package net.rezmason.ropes;
 
 import haxe.Unserializer;
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 import net.rezmason.utils.SafeSerializer;
 import net.rezmason.utils.Pointers;
 

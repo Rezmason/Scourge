@@ -1,7 +1,7 @@
 package net.rezmason.scourge.textview.core;
 
 import net.rezmason.gl.IndexBuffer;
-import net.rezmason.gl.Types;
+import net.rezmason.gl.Data;
 import net.rezmason.gl.VertexBuffer;
 import net.rezmason.gl.utils.BufferUtil;
 

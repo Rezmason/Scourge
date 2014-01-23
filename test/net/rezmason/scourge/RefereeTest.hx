@@ -11,7 +11,7 @@ import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
 
 import net.rezmason.scourge.controller.Referee;
-import net.rezmason.scourge.controller.Types;
+import net.rezmason.scourge.controller.ControllerTypes;
 
 using net.rezmason.scourge.model.BoardUtils;
 class RefereeTest {

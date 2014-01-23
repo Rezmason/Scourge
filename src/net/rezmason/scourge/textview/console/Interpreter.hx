@@ -5,7 +5,7 @@ import haxe.ds.ArraySort;
 import net.rezmason.utils.StringSort;
 
 import net.rezmason.scourge.textview.core.Interaction;
-import net.rezmason.scourge.textview.console.Types;
+import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.utils.Utf8Utils.*;
 
 

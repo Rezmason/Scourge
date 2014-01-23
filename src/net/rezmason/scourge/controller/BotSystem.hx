@@ -1,7 +1,7 @@
 package net.rezmason.scourge.controller;
 
 import haxe.Timer;
-import net.rezmason.scourge.controller.Types;
+import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.Zig;
 

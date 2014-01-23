@@ -13,7 +13,7 @@ import flash.geom.Matrix3D;
     import openfl.gl.GLTexture;
 #end
 
-import net.rezmason.gl.Types;
+import net.rezmason.gl.Data;
 import net.rezmason.gl.utils.Util;
 
 class ProgramUtil extends Util {

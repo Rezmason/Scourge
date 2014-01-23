@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.console;
 
-import net.rezmason.scourge.textview.console.Types;
+import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.utils.Utf8Utils.*;
 
 using Lambda;

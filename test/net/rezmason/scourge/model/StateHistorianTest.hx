@@ -3,7 +3,7 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlanner;

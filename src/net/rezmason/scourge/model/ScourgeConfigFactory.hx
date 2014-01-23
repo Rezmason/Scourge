@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model;
 
 import net.rezmason.scourge.model.BuildConfig;
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.State;
 import net.rezmason.utils.Siphon;

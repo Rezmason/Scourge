@@ -5,7 +5,7 @@ import flash.display.BitmapData;
     import flash.display3D.Context3DTextureFormat;
 #end
 import flash.geom.Matrix;
-import net.rezmason.gl.Types;
+import net.rezmason.gl.Data;
 import net.rezmason.gl.utils.Util;
 
 class TextureUtil extends Util {

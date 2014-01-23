@@ -1,6 +1,6 @@
 package net.rezmason.ropes;
 
-import net.rezmason.ropes.Types;
+import net.rezmason.ropes.RopesTypes;
 
 using Lambda;
 using net.rezmason.ropes.GridUtils;
