@@ -1,9 +1,12 @@
-Expand TextCommand output to Array<Token>
-Expand ArgsCommand output to Array<Token>
-Support output hints
+I don't like the console much anymore.
 
 Human players, GUISystem
-    Implement play text commands
+    Implement abstract commands
+    THEN figure out how to connect them to the console
+Refactor the console stuff- within reason
+    It's a mess
+Support output hints
+
 
 Move the logic into a Worker
 Get referee to handle situations where a player takes too long to sync or move

@@ -25,11 +25,11 @@ class ConsoleUIMediator extends UIMediator {
     inline static var HINT_PREFIX:String = '__hint_';
 
     public var hintSignal(default, null):Zig<Array<TextToken>->InputInfo->Void>;
-    public var execSignal(default, null):Zig<Array<TextToken>->Void>;
+    public var runSignal(default, null):Zig<Array<TextToken>->Void>;
     public var buttonSignal(default, null):Zig<TextToken->MouseInteractionType->Void>;
 
     public var frozen(get, set):Bool;
-    var hintingPreExecution:Bool;
+    var finalizingInputPreExecution:Bool;
     var executing:Bool;
 
     var caretStyle:AnimatedStyle;
@@ -63,56 +63,40 @@ class ConsoleUIMediator extends UIMediator {
     var isInteractiveDocDirty:Bool;
 
     public function new():Void {
-
         super();
-
-        interactiveDoc = new Document();
-        interactiveDoc.shareWith(compositeDoc);
-
-        appendedDoc = new Document();
-        appendedDoc.shareWith(compositeDoc);
-
-        isLogDocDirty = false;
-        isLogDocAppended = false;
-        isInteractiveDocDirty = false;
-
-        addedText = '';
-
         loadStyles([
             Strings.BREATHING_PROMPT_STYLE,
             Strings.WAIT_STYLES,
             Strings.INPUT_STYLE,
             Strings.ERROR_STYLES,
         ].join(''));
-
+        interactiveDoc = new Document();
+        interactiveDoc.shareWith(compositeDoc);
+        appendedDoc = new Document();
+        appendedDoc.shareWith(compositeDoc);
+        isLogDocDirty = false;
+        isLogDocAppended = false;
+        isInteractiveDocDirty = false;
         setPlayer('rezmason', 0x30FF00);
-
         for (span in Parser.parse(Strings.CARET_STYLE).spans) if (Std.is(span.style, AnimatedStyle)) caretSpan = span;
         caretStyle = cast caretSpan.style;
-
         caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
-
         caretIndex = 0;
         tokenIndex = 0;
-
+        addedText = '';
         outputString = '';
-
         outputTokens = [];
         hintTokens = [];
-
         lastHistEntry = {val:[blankToken()]};
         curHistEntry = lastHistEntry;
         inputTokens = curHistEntry.val.map(copyToken);
-
         hintSignal = new Zig();
-        execSignal = new Zig();
+        runSignal = new Zig();
         buttonSignal = new Zig();
-
         frozenQueue = new List();
         frozen = false;
         executing = false;
-        hintingPreExecution = false;
-
+        finalizingInputPreExecution = false;
         isInteractiveDocDirty = true;
     }
 
@@ -180,9 +164,7 @@ class ConsoleUIMediator extends UIMediator {
     }
 
     override public function receiveInteraction(id:Int, interaction:Interaction):Void {
-
         if (frozen) frozenQueue.add({id:id, interaction:interaction});
-
         switch (interaction) {
             case KEYBOARD(type, key, char, shift, alt, ctrl) if (type == KEY_DOWN || type == KEY_REPEAT):
                 switch (key) {
@@ -204,7 +186,7 @@ class ConsoleUIMediator extends UIMediator {
         super.handleSpanMouseInteraction(span, type);
         if (span.id.indexOf(INPUT_PREFIX) == 0) {
             for (ike in 0...inputTokens.length) {
-                if (inputTokens[ike].id == span.id) {
+                if (inputTokens[ike].spanID == span.id) {
                     if (type == MOUSE_DOWN || type == MOUSE_UP) {
                         tokenIndex = ike;
                         caretIndex = length(inputTokens[tokenIndex].text);
@@ -216,14 +198,14 @@ class ConsoleUIMediator extends UIMediator {
             }
         } else if (span.id.indexOf(OUTPUT_PREFIX) == 0) {
             for (token in outputTokens) {
-                if (token.id == span.id) {
+                if (token.spanID == span.id) {
                     buttonSignal.dispatch(token, type);
                     break;
                 }
             }
         } else if (span.id.indexOf(HINT_PREFIX) == 0) {
             for (token in hintTokens) {
-                if (token.id == span.id) {
+                if (token.spanID == span.id) {
                     buttonSignal.dispatch(token, type);
                     break;
                 }
@@ -236,38 +218,39 @@ class ConsoleUIMediator extends UIMediator {
         super.updateSpans(delta);
     }
 
-    public function receiveHint(input:Array<TextToken>, tokenIndex:Int, caretIndex:Int, hint:Array<TextToken>):Void {
-        this.inputTokens = input;
+    public function receiveInput(tokens:Array<TextToken>, tokenIndex:Int, caretIndex:Int):Void {
+        inputTokens = tokens;
         this.tokenIndex = tokenIndex;
         this.caretIndex = caretIndex;
-        this.hintTokens = hint;
-
         for (token in inputTokens) if (token.styleName == null) token.styleName = Strings.INPUT_STYLENAME;
+        isDirty = true;
+        isInteractiveDocDirty = true;
+
+        finalizeInputPreExecution();
+    }
+
+    public function receiveHints(tokens:Array<TextToken>):Void {
+        hintTokens = tokens;
         for (token in  hintTokens) if (token.styleName == null) token.styleName = Strings.INPUT_STYLENAME;
-
-        if (hintingPreExecution) {
-            hintingPreExecution = false;
-            if (frozen) frozen = false;
-            onExecHint();
-        }
-
         isDirty = true;
         isInteractiveDocDirty = true;
     }
 
-    public function receiveExec(output:Array<TextToken>, done:Bool):Void {
+    public function receiveOutput(tokens:Array<TextToken>, done:Bool):Void {
+        outputTokens = tokens;
+        isDirty = true;
+        isInteractiveDocDirty = true;
+
         if (done) {
             frozen = false;
             executing = false;
         }
 
-        outputTokens = output;
         if (outputTokens.length > 0 && length(outputTokens.map(stringFromToken).join('')) > 0) {
             outputString = '\t${printTokens(OUTPUT_PREFIX, outputTokens, "\n\t")}\n';
+        } else {
+            outputString = '';
         }
-        else outputString = '';
-        isDirty = true;
-        isInteractiveDocDirty = true;
     }
 
     public function addToText(text:String):Void {
@@ -318,38 +301,38 @@ class ConsoleUIMediator extends UIMediator {
     }
 
     inline function handleEnter():Void {
+        inputTokens.push(blankToken());
         tokenIndex = inputTokens.length - 1;
         frozen = true;
-        hintingPreExecution = true;
-        dispatchHintSignal(' ');
+        finalizingInputPreExecution = true;
+        dispatchHintSignal();
     }
 
-    private function onExecHint():Void {
+    inline function finalizeInputPreExecution():Void {
+        if (finalizingInputPreExecution) {
+            finalizingInputPreExecution = false;
+            frozen = false;
 
-        var isEmpty:Bool = inputTokens.length == 1 && length(inputTokens[0].text) == 0;
+            var isEmpty:Bool = inputTokens.length == 1 && length(inputTokens[0].text) == 0;
+            var lastInteractiveText:String = (length(mainText) > 0 ? '\n' : '');
 
-        var lastInteractiveText:String = (length(mainText) > 0 ? '\n' : '');
+            lastInteractiveText += outputString;
+            lastInteractiveText += prompt + printTokens(INPUT_PREFIX, inputTokens, ' ');
 
-        var oldOutputString:String = '';
-        if (outputTokens.length > 0 && length(outputTokens.map(stringFromToken).join('')) > 0) {
-            oldOutputString = '\t${printTokens(OUTPUT_PREFIX, outputTokens, "\n\t")}\n';
+            if (!isEmpty) {
+                frozen = true;
+                executing = true;
+                appendHistEntry(inputTokens.slice(0, inputTokens.length - 1));
+                dispatchExecSignal();
+            }
+
+            addToText(lastInteractiveText);
+
+            loadInputFromHistEntry(lastHistEntry);
+            hintTokens = [];
+            outputTokens = [];
+            outputString = '';
         }
-        lastInteractiveText += oldOutputString;
-        lastInteractiveText += prompt + printTokens(INPUT_PREFIX, inputTokens, ' ');
-
-        if (!isEmpty) {
-            frozen = true;
-            executing = true;
-            appendHistEntry(inputTokens);
-            dispatchExecSignal();
-        }
-
-        addToText(lastInteractiveText);
-
-        loadInputFromHistEntry(lastHistEntry);
-        hintTokens = [];
-        outputTokens = [];
-        outputString = '';
     }
 
     inline function handleTab():Void {
@@ -363,7 +346,6 @@ class ConsoleUIMediator extends UIMediator {
     }
 
     inline function handleCaretNudge(alt:Bool, ctrl:Bool, nudgeLeft:Bool = false):Void {
-
         var tokenLimit:Int = nudgeLeft ? 0 : inputTokens.length - 1;
         var sign:Int = nudgeLeft ? -1 : 1;
 
@@ -436,8 +418,8 @@ class ConsoleUIMediator extends UIMediator {
         }
     }
 
-    inline function printTokens(idPrefix:String, tokens:Array<TextToken>, sep:String, tokenIndex:Int = -1, caretIndex:Int = -1):String {
-        for (ike in 0...tokens.length) tokens[ike].id = idPrefix + ike;
+    inline function printTokens(spanIDPrefix:String, tokens:Array<TextToken>, sep:String, tokenIndex:Int = -1, caretIndex:Int = -1):String {
+        for (ike in 0...tokens.length) tokens[ike].spanID = spanIDPrefix + ike;
         var strings:Array<String> = tokens.map(styleToken);
         if (tokenIndex != -1 && caretIndex != -1) {
             var token:TextToken = copyToken(tokens[tokenIndex]);
@@ -452,7 +434,7 @@ class ConsoleUIMediator extends UIMediator {
         var styleTag:String = '§{}';
         var styleName:String = token.styleName;
         if (styleName != null && compositeDoc.getStyleByName(styleName) != null) {
-            styleTag = Sigil.BUTTON_STYLE + '{name:$styleName, id:${token.id}}';
+            styleTag = Sigil.BUTTON_STYLE + '{name:$styleName, id:${token.spanID}}';
         }
         return styleTag + token.text + '§{}';
     }
@@ -482,20 +464,32 @@ class ConsoleUIMediator extends UIMediator {
 
     inline function dispatchExecSignal():Void {
         var tokens:Array<TextToken> = inputTokens.map(copyToken);
-        Timer.delay(function() execSignal.dispatch(tokens), 1);
+        Timer.delay(function() runSignal.dispatch(tokens), 1);
     }
 
     inline function stringFromToken(token:TextToken):String return token.text;
 
-    inline static function blankToken():TextToken return {text:'', styleName:Strings.INPUT_STYLENAME};
+    inline static function blankToken():TextToken {
+        var token:TextToken = {
+            text:'',
+            styleName:Strings.INPUT_STYLENAME,
+            authorID:null,
+            data:null,
+            spanID:null,
+            restriction:null,
+        };
+        return token;
+    }
 
     function copyToken(token:TextToken):TextToken {
-        var copy:TextToken = {text:token.text};
-        copy.id = token.id;
-        copy.authorID = token.authorID;
-        copy.styleName = token.styleName;
-        copy.restriction = token.restriction;
-        copy.hintData = token.hintData;
+        var copy:TextToken = {
+            text:token.text,
+            spanID:token.spanID,
+            authorID:token.authorID,
+            styleName:token.styleName,
+            restriction:token.restriction,
+            data:token.data,
+        };
         return copy;
     }
 

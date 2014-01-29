@@ -171,45 +171,44 @@ class TextDemo {
         // return 0;
     }
 
-    function setFont(input:String):String {
-        var fontName:String = input.split(' ')[1];
+    function setFont(input:Array<String>):String {
+        var fontName:String = input[1];
         var fontTexture:GlyphTexture = fontTextures[fontName];
         if (fontTexture == null) return 'Font $fontName does not exist.';
         for (body in engine.eachBody()) body.glyphTexture = fontTexture;
         return 'Font set to $fontName';
     }
 
-    function setFontSize(input:String):String {
-        var size:Float = Std.parseFloat(input.split(' ')[1]);
+    function setFontSize(input:Array<String>):String {
+        var size:Float = Std.parseFloat(input[1]);
         if (!uiBody.setFontSize(size)) {
             return '$size is an invalid font size.';
         }
         return 'Font size set to $size.';
     }
 
-    function setName(input:String):String {
-        var args:Array<String> = input.split(' ');
-        var name:String = args[1];
+    function setName(input:Array<String>):String {
+        var name:String = input[1];
         var color:Int = 0xFFFFFF;
-        if (args[2] != null) color = Std.parseInt(args[2]);
+        if (input[2] != null) color = Std.parseInt(input[2]);
         console.setPlayer(name, color);
         return 'Done.';
     }
 
-    function print(input:String):String {
-        var strName:String = input.substr(input.indexOf(' ') + 1);
+    function print(input:Array<String>):String {
+        var strName:String = input[1];
         var str:String = Assets.getText('exampletext/$strName.txt');
         if (str == null) str = 'String $strName not found.';
         return '\n$str';
     }
 
-    function clear(input:String):String {
+    function clear(input:Array<String>):String {
         console.clearText();
         return '';
     }
 
-    function show(input:String):String {
-        var bodyName:String = input.substr(input.indexOf(' ') + 1);
+    function show(input:Array<String>):String {
+        var bodyName:String = input[1];
         var body:Body = bodiesByName[bodyName.toLowerCase()];
         var str:String = null;
         if (body == null) str = '"$bodyName" not found.';
@@ -221,11 +220,11 @@ class TextDemo {
     }
 
     #if (neko || cpp)
-        function quit(input:String):String {
+        function quit(input:Array<String>):String {
             return 'Are you sure you want to quit Scourge?';
         }
 
-        function confirmQuit(input:String):String {
+        function confirmQuit(input:Array<String>):String {
             Sys.exit(0);
             return '';
         }
@@ -289,7 +288,7 @@ class TextDemo {
 
     function onDeactivate(?event:Event):Void engine.deactivate();
 
-    function runTests(input:String):String {
+    function runTests(input:Array<String>):String {
         var client = new SimpleTestClient();
         var runner:TestRunner = new TestRunner(client);
         runner.completionHandler = function(b) {};

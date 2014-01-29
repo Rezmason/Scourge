@@ -9,7 +9,8 @@ typedef Func = Map<String, String>->Array<String>->String;
 
 class ArgsCommand extends ConsoleCommand {
 
-    inline static var UNRECOGNIZED_PARAM:String = 'Unrecognized parameter.';
+    inline static var UNRECOGNIZED_PARAM:String = 'Unrecognized parameter';
+    inline static var UNSPECIFIED_VALUE:String = 'Unspecified value for key: ';
     inline static var STYLES:String =
             'µ{name:key,  basis:__input, r:0.5, g:1.0, b:1.0}' +
             'µ{name:val,  basis:__input, r:1.0, g:0.5, b:1.0}' +
@@ -32,9 +33,10 @@ class ArgsCommand extends ConsoleCommand {
         tokenStyles = STYLES;
     }
 
-    override public function getHint(tokens:Array<TextToken>, info:InputInfo, callback:HintCallback):Void {
+    override public function requestHints(tokens:Array<TextToken>, info:InputInfo):Void {
         var hintTokens:Array<TextToken> = modifyInput(tokens, info);
-        callback(tokens, info.tokenIndex, info.caretIndex, hintTokens);
+        hintsGeneratedSignal.dispatch(hintTokens);
+        inputGeneratedSignal.dispatch(tokens, info.tokenIndex, info.caretIndex);
     }
 
     private function modifyInput(tokens:Array<TextToken>, info:InputInfo):Array<TextToken> {
@@ -43,7 +45,7 @@ class ArgsCommand extends ConsoleCommand {
 
         if (tokens.length == 1) {
             // Let's move the caret to a new token.
-            tokens.push({text:''});
+            tokens.push(makeToken(''));
             info.tokenIndex = 1;
             info.caretIndex = 0;
         }
@@ -68,35 +70,55 @@ class ArgsCommand extends ConsoleCommand {
             var showAllHints:Bool = false;
             var errorMessage:String = null;
 
-            if (info.char == ' ') {
-                currentArg = rtrim(currentArg);
-                currentToken.text = currentArg;
-                info.caretIndex = length(currentArg);
-                if (length(currentArg) > 0 && currentToken.styleName != Strings.ERROR_HINT_STYLENAME) {
-                    completed = true;
-                }
-            }
-
             var remainingKeyHints:Array<String> = keyHints.copy();
             var remainingFlagHints:Array<String> = flagHints.copy();
 
             // Is this a key/flag or a value?
-            var upairedKeyCount:Int = 0;
+            var unpairedKey:Bool = false;
             for (ike in 1...info.tokenIndex) {
                 switch (tokens[ike].styleName) {
                     case KEY_STYLENAME:
-                        upairedKeyCount++;
-                        remainingKeyHints.remove(tokens[ike].text);
-                    case VALUE_STYLENAME:
-                        upairedKeyCount--;
+                        if (!unpairedKey) {
+                            unpairedKey = true;
+                            remainingKeyHints.remove(tokens[ike].text);
+                        } else {
+
+                        }
                     case FLAG_STYLENAME:
                         remainingFlagHints.remove(tokens[ike].text);
+                    case VALUE_STYLENAME:
+                        unpairedKey = false;
+                    case _:
+                        if (length(tokens[ike].text) > 0) {
+                            tokens[ike].styleName = Strings.ERROR_HINT_STYLENAME;
+                            errorMessage = UNRECOGNIZED_PARAM;
+                        }
+                }
+            }
+
+            if (info.char == ' ') {
+                currentArg = rtrim(currentArg);
+                currentToken.text = currentArg;
+                info.caretIndex = length(currentArg);
+                if (length(currentArg) > 0) {
+                    if (currentToken.styleName != VALUE_STYLENAME && !(flagHints.has(currentArg) || keyHints.has(currentArg))) {
+                        info.char = '';
+                    } else if (currentToken.styleName != Strings.ERROR_HINT_STYLENAME) {
+                        completed = true;
+                    }
                 }
             }
 
             if (info.char != '') currentToken.styleName = null;
 
-            if (upairedKeyCount == 0) {
+            if (remainingKeyHints.has(currentArg)) currentToken.styleName = KEY_STYLENAME;
+            else if (remainingFlagHints.has(currentArg)) currentToken.styleName = FLAG_STYLENAME;
+
+            if (unpairedKey) {
+                // values
+                currentToken.styleName = VALUE_STYLENAME;
+                if (completed) showAllHints = true;
+            } else {
                 // keys and flags
 
                 if (completed) {
@@ -115,17 +137,14 @@ class ArgsCommand extends ConsoleCommand {
                     if ( matchingKeyHints.length > 0) hintTokens = hintTokens.concat( matchingKeyHints.map(keyHintToToken));
                     if (hintTokens.length == 0 && length(currentArg) > 0) errorMessage = UNRECOGNIZED_PARAM;
                 }
-            } else {
-                // values
-                currentToken.styleName = VALUE_STYLENAME;
-                if (completed) showAllHints = true;
             }
 
             if (errorMessage != null) {
                 currentToken.styleName = Strings.ERROR_HINT_STYLENAME;
-                hintTokens = [{text:errorMessage, styleName:Strings.ERROR_HINT_STYLENAME}];
+                hintTokens = [makeToken(errorMessage, Strings.ERROR_HINT_STYLENAME)];
             } else if (completed) {
-                tokens.push({text:''});
+                tokens.push(makeToken('', null, keyRestrictions[currentToken.text]));
+
                 info.tokenIndex++;
                 info.caretIndex = 0;
 
@@ -144,13 +163,14 @@ class ArgsCommand extends ConsoleCommand {
     function hintMatchesArg(hint:String, arg:String):Bool return hint.indexOf(arg) == 0;
 
     function hintToToken(tokens:Array<TextToken>, hint:String, styleName:String = null):TextToken {
-        var token:TextToken =  {text:hint, authorID:id};
+        var token:TextToken = makeToken(hint);
+        token.authorID = id;
         if (styleName != null) token.styleName = styleName;
-        token.hintData = {tokens:tokens.concat([token, {text:'', restriction:keyRestrictions[hint]}])};
+        token.data = {tokens:tokens.concat([token, makeToken('', null, keyRestrictions[hint])])};
         return token;
     }
 
-    override public function getExec(tokens:Array<TextToken>, callback:ExecCallback):Void {
+    override public function execute(tokens:Array<TextToken>):Void {
 
         var info:InputInfo = {
             tokenIndex:tokens.length - 1,
@@ -163,25 +183,41 @@ class ArgsCommand extends ConsoleCommand {
         var output:TextToken = null;
 
         if (hintTokens.length > 0 && hintTokens[0].styleName == Strings.ERROR_HINT_STYLENAME) {
-            output = {text:hintTokens[0].text, styleName:Strings.ERROR_EXEC_STYLENAME};
+            output = makeToken(hintTokens[0].text, Strings.ERROR_EXEC_STYLENAME);
         } else {
-            var keyValuePairs:Map<String, String> = new Map();
-            var flags:Array<String> = [];
 
-            var currentKey:String = null;
-            for (ike in 1...tokens.length) {
-                var token:TextToken = tokens[ike];
-                switch (token.styleName) {
-                    case FLAG_STYLENAME: flags.push(token.text);
-                    case KEY_STYLENAME: currentKey = token.text;
-                    case VALUE_STYLENAME: keyValuePairs[currentKey] = token.text;
-                    case Strings.ERROR_HINT_STYLENAME:
+            var unspecifiedValue:Bool = false;
+
+            for (ike in 0...tokens.length - 1) {
+                if (tokens[ike].styleName == KEY_STYLENAME && tokens[ike + 1].styleName == VALUE_STYLENAME) {
+                    if (tokens[ike + 1].text == '') {
+                        tokens[ike].styleName = Strings.ERROR_HINT_STYLENAME;
+                        output = makeToken(UNSPECIFIED_VALUE + tokens[ike].text, Strings.ERROR_EXEC_STYLENAME);
+                        unspecifiedValue = true;
+                        break;
+                    }
                 }
             }
 
-            output = {text:func(keyValuePairs, flags)};
+            if (!unspecifiedValue) {
+                var keyValuePairs:Map<String, String> = new Map();
+                var flags:Array<String> = [];
+
+                var currentKey:String = null;
+                for (ike in 1...tokens.length) {
+                    var token:TextToken = tokens[ike];
+                    switch (token.styleName) {
+                        case FLAG_STYLENAME: flags.push(token.text);
+                        case KEY_STYLENAME: currentKey = token.text;
+                        case VALUE_STYLENAME: keyValuePairs[currentKey] = token.text;
+                        case Strings.ERROR_HINT_STYLENAME:
+                    }
+                }
+
+                output = makeToken(func(keyValuePairs, flags));
+            }
         }
 
-        callback([output], true);
+        outputGeneratedSignal.dispatch([output], true);
     }
 }

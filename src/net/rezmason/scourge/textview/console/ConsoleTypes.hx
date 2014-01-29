@@ -8,20 +8,12 @@ class CommandCodeRestriction {
 
 typedef TextToken = {
     var text:String;
-    @:optional var styleName:String;
-    @:optional var restriction:String;
-    @:optional var hintData:HintData;
-    @:optional var id:String;
-    @:optional var authorID:Int;
+    var styleName:String;
+    var restriction:String;
+    var data:Dynamic;
+    var spanID:String;
+    var authorID:Null<Int>;
 }
-
-typedef HintData = {
-    var tokens:Array<TextToken>;
-    @:optional var instant:Bool;
-}
-
-typedef HintCallback = Array<TextToken> -> Int -> Int -> Array<TextToken> -> Void;
-typedef ExecCallback = Array<TextToken> -> Bool -> Void;
 
 typedef InputInfo = {
     var tokenIndex:Int;
