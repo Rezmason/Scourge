@@ -1,4 +1,13 @@
 I don't like the console much anymore.
+    Why?
+        Tokens aren't enough. There needs to be some other kind of statefulness.
+        It feels like ConsoleUIMediator, Interpreter and the commands are performing the same operations
+        And it's really hard to pin down the correct behaviors!
+            Hinting and executing are oddly mixed together
+            Appending an empty text token is lame
+
+SO:
+    Replace Array<TextToken> with something better
 
 Human players, GUISystem
     Implement abstract commands

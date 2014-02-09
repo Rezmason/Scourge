@@ -30,11 +30,9 @@ class Strings {
 
     public inline static var ERROR_STYLES:String =
         'µ{name:__errorInput, basis:__input, g:0, b:0}' +
-        '§{name:errorHint, g:0, b:0, f:0.4}' +
-        '§{name:errorExec, g:0, b:0, f:0.6}';
+        '§{name:__errorOutput, g:0, b:0, f:0.6}';
     public inline static var ERROR_INPUT_STYLENAME:String = '__errorInput';
-    public inline static var ERROR_HINT_STYLENAME:String = 'errorHint';
-    public inline static var ERROR_EXEC_STYLENAME:String = 'errorExec';
+    public inline static var ERROR_OUTPUT_STYLENAME:String = '__errorOutput';
 
     public inline static var CARET_CHAR:String = '|';
     public inline static var WAIT_INDICATOR:String = ' §{wait_a}•§{} §{wait_b}•§{} §{wait_c}•§{} ';

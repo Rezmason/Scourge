@@ -5,7 +5,7 @@ class CommandCodeRestriction {
     public inline static var NODE_CODE:String = '01234567890abcdefABCDEF';
     public inline static var CRAWL_SCRAWL:String = 'qweasdzxcQWEASDZXC';
 }
-
+/*
 typedef TextToken = {
     var text:String;
     var styleName:String;
@@ -20,3 +20,4 @@ typedef InputInfo = {
     var caretIndex:Int;
     var char:String;
 }
+*/
