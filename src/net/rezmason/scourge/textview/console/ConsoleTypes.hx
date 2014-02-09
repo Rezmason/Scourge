@@ -5,19 +5,18 @@ class CommandCodeRestriction {
     public inline static var NODE_CODE:String = '01234567890abcdefABCDEF';
     public inline static var CRAWL_SCRAWL:String = 'qweasdzxcQWEASDZXC';
 }
-/*
-typedef TextToken = {
+
+typedef ConsoleToken = {
     var text:String;
-    var styleName:String;
-    var restriction:String;
-    var data:Dynamic;
-    var spanID:String;
-    var authorID:Null<Int>;
+    @:optional var next:ConsoleToken;
+    @:optional var prev:ConsoleToken;
+    @:optional var invalidReason:String;
 }
 
-typedef InputInfo = {
-    var tokenIndex:Int;
+typedef ConsoleState = {
+    var input:ConsoleToken;
+    var output:ConsoleToken;
+    var hint:ConsoleToken;
+    var currentToken:ConsoleToken;
     var caretIndex:Int;
-    var char:String;
 }
-*/

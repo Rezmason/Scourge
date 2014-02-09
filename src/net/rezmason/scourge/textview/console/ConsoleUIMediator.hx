@@ -1,7 +1,5 @@
 package net.rezmason.scourge.textview.console;
 
-import flash.ui.Keyboard;
-
 import haxe.Utf8;
 
 import net.rezmason.scourge.textview.console.ConsoleTypes;
@@ -18,11 +16,9 @@ private typedef FrozenInteraction = { id:Int, interaction:Interaction };
 
 class ConsoleUIMediator extends UIMediator {
 
-    inline static var INPUT_PREFIX:String = '__input_';
-    inline static var OUTPUT_PREFIX:String = '__output_';
-    inline static var HINT_PREFIX:String = '__hint_';
-
-    public var frozen(get, set):Bool;
+    public var frozen(default, null):Bool;
+    public var keyboardSignal(default, null):Zig<Int->Int->Bool->Bool->Void>;
+    public var clickSignal(default, null):Zig<String->Void>;
     var executing:Bool;
 
     var caretStyle:AnimatedStyle;
@@ -35,7 +31,6 @@ class ConsoleUIMediator extends UIMediator {
     var hintString:String;
 
     var frozenQueue:List<FrozenInteraction>;
-    var _frozen:Bool;
 
     var interactiveDoc:Document;
     var appendedDoc:Document;
@@ -73,6 +68,8 @@ class ConsoleUIMediator extends UIMediator {
         frozen = false;
         executing = false;
         isInteractiveDocDirty = true;
+        keyboardSignal = new Zig();
+        clickSignal = new Zig();
     }
 
     public inline function loadStyles(dec:String):Void compositeDoc.loadStyles(dec);
@@ -121,7 +118,7 @@ class ConsoleUIMediator extends UIMediator {
             if (executing) {
                 interactiveText += Strings.WAIT_INDICATOR;
             } else {
-                interactiveText += prompt + inputString;
+                interactiveText += prompt + (inputString + '¢');
                 interactiveText += '\n'; // Always added, because there's always input
                 if (false) interactiveText += '\t' + hintString;
             }
@@ -138,30 +135,14 @@ class ConsoleUIMediator extends UIMediator {
         if (frozen) frozenQueue.add({id:id, interaction:interaction});
         switch (interaction) {
             case KEYBOARD(type, key, char, shift, alt, ctrl) if (type == KEY_DOWN || type == KEY_REPEAT):
-                switch (key) {
-                    case Keyboard.BACKSPACE: handleBackspace(alt, ctrl);
-                    case Keyboard.ENTER: handleEnter();
-                    case Keyboard.ESCAPE: handleEscape();
-                    case Keyboard.LEFT: handleCaretNudge(alt, ctrl, true);
-                    case Keyboard.RIGHT: handleCaretNudge(alt, ctrl);
-                    case Keyboard.UP: handleUp();
-                    case Keyboard.DOWN: handleDown();
-                    case Keyboard.TAB: handleTab();
-                    case _: handleChar(char);
-                }
+                keyboardSignal.dispatch(key, char, alt, ctrl);
             case _: super.receiveInteraction(id, interaction);
         }
     }
 
     override function handleSpanMouseInteraction(span:Span, type:MouseInteractionType):Void {
         super.handleSpanMouseInteraction(span, type);
-        if (span.id.indexOf(INPUT_PREFIX) == 0) {
-
-        } else if (span.id.indexOf(OUTPUT_PREFIX) == 0) {
-
-        } else if (span.id.indexOf(HINT_PREFIX) == 0) {
-
-        }
+        clickSignal.dispatch(span.id);
     }
 
     override public function updateSpans(delta:Float):Void {
@@ -171,69 +152,43 @@ class ConsoleUIMediator extends UIMediator {
 
     public function addToText(text:String):Void {
         addedText += text;
-        isDirty = true;
-        isLogDocAppended = true;
+        isDirty = isLogDocAppended = true;
     }
 
     public function clearText():Void {
         mainText = '';
         addedText = '';
-        isDirty = true;
-        isLogDocDirty = true;
         isLogDocAppended = false;
+        isDirty = isLogDocDirty = true;
     }
 
-    inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
-        inputString = '';
-        isDirty = isInteractiveDocDirty = true;
-        caretStyle.startSpan(caretSpan, 0);
-    }
-
-    inline function handleEnter():Void {
-
-    }
-
-    inline function handleTab():Void {
-
-    }
-
-    inline function handleEscape():Void {
-
-    }
-
-    inline function handleCaretNudge(alt:Bool, ctrl:Bool, nudgeLeft:Bool = false):Void {
-
-    }
-
-    inline function handleUp():Void {
-
-    }
-
-    inline function handleDown():Void {
-
-    }
-
-    inline function handleChar(charCode:Int):Void {
-        if (charCode > 0) {
-            inputString += String.fromCharCode(charCode);
+    public function setInput(str:String):Void {
+        if (inputString != str) {
+            inputString = str;
             isDirty = isInteractiveDocDirty = true;
-
-            caretStyle.startSpan(caretSpan, 0);
         }
     }
 
-    inline function get_frozen():Bool return _frozen;
-
-    inline function set_frozen(val:Bool):Bool {
-        if (_frozen && !val) {
-            _frozen = false;
-            emptyFrozenQueue();
+    public function setOutput(str:String):Void {
+        if (outputString != str) {
+            outputString = str;
+            isDirty = isInteractiveDocDirty = true;
         }
-        _frozen = val;
-        return val;
     }
 
-    inline function emptyFrozenQueue():Void {
+    public function setHint(str:String):Void {
+        if (hintString != str) {
+            hintString = str;
+            isDirty = isInteractiveDocDirty = true;
+        }
+    }
+
+    public inline function freeze():Void {
+        frozen = true;
+    }
+
+    public inline function unfreeze():Void {
+        frozen = false;
         while (!frozenQueue.isEmpty()) {
             var leftovers:FrozenInteraction = frozenQueue.pop();
             receiveInteraction(leftovers.id, leftovers.interaction);

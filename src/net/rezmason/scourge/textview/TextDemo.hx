@@ -9,7 +9,7 @@ import flash.geom.Rectangle;
 import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
-import net.rezmason.scourge.textview.console.ConsoleUIMediator;
+import net.rezmason.scourge.textview.console.*;
 
 import net.rezmason.utils.FlatFont;
 
@@ -40,7 +40,8 @@ class TextDemo {
     function init():Void {
         addListeners();
         var console = new ConsoleUIMediator();
-        var uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], new ConsoleUIMediator());
+        var interpreter = new Interpreter(console);
+        var uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], console);
         var rect:Rectangle = new Rectangle(0, 0, 1, 1);
         rect.inflate(-0.02, -0.02);
         uiBody.viewRect = rect;
