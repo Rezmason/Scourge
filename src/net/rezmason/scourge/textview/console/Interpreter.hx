@@ -13,14 +13,28 @@ class Interpreter {
     // inline static var HINT_PREFIX:String = '__hint_';
 
     var console:ConsoleUIMediator;
-
     var state:ConsoleState;
+    var commands:Map<String, ConsoleCommand>;
+    var currentCommand:ConsoleCommand;
 
     public function new(console:ConsoleUIMediator):Void {
         this.console = console;
         this.console.keyboardSignal.add(handleKeyboard);
         this.console.clickSignal.add(handleSpanClick);
         state = blankState();
+        commands = new Map();
+        currentCommand = null;
+    }
+
+    public function addCommand(command:ConsoleCommand):Void {
+        if (command != null) {
+            if (commands[command.name] != command) throw 'Existing command with name ${command.name}';
+            commands[command.name] = command;
+        }
+    }
+
+    public function removeCommand(command:ConsoleCommand):Void {
+        commands.remove(command.name);
     }
 
     function handleKeyboard(key:Int, charCode:Int, alt:Bool, ctrl:Bool):Void {
@@ -36,8 +50,9 @@ class Interpreter {
             case _: handleChar(charCode);
         }
 
-        if (state.currentToken.next != null) validateInput();
-        console.setInput(printToken(state.input));
+        var inputString:String = printTokens(state.input);
+        console.setInput(inputString);
+        trace(inputString);
     }
 
     inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
@@ -46,19 +61,23 @@ class Interpreter {
         } else if (alt) {
             if (state.currentToken.prev != null) {
                 state.currentToken = state.currentToken.prev;
-                state.caretIndex = length(state.currentToken.text) - 1;
+                state.caretIndex = length(state.currentToken.text);
             } else {
                 state.currentToken.text = '';
                 state.caretIndex = 0;
             }
         } else {
             if (state.caretIndex != 0) {
-                state.currentToken.text = sub(state.currentToken.text, 0, length(state.currentToken.text) - 1);
+                var left:String = sub(state.currentToken.text, 0, state.caretIndex);
+                var right:String = sub(state.currentToken.text, state.caretIndex);
+
+                state.currentToken.text = sub(left, 0, length(left) - 1) + right;
                 state.caretIndex--;
             } else if (state.currentToken.prev != null) {
                 state.currentToken = state.currentToken.prev;
-                state.caretIndex = length(state.currentToken.text) - 1;
+                state.caretIndex = length(state.currentToken.text);
             }
+            // validate
         }
         state.currentToken.next = null;
     }
@@ -78,10 +97,10 @@ class Interpreter {
     inline function handleCaretLeft(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
             while (state.currentToken.prev != null) state.currentToken = state.currentToken.prev;
-            state.caretIndex = length(state.currentToken.text) - 1;
+            state.caretIndex = length(state.currentToken.text);
         } else if (alt) {
             if (state.currentToken.prev != null) state.currentToken = state.currentToken.prev;
-            state.caretIndex = length(state.currentToken.text) - 1;
+            state.caretIndex = length(state.currentToken.text);
         } else {
             if (state.caretIndex == 0) {
                 if (state.currentToken.prev != null) state.currentToken = state.currentToken.prev;
@@ -94,12 +113,12 @@ class Interpreter {
     inline function handleCaretRight(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
             while (state.currentToken.next != null) state.currentToken = state.currentToken.next;
-            state.caretIndex = length(state.currentToken.text) - 1;
+            state.caretIndex = length(state.currentToken.text);
         } else if (alt) {
             if (state.currentToken.next != null) state.currentToken = state.currentToken.next;
-            state.caretIndex = length(state.currentToken.text) - 1;
+            state.caretIndex = length(state.currentToken.text);
         } else {
-            if (state.caretIndex == length(state.currentToken.text) - 1) {
+            if (state.caretIndex == length(state.currentToken.text)) {
                 if (state.currentToken.next != null) state.currentToken = state.currentToken.next;
             } else {
                 state.caretIndex++;
@@ -118,13 +137,21 @@ class Interpreter {
     inline function handleChar(charCode:Int):Void {
         if (charCode > 0) {
             var char:String = String.fromCharCode(charCode);
-            if (char == ' ' && state.currentToken.invalidReason == null) {
-                state.currentToken.next = blankToken(state.currentToken);
-                state.currentToken = state.currentToken.next;
-                state.caretIndex = 0;
+            var left:String = sub(state.currentToken.text, 0, state.caretIndex);
+            var right:String = sub(state.currentToken.text, state.caretIndex);
+            if (char == ' ') {
+                // validate as complete
+                if (state.currentToken.invalidReason == null) {
+                    state.currentToken.text = left;
+                    state.currentToken.next = blankToken(state.currentToken);
+                    state.currentToken = state.currentToken.next;
+                    state.currentToken.text = right;
+                    state.caretIndex = length(right);
+                }
             } else {
-                state.currentToken.text += char;
+                state.currentToken.text = left + char + right;
                 state.caretIndex++;
+                // validate
             }
             state.currentToken.next = null;
         }
@@ -145,24 +172,16 @@ class Interpreter {
     inline function printTokens(token:ConsoleToken):String {
         var str:String = null;
         if (token != null) {
-            str = printToken(token);
+            str = styleToken(token);
             if (token.next != null) str += ' ' + printTokens(token.next);
         }
         return str;
     }
 
-    inline function printToken(token:ConsoleToken):String {
+    inline function styleToken(token:ConsoleToken):String {
         var str:String = token.text;
         if (token == state.currentToken) str = sub(str, 0, state.caretIndex) + '¢' + sub(str, state.caretIndex);
         return str;
-    }
-
-    inline function validateInput():Void {
-        var token:ConsoleToken = state.input;
-        while (token != null) {
-            // TODO: validate
-            token = token.next;
-        }
     }
 
     inline static function blankState():ConsoleState {

@@ -61,7 +61,7 @@ class ConsoleUIMediator extends UIMediator {
         caretStyle = cast caretSpan.style;
         caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
         addedText = '';
-        inputString = '';
+        inputString = '¢';
         outputString = '';
         hintString = '';
         frozenQueue = new List();
@@ -118,7 +118,7 @@ class ConsoleUIMediator extends UIMediator {
             if (executing) {
                 interactiveText += Strings.WAIT_INDICATOR;
             } else {
-                interactiveText += prompt + (inputString + '¢');
+                interactiveText += prompt + inputString;
                 interactiveText += '\n'; // Always added, because there's always input
                 if (false) interactiveText += '\t' + hintString;
             }

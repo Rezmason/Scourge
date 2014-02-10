@@ -1,5 +1,6 @@
 package net.rezmason.scourge.textview;
 
+import openfl.Assets.*;
 import flash.Vector;
 import flash.display.Stage;
 import flash.geom.Matrix3D;
@@ -22,7 +23,9 @@ class Lab {
         uniform sampler2D uSampler;
 
         void main(void) {
-            vec3 texture = texture2D(uSampler, vUV).rgb;
+            float glyph = texture2D(uSampler, vUV).b + 0.2;
+            glyph = 1.0 - glyph * glyph;
+            vec3 texture = vec3(glyph, glyph, glyph);
             if (vVid >= 0.3) texture *= -1.0;
             gl_FragColor = vec4(vColor * (texture + vVid) * clamp(2.0 - vZ, 0.0, 1.0), 1.0);
         }
@@ -100,10 +103,13 @@ class Lab {
 
     var data:ReadbackData;
 
-    public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
+    public function new(utils:UtilitySet, stage:Stage):Void {
         this.utils = utils;
         this.stage = stage;
-        this.glyphTexture = new GlyphTexture(utils.textureUtil, fonts['full']);
+
+        var path = 'flatfonts/full_flat';
+        var font:FlatFont = new FlatFont(getBitmapData('$path.png'), getText('$path.json'));
+        this.glyphTexture = new GlyphTexture(utils.textureUtil, font);
 
         width = stage.stageWidth;
         height = stage.stageHeight;
@@ -122,7 +128,7 @@ class Lab {
 
         // Create geometry
 
-        body = new TestBody(utils.bufferUtil, glyphTexture, bonk, 10);
+        body = new TestBody(utils.bufferUtil, glyphTexture, 10);
         body.update(0);
         segment = body.segments[0];
 
@@ -205,10 +211,6 @@ class Lab {
         utils.drawUtil.addRenderCall(onRender);
     }
 
-    function bonk():Void {
-
-    }
-
     function update():Void {
         /*
         t += 0.1;
@@ -263,7 +265,6 @@ class Lab {
             if (pixel == 0xFFFFFFFF) whiteCount++;
         }
 
-        trace(whiteCount / (width * height));
         /**/
 
         //*

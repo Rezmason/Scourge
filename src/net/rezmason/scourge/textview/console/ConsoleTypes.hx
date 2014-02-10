@@ -13,6 +13,7 @@ typedef ConsoleToken = {
     @:optional var invalidReason:String;
 }
 
+
 typedef ConsoleState = {
     var input:ConsoleToken;
     var output:ConsoleToken;

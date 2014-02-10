@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview;
 
-import openfl.Assets;
+import openfl.Assets.*;
 
 import flash.display.Stage;
 import flash.events.Event;
@@ -20,20 +20,22 @@ class TextDemo {
     var utils:UtilitySet;
     var fontTextures:Map<String, GlyphTexture>;
 
-    public function new(utils:UtilitySet, stage:Stage, fonts:Map<String, FlatFont>):Void {
+    public function new(utils:UtilitySet, stage:Stage):Void {
         this.utils = utils;
         this.stage = stage;
-        makeFontTextures(fonts);
+        makeFontTextures();
         engine = new Engine(utils, stage, fontTextures);
         engine.readySignal.add(init);
         engine.init();
     }
 
-    function makeFontTextures(fonts:Map<String, FlatFont>):Void {
+    function makeFontTextures():Void {
         fontTextures = new Map();
-        for (key in fonts.keys()) {
-            fontTextures[key] = cast new GlyphTexture(utils.textureUtil, fonts[key]);
-            fontTextures[key + "_fog"] = cast new GlyphTexture(utils.textureUtil, fonts[key]);
+        for (name in ['source', 'profont', 'full']) {
+            var path:String = 'flatfonts/${name}_flat';
+            var font:FlatFont = new FlatFont(getBitmapData('$path.png'), getText('$path.json'));
+            fontTextures[name] = cast new GlyphTexture(utils.textureUtil, font);
+            fontTextures[name + "_fog"] = cast new GlyphTexture(utils.textureUtil, font);
         }
     }
 

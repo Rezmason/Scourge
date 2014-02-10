@@ -2,6 +2,13 @@ Flesh out the interpreter
     commands
         styling
         validation
+            Token types:
+                Command: token needs to match the name of a command.
+                Flag: token needs to match a field in the "flags" list that isn't already matched.
+                Key: token needs to match a field in the "keys" list that isn't already matched.
+                Value: token text can only include characters from a restricted set.
+                Free: token doesn't need to match anything, can include spaces, and must go last.
+                <Null>: token is empty.
     hinting
     execution
     history
