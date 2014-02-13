@@ -61,7 +61,7 @@ class ConsoleUIMediator extends UIMediator {
         caretStyle = cast caretSpan.style;
         caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
         addedText = '';
-        inputString = '¢';
+        inputString = '';
         outputString = '';
         hintString = '';
         frozenQueue = new List();
@@ -120,7 +120,7 @@ class ConsoleUIMediator extends UIMediator {
             } else {
                 interactiveText += prompt + inputString;
                 interactiveText += '\n'; // Always added, because there's always input
-                if (false) interactiveText += '\t' + hintString;
+                if (hintString != null) interactiveText += hintString;
             }
 
             interactiveDoc.setText(swapTabsWithSpaces(interactiveText));
@@ -163,6 +163,7 @@ class ConsoleUIMediator extends UIMediator {
     }
 
     public function setInput(str:String):Void {
+        if (str == null) str = '';
         if (inputString != str) {
             inputString = str;
             isDirty = isInteractiveDocDirty = true;
@@ -170,6 +171,7 @@ class ConsoleUIMediator extends UIMediator {
     }
 
     public function setOutput(str:String):Void {
+        if (str == null) str = '';
         if (outputString != str) {
             outputString = str;
             isDirty = isInteractiveDocDirty = true;
@@ -177,6 +179,7 @@ class ConsoleUIMediator extends UIMediator {
     }
 
     public function setHint(str:String):Void {
+        if (str == null) str = '';
         if (hintString != str) {
             hintString = str;
             isDirty = isInteractiveDocDirty = true;

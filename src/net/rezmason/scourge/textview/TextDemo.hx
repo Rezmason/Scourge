@@ -43,6 +43,7 @@ class TextDemo {
         addListeners();
         var console = new ConsoleUIMediator();
         var interpreter = new Interpreter(console);
+        interpreter.addCommand(new ConsoleCommand());
         var uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], console);
         var rect:Rectangle = new Rectangle(0, 0, 1, 1);
         rect.inflate(-0.02, -0.02);

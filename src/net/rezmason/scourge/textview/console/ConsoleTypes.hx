@@ -8,11 +8,19 @@ class CommandCodeRestriction {
 
 typedef ConsoleToken = {
     var text:String;
-    @:optional var next:ConsoleToken;
-    @:optional var prev:ConsoleToken;
-    @:optional var invalidReason:String;
+    var type:ConsoleTokenType;
+    var next:ConsoleToken;
+    var prev:ConsoleToken;
 }
 
+enum ConsoleTokenType {
+    Key;
+    Value;
+    Flag;
+    CommandName;
+    Tail;
+    TailMarker;
+}
 
 typedef ConsoleState = {
     var input:ConsoleToken;
@@ -20,4 +28,28 @@ typedef ConsoleState = {
     var hint:ConsoleToken;
     var currentToken:ConsoleToken;
     var caretIndex:Int;
+
+    @:optional var completionError:String;
+    @:optional var hintError:String;
+    @:optional var commandError:String;
+
+    @:optional var autoTail:Bool;
+
+    @:optional var currentCommand:ConsoleCommand;
+    @:optional var keyReg:Map<String, Bool>;
+    @:optional var flagReg:Map<String, Bool>;
+    @:optional var tailMarkerPresent:Bool;
+
+    @:optional var hints:Array<ConsoleHint>;
+}
+
+typedef ConsoleHint = {
+    var text:String;
+    var type:ConsoleTokenType;
+}
+
+typedef ConsoleCommandArgs = {
+    var flags:Array<String>;
+    var keyValuePairs:Map<String, String>;
+    var user:String;
 }
