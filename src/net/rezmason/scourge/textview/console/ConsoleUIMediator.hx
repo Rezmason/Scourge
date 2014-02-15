@@ -132,11 +132,14 @@ class ConsoleUIMediator extends UIMediator {
     }
 
     override public function receiveInteraction(id:Int, interaction:Interaction):Void {
-        if (frozen) frozenQueue.add({id:id, interaction:interaction});
-        switch (interaction) {
-            case KEYBOARD(type, key, char, shift, alt, ctrl) if (type == KEY_DOWN || type == KEY_REPEAT):
-                keyboardSignal.dispatch(key, char, alt, ctrl);
-            case _: super.receiveInteraction(id, interaction);
+        if (frozen) {
+            frozenQueue.add({id:id, interaction:interaction});
+        } else {
+            switch (interaction) {
+                case KEYBOARD(type, key, char, shift, alt, ctrl) if (type == KEY_DOWN || type == KEY_REPEAT):
+                    keyboardSignal.dispatch(key, char, alt, ctrl);
+                case _: super.receiveInteraction(id, interaction);
+            }
         }
     }
 
@@ -192,7 +195,7 @@ class ConsoleUIMediator extends UIMediator {
 
     public inline function unfreeze():Void {
         frozen = false;
-        while (!frozenQueue.isEmpty()) {
+        while (!frozenQueue.isEmpty() && !frozen) {
             var leftovers:FrozenInteraction = frozenQueue.pop();
             receiveInteraction(leftovers.id, leftovers.interaction);
         }

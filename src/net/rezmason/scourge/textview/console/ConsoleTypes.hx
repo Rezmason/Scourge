@@ -35,6 +35,7 @@ typedef ConsoleState = {
 
     @:optional var autoTail:Bool;
 
+    @:optional var args:ConsoleCommandArgs;
     @:optional var currentCommand:ConsoleCommand;
     @:optional var keyReg:Map<String, Bool>;
     @:optional var flagReg:Map<String, Bool>;
@@ -51,5 +52,8 @@ typedef ConsoleHint = {
 typedef ConsoleCommandArgs = {
     var flags:Array<String>;
     var keyValuePairs:Map<String, String>;
-    var user:String;
+    var tail:String;
+
+    @:optional var pendingKey:String;
+    @:optional var pendingValue:String;
 }

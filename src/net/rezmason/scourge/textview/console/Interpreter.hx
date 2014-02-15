@@ -9,6 +9,12 @@ using Lambda;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.utils.ArrayUtils;
 
+enum InterpreterState {
+    Idle;
+    Hinting;
+    Executing;
+}
+
 class Interpreter {
 
     // inline static var INPUT_PREFIX:String = '__input_';
@@ -16,14 +22,16 @@ class Interpreter {
     // inline static var HINT_PREFIX:String = '__hint_';
 
     var console:ConsoleUIMediator;
-    var state:ConsoleState;
+    var cState:ConsoleState;
+    var iState:InterpreterState;
     var commands:Map<String, ConsoleCommand>;
 
     public function new(console:ConsoleUIMediator):Void {
         this.console = console;
         this.console.keyboardSignal.add(handleKeyboard);
         this.console.clickSignal.add(handleSpanClick);
-        state = blankState();
+        cState = blankState();
+        iState = Idle;
         commands = new Map();
         print();
     }
@@ -42,6 +50,7 @@ class Interpreter {
     }
 
     function handleKeyboard(key:Int, charCode:Int, alt:Bool, ctrl:Bool):Void {
+
         switch (key) {
             case Keyboard.BACKSPACE: handleBackspace(alt, ctrl);
             case Keyboard.ENTER: handleEnter();
@@ -54,31 +63,34 @@ class Interpreter {
             case _: handleChar(charCode);
         }
 
+        if (key != Keyboard.LEFT && key != Keyboard.RIGHT) checkForCommandHintCondition();
+
         print();
+        trace(iState);
     }
 
     inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
-            state = blankState();
+            cState = blankState();
         } else if (alt) {
-            if (state.currentToken.prev != null) {
-                state.currentToken = state.currentToken.prev;
-                state.caretIndex = length(state.currentToken.text);
+            if (cState.currentToken.prev != null) {
+                cState.currentToken = cState.currentToken.prev;
+                cState.caretIndex = length(cState.currentToken.text);
             } else {
-                state.currentToken.text = '';
-                state.caretIndex = 0;
+                cState.currentToken.text = '';
+                cState.caretIndex = 0;
             }
             trimState();
         } else {
-            if (state.caretIndex != 0) {
-                var left:String = sub(state.currentToken.text, 0, state.caretIndex);
-                var right:String = sub(state.currentToken.text, state.caretIndex);
+            if (cState.caretIndex != 0) {
+                var left:String = sub(cState.currentToken.text, 0, cState.caretIndex);
+                var right:String = sub(cState.currentToken.text, cState.caretIndex);
 
-                state.currentToken.text = sub(left, 0, length(left) - 1) + right;
-                state.caretIndex--;
-            } else if (state.currentToken.prev != null) {
-                state.currentToken = state.currentToken.prev;
-                state.caretIndex = length(state.currentToken.text);
+                cState.currentToken.text = sub(left, 0, length(left) - 1) + right;
+                cState.caretIndex--;
+            } else if (cState.currentToken.prev != null) {
+                cState.currentToken = cState.currentToken.prev;
+                cState.caretIndex = length(cState.currentToken.text);
             }
             trimState();
             validateState(false);
@@ -86,64 +98,65 @@ class Interpreter {
     }
 
     inline function handleEnter():Void {
-        // TODO: execution
+        validateState(true);
+        if (cState.completionError == null) waitForCommandExecution();
     }
 
     inline function handleTab():Void {
-        if (state.hints != null && state.hints.length > 0) {
-            state.currentToken.text = state.hints[0].text;
+        if (cState.hints != null && cState.hints.length > 0) {
+            cState.currentToken.text = cState.hints[0].text;
             validateState(true);
-            if (state.completionError == null && state.commandError == null) {
-                state.currentToken.next = blankToken(state.currentToken);
-                state.currentToken = state.currentToken.next;
-                state.caretIndex = 0;
+            if (cState.completionError == null) {
+                cState.currentToken.next = blankToken(cState.currentToken);
+                cState.currentToken = cState.currentToken.next;
+                cState.caretIndex = 0;
             } else {
-                state.caretIndex = length(state.currentToken.text);
+                cState.caretIndex = length(cState.currentToken.text);
             }
-        } else if (length(state.currentToken.text) == 0) {
+        } else if (length(cState.currentToken.text) == 0) {
             validateState(false);
         }
     }
 
     inline function handleEscape():Void {
-        state = blankState();
+        cState = blankState();
         validateState(false);
     }
 
     inline function handleCaretLeft(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
-            while (state.currentToken.prev != null) state.currentToken = state.currentToken.prev;
-            state.caretIndex = length(state.currentToken.text);
+            while (cState.currentToken.prev != null) cState.currentToken = cState.currentToken.prev;
+            cState.caretIndex = length(cState.currentToken.text);
         } else if (alt) {
-            if (state.currentToken.prev != null) state.currentToken = state.currentToken.prev;
-            state.caretIndex = length(state.currentToken.text);
+            if (cState.currentToken.prev != null) cState.currentToken = cState.currentToken.prev;
+            cState.caretIndex = length(cState.currentToken.text);
         } else {
-            if (state.caretIndex == 0) {
-                if (state.currentToken.prev != null) {
-                    state.currentToken = state.currentToken.prev;
-                    state.caretIndex = length(state.currentToken.text);
+            if (cState.caretIndex == 0) {
+                if (cState.currentToken.prev != null) {
+                    cState.currentToken = cState.currentToken.prev;
+                    cState.caretIndex = length(cState.currentToken.text);
                 }
             } else {
-                state.caretIndex--;
+                cState.caretIndex--;
             }
         }
     }
 
     inline function handleCaretRight(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
-            while (state.currentToken.next != null) state.currentToken = state.currentToken.next;
-            state.caretIndex = length(state.currentToken.text);
+            while (cState.currentToken.next != null) cState.currentToken = cState.currentToken.next;
+            cState.caretIndex = length(cState.currentToken.text);
         } else if (alt) {
-            if (state.currentToken.next != null) state.currentToken = state.currentToken.next;
-            state.caretIndex = length(state.currentToken.text);
+            if (cState.currentToken.next != null) cState.currentToken = cState.currentToken.next;
+            cState.caretIndex = length(cState.currentToken.text);
         } else {
-            if (state.caretIndex == length(state.currentToken.text)) {
-                if (state.currentToken.next != null) {
-                    state.currentToken = state.currentToken.next;
-                    state.caretIndex = 0;
+            if (cState.caretIndex == length(cState.currentToken.text)) {
+                if (cState.currentToken.next != null) {
+                    cState.currentToken = cState.currentToken.next;
+                    cState.caretIndex = 0;
                 }
             } else {
-                state.caretIndex++;
+                cState.caretIndex++;
             }
         }
     }
@@ -159,29 +172,29 @@ class Interpreter {
     inline function handleChar(charCode:Int):Void {
         if (charCode > 0) {
             var char:String = String.fromCharCode(charCode);
-            var left:String = sub(state.currentToken.text, 0, state.caretIndex);
-            var right:String = sub(state.currentToken.text, state.caretIndex);
-            var token:ConsoleToken = state.currentToken;
+            var left:String = sub(cState.currentToken.text, 0, cState.caretIndex);
+            var right:String = sub(cState.currentToken.text, cState.caretIndex);
+            var token:ConsoleToken = cState.currentToken;
             if (char == ' ' && token.type != Tail) {
                 if (length(token.text) == 0) {
                     validateState(false);
                 } else {
                     validateState(true);
-                    if (state.completionError == null && state.commandError == null) {
+                    if (cState.completionError == null) {
                         token.text = left;
                         token.next = blankToken(token);
                         token = token.next;
-                        state.currentToken = token;
+                        cState.currentToken = token;
                         token.text = right;
-                        state.caretIndex = length(right);
+                        cState.caretIndex = length(right);
                     }
                 }
             } else {
                 var prev:ConsoleToken = token.prev;
-                if (prev == null || prev.type != Key || state.currentCommand.keys[prev.text].indexOf(char) != -1) {
-                    if (token.next != null || !(state.commandError != null || state.hintError != null)) {
+                if (prev == null || prev.type != Key || cState.currentCommand.keys[prev.text].indexOf(char) != -1) {
+                    if (token.next != null || cState.hintError == null) {
                         token.text = left + char + right;
-                        state.caretIndex++;
+                        cState.caretIndex++;
                         trimState();
                         validateState(false);
                     }
@@ -191,39 +204,36 @@ class Interpreter {
     }
 
     inline function trimState():Void {
-        var token:ConsoleToken = state.currentToken;
+        var token:ConsoleToken = cState.currentToken;
 
         while (token != null) {
             if (token.type != null) {
                 switch (token.type) {
-                    case Key: state.keyReg[token.text] = false;
-                    case Flag: state.flagReg[token.text] = false;
-                    case TailMarker: state.tailMarkerPresent = false;
+                    case Key: cState.keyReg[token.text] = false;
+                    case Flag: cState.flagReg[token.text] = false;
+                    case TailMarker: cState.tailMarkerPresent = false;
                     case _:
                 }
             }
             token = token.next;
         }
 
-        state.currentToken.next = null;
+        cState.currentToken.next = null;
     }
 
     function print():Void {
-
         var hintString:String = null;
-        if (state.completionError != null) {
-            hintString = '\t§{${Strings.ERROR_OUTPUT_STYLENAME}}${state.completionError}§{}';
-        } else if (state.commandError != null) {
-            hintString = '\t§{${Strings.ERROR_OUTPUT_STYLENAME}}${state.commandError}§{}';
-        } else if (state.hintError != null) {
-            hintString = '\t§{${Strings.ERROR_OUTPUT_STYLENAME}}${state.hintError}§{}';
+        if (cState.completionError != null) {
+            hintString = '\t§{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.completionError}§{}';
+        } else if (cState.hintError != null) {
+            hintString = '\t§{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.hintError}§{}';
         } else {
-            hintString = printHints(state.hints);
+            hintString = printHints(cState.hints);
         }
         console.setHint(hintString);
         trace(hintString);
 
-        var inputString:String = printTokens(state.input);
+        var inputString:String = printTokens(cState.input);
         console.setInput(inputString);
         trace(inputString);
     }
@@ -243,10 +253,9 @@ class Interpreter {
     function validateState(complete:Bool):Void {
         var completionError:String = null;
         var hintError:String = null;
-        var commandError:String = null;
         var type:ConsoleTokenType = null;
-        var prev:ConsoleToken = state.currentToken.prev;
-        var currentText:String = state.currentToken.text;
+        var prev:ConsoleToken = cState.currentToken.prev;
+        var currentText:String = cState.currentToken.text;
         var hints:Array<ConsoleHint> = null;
 
         if (prev == null) {
@@ -256,18 +265,18 @@ class Interpreter {
                     completionError = 'Command not found.';
                 } else {
                     var command:ConsoleCommand = commands[currentText];
-                    state.currentCommand = command;
-                    state.autoTail = command.flags.empty() && command.keys.empty();
+                    cState.currentCommand = command;
+                    cState.autoTail = command.flags.empty() && command.keys.empty();
 
                     var keyReg:Map<String, Bool> = new Map();
                     for (key in command.keys.keys()) keyReg[key] = false;
-                    state.keyReg = keyReg;
+                    cState.keyReg = keyReg;
 
                     var flagReg:Map<String, Bool> = new Map();
                     for (flag in command.flags) flagReg[flag] = false;
-                    state.flagReg = flagReg;
+                    cState.flagReg = flagReg;
 
-                    state.tailMarkerPresent = false;
+                    cState.tailMarkerPresent = false;
                 }
             } else {
                 hints = commands.keys().intoArray().filter(startsWith.bind(_, currentText)).map(argToHint.bind(_, CommandName));
@@ -278,42 +287,37 @@ class Interpreter {
             switch (prev.type) {
                 case Key:
                     type = Value;
-                    state.currentToken.type = type;
-                    if (complete) {
-                        if (length(currentText) == 0) {
-                            completionError = 'Empty value.';
-                        }
+                    cState.currentToken.type = type;
+                    if (complete && length(currentText) == 0) {
+                        completionError = 'Empty value.';
                     }
-                    // send to the command for further validation
-                    // commandError
                 case TailMarker:
                     type = Tail;
-                    state.currentToken.type = type;
+                    cState.currentToken.type = type;
                 case _:
-                    trace('${state.autoTail} ${state.tailMarkerPresent} $currentText');
-                    if (!state.autoTail && !state.tailMarkerPresent && currentText == ':') {
+                    if (!cState.autoTail && !cState.tailMarkerPresent && currentText == ':') {
                         type = TailMarker;
-                        if (complete) state.tailMarkerPresent = true;
+                        if (complete) cState.tailMarkerPresent = true;
                     } else {
                         if (complete) {
-                            if (state.keyReg[currentText] == false) {
+                            if (cState.keyReg[currentText] == false) {
                                 type = Key;
-                                state.keyReg[currentText] = true;
-                            } else if (state.keyReg[currentText] == true) {
+                                cState.keyReg[currentText] = true;
+                            } else if (cState.keyReg[currentText] == true) {
                                 completionError = 'Duplicate key.';
-                            } else if (state.flagReg[currentText] == false) {
+                            } else if (cState.flagReg[currentText] == false) {
                                 type = Flag;
-                                state.flagReg[currentText] = true;
-                            } else if (state.flagReg[currentText] == true) {
+                                cState.flagReg[currentText] = true;
+                            } else if (cState.flagReg[currentText] == true) {
                                 completionError = 'Duplicate flag.';
                             } else {
                                 completionError = 'No matches found.';
                             }
                         } else {
-                            var keys = state.keyReg.keys().intoArray().filter(isUnusedMatch.bind(_, state.keyReg, currentText));
+                            var keys = cState.keyReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.keyReg, currentText));
                             var keyHints:Array<ConsoleHint> = keys.map(argToHint.bind(_, Key));
 
-                            var flags = state.flagReg.keys().intoArray().filter(isUnusedMatch.bind(_, state.flagReg, currentText));
+                            var flags = cState.flagReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.flagReg, currentText));
                             var flagHints:Array<ConsoleHint> = flags.map(argToHint.bind(_, Flag));
 
                             if (keyHints.empty() && flagHints.empty()) {
@@ -327,13 +331,12 @@ class Interpreter {
             }
         }
 
-        if (complete) state.currentToken.type = type;
+        if (complete) cState.currentToken.type = type;
         trace(type);
 
-        state.completionError = completionError;
-        state.hintError = hintError;
-        state.commandError = commandError;
-        state.hints = hints;
+        cState.completionError = completionError;
+        cState.hintError = hintError;
+        cState.hints = hints;
     }
 
     function startsWith(arg:String, sub:String):Bool return arg.indexOf(sub) == 0;
@@ -350,6 +353,43 @@ class Interpreter {
         else return -1;
     }
 
+    inline function bakeArgs():Void {
+        if (cState.currentCommand != null) {
+            if (cState.args == null) cState.args = {flags:[], keyValuePairs:new Map(), tail:null};
+
+            var flags:Array<String> = cState.args.flags;
+            var keyValuePairs:Map<String, String> = cState.args.keyValuePairs;
+            var tail:String = null;
+            var pendingKey:String = null;
+            var pendingValue:String = null;
+
+            flags.splice(0, flags.length);
+            for (key in keyValuePairs.keys()) keyValuePairs.remove(key);
+
+            var token:ConsoleToken = cState.input;
+            while (token != null) {
+                switch (token.type) {
+                    case Flag: flags.push(token.text);
+                    case Key if (token.next != null):
+                        if (token.next.type == null) {
+                            pendingKey = token.text;
+                            pendingValue = token.next.text;
+                        } else {
+                            keyValuePairs[token.text] = token.next.text;
+                        }
+                        token = token.next;
+                    case Tail: tail = token.text;
+                    case _:
+                }
+                token = token.next;
+            }
+
+            cState.args.tail = tail;
+            cState.args.pendingKey = pendingKey;
+            cState.args.pendingValue = pendingValue;
+        }
+    }
+
     inline function printTokens(token:ConsoleToken):String {
         var str:String = null;
         if (token != null) {
@@ -362,7 +402,7 @@ class Interpreter {
     inline function printHints(hints:Array<ConsoleHint>):String {
         var hintStrings:Array<String> = [];
         if (hints != null) {
-            for (hint in state.hints) {
+            for (hint in cState.hints) {
                 hintStrings.push('\t§{}${hint.text}§{}');
             }
         }
@@ -372,14 +412,62 @@ class Interpreter {
     inline function styleToken(token:ConsoleToken):String {
         var str:String = token.text;
         var styleName:String = null; // TODO: map token types to style names
-        if (token == state.currentToken) {
-            str = sub(str, 0, state.caretIndex) + CARET + sub(str, state.caretIndex);
+        if (token == cState.currentToken) {
+            str = sub(str, 0, cState.caretIndex) + CARET + sub(str, cState.caretIndex);
         }
-        if (token.next == null && (state.completionError != null || state.commandError != null || state.hintError != null)) {
+        if (token.next == null && (cState.completionError != null || cState.hintError != null)) {
             styleName = Strings.ERROR_INPUT_STYLENAME;
         }
         if (styleName == null) styleName = Strings.INPUT_STYLENAME;
         return '§{$styleName}$str§{}';
+    }
+
+    inline function checkForCommandHintCondition():Void {
+        if (cState.currentCommand != null) {
+            var lastToken:ConsoleToken = cState.input;
+            while (lastToken.next != null) lastToken = lastToken.next;
+            var tokenIsEmpty:Bool = length(lastToken.text) == 0;
+
+            if (lastToken.type == Value && !tokenIsEmpty) {
+                waitForCommandHints();
+            } else if (tokenIsEmpty && (lastToken.prev.type == Flag || lastToken.prev.type == Value)) {
+                waitForCommandHints();
+            }
+        }
+    }
+
+    function waitForCommandHints():Void {
+        bakeArgs();
+        console.freeze();
+        iState = Hinting;
+        cState.currentCommand.outputSignal.add(onCommandHint);
+        cState.currentCommand.hint(cState.args);
+    }
+
+    function onCommandHint(outputString:String, done:Bool):Void {
+        // Do something with outputString
+        trace(outputString);
+        cState.currentCommand.outputSignal.remove(onCommandHint);
+        iState = Idle;
+        console.unfreeze();
+    }
+
+    function waitForCommandExecution():Void {
+        bakeArgs();
+        console.freeze();
+        iState = Executing;
+        cState.currentCommand.outputSignal.add(onCommandExecute);
+        cState.currentCommand.execute(cState.args);
+    }
+
+    function onCommandExecute(outputString:String, done:Bool):Void {
+        // Do something with outputString
+        trace(outputString);
+        if (done) {
+            cState.currentCommand.outputSignal.remove(onCommandHint);
+            iState = Idle;
+            console.unfreeze();
+        }
     }
 
     inline static function blankState():ConsoleState {

@@ -1,7 +1,11 @@
 Flesh out the interpreter
 
-    hints from command (async)
-    execution (async)
+    waitFor functions
+        wire up phony command response
+
+    hints from command
+    execution
+        wait indicator
 
     history
     key, value, flag, tail marker and tail styling
