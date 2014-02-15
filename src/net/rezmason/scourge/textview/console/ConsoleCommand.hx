@@ -20,10 +20,11 @@ class ConsoleCommand {
     }
 
     public function hint(args:ConsoleCommandArgs):Void {
-
+        outputSignal.dispatch('HINT! ${args.keyValuePairs["a"]}', true);
     }
 
     public function execute(args:ConsoleCommandArgs):Void {
-
+        outputSignal.dispatch('OUTPUT 1! ${args.keyValuePairs["a"]}', false);
+        outputSignal.dispatch('OUTPUT 2! ${args.keyValuePairs["b"]}', true);
     }
 }

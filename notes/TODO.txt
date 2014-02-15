@@ -1,11 +1,10 @@
 Flesh out the interpreter
 
-    waitFor functions
-        wire up phony command response
-
-    hints from command
-    execution
+    ConsoleUIMediator should have one interactive text setter, not three
+        Interpreter should stitch input, hints, output and the wait indicator together.
         wait indicator
+
+    execution
 
     history
     key, value, flag, tail marker and tail styling

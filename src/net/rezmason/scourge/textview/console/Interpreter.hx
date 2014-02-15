@@ -1,6 +1,7 @@
 package net.rezmason.scourge.textview.console;
 
 import flash.ui.Keyboard;
+import haxe.Timer;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.text.Sigil.*;
 import net.rezmason.utils.Utf8Utils.*;
@@ -66,7 +67,6 @@ class Interpreter {
         if (key != Keyboard.LEFT && key != Keyboard.RIGHT) checkForCommandHintCondition();
 
         print();
-        trace(iState);
     }
 
     inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
@@ -231,11 +231,9 @@ class Interpreter {
             hintString = printHints(cState.hints);
         }
         console.setHint(hintString);
-        trace(hintString);
 
         var inputString:String = printTokens(cState.input);
         console.setInput(inputString);
-        trace(inputString);
     }
 
     function handleSpanClick(id:String):Void {
@@ -332,7 +330,7 @@ class Interpreter {
         }
 
         if (complete) cState.currentToken.type = type;
-        trace(type);
+        // trace(type);
 
         cState.completionError = completionError;
         cState.hintError = hintError;
@@ -368,18 +366,20 @@ class Interpreter {
 
             var token:ConsoleToken = cState.input;
             while (token != null) {
-                switch (token.type) {
-                    case Flag: flags.push(token.text);
-                    case Key if (token.next != null):
-                        if (token.next.type == null) {
-                            pendingKey = token.text;
-                            pendingValue = token.next.text;
-                        } else {
-                            keyValuePairs[token.text] = token.next.text;
-                        }
-                        token = token.next;
-                    case Tail: tail = token.text;
-                    case _:
+                if (token.type != null) {
+                    switch (token.type) {
+                        case Flag: flags.push(token.text);
+                        case Key if (token.next != null):
+                            if (token.next.type == null) {
+                                pendingKey = token.text;
+                                pendingValue = token.next.text;
+                            } else {
+                                keyValuePairs[token.text] = token.next.text;
+                            }
+                            token = token.next;
+                        case Tail: tail = token.text;
+                        case _:
+                    }
                 }
                 token = token.next;
             }
@@ -423,7 +423,7 @@ class Interpreter {
     }
 
     inline function checkForCommandHintCondition():Void {
-        if (cState.currentCommand != null) {
+        if (iState == Idle && cState.currentCommand != null) {
             var lastToken:ConsoleToken = cState.input;
             while (lastToken.next != null) lastToken = lastToken.next;
             var tokenIsEmpty:Bool = length(lastToken.text) == 0;
@@ -441,12 +441,11 @@ class Interpreter {
         console.freeze();
         iState = Hinting;
         cState.currentCommand.outputSignal.add(onCommandHint);
-        cState.currentCommand.hint(cState.args);
+        Timer.delay(function() cState.currentCommand.hint(cState.args), 0);
     }
 
     function onCommandHint(outputString:String, done:Bool):Void {
-        // Do something with outputString
-        trace(outputString);
+        console.setHint('\t' + outputString);
         cState.currentCommand.outputSignal.remove(onCommandHint);
         iState = Idle;
         console.unfreeze();
@@ -457,7 +456,7 @@ class Interpreter {
         console.freeze();
         iState = Executing;
         cState.currentCommand.outputSignal.add(onCommandExecute);
-        cState.currentCommand.execute(cState.args);
+        Timer.delay(function() cState.currentCommand.execute(cState.args), 0);
     }
 
     function onCommandExecute(outputString:String, done:Bool):Void {
