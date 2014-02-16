@@ -10,7 +10,7 @@ import flash.geom.Matrix3D;
 import flash.utils.Endian;
 import flash.utils.ByteArray;
 
-import net.rezmason.gl.glsl2agal.Types;
+import net.rezmason.gl.glsl2agal.GLSL2AGALTypes;
 
 /**
 
