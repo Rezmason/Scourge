@@ -19,6 +19,8 @@ class Interpreter {
     // inline static var OUTPUT_PREFIX:String = '__output_';
     // inline static var HINT_PREFIX:String = '__hint_';
 
+    static var styleNamesByType:Map<ConsoleTokenType, String> = makeStyleNamesByType();
+
     var currentToken(get, set):ConsoleToken;
     var caretIndex(get, set):Int;
 
@@ -54,6 +56,7 @@ class Interpreter {
             Strings.WAIT_STYLES,
             Strings.INPUT_STYLE,
             Strings.ERROR_STYLES,
+            Strings.INTERPRETER_STYLES,
         ].join(''));
 
         commandHintString = '';
@@ -503,7 +506,9 @@ class Interpreter {
         var hintStrings:Array<String> = [];
         if (hints != null) {
             for (hint in cState.hints) {
-                hintStrings.push('  §{}${hint.text}§{}');
+                var styleName:String = Strings.INPUT_STYLENAME;
+                if (hint.type != null) styleName = styleNamesByType[hint.type];
+                hintStrings.push('  §{$styleName}${hint.text}§{}');
             }
         }
         return hintStrings.join('\n');
@@ -511,14 +516,15 @@ class Interpreter {
 
     inline function styleToken(token:ConsoleToken, includeCaret:Bool):String {
         var str:String = token.text;
-        var styleName:String = null; // TODO: map token types to style names
+        var styleName:String = Strings.INPUT_STYLENAME;
         if (token == currentToken && includeCaret) {
             str = sub(str, 0, caretIndex) + CARET + sub(str, caretIndex);
         }
         if (token.next == null && (cState.completeError != null || cState.hintError != null)) {
             styleName = Strings.ERROR_INPUT_STYLENAME;
+        } else if (token.type != null) {
+            styleName = styleNamesByType[token.type];
         }
-        if (styleName == null) styleName = Strings.INPUT_STYLENAME;
         return '§{$styleName}$str§{}';
     }
 
@@ -599,6 +605,17 @@ class Interpreter {
 
     inline function get_caretIndex():Int return cState.caretIndex;
     inline function set_caretIndex(val:Int):Int return cState.caretIndex = val;
+
+    static function makeStyleNamesByType():Map<ConsoleTokenType, String> {
+        var styleNamesByType:Map<ConsoleTokenType, String> = new Map();
+        styleNamesByType[Key] = Strings.KEY_STYLENAME;
+        styleNamesByType[Value] = Strings.VALUE_STYLENAME;
+        styleNamesByType[Flag] = Strings.FLAG_STYLENAME;
+        styleNamesByType[CommandName] = Strings.COMMAND_NAME_STYLENAME;
+        styleNamesByType[Tail] = Strings.TAIL_STYLENAME;
+        styleNamesByType[TailMarker] = Strings.TAIL_MARKER_STYLENAME;
+        return styleNamesByType;
+    }
 
     inline static function blankState():ConsoleState {
         var tok = blankToken();

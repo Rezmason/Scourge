@@ -1,7 +1,5 @@
 Flesh out the interpreter
 
-    styling
-        key, value, flag, tail marker and tail
     hint clicking
         appending to console state
         optionally executing
