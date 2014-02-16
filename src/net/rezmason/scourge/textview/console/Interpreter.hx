@@ -1,7 +1,10 @@
 package net.rezmason.scourge.textview.console;
 
 import flash.ui.Keyboard;
+
 import haxe.Timer;
+import haxe.Utf8;
+
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.text.Sigil.*;
 import net.rezmason.utils.Utf8Utils.*;
@@ -28,6 +31,9 @@ class Interpreter {
     var commandHintString:String;
     var outputString:String;
     var combinedString:String;
+    var cHistory:Array<String>;
+    var mHistory:Array<String>;
+    var mHistIndex:Int = 0;
 
     public function new(console:ConsoleUIMediator):Void {
         setPrompt('scourge', 0x3060FF);
@@ -35,6 +41,10 @@ class Interpreter {
         this.console.keyboardSignal.add(handleKeyboard);
         this.console.clickSignal.add(handleSpanClick);
         cState = blankState();
+        cHistory = [''];
+        mHistory = cHistory.copy();
+        mHistIndex = 0;
+
         iState = Idle;
         commands = new Map();
         runningCommand = null;
@@ -147,6 +157,11 @@ class Interpreter {
             appendInteractiveText();
             outputString = '';
             if (length(cState.input.text) > 0) waitForCommandExecution();
+            cHistory.pop();
+            cHistory.push(stringifyState());
+            cHistory.push('');
+            mHistory = cHistory.copy();
+            mHistIndex = cHistory.length - 1;
             cState = blankState();
         }
     }
@@ -211,11 +226,21 @@ class Interpreter {
     }
 
     inline function handleUp():Void {
-        // TODO: history
+        if (mHistIndex > 0) {
+            mHistory[mHistIndex] = stringifyState();
+            mHistIndex--;
+            loadStateFromString(mHistory[mHistIndex]);
+            validateState(true);
+        }
     }
 
     inline function handleDown():Void {
-        // TODO: history
+        if (mHistIndex < mHistory.length - 1) {
+            mHistory[mHistIndex] = stringifyState();
+            mHistIndex++;
+            loadStateFromString(mHistory[mHistIndex]);
+            validateState(true);
+        }
     }
 
     inline function handleChar(charCode:Int):Void {
@@ -547,6 +572,21 @@ class Interpreter {
         outputString += '  ' + str + '\n';
         combineStrings();
         printInteractiveText();
+    }
+
+    inline function stringifyState():String {
+        var tokenStrings:Array<String> = [];
+        var token:ConsoleToken = cState.input;
+        while (token != null) {
+            if (length(token.text) > 0) tokenStrings.push(token.text);
+            token = token.next;
+        }
+        return tokenStrings.join(' ');
+    }
+
+    inline function loadStateFromString(str:String):Void {
+        cState = blankState();
+        Utf8.iter(str, handleChar);
     }
 
     inline function get_currentToken():ConsoleToken return cState.currentToken;

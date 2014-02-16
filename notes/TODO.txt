@@ -1,10 +1,7 @@
 Flesh out the interpreter
 
-    history
-        states stored as strings
-            stateToString
-            stateFromString
-        And that nutty history logic
+    Duplicate key/flag bug
+
     styling
         key, value, flag, tail marker and tail
     hint clicking
