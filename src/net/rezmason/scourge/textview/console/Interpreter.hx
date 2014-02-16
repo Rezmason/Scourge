@@ -6,6 +6,7 @@ import haxe.Timer;
 import haxe.Utf8;
 
 import net.rezmason.scourge.textview.console.ConsoleTypes;
+import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.Sigil.*;
 import net.rezmason.utils.Utf8Utils.*;
 
@@ -14,10 +15,6 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.utils.ArrayUtils;
 
 class Interpreter {
-
-    // inline static var INPUT_PREFIX:String = '__input_';
-    // inline static var OUTPUT_PREFIX:String = '__output_';
-    // inline static var HINT_PREFIX:String = '__hint_';
 
     static var styleNamesByType:Map<ConsoleTokenType, String> = makeStyleNamesByType();
 
@@ -37,11 +34,14 @@ class Interpreter {
     var mHistory:Array<String>;
     var mHistIndex:Int = 0;
 
+    var tokensByID:Map<String, ConsoleToken>;
+    var hintsByID:Map<String, ConsoleToken>;
+
     public function new(console:ConsoleUIMediator):Void {
         setPrompt('scourge', 0x3060FF);
         this.console = console;
         this.console.keyboardSignal.add(handleKeyboard);
-        this.console.clickSignal.add(handleSpanClick);
+        this.console.clickSignal.add(handleMouseInteraction);
         cState = blankState();
         cHistory = [''];
         mHistory = cHistory.copy();
@@ -54,6 +54,7 @@ class Interpreter {
         console.loadStyles([
             Strings.BREATHING_PROMPT_STYLE,
             Strings.WAIT_STYLES,
+            Strings.COMMAND_HINT_STYLE,
             Strings.INPUT_STYLE,
             Strings.ERROR_STYLES,
             Strings.INTERPRETER_STYLES,
@@ -62,6 +63,8 @@ class Interpreter {
         commandHintString = '';
         outputString = '';
 
+        tokensByID = new Map();
+        hintsByID = new Map();
         combineStrings();
         printInteractiveText();
     }
@@ -91,6 +94,9 @@ class Interpreter {
     }
 
     function handleKeyboard(key:Int, charCode:Int, alt:Bool, ctrl:Bool):Void {
+
+        tokensByID = new Map();
+        hintsByID = new Map();
 
         switch (key) {
             case Keyboard.BACKSPACE: handleBackspace(alt, ctrl);
@@ -312,9 +318,9 @@ class Interpreter {
             combinedString += '  ' + Strings.WAIT_INDICATOR;
         } else {
             var hintString:String = '';
-            if (cState.finalError != null) hintString = '§{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.finalError}§{}';
-            else if (cState.completeError != null) hintString = '§{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.completeError}§{}';
-            else if (cState.hintError != null) hintString = '§{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.hintError}§{}';
+            if (cState.finalError != null) hintString = '  §{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.finalError}§{}';
+            else if (cState.completeError != null) hintString = '  §{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.completeError}§{}';
+            else if (cState.hintError != null) hintString = '  §{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.hintError}§{}';
             else hintString = printHints(cState.hints);
 
             var inputString:String = printTokens(cState.input, includeCaret);
@@ -325,16 +331,40 @@ class Interpreter {
         }
     }
 
-    function handleSpanClick(id:String):Void {
-        /*
-        if (id.indexOf(INPUT_PREFIX) == 0) {
-
-        } else if (id.indexOf(OUTPUT_PREFIX) == 0) {
-
-        } else if (id.indexOf(HINT_PREFIX) == 0) {
-
+    function handleMouseInteraction(id:String, type:MouseInteractionType):Void {
+        if (iState == Idle) {
+            switch (type) {
+                case ENTER:
+                    if (hintsByID[id] != null && cState.currentCommand != null) {
+                        bakeArgs();
+                        cState.currentCommand.hintRollOver(cState.args, hintsByID[id]);
+                    }
+                case EXIT:
+                    if (hintsByID[id] != null && cState.currentCommand != null) {
+                        cState.currentCommand.hintRollOut();
+                    }
+                case CLICK:
+                    if (tokensByID[id] != null) {
+                        currentToken = tokensByID[id];
+                        caretIndex = length(currentToken.text);
+                    } else if (hintsByID[id] != null) {
+                        currentToken.text = hintsByID[id].text;
+                        validateState(true);
+                        if (cState.completeError == null) {
+                            hintsByID = new Map();
+                            tokensByID = new Map();
+                            currentToken.next = blankToken(currentToken);
+                            currentToken = currentToken.next;
+                            caretIndex = 0;
+                        } else {
+                            caretIndex = length(currentToken.text);
+                        }
+                    }
+                    combineStrings();
+                    printInteractiveText();
+                case _:
+            }
         }
-        */
     }
 
     function validateState(isComplete:Bool, isFinal:Bool = false):Void {
@@ -345,7 +375,7 @@ class Interpreter {
         var token:ConsoleToken = currentToken;
         var prev:ConsoleToken = token.prev;
         var currentText:String = token.text;
-        var hints:Array<ConsoleHint> = null;
+        var hints:Array<ConsoleToken> = null;
 
         if (prev == null) {
             type = CommandName;
@@ -415,13 +445,13 @@ class Interpreter {
                             }
                         } else {
                             var keys = cState.keyReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.keyReg, currentText));
-                            var keyHints:Array<ConsoleHint> = keys.map(argToHint.bind(_, Key));
+                            var keyHints:Array<ConsoleToken> = keys.map(argToHint.bind(_, Key));
 
                             var flags = cState.flagReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.flagReg, currentText));
-                            var flagHints:Array<ConsoleHint> = flags.map(argToHint.bind(_, Flag));
+                            var flagHints:Array<ConsoleToken> = flags.map(argToHint.bind(_, Flag));
 
                             if (keyHints.empty() && flagHints.empty()) {
-                                hintError = 'No matches.';
+                                if (length(currentText) > 0) hintError = 'No matches.';
                             } else {
                                 hints = keyHints.concat(flagHints);
                                 hints.sort(alphabeticallyByName);
@@ -446,16 +476,16 @@ class Interpreter {
         return !argMap[arg] && arg.indexOf(sub) == 0;
     }
 
-    function argToHint(arg:String, type:ConsoleTokenType):ConsoleHint return {text:arg, type:type};
+    function argToHint(arg:String, type:ConsoleTokenType):ConsoleToken return {text:arg, type:type};
 
-    function alphabeticallyByName(hint1:ConsoleHint, hint2:ConsoleHint):Int {
+    function alphabeticallyByName(hint1:ConsoleToken, hint2:ConsoleToken):Int {
         if (hint1.text == hint2.text) return 0;
         else if (hint1.text > hint2.text) return 1;
         else return -1;
     }
 
     inline function bakeArgs():Void {
-        if (cState.currentCommand != null) {
+        if (cState.currentCommand != null && cState.args == null) {
             if (cState.args == null) cState.args = {flags:[], keyValuePairs:new Map(), tail:null};
 
             var flags:Array<String> = cState.args.flags;
@@ -494,27 +524,33 @@ class Interpreter {
     }
 
     inline function printTokens(token:ConsoleToken, includeCaret:Bool):String {
-        var str:String = null;
-        if (token != null) {
-            str = styleToken(token, includeCaret);
-            if (token.next != null) str += ' ' + printTokens(token.next, includeCaret);
+        var index:Int = 0;
+        var str:String = '';
+        while (token != null) {
+            str += styleToken(token, includeCaret, index);
+            if (token.next != null) str += ' ';
+            index++;
+            token = token.next;
         }
         return str;
     }
 
-    inline function printHints(hints:Array<ConsoleHint>):String {
+    inline function printHints(hints:Array<ConsoleToken>):String {
         var hintStrings:Array<String> = [];
         if (hints != null) {
-            for (hint in cState.hints) {
+            for (hint in hints) {
                 var styleName:String = Strings.INPUT_STYLENAME;
                 if (hint.type != null) styleName = styleNamesByType[hint.type];
-                hintStrings.push('  §{$styleName}${hint.text}§{}');
+                var id:String = hint.text;
+                if (id == ':') id = '__tailmarker';
+                hintsByID[id] = hint;
+                hintStrings.push('  §{name:$styleName, id:$id}${hint.text}§{}');
             }
         }
         return hintStrings.join('\n');
     }
 
-    inline function styleToken(token:ConsoleToken, includeCaret:Bool):String {
+    inline function styleToken(token:ConsoleToken, includeCaret:Bool, index:Int):String {
         var str:String = token.text;
         var styleName:String = Strings.INPUT_STYLENAME;
         if (token == currentToken && includeCaret) {
@@ -525,7 +561,9 @@ class Interpreter {
         } else if (token.type != null) {
             styleName = styleNamesByType[token.type];
         }
-        return '§{$styleName}$str§{}';
+        var id:String = '__$index';
+        tokensByID[id] = token;
+        return '§{name:$styleName, id:$id}$str§{}';
     }
 
     inline function checkForCommandHintCondition():Void {
@@ -534,10 +572,11 @@ class Interpreter {
             var lastToken:ConsoleToken = cState.input;
             while (lastToken.next != null) lastToken = lastToken.next;
             var tokenIsEmpty:Bool = length(lastToken.text) == 0;
+            var prev:ConsoleToken = lastToken.prev;
 
             if (lastToken.type == Value && !tokenIsEmpty) {
                 shouldWait = true;
-            } else if (tokenIsEmpty && (lastToken.prev.type == Flag || lastToken.prev.type == Value)) {
+            } else if (tokenIsEmpty && prev != null && (prev.type == Flag || prev.type == Value)) {
                 shouldWait = true;
             }
         }
@@ -547,16 +586,20 @@ class Interpreter {
     }
 
     function waitForCommandHints():Void {
+        cState.args = null;
         bakeArgs();
         console.freeze();
         iState = Hinting;
-        cState.currentCommand.outputSignal.add(onCommandHint);
+        cState.currentCommand.hintSignal.add(onCommandHint);
         Timer.delay(function() cState.currentCommand.hint(cState.args), 0);
     }
 
-    function onCommandHint(str:String, done:Bool):Void {
-        commandHintString = '  ' + str;
-        cState.currentCommand.outputSignal.remove(onCommandHint);
+    function onCommandHint(str:String, hints:Array<ConsoleToken>):Void {
+        commandHintString = '  §{${Strings.COMMAND_HINT_STYLENAME}}$str§{}';
+
+        if (hints != null && hints.length > 0) commandHintString += '\n' + printHints(hints);
+
+        cState.currentCommand.hintSignal.remove(onCommandHint);
         iState = Idle;
         console.unfreeze();
         combineStrings();
@@ -564,6 +607,7 @@ class Interpreter {
     }
 
     function waitForCommandExecution():Void {
+        cState.args = null;
         bakeArgs();
         console.freeze();
         iState = Executing;

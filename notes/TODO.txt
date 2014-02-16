@@ -1,9 +1,5 @@
-Flesh out the interpreter
-
-    hint clicking
-        appending to console state
-        optionally executing
-    hint hovering (signal to command)
+Make commands again
+Merge back to master
 
 Human players, GUISystem
     Implement abstract commands

@@ -9,8 +9,8 @@ class CommandCodeRestriction {
 typedef ConsoleToken = {
     var text:String;
     var type:ConsoleTokenType;
-    var next:ConsoleToken;
-    var prev:ConsoleToken;
+    @:optional var next:ConsoleToken;
+    @:optional var prev:ConsoleToken;
 }
 
 enum ConsoleTokenType {
@@ -42,12 +42,7 @@ typedef ConsoleState = {
     @:optional var flagReg:Map<String, Bool>;
     @:optional var tailMarkerPresent:Bool;
 
-    @:optional var hints:Array<ConsoleHint>;
-}
-
-typedef ConsoleHint = {
-    var text:String;
-    var type:ConsoleTokenType;
+    @:optional var hints:Array<ConsoleToken>;
 }
 
 typedef ConsoleCommandArgs = {

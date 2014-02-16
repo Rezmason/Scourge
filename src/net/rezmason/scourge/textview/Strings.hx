@@ -23,6 +23,9 @@ class Strings {
     public inline static var BREATHING_PROMPT_STYLE:String = '§{name:_br1,f:0.2}§{name:_br2,f:0.6}∂{name:breathingprompt,period:3.5,frames:[_br1,_br2], s:1.7, persist:true}';
     public inline static var BREATHING_PROMPT_STYLENAME:String = 'breathingprompt';
 
+    public inline static var COMMAND_HINT_STYLE:String = '§{name:__command_hint, r:0.8, g:0.8, b:0.8, f:0.4}';
+    public inline static var COMMAND_HINT_STYLENAME:String = '__command_hint';
+
     public inline static var INTERPRETER_STYLES:String =
         'µ{name:__Key_input, basis:__input, r:1, g:0.5, b:0.5}' +
         'µ{name:__Value_input, basis:__input, r:1, g:1, b:0.5}' +
@@ -30,9 +33,6 @@ class Strings {
         'µ{name:__CommandName_input, basis:__input, r:0.5, g:1, b:1}' +
         'µ{name:__TailMarker_input, basis:__input, r:0.5, g:0.5, b:1}' +
         'µ{name:__Tail_input, basis:__input, r:1, g:0.5, b:1}';
-
-    public inline static var COMMAND_HINT_STYLE:String = '§{name:__command_hint, r:0.8, g:0.8, b:0.8, f:0.4}';
-    public inline static var COMMAND_HINT_STYLENAME:String = '__command_hint';
 
     public inline static var KEY_STYLENAME:String = '__Key_input';
     public inline static var VALUE_STYLENAME:String = '__Value_input';

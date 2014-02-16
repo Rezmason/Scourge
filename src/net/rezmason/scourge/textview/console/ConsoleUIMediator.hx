@@ -17,7 +17,7 @@ class ConsoleUIMediator extends UIMediator {
 
     public var frozen(default, null):Bool;
     public var keyboardSignal(default, null):Zig<Int->Int->Bool->Bool->Void>;
-    public var clickSignal(default, null):Zig<String->Void>;
+    public var clickSignal(default, null):Zig<String->MouseInteractionType->Void>;
 
     var caretStyle:AnimatedStyle;
     var caretSpan:Span;
@@ -106,7 +106,7 @@ class ConsoleUIMediator extends UIMediator {
 
     override function handleSpanMouseInteraction(span:Span, type:MouseInteractionType):Void {
         super.handleSpanMouseInteraction(span, type);
-        clickSignal.dispatch(span.id);
+        clickSignal.dispatch(span.id, type);
     }
 
     override public function updateSpans(delta:Float):Void {
