@@ -10,31 +10,47 @@ using Lambda;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.utils.ArrayUtils;
 
-enum InterpreterState {
-    Idle;
-    Hinting;
-    Executing;
-}
-
 class Interpreter {
 
     // inline static var INPUT_PREFIX:String = '__input_';
     // inline static var OUTPUT_PREFIX:String = '__output_';
     // inline static var HINT_PREFIX:String = '__hint_';
 
+    var currentToken(get, set):ConsoleToken;
+    var caretIndex(get, set):Int;
+
     var console:ConsoleUIMediator;
     var cState:ConsoleState;
     var iState:InterpreterState;
     var commands:Map<String, ConsoleCommand>;
+    var runningCommand:ConsoleCommand;
+    var prompt:String;
+    var commandHintString:String;
+    var outputString:String;
+    var combinedString:String;
 
     public function new(console:ConsoleUIMediator):Void {
+        setPrompt('scourge', 0x3060FF);
         this.console = console;
         this.console.keyboardSignal.add(handleKeyboard);
         this.console.clickSignal.add(handleSpanClick);
         cState = blankState();
         iState = Idle;
         commands = new Map();
-        print();
+        runningCommand = null;
+
+        console.loadStyles([
+            Strings.BREATHING_PROMPT_STYLE,
+            Strings.WAIT_STYLES,
+            Strings.INPUT_STYLE,
+            Strings.ERROR_STYLES,
+        ].join(''));
+
+        commandHintString = '';
+        outputString = '';
+
+        combineStrings();
+        printInteractiveText();
     }
 
     public function addCommand(command:ConsoleCommand):Void {
@@ -48,6 +64,17 @@ class Interpreter {
 
     public function removeCommand(command:ConsoleCommand):Void {
         commands.remove(command.name);
+    }
+
+    public function setPrompt(name:String, color:Int):Void {
+
+        var r:Float = (color >> 16 & 0xFF) / 0xFF;
+        var g:Float = (color >> 8  & 0xFF) / 0xFF;
+        var b:Float = (color >> 0  & 0xFF) / 0xFF;
+
+        prompt =
+        '∂{name:head_prompt_$name, basis:${Strings.BREATHING_PROMPT_STYLENAME}, r:$r, g:$g, b:$b}Ω' +
+        '§{name:prompt_$name, r:$r, g:$g, b:$b} $name§{}${Strings.PROMPT}§{}';
     }
 
     function handleKeyboard(key:Int, charCode:Int, alt:Bool, ctrl:Bool):Void {
@@ -65,55 +92,77 @@ class Interpreter {
         }
 
         if (key != Keyboard.LEFT && key != Keyboard.RIGHT) checkForCommandHintCondition();
+        else commandHintString = '';
 
-        print();
+        combineStrings();
+        printInteractiveText();
     }
 
     inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
             cState = blankState();
-        } else if (alt) {
-            if (cState.currentToken.prev != null) {
-                cState.currentToken = cState.currentToken.prev;
-                cState.caretIndex = length(cState.currentToken.text);
-            } else {
-                cState.currentToken.text = '';
-                cState.caretIndex = 0;
-            }
-            trimState();
         } else {
-            if (cState.caretIndex != 0) {
-                var left:String = sub(cState.currentToken.text, 0, cState.caretIndex);
-                var right:String = sub(cState.currentToken.text, cState.caretIndex);
-
-                cState.currentToken.text = sub(left, 0, length(left) - 1) + right;
-                cState.caretIndex--;
-            } else if (cState.currentToken.prev != null) {
-                cState.currentToken = cState.currentToken.prev;
-                cState.caretIndex = length(cState.currentToken.text);
+            if (alt) {
+                if (currentToken.prev != null) {
+                    currentToken = currentToken.prev;
+                    caretIndex = length(currentToken.text);
+                    trimState();
+                } else {
+                    trimState();
+                    currentToken.text = '';
+                    caretIndex = 0;
+                }
+            } else {
+                if (caretIndex != 0) {
+                    var left:String = sub(currentToken.text, 0, caretIndex);
+                    var right:String = sub(currentToken.text, caretIndex);
+                    trimState();
+                    currentToken.text = sub(left, 0, length(left) - 1) + right;
+                    caretIndex--;
+                } else if (length(currentToken.text) == 0 && currentToken.prev != null) {
+                    currentToken = currentToken.prev;
+                    caretIndex = length(currentToken.text);
+                    trimState();
+                }
             }
-            trimState();
+
             validateState(false);
         }
     }
 
     inline function handleEnter():Void {
-        validateState(true);
-        if (cState.completionError == null) waitForCommandExecution();
+
+        if (length(currentToken.text) == 0 && currentToken.prev != null) {
+            if (currentToken.type == null || currentToken.type == Tail) {
+                currentToken = currentToken.prev;
+                currentToken.next = null;
+            }
+        }
+
+        validateState(true, true);
+        if (cState.completeError == null && cState.finalError == null) {
+            cState.hints = null;
+            commandHintString = '';
+            combineStrings(false);
+            appendInteractiveText();
+            outputString = '';
+            if (length(cState.input.text) > 0) waitForCommandExecution();
+            cState = blankState();
+        }
     }
 
     inline function handleTab():Void {
         if (cState.hints != null && cState.hints.length > 0) {
-            cState.currentToken.text = cState.hints[0].text;
+            currentToken.text = cState.hints[0].text;
             validateState(true);
-            if (cState.completionError == null) {
-                cState.currentToken.next = blankToken(cState.currentToken);
-                cState.currentToken = cState.currentToken.next;
-                cState.caretIndex = 0;
+            if (cState.completeError == null) {
+                currentToken.next = blankToken(currentToken);
+                currentToken = currentToken.next;
+                caretIndex = 0;
             } else {
-                cState.caretIndex = length(cState.currentToken.text);
+                caretIndex = length(currentToken.text);
             }
-        } else if (length(cState.currentToken.text) == 0) {
+        } else if (length(currentToken.text) == 0) {
             validateState(false);
         }
     }
@@ -125,38 +174,38 @@ class Interpreter {
 
     inline function handleCaretLeft(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
-            while (cState.currentToken.prev != null) cState.currentToken = cState.currentToken.prev;
-            cState.caretIndex = length(cState.currentToken.text);
+            while (currentToken.prev != null) currentToken = currentToken.prev;
+            caretIndex = length(currentToken.text);
         } else if (alt) {
-            if (cState.currentToken.prev != null) cState.currentToken = cState.currentToken.prev;
-            cState.caretIndex = length(cState.currentToken.text);
+            if (currentToken.prev != null) currentToken = currentToken.prev;
+            caretIndex = length(currentToken.text);
         } else {
-            if (cState.caretIndex == 0) {
-                if (cState.currentToken.prev != null) {
-                    cState.currentToken = cState.currentToken.prev;
-                    cState.caretIndex = length(cState.currentToken.text);
+            if (caretIndex == 0) {
+                if (currentToken.prev != null) {
+                    currentToken = currentToken.prev;
+                    caretIndex = length(currentToken.text);
                 }
             } else {
-                cState.caretIndex--;
+                caretIndex--;
             }
         }
     }
 
     inline function handleCaretRight(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
-            while (cState.currentToken.next != null) cState.currentToken = cState.currentToken.next;
-            cState.caretIndex = length(cState.currentToken.text);
+            while (currentToken.next != null) currentToken = currentToken.next;
+            caretIndex = length(currentToken.text);
         } else if (alt) {
-            if (cState.currentToken.next != null) cState.currentToken = cState.currentToken.next;
-            cState.caretIndex = length(cState.currentToken.text);
+            if (currentToken.next != null) currentToken = currentToken.next;
+            caretIndex = length(currentToken.text);
         } else {
-            if (cState.caretIndex == length(cState.currentToken.text)) {
-                if (cState.currentToken.next != null) {
-                    cState.currentToken = cState.currentToken.next;
-                    cState.caretIndex = 0;
+            if (caretIndex == length(currentToken.text)) {
+                if (currentToken.next != null) {
+                    currentToken = currentToken.next;
+                    caretIndex = 0;
                 }
             } else {
-                cState.caretIndex++;
+                caretIndex++;
             }
         }
     }
@@ -172,30 +221,31 @@ class Interpreter {
     inline function handleChar(charCode:Int):Void {
         if (charCode > 0) {
             var char:String = String.fromCharCode(charCode);
-            var left:String = sub(cState.currentToken.text, 0, cState.caretIndex);
-            var right:String = sub(cState.currentToken.text, cState.caretIndex);
-            var token:ConsoleToken = cState.currentToken;
+            var left:String = sub(currentToken.text, 0, caretIndex);
+            var right:String = sub(currentToken.text, caretIndex);
+            var token:ConsoleToken = currentToken;
             if (char == ' ' && token.type != Tail) {
                 if (length(token.text) == 0) {
                     validateState(false);
                 } else {
                     validateState(true);
-                    if (cState.completionError == null) {
+                    if (cState.completeError == null) {
                         token.text = left;
                         token.next = blankToken(token);
                         token = token.next;
-                        cState.currentToken = token;
+                        currentToken = token;
                         token.text = right;
-                        cState.caretIndex = length(right);
+                        caretIndex = length(right);
                     }
                 }
             } else {
-                var prev:ConsoleToken = token.prev;
-                if (prev == null || prev.type != Key || cState.currentCommand.keys[prev.text].indexOf(char) != -1) {
+                var restriction:String = null;
+                if (token.prev != null && token.prev.type == Key) restriction = cState.currentCommand.keys[token.prev.text];
+                if (restriction == null || restriction.indexOf(char) != -1) {
                     if (token.next != null || cState.hintError == null) {
-                        token.text = left + char + right;
-                        cState.caretIndex++;
                         trimState();
+                        token.text = left + char + right;
+                        caretIndex++;
                         validateState(false);
                     }
                 }
@@ -204,36 +254,45 @@ class Interpreter {
     }
 
     inline function trimState():Void {
-        var token:ConsoleToken = cState.currentToken;
+        var token:ConsoleToken = currentToken;
 
         while (token != null) {
             if (token.type != null) {
                 switch (token.type) {
-                    case Key: cState.keyReg[token.text] = false;
-                    case Flag: cState.flagReg[token.text] = false;
+                    case Key: if (cState.keyReg[token.text] == true) cState.keyReg[token.text] = false;
+                    case Flag: if (cState.flagReg[token.text] == true) cState.flagReg[token.text] = false;
                     case TailMarker: cState.tailMarkerPresent = false;
                     case _:
                 }
+                token.type = null;
             }
             token = token.next;
         }
 
-        cState.currentToken.next = null;
+        currentToken.next = null;
     }
 
-    function print():Void {
-        var hintString:String = null;
-        if (cState.completionError != null) {
-            hintString = '\t§{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.completionError}§{}';
-        } else if (cState.hintError != null) {
-            hintString = '\t§{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.hintError}§{}';
-        } else {
-            hintString = printHints(cState.hints);
-        }
-        console.setHint(hintString);
+    function appendInteractiveText():Void console.addToText(combinedString);
+    function printInteractiveText():Void console.setInteractiveText(combinedString);
 
-        var inputString:String = printTokens(cState.input);
-        console.setInput(inputString);
+    function combineStrings(includeCaret:Bool = true):Void {
+        combinedString = outputString;
+
+        if (iState == Executing) {
+            combinedString += '  ' + Strings.WAIT_INDICATOR;
+        } else {
+            var hintString:String = '';
+            if (cState.finalError != null) hintString = '§{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.finalError}§{}';
+            else if (cState.completeError != null) hintString = '§{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.completeError}§{}';
+            else if (cState.hintError != null) hintString = '§{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.hintError}§{}';
+            else hintString = printHints(cState.hints);
+
+            var inputString:String = printTokens(cState.input, includeCaret);
+
+            combinedString += prompt + inputString + '\n';
+            if (length(hintString) > 0) combinedString += hintString + '\n';
+            if (length(commandHintString) > 0) combinedString += '   ---\n' + commandHintString + '\n';
+        }
     }
 
     function handleSpanClick(id:String):Void {
@@ -248,19 +307,21 @@ class Interpreter {
         */
     }
 
-    function validateState(complete:Bool):Void {
-        var completionError:String = null;
+    function validateState(isComplete:Bool, isFinal:Bool = false):Void {
+        var completeError:String = null;
+        var finalError:String = null;
         var hintError:String = null;
         var type:ConsoleTokenType = null;
-        var prev:ConsoleToken = cState.currentToken.prev;
-        var currentText:String = cState.currentToken.text;
+        var token:ConsoleToken = currentToken;
+        var prev:ConsoleToken = token.prev;
+        var currentText:String = token.text;
         var hints:Array<ConsoleHint> = null;
 
         if (prev == null) {
             type = CommandName;
-            if (complete) {
+            if (isComplete && length(currentText) > 0) {
                 if (commands[currentText] == null) {
-                    completionError = 'Command not found.';
+                    completeError = 'Command not found.';
                 } else {
                     var command:ConsoleCommand = commands[currentText];
                     cState.currentCommand = command;
@@ -285,31 +346,39 @@ class Interpreter {
             switch (prev.type) {
                 case Key:
                     type = Value;
-                    cState.currentToken.type = type;
-                    if (complete && length(currentText) == 0) {
-                        completionError = 'Empty value.';
+                    token.type = type;
+                    if (isComplete && length(currentText) == 0) {
+                        completeError = 'Empty value.';
+                    }
+                    if (isFinal && length(currentText) == 0) {
+                        finalError = 'Missing value.';
                     }
                 case TailMarker:
                     type = Tail;
-                    cState.currentToken.type = type;
+                    token.type = type;
+                    if (isFinal && length(currentText) == 0) {
+                        finalError = 'Missing tail.';
+                    }
                 case _:
                     if (!cState.autoTail && !cState.tailMarkerPresent && currentText == ':') {
                         type = TailMarker;
-                        if (complete) cState.tailMarkerPresent = true;
+                        if (isComplete) cState.tailMarkerPresent = true;
                     } else {
-                        if (complete) {
-                            if (cState.keyReg[currentText] == false) {
+                        if (isComplete) {
+                            if (isFinal && cState.keyReg[currentText] != null) {
+                                finalError = 'Missing value.';
+                            } else if (cState.keyReg[currentText] == false) {
                                 type = Key;
                                 cState.keyReg[currentText] = true;
                             } else if (cState.keyReg[currentText] == true) {
-                                completionError = 'Duplicate key.';
+                                completeError = 'Duplicate key.';
                             } else if (cState.flagReg[currentText] == false) {
                                 type = Flag;
                                 cState.flagReg[currentText] = true;
                             } else if (cState.flagReg[currentText] == true) {
-                                completionError = 'Duplicate flag.';
+                                completeError = 'Duplicate flag.';
                             } else {
-                                completionError = 'No matches found.';
+                                completeError = 'No matches found.';
                             }
                         } else {
                             var keys = cState.keyReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.keyReg, currentText));
@@ -329,10 +398,11 @@ class Interpreter {
             }
         }
 
-        if (complete) cState.currentToken.type = type;
+        if (isComplete) token.type = type;
         // trace(type);
 
-        cState.completionError = completionError;
+        cState.completeError = completeError;
+        cState.finalError = finalError;
         cState.hintError = hintError;
         cState.hints = hints;
     }
@@ -390,11 +460,11 @@ class Interpreter {
         }
     }
 
-    inline function printTokens(token:ConsoleToken):String {
+    inline function printTokens(token:ConsoleToken, includeCaret:Bool):String {
         var str:String = null;
         if (token != null) {
-            str = styleToken(token);
-            if (token.next != null) str += ' ' + printTokens(token.next);
+            str = styleToken(token, includeCaret);
+            if (token.next != null) str += ' ' + printTokens(token.next, includeCaret);
         }
         return str;
     }
@@ -403,19 +473,19 @@ class Interpreter {
         var hintStrings:Array<String> = [];
         if (hints != null) {
             for (hint in cState.hints) {
-                hintStrings.push('\t§{}${hint.text}§{}');
+                hintStrings.push('  §{}${hint.text}§{}');
             }
         }
         return hintStrings.join('\n');
     }
 
-    inline function styleToken(token:ConsoleToken):String {
+    inline function styleToken(token:ConsoleToken, includeCaret:Bool):String {
         var str:String = token.text;
         var styleName:String = null; // TODO: map token types to style names
-        if (token == cState.currentToken) {
-            str = sub(str, 0, cState.caretIndex) + CARET + sub(str, cState.caretIndex);
+        if (token == currentToken && includeCaret) {
+            str = sub(str, 0, caretIndex) + CARET + sub(str, caretIndex);
         }
-        if (token.next == null && (cState.completionError != null || cState.hintError != null)) {
+        if (token.next == null && (cState.completeError != null || cState.hintError != null)) {
             styleName = Strings.ERROR_INPUT_STYLENAME;
         }
         if (styleName == null) styleName = Strings.INPUT_STYLENAME;
@@ -423,17 +493,21 @@ class Interpreter {
     }
 
     inline function checkForCommandHintCondition():Void {
+        var shouldWait:Bool = false;
         if (iState == Idle && cState.currentCommand != null) {
             var lastToken:ConsoleToken = cState.input;
             while (lastToken.next != null) lastToken = lastToken.next;
             var tokenIsEmpty:Bool = length(lastToken.text) == 0;
 
             if (lastToken.type == Value && !tokenIsEmpty) {
-                waitForCommandHints();
+                shouldWait = true;
             } else if (tokenIsEmpty && (lastToken.prev.type == Flag || lastToken.prev.type == Value)) {
-                waitForCommandHints();
+                shouldWait = true;
             }
         }
+
+        if (shouldWait) waitForCommandHints();
+        else commandHintString = '';
     }
 
     function waitForCommandHints():Void {
@@ -444,30 +518,42 @@ class Interpreter {
         Timer.delay(function() cState.currentCommand.hint(cState.args), 0);
     }
 
-    function onCommandHint(outputString:String, done:Bool):Void {
-        console.setHint('\t' + outputString);
+    function onCommandHint(str:String, done:Bool):Void {
+        commandHintString = '  ' + str;
         cState.currentCommand.outputSignal.remove(onCommandHint);
         iState = Idle;
         console.unfreeze();
+        combineStrings();
+        printInteractiveText();
     }
 
     function waitForCommandExecution():Void {
         bakeArgs();
         console.freeze();
         iState = Executing;
-        cState.currentCommand.outputSignal.add(onCommandExecute);
-        Timer.delay(function() cState.currentCommand.execute(cState.args), 0);
+        runningCommand = cState.currentCommand;
+        runningCommand.outputSignal.add(onCommandExecute);
+        var args:ConsoleCommandArgs = cState.args;
+        Timer.delay(function() runningCommand.execute(args), 0);
     }
 
-    function onCommandExecute(outputString:String, done:Bool):Void {
-        // Do something with outputString
-        trace(outputString);
+    function onCommandExecute(str:String, done:Bool):Void {
         if (done) {
-            cState.currentCommand.outputSignal.remove(onCommandHint);
-            iState = Idle;
+            runningCommand.outputSignal.remove(onCommandExecute);
+            runningCommand = null;
             console.unfreeze();
+            iState = Idle;
         }
+        outputString += '  ' + str + '\n';
+        combineStrings();
+        printInteractiveText();
     }
+
+    inline function get_currentToken():ConsoleToken return cState.currentToken;
+    inline function set_currentToken(val:ConsoleToken):ConsoleToken return cState.currentToken = val;
+
+    inline function get_caretIndex():Int return cState.caretIndex;
+    inline function set_caretIndex(val:Int):Int return cState.caretIndex = val;
 
     inline static function blankState():ConsoleState {
         var tok = blankToken();

@@ -2,7 +2,6 @@ package net.rezmason.scourge.textview.console;
 
 import haxe.Utf8;
 
-import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.*;
@@ -19,16 +18,12 @@ class ConsoleUIMediator extends UIMediator {
     public var frozen(default, null):Bool;
     public var keyboardSignal(default, null):Zig<Int->Int->Bool->Bool->Void>;
     public var clickSignal(default, null):Zig<String->Void>;
-    var executing:Bool;
 
     var caretStyle:AnimatedStyle;
     var caretSpan:Span;
 
-    var prompt:String;
     var caretCharCode:Int;
-    var inputString:String;
-    var outputString:String;
-    var hintString:String;
+    var interactiveText:String;
 
     var frozenQueue:List<FrozenInteraction>;
 
@@ -43,12 +38,6 @@ class ConsoleUIMediator extends UIMediator {
 
     public function new():Void {
         super();
-        loadStyles([
-            Strings.BREATHING_PROMPT_STYLE,
-            Strings.WAIT_STYLES,
-            Strings.INPUT_STYLE,
-            Strings.ERROR_STYLES,
-        ].join(''));
         interactiveDoc = new Document();
         interactiveDoc.shareWith(compositeDoc);
         appendedDoc = new Document();
@@ -56,18 +45,13 @@ class ConsoleUIMediator extends UIMediator {
         isLogDocDirty = false;
         isLogDocAppended = false;
         isInteractiveDocDirty = false;
-        setPrompt('scourge', 0x3060FF);
         for (span in Parser.parse(Strings.CARET_STYLE).spans) if (Std.is(span.style, AnimatedStyle)) caretSpan = span;
         caretStyle = cast caretSpan.style;
         caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
         addedText = '';
-        inputString = '';
-        outputString = '';
-        hintString = '';
+        interactiveText = '';
         frozenQueue = new List();
         frozen = false;
-        executing = false;
-        isInteractiveDocDirty = true;
         keyboardSignal = new Zig();
         clickSignal = new Zig();
     }
@@ -80,17 +64,6 @@ class ConsoleUIMediator extends UIMediator {
         caretGlyph.set_char(caretCharCode, font);
     }
 
-    public function setPrompt(name:String, color:Int):Void {
-
-        var r:Float = (color >> 16 & 0xFF) / 0xFF;
-        var g:Float = (color >> 8  & 0xFF) / 0xFF;
-        var b:Float = (color >> 0  & 0xFF) / 0xFF;
-
-        prompt =
-        '∂{name:head_prompt_$name, basis:${Strings.BREATHING_PROMPT_STYLENAME}, r:$r, g:$g, b:$b}Ω' +
-        '§{name:prompt_$name, r:$r, g:$g, b:$b} $name§{}${Strings.PROMPT}§{}';
-    }
-
     override function combineDocs():Void {
 
         if (isLogDocDirty) {
@@ -100,7 +73,6 @@ class ConsoleUIMediator extends UIMediator {
 
         if (isLogDocAppended) {
             isLogDocAppended = false;
-
             mainText += addedText;
             appendedDoc.setText(swapTabsWithSpaces(addedText));
             appendedDoc.removeInteraction();
@@ -112,17 +84,6 @@ class ConsoleUIMediator extends UIMediator {
 
         if (isInteractiveDocDirty) {
             isInteractiveDocDirty = false;
-
-            var interactiveText:String = (length(mainText) > 0 ? '\n' : '') + outputString;
-
-            if (executing) {
-                interactiveText += Strings.WAIT_INDICATOR;
-            } else {
-                interactiveText += prompt + inputString;
-                interactiveText += '\n'; // Always added, because there's always input
-                if (hintString != null) interactiveText += hintString;
-            }
-
             interactiveDoc.setText(swapTabsWithSpaces(interactiveText));
         }
 
@@ -165,27 +126,12 @@ class ConsoleUIMediator extends UIMediator {
         isDirty = isLogDocDirty = true;
     }
 
-    public function setInput(str:String):Void {
+    public function setInteractiveText(str:String):Void {
         if (str == null) str = '';
-        if (inputString != str) {
-            inputString = str;
+        if (interactiveText != str) {
+            interactiveText = str;
             isDirty = isInteractiveDocDirty = true;
-        }
-    }
-
-    public function setOutput(str:String):Void {
-        if (str == null) str = '';
-        if (outputString != str) {
-            outputString = str;
-            isDirty = isInteractiveDocDirty = true;
-        }
-    }
-
-    public function setHint(str:String):Void {
-        if (str == null) str = '';
-        if (hintString != str) {
-            hintString = str;
-            isDirty = isInteractiveDocDirty = true;
+            caretStyle.startSpan(caretSpan, 0);
         }
     }
 

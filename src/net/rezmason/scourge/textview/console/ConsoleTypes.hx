@@ -29,7 +29,8 @@ typedef ConsoleState = {
     var currentToken:ConsoleToken;
     var caretIndex:Int;
 
-    @:optional var completionError:String;
+    @:optional var completeError:String;
+    @:optional var finalError:String;
     @:optional var hintError:String;
     @:optional var commandError:String;
 
@@ -56,4 +57,10 @@ typedef ConsoleCommandArgs = {
 
     @:optional var pendingKey:String;
     @:optional var pendingValue:String;
+}
+
+enum InterpreterState {
+    Idle;
+    Hinting;
+    Executing;
 }

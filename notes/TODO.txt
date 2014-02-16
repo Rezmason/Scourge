@@ -1,13 +1,12 @@
 Flesh out the interpreter
 
-    ConsoleUIMediator should have one interactive text setter, not three
-        Interpreter should stitch input, hints, output and the wait indicator together.
-        wait indicator
-
-    execution
-
     history
-    key, value, flag, tail marker and tail styling
+        states stored as strings
+            stateToString
+            stateFromString
+        And that nutty history logic
+    styling
+        key, value, flag, tail marker and tail
     hint clicking
         appending to console state
         optionally executing

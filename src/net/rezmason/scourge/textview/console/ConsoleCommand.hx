@@ -15,8 +15,8 @@ class ConsoleCommand {
         outputSignal = new Zig();
 
         name = "burp";
-        flags = ["one", "two"];
-        keys = ['a'=>'apple', 'b'=>'ball'];
+        flags = ["one", "two", "ad"];
+        keys = ['a'=>'apple', 'b'=>'ball', 'ac'=>null];
     }
 
     public function hint(args:ConsoleCommandArgs):Void {
