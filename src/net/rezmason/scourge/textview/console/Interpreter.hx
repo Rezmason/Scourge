@@ -150,14 +150,6 @@ class Interpreter {
     }
 
     inline function handleEnter():Void {
-
-        if (length(currentToken.text) == 0 && currentToken.prev != null) {
-            if (currentToken.type == null || currentToken.type == Tail) {
-                currentToken = currentToken.prev;
-                currentToken.next = null;
-            }
-        }
-
         validateState(true, true);
         if (cState.completeError == null && cState.finalError == null) {
             cState.hints = null;
@@ -400,7 +392,7 @@ class Interpreter {
             } else {
                 hints = commands.keys().intoArray().filter(startsWith.bind(_, currentText)).map(argToHint.bind(_, CommandName));
                 if (hints.empty()) {
-                    if (length(currentText) > 0) hintError = 'No matches.';
+                    if (length(currentText) > 0) hintError = 'No matches found.';
                 } else {
                     hints.sort(alphabeticallyByName);
                 }
@@ -428,7 +420,9 @@ class Interpreter {
                         if (isComplete) cState.tailMarkerPresent = true;
                     } else {
                         if (isComplete) {
-                            if (isFinal && cState.keyReg[currentText] != null) {
+                            if (isFinal && length(currentText) == 0) {
+
+                            } else if (isFinal && cState.keyReg[currentText] != null) {
                                 finalError = 'Missing value.';
                             } else if (cState.keyReg[currentText] == false) {
                                 type = Key;
@@ -451,7 +445,7 @@ class Interpreter {
                             var flagHints:Array<ConsoleToken> = flags.map(argToHint.bind(_, Flag));
 
                             if (keyHints.empty() && flagHints.empty()) {
-                                if (length(currentText) > 0) hintError = 'No matches.';
+                                if (length(currentText) > 0) hintError = 'No matches found.';
                             } else {
                                 hints = keyHints.concat(flagHints);
                                 hints.sort(alphabeticallyByName);
