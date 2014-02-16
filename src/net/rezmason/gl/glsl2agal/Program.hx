@@ -10,7 +10,7 @@ import flash.geom.Matrix3D;
 import flash.utils.ByteArray;
 import flash.Vector;
 
-import net.rezmason.gl.glsl2agal.Types;
+import net.rezmason.gl.glsl2agal.GLSL2AGALTypes;
 import net.rezmason.utils.workers.Golem;
 import net.rezmason.utils.workers.TempAgency;
 
