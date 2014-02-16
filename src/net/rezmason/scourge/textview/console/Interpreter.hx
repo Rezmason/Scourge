@@ -250,17 +250,19 @@ class Interpreter {
             var right:String = sub(currentToken.text, caretIndex);
             var token:ConsoleToken = currentToken;
             if (char == ' ' && token.type != Tail) {
-                if (length(token.text) == 0) {
-                    validateState(false);
-                } else {
-                    validateState(true);
-                    if (cState.completeError == null) {
-                        token.text = left;
-                        token.next = blankToken(token);
-                        token = token.next;
-                        currentToken = token;
-                        token.text = right;
-                        caretIndex = length(right);
+                if (length(right) == 0) {
+                    trimState();
+                    if (length(token.text) == 0) {
+                        validateState(false);
+                    } else {
+                        validateState(true);
+                        if (cState.completeError == null) {
+                            token.text = left;
+                            token.next = blankToken(token);
+                            token = token.next;
+                            currentToken = token;
+                            caretIndex = 0;
+                        }
                     }
                 }
             } else {
@@ -364,8 +366,11 @@ class Interpreter {
                 }
             } else {
                 hints = commands.keys().intoArray().filter(startsWith.bind(_, currentText)).map(argToHint.bind(_, CommandName));
-                if (hints.empty()) hintError = 'No matches.';
-                else hints.sort(alphabeticallyByName);
+                if (hints.empty()) {
+                    if (length(currentText) > 0) hintError = 'No matches.';
+                } else {
+                    hints.sort(alphabeticallyByName);
+                }
             }
         } else {
             switch (prev.type) {

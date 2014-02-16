@@ -1,7 +1,5 @@
 Flesh out the interpreter
 
-    Duplicate key/flag bug
-
     styling
         key, value, flag, tail marker and tail
     hint clicking
