@@ -14,6 +14,19 @@ using Lambda;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.utils.ArrayUtils;
 
+/**
+ * An Interpreter sits atop a ConsoleUIMediator, interpreting interactions of that mediator and populating it with text.
+ * Whereas a ConsoleUIMediator operates on spans of text, an Interpreter operates on tokens.
+ * Tokens have types, and the validity of a token depends on type, token order and argument availability.
+ * Arguments are derived from the properties of ConsoleCommands, which are subscribed to the Interpreter.
+ * This is the second role of an Interpreter - to send arguments to ConsoleCommands, and to interpret their output while
+ * waiting for them to complete.
+ *
+ * Interpreters are meant to behave like terminal emulators with syntax highlighting and text completion.
+ * That includes a history of previously entered commands. Consequently, much of an Interpreter's state is
+ * kept in a memento stored in its history.
+ */
+
 class Interpreter {
 
     static var styleNamesByType:Map<ConsoleTokenType, String> = makeStyleNamesByType();
@@ -82,6 +95,10 @@ class Interpreter {
         commands.remove(command.name);
     }
 
+    /**
+     * If two human players are taking turns playing on one computer, this prompt will serve to indicate
+     * to them whose turn it is.
+     */
     public function setPrompt(name:String, color:Int):Void {
 
         var r:Float = (color >> 16 & 0xFF) / 0xFF;
@@ -93,10 +110,12 @@ class Interpreter {
         '§{name:prompt_$name, r:$r, g:$g, b:$b} $name§{}${Strings.PROMPT}§{}';
     }
 
+    /**
+     * Sort of the "entry point". The majority of the work starts here.
+     */
     function handleKeyboard(key:Int, charCode:Int, alt:Bool, ctrl:Bool):Void {
 
-        tokensByID = new Map();
-        hintsByID = new Map();
+        clearInteractiveTokens();
 
         switch (key) {
             case Keyboard.BACKSPACE: handleBackspace(alt, ctrl);
@@ -118,46 +137,49 @@ class Interpreter {
     }
 
     inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
-        if (ctrl) {
-            cState = blankState();
-        } else {
-            if (alt) {
-                if (currentToken.prev != null) {
-                    currentToken = currentToken.prev;
-                    caretIndex = length(currentToken.text);
-                    trimState();
-                } else {
-                    trimState();
-                    currentToken.text = '';
-                    caretIndex = 0;
-                }
-            } else {
-                if (caretIndex != 0) {
-                    var left:String = sub(currentToken.text, 0, caretIndex);
-                    var right:String = sub(currentToken.text, caretIndex);
-                    trimState();
-                    currentToken.text = sub(left, 0, length(left) - 1) + right;
-                    caretIndex--;
-                } else if (length(currentToken.text) == 0 && currentToken.prev != null) {
-                    currentToken = currentToken.prev;
-                    caretIndex = length(currentToken.text);
-                    trimState();
-                }
+        if (!alt && !ctrl) {
+            if (caretIndex != 0) {
+                // Delete one character.
+                var left:String = sub(currentToken.text, 0, caretIndex);
+                var right:String = sub(currentToken.text, caretIndex);
+                trimState();
+                currentToken.text = sub(left, 0, length(left) - 1) + right;
+                caretIndex--;
+                validateState(false);
+            } else if (length(currentToken.text) == 0 && currentToken.prev != null) {
+                alt = true;
             }
-
-            validateState(false);
+        }
+        if (alt && !ctrl) {
+            // Clear the current token and all subsequent tokens, and move the caret to the last token.
+            if (currentToken.prev != null) {
+                currentToken = currentToken.prev;
+                caretIndex = length(currentToken.text);
+                trimState();
+                validateState(false);
+            } else {
+                ctrl = true;
+            }
+        }
+        if (ctrl) {
+            // Delete the whole thing.
+            cState = blankState();
         }
     }
 
     inline function handleEnter():Void {
         validateState(true, true);
         if (cState.completeError == null && cState.finalError == null) {
+            // Flush the hint stuff from the state. That stuff doesn't belong in the history.
             cState.hints = null;
             commandHintString = '';
+            // Add the old output and current input to the log.
             combineStrings(false);
             appendInteractiveText();
             outputString = '';
+            // Call the command.
             if (length(cState.input.text) > 0) waitForCommandExecution();
+            // Append the state to the history, and make a new state.
             cHistory.pop();
             cHistory.push(stringifyState());
             cHistory.push('');
@@ -169,6 +191,7 @@ class Interpreter {
 
     inline function handleTab():Void {
         if (cState.hints != null && cState.hints.length > 0) {
+            // Complete the current token with the text in the first available hint.
             currentToken.text = cState.hints[0].text;
             validateState(true);
             if (cState.completeError == null) {
@@ -179,6 +202,7 @@ class Interpreter {
                 caretIndex = length(currentToken.text);
             }
         } else if (length(currentToken.text) == 0) {
+            // Spit out whatever hints are available.
             validateState(false);
         }
     }
@@ -190,12 +214,15 @@ class Interpreter {
 
     inline function handleCaretLeft(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
-            while (currentToken.prev != null) currentToken = currentToken.prev;
+            // Move the caret to the end of the first token.
+            currentToken = cState.input;
             caretIndex = length(currentToken.text);
         } else if (alt) {
+            // Move the caret to the end of the previous token.
             if (currentToken.prev != null) currentToken = currentToken.prev;
             caretIndex = length(currentToken.text);
         } else {
+            // Move the caret left, or to the end of the previous token.
             if (caretIndex == 0) {
                 if (currentToken.prev != null) {
                     currentToken = currentToken.prev;
@@ -209,12 +236,15 @@ class Interpreter {
 
     inline function handleCaretRight(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
+            // Move the caret to the end of the last token.
             while (currentToken.next != null) currentToken = currentToken.next;
             caretIndex = length(currentToken.text);
         } else if (alt) {
+            // Move the caret to the end of the next token.
             if (currentToken.next != null) currentToken = currentToken.next;
             caretIndex = length(currentToken.text);
         } else {
+            // Move the caret right, or to the start of the next token.
             if (caretIndex == length(currentToken.text)) {
                 if (currentToken.next != null) {
                     currentToken = currentToken.next;
@@ -227,6 +257,13 @@ class Interpreter {
     }
 
     inline function handleUp():Void {
+
+        // A quick note about history.
+        // Most Unix shells have a history that is immutable that's behind the scenes,
+        // and is cloned into a mutable history. Users can mess with the whole mutable history,
+        // but as soon as they execute a command, that history is replaced with a fresh clone
+        // of the immutable one. Interpreters behave the same way.
+
         if (mHistIndex > 0) {
             mHistory[mHistIndex] = stringifyState();
             mHistIndex--;
@@ -251,6 +288,7 @@ class Interpreter {
             var right:String = sub(currentToken.text, caretIndex);
             var token:ConsoleToken = currentToken;
             if (char == ' ' && token.type != Tail) {
+                // Complete the current token and append the next one.
                 if (length(right) == 0) {
                     trimState();
                     if (length(token.text) == 0) {
@@ -267,6 +305,7 @@ class Interpreter {
                     }
                 }
             } else {
+                // Add a character to the current token, if it's allowed.
                 var restriction:String = null;
                 if (token.prev != null && token.prev.type == Key) restriction = cState.currentCommand.keys[token.prev.text];
                 if (restriction == null || restriction.indexOf(char) != -1) {
@@ -281,6 +320,11 @@ class Interpreter {
         }
     }
 
+    /**
+     * Whenever the state changes, the current token should be the LAST token. Any tokens to its right
+     * ought to be destroyed, and if they are keys, flags or tail markers, then those args need to be
+     * freed from the registry.
+     */
     inline function trimState():Void {
         var token:ConsoleToken = currentToken;
 
@@ -303,6 +347,9 @@ class Interpreter {
     function appendInteractiveText():Void console.addToText(combinedString);
     function printInteractiveText():Void console.setInteractiveText(combinedString);
 
+    /**
+     * Combines input, output, errors, hints and command hints into a single string to send to the console.
+     */
     function combineStrings(includeCaret:Bool = true):Void {
         combinedString = outputString;
 
@@ -323,6 +370,10 @@ class Interpreter {
         }
     }
 
+    /**
+     * Another "entry point". Hover events are forwarded to the current command.
+     * Click events are resolved to either a token or a hint.
+     */
     function handleMouseInteraction(id:String, type:MouseInteractionType):Void {
         if (iState == Idle) {
             switch (type) {
@@ -337,14 +388,15 @@ class Interpreter {
                     }
                 case CLICK:
                     if (tokensByID[id] != null) {
+                        // Clicking a token sets it to the current token.
                         currentToken = tokensByID[id];
                         caretIndex = length(currentToken.text);
                     } else if (hintsByID[id] != null) {
+                        // Clicking a hint assigns the text of the hint to the current token.
                         currentToken.text = hintsByID[id].text;
                         validateState(true);
                         if (cState.completeError == null) {
-                            hintsByID = new Map();
-                            tokensByID = new Map();
+                            clearInteractiveTokens();
                             currentToken.next = blankToken(currentToken);
                             currentToken = currentToken.next;
                             caretIndex = 0;
@@ -359,22 +411,37 @@ class Interpreter {
         }
     }
 
+    /**
+     * The tables used to resolve span IDs to tokens must be cleared whenever the state's text changes.
+     */
+    function clearInteractiveTokens():Void {
+        tokensByID = new Map();
+        hintsByID = new Map();
+    }
+
+    /**
+     * This validation function is sprawling, but straightforward.
+     */
     function validateState(isComplete:Bool, isFinal:Bool = false):Void {
         var completeError:String = null;
         var finalError:String = null;
         var hintError:String = null;
         var type:ConsoleTokenType = null;
         var token:ConsoleToken = currentToken;
-        var prev:ConsoleToken = token.prev;
         var currentText:String = token.text;
         var hints:Array<ConsoleToken> = null;
 
-        if (prev == null) {
+        if (token == cState.input) {
+            // The first token is always a command name.
             type = CommandName;
             if (isComplete && length(currentText) > 0) {
                 if (commands[currentText] == null) {
                     completeError = 'Command not found.';
                 } else {
+
+                    // Resolve the named command to the current command.
+                    // Populate the state's key, flag and tail marker registries.
+
                     var command:ConsoleCommand = commands[currentText];
                     cState.currentCommand = command;
                     cState.autoTail = command.flags.empty() && command.keys.empty();
@@ -390,6 +457,9 @@ class Interpreter {
                     cState.tailMarkerPresent = false;
                 }
             } else {
+
+                // Produce hints for command names.
+
                 hints = commands.keys().intoArray().filter(startsWith.bind(_, currentText)).map(argToHint.bind(_, CommandName));
                 if (hints.empty()) {
                     if (length(currentText) > 0) hintError = 'No matches found.';
@@ -398,70 +468,98 @@ class Interpreter {
                 }
             }
         } else {
+            var prev:ConsoleToken = token.prev;
             switch (prev.type) {
                 case Key:
+                    // Keys are always followed by values; therefore, this token is a value.
                     type = Value;
                     token.type = type;
                     if (isComplete && length(currentText) == 0) {
                         completeError = 'Empty value.';
                     }
+                    // The state isn't final unless every key has a matching complete value.
                     if (isFinal && length(currentText) == 0) {
                         finalError = 'Missing value.';
                     }
                 case TailMarker:
+                    // A tail marker is always followed by a tail; therefore, this token is a tail.
                     type = Tail;
                     token.type = type;
+                    // The state isn't final unless every tail marker has a matching complete tail.
                     if (isFinal && length(currentText) == 0) {
                         finalError = 'Missing tail.';
                     }
                 case _:
-                    if (!cState.autoTail && !cState.tailMarkerPresent && currentText == ':') {
+                    if (cState.autoTail) {
+                        // Auto tail, for simple commands.
+                        type = Tail;
+                        token.type = type;
+                    } else if (!cState.tailMarkerPresent && currentText == ':') {
+                        // There can only be one tail marker, and it's denoted by a single ':' character.
                         type = TailMarker;
                         if (isComplete) cState.tailMarkerPresent = true;
                     } else {
                         if (isComplete) {
                             if (isFinal && length(currentText) == 0) {
-
+                                // Empty final tokens are ignored when finalizing the state.
                             } else if (isFinal && cState.keyReg[currentText] != null) {
+                                // This is a key without a value.
                                 finalError = 'Missing value.';
                             } else if (cState.keyReg[currentText] == false) {
+                                // Complete the key token and mark the key as in use.
                                 type = Key;
                                 cState.keyReg[currentText] = true;
                             } else if (cState.keyReg[currentText] == true) {
+                                // Can't use the same key twice.
                                 completeError = 'Duplicate key.';
                             } else if (cState.flagReg[currentText] == false) {
+                                // Complete the flag token and mark the flag as in use.
                                 type = Flag;
                                 cState.flagReg[currentText] = true;
                             } else if (cState.flagReg[currentText] == true) {
+                                // Can't use the same flag twice.
                                 completeError = 'Duplicate flag.';
                             } else {
+                                // There's no key or flag that starts with the current token's text.
                                 completeError = 'No matches found.';
                             }
                         } else {
-                            var keys = cState.keyReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.keyReg, currentText));
-                            var keyHints:Array<ConsoleToken> = keys.map(argToHint.bind(_, Key));
-
-                            var flags = cState.flagReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.flagReg, currentText));
-                            var flagHints:Array<ConsoleToken> = flags.map(argToHint.bind(_, Flag));
-
-                            if (keyHints.empty() && flagHints.empty()) {
+                            hints = makeKeyFlagHints(currentText);
+                            if (hints.empty()) {
                                 if (length(currentText) > 0) hintError = 'No matches found.';
-                            } else {
-                                hints = keyHints.concat(flagHints);
-                                hints.sort(alphabeticallyByName);
+                                hints = null;
                             }
                         }
                     }
             }
         }
 
-        if (isComplete) token.type = type;
-        // trace(type);
-
+        // Copy results to the state.
+        if (isComplete) {
+            token.type = type;
+            if (completeError == null && !isFinal) {
+                if (token.type == Value || token.type == Flag || token.type == CommandName) hints = makeKeyFlagHints('');
+            }
+        }
         cState.completeError = completeError;
         cState.finalError = finalError;
         cState.hintError = hintError;
         cState.hints = hints;
+    }
+
+    /**
+     * All unused keys and flags that match the input text are made into hints and returned in an array.
+     */
+    function makeKeyFlagHints(text:String):Array<ConsoleToken> {
+        var keys = cState.keyReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.keyReg, text));
+        var flags = cState.flagReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.flagReg, text));
+
+        var keyHints:Array<ConsoleToken> = keys.map(argToHint.bind(_, Key));
+        var flagHints:Array<ConsoleToken> = flags.map(argToHint.bind(_, Flag));
+
+        var hints:Array<ConsoleToken> = keyHints.concat(flagHints);
+        hints.sort(alphabeticallyByName);
+        return hints;
     }
 
     function startsWith(arg:String, sub:String):Bool return arg.indexOf(sub) == 0;
@@ -478,6 +576,9 @@ class Interpreter {
         else return -1;
     }
 
+    /**
+     * Commands have no need for tokens; the interpreter sends them a ConsoleCommandArgs object.
+     */
     inline function bakeArgs():Void {
         if (cState.currentCommand != null && cState.args == null) {
             if (cState.args == null) cState.args = {flags:[], keyValuePairs:new Map(), tail:null};
@@ -529,21 +630,9 @@ class Interpreter {
         return str;
     }
 
-    inline function printHints(hints:Array<ConsoleToken>):String {
-        var hintStrings:Array<String> = [];
-        if (hints != null) {
-            for (hint in hints) {
-                var styleName:String = Strings.INPUT_STYLENAME;
-                if (hint.type != null) styleName = styleNamesByType[hint.type];
-                var id:String = hint.text;
-                if (id == ':') id = '__tailmarker';
-                hintsByID[id] = hint;
-                hintStrings.push('  §{name:$styleName, id:$id}${hint.text}§{}');
-            }
-        }
-        return hintStrings.join('\n');
-    }
-
+    /**
+     * Converts a token to styled text. Optionally includes the caret.
+     */
     inline function styleToken(token:ConsoleToken, includeCaret:Bool, index:Int):String {
         var str:String = token.text;
         var styleName:String = Strings.INPUT_STYLENAME;
@@ -560,6 +649,26 @@ class Interpreter {
         return '§{name:$styleName, id:$id}$str§{}';
     }
 
+    inline function printHints(hints:Array<ConsoleToken>):String {
+        var hintStrings:Array<String> = [];
+        if (hints != null) hintStrings = hints.map(styleHint);
+        return hintStrings.join('\n');
+    }
+
+    /**
+     * Converts a hint to styled text.
+     */
+     inline function styleHint(hint:ConsoleToken):String {
+        var styleName:String = Strings.INPUT_STYLENAME;
+        if (hint.type != null) styleName = styleNamesByType[hint.type];
+        var id:String = hint.text;
+        hintsByID[id] = hint;
+        return '  §{name:$styleName, id:$id}${hint.text}§{}';
+    }
+
+    /**
+     * If an Interpreter is idle and has a command, it may poll the command for command-specific hints.
+     */
     inline function checkForCommandHintCondition():Void {
         var shouldWait:Bool = false;
         if (iState == Idle && cState.currentCommand != null) {
@@ -569,8 +678,10 @@ class Interpreter {
             var prev:ConsoleToken = lastToken.prev;
 
             if (lastToken.type == Value && !tokenIsEmpty) {
+                // The command might have suggestions for values
                 shouldWait = true;
             } else if (tokenIsEmpty && prev != null && (prev.type == Flag || prev.type == Value)) {
+                // The command might have suggestions for keys and flags
                 shouldWait = true;
             }
         }
@@ -579,6 +690,9 @@ class Interpreter {
         else commandHintString = '';
     }
 
+    /**
+     * Freezes the console, sends args to the command and awaits a hint response.
+     */
     function waitForCommandHints():Void {
         cState.args = null;
         bakeArgs();
@@ -588,9 +702,12 @@ class Interpreter {
         Timer.delay(function() cState.currentCommand.hint(cState.args), 0);
     }
 
+    /**
+     * Unfreezes the console and processes the command hints.
+     */
     function onCommandHint(str:String, hints:Array<ConsoleToken>):Void {
-        commandHintString = '  §{${Strings.COMMAND_HINT_STYLENAME}}$str§{}';
-
+        commandHintString = '';
+        if (str == null) commandHintString += '  §{${Strings.COMMAND_HINT_STYLENAME}}$str§{}';
         if (hints != null && hints.length > 0) commandHintString += '\n' + printHints(hints);
 
         cState.currentCommand.hintSignal.remove(onCommandHint);
@@ -600,6 +717,9 @@ class Interpreter {
         printInteractiveText();
     }
 
+    /**
+     * Freezes the console, sends args to the command and awaits an execution response.
+     */
     function waitForCommandExecution():Void {
         cState.args = null;
         bakeArgs();
@@ -611,6 +731,9 @@ class Interpreter {
         Timer.delay(function() runningCommand.execute(args), 0);
     }
 
+    /**
+     * Appends the output, and, if the command has finished, unfreezes the console.
+     */
     function onCommandExecute(str:String, done:Bool):Void {
         if (done) {
             runningCommand.outputSignal.remove(onCommandExecute);
@@ -618,7 +741,7 @@ class Interpreter {
             console.unfreeze();
             iState = Idle;
         }
-        outputString += '  ' + str + '\n';
+        if (str != null) outputString += '  ' + str + '\n';
         combineStrings();
         printInteractiveText();
     }
@@ -638,9 +761,11 @@ class Interpreter {
         Utf8.iter(str, handleChar);
     }
 
+    // shortcut to cState.currentToken
     inline function get_currentToken():ConsoleToken return cState.currentToken;
     inline function set_currentToken(val:ConsoleToken):ConsoleToken return cState.currentToken = val;
 
+    // shortcut to cState.caretIndex
     inline function get_caretIndex():Int return cState.caretIndex;
     inline function set_caretIndex(val:Int):Int return cState.caretIndex = val;
 

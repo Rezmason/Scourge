@@ -17,8 +17,12 @@ class ConsoleCommand {
         hintSignal = new Zig();
 
         name = "burp";
+
         flags = ["one", "two", "ad"];
         keys = ['a'=>'apple', 'b'=>'ball', 'ac'=>null];
+
+        // flags = [];
+        // keys = new Map();
     }
 
     public function hint(args:ConsoleCommandArgs):Void {
