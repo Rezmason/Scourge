@@ -85,6 +85,17 @@ class UIBody extends Body {
         return worked;
     }
 
+    public function setFontTexture(tex:GlyphTexture):Bool {
+        var worked:Bool = false;
+        if (tex != null) {
+            worked = true;
+            glyphTexture = tex;
+            glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
+            resize();
+        }
+        return worked;
+    }
+
     override public function update(delta:Float):Void {
 
         if (!dragging && uiMediator.isDirty) {

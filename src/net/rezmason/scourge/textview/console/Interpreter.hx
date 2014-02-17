@@ -6,6 +6,7 @@ import haxe.Timer;
 import haxe.Utf8;
 
 import net.rezmason.scourge.textview.console.ConsoleTypes;
+import net.rezmason.scourge.textview.console.ConsoleUtils.*;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.Sigil.*;
 import net.rezmason.utils.Utf8Utils.*;
@@ -106,8 +107,8 @@ class Interpreter {
         var b:Float = (color >> 0  & 0xFF) / 0xFF;
 
         prompt =
-        '∂{name:head_prompt_$name, basis:${Strings.BREATHING_PROMPT_STYLENAME}, r:$r, g:$g, b:$b}Ω' +
-        '§{name:prompt_$name, r:$r, g:$g, b:$b} $name§{}${Strings.PROMPT}§{}';
+        '∂{name:head_prompt_${name}_${Math.random()}, basis:${Strings.BREATHING_PROMPT_STYLENAME}, r:$r, g:$g, b:$b}Ω' +
+        '§{name:prompt_${name}_${Math.random()}, r:$r, g:$g, b:$b} $name§{}${Strings.PROMPT}§{}';
     }
 
     /**
@@ -136,7 +137,7 @@ class Interpreter {
         printInteractiveText();
     }
 
-    inline function handleBackspace(alt:Bool, ctrl:Bool):Void {
+    /*inline*/ function handleBackspace(alt:Bool, ctrl:Bool):Void {
         if (!alt && !ctrl) {
             if (caretIndex != 0) {
                 // Delete one character.
@@ -167,11 +168,12 @@ class Interpreter {
         }
     }
 
-    inline function handleEnter():Void {
+    /*inline*/ function handleEnter():Void {
         validateState(true, true);
         if (cState.completeError == null && cState.finalError == null) {
             // Flush the hint stuff from the state. That stuff doesn't belong in the history.
             cState.hints = null;
+            cState.commandHints = null;
             commandHintString = '';
             // Add the old output and current input to the log.
             combineStrings(false);
@@ -189,10 +191,14 @@ class Interpreter {
         }
     }
 
-    inline function handleTab():Void {
-        if (cState.hints != null && cState.hints.length > 0) {
+    /*inline*/ function handleTab():Void {
+        var firstHint:String = null;
+        if (cState.hints != null && cState.hints.length > 0) firstHint = cState.hints[0].text;
+        else if (cState.commandHints != null && cState.commandHints.length > 0) firstHint = cState.commandHints[0].text;
+
+        if (firstHint != null) {
             // Complete the current token with the text in the first available hint.
-            currentToken.text = cState.hints[0].text;
+            currentToken.text = firstHint;
             validateState(true);
             if (cState.completeError == null) {
                 currentToken.next = blankToken(currentToken);
@@ -207,12 +213,12 @@ class Interpreter {
         }
     }
 
-    inline function handleEscape():Void {
+    /*inline*/ function handleEscape():Void {
         cState = blankState();
         validateState(false);
     }
 
-    inline function handleCaretLeft(alt:Bool, ctrl:Bool):Void {
+    /*inline*/ function handleCaretLeft(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
             // Move the caret to the end of the first token.
             currentToken = cState.input;
@@ -234,7 +240,7 @@ class Interpreter {
         }
     }
 
-    inline function handleCaretRight(alt:Bool, ctrl:Bool):Void {
+    /*inline*/ function handleCaretRight(alt:Bool, ctrl:Bool):Void {
         if (ctrl) {
             // Move the caret to the end of the last token.
             while (currentToken.next != null) currentToken = currentToken.next;
@@ -256,7 +262,7 @@ class Interpreter {
         }
     }
 
-    inline function handleUp():Void {
+    /*inline*/ function handleUp():Void {
 
         // A quick note about history.
         // Most Unix shells have a history that is immutable that's behind the scenes,
@@ -272,16 +278,17 @@ class Interpreter {
         }
     }
 
-    inline function handleDown():Void {
+    /*inline*/ function handleDown():Void {
         if (mHistIndex < mHistory.length - 1) {
             mHistory[mHistIndex] = stringifyState();
             mHistIndex++;
+
             loadStateFromString(mHistory[mHistIndex]);
             validateState(true);
         }
     }
 
-    inline function handleChar(charCode:Int):Void {
+    /*inline*/ function handleChar(charCode:Int):Void {
         if (charCode > 0) {
             var char:String = String.fromCharCode(charCode);
             var left:String = sub(currentToken.text, 0, caretIndex);
@@ -325,7 +332,7 @@ class Interpreter {
      * ought to be destroyed, and if they are keys, flags or tail markers, then those args need to be
      * freed from the registry.
      */
-    inline function trimState():Void {
+    /*inline*/ function trimState():Void {
         var token:ConsoleToken = currentToken;
 
         while (token != null) {
@@ -357,9 +364,9 @@ class Interpreter {
             combinedString += '  ' + Strings.WAIT_INDICATOR;
         } else {
             var hintString:String = '';
-            if (cState.finalError != null) hintString = '  §{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.finalError}§{}';
-            else if (cState.completeError != null) hintString = '  §{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.completeError}§{}';
-            else if (cState.hintError != null) hintString = '  §{${Strings.ERROR_OUTPUT_STYLENAME}}${cState.hintError}§{}';
+            if (cState.finalError != null) hintString = '  ' + styleError(cState.finalError);
+            else if (cState.completeError != null) hintString = '  ' + styleError(cState.completeError);
+            else if (cState.hintError != null) hintString = '  ' + styleError(cState.hintError);
             else hintString = printHints(cState.hints);
 
             var inputString:String = printTokens(cState.input, includeCaret);
@@ -379,7 +386,7 @@ class Interpreter {
             switch (type) {
                 case ENTER:
                     if (hintsByID[id] != null && cState.currentCommand != null) {
-                        bakeArgs();
+                        bakeArgs(false);
                         cState.currentCommand.hintRollOver(cState.args, hintsByID[id]);
                     }
                 case EXIT:
@@ -404,6 +411,7 @@ class Interpreter {
                             caretIndex = length(currentToken.text);
                         }
                     }
+                    checkForCommandHintCondition();
                     combineStrings();
                     printInteractiveText();
                 case _:
@@ -537,9 +545,7 @@ class Interpreter {
         // Copy results to the state.
         if (isComplete) {
             token.type = type;
-            if (completeError == null && !isFinal) {
-                if (token.type == Value || token.type == Flag || token.type == CommandName) hints = makeKeyFlagHints('');
-            }
+            if (completeError == null && !isFinal && (type == Value || type == Flag)) hints = makeKeyFlagHints('');
         }
         cState.completeError = completeError;
         cState.finalError = finalError;
@@ -562,13 +568,9 @@ class Interpreter {
         return hints;
     }
 
-    function startsWith(arg:String, sub:String):Bool return arg.indexOf(sub) == 0;
-
     function isUnusedMatch(arg:String, argMap:Map<String, Bool>, sub:String):Bool {
         return !argMap[arg] && arg.indexOf(sub) == 0;
     }
-
-    function argToHint(arg:String, type:ConsoleTokenType):ConsoleToken return {text:arg, type:type};
 
     function alphabeticallyByName(hint1:ConsoleToken, hint2:ConsoleToken):Int {
         if (hint1.text == hint2.text) return 0;
@@ -579,7 +581,7 @@ class Interpreter {
     /**
      * Commands have no need for tokens; the interpreter sends them a ConsoleCommandArgs object.
      */
-    inline function bakeArgs():Void {
+    /*inline*/ function bakeArgs(isFinal:Bool):Void {
         if (cState.currentCommand != null && cState.args == null) {
             if (cState.args == null) cState.args = {flags:[], keyValuePairs:new Map(), tail:null};
 
@@ -598,7 +600,7 @@ class Interpreter {
                     switch (token.type) {
                         case Flag: flags.push(token.text);
                         case Key if (token.next != null):
-                            if (token.next.type == null) {
+                            if (token.next == currentToken) {
                                 pendingKey = token.text;
                                 pendingValue = token.next.text;
                             } else {
@@ -613,12 +615,16 @@ class Interpreter {
             }
 
             cState.args.tail = tail;
-            cState.args.pendingKey = pendingKey;
-            cState.args.pendingValue = pendingValue;
+            if (isFinal) {
+                cState.args.keyValuePairs[pendingKey] = pendingValue;
+            } else {
+                cState.args.pendingKey = pendingKey;
+                cState.args.pendingValue = pendingValue;
+            }
         }
     }
 
-    inline function printTokens(token:ConsoleToken, includeCaret:Bool):String {
+    /*inline*/ function printTokens(token:ConsoleToken, includeCaret:Bool):String {
         var index:Int = 0;
         var str:String = '';
         while (token != null) {
@@ -633,7 +639,7 @@ class Interpreter {
     /**
      * Converts a token to styled text. Optionally includes the caret.
      */
-    inline function styleToken(token:ConsoleToken, includeCaret:Bool, index:Int):String {
+    /*inline*/ function styleToken(token:ConsoleToken, includeCaret:Bool, index:Int):String {
         var str:String = token.text;
         var styleName:String = Strings.INPUT_STYLENAME;
         if (token == currentToken && includeCaret) {
@@ -649,7 +655,7 @@ class Interpreter {
         return '§{name:$styleName, id:$id}$str§{}';
     }
 
-    inline function printHints(hints:Array<ConsoleToken>):String {
+    /*inline*/ function printHints(hints:Array<ConsoleToken>):String {
         var hintStrings:Array<String> = [];
         if (hints != null) hintStrings = hints.map(styleHint);
         return hintStrings.join('\n');
@@ -658,7 +664,7 @@ class Interpreter {
     /**
      * Converts a hint to styled text.
      */
-     inline function styleHint(hint:ConsoleToken):String {
+     /*inline*/ function styleHint(hint:ConsoleToken):String {
         var styleName:String = Strings.INPUT_STYLENAME;
         if (hint.type != null) styleName = styleNamesByType[hint.type];
         var id:String = hint.text;
@@ -669,21 +675,12 @@ class Interpreter {
     /**
      * If an Interpreter is idle and has a command, it may poll the command for command-specific hints.
      */
-    inline function checkForCommandHintCondition():Void {
+    /*inline*/ function checkForCommandHintCondition():Void {
         var shouldWait:Bool = false;
         if (iState == Idle && cState.currentCommand != null) {
             var lastToken:ConsoleToken = cState.input;
             while (lastToken.next != null) lastToken = lastToken.next;
-            var tokenIsEmpty:Bool = length(lastToken.text) == 0;
-            var prev:ConsoleToken = lastToken.prev;
-
-            if (lastToken.type == Value && !tokenIsEmpty) {
-                // The command might have suggestions for values
-                shouldWait = true;
-            } else if (tokenIsEmpty && prev != null && (prev.type == Flag || prev.type == Value)) {
-                // The command might have suggestions for keys and flags
-                shouldWait = true;
-            }
+            shouldWait = lastToken.type == Value || (lastToken.prev != null && lastToken.prev.type == Key);
         }
 
         if (shouldWait) waitForCommandHints();
@@ -695,7 +692,7 @@ class Interpreter {
      */
     function waitForCommandHints():Void {
         cState.args = null;
-        bakeArgs();
+        bakeArgs(false);
         console.freeze();
         iState = Hinting;
         cState.currentCommand.hintSignal.add(onCommandHint);
@@ -705,10 +702,13 @@ class Interpreter {
     /**
      * Unfreezes the console and processes the command hints.
      */
-    function onCommandHint(str:String, hints:Array<ConsoleToken>):Void {
-        commandHintString = '';
-        if (str == null) commandHintString += '  §{${Strings.COMMAND_HINT_STYLENAME}}$str§{}';
-        if (hints != null && hints.length > 0) commandHintString += '\n' + printHints(hints);
+    function onCommandHint(str:String, commandHints:Array<ConsoleToken>):Void {
+        cState.commandHints = commandHints;
+
+        var commandHintStrings:Array<String> = [];
+        if (str != null) commandHintStrings.push('  §{${Strings.COMMAND_HINT_STYLENAME}}$str§{}');
+        if (commandHints != null && commandHints.length > 0) commandHintStrings.push(printHints(commandHints));
+        commandHintString = commandHintStrings.join('\n');
 
         cState.currentCommand.hintSignal.remove(onCommandHint);
         iState = Idle;
@@ -722,7 +722,7 @@ class Interpreter {
      */
     function waitForCommandExecution():Void {
         cState.args = null;
-        bakeArgs();
+        bakeArgs(true);
         console.freeze();
         iState = Executing;
         runningCommand = cState.currentCommand;
@@ -746,7 +746,7 @@ class Interpreter {
         printInteractiveText();
     }
 
-    inline function stringifyState():String {
+    /*inline*/ function stringifyState():String {
         var tokenStrings:Array<String> = [];
         var token:ConsoleToken = cState.input;
         while (token != null) {
@@ -756,18 +756,18 @@ class Interpreter {
         return tokenStrings.join(' ');
     }
 
-    inline function loadStateFromString(str:String):Void {
+    /*inline*/ function loadStateFromString(str:String):Void {
         cState = blankState();
         Utf8.iter(str, handleChar);
     }
 
     // shortcut to cState.currentToken
-    inline function get_currentToken():ConsoleToken return cState.currentToken;
-    inline function set_currentToken(val:ConsoleToken):ConsoleToken return cState.currentToken = val;
+    /*inline*/ function get_currentToken():ConsoleToken return cState.currentToken;
+    /*inline*/ function set_currentToken(val:ConsoleToken):ConsoleToken return cState.currentToken = val;
 
     // shortcut to cState.caretIndex
-    inline function get_caretIndex():Int return cState.caretIndex;
-    inline function set_caretIndex(val:Int):Int return cState.caretIndex = val;
+    /*inline*/ function get_caretIndex():Int return cState.caretIndex;
+    /*inline*/ function set_caretIndex(val:Int):Int return cState.caretIndex = val;
 
     static function makeStyleNamesByType():Map<ConsoleTokenType, String> {
         var styleNamesByType:Map<ConsoleTokenType, String> = new Map();
@@ -778,14 +778,5 @@ class Interpreter {
         styleNamesByType[Tail] = Strings.TAIL_STYLENAME;
         styleNamesByType[TailMarker] = Strings.TAIL_MARKER_STYLENAME;
         return styleNamesByType;
-    }
-
-    inline static function blankState():ConsoleState {
-        var tok = blankToken();
-        return {input:tok, output:null, hint:null, currentToken:tok, caretIndex:0};
-    }
-
-    inline static function blankToken(prev:ConsoleToken = null, next:ConsoleToken = null):ConsoleToken {
-        return {text:'', type:null, prev:prev, next:next};
     }
 }

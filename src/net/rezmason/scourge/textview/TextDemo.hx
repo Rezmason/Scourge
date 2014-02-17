@@ -10,6 +10,7 @@ import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.console.*;
+import net.rezmason.scourge.textview.commands.*;
 
 import net.rezmason.utils.FlatFont;
 
@@ -35,20 +36,24 @@ class TextDemo {
             var path:String = 'flatfonts/${name}_flat';
             var font:FlatFont = new FlatFont(getBitmapData('$path.png'), getText('$path.json'));
             fontTextures[name] = cast new GlyphTexture(utils.textureUtil, font);
-            fontTextures[name + "_fog"] = cast new GlyphTexture(utils.textureUtil, font);
         }
     }
 
     function init():Void {
         addListeners();
         var console = new ConsoleUIMediator();
-        var interpreter = new Interpreter(console);
-        interpreter.addCommand(new ConsoleCommand());
         var uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], console);
         var rect:Rectangle = new Rectangle(0, 0, 1, 1);
         rect.inflate(-0.02, -0.02);
         uiBody.viewRect = rect;
         engine.addBody(uiBody);
+
+        var interpreter = new Interpreter(console);
+        interpreter.addCommand(new RunTestsConsoleCommand());
+        interpreter.addCommand(new SetFontConsoleCommand(uiBody, fontTextures));
+        interpreter.addCommand(new SetNameConsoleCommand(interpreter));
+        interpreter.addCommand(new PrintConsoleCommand());
+        interpreter.addCommand(new ClearConsoleCommand(console));
     }
 
     function addListeners():Void {

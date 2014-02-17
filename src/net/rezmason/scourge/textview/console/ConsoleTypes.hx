@@ -43,6 +43,7 @@ typedef ConsoleState = {
     @:optional var tailMarkerPresent:Bool;
 
     @:optional var hints:Array<ConsoleToken>;
+    @:optional var commandHints:Array<ConsoleToken>;
 }
 
 typedef ConsoleCommandArgs = {

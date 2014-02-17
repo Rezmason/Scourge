@@ -1,6 +1,3 @@
-Make commands again
-Merge back to master
-
 Human players, GUISystem
     Implement abstract commands
     THEN figure out how to connect them to the console
