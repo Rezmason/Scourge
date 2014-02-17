@@ -15,7 +15,7 @@ class PrintConsoleCommand extends ConsoleCommand {
     }
 
     override public function execute(args:ConsoleCommandArgs):Void {
-        if (!exists(args.tail)) outputSignal.dispatch(styleError('Asset ${args.tail} not found.'), true);
+        if (!exists(args.tail)) outputSignal.dispatch(styleError('Asset "${args.tail}" not found.'), true);
         else outputSignal.dispatch(getText(args.tail), true);
     }
 }

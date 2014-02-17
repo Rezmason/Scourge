@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge;
 
 import openfl.Assets.*;
 
@@ -7,6 +7,8 @@ import flash.events.Event;
 import flash.geom.Rectangle;
 
 import net.rezmason.gl.utils.UtilitySet;
+import net.rezmason.scourge.textview.*;
+import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.console.*;
@@ -14,12 +16,13 @@ import net.rezmason.scourge.textview.commands.*;
 
 import net.rezmason.utils.FlatFont;
 
-class TextDemo {
+class Context {
 
     var engine:Engine;
     var stage:Stage;
     var utils:UtilitySet;
     var fontTextures:Map<String, GlyphTexture>;
+    var displaySystem:DisplaySystem;
 
     public function new(utils:UtilitySet, stage:Stage):Void {
         this.utils = utils;
@@ -41,19 +44,44 @@ class TextDemo {
 
     function init():Void {
         addListeners();
+        displaySystem = new DisplaySystem(engine);
         var console = new ConsoleUIMediator();
-        var uiBody = new UIBody(utils.bufferUtil, fontTextures['full'], console);
-        var rect:Rectangle = new Rectangle(0, 0, 1, 1);
-        rect.inflate(-0.02, -0.02);
-        uiBody.viewRect = rect;
-        engine.addBody(uiBody);
-
         var interpreter = new Interpreter(console);
+        var fullTexture:GlyphTexture = fontTextures['full'];
+
+        var regions:Map<String, Rectangle> = [
+            'full'      => new Rectangle(0.0, 0.0, 1.0, 1.0),
+            'main'      => new Rectangle(0.0, 0.0, 0.6, 1.0),
+            'console'   => new Rectangle(0.6, 0.0, 0.4, 1.0),
+            'splash'    => new Rectangle(0.0, 0.0, 1.0, 0.3),
+            'splashnav' => new Rectangle(0.0, 0.7, 1.0, 0.3),
+        ];
+        for (regionName in regions.keys()) displaySystem.addRegion(regionName, regions[regionName]);
+
+        var bodies:Map<String, Class<Body>> = [
+            'splash'    => SplashBody,
+            'alphabet'  => AlphabetBody,
+            'sdf'       => GlyphBody,
+            'test'      => TestBody,
+            // #if flash 'video'     => VideoBody, #end
+        ];
+        for (bodyName in bodies.keys()) {
+            var body:Body = Type.createInstance(bodies[bodyName], [utils.bufferUtil, fullTexture]);
+            displaySystem.addBody(bodyName, body);
+        }
+
+        var uiBody:UIBody = new UIBody(utils.bufferUtil, fontTextures['full'], console);
+        displaySystem.addBody('console', uiBody, 'console');
+
         interpreter.addCommand(new RunTestsConsoleCommand());
         interpreter.addCommand(new SetFontConsoleCommand(uiBody, fontTextures));
         interpreter.addCommand(new SetNameConsoleCommand(interpreter));
         interpreter.addCommand(new PrintConsoleCommand());
         interpreter.addCommand(new ClearConsoleCommand(console));
+        interpreter.addCommand(new ShowBodyConsoleCommand(displaySystem));
+        #if (neko || cpp)
+            interpreter.addCommand(new QuitConsoleCommand());
+        #end
     }
 
     function addListeners():Void {

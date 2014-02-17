@@ -16,7 +16,7 @@ class Scourge {
     }
 
     static function init():Void {
-        new net.rezmason.scourge.textview.TextDemo(utils, Lib.current.stage);
+        new net.rezmason.scourge.Context(utils, Lib.current.stage);
         // new net.rezmason.scourge.textview.Lab(utils, Lib.current.stage);
         // new net.rezmason.scourge.textview.waves.WaveDemo(Lib.current);
     }

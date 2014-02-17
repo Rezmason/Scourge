@@ -114,10 +114,13 @@ class UIBody extends Body {
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
+        var originalViewRect:Rectangle = viewRect.clone();
+        viewRect.inflate(-0.02, -0.02);
         super.adjustLayout(stageWidth, stageHeight);
         viewPixelHeight = viewRect.height * stageHeight;
         viewPixelWidth  = viewRect.width  * stageWidth;
         resize();
+        viewRect = originalViewRect;
     }
 
     function glideTextToPos(pos:Float):Void {
