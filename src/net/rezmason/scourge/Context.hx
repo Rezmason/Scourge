@@ -23,6 +23,7 @@ class Context {
     var utils:UtilitySet;
     var fontTextures:Map<String, GlyphTexture>;
     var displaySystem:DisplaySystem;
+    var gameSystem:GameSystem;
 
     public function new(utils:UtilitySet, stage:Stage):Void {
         this.utils = utils;
@@ -70,8 +71,13 @@ class Context {
             displaySystem.addBody(bodyName, body);
         }
 
-        var uiBody:UIBody = new UIBody(utils.bufferUtil, fontTextures['full'], console);
+        var uiBody:UIBody = new UIBody(utils.bufferUtil, fullTexture, console);
         displaySystem.addBody('console', uiBody, 'console');
+
+        var boardBody:BoardBody = new BoardBody(utils.bufferUtil, fullTexture);
+        displaySystem.addBody('board', boardBody);
+
+        gameSystem = new GameSystem(boardBody);
 
         interpreter.addCommand(new RunTestsConsoleCommand());
         interpreter.addCommand(new SetFontConsoleCommand(uiBody, fontTextures));
@@ -82,6 +88,7 @@ class Context {
         #if (neko || cpp)
             interpreter.addCommand(new QuitConsoleCommand());
         #end
+        interpreter.addCommand(new PlayGameConsoleCommand(displaySystem, gameSystem));
     }
 
     function addListeners():Void {

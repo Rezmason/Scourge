@@ -1,9 +1,16 @@
 package net.rezmason.scourge.textview.console;
 
-class CommandCodeRestriction {
+class ConsoleRestriction {
     public inline static var ROTATION_NOTATION:String = 'yuioYUIO';
     public inline static var NODE_CODE:String = '01234567890abcdefABCDEF';
     public inline static var CRAWL_SCRAWL:String = 'qweasdzxcQWEASDZXC';
+
+    public inline static var PLAYER_PATTERN:String = 'bhBH';
+    public inline static var INTEGERS:String = '01234567890';
+    public inline static var LOWER_CASE:String = 'abcdefghijklmnopqrstuvwxyz';
+    public inline static var UPPER_CASE:String = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+    public inline static var ALPHANUMERICS:String = INTEGERS + LOWER_CASE + UPPER_CASE;
 }
 
 typedef ConsoleToken = {

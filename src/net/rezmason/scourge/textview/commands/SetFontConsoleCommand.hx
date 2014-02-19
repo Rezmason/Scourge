@@ -2,6 +2,7 @@ package net.rezmason.scourge.textview.commands;
 
 import net.rezmason.scourge.textview.console.ConsoleCommand;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
+import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 
@@ -16,8 +17,8 @@ class SetFontConsoleCommand extends ConsoleCommand {
         super();
         name = 'setFont';
 
-        keys['fontName'] = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        keys['size'] = '0123456789';
+        keys['fontName'] = ALPHANUMERICS;
+        keys['size'] = INTEGERS;
 
         this.uiBody = uiBody;
         this.fontTextures = fontTextures;
