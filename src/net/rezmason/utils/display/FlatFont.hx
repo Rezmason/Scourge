@@ -18,7 +18,7 @@ typedef FlatFontJSON = {
     var missingChars:Dynamic;
 };
 
-@:allow(net.rezmason.utils.FlatFontGenerator)
+@:allow(net.rezmason.utils.display.FlatFontGenerator)
 class FlatFont {
 
     var bitmapData:BitmapData;

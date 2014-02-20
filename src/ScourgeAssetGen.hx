@@ -16,7 +16,7 @@ import flash.text.Font;
 import flash.net.FileReference;
 
 import net.rezmason.utils.display.FlatFont;
-import net.rezmason.utils.FlatFontGenerator;
+import net.rezmason.utils.display.FlatFontGenerator;
 
 import net.rezmason.scourge.Strings;
 
