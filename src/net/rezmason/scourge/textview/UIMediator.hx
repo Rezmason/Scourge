@@ -144,7 +144,7 @@ class UIMediator {
         // Splits a line into an array of lines whose length, ignoring sigils, is numCols
 
         var charCodes:Array<Int> = [];
-        Utf8.iter(s, charCodes.push);
+        Utf8.iter(s, function(c) charCodes.push(c));
 
         var wrappedLines:Array<String> = [];
         var index:Int = 0;

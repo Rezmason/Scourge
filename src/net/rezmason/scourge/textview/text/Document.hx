@@ -30,7 +30,7 @@ abstract Document(ParsedOutput) {
 
         // share recycled spans
         if (this.recycledSpans != that.recycledSpans) {
-            this.recycledSpans.map(that.recycledSpans.push);
+            for (span in this.recycledSpans) that.recycledSpans.push(span);
             this.recycledSpans = that.recycledSpans;
         }
     }
@@ -71,7 +71,7 @@ abstract Document(ParsedOutput) {
     }
 
     public inline function setText(input:String):Void {
-        this.spans.map(this.recycledSpans.push);
+        for (span in this.spans) this.recycledSpans.push(span);
         this = Parser.parse(input, this.styles, 0, this.recycledSpans);
     }
 
