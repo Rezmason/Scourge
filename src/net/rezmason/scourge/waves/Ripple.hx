@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.waves;
+package net.rezmason.scourge.waves;
 
 class Ripple {
     public var func:Float->Float;

@@ -1,4 +1,4 @@
-package net.rezmason.utils;
+package net.rezmason.utils.display;
 
 import flash.display.BitmapData;
 import flash.geom.Matrix;

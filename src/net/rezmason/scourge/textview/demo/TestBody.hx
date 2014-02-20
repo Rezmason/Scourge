@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.demo;
 
 import flash.geom.Matrix3D;
 import flash.geom.Rectangle;

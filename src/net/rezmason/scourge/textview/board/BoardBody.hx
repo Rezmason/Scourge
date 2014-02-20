@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.board;
 
 import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
@@ -13,9 +13,9 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 
-import net.rezmason.scourge.textview.waves.WavePool;
-import net.rezmason.scourge.textview.waves.Ripple;
-import net.rezmason.scourge.textview.waves.WaveFunctions;
+import net.rezmason.scourge.waves.WavePool;
+import net.rezmason.scourge.waves.Ripple;
+import net.rezmason.scourge.waves.WaveFunctions;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;

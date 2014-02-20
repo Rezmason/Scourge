@@ -5,7 +5,8 @@ import haxe.Utf8;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.*;
-import net.rezmason.utils.FlatFont;
+import net.rezmason.scourge.textview.ui.UIMediator;
+import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
 import net.rezmason.utils.Zig;
 

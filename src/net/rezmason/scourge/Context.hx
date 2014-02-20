@@ -13,8 +13,13 @@ import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.console.*;
 import net.rezmason.scourge.textview.commands.*;
+import net.rezmason.scourge.textview.demo.*;
+import net.rezmason.scourge.textview.ui.UIBody;
 
-import net.rezmason.utils.FlatFont;
+import net.rezmason.scourge.textview.board.BoardBody;
+import net.rezmason.scourge.textview.ui.SplashBody;
+
+import net.rezmason.utils.display.FlatFont;
 
 class Context {
 
