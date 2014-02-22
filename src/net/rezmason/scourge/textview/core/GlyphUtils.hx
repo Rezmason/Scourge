@@ -3,7 +3,7 @@ package net.rezmason.scourge.textview.core;
 import net.rezmason.gl.Data;
 
 import net.rezmason.utils.FatChar;
-import net.rezmason.utils.FlatFont;
+import net.rezmason.utils.display.FlatFont;
 import net.rezmason.scourge.textview.core.Almanac.*;
 
 class GlyphUtils {

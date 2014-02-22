@@ -15,10 +15,10 @@ import flash.text.Font;
 
 import flash.net.FileReference;
 
-import net.rezmason.utils.FlatFont;
-import net.rezmason.utils.FlatFontGenerator;
+import net.rezmason.utils.display.FlatFont;
+import net.rezmason.utils.display.FlatFontGenerator;
 
-import net.rezmason.scourge.textview.Strings;
+import net.rezmason.scourge.Strings;
 
 @:font("assets/fonts/ProFontX.ttf") class ProFont extends Font {}
 @:font("assets/fonts/SourceCodePro_FontsOnly-1.013/TTF/SourceCodePro-Semibold.ttf") class SourceProFont extends Font {}

@@ -2,7 +2,7 @@ package net.rezmason.scourge.textview.core;
 
 import flash.display.BitmapData;
 import flash.geom.Matrix3D;
-import net.rezmason.utils.FlatFont;
+import net.rezmason.utils.display.FlatFont;
 import net.rezmason.gl.Texture;
 import net.rezmason.gl.utils.TextureUtil;
 

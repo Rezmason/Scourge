@@ -3,7 +3,7 @@ package;
 import flash.Lib;
 
 import net.rezmason.gl.utils.UtilitySet;
-import net.rezmason.scourge.textview.Strings;
+import net.rezmason.scourge.Strings;
 
 class Scourge {
 
@@ -17,7 +17,7 @@ class Scourge {
 
     static function init():Void {
         new net.rezmason.scourge.Context(utils, Lib.current.stage);
-        // new net.rezmason.scourge.textview.Lab(utils, Lib.current.stage);
-        // new net.rezmason.scourge.textview.waves.WaveDemo(Lib.current);
+        // new net.rezmason.scourge.Lab(utils, Lib.current.stage);
+        // new net.rezmason.scourge.waves.WaveDemo(Lib.current);
     }
 }

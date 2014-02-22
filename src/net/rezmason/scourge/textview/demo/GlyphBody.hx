@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.demo;
 
 import net.kawa.tween.easing.Quint;
 import net.kawa.tween.easing.Linear;

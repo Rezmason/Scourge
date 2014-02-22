@@ -7,6 +7,7 @@ import net.rezmason.scourge.controller.SimpleSpectator;
 import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
+import net.rezmason.scourge.textview.board.BoardBody;
 
 using Lambda;
 

@@ -7,8 +7,8 @@ import haxe.Timer;
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.scourge.textview.core.Interaction;
-import net.rezmason.scourge.textview.rendermethods.*;
-import net.rezmason.utils.FlatFont;
+import net.rezmason.scourge.textview.core.rendermethods.*;
+import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.Zig;
 
 using Lambda;

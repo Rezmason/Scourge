@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.rendermethods;
+package net.rezmason.scourge.textview.core.rendermethods;
 
 import flash.geom.Matrix3D;
 

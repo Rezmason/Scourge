@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge;
 
 typedef Color = {
     var r:Float;

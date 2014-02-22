@@ -1,4 +1,4 @@
-package net.rezmason.utils;
+package net.rezmason.utils.display;
 
 import flash.display.BitmapData;
 import flash.geom.Matrix;
@@ -15,7 +15,7 @@ import flash.text.engine.TextLine;
 import flash.text.Font;
 import flash.utils.ByteArray;
 
-import net.rezmason.utils.FlatFont;
+import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.workers.TempAgency;
 import net.rezmason.utils.workers.Golem;
 

@@ -5,6 +5,7 @@ import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
 import net.rezmason.scourge.textview.core.GlyphTexture;
+import net.rezmason.scourge.textview.ui.UIBody;
 
 using net.rezmason.utils.ArrayUtils;
 

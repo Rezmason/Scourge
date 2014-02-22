@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge;
 
 import openfl.Assets.*;
 import flash.Vector;
@@ -9,8 +9,10 @@ import flash.geom.Vector3D;
 import net.rezmason.gl.utils.*;
 import net.rezmason.gl.*;
 import net.rezmason.gl.Data;
+import net.rezmason.scourge.textview.*;
 import net.rezmason.scourge.textview.core.*;
-import net.rezmason.utils.FlatFont;
+import net.rezmason.scourge.textview.demo.*;
+import net.rezmason.utils.display.FlatFont;
 
 class Lab {
 

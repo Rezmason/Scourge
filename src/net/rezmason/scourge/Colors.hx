@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge;
 
 class Colors {
     public inline static function white():Color return {r:1, g:1, b:1};

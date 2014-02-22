@@ -1,4 +1,4 @@
-package net.rezmason.utils;
+package net.rezmason.utils.display;
 
 import flash.display.BitmapData;
 import flash.geom.Matrix;
@@ -18,7 +18,7 @@ typedef FlatFontJSON = {
     var missingChars:Dynamic;
 };
 
-@:allow(net.rezmason.utils.FlatFontGenerator)
+@:allow(net.rezmason.utils.display.FlatFontGenerator)
 class FlatFont {
 
     var bitmapData:BitmapData;
