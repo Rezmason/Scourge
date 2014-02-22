@@ -184,9 +184,12 @@ class Interpreter {
             // Call the command.
             if (length(cState.input.text) > 0) waitForCommandExecution();
             // Append the state to the history, and make a new state.
-            cHistory.pop();
-            cHistory.push(stringifyState());
-            cHistory.push('');
+            var stateString:String = stringifyState();
+            if (cHistory.length <= 1 || cHistory[cHistory.length - 2] != stateString) {
+                cHistory.pop();
+                cHistory.push(stateString);
+                cHistory.push('');
+            }
             mHistory = cHistory.copy();
             mHistIndex = cHistory.length - 1;
             cState = blankState();
@@ -273,7 +276,7 @@ class Interpreter {
     inline function handleHotKey(charCode:Int, alt:Bool):Void {
         var char:String = String.fromCharCode(charCode);
         if (ConsoleRestriction.INTEGERS.indexOf(char) != -1) adoptHintAtIndex(Std.parseInt(char));
-        else if (char == 'k') console.clearText();
+        // else if (char == 'k') console.clearText();
         else if (char == ' ') autoComplete();
     }
 
