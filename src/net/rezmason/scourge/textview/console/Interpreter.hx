@@ -127,7 +127,9 @@ class Interpreter {
             case Keyboard.UP: handleUp();
             case Keyboard.DOWN: handleDown();
             case Keyboard.TAB: handleTab();
-            case _: handleChar(charCode);
+            case _:
+                if (ctrl) handleHotKey(charCode, alt);
+                else handleChar(charCode);
         }
 
         if (key != Keyboard.LEFT && key != Keyboard.RIGHT) checkForCommandHintCondition();
@@ -191,27 +193,7 @@ class Interpreter {
         }
     }
 
-    inline function handleTab():Void {
-        var firstHint:String = null;
-        if (cState.hints != null && cState.hints.length > 0) firstHint = cState.hints[0].text;
-        else if (cState.commandHints != null && cState.commandHints.length > 0) firstHint = cState.commandHints[0].text;
-
-        if (firstHint != null) {
-            // Complete the current token with the text in the first available hint.
-            currentToken.text = firstHint;
-            validateState(true);
-            if (cState.completeError == null) {
-                currentToken.next = blankToken(currentToken);
-                currentToken = currentToken.next;
-                caretIndex = 0;
-            } else {
-                caretIndex = length(currentToken.text);
-            }
-        } else if (length(currentToken.text) == 0) {
-            // Spit out whatever hints are available.
-            validateState(false);
-        }
-    }
+    inline function handleTab():Void autoComplete();
 
     inline function handleEscape():Void {
         cState = blankState();
@@ -288,40 +270,45 @@ class Interpreter {
         }
     }
 
+    inline function handleHotKey(charCode:Int, alt:Bool):Void {
+        var char:String = String.fromCharCode(charCode);
+        if (ConsoleRestriction.INTEGERS.indexOf(char) != -1) adoptHintAtIndex(Std.parseInt(char));
+        else if (char == 'k') console.clearText();
+        else if (char == ' ') autoComplete();
+    }
+
     inline function handleChar(charCode:Int):Void {
-        if (charCode > 0) {
-            var char:String = String.fromCharCode(charCode);
-            var left:String = sub(currentToken.text, 0, caretIndex);
-            var right:String = sub(currentToken.text, caretIndex);
-            var token:ConsoleToken = currentToken;
-            if (char == ' ' && token.type != Tail) {
+        var char:String = String.fromCharCode(charCode);
+        var left:String = sub(currentToken.text, 0, caretIndex);
+        var right:String = sub(currentToken.text, caretIndex);
+        var token:ConsoleToken = currentToken;
+        if (char == ' ' && token.type != Tail) {
+            if (length(right) == 0) {
                 // Complete the current token and append the next one.
-                if (length(right) == 0) {
-                    trimState();
-                    if (length(token.text) == 0) {
-                        validateState(false);
-                    } else {
-                        validateState(true);
-                        if (cState.completeError == null) {
-                            token.text = left;
-                            token.next = blankToken(token);
-                            token = token.next;
-                            currentToken = token;
-                            caretIndex = 0;
-                        }
+                trimState();
+                if (length(token.text) == 0) {
+                    validateState(false);
+                } else {
+                    validateState(true);
+                    if (cState.completeError == null) {
+                        token.text = left;
+                        token.next = blankToken(token);
+                        token = token.next;
+                        currentToken = token;
+                        caretIndex = 0;
                     }
                 }
-            } else {
-                // Add a character to the current token, if it's allowed.
-                var restriction:String = null;
-                if (token.prev != null && token.prev.type == Key) restriction = cState.currentCommand.keys[token.prev.text];
-                if (restriction == null || restriction.indexOf(char) != -1) {
-                    if (token.next != null || cState.hintError == null) {
-                        trimState();
-                        token.text = left + char + right;
-                        caretIndex++;
-                        validateState(false);
-                    }
+            }
+        } else {
+            // Add a character to the current token, if it's allowed.
+            var restriction:String = null;
+            if (token.prev != null && token.prev.type == Key) restriction = cState.currentCommand.keys[token.prev.text];
+            if (restriction == null || restriction.indexOf(char) != -1) {
+                if (token.next != null || cState.hintError == null) {
+                    trimState();
+                    token.text = left + char + right;
+                    caretIndex++;
+                    validateState(false);
                 }
             }
         }
@@ -373,7 +360,10 @@ class Interpreter {
 
             combinedString += prompt + inputString + '\n';
             if (length(hintString) > 0) combinedString += hintString + '\n';
-            if (length(commandHintString) > 0) combinedString += '   ---\n' + commandHintString + '\n';
+            if (length(commandHintString) > 0) {
+                if (length(hintString) > 0) combinedString += '\n';
+                combinedString += commandHintString + '\n';
+            }
         }
     }
 
@@ -400,16 +390,7 @@ class Interpreter {
                         caretIndex = length(currentToken.text);
                     } else if (hintsByID[id] != null) {
                         // Clicking a hint assigns the text of the hint to the current token.
-                        currentToken.text = hintsByID[id].text;
-                        validateState(true);
-                        if (cState.completeError == null) {
-                            clearInteractiveTokens();
-                            currentToken.next = blankToken(currentToken);
-                            currentToken = currentToken.next;
-                            caretIndex = 0;
-                        } else {
-                            caretIndex = length(currentToken.text);
-                        }
+                        adoptHint(hintsByID[id]);
                     }
                     checkForCommandHintCondition();
                     combineStrings();
@@ -576,6 +557,40 @@ class Interpreter {
         if (hint1.text == hint2.text) return 0;
         else if (hint1.text > hint2.text) return 1;
         else return -1;
+    }
+
+    inline function autoComplete():Void {
+        if (!adoptHintAtIndex(0) && length(currentToken.text) == 0) {
+            // Spit out whatever hints are available.
+            validateState(false);
+        }
+    }
+
+    inline function adoptHintAtIndex(index:Int):Bool {
+        var hint:ConsoleToken = null;
+        if (cState.hints != null && cState.hints.length > index) {
+            hint = cState.hints[index];
+        } else if (cState.commandHints != null && cState.commandHints.length > index) {
+            if (cState.hints != null) index -= cState.hints.length;
+            hint = cState.commandHints[index];
+        }
+
+        if (hint != null) adoptHint(hint);
+        return hint != null;
+    }
+
+    inline function adoptHint(hint:ConsoleToken):Void {
+        // Complete the current token with the text in the provided hint.
+        currentToken.text = hint.text;
+        validateState(true);
+        if (cState.completeError == null) {
+            clearInteractiveTokens();
+            currentToken.next = blankToken(currentToken);
+            currentToken = currentToken.next;
+            caretIndex = 0;
+        } else {
+            caretIndex = length(currentToken.text);
+        }
     }
 
     /**
