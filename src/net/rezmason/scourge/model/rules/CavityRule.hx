@@ -10,6 +10,7 @@ import net.rezmason.scourge.model.aspects.OwnershipAspect;
 using Lambda;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.AspectUtils;
+using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
 class CavityRule extends Rule {
@@ -46,10 +47,10 @@ class CavityRule extends Rule {
 
         // We destroy the existing cavity list
         var cavityFirst:Int = player[cavityFirst_];
-        var oldCavityNodes:Map<Int, AspectSet> = new Map();
+        var oldCavityNodes:Array<AspectSet> = [];
         if (cavityFirst != Aspect.NULL) {
-            oldCavityNodes = getNode(cavityFirst).listToMap(state.nodes, cavityNext_, ident_);
-            for (node in oldCavityNodes) clearCavityCell(node, maxFreshness);
+            oldCavityNodes = getNode(cavityFirst).listToAssocArray(state.nodes, cavityNext_, ident_);
+            for (node in oldCavityNodes) if (node != null) clearCavityCell(node, maxFreshness);
             player[cavityFirst_] = Aspect.NULL;
         }
 
@@ -64,7 +65,7 @@ class CavityRule extends Rule {
             var head:BoardLocus = getLocus(player[head_]);
 
             // We're going to search the board for ALL nodes UNTIL we have found all body nodes
-            // This takes advantage of the FILO search pattern of GridUtils.getGraph
+            // This takes advantage of the FIFO search pattern of GridUtils.getGraphSequence
 
             remainingNodes = body.length - 1;
             var widePerimeter:Array<BoardLocus> = head.getGraphSequence(true, isWithinPerimeter.bind(playerID));
@@ -72,7 +73,7 @@ class CavityRule extends Rule {
             // After reversing the search results, they are sorted in the order of most-outside to least-outside
             widePerimeter.reverse();
 
-            var nodeIDs:Map<Int, Bool> = new Map();
+            var nodeIDs:Array<Bool> = [];
             for (locus in widePerimeter) nodeIDs[getID(locus.value)] = true;
 
             var empties:Array<AspectSet> = [];
@@ -88,7 +89,7 @@ class CavityRule extends Rule {
                 // Dismiss filled nodes
                 if (isFilled == Aspect.TRUE) {
                     // remove enemy filled nodes from the nodeIDs
-                    if (occupier != playerID) nodeIDs.remove(getID(locus.value));
+                    if (occupier != playerID) nodeIDs[getID(locus.value)] = false;
                 } else {
                     empties.push(locus.value);
                 }
@@ -103,8 +104,8 @@ class CavityRule extends Rule {
                 for (node in empties) {
                     newEmpties.push(node);
                     for (neighbor in getNodeLocus(node).orthoNeighbors()) {
-                        if (neighbor == null || !nodeIDs.exists(getID(neighbor.value))) {
-                            nodeIDs.remove(getID(node));
+                        if (neighbor == null || !nodeIDs[getID(neighbor.value)]) {
+                            nodeIDs[getID(node)] = false;
                             newEmpties.pop();
                             break;
                         }
@@ -120,7 +121,7 @@ class CavityRule extends Rule {
         if (cavityNodes.length > 0) {
 
             // Cavity nodes that haven't changed don't get freshened
-            for (node in cavityNodes) createCavity(playerID, oldCavityNodes.exists(getID(node)) ? 0 : maxFreshness, node);
+            for (node in cavityNodes) createCavity(playerID, oldCavityNodes[getID(node)] != null ? 0 : maxFreshness, node);
 
             cavityNodes.chainByAspect(ident_, cavityNext_, cavityPrev_);
             player[cavityFirst_] = cavityNodes[0][ident_];

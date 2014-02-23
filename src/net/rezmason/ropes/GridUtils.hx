@@ -3,6 +3,7 @@ package net.rezmason.ropes;
 import haxe.Serializer;
 import haxe.Unserializer;
 import net.rezmason.ropes.GridLocus;
+import net.rezmason.ds.ShitList;
 
 using Lambda;
 using net.rezmason.utils.MapUtils;
@@ -43,26 +44,24 @@ class GridUtils {
         return node2;
     }
 
-    public inline static function allNeighbors<T>(node:GridLocus<T>):Array<GridLocus<T>> {
-        return node.neighbors;
-    }
-
     public inline static function orthoNeighbors<T>(node:GridLocus<T>):Array<GridLocus<T>> {
-        return [n(node), e(node), s(node), w(node)];
+        if (node._orthoNeighbors == null) node._orthoNeighbors = [n(node), e(node), s(node), w(node)];
+        return node._orthoNeighbors;
     }
 
     public inline static function diagNeighbors<T>(node:GridLocus<T>):Array<GridLocus<T>> {
-        return [ne(node), se(node), sw(node), nw(node)];
+        if (node._diagNeighbors == null) node._diagNeighbors = [ne(node), se(node), sw(node), nw(node)];
+        return node._diagNeighbors;
     }
 
-    public inline static function getGraph<T>(source:GridLocus<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Map<Int, GridLocus<T>> {
-        return expandGraph([source.id => source], orthoOnly, spreadFilter);
+    public inline static function getGraph<T>(source:GridLocus<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
+        return expandGraph([source], orthoOnly, spreadFilter);
     }
 
-    public inline static function expandGraph<T>(sources:Map<Int, GridLocus<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Map<Int, GridLocus<T>> {
-        var nodes:Map<Int, GridLocus<T>> = new Map();
-        nodes.absorb(sources);
-        var newNodes:List<GridLocus<T>> = sources.list();
+    public inline static function expandGraph<T>(sources:Array<GridLocus<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
+        var nodes:Array<GridLocus<T>> = [];
+        for (node in sources) nodes[node.id] = node;
+        var newNodes:ShitList<GridLocus<T>> = new ShitList(sources);
 
         var node:GridLocus<T> = newNodes.pop();
         while (node != null) {
@@ -70,7 +69,7 @@ class GridUtils {
             var neighbors:Array<GridLocus<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
 
             for (neighbor in neighbors) {
-                if (neighbor != null && !nodes.exists(neighbor.id) && (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
+                if (neighbor != null && nodes[neighbor.id] == null && (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
                     nodes[neighbor.id] = neighbor;
                     newNodes.add(neighbor);
                 }
@@ -87,9 +86,9 @@ class GridUtils {
 
     public inline static function expandGraphSequence<T>(sources:Array<GridLocus<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
         var nodes:Array<GridLocus<T>> = sources.copy();
-        var newNodes:List<GridLocus<T>> = sources.list();
+        var newNodes:ShitList<GridLocus<T>> = new ShitList(sources);
 
-        var nodesByID:Map<Int, GridLocus<T>> = new Map();
+        var nodesByID:Array<GridLocus<T>> = [];
         for (node in nodes) nodesByID[node.id] = node;
 
         var node:GridLocus<T> = newNodes.pop();
@@ -98,7 +97,7 @@ class GridUtils {
             var neighbors:Array<GridLocus<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
 
             for (neighbor in neighbors) {
-                if (neighbor != null && !nodesByID.exists(neighbor.id) && (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
+                if (neighbor != null && nodesByID[neighbor.id] == null && (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
                     nodes.push(neighbor);
                     newNodes.add(neighbor);
                     nodesByID[neighbor.id] = neighbor;

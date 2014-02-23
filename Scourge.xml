@@ -14,6 +14,7 @@
 	<set name="BUILD_DIR" value="Export" />
 
 	<classpath name="src" />
+	<classpath name="thirdparty/kawanet_ktween/src" />
 
 	<haxelib name="munit" />
 	<classpath name="test" />

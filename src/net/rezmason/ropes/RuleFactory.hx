@@ -6,13 +6,12 @@ import net.rezmason.utils.StringSort;
 
 using Lambda;
 using Type;
+using net.rezmason.utils.MapUtils;
 
 class RuleFactory {
 
     public static function makeBasicRules(ruleDefs:Map<String, Class<Rule>>, cfg:Map<String, Dynamic>):Map<String, Rule> {
-
         var rules:Map<String, Rule> = new Map();
-
         if (cfg != null) {
             var cfgKeys:Array<String> = [];
             for (key in cfg.keys()) cfgKeys.push(key);
@@ -46,9 +45,9 @@ class RuleFactory {
                 for (ruleName in ruleNames) {
                     if (ruleName == key) trace('Joint rule $key cannot contain itself.');
                     else if (ruleStack.has(ruleName)) trace('Cyclical joint rule definition: $key and $ruleName');
-                    else if (basicRules.exists(ruleName)) rules.push(basicRules[ruleName]);
-                    else if (combinedRules.exists(ruleName)) rules.push(combinedRules[ruleName]);
-                    else if (cfg.exists(ruleName)) rules.push(makeJointRule(ruleName));
+                    else if (basicRules.isNotNull(ruleName)) rules.push(basicRules[ruleName]);
+                    else if (combinedRules.isNotNull(ruleName)) rules.push(combinedRules[ruleName]);
+                    else if (cfg.isNotNull(ruleName)) rules.push(makeJointRule(ruleName));
                     else trace('Rule not found: $ruleName');
                 }
                 var jointRule:Rule = new JointRule(rules);
@@ -62,8 +61,8 @@ class RuleFactory {
 
             ArraySort.sort(cfgKeys, StringSort.sort);
             for (key in cfgKeys) {
-                if (basicRules.exists(key)) trace('Basic rule already exists with name: $key');
-                else if (!combinedRules.exists(key)) makeJointRule(key);
+                if (basicRules.isNotNull(key)) trace('Basic rule already exists with name: $key');
+                else if (combinedRules.isNull(key)) makeJointRule(key);
             }
         }
 

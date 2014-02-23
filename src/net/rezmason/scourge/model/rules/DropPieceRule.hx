@@ -14,6 +14,7 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 using Lambda;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.AspectUtils;
+using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
 typedef DropPieceConfig = {
@@ -142,12 +143,10 @@ class DropPieceRule extends Rule {
                             var valid:Bool = true;
 
                             var numAddedNodes:Int = 0;
-                            var addedNodesByID:Map<Int, AspectSet> = new Map();
                             var addedNodes:Array<Int> = [];
 
                             for (coord in rotation[0]) {
                                 var nodeAtCoord:AspectSet = walkLocus(getNodeLocus(node), coord, homeCoord).value;
-                                addedNodesByID[getID(nodeAtCoord)] = nodeAtCoord;
                                 addedNodes.push(getID(nodeAtCoord));
                                 numAddedNodes++;
                                 var occupier:Int = nodeAtCoord[occupier_];
@@ -302,6 +301,6 @@ class DropPieceRule extends Rule {
     }
 
     inline function neighborsFor(locus:BoardLocus, ortho:Bool):Array<BoardLocus> {
-        return ortho ? locus.orthoNeighbors() : locus.allNeighbors();
+        return ortho ? locus.orthoNeighbors() : locus.neighbors;
     }
 }

@@ -10,6 +10,7 @@ using Lambda;
 import net.rezmason.ropes.RopesTypes;
 
 using net.rezmason.utils.Alphabetizer;
+using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
 #if !macro @:autoBuild(net.rezmason.ropes.Rule.build()) #end class Rule {
@@ -185,7 +186,7 @@ using net.rezmason.utils.Pointers;
             }
 
             for (metaTag in field.meta) {
-                if (lkpSources.exists(metaTag.name)) {
+                if (lkpSources.isNotNull(metaTag.name)) {
                     var kind:String = metaTag.name;
                     var name:String = field.name;
                     var aspect:Expr = metaTag.params[0];

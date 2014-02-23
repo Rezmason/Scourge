@@ -9,8 +9,9 @@ import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
 using Lambda;
 
-using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.AspectUtils;
+using net.rezmason.ropes.GridUtils;
+using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
 typedef DecayConfig = {
@@ -43,16 +44,16 @@ class DecayRule extends Rule {
 
         // Grab all the player heads
 
-        var heads:Map<Int, BoardLocus> = new Map();
+        var heads:Array<BoardLocus> = [];
         for (player in eachPlayer()) {
             var headIndex:Int = player[head_];
             if (headIndex != Aspect.NULL && getNode(headIndex)[occupier_] == getID(player)) {
-                heads[headIndex] = getLocus(headIndex);
+                heads.push(getLocus(headIndex));
             }
         }
 
         // Use the heads as starting points for a flood fill of connected living cells
-        var livingBodyNeighbors:Map<Int, BoardLocus> = heads.expandGraph(cfg.orthoOnly, isLivingBodyNeighbor);
+        var livingBodyNeighbors:Array<BoardLocus> = heads.expandGraph(cfg.orthoOnly, isLivingBodyNeighbor);
 
         // Remove cells from player bodies
         for (player in eachPlayer()) {
@@ -62,7 +63,7 @@ class DecayRule extends Rule {
             var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != Aspect.NULL) {
                 for (node in getNode(bodyFirst).iterate(state.nodes, bodyNext_)) {
-                    if (!livingBodyNeighbors.exists(getID(node))) bodyFirst = killCell(node, maxFreshness, bodyFirst);
+                    if (livingBodyNeighbors[getID(node)] == null) bodyFirst = killCell(node, maxFreshness, bodyFirst);
                     else totalArea++;
                 }
             }

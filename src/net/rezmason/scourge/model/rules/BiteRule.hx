@@ -12,6 +12,7 @@ import net.rezmason.scourge.model.aspects.BiteAspect;
 using Lambda;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.AspectUtils;
+using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
 typedef BiteConfig = {
@@ -209,23 +210,23 @@ class BiteRule extends Rule {
     // "front" as in "battle front". Areas where the current player touches other players
     /*
     inline function isFront(headIDs:Array<Int>, node:AspectSet):Bool {
-        return neighborsFor(getNodeLocus(node)).exists(isValidEnemy.bind(headIDs, node[occupier_]));
+        return neighborsFor(getNodeLocus(node)).isNotNull(isValidEnemy.bind(headIDs, node[occupier_]));
     }
     */
 
     inline function isFront(headIDs:Array<Int>, node:AspectSet):Bool {
-        var exists:Bool = false;
+        var isNotNull:Bool = false;
 
         var occupier:Int = node[occupier_];
 
         for (neighbor in neighborsFor(getNodeLocus(node))) {
             if (isValidEnemy(headIDs, occupier, neighbor.value)) {
-                exists = true;
+                isNotNull = true;
                 break;
             }
         }
 
-        return exists;
+        return isNotNull;
     }
 
     // Depending on the config, enemy nodes of different kinds can be bitten
@@ -281,6 +282,6 @@ class BiteRule extends Rule {
     }
 
     inline function neighborsFor(node:BoardLocus):Array<BoardLocus> {
-        return cfg.orthoOnly ? node.orthoNeighbors() : node.allNeighbors();
+        return cfg.orthoOnly ? node.orthoNeighbors() : node.neighbors;
     }
 }

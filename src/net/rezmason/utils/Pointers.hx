@@ -67,14 +67,16 @@ class PtrIterator<T> {
     var a:PtrSet<T>;
     var k:PtrKey;
     var itr:Int;
+    var l:Int;
 
     public function new(a:PtrSet<T>, k:PtrKey):Void {
         this.a = a;
         this.k = k;
+        this.l = a.length();
         itr = 0;
     }
 
-    public function hasNext():Bool return itr < a.length();
+    public function hasNext():Bool return itr < l;
     public function next():Ptr<T> return a.ptr(itr++, k);
 
 }

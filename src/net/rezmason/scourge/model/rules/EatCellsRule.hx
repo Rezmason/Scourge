@@ -7,11 +7,13 @@ import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
+import net.rezmason.ds.ShitList;
 
 using Lambda;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.ArrayUtils;
+using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
 typedef EatCellsConfig = {
@@ -55,19 +57,19 @@ class EatCellsRule extends Rule {
 
         // Find all fresh body nodes of the current player
 
-        var newNodes:List<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_).filter(isFresh).list();
+        var newNodes:ShitList<AspectSet> = new ShitList(bodyNode.listToArray(state.nodes, bodyNext_).filter(isFresh));
 
-        var newNodesMap:Map<Int, AspectSet> = new Map();
-        for (node in newNodes) newNodesMap[getID(node)] = node;
+        var newNodesByID:Array<AspectSet> = [];
+        for (node in newNodes) newNodesByID[getID(node)] = node;
 
-        var eatenNodes:Map<Int, AspectSet> = new Map();
+        var eatenNodes:Array<AspectSet> = [];
 
         // We search space for uninterrupted regions of player cells that begin and end
         // with cells of the current player. We propagate these searches from cells
         // that have been freshly eaten, starting with the current player's fresh nodes
 
         var node:AspectSet = newNodes.pop();
-        if (node != null) newNodesMap.remove(getID(node));
+        if (node != null) newNodesByID[getID(node)] = null;
         while (node != null) {
             // search in all directions
             for (direction in directionsFor(cfg.orthoOnly)) {
@@ -77,12 +79,12 @@ class EatCellsRule extends Rule {
                     if (scout == locus) continue; // starting node
                     if (scout.value[isFilled_] > 0) {
                         var scoutOccupier:Int = scout.value[occupier_];
-                        if (scoutOccupier == currentPlayer || eatenNodes.exists(getID(scout.value))) {
+                        if (scoutOccupier == currentPlayer || eatenNodes[getID(scout.value)] != null) {
                             // Add nodes to the eaten region
                             for (pendingNode in pendingNodes) {
                                 var playerID:Int = headIndices.indexOf(getID(pendingNode));
                                 if (playerID != -1 && cfg.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
-                                else if (cfg.recursive && !newNodesMap.exists(getID(pendingNode))) newNodes.add(pendingNode); // recursive eating
+                                else if (cfg.recursive && newNodesByID[getID(pendingNode)] == null) newNodes.add(pendingNode); // recursive eating
 
                                 eatenNodes[getID(pendingNode)] = pendingNode;
                             }
@@ -100,13 +102,15 @@ class EatCellsRule extends Rule {
                 }
             }
             node = newNodes.pop();
-            if (node != null) newNodesMap.remove(getID(node));
+            if (node != null) newNodesByID[getID(node)] = null;
         }
 
         // Update cells in the eaten region
         for (node in eatenNodes) {
-            node[occupier_] = currentPlayer;
-            node[freshness_] = maxFreshness++;
+            if (node != null) {
+                node[occupier_] = currentPlayer;
+                node[freshness_] = maxFreshness++;
+            }
         }
 
         state.aspects[maxFreshness_] = maxFreshness;
@@ -137,7 +141,7 @@ class EatCellsRule extends Rule {
 
         // Add the filled eaten nodes to the current player body
         for (node in eatenNodes) {
-            if (node[isFilled_] == Aspect.TRUE) {
+            if (node != null && node[isFilled_] == Aspect.TRUE) {
                 bodyNode = bodyNode.addSet(node, state.nodes, ident_, bodyNext_, bodyPrev_);
             }
         }

@@ -18,10 +18,10 @@ class AspectUtils {
         return arr;
     }
 
-    public inline static function listToMap(me:AspectSet, list:Array<AspectSet>, itrPtr:AspectPtr, keyPtr:AspectPtr):Map<Int, AspectSet> {
-        var map:Map<Int, AspectSet> = new Map();
-        for (me in iterate(me, list, itrPtr)) map[me[keyPtr]] = me;
-        return map;
+    public inline static function listToAssocArray(me:AspectSet, list:Array<AspectSet>, itrPtr:AspectPtr, keyPtr:AspectPtr):Array<AspectSet> {
+        var arr:Array<AspectSet> = [];
+        for (me in iterate(me, list, itrPtr)) arr[me[keyPtr]] = me;
+        return arr;
     }
 
     public inline static function removeSet(me:AspectSet, list:Array<AspectSet>, next:AspectPtr, prev:AspectPtr):AspectSet {
