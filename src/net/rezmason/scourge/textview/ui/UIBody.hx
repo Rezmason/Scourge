@@ -25,6 +25,7 @@ class UIBody extends Body {
     var glyphHeightInPixels:Float;
     var baseTransform:Matrix3D;
 
+    var croppedViewRect:Rectangle;
     var viewPixelWidth:Float;
     var viewPixelHeight:Float;
 
@@ -114,13 +115,14 @@ class UIBody extends Body {
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
+        croppedViewRect = viewRect;
         var originalViewRect:Rectangle = viewRect.clone();
         viewRect.inflate(-0.02, -0.02);
         super.adjustLayout(stageWidth, stageHeight);
         viewPixelHeight = viewRect.height * stageHeight;
         viewPixelWidth  = viewRect.width  * stageWidth;
-        resize();
         viewRect = originalViewRect;
+        resize();
     }
 
     function glideTextToPos(pos:Float):Void {
@@ -194,7 +196,7 @@ class UIBody extends Body {
         numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
         numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
 
-        setGlyphScale(viewRect.width / numCols * 2, viewRect.height / (numRows - 1) * 2);
+        setGlyphScale(croppedViewRect.width / numCols * 2, croppedViewRect.height / (numRows - 1) * 2);
 
         growTo(numRows * numCols + 1);
 

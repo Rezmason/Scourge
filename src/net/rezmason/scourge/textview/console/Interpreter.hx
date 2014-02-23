@@ -128,8 +128,10 @@ class Interpreter {
             case Keyboard.DOWN: handleDown();
             case Keyboard.TAB: handleTab();
             case _:
-                if (ctrl) handleHotKey(charCode, alt);
-                else handleChar(charCode);
+                if (charCode > 0) {
+                    if (ctrl) handleHotKey(charCode, alt);
+                    else handleChar(charCode);
+                }
         }
 
         if (key != Keyboard.LEFT && key != Keyboard.RIGHT) checkForCommandHintCondition();
@@ -185,7 +187,7 @@ class Interpreter {
             if (length(cState.input.text) > 0) waitForCommandExecution();
             // Append the state to the history, and make a new state.
             var stateString:String = stringifyState();
-            if (cHistory.length <= 1 || cHistory[cHistory.length - 2] != stateString) {
+            if (length(stateString) > 0 && (cHistory.length <= 1 || cHistory[cHistory.length - 2] != stateString)) {
                 cHistory.pop();
                 cHistory.push(stateString);
                 cHistory.push('');
