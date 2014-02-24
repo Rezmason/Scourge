@@ -101,7 +101,7 @@ class DropPieceRule extends Rule {
         var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
 
         // Find edge nodes of current player
-        var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_).filter(isFreeEdge);
+        var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_).filter(hasFreeEdge);
 
         var pieceReflection:Int = state.aspects[pieceReflection_];
         var pieceRotation:Int = state.aspects[pieceRotation_];
@@ -241,7 +241,7 @@ class DropPieceRule extends Rule {
 
     override private function _collectMoves():Void movePool = allMoves.copy();
 
-    inline function isFreeEdge(node:AspectSet):Bool {
+    inline function hasFreeEdge(node:AspectSet):Bool {
         var exists:Bool = false;
 
         for (neighbor in neighborsFor(getNodeLocus(node), cfg.orthoOnly)) {

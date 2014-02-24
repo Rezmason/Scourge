@@ -36,14 +36,12 @@ class CavityRule extends Rule {
 
     override private function _chooseMove(choice:Int):Void {
         var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
-        for (player in eachPlayer()) remapCavities(getID(player), maxFreshness);
+        for (player in eachPlayer()) remapCavities(player, maxFreshness);
         state.aspects[maxFreshness_] = maxFreshness;
         signalEvent();
     }
 
-    private function remapCavities(playerID:Int, maxFreshness:Int):Void {
-
-        var player:AspectSet = getPlayer(playerID);
+    private function remapCavities(player:AspectSet, maxFreshness:Int):Void {
 
         // We destroy the existing cavity list
         var cavityFirst:Int = player[cavityFirst_];
@@ -56,67 +54,100 @@ class CavityRule extends Rule {
 
         var cavityNodes:Array<AspectSet> = [];
 
-        // No one cares about your cavities if you're dead
-        if (player[head_] != Aspect.NULL) {
+        // Find edge nodes of current player
+        var bodyNode:AspectSet = getNode(player[bodyFirst_]);
+        var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_).filter(hasFreeEdge);
 
-            // Now for the fun part: finding all the cavity nodes.
+        var allEdges:Map<String, Int> = new Map();
+        var groups:Array<Array<String>> = [];
+        var groupAngles:Array<Int> = [];
+        var currentGroupIndex:Int = 0;
+        var currentGroup:Array<String> = null;
+        var currentEdge:String = null;
 
-            var body:Array<AspectSet> = getNode(player[bodyFirst_]).listToArray(state.nodes, bodyNext_);
-            var head:BoardLocus = getLocus(player[head_]);
-
-            // We're going to search the board for ALL nodes UNTIL we have found all body nodes
-            // This takes advantage of the FIFO search pattern of GridUtils.getGraphSequence
-
-            remainingNodes = body.length - 1;
-            var widePerimeter:Array<BoardLocus> = head.getGraphSequence(true, isWithinPerimeter.bind(playerID));
-
-            // After reversing the search results, they are sorted in the order of most-outside to least-outside
-            widePerimeter.reverse();
-
-            var nodeIDs:Array<Bool> = [];
-            for (locus in widePerimeter) nodeIDs[getID(locus.value)] = true;
-
-            var empties:Array<AspectSet> = [];
-
-            // Searching from the outside in, we remove exposed empty nodes from the set
-            for (ike in 0...widePerimeter.length) {
-
-                var locus:BoardLocus = widePerimeter[ike];
-
-                var occupier:Int = locus.value[occupier_];
-                var isFilled:Int = locus.value[isFilled_];
-
-                // Dismiss filled nodes
-                if (isFilled == Aspect.TRUE) {
-                    // remove enemy filled nodes from the nodeIDs
-                    if (occupier != playerID) nodeIDs[getID(locus.value)] = false;
-                } else {
-                    empties.push(locus.value);
+        // For each edge node,
+        for (edgeNode in edgeNodes) {
+            var edgeLocus = getNodeLocus(edgeNode);
+            // For each empty ortho neighbor,
+            for (direction in GridUtils.orthoDirections()) {
+                var neighbor = edgeLocus.neighbors[direction];
+                if (neighbor.value[isFilled_] == Aspect.FALSE) {
+                    // make an edge that's in-no-group
+                    allEdges['${getID(edgeNode)}/$direction'] = -1;
                 }
             }
-
-            // Of those cells, we repeatedly remove cells which are in fact still exposed
-            // TODO: use getGraph for this instead
-            var lastLength:Int = 0;
-            while (empties.length != lastLength) {
-                lastLength = empties.length;
-                var newEmpties:Array<AspectSet> = [];
-                for (node in empties) {
-                    newEmpties.push(node);
-                    for (neighbor in getNodeLocus(node).orthoNeighbors()) {
-                        if (neighbor == null || !nodeIDs[getID(neighbor.value)]) {
-                            nodeIDs[getID(node)] = false;
-                            newEmpties.pop();
-                            break;
-                        }
-                    }
-                }
-                empties = newEmpties;
-            }
-
-            // The cavities are the nodes that remain and are empty
-            cavityNodes = empties;
         }
+
+        // For each edge,
+        for (edge in allEdges.keys()) {
+            // if edge is in-no-group,
+            if (allEdges[edge] != -1) continue;
+
+            // make a new group
+            currentGroupIndex = groups.length;
+            currentGroup = [];
+            groups.push(currentGroup);
+            groupAngles.push(0);
+
+            // current edge is edge
+            currentEdge = edge;
+            // while (current edge is in-no-group)
+            while (currentEdge != null && allEdges[currentEdge] == -1) {
+                // current group: add current edge
+                allEdges[currentEdge] = currentGroupIndex;
+                currentGroup.push(currentEdge);
+
+                var bits:Array<String> = currentEdge.split('/');
+                var inID:Int = Std.parseInt(bits[0]);
+                var direction:Int = Std.parseInt(bits[1]);
+
+                var changeInDirection:Int = 0;
+                var nextDirection:Int = 0;
+                var nextEdge:String = null;
+
+                {
+                    changeInDirection = -2;
+                    nextDirection = (direction + 6) % 8;
+                    nextEdge = '${getID(getLocus(inID).neighbors[(direction + 1) % 8].value)}/$nextDirection';
+                }
+                if (allEdges[nextEdge] == null)
+                {
+                    changeInDirection = 0;
+                    nextDirection = direction;
+                    nextEdge = '${getID(getLocus(inID).neighbors[(direction + 2) % 8].value)}/$nextDirection';
+                }
+                if (allEdges[nextEdge] == null)
+                {
+                    changeInDirection = 2;
+                    nextDirection = (direction + 2) % 8;
+                    nextEdge = '$inID/$nextDirection';
+                }
+
+                if (allEdges[nextEdge] == null) {
+                    currentEdge = null;
+                } else {
+                    // add 'angle change' to current group's angle
+                    groupAngles[currentGroupIndex] += changeInDirection;
+                    currentEdge = nextEdge;
+                }
+            }
+            // if group of current edge is current group
+                // Closed loop!
+            // else
+                // Error, probably!
+        }
+
+        for (ike in 0...groups.length) {
+            if (groupAngles[ike] == -8) {
+                // Add its interior to the cavityNodes
+                var bits:Array<String> = groups[ike][0].split('/');
+                var firstLocus:BoardLocus = getLocus(Std.parseInt(bits[0]));
+                firstLocus = firstLocus.neighbors[Std.parseInt(bits[1])];
+                for (locus in firstLocus.getGraphSequence(true, isEmpty)) cavityNodes.push(locus.value);
+            }
+        }
+
+        var playerID:Int = getID(player);
 
         if (cavityNodes.length > 0) {
 
@@ -132,13 +163,20 @@ class CavityRule extends Rule {
         }
     }
 
-    // This comparator doesn't actually compare aspect sets; it counts the number
-    // of aspects it has found, and ends the search when they're all found
-    function isWithinPerimeter(allegiance:Int, me:AspectSet, you:AspectSet):Bool {
-        if (remainingNodes <= 0) return false;
-        if (me[isFilled_] == Aspect.TRUE && me[occupier_] == allegiance) remainingNodes--;
-        return true;
+    inline function hasFreeEdge(node:AspectSet):Bool {
+        var exists:Bool = false;
+
+        for (neighbor in getNodeLocus(node).orthoNeighbors()) {
+            if (neighbor.value[isFilled_] == Aspect.FALSE) {
+                exists = true;
+                break;
+            }
+        }
+
+        return exists;
     }
+
+    inline function isEmpty(me:AspectSet, you:AspectSet):Bool return me[isFilled_] == Aspect.FALSE;
 
     inline function createCavity(occupier:Int, maxFreshness:Int, node:AspectSet):Void {
         node[isFilled_] = Aspect.FALSE;
