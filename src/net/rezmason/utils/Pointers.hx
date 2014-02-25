@@ -83,7 +83,7 @@ class PtrIterator<T> {
         itr = 0;
     }
 
-    public function hasNext():Bool return itr < l;
-    public function next():Ptr<T> return a.ptr(itr++, k);
+    public inline function hasNext():Bool return itr < l;
+    public inline function next():Ptr<T> return a.ptr(itr++, k);
 
 }

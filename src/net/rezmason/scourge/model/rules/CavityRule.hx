@@ -26,9 +26,19 @@ class CavityRule extends Rule {
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
+    var allEdges:Array<Int>;
+    var groupFirstEdges:Array<Int>;
+    var groupAngles:Array<Int>;
+    var cavityNodes:Array<AspectSet>;
+
     public function new():Void {
         super();
         moves.push({id:0});
+
+        allEdges = [];
+        groupFirstEdges = [];
+        groupAngles = [];
+        cavityNodes = [];
     }
 
     override private function _chooseMove(choice:Int):Void {
@@ -44,11 +54,9 @@ class CavityRule extends Rule {
         var bodyNode:AspectSet = getNode(player[bodyFirst_]);
         var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_).filter(hasFreeEdge);
 
-        var allEdges:Array<Int> = [];
+        var numEdges:Int = 0;
         var edgeGroupIDs:Array<Null<Int>> = [];
         var numGroups:Int = 0;
-        var groupFirstEdges:Array<Int> = [];
-        var groupAngles:Array<Int> = [];
         var currentGroupIndex:Int = 0;
         var currentEdge:Int = 0;
 
@@ -62,24 +70,25 @@ class CavityRule extends Rule {
                     // make an edge that's in-no-group
                     currentEdge = makeEdge(getID(edgeNode), direction);
                     edgeGroupIDs[currentEdge] = -1;
-                    allEdges.push(currentEdge);
+                    allEdges[numEdges] = currentEdge;
+                    numEdges++;
                 }
             }
         }
 
         // For each edge,
-        for (edge in allEdges) {
+        for (ike in 0...numEdges) {
+            currentEdge = allEdges[ike];
+
             // if edge is in-no-group,
-            if (edgeGroupIDs[edge] != -1) continue;
+            if (edgeGroupIDs[currentEdge] != -1) continue;
 
             // make a new group
+            currentGroupIndex = numGroups;
+            groupFirstEdges[currentGroupIndex] = currentEdge;
+            groupAngles[currentGroupIndex] = 0;
             numGroups++;
-            currentGroupIndex = numGroups - 1;
-            groupFirstEdges.push(edge);
-            groupAngles.push(0);
 
-            // current edge is edge
-            currentEdge = edge;
             // while (current edge is in-no-group)
             while (currentEdge != -1 && edgeGroupIDs[currentEdge] == -1) {
                 // current group: add current edge
@@ -143,10 +152,15 @@ class CavityRule extends Rule {
             player[cavityFirst_] = Aspect.NULL;
         }
 
-        var cavityNodes:Array<AspectSet> = [];
-        for (locus in loci.expandGraphSequence(true, isEmpty)) cavityNodes.push(locus.value);
+        var numCavityNodes:Int = 0;
+        for (locus in loci.expandGraphSequence(true, isEmpty)) {
+            cavityNodes[numCavityNodes] = locus.value;
+            numCavityNodes++;
+        }
 
-        if (cavityNodes.length > 0) {
+        if (numCavityNodes > 0) {
+
+            cavityNodes.splice(numCavityNodes, cavityNodes.length);
 
             // Cavity nodes that haven't changed don't get freshened
             var playerID:Int = getID(player);
