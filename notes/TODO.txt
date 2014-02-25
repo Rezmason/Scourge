@@ -1,6 +1,3 @@
-Reimpliment CavityRule
-    Use winding to identify interior regions
-    Edge walker
 
 Human players, GUISystem
     Implement abstract commands

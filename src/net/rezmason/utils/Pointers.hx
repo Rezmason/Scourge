@@ -47,7 +47,11 @@ abstract PtrSet<T>(Array<T>) {
     @:allow(net.rezmason.utils.PtrIterator) inline function length():Int return this.length;
 
     public inline function ptr(i:Int, k:PtrKey):Ptr<T> return new Ptr(i, k);
-    public inline function ptrs(k:PtrKey):PtrIterator<T> return new PtrIterator(cast this, k);
+    public inline function ptrs(k:PtrKey, pItr:PtrIterator<T> = null):PtrIterator<T> {
+        if (pItr == null) pItr = new PtrIterator();
+        pItr.attach(cast this, k);
+        return pItr;
+    }
 }
 
 abstract PtrKey({i:Int}) {
@@ -69,7 +73,10 @@ class PtrIterator<T> {
     var itr:Int;
     var l:Int;
 
-    public function new(a:PtrSet<T>, k:PtrKey):Void {
+    public function new():Void {}
+
+    @:allow(net.rezmason.utils)
+    function attach(a:PtrSet<T>, k:PtrKey):Void {
         this.a = a;
         this.k = k;
         this.l = a.length();

@@ -10,7 +10,6 @@ import net.rezmason.scourge.model.aspects.OwnershipAspect;
 using Lambda;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.AspectUtils;
-using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
 class CavityRule extends Rule {
@@ -27,8 +26,6 @@ class CavityRule extends Rule {
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
-    var remainingNodes:Int;
-
     public function new():Void {
         super();
         moves.push({id:0});
@@ -43,27 +40,17 @@ class CavityRule extends Rule {
 
     private function remapCavities(player:AspectSet, maxFreshness:Int):Void {
 
-        // We destroy the existing cavity list
-        var cavityFirst:Int = player[cavityFirst_];
-        var oldCavityNodes:Array<AspectSet> = [];
-        if (cavityFirst != Aspect.NULL) {
-            oldCavityNodes = getNode(cavityFirst).listToAssocArray(state.nodes, cavityNext_, ident_);
-            for (node in oldCavityNodes) if (node != null) clearCavityCell(node, maxFreshness);
-            player[cavityFirst_] = Aspect.NULL;
-        }
-
-        var cavityNodes:Array<AspectSet> = [];
-
         // Find edge nodes of current player
         var bodyNode:AspectSet = getNode(player[bodyFirst_]);
         var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_).filter(hasFreeEdge);
 
-        var allEdges:Map<String, Int> = new Map();
-        var groups:Array<Array<String>> = [];
+        var allEdges:Array<Int> = [];
+        var edgeGroupIDs:Array<Null<Int>> = [];
+        var numGroups:Int = 0;
+        var groupFirstEdges:Array<Int> = [];
         var groupAngles:Array<Int> = [];
         var currentGroupIndex:Int = 0;
-        var currentGroup:Array<String> = null;
-        var currentEdge:String = null;
+        var currentEdge:Int = 0;
 
         // For each edge node,
         for (edgeNode in edgeNodes) {
@@ -73,58 +60,58 @@ class CavityRule extends Rule {
                 var neighbor = edgeLocus.neighbors[direction];
                 if (neighbor.value[isFilled_] == Aspect.FALSE) {
                     // make an edge that's in-no-group
-                    allEdges['${getID(edgeNode)}/$direction'] = -1;
+                    currentEdge = makeEdge(getID(edgeNode), direction);
+                    edgeGroupIDs[currentEdge] = -1;
+                    allEdges.push(currentEdge);
                 }
             }
         }
 
         // For each edge,
-        for (edge in allEdges.keys()) {
+        for (edge in allEdges) {
             // if edge is in-no-group,
-            if (allEdges[edge] != -1) continue;
+            if (edgeGroupIDs[edge] != -1) continue;
 
             // make a new group
-            currentGroupIndex = groups.length;
-            currentGroup = [];
-            groups.push(currentGroup);
+            numGroups++;
+            currentGroupIndex = numGroups - 1;
+            groupFirstEdges.push(edge);
             groupAngles.push(0);
 
             // current edge is edge
             currentEdge = edge;
             // while (current edge is in-no-group)
-            while (currentEdge != null && allEdges[currentEdge] == -1) {
+            while (currentEdge != -1 && edgeGroupIDs[currentEdge] == -1) {
                 // current group: add current edge
-                allEdges[currentEdge] = currentGroupIndex;
-                currentGroup.push(currentEdge);
+                edgeGroupIDs[currentEdge] = currentGroupIndex;
 
-                var bits:Array<String> = currentEdge.split('/');
-                var inID:Int = Std.parseInt(bits[0]);
-                var direction:Int = Std.parseInt(bits[1]);
+                var inID:Int = getEdgeID(currentEdge);
+                var direction:Int = getEdgeDirection(currentEdge);
 
                 var changeInDirection:Int = 0;
                 var nextDirection:Int = 0;
-                var nextEdge:String = null;
+                var nextEdge:Int = -1;
 
                 {
                     changeInDirection = -2;
                     nextDirection = (direction + 6) % 8;
-                    nextEdge = '${getID(getLocus(inID).neighbors[(direction + 1) % 8].value)}/$nextDirection';
+                    nextEdge = makeEdge(getID(getLocus(inID).neighbors[(direction + 1) % 8].value), nextDirection);
                 }
-                if (allEdges[nextEdge] == null)
+                if (edgeGroupIDs[nextEdge] == null)
                 {
                     changeInDirection = 0;
                     nextDirection = direction;
-                    nextEdge = '${getID(getLocus(inID).neighbors[(direction + 2) % 8].value)}/$nextDirection';
+                    nextEdge = makeEdge(getID(getLocus(inID).neighbors[(direction + 2) % 8].value), nextDirection);
                 }
-                if (allEdges[nextEdge] == null)
+                if (edgeGroupIDs[nextEdge] == null)
                 {
                     changeInDirection = 2;
                     nextDirection = (direction + 2) % 8;
-                    nextEdge = '$inID/$nextDirection';
+                    nextEdge = makeEdge(inID, nextDirection);
                 }
 
-                if (allEdges[nextEdge] == null) {
-                    currentEdge = null;
+                if (edgeGroupIDs[nextEdge] == null) {
+                    currentEdge = -1;
                 } else {
                     // add 'angle change' to current group's angle
                     groupAngles[currentGroupIndex] += changeInDirection;
@@ -137,21 +124,32 @@ class CavityRule extends Rule {
                 // Error, probably!
         }
 
-        for (ike in 0...groups.length) {
+        var loci:Array<BoardLocus> = [];
+
+        for (ike in 0...numGroups) {
             if (groupAngles[ike] == -8) {
                 // Add its interior to the cavityNodes
-                var bits:Array<String> = groups[ike][0].split('/');
-                var firstLocus:BoardLocus = getLocus(Std.parseInt(bits[0]));
-                firstLocus = firstLocus.neighbors[Std.parseInt(bits[1])];
-                for (locus in firstLocus.getGraphSequence(true, isEmpty)) cavityNodes.push(locus.value);
+                currentEdge = groupFirstEdges[ike];
+                loci.push(getLocus(getEdgeID(currentEdge)).neighbors[getEdgeDirection(currentEdge)]);
             }
         }
 
-        var playerID:Int = getID(player);
+        // We destroy the existing cavity list
+        var cavityFirst:Int = player[cavityFirst_];
+        var oldCavityNodes:Array<AspectSet> = [];
+        if (cavityFirst != Aspect.NULL) {
+            oldCavityNodes = getNode(cavityFirst).listToAssocArray(state.nodes, cavityNext_, ident_);
+            for (node in oldCavityNodes) if (node != null) clearCavityCell(node, maxFreshness);
+            player[cavityFirst_] = Aspect.NULL;
+        }
+
+        var cavityNodes:Array<AspectSet> = [];
+        for (locus in loci.expandGraphSequence(true, isEmpty)) cavityNodes.push(locus.value);
 
         if (cavityNodes.length > 0) {
 
             // Cavity nodes that haven't changed don't get freshened
+            var playerID:Int = getID(player);
             for (node in cavityNodes) createCavity(playerID, oldCavityNodes[getID(node)] != null ? 0 : maxFreshness, node);
 
             cavityNodes.chainByAspect(ident_, cavityNext_, cavityPrev_);
@@ -175,6 +173,10 @@ class CavityRule extends Rule {
 
         return exists;
     }
+
+    inline function makeEdge(id:Int, direction:Int):Int return (id << 3) | (direction & 7);
+    inline function getEdgeID(edge:Int):Int return edge >> 3;
+    inline function getEdgeDirection(edge:Int):Int return edge & 7;
 
     inline function isEmpty(me:AspectSet, you:AspectSet):Bool return me[isFilled_] == Aspect.FALSE;
 
