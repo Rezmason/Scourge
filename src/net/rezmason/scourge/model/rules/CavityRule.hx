@@ -50,15 +50,19 @@ class CavityRule extends Rule {
 
     private function remapCavities(player:AspectSet, maxFreshness:Int):Void {
 
-        // Find edge nodes of current player
-        var bodyNode:AspectSet = getNode(player[bodyFirst_]);
-        var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_).filter(hasFreeEdge);
-
-        var numEdges:Int = 0;
         var edgeGroupIDs:Array<Null<Int>> = [];
+        var numEdges:Int = 0;
         var numGroups:Int = 0;
         var currentGroupIndex:Int = 0;
         var currentEdge:Int = 0;
+
+        // Find edge nodes of current player
+        var bodyNode:AspectSet = getNode(player[bodyFirst_]);
+
+        if (bodyNode == null) return;
+
+        var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_);
+        edgeNodes = edgeNodes.filter(hasDifferentNeighbor.bind(bodyNode[occupier_]));
 
         // For each edge node,
         for (edgeNode in edgeNodes) {
@@ -175,11 +179,11 @@ class CavityRule extends Rule {
         }
     }
 
-    inline function hasFreeEdge(node:AspectSet):Bool {
+    inline function hasDifferentNeighbor(allegiance:Int, node:AspectSet):Bool {
         var exists:Bool = false;
 
         for (neighbor in getNodeLocus(node).orthoNeighbors()) {
-            if (neighbor.value[isFilled_] == Aspect.FALSE) {
+            if (neighbor == null || neighbor.value[isFilled_] == Aspect.FALSE || neighbor.value[occupier_] != allegiance) {
                 exists = true;
                 break;
             }
