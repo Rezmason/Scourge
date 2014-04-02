@@ -18,7 +18,7 @@ class RandomSmarts extends Smarts {
 
     override public function init(game:Game):Void {
         super.init(game);
-        actionIndices = PRIORITIZED_ACTIONS.map(game.actionIDs.indexOf);
+        actionIndices = PRIORITIZED_ACTIONS.map(function(el) return game.actionIDs.indexOf(el));
     }
 
     override public function choose(game:Game):GameEventType {

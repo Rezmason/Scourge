@@ -137,7 +137,7 @@ class TestBody extends Body {
                     switch (key) {
                         case Keyboard.LEFT:  setSize(Std.int(numGlyphs * (shift ? 0.666 : 0.9)));
                         case Keyboard.RIGHT: setSize(Std.int(numGlyphs * (shift ? 1.500 : 1.1)));
-                        case _: setGlobalChar(char);
+                        case _: setGlobalChar(cast char);
                     }
                 }
         }
@@ -167,7 +167,7 @@ class TestBody extends Body {
     }
 
     inline function setGlobalChar(charCode:Int):Void {
-        if (charCode > 0) for (glyph in glyphs) glyph.set_char(charCode, glyphTexture.font);
+        for (glyph in glyphs) glyph.set_char(charCode, glyphTexture.font);
     }
 
 }

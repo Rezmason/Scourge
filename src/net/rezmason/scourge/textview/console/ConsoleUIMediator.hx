@@ -17,7 +17,7 @@ private typedef FrozenInteraction = { id:Int, interaction:Interaction };
 class ConsoleUIMediator extends UIMediator {
 
     public var frozen(default, null):Bool;
-    public var keyboardSignal(default, null):Zig<Int->Int->Bool->Bool->Void>;
+    public var keyboardSignal(default, null):Zig<UInt->UInt->Bool->Bool->Void>;
     public var clickSignal(default, null):Zig<String->MouseInteractionType->Void>;
 
     var caretStyle:AnimatedStyle;

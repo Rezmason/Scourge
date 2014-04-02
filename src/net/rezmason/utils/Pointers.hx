@@ -23,7 +23,7 @@ abstract PtrSet<T>(Array<T>) {
         for (ike in 0...this.length) dest.write(ike + offset, this[ike]);
     }
     public inline function map<U>(mapFunc:T->U):PtrSet<U> return cast this.map(mapFunc);
-    public inline function mapTo<U>(mapFunc:T->U, dest:PtrSet<U>, offset:Int):Void {
+    public /*inline*/ function mapTo<U>(mapFunc:T->U, dest:PtrSet<U>, offset:Int):Void { // Was inline; caused openFL issue
         for (ike in 0...this.length) dest.write(ike + offset, mapFunc(this[ike]));
     }
 

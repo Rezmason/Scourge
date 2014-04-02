@@ -6,7 +6,7 @@ typedef InteractionSource = {
 }
 
 enum Interaction {
-    KEYBOARD(type:KeyboardInteractionType, key:Int, char:Int, shift:Bool, alt:Bool, ctrl:Bool);
+    KEYBOARD(type:KeyboardInteractionType, key:UInt, char:UInt, shift:Bool, alt:Bool, ctrl:Bool);
     MOUSE(type:MouseInteractionType, x:Float, y:Float);
 }
 

@@ -60,8 +60,8 @@ class KeyboardSystem {
     }
 
     inline function sendInteraction(event:KeyboardEvent, type:KeyboardInteractionType):Void {
-        var keyCode:Int = event.keyCode;
-        var charCode:Int = event.charCode;
+        var keyCode:UInt = event.keyCode;
+        var charCode:UInt = event.charCode;
 
         var shiftKey:Bool = event.shiftKey;
         var altKey:Bool = event.altKey;

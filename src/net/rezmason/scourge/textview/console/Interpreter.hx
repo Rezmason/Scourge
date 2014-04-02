@@ -114,7 +114,7 @@ class Interpreter {
     /**
      * Sort of the "entry point". The majority of the work starts here.
      */
-    function handleKeyboard(key:Int, charCode:Int, alt:Bool, ctrl:Bool):Void {
+    function handleKeyboard(key:UInt, charCode:UInt, alt:Bool, ctrl:Bool):Void {
 
         clearInteractiveTokens();
 

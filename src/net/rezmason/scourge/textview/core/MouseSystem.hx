@@ -35,6 +35,7 @@ class MouseSystem {
     var lastMoveEvent:MouseEvent;
     var width:Int;
     var height:Int;
+    var initialized:Bool;
     var drawUtil:DrawUtil;
 
     public function new(drawUtil:DrawUtil, target:EventDispatcher):Void {
@@ -53,8 +54,9 @@ class MouseSystem {
         hoverRawID = NULL_ID;
         pressRawID = NULL_ID;
 
-        width = -1;
-        height = -1;
+        width = 0;
+        height = 0;
+        initialized = false;
         invalidate();
 
         /*
@@ -67,7 +69,8 @@ class MouseSystem {
     }
 
     public function setSize(width:Int, height:Int):Void {
-        if (this.width != width || this.height != height) {
+        if (!initialized || this.width != width || this.height != height) {
+            initialized = true;
             this.width = width;
             this.height = height;
 
@@ -84,7 +87,7 @@ class MouseSystem {
 
     function getRawID(x:Float, y:Float):Int {
 
-        if (data == null || data.length < width * height * 4) return NULL_ID;
+        if (data == null || data.length < cast width * height * 4) return NULL_ID;
 
         if (x < 0) x = 0;
         if (x >= width) x = width - 1;

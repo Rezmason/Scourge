@@ -80,7 +80,7 @@ class GridUtils {
         return nodes;
     }
 
-    public inline static function getGraphSequence<T>(source:GridLocus<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
+    public inline static function getGraphSequence<T>(source:GridLocus<T>, orthoOnly:Null<Bool> = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
         return expandGraphSequence([source], orthoOnly, spreadFilter);
     }
 

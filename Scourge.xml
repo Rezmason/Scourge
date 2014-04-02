@@ -38,8 +38,9 @@
 	<!-- <haxedef name="dce" value="no" if="flash"/> -->
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 
-	<haxelib name="openfl" />
 
+	<set name="html5-backend" value="openfl-html5-dom" />
+	<haxelib name="openfl" />
 	<set name="custom-html5-backend" />
 	<haxelib name="openfl-html5-revised" if="html5" />
 
