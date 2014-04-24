@@ -124,12 +124,6 @@ using net.rezmason.utils.Pointers;
     @:final inline function getID(aspectSet:AspectSet):Int { return aspectSet[ident_]; }
     @:final inline function getNodeLocus(node:AspectSet):BoardLocus { return getLocus(getID(node)); }
 
-    // Are these still necessary?
-    @:final inline function statePtr(prop:AspectProperty):AspectPtr { return plan.stateAspectLookup[prop.id]; }
-    @:final inline function playerPtr(prop:AspectProperty):AspectPtr { return plan.playerAspectLookup[prop.id]; }
-    @:final inline function nodePtr(prop:AspectProperty):AspectPtr { return plan.nodeAspectLookup[prop.id]; }
-    @:final inline function extraPtr(prop:AspectProperty):AspectPtr { return extraAspectLookup[prop.id]; }
-
     @:final inline function getNode(index:Int):AspectSet { return state.nodes[index]; }
     @:final inline function getLocus(index:Int):BoardLocus { return state.loci[index]; }
     @:final inline function getPlayer(index:Int):AspectSet { return state.players[index]; }

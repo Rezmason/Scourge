@@ -24,16 +24,16 @@ class StateHistorian {
 
     public function write():Void {
         writeAspects(state.aspects, historyState.aspects, aItr);
-        for (ike in 0...state.players.length) writeAspects(state.players[ike], historyState.players[ike], aItr);
-        for (ike in 0...state.nodes  .length) writeAspects(state.nodes  [ike], historyState.nodes  [ike], aItr);
-        for (ike in 0...state.extras .length) writeAspects(state.extras [ike], historyState.extras [ike], aItr);
+        writeAspectSets(state.players, historyState.players);
+        writeAspectSets(state.nodes, historyState.nodes);
+        writeAspectSets(state.extras, historyState.extras);
     }
 
     public function read():Void {
         readAspects(state.aspects, historyState.aspects, aItr);
-        for (ike in 0...state.players.length) readAspects(state.players[ike], historyState.players[ike], aItr);
-        for (ike in 0...state.nodes  .length) readAspects(state.nodes  [ike], historyState.nodes  [ike], aItr);
-        for (ike in 0...state.extras .length) readAspects(state.extras [ike], historyState.extras [ike], aItr);
+        readAspectSets(state.players, historyState.players);
+        readAspectSets(state.nodes, historyState.nodes);
+        readAspectSets(state.extras, historyState.extras);
     }
 
     public function save():SavedState {
@@ -55,8 +55,16 @@ class StateHistorian {
         for (ptr in aspects.ptrs(key, aItr)) history.set(histAspects[ptr], aspects[ptr]);
     }
 
+    private inline function writeAspectSets(aspectSets:Array<AspectSet>, histAspectSets:Array<AspectSet>):Void {
+        for (ike in 0...aspectSets.length) writeAspects(aspectSets[ike], histAspectSets[ike], aItr);
+    }
+
     private inline function readAspects(aspects:AspectSet, histAspects:AspectSet, itr:AspectItr):Void {
         for (ptr in aspects.ptrs(key, aItr)) aspects[ptr] = history.get(histAspects[ptr]);
+    }
+
+    private inline function readAspectSets(aspectSets:Array<AspectSet>, histAspectSets:Array<AspectSet>):Void {
+        for (ike in 0...aspectSets.length) readAspects(aspectSets[ike], histAspectSets[ike], aItr);
     }
 }
 

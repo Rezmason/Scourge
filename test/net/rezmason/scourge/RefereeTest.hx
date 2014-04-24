@@ -61,7 +61,7 @@ class RefereeTest {
         // Assert.areEqual(prevData, data);
     }
 
-    #if neko @Ignore('Runs slow on NekoVM') #end
+    #if neko @Ignore('Runs too slow on NekoVM') #end
     @Test
     public function saveTest():Void {
 

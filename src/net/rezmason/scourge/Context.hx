@@ -82,7 +82,7 @@ class Context {
         var boardBody:BoardBody = new BoardBody(utils.bufferUtil, fullTexture);
         displaySystem.addBody('board', boardBody);
 
-        gameSystem = new GameSystem(boardBody);
+        gameSystem = new GameSystem(boardBody, console);
 
         interpreter.addCommand(new RunTestsConsoleCommand());
         interpreter.addCommand(new SetFontConsoleCommand(uiBody, fontTextures));

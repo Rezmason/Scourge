@@ -1,25 +1,14 @@
 package net.rezmason.scourge.textview.console;
 
-import net.rezmason.scourge.controller.ControllerTypes;
-import net.rezmason.scourge.controller.RandomSmarts;
-import net.rezmason.scourge.controller.Referee;
-import net.rezmason.scourge.controller.ReplaySmarts;
-import net.rezmason.scourge.controller.SimpleSpectator;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
-import net.rezmason.scourge.textview.console.ConsoleCommand;
 import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
-import net.rezmason.scourge.textview.core.GlyphTexture;
 using Lambda;
 
 class PlayGameConsoleCommand extends ConsoleCommand {
-    /*
-    static var playKeyHints:Array<String> = ['playerPattern', 'botPeriod'];
-    static var playFlagHints:Array<String> = ['replay', 'circular'];
-    static var playKeyRestrictions:Map<String, String> = ['playerPattern' => 'bh'];
-    */
+    
     var displaySystem:DisplaySystem;
     var gameSystem:GameSystem;
 
@@ -61,7 +50,9 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         if (playerPattern.length > numPlayers) playerPattern = playerPattern.slice(0, numPlayers);
         while (playerPattern.length < numPlayers) playerPattern.push('b');
 
-        var botPeriod:Int = Std.parseInt(args.keyValuePairs['botPeriod']);
+        var botPeriodString:String = args.keyValuePairs['botPeriod'];
+        if (botPeriodString == null) botPeriodString = '1000';
+        var botPeriod:Int = Std.parseInt(botPeriodString);
 
         var circular:Bool = args.flags.has('circular');
 

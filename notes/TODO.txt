@@ -1,3 +1,16 @@
+VisualNarrator
+    Pool NodeVOs and steps
+
+An action should be the index of the type of action, followed by the index of the move
+    Then, the model should only enumerate the moves of the specified action
+
+Animation system
+    The narrative needs to be turned into a bunch of animations
+    Sequencing
+        Signals
+        Timeout handling
+        Don't confuse the reasoning phase with the narrative phase
+            Talk to coworkers about this stuff; it's likely that players can cheat if this is mishandled
 
 Human players, GUISystem
     Implement abstract commands

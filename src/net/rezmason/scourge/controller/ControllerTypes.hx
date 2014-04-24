@@ -48,3 +48,40 @@ enum RefereeActionType {
     Init(config:String, ?savedState:String);
     RandomFloats(floats:String);
 }
+
+enum NodeState {
+    Wall;
+    Empty;
+    Cavity;
+    Body;
+    Head;
+}
+
+enum NodeEffect {
+    BodyEaten;
+    BodyKilled;
+    CavityFadesOver;
+    CavityFadesIn;
+    CavityFadesOut;
+    PieceDropsDown;
+    HeadEaten;
+    HeadKilled;
+}
+
+typedef NodeVO = {
+    var id:Int;
+    var occupier:Int;
+    /*
+    var isHead:Bool;
+    var isFilled:Bool;
+    */
+    var state:Null<NodeState>;
+    var freshness:Float;
+    @:optional var cause:String;
+    @:optional var effect:NodeEffect;
+};
+
+typedef NarrativeStep = {
+    var nodeVOs:Array<NodeVO>;
+    var cause:String;
+}

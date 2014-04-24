@@ -26,6 +26,7 @@ Game varieties
 			Bitey pieces (Free bite originating from piece at end of turn)
 			Head piece (Makes another head)
 			Ossified pieces (Spreads through remote parts of your body, killing it– but that region cannot be occupied)
+				Or maybe cavities ossify!
 		Tradeoffs
 			Non-pieces
 			Slower bite replenishment rate

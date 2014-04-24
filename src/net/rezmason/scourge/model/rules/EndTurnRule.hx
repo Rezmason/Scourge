@@ -38,7 +38,7 @@ class EndTurnRule extends Rule {
         }
 
         // reset freshness on all nodes
-        for (node in eachNode()) node[freshness_] = 0;
+        for (node in eachNode()) node[freshness_] = Aspect.NULL;
 
         state.aspects[currentPlayer_] = playerID;
         state.aspects[maxFreshness_] = 0;

@@ -8,6 +8,8 @@ package ;
 
 class Main
 {
-	static function main () new Opti ()
-	
+	static function main () 
+	{
+		new Opti ();
+	}
 }

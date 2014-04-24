@@ -108,8 +108,10 @@ class EatCellsRule extends Rule {
         // Update cells in the eaten region
         for (node in eatenNodes) {
             if (node != null) {
-                node[occupier_] = currentPlayer;
-                node[freshness_] = maxFreshness++;
+                if (node[occupier_] != currentPlayer) {
+                    node[occupier_] = currentPlayer;
+                    node[freshness_] = maxFreshness++;
+                }
             }
         }
 

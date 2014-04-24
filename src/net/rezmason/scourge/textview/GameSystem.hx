@@ -3,11 +3,14 @@ package net.rezmason.scourge.textview;
 import net.rezmason.scourge.controller.RandomSmarts;
 import net.rezmason.scourge.controller.Referee;
 import net.rezmason.scourge.controller.ReplaySmarts;
-import net.rezmason.scourge.controller.SimpleSpectator;
+import net.rezmason.scourge.controller.StateChangeSequencer;
 import net.rezmason.scourge.controller.ControllerTypes;
+import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.textview.board.BoardBody;
+import net.rezmason.scourge.textview.console.ConsoleUIMediator;
+import net.rezmason.scourge.model.aspects.PlyAspect;
 
 using Lambda;
 
@@ -17,19 +20,23 @@ class GameSystem {
     static var movePeriod:Float = 10;
 
     public var referee(default, null):Referee;
-    public var spectator(default, null):SimpleSpectator;
+    public var sequencer(default, null):StateChangeSequencer;
     public var boardBody(default, null):BoardBody;
 
-    public function new(boardBody:BoardBody):Void {
+    var console:ConsoleUIMediator;
+
+    public function new(boardBody:BoardBody, console:ConsoleUIMediator):Void {
         referee = new Referee();
-        spectator = new SimpleSpectator(syncPeriod, movePeriod);
+        sequencer = new StateChangeSequencer(syncPeriod, movePeriod);
+        
         this.boardBody = boardBody;
+        this.console = console;
     }
 
     public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, botPeriod:Int, isReplay:Bool):Void {
 
         if (referee.gameBegun) referee.endGame();
-        spectator.viewSignal.removeAll();
+        //sequencer.viewSignal.removeAll();
 
         var playerDefs:Array<PlayerDef> = [];
         var randGen:Void->Float = randomFunction;
@@ -50,15 +57,16 @@ class GameSystem {
 
         referee.beginGame({
             playerDefs:playerDefs,
-            spectators:[spectator],
+            spectators:[sequencer],
             randGen:randGen,
             gameConfig:config,
             syncPeriod:syncPeriod,
             movePeriod:movePeriod,
         });
 
-        boardBody.attach(spectator.getGame(), referee.numPlayers);
-        spectator.viewSignal.add(boardBody.invalidateBoard);
+        //boardBody.attach(sequencer.getGame(), referee.numPlayers);
+        //sequencer.viewSignal.add(boardBody.invalidateBoard);
+        //sequencer.viewSignal.add(updateConsole);
     }
 
     function playerActionsOnly(event:GameEvent):Bool {

@@ -10,7 +10,8 @@ class Zig<T> {
 
     public function new() {
         subs = [];
-        dispatch = Reflect.makeVarArgs(function(args) for (sub in subs) Reflect.callMethod(null, sub, args));
+        var callSub = Reflect.callMethod.bind(null);
+        dispatch = Reflect.makeVarArgs(function(args) for (sub in subs) callSub(sub, args));
     }
 
     public function add(sub) if (!Lambda.has(subs, sub)) subs.push(sub);
