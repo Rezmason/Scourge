@@ -37,26 +37,26 @@ class HistoryTest
         var propA:Int = history.alloc(0);
         var propB:Int = history.alloc(0);
 
-        history.set(propA, 0);
+        history.write(propA, 0);
 
         Assert.areEqual(2, history.commit()); // Commit with subscribers with no changes
 
-        history.set(propA, 1);
+        history.write(propA, 1);
         Assert.areEqual(3, history.commit()); // Commit
-        history.set(propB, 2);
+        history.write(propB, 2);
         Assert.areEqual(4, history.commit()); // Commit
 
-        history.set(propA, 3);
-        history.set(propB, 3);
+        history.write(propA, 3);
+        history.write(propB, 3);
 
         var propC:Int = history.alloc(3); // Late subscription
 
         Assert.areEqual(5, history.commit()); // Commit
 
         // current state
-        Assert.areEqual(3, history.get(propA));
-        Assert.areEqual(3, history.get(propB));
-        Assert.areEqual(3, history.get(propC));
+        Assert.areEqual(3, history.read(propA));
+        Assert.areEqual(3, history.read(propB));
+        Assert.areEqual(3, history.read(propC));
 
         // invalid revert
         try {
@@ -67,41 +67,41 @@ class HistoryTest
         // revert to early state
 
         history.revert(4);
-        Assert.areEqual(1, history.get(propA));
-        Assert.areEqual(2, history.get(propB));
-        Assert.areEqual(3, history.get(propC));
+        Assert.areEqual(1, history.read(propA));
+        Assert.areEqual(2, history.read(propB));
+        Assert.areEqual(3, history.read(propC));
 
         Assert.areEqual(4, history.revision);
 
         // Pending changes
-        history.set(propA, 4);
-        history.set(propB, 5);
-        history.set(propC, 6);
+        history.write(propA, 4);
+        history.write(propB, 5);
+        history.write(propC, 6);
 
         // reset undoes pending changes
         history.reset();
-        Assert.areEqual(1, history.get(propA));
-        Assert.areEqual(2, history.get(propB));
-        Assert.areEqual(3, history.get(propC));
+        Assert.areEqual(1, history.read(propA));
+        Assert.areEqual(2, history.read(propB));
+        Assert.areEqual(3, history.read(propC));
 
         // revert to first state
         history.revert(0);
-        Assert.areEqual(0, history.get(propA));
-        Assert.areEqual(0, history.get(propB));
-        Assert.areEqual(3, history.get(propC));
+        Assert.areEqual(0, history.read(propA));
+        Assert.areEqual(0, history.read(propB));
+        Assert.areEqual(3, history.read(propC));
 
         Assert.areEqual(0, history.revision);
 
-        history.set(propA, 1);
-        history.set(propB, 2);
-        history.set(propC, 3);
+        history.write(propA, 1);
+        history.write(propB, 2);
+        history.write(propC, 3);
         Assert.areEqual(1, history.commit()); // Commit
 
         history.wipe();
         Assert.areEqual(0, history.revision);
 
         try {
-            history.get(propA);
+            history.read(propA);
             Assert.fail('Bad get failed to throw error');
         } catch (error:Dynamic) {}
 
@@ -115,7 +115,7 @@ class HistoryTest
 
         history.forget();
 
-        for (ike in 0...100) Assert.areEqual(1, history.get(pointers[ike]));
+        for (ike in 0...100) Assert.areEqual(1, history.read(pointers[ike]));
         Assert.areEqual(0, history.revision);
 
         history.wipe();
@@ -124,7 +124,7 @@ class HistoryTest
         history.wipe();
 
         try {
-            history.get(propE);
+            history.read(propE);
             Assert.fail('Bad get failed to throw error');
         } catch (error:Dynamic) {}
 

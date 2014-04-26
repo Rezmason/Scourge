@@ -23,17 +23,19 @@ abstract PtrSet<T>(Array<T>) {
         for (ike in 0...this.length) dest.write(ike + offset, this[ike]);
     }
     public inline function map<U>(mapFunc:T->U):PtrSet<U> return cast this.map(mapFunc);
-    public /*inline*/ function mapTo<U>(mapFunc:T->U, dest:PtrSet<U>, offset:Int):Void { // Was inline; caused openFL issue
+    public inline function mapTo<U>(mapFunc:T->U, dest:PtrSet<U>, offset:Int):Void { // Was inline; caused openFL issue
         for (ike in 0...this.length) dest.write(ike + offset, mapFunc(this[ike]));
     }
 
     inline function write(index:Int, value:T):T return this[index] = value;
 
-    @:arrayAccess inline function ptrAccess(p:Ptr<T>):T {
+    @:arrayAccess #if !cpp inline #end function ptrAccess(p:Ptr<T>):T { // Was inline; caused openFL issue
         #if USE_POINTERS if (p == null) throw 'Null pointer'; return this[p.i()];
         #else return this[p.toInt()];
         #end
     }
+
+    public function acc(i:Int):T return this[i];
 
     @:arrayAccess inline function ptrWrite(p:Ptr<T>, v:T):T {
         #if USE_POINTERS
@@ -44,7 +46,9 @@ abstract PtrSet<T>(Array<T>) {
         #end
     }
 
-    @:allow(net.rezmason.utils.PtrIterator) inline function length():Int return this.length;
+    public inline function goFuckYourself():String return this.join('_');
+
+    @:allow(net.rezmason.utils.PtrIterator) public inline function size():Int return this.length;
 
     public inline function ptr(i:Int, k:PtrKey):Ptr<T> return new Ptr(i, k);
     public inline function ptrs(k:PtrKey, pItr:PtrIterator<T> = null):PtrIterator<T> {
@@ -79,7 +83,7 @@ class PtrIterator<T> {
     function attach(a:PtrSet<T>, k:PtrKey):Void {
         this.a = a;
         this.k = k;
-        this.l = a.length();
+        this.l = a.size();
         itr = 0;
     }
 

@@ -52,7 +52,7 @@ class StateHistorian {
     }
 
     private inline function writeAspects(aspects:AspectSet, histAspects:AspectSet, aItr:AspectItr):Void {
-        for (ptr in aspects.ptrs(key, aItr)) history.set(histAspects[ptr], aspects[ptr]);
+        for (ptr in aspects.ptrs(key, aItr)) history.write(histAspects[ptr], aspects[ptr]);
     }
 
     private inline function writeAspectSets(aspectSets:Array<AspectSet>, histAspectSets:Array<AspectSet>):Void {
@@ -60,7 +60,7 @@ class StateHistorian {
     }
 
     private inline function readAspects(aspects:AspectSet, histAspects:AspectSet, itr:AspectItr):Void {
-        for (ptr in aspects.ptrs(key, aItr)) aspects[ptr] = history.get(histAspects[ptr]);
+        for (ptr in aspects.ptrs(key, aItr)) aspects[ptr] = history.read(histAspects[ptr]);
     }
 
     private inline function readAspectSets(aspectSets:Array<AspectSet>, histAspectSets:Array<AspectSet>):Void {

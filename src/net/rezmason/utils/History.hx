@@ -102,13 +102,13 @@ class History<T> {
         return length++;
     }
 
-    public inline function get(index:Int):Null<T> {
-        if (length == 0) throw 'Invalid get : no data allocated for index $index';
+    public inline function read(index:Int):Null<T> {
+        if (length == 0) throw 'Invalid read : no data allocated for index $index';
         return array[index];
     }
 
-    public inline function set(index:Int, val:Null<T>):Null<T> {
-        if (length == 0) throw 'Invalid set : no data allocated for index $index';
+    public inline function write(index:Int, val:Null<T>):Null<T> {
+        if (length == 0) throw 'Invalid write : no data allocated for index $index';
         return array[index] = val;
     }
 
