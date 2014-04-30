@@ -81,7 +81,7 @@ typedef NodeVO = {
     @:optional var effect:NodeEffect;
 };
 
-typedef NarrativeStep = {
+typedef SequenceStep = {
     var nodeVOs:Array<NodeVO>;
     var cause:String;
 }

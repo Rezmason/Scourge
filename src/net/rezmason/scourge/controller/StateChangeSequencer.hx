@@ -8,6 +8,7 @@ import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.scourge.model.BoardUtils;
+using Lambda;
 
 import net.rezmason.scourge.model.aspects.*;
 
@@ -18,8 +19,8 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
     static var nodeEffectMap:Map<NodeState, Map<NodeState, Null<NodeEffect>>> = makeNodeEffectMap();
 
     var nodeVOs:Array<NodeVO>;
-    var narrative:Array<NarrativeStep>;
-    var lastStep:NarrativeStep;
+    var sequence:Array<SequenceStep>;
+    var lastStep:SequenceStep;
     var maxFreshness:Int;
     
     var occupier_:AspectPtr;
@@ -28,32 +29,43 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
     var freshness_:AspectPtr;
     var maxFreshness_:AspectPtr;
 
+    var nodePool:Array<NodeVO>;
+    var stepPool:Array<SequenceStep>;
+
     var headNodes:Array<AspectSet>;
     
     public function new(syncPeriod:Null<Float>, movePeriod:Null<Float>):Void {
         super(syncPeriod, movePeriod);
         updateSignal = new Zig();
         updateSignal.add(onUpdate);
-        onAlert = addNarrativeStep;
+        onAlert = addSequenceStep;
+        nodePool = [];
+        stepPool = [];
     }
 
     override private function connect():Void {}
     override private function disconnect():Void endGame();
+    
+    override private function init(configData:String, saveData:String):Void {
+        super.init(configData, saveData);
+        initSequence();
+    }
+    
     override private function isMyTurn():Bool return false;
     
     private function onUpdate(event:GameEvent):Void {
         switch (event.type) {
-            case RefereeAction(_): 
+            case RefereeAction(type): 
                 processGameEventType(event.type);
-                if (nodeVOs == null && game.plan != null) initNarrative();
-            case _: 
-                beginNarrative();
+            case _:
+                beginSequence();
                 processGameEventType(event.type);
-                endNarrative();
+                endSequence();
+                if (game.winner != Aspect.NULL) destroySequence();
         }
     }
 
-    private inline function initNarrative():Void {
+    private inline function initSequence():Void {
         // get props
         maxFreshness_ = game.plan.onState(FreshnessAspect.MAX_FRESHNESS);
         head_ = game.plan.onPlayer(BodyAspect.HEAD);
@@ -61,35 +73,53 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         isFilled_ = game.plan.onNode(OwnershipAspect.IS_FILLED);
         freshness_ = game.plan.onNode(FreshnessAspect.FRESHNESS);
 
-        // initialize and populate narrative data structure
+        // initialize and populate sequence data structure
         nodeVOs = [];
         headNodes = [];
         var nodes:Array<AspectSet> = game.state.nodes;
         for (ike in 0...game.state.players.length) headNodes[ike] = game.state.nodes[game.state.players[ike][head_]];
-        for (ike in 0...nodes.length) nodeVOs[ike] = makeNodeVO(ike);
-        lastStep = {cause:null, nodeVOs:nodeVOs.copy()};
-        narrative = [lastStep];
+        for (ike in 0...nodes.length) nodeVOs[ike] = getNodeVO(ike);
+        lastStep = getStep(nodeVOs.copy());
+        sequence = [lastStep];
         maxFreshness = 0;
     }
 
-    private inline function beginNarrative():Void {
-        lastStep = {cause:null, nodeVOs:nodeVOs.copy()};
-        narrative = [lastStep];
+    private inline function beginSequence():Void {
+        poolObjects();
+        lastStep = getStep(nodeVOs.copy());
+        sequence = [lastStep];
         maxFreshness = 0;
     }
 
-    private inline function endNarrative():Void {
+    private inline function endSequence():Void {
         var nodeVOsByFreshness:Array<NodeVO> = [];
-        for (ike in 1...narrative.length) {
-            var step:NarrativeStep = narrative[ike];
+        for (ike in 1...sequence.length) {
+            var step:SequenceStep = sequence[ike];
             for (nodeVO in step.nodeVOs) if (nodeVO != null) nodeVO.freshness /= maxFreshness;
             nodeVOsByFreshness = nodeVOsByFreshness.concat(step.nodeVOs.filter(isNotNull));
         }
         nodeVOsByFreshness.sort(whichNodeIsFresher);
         trace(nodeVOsByFreshness.join('\n'));
-        trace(nodeVOsByFreshness.length);
-        // Trigger the view stuff.
+        trace(sequence.length);
         trace(game.spitBoard());
+        
+        // Trigger the view stuff.
+
+    }
+
+    private inline function destroySequence():Void {
+        poolObjects(true);
+        nodeVOs = null;
+        sequence = null;
+    }
+
+    private inline function poolObjects(grabAll:Bool = false):Void {
+        if (sequence != null) {
+            for (step in sequence) {
+                for (vo in step.nodeVOs) if (vo != null && (grabAll || !nodeVOs.has(vo))) nodePool.push(vo);
+                stepPool.push(step);
+            }
+        }
     }
 
     private function isNotNull(vo:NodeVO):Bool return vo != null;
@@ -103,14 +133,15 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         return val;
     }
 
-    private function addNarrativeStep(cause:String):Void {
+    private function addSequenceStep(cause:String):Void {
 
-        if (narrative == null) return;
+        if (sequence == null) return;
 
-        // Append a step to the narrative.
+
+        // Append a step to the sequence.
         var nodes:Array<AspectSet> = game.state.nodes;
         var players:Array<AspectSet> = game.state.players;
-        var step:NarrativeStep = null;
+        var step:SequenceStep = null;
         // update the head table
         for (ike in 0...game.state.players.length) headNodes[ike] = nodes[game.state.players[ike][head_]];
 
@@ -118,8 +149,8 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         if (cause == "CavityRule" && lastStep.cause == "DecayRule") {
             step = lastStep;
         } else {
-            step = {nodeVOs:[], cause:cause};
-            narrative.push(step);
+            step = getStep([], cause);
+            sequence.push(step);
         }
 
         for (ike in 0...players.length) headNodes[ike] = nodes[players[ike][head_]];
@@ -127,7 +158,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
             var freshness:Int = nodes[ike][freshness_];
             if (freshness == Aspect.NULL || freshness <= maxFreshness) continue;
             
-            var next:NodeVO = makeNodeVO(ike, cause);
+            var next:NodeVO = getNodeVO(ike, cause);
             next.effect = nodeEffectMap[nodeVOs[ike].state][next.state];
             nodeVOs[ike] = next;
             step.nodeVOs[ike] = next;
@@ -136,19 +167,37 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
 
         var mF:Int = game.state.aspects[maxFreshness_];
         if (maxFreshness < mF) maxFreshness = mF;
+
     }
 
-    private function makeNodeVO(id:Int, cause:String = null):NodeVO {
+    private function getNodeVO(id:Int, cause:String = null):NodeVO {
+        var vo:NodeVO = nodePool.pop();
+        if (vo == null) vo = {id:0, occupier:0, freshness:0, state:Empty, cause:null};
         var node:AspectSet = game.state.nodes[id];
+        
         var occupier:Int = node[occupier_];
         var isFilled:Bool = node[isFilled_] == Aspect.TRUE;
         var isOccupied:Bool = occupier != Aspect.NULL;
         var isHead:Bool = occupier != Aspect.NULL && headNodes[occupier] == node;
-        var freshness:Int = node[freshness_];
         
-        var state:Null<NodeState> = nodeStateMap[(isOccupied ? 1 : 0) | (isFilled ? 2 : 0) | (isHead ? 4 : 0)];
+        vo.id = id;
+        vo.cause = cause;
+        vo.occupier = occupier;
+        vo.freshness = node[freshness_];
+        vo.state = nodeStateMap[(isOccupied ? 1 : 0) | (isFilled ? 2 : 0) | (isHead ? 4 : 0)];
 
-        return {id:id, occupier:occupier, /*isHead:isHead, isFilled:isFilled, */freshness:freshness, state:state, cause:cause};
+        return vo;
+    }
+
+    private function getStep(nodeVOs:Array<NodeVO>, cause:String = null):SequenceStep {
+        var step:SequenceStep = stepPool.pop();
+        if (step == null) {
+            step = {cause:cause, nodeVOs:nodeVOs};
+        } else {
+            step.cause = cause;
+            step.nodeVOs = nodeVOs;
+        }
+        return step;
     }
 
     static function makeNodeStateMap():Array<Null<NodeState>> return [Empty, Cavity, Wall, Body, null, null, null, Head,];
