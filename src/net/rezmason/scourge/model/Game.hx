@@ -33,9 +33,14 @@ class Game {
     var currentPlayer_:AspectPtr;
     var planner:StatePlanner;
 
+    var moveCache:Array<Array<Move>>;
+    var quantumMoveCache:Array<Array<Move>>;
+
     public function new():Void {
         historian = new StateHistorian();
         planner = new StatePlanner();
+        moveCache = [];
+        quantumMoveCache = [];
     }
 
     public function begin(config:ScourgeConfig, randomFunction:Void->Float, alertFunction:String->Void, savedState:SavedState = null):Int {
@@ -103,7 +108,7 @@ class Game {
             startAction.chooseMove();
         }
 
-        updateAll();
+        invalidate();
 
         return historian.history.revision;
     }
@@ -122,41 +127,43 @@ class Game {
 
     public function forget():Void { historian.history.forget(); }
 
-    public function getMoves():Array<Array<Move>> {
-        var allMoves:Array<Array<Move>> = [];
-        for (action in actions) allMoves.push(action.moves);
-        return allMoves;
+    public function getMovesForAction(index:Int):Array<Move> {
+        if (moveCache[index] == null) updateAction(index);
+        return moveCache[index];
     }
 
-    public function getQuantumMoves():Array<Array<Move>> {
-        var allQuantumMoves:Array<Array<Move>> = [];
-        for (action in actions) allQuantumMoves.push(action.quantumMoves);
-        return allQuantumMoves;
+    public function getQuantumMovesForAction(index:Int):Array<Move> {
+        if (moveCache[index] == null) updateAction(index);
+        return moveCache[index];
     }
 
     public function chooseMove(actionIndex:Int, moveIndex:Int = 0, isQuantum:Bool = false, cleanUp:Bool = true):Int {
 
         if (actionIndex < 0 || actionIndex > actionIDs.length - 1) throw 'Invalid action';
 
-        var action:Rule = actions[actionIndex];
-
-        if (moveIndex < 0 || moveIndex > action.moves.length - 1) {
-            throw 'Invalid move for action ${actionIDs[actionIndex]}';
+        if (isQuantum) {
+            if (moveIndex < 0 || moveIndex > getQuantumMovesForAction(actionIndex).length - 1) {
+                throw 'Invalid quantum move for action ${actionIDs[actionIndex]}';
+            } else {
+                actions[actionIndex].chooseQuantumMove(moveIndex);
+            }
+        } else {
+            if (moveIndex < 0 || moveIndex > getMovesForAction(actionIndex).length - 1) {
+                throw 'Invalid move for action ${actionIDs[actionIndex]}';
+            } else {
+                actions[actionIndex].chooseMove(moveIndex);
+            }
         }
 
-        if (isQuantum) action.chooseQuantumMove(moveIndex);
-        else action.chooseMove(moveIndex);
-
         if (cleanUp) collectAllMoves();
-
-        updateAll();
+        invalidate();
         return pushHist();
     }
 
     public function rewind(revision:Int):Void {
         historian.history.revert(revision);
         historian.read();
-        updateAll();
+        invalidate();
     }
 
     public function spitBoard():String {
@@ -165,7 +172,8 @@ class Game {
 
     public function spitMoves():String {
         var str:String = '';
-        var moves:Array<Array<Move>> = getMoves();
+        var moves:Array<Array<Move>> = [];
+        for (ike in 0...actions.length) moves.push(getMovesForAction(ike));
         for (ike in 0...moves.length) {
             for (move in moves[ike]) {
                 str += spitMove(ike, move) + ', \n';
@@ -186,15 +194,23 @@ class Game {
         return historian.history.commit();
     }
 
-    private function updateAll():Void {
-        historian.key.lock();
-        for (action in actions) action.update();
-        historian.key.unlock();
+    private function invalidate():Void {
+        for (ike in 0...actions.length) {
+            moveCache[ike] = null;
+            quantumMoveCache[ike] = null;
+        }
     }
 
     private function collectAllMoves():Void {
         historian.key.lock();
         for (action in actions) action.collectMoves();
+        historian.key.unlock();
+    }
+
+    private inline function updateAction(index:Int):Void {
+        historian.key.lock();
+        actions[index].update();
+        moveCache[index] = actions[index].moves;
         historian.key.unlock();
     }
 

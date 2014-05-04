@@ -2,9 +2,6 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
-VisualNarrator
-    Pool NodeVOs and steps
-
 An action should be the index of the type of action, followed by the index of the move
     Then, the model should only enumerate the moves of the specified action
 
@@ -23,6 +20,7 @@ Refactor the console stuff- within reason
     It's a mess
 Support output hints
 
+Code review?
 
 Move the logic into a Worker
 Get referee to handle situations where a player takes too long to sync or move

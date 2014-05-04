@@ -1,5 +1,6 @@
 package net.rezmason.scourge.controller;
 
+import net.rezmason.ropes.RopesTypes.Move;
 import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeAction.QUIT_ACTION;
@@ -15,13 +16,15 @@ class ReplaySmarts extends Smarts {
     }
 
     override public function choose(game:Game):GameEventType {
-        var moves = game.getMoves();
         // trace(moves[1].length);
         var type:GameEventType = log.shift().type;
-
         var params = Type.enumParameters(type);
-        if (moves[params[0]].length < params[1] + 1) {
-            // trace('Move failure: $type < ${moves[params[0]].length}');
+        var actionIndex:Int = params[0];
+        var moveIndex:Int = params[1];
+        var moves:Array<Move> = game.getMovesForAction(actionIndex);
+        
+        if (moves.length < moveIndex + 1) {
+            // trace('Move failure: $type < ${moves.length}');
             type = null;
         }
 
