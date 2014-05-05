@@ -8,7 +8,6 @@ import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.scourge.model.BoardUtils;
-using Lambda;
 
 import net.rezmason.scourge.model.aspects.*;
 
@@ -116,7 +115,10 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
     private inline function poolObjects(grabAll:Bool = false):Void {
         if (sequence != null) {
             for (step in sequence) {
-                for (vo in step.nodeVOs) if (vo != null && (grabAll || !nodeVOs.has(vo))) nodePool.push(vo);
+                for (ike in 0...step.nodeVOs.length) {
+                    var vo:NodeVO = step.nodeVOs[ike];
+                    if (vo != null && (grabAll || nodeVOs[ike] != vo)) nodePool.push(vo);
+                }
                 stepPool.push(step);
             }
         }
