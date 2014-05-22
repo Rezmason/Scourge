@@ -2,16 +2,22 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
-An action should be the index of the type of action, followed by the index of the move
-    Then, the model should only enumerate the moves of the specified action
+
+
+
+Add neighbor bitfield changes to sequencer
+Add distance changes to sequencer
 
 Animation system
-    The narrative needs to be turned into a bunch of animations
-    Sequencing
-        Signals
-        Timeout handling
-        Don't confuse the reasoning phase with the narrative phase
-            Talk to coworkers about this stuff; it's likely that players can cheat if this is mishandled
+    Board body should operate on node VOs, not the game model itself
+        But, the board body operates on the node map
+            - For breathing / speaking
+            - For reflexive response to pain
+                How will this even freakin' work?
+        BoardBody also has some sense of form
+        Does this logic belong in the sequencer?
+        Or should the board body have access to the game?
+    The cause-effect sequence needs to be turned into a bunch of animations
 
 Human players, GUISystem
     Implement abstract commands

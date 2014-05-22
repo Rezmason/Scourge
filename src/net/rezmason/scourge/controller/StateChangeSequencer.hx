@@ -14,6 +14,8 @@ import net.rezmason.scourge.model.aspects.*;
 class StateChangeSequencer extends PlayerSystem implements Spectator {
 
     public var updateSignal(default, null):Zig<GameEvent->Void>;
+    public var sequenceStartSignal(default, null):Zig<Int->Array<NodeVO>->Void>;
+    public var sequenceUpdateSignal(default, null):Zig<Int->Array<SequenceStep>->Void>;
     static var nodeStateMap:Array<Null<NodeState>> = makeNodeStateMap();
     static var nodeEffectMap:Map<NodeState, Map<NodeState, Null<NodeEffect>>> = makeNodeEffectMap();
 
@@ -33,9 +35,11 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
 
     var headNodes:Array<AspectSet>;
     
-    public function new(syncPeriod:Null<Float>, movePeriod:Null<Float>):Void {
-        super(syncPeriod, movePeriod);
+    public function new():Void {
+        super();
         updateSignal = new Zig();
+        sequenceStartSignal = new Zig();
+        sequenceUpdateSignal = new Zig();
         updateSignal.add(onUpdate);
         onAlert = addSequenceStep;
         nodePool = [];
@@ -81,6 +85,8 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         lastStep = getStep(nodeVOs.copy());
         sequence = [lastStep];
         maxFreshness = 0;
+
+        sequenceStartSignal.dispatch(game.state.players.length, nodeVOs);
     }
 
     private inline function beginSequence():Void {
@@ -94,7 +100,6 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         var nodeVOsByFreshness:Array<NodeVO> = [];
         for (ike in 1...sequence.length) {
             var step:SequenceStep = sequence[ike];
-            for (nodeVO in step.nodeVOs) if (nodeVO != null) nodeVO.freshness /= maxFreshness;
             nodeVOsByFreshness = nodeVOsByFreshness.concat(step.nodeVOs.filter(isNotNull));
         }
         nodeVOsByFreshness.sort(whichNodeIsFresher);
@@ -104,6 +109,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         
         // Trigger the view stuff.
 
+        sequenceUpdateSignal.dispatch(maxFreshness, sequence);
     }
 
     private inline function destroySequence():Void {
@@ -127,7 +133,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
     private function isNotNull(vo:NodeVO):Bool return vo != null;
 
     private function whichNodeIsFresher(vo1:NodeVO, vo2:NodeVO):Int {
-        var diff:Float = vo1.freshness - vo2.freshness;
+        var diff:Int = vo1.freshness - vo2.freshness;
         var val:Int = 0;
         if (diff < 0) val = -1;
         else if (diff > 0) val = 1;
@@ -147,7 +153,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         // update the head table
         for (ike in 0...game.state.players.length) headNodes[ike] = nodes[game.state.players[ike][head_]];
 
-        // Decay and Cavity rules should be narrated *simultaneously*
+        // Decay and Cavity rule changes should be timed *simultaneously*
         if (cause == "CavityRule" && lastStep.cause == "DecayRule") {
             step = lastStep;
         } else {
@@ -174,7 +180,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
 
     private function getNodeVO(id:Int, cause:String = null):NodeVO {
         var vo:NodeVO = nodePool.pop();
-        if (vo == null) vo = {id:0, occupier:0, freshness:0, state:Empty, cause:null};
+        if (vo == null) vo = {id:0, occupier:0, lastOccupier:0, freshness:0, state:Empty, cause:null};
         var node:AspectSet = game.state.nodes[id];
         
         var occupier:Int = node[occupier_];
@@ -185,6 +191,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         vo.id = id;
         vo.cause = cause;
         vo.occupier = occupier;
+        vo.lastOccupier = (nodeVOs[id] != null) ? nodeVOs[id].occupier : occupier;
         vo.freshness = node[freshness_];
         vo.state = nodeStateMap[(isOccupied ? 1 : 0) | (isFilled ? 2 : 0) | (isHead ? 4 : 0)];
 

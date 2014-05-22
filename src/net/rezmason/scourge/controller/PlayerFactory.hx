@@ -11,7 +11,7 @@ class PlayerFactory {
 
     }
 
-    public function makePlayers(defs:Array<PlayerDef>, signal:PlaySignal, syncPeriod:Null<Float>, movePeriod:Null<Float>):Array<Player> {
+    public function makePlayers(defs:Array<PlayerDef>, signal:PlaySignal):Array<Player> {
         var players:Array<Player> = [];
 
         var botSystem:BotSystem = null;
@@ -22,9 +22,9 @@ class PlayerFactory {
 
             var player:Player = null;
             switch (def) {
-                case Test(proxy): player = new TestPlayer(ike, signal, proxy, syncPeriod, movePeriod);
+                case Test(proxy): player = new TestPlayer(ike, signal, proxy);
                 case Bot(smarts, period):
-                    if (botSystem == null) botSystem = new BotSystem(syncPeriod, movePeriod);
+                    if (botSystem == null) botSystem = new BotSystem();
                     player = botSystem.createPlayer(ike, signal, smarts, period);
                 // case Human:
                 // case Remote:

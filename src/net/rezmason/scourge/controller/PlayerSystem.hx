@@ -14,12 +14,8 @@ class PlayerSystem {
     private var floats:Array<Float>;
     private var playSignal:PlaySignal;
     private var onAlert:String->Void;
-    private var syncPeriod:Null<Float>;
-    private var movePeriod:Null<Float>;
 
-    function new(syncPeriod:Null<Float>, movePeriod:Null<Float>):Void {
-        this.syncPeriod = syncPeriod;
-        this.movePeriod = movePeriod;
+    function new():Void {
         game = new Game();
         floats = [];
     }

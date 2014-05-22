@@ -71,12 +71,9 @@ enum NodeEffect {
 typedef NodeVO = {
     var id:Int;
     var occupier:Int;
-    /*
-    var isHead:Bool;
-    var isFilled:Bool;
-    */
+    var lastOccupier:Int;
     var state:Null<NodeState>;
-    var freshness:Float;
+    var freshness:Int;
     @:optional var cause:String;
     @:optional var effect:NodeEffect;
 };

@@ -16,9 +16,6 @@ using Lambda;
 
 class GameSystem {
 
-    static var syncPeriod:Float = 1;
-    static var movePeriod:Float = 10;
-
     public var referee(default, null):Referee;
     public var sequencer(default, null):StateChangeSequencer;
     public var boardBody(default, null):BoardBody;
@@ -27,7 +24,7 @@ class GameSystem {
 
     public function new(boardBody:BoardBody, console:ConsoleUIMediator):Void {
         referee = new Referee();
-        sequencer = new StateChangeSequencer(syncPeriod, movePeriod);
+        sequencer = new StateChangeSequencer();
         
         this.boardBody = boardBody;
         this.console = console;
@@ -36,7 +33,8 @@ class GameSystem {
     public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, botPeriod:Int, isReplay:Bool):Void {
 
         if (referee.gameBegun) referee.endGame();
-        //sequencer.viewSignal.removeAll();
+        sequencer.sequenceUpdateSignal.removeAll();
+        sequencer.sequenceStartSignal.removeAll();
 
         var playerDefs:Array<PlayerDef> = [];
         var randGen:Void->Float = randomFunction;
@@ -59,14 +57,9 @@ class GameSystem {
             playerDefs:playerDefs,
             spectators:[sequencer],
             randGen:randGen,
-            gameConfig:config,
-            syncPeriod:syncPeriod,
-            movePeriod:movePeriod,
+            gameConfig:config
         });
 
-        //boardBody.attach(sequencer.getGame(), referee.numPlayers);
-        //sequencer.viewSignal.add(boardBody.invalidateBoard);
-        //sequencer.viewSignal.add(updateConsole);
     }
 
     function playerActionsOnly(event:GameEvent):Bool {

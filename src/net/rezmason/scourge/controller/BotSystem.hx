@@ -12,8 +12,8 @@ class BotSystem extends PlayerSystem {
     private var ballots:Array<GameEvent>;
     private var numBots:Int;
 
-    public function new(syncPeriod:Null<Float>, movePeriod:Null<Float>):Void {
-        super(syncPeriod, movePeriod);
+    public function new():Void {
+        super();
 
         botsByIndex = new Map();
         botSignal = new Zig();

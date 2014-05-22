@@ -18,8 +18,6 @@ typedef RefereeParams = {
     var gameConfig:ScourgeConfig;
     @:optional var spectators:Array<Spectator>;
     @:optional var savedGame:SavedGame;
-    @:optional var syncPeriod:Float;
-    @:optional var movePeriod:Float;
 }
 
 class Referee {
@@ -38,8 +36,6 @@ class Referee {
     var busy:Bool;
     var playerFactory:PlayerFactory;
     var playSignal:PlaySignal;
-    var syncPeriod:Null<Float>;
-    var movePeriod:Null<Float>;
 
     public var lastGame(default, null):SavedGame;
     public var lastGameConfig(default, null):ScourgeConfig;
@@ -81,11 +77,9 @@ class Referee {
 
         gameConfig = params.gameConfig;
         randGen = params.randGen;
-        syncPeriod = params.syncPeriod;
-        movePeriod = params.movePeriod;
         spectators = params.spectators;
         // Not sure if this belongs here.
-        players = playerFactory.makePlayers(params.playerDefs, playSignal, syncPeriod, movePeriod);
+        players = playerFactory.makePlayers(params.playerDefs, playSignal);
         clearFloats();
 
         game.begin(params.gameConfig, generateRandomFloat, null, savedGameState);
