@@ -1,10 +1,6 @@
 package net.rezmason.scourge;
 
 class Colors {
-    public inline static function white():Color return {r:1, g:1, b:1};
-    public inline static function red():Color return {r:1, g:0, b:0};
-    public inline static function blue():Color return {r:0, g:0, b:1};
-
     public inline static function mult(color:Color, val:Float):Color {
         return {
             r: color.r * val,

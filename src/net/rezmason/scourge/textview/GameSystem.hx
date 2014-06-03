@@ -28,13 +28,14 @@ class GameSystem {
         
         this.boardBody = boardBody;
         this.console = console;
+
+        sequencer.sequenceStartSignal.add(boardBody.presentStart);
+        sequencer.sequenceUpdateSignal.add(boardBody.presentSequence);
     }
 
-    public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, botPeriod:Int, isReplay:Bool):Void {
+    public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, thinkPeriod:Int, animatePeriod:Int, isReplay:Bool):Void {
 
         if (referee.gameBegun) referee.endGame();
-        sequencer.sequenceUpdateSignal.removeAll();
-        sequencer.sequenceStartSignal.removeAll();
 
         var playerDefs:Array<PlayerDef> = [];
         var randGen:Void->Float = randomFunction;
@@ -44,14 +45,16 @@ class GameSystem {
             var log:Array<GameEvent> = referee.lastGame.log.filter(playerActionsOnly);
             var floats:Array<Float> = referee.lastGame.floats.copy();
             randGen = function() return floats.shift();
-            while (playerDefs.length < config.numPlayers) playerDefs.push(Bot(new ReplaySmarts(log), botPeriod));
+            while (playerDefs.length < config.numPlayers) playerDefs.push(Bot(new ReplaySmarts(log), thinkPeriod));
         } else {
             while (playerDefs.length < config.numPlayers) {
                 var char:String = playerPattern[playerDefs.length];
-                var pdef = (char == 'b' ? Bot(new RandomSmarts(), botPeriod) : Human);
+                var pdef = (char == 'b' ? Bot(new RandomSmarts(), thinkPeriod + animatePeriod) : Human);
                 playerDefs.push(pdef);
             }
         }
+
+        sequencer.setAnimationPeriod(animatePeriod);
 
         referee.beginGame({
             playerDefs:playerDefs,
@@ -59,7 +62,6 @@ class GameSystem {
             randGen:randGen,
             gameConfig:config
         });
-
     }
 
     function playerActionsOnly(event:GameEvent):Bool {

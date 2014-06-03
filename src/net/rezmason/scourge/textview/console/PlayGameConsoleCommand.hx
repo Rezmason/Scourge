@@ -19,7 +19,8 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         name = 'play';
 
         keys['playerPattern'] = PLAYER_PATTERN;
-        keys['botPeriod'] = INTEGERS;
+        keys['thinkPeriod'] = INTEGERS;
+        keys['animatePeriod'] = INTEGERS;
         flags.push('replay');
         flags.push('circular');
     }
@@ -50,9 +51,13 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         if (playerPattern.length > numPlayers) playerPattern = playerPattern.slice(0, numPlayers);
         while (playerPattern.length < numPlayers) playerPattern.push('b');
 
-        var botPeriodString:String = args.keyValuePairs['botPeriod'];
-        if (botPeriodString == null) botPeriodString = '1000';
-        var botPeriod:Int = Std.parseInt(botPeriodString);
+        var thinkPeriodString:String = args.keyValuePairs['thinkPeriod'];
+        if (thinkPeriodString == null) thinkPeriodString = '10';
+        var thinkPeriod:Int = Std.parseInt(thinkPeriodString);
+
+        var animatePeriodString:String = args.keyValuePairs['animatePeriod'];
+        if (animatePeriodString == null) animatePeriodString = '1000';
+        var animatePeriod:Int = Std.parseInt(animatePeriodString);
 
         var circular:Bool = args.flags.has('circular');
 
@@ -68,7 +73,7 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         cfg.maxBites = 0;
         cfg.maxSkips = 3;
 
-        gameSystem.beginGame(cfg, playerPattern, botPeriod, isReplay);
+        gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animatePeriod, isReplay);
         displaySystem.showBody('board', 'main');
 
         message = 'Starting $numPlayers-player game.';

@@ -57,28 +57,11 @@ enum NodeState {
     Head;
 }
 
-enum NodeEffect {
-    BodyEaten;
-    BodyKilled;
-    CavityFadesOver;
-    CavityFadesIn;
-    CavityFadesOut;
-    PieceDropsDown;
-    HeadEaten;
-    HeadKilled;
-}
-
 typedef NodeVO = {
     var id:Int;
     var occupier:Int;
-    var lastOccupier:Int;
-    var state:Null<NodeState>;
+    var state:NodeState;
     var freshness:Int;
-    @:optional var cause:String;
-    @:optional var effect:NodeEffect;
 };
 
-typedef SequenceStep = {
-    var nodeVOs:Array<NodeVO>;
-    var cause:String;
-}
+typedef NodePosition = {x:Float, y:Float, z:Float};
