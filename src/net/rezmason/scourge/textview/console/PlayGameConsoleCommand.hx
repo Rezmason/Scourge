@@ -65,13 +65,13 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         cfg.pieceTableIDs = cfg.pieces.getAllPieceIDsOfSize(4);
         cfg.allowRotating = true;
         cfg.circular = circular;
-        cfg.allowNowhereDrop = true;
+        cfg.allowNowhereDrop = false;
         cfg.numPlayers = numPlayers;
         cfg.includeCavities = true;
 
-        cfg.maxSwaps = 0;
-        cfg.maxBites = 0;
-        cfg.maxSkips = 3;
+        cfg.maxSwaps = 5;
+        cfg.maxBites = 5;
+        cfg.maxSkips = 0;
 
         gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animatePeriod, isReplay);
         displaySystem.showBody('board', 'main');

@@ -64,7 +64,7 @@ class BotSystem extends PlayerSystem {
 
     override private function init(configData:String, saveData:String):Void {
         super.init(configData, saveData);
-        for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game);
+        for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game, config);
     }
 
     override private function connect():Void beat(announceReady);

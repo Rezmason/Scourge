@@ -8,9 +8,13 @@ import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeAction.*;
 import net.rezmason.scourge.model.ScourgeConfig;
 
-using Lambda;
+import net.rezmason.ropes.RopesTypes;
+import net.rezmason.scourge.model.aspects.BodyAspect;
+import net.rezmason.scourge.model.aspects.OwnershipAspect;
 
-class RandomSmarts extends Smarts {
+using net.rezmason.ropes.StatePlan;
+
+class BasicSmarts extends Smarts {
 
     private var dropActionIndex:Int;
     private var swapActionIndex:Int;
@@ -18,6 +22,8 @@ class RandomSmarts extends Smarts {
     private var quitActionIndex:Int;
     private var otherActionIndices:Array<Int>;
     private var canSkip:Bool;
+    private var totalArea_:AspectPtr;
+    private var occupier_:AspectPtr;
     
     override public function init(game:Game, config:ScourgeConfig):Void {
         super.init(game, config);
@@ -26,6 +32,9 @@ class RandomSmarts extends Smarts {
         biteActionIndex = game.actionIDs.indexOf(BITE_ACTION);
         quitActionIndex = game.actionIDs.indexOf(QUIT_ACTION);
         canSkip = config.allowNowhereDrop;
+
+        totalArea_ = game.plan.onPlayer(BodyAspect.TOTAL_AREA);
+        occupier_ = game.plan.onNode(OwnershipAspect.OCCUPIER);
     }
 
     override public function choose(game:Game):GameEventType {
@@ -54,7 +63,31 @@ class RandomSmarts extends Smarts {
         if (type == null) {
             var biteMoves:Array<Move> = game.getMovesForAction(biteActionIndex);
             if (biteMoves.length > 0) {
-                choice = biteMoves.length - 1;
+
+                var biteSizes:Array<Int> = biteMoves.map(function(_) return (cast _).bitNodes.length);
+                var maxBiteSize:Int = biteSizes[biteSizes.length - 1];
+                var maxBiteSizeIndex:Int = biteSizes.indexOf(maxBiteSize);
+
+                var maxReduction:Int = 0;
+                var maxReductionIndex:Int = 0;
+                var players = game.state.players;
+                var nodes = game.state.nodes;
+                var itr:Int = 0;
+                for (ike in maxBiteSizeIndex...biteMoves.length) {
+                    trace('---> $itr');
+                    var enemy = players[nodes[(cast biteMoves[ike]).bitNodes[0]][occupier_]];
+                    var enemySize:Int = enemy[totalArea_];
+                    game.chooseMove(biteActionIndex, ike);
+                    var reduction:Int = enemySize - enemy[totalArea_];
+                    game.rewind(rev);
+                    if (maxReduction < reduction) {
+                        maxReduction = reduction;
+                        maxReductionIndex = ike;
+                    }
+                    itr++;
+                }
+                
+                choice = maxReductionIndex;
                 type = PlayerAction(SubmitMove(biteActionIndex, choice));
             }
         }

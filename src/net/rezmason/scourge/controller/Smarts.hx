@@ -2,6 +2,7 @@ package net.rezmason.scourge.controller;
 
 import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
+import net.rezmason.scourge.model.ScourgeConfig;
 
 class Smarts {
 
@@ -9,7 +10,7 @@ class Smarts {
 
     public function new():Void {}
 
-    public function init(game:Game):Void {
+    public function init(game:Game, config:ScourgeConfig):Void {
         actionIndicesByAction = new Map();
         for (ike in 0...game.actionIDs.length) actionIndicesByAction[game.actionIDs[ike]] = ike;
     }

@@ -1,6 +1,7 @@
 package net.rezmason.scourge.textview;
 
 import net.rezmason.scourge.controller.RandomSmarts;
+import net.rezmason.scourge.controller.BasicSmarts;
 import net.rezmason.scourge.controller.Referee;
 import net.rezmason.scourge.controller.ReplaySmarts;
 import net.rezmason.scourge.controller.StateChangeSequencer;

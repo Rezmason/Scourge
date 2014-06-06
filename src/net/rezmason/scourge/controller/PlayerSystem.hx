@@ -14,6 +14,7 @@ class PlayerSystem {
     private var floats:Array<Float>;
     private var playSignal:PlaySignal;
     private var onAlert:String->Void;
+    private var config:ScourgeConfig;
 
     function new():Void {
         game = new Game();
@@ -43,7 +44,8 @@ class PlayerSystem {
 
     private function init(configData:String, saveData:String):Void {
         var savedState:SavedState = saveData != null ? Unserializer.run(saveData).state : null;
-        game.begin(Unserializer.run(configData), retrieveRandomFloat, onAlert, savedState);
+        config = Unserializer.run(configData);
+        game.begin(config, retrieveRandomFloat, onAlert, savedState);
     }
 
     private function endGame():Void game.end();

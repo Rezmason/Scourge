@@ -43,7 +43,7 @@ class TestPlayer extends PlayerSystem implements Player {
 
     override private function init(configData:String, saveData:String):Void {
         super.init(configData, saveData);
-        smarts.init(game);
+        smarts.init(game, config);
     }
 
     override private function connect():Void proxy(game, announceReady);
