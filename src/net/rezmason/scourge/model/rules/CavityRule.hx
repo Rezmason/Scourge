@@ -59,23 +59,23 @@ class CavityRule extends Rule {
         // Find edge nodes of current player
         var bodyNode:AspectSet = getNode(player[bodyFirst_]);
 
-        if (bodyNode == null) return;
+        if (bodyNode != null) {
+            var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_);
+            edgeNodes = edgeNodes.filter(hasDifferentNeighbor.bind(bodyNode[occupier_]));
 
-        var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_);
-        edgeNodes = edgeNodes.filter(hasDifferentNeighbor.bind(bodyNode[occupier_]));
-
-        // For each edge node,
-        for (edgeNode in edgeNodes) {
-            var edgeLocus = getNodeLocus(edgeNode);
-            // For each empty ortho neighbor,
-            for (direction in GridUtils.orthoDirections()) {
-                var neighbor = edgeLocus.neighbors[direction];
-                if (neighbor.value[isFilled_] == Aspect.FALSE) {
-                    // make an edge that's in-no-group
-                    currentEdge = makeEdge(getID(edgeNode), direction);
-                    edgeGroupIDs[currentEdge] = -1;
-                    allEdges[numEdges] = currentEdge;
-                    numEdges++;
+            // For each edge node,
+            for (edgeNode in edgeNodes) {
+                var edgeLocus = getNodeLocus(edgeNode);
+                // For each empty ortho neighbor,
+                for (direction in GridUtils.orthoDirections()) {
+                    var neighbor = edgeLocus.neighbors[direction];
+                    if (neighbor.value[isFilled_] == Aspect.FALSE) {
+                        // make an edge that's in-no-group
+                        currentEdge = makeEdge(getID(edgeNode), direction);
+                        edgeGroupIDs[currentEdge] = -1;
+                        allEdges[numEdges] = currentEdge;
+                        numEdges++;
+                    }
                 }
             }
         }

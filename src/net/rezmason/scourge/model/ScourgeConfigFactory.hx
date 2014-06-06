@@ -31,7 +31,7 @@ class ScourgeConfigFactory {
     static var KILL_HEADLESS_BODY:String = Siphon.getClassName(KillHeadlessBodyRule);
     static var PICK_PIECE:String         = Siphon.getClassName(PickPieceRule);
     static var REPLENISH:String          = Siphon.getClassName(ReplenishRule);
-    static var STALEMATE:String    = Siphon.getClassName(StalemateRule);
+    static var STALEMATE:String          = Siphon.getClassName(StalemateRule);
     static var ONE_LIVING_PLAYER:String  = Siphon.getClassName(OneLivingPlayerRule);
     static var BITE:String               = Siphon.getClassName(BiteRule);
     static var SWAP_PIECE:String         = Siphon.getClassName(SwapPieceRule);
@@ -108,7 +108,6 @@ class ScourgeConfigFactory {
             DECAY => makeDecayConfig(config),
             DROP_PIECE => makeDropPieceConfig(config),
             REPLENISH => makeReplenishConfig(config, buildCfg),
-            STALEMATE => makeSkipsExhaustedConfig(config),
 
             END_TURN => null,
             FORFEIT => null,
@@ -120,6 +119,7 @@ class ScourgeConfigFactory {
         if (config.includeCavities) ruleConfig.set(CAVITY, null);
         if (!config.allowAllPieces && config.maxSwaps > 0) ruleConfig.set(SWAP_PIECE, makeSwapConfig(config));
         if (config.maxBites > 0) ruleConfig.set(BITE, makeBiteConfig(config));
+        if (config.maxSkips > 0) ruleConfig.set(STALEMATE, makeSkipsExhaustedConfig(config));
 
         return ruleConfig;
     }
@@ -132,12 +132,13 @@ class ScourgeConfigFactory {
 
             START_ACTION => [CLEAN_UP],
             QUIT_ACTION  => [FORFEIT, CLEAN_UP, WRAP_UP],
-            DROP_ACTION  => [DROP_PIECE, EAT_CELLS, CLEAN_UP, WRAP_UP, STALEMATE],
+            DROP_ACTION  => [DROP_PIECE, EAT_CELLS, CLEAN_UP, WRAP_UP],
         ];
 
         if (config.includeCavities) combinedRuleConfig[CLEAN_UP].insert(1, CAVITY);
         if (!config.allowAllPieces && config.maxSwaps > 0) combinedRuleConfig[SWAP_ACTION] = [SWAP_PIECE, PICK_PIECE];
         if (config.maxBites > 0) combinedRuleConfig[BITE_ACTION] = [BITE, CLEAN_UP];
+        if (config.maxSkips > 0) combinedRuleConfig[DROP_ACTION].push(STALEMATE);
 
         if (!config.allowAllPieces) {
             combinedRuleConfig[START_ACTION].push(PICK_PIECE);
