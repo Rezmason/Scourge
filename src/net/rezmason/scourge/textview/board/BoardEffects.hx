@@ -4,9 +4,11 @@ import net.rezmason.scourge.controller.ControllerTypes.NodeState;
 import net.rezmason.scourge.textview.board.BoardTypes;
 import net.rezmason.scourge.textview.core.Glyph;
 
+import net.kawa.tween.easing.*;
+
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-typedef BoardEffect = NodeTween->Float->Void;
+typedef BoardEffect = NodeView->String->Float->Float->NodeProps->NodeProps->Array<NodeTween>->Void;
 
 class BoardEffects {
 
@@ -15,135 +17,87 @@ class BoardEffects {
     public static function getEffectForStateChange(state1:NodeState, state2:NodeState):BoardEffect {
         var effect:BoardEffect = null;
         if (state1 != null && state2 != null) {
-            if (state1 == state2) {
-                effect = animateLinear;
-            } else if (EFFECTS_BY_STATE_CHANGE[state1] != null && EFFECTS_BY_STATE_CHANGE[state1][state2] != null) {
+            if (EFFECTS_BY_STATE_CHANGE[state1] != null && EFFECTS_BY_STATE_CHANGE[state1][state2] != null) {
                 effect = EFFECTS_BY_STATE_CHANGE[state1][state2];
             } else {
-                trace('No effect for $state1-->$state2');
+                if (state1 != state2) trace('No effect for $state1-->$state2');
                 effect = animateLinear;
             }
         } else {
             trace('Null state: $state1-->$state2');
             effect = animateLinear;
         }
-        return animateLinear;
+        return effect;
     }
     
     // ------- EFFECTS ------- //
 
-    public static function animateLinear(tween:NodeTween, now:Float):Void {
-        //trace('animateLinear ${getTimeFrac(tween.start, tween.duration, now)}');
-        var frac:Float = getTimeFrac(tween.start, tween.duration, now);
-        
-        var topGlyph:Glyph = tween.view.topGlyph;
-        var bottomGlyph:Glyph = tween.view.bottomGlyph;
-
-        topGlyph.set_s(interp(tween.from.topSize, tween.to.topSize , frac));
-        topGlyph.set_rgb(
-            interp(tween.from.topColor.r, tween.to.topColor.r, frac),
-            interp(tween.from.topColor.g, tween.to.topColor.g, frac),
-            interp(tween.from.topColor.b, tween.to.topColor.b, frac)
-        );
-        
-        if (tween.from.topChar == -1) {
-            if (tween.view.topGlyph.get_char() != tween.to.topChar) {
-                topGlyph.set_char(tween.to.topChar, tween.to.topFont);
-            }
-        } else if (tween.from.topChar != tween.to.topChar) {
-            if (frac < 0.5) {
-                topGlyph.set_f(interp(0.5, 0, frac * 2));
-            } else {
-                topGlyph.set_f(interp(0, 0.5, frac * 2 - 1));
-                if (topGlyph.get_char() != tween.to.topChar) {
-                    topGlyph.set_char(tween.to.topChar, tween.to.topFont);
-                }
-            }
-        }
-
-        bottomGlyph.set_s(interp(tween.from.bottomSize, tween.to.bottomSize , frac));
-        bottomGlyph.set_rgb(
-            interp(tween.from.bottomColor.r, tween.to.bottomColor.r, frac),
-            interp(tween.from.bottomColor.g, tween.to.bottomColor.g, frac),
-            interp(tween.from.bottomColor.b, tween.to.bottomColor.b, frac)
-        );
-        
-        if (tween.from.bottomChar == -1) {
-            if (tween.view.bottomGlyph.get_char() != tween.to.bottomChar) {
-                bottomGlyph.set_char(tween.to.bottomChar, tween.to.bottomFont);
-            }
-        } else if (tween.from.bottomChar != tween.to.bottomChar) {
-            if (frac < 0.5) {
-                bottomGlyph.set_f(interp(0.5, 0, frac * 2));
-            } else {
-                bottomGlyph.set_f(interp(0, 0.5, frac * 2 - 1));
-                if (bottomGlyph.get_char() != tween.to.bottomChar) {
-                    bottomGlyph.set_char(tween.to.bottomChar, tween.to.bottomFont);
-                }
-            }
-        }
+    static function animateLinear(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
+        arr.push(makeTween(view, cause, start, duration, from, to));
     };
 
-    public static function animateBodyEaten(tween:NodeTween, now:Float):Void {
-        //trace('animateBodyEaten ${getTimeFrac(tween.start, tween.duration, now)}');
-        animateLinear(tween, now); // TEMPORARY
+    static function animateBodyEaten(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
+        arr.push(makeTween(view, cause, start, duration, from, to)); // TEMPORARY
         // Raise out, then drop in
         // change color linearly
     };
 
-    public static function animateBodyKilled(tween:NodeTween, now:Float):Void {
-        //trace('animateBodyKilled ${getTimeFrac(tween.start, tween.duration, now)}');
-        animateLinear(tween, now); // TEMPORARY
-        // View is suddenly no longer alive
-        // turn pale, then lowers out
+    static function animateBodyKilled(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
+        var mid:NodeProps = cloneProps(from);
+        mid.top.color.r = (mid.top.color.r + 0.75) / 2;
+        mid.top.color.g = (mid.top.color.g + 0.75) / 2;
+        mid.top.color.b = (mid.top.color.b + 0.75) / 2;
+        arr.push(makeTween(view, cause, start, duration * 0.5, from, mid, Quad.easeInOut));
+        arr.push(makeTween(view, cause, start + 0.5 * duration, duration * 0.5, mid, to, Quad.easeIn));
     };
 
-    public static function animateCavityFadesOver(tween:NodeTween, now:Float):Void {
-        //trace('animateCavityFadesOver ${getTimeFrac(tween.start, tween.duration, now)}');
-        animateLinear(tween, now); // TEMPORARY
-        // change color in-out
+    static function animateCavityFade(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
+        var mid:NodeProps = cloneProps(to);
+        //mid.bottom.size = to.bottom.size * 1.25;
+        arr.push(makeTween(view, cause, start, duration * 0.5, from, mid, Circ.easeOut));
+        arr.push(makeTween(view, cause, start + 0.5 * duration, duration * 0.5, mid, to, Circ.easeIn));
     };
 
-    public static function animateCavityFadesIn(tween:NodeTween, now:Float):Void {
-        //trace('animateCavityFadesIn ${getTimeFrac(tween.start, tween.duration, now)}');
-        animateLinear(tween, now); // TEMPORARY
-        // change color in
+    static function animatePieceDropsDown(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
+        from.top.pop = -0.3;
+        from.top.color.r = 0;
+        from.top.color.g = 0;
+        from.top.color.b = 0;
+        //from.top.size = 3;
+        from.top.thickness = 0.8;
+        var hotProps:NodeProps = cloneProps(to);
+        hotProps.top.color.r = 1;
+        hotProps.top.color.g = 1;
+        hotProps.top.color.b = 1;
+        // hotProps.top.size = 1.2;
+        hotProps.top.thickness = 0.7;
+        arr.push(makeTween(view, cause, start, duration * 0.3, from, hotProps, Quint.easeIn));
+        arr.push(makeTween(view, cause, start + duration * 0.3, duration * 0.7, hotProps, to, Quad.easeIn));
     };
 
-    public static function animateCavityFadesOut(tween:NodeTween, now:Float):Void {
-        //trace('animateCavityFadesOut ${getTimeFrac(tween.start, tween.duration, now)}');
-        animateLinear(tween, now); // TEMPORARY
-        // change color out
-    };
-
-    public static function animatePieceDropsDown(tween:NodeTween, now:Float):Void {
-        //trace('animatePieceDropsDown ${getTimeFrac(tween.start, tween.duration, now)}');
-        animateLinear(tween, now); // TEMPORARY
-        // sudden
-        // bounce down as white, then fade out to natural color
-    };
-
-    public static function animateHeadEaten(tween:NodeTween, now:Float):Void {
-        //trace('animateHeadEaten ${getTimeFrac(tween.start, tween.duration, now)}');
-        animateLinear(tween, now); // TEMPORARY
+    static function animateHeadEaten(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
+        arr.push(makeTween(view, cause, start, duration, from, to)); // TEMPORARY
         // TODO - deserves special effect?
     };
 
-    public static function animateHeadKilled(tween:NodeTween, now:Float):Void {
-        //trace('animateHeadKilled ${getTimeFrac(tween.start, tween.duration, now)}');
-        animateLinear(tween, now); // TEMPORARY
+    static function animateHeadKilled(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
+        arr.push(makeTween(view, cause, start, duration, from, to)); // TEMPORARY
         // TODO - deserves special effect?
     };
+
+    inline static function makeTween(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, ease:Float->Float = null):NodeTween {
+        return {view:view, cause:cause, from:from, to:to, start:start, duration:duration, ease:ease};
+    }
 
     inline static function makeEffectMap():Map<NodeState, Map<NodeState, Null<BoardEffect>>> {
         return [
             Empty => [
-                Cavity => animateCavityFadesIn, 
+                Cavity => animateCavityFade, 
                 Body => animatePieceDropsDown,
             ],
             Cavity => [
-                Empty => animateCavityFadesOut, 
-                Cavity => animateCavityFadesOver, 
+                Empty => animateCavityFade, 
+                Cavity => animateCavityFade, 
                 Body => animatePieceDropsDown,
             ],
             Wall => [
@@ -162,8 +116,23 @@ class BoardEffects {
         ];
     }
 
-    inline static function getTimeFrac(start:Float, duration:Float, now:Float):Float return (now - start) / duration;
+    inline static function cloneProps(props:NodeProps):NodeProps {
+        return {top:cloneGlyphProps(props.top), bottom:cloneGlyphProps(props.bottom)};
+    }
 
-    inline static function interp(val1:Float, val2:Float, frac:Float):Float return val1 * (1 - frac) + val2 * frac;
+    inline static function cloneGlyphProps(glyphProps:NodeGlyphProps):NodeGlyphProps {
+        var copiedColor:Color = {
+            r:glyphProps.color.r,
+            g:glyphProps.color.g,
+            b:glyphProps.color.b,
+        };
+        return {
+            char:glyphProps.char, 
+            size:glyphProps.size, 
+            pop:glyphProps.pop, 
+            color:copiedColor, 
+            thickness:glyphProps.thickness,
+        };
+    }
 }
 

@@ -11,7 +11,6 @@ import net.rezmason.utils.Zig;
 
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.ropes.GridUtils;
-using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Pointers;
 
 class StateChangeSequencer extends PlayerSystem implements Spectator {

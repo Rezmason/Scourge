@@ -60,7 +60,7 @@ enum NodeState {
 typedef NodeVO = {
     var id:Int;
     var occupier:Int;
-    var state:NodeState;
+    var state:Null<NodeState>;
     var freshness:Int;
 };
 

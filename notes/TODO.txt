@@ -3,9 +3,6 @@ REMEMBER:
         Bottom up approach
 
 Board
-    Board animation
-        Effects should be generators of tweens, NOT updators of glyphs
-    Animation system needs to pool objects
     Bring back the wave pool
     Figure out how to do "pain"-related things
     Move some types around

@@ -9,20 +9,22 @@ typedef NodeTween = {
     var to:NodeProps;
     var view:NodeView;
     var start:Float;
-    var end:Float;
     var duration:Float;
-    var effect:BoardEffect;
+    var ease:Float->Float;
+    var cause:String;
+}
+
+typedef NodeGlyphProps = {
+    var size:Float;
+    var char:Int;
+    var color:Color;
+    var pop:Float;
+    var thickness:Float;
 }
 
 typedef NodeProps = {
-    var topSize:Float;
-    var topChar:Int;
-    var topColor:Color;
-    var bottomSize:Float;
-    var bottomChar:Int;
-    var bottomColor:Color;
-    var topFont:FlatFont;
-    var bottomFont:FlatFont;
+    var top:NodeGlyphProps;
+    var bottom:NodeGlyphProps;
 }
 
 typedef NodeView = {

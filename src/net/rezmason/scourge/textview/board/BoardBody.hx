@@ -138,18 +138,35 @@ class BoardBody extends Body {
 
     public function presentSequence(time:Float, maxFreshness:Int, causes:Array<String>, steps:Array<Array<NodeVO>>, distancesFromHead:Array<Int>, neighborBitfields:Array<Int>):Void {
         
-        if (numActiveTweens > 0) for (tween in nodeTweens) if (tween != null) tween.effect(tween, tween.end);
+        if (numActiveTweens > 0) {
+            var lastStr:String = '';
+            for (tween in nodeTweens) {
+                if (tween != null) {
+                    animateTween(tween, tween.start + tween.duration);
+                    lastStr += '*';
+                } else {
+                    lastStr += ' ';
+                }
+            }
+            lastStr += '\n';
+            //trace(lastStr);
+        }
 
         animationTime = 0;
         totalAnimationTime = time;
         nodeTweens = [];
 
-        var nodeVOs:Array<NodeVO> = steps.shift();
-        if (steps.length == 0) steps.push(nodeVOs);
+        var nodeVOs:Array<NodeVO> = steps[0];
+        
+        if (steps.length > 1) {
+            steps.shift();
+            causes.shift();
+        }
+
+        //for (ike in 0...causes.length) if (steps[ike].length > 0) trace('$ike ${causes[ike]}');
 
         var start:Float = 0;
-        var end:Float = 0;
-
+        
         for (ike in 0...steps.length) {
             var step:Array<NodeVO> = steps[ike];
             var cause:String = causes[ike];
@@ -162,24 +179,16 @@ class BoardBody extends Body {
                 if (lastFreshness < nodeVO.freshness) lastFreshness = nodeVO.freshness;
                 else start -= delta;
                 var view:NodeView = nodeViews[id];
-                var newProps:NodeProps = makeProps(nodeVO.state, nodeVO.occupier, neighborBitfields[id], distancesFromHead[id]);
+                var newProps:NodeProps = makeProps(nodeVO, neighborBitfields[id], distancesFromHead[id]);
                 var oldProps:NodeProps = view.props;
                 if (oldProps == null) oldProps = makeProps();
-                var tween:NodeTween = {
-                    from:oldProps, 
-                    to:newProps, 
-                    view:view, 
-                    start:start,
-                    duration:duration, 
-                    end:start + duration,
-                    effect:BoardEffects.getEffectForStateChange(nodeVOs[id].state, nodeVO.state),
-                };
 
-                if (end < tween.end) end = tween.end;
+                var effect:BoardEffect = BoardEffects.getEffectForStateChange(nodeVOs[id].state, nodeVO.state);
+                effect(view, cause, start, duration, oldProps, newProps, nodeTweens);
+
                 start += delta;
                 view.props = newProps;
                 if (nodeVO.state == Wall) view.topGlyph.set_z(view.z + WALL_TOP_OFFSET);
-                nodeTweens.push(tween);
                 nodeVOs[id] = nodeVO;
             }
         }
@@ -187,16 +196,21 @@ class BoardBody extends Body {
         numActiveTweens = nodeTweens.length;
         
         if (numActiveTweens > 0) {
+            var end:Float = 0;
+            for (tween in nodeTweens) if (end < tween.start + tween.duration) end = tween.start + tween.duration;
             // If the animation is too long, we need to compress it
             var scale:Float = time / end;
             if (scale < 1) {
                 for (tween in nodeTweens) {
                     tween.start *= scale;
                     tween.duration *= scale;
-                    tween.end *= scale;
                 }
             }
         }
+
+        var str:String = '';
+        for (tween in nodeTweens) str += Std.string(causes.indexOf(tween.cause));
+        //trace(str);
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
@@ -214,21 +228,31 @@ class BoardBody extends Body {
         
         if (numActiveTweens > 0) {
             animationTime += delta;
+            var str:String = '';
             for (ike in 0...nodeTweens.length) {
                 var tween:NodeTween = nodeTweens[ike];
-                if (tween != null && animationTime > tween.start) {
-                    if (animationTime > tween.end) {
-                        tween.effect(tween, tween.end);
+                if (tween != null) {
+                    if (animationTime < tween.start) {
+                        str += ' ';
+                    } else if (animationTime > tween.start + tween.duration) {
+                        str += '•';
+                        animateTween(tween, tween.start + tween.duration);
                         nodeTweens[ike] = null;
                         numActiveTweens--;
                     } else {
-                        tween.effect(tween, animationTime);
+                        str += '|';
+                        animateTween(tween, animationTime);
                     }
+                } else {
+                    str += ' ';
                 }
             }
 
+            //trace(str);
+
             if (numActiveTweens == 0) nodeTweens = [];
         }
+
 
         if (!dragging) {
             rawTransform.interpolateTo(plainTransform, 0.1);
@@ -298,66 +322,89 @@ class BoardBody extends Body {
         };
     }
 
-    inline function makeProps(state:Null<NodeState> = null, occupier:Int = -1, bitfield:Int = -1, distance:Int = 0):NodeProps {
-        var topSize:Float = 0;
-        var topChar:Int = -1;
-        var topColor:Color = BLACK;
+    inline function makeProps(nodeVO:NodeVO = null, bitfield:Int = -1, distance:Int = 0):NodeProps {
+        var top:NodeGlyphProps = {size:0, char:-1, color:BLACK, pop:0, thickness:0.5};
+        var bottom:NodeGlyphProps = {size:0, char:-1, color:BLACK, pop:0, thickness:0.5};
 
-        var bottomSize:Float = 0;
-        var bottomChar:Int = -1;
-        var bottomColor:Color = BLACK;
-
-        switch (state) {
+        switch (nodeVO.state) {
             case Wall:
                 if (bitfield != -1) {
-                    topSize = 1;
-                    topChar = Utf8.charCodeAt(Strings.BOX_SYMBOLS, bitfield);
-                    topColor = WALL_COLOR;
-                    bottomSize = 1;
-                    bottomChar = topChar;
-                    bottomColor = BOARD_COLOR;
+                    top.size = 1;
+                    top.char = Utf8.charCodeAt(Strings.BOX_SYMBOLS, bitfield);
+                    top.color = WALL_COLOR;
+                    bottom.size = 1;
+                    bottom.char = top.char;
+                    bottom.color = BOARD_COLOR;
                 }
             case Empty:
-                bottomColor = BOARD_COLOR;
-                bottomChar = boardCode;
-                bottomSize = 0.5;
+                bottom.color = BOARD_COLOR;
+                bottom.char = boardCode;
+                bottom.size = 0.5;
             case Cavity:
-                bottomColor = Colors.mult(TEAM_COLORS[occupier % TEAM_COLORS.length], 0.6);
-                bottomChar = boardCode;
-                bottomSize = 0.5;
+                bottom.color = Colors.mult(TEAM_COLORS[nodeVO.occupier % TEAM_COLORS.length], 0.6);
+                bottom.char = boardCode;
+                bottom.size = 0.5;
             case Body:
-                // if (bitfield == 0xF) topChar = BODY_CHARS.charCodeAt(distance % Utf8.length(BODY_CHARS));
-                // else topChar = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
-                topChar = bodyCode;
-                topColor = TEAM_COLORS[occupier];
+                // if (bitfield == 0xF) top.char = BODY_CHARS.charCodeAt(distance % Utf8.length(BODY_CHARS));
+                // else top.char = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
+                top.char = bodyCode;
+                top.color = TEAM_COLORS[nodeVO.occupier];
                 /*
                 var numNeighbors:Int = 0;
                 for (i in 0...4) numNeighbors += (bitfield >> i) & 1;
-                topSize = (numNeighbors / 4) * 0.6 + 0.2;
+                top.size = (numNeighbors / 4) * 0.6 + 0.2;
                 */
-                topSize = 1;
+                top.size = 1;
             case Head:
-                topColor = TEAM_COLORS[occupier];
-                topChar = headCode;
-                topSize = 1.5;
+                top.color = TEAM_COLORS[nodeVO.occupier];
+                top.char = headCode;
+                top.size = 1.5;
             case null:
             case _:
         }
 
-        return {
-            topSize:topSize, topChar:topChar, topColor:topColor, topFont:glyphTexture.font,
-            bottomSize:bottomSize, bottomChar:bottomChar, bottomColor:bottomColor, bottomFont:glyphTexture.font,
-        };
+        return {top:top, bottom:bottom};
     }
+
+    inline function animateTween(tween:NodeTween, now:Float):Void {
+        var frac:Float = (now - tween.start) / tween.duration;
+        if (tween.ease != null) frac = tween.ease(frac);
+        animateGlyph(tween.view.topGlyph, tween.from.top, tween.to.top, frac);
+        animateGlyph(tween.view.bottomGlyph, tween.from.bottom, tween.to.bottom, frac);
+    }
+
+    inline function animateGlyph(glyph:Glyph, from:NodeGlyphProps, to:NodeGlyphProps, frac:Float):Void {
+        glyph.set_s(interp(from.size, to.size , frac));
+        glyph.set_p(interp(from.pop, to.pop , frac));
+        glyph.set_f(interp(from.thickness, to.thickness , frac));
+        glyph.set_rgb(
+            interp(from.color.r, to.color.r, frac),
+            interp(from.color.g, to.color.g, frac),
+            interp(from.color.b, to.color.b, frac)
+        );
+        
+        if (from.char == -1) {
+            if (glyph.get_char() != to.char) glyph.set_char(to.char, glyphTexture.font);
+        } else if (from.char != to.char) {
+            if (frac < 0.5) {
+                glyph.set_f(interp(0.5, 0, frac * 2));
+            } else {
+                glyph.set_f(interp(0, 0.5, frac * 2 - 1));
+                if (glyph.get_char() != to.char) glyph.set_char(to.char, glyphTexture.font);
+            }
+        }
+    }
+
+    inline static function interp(val1:Float, val2:Float, frac:Float):Float return val1 * (1 - frac) + val2 * frac;
 
     private function isNotNull(vo:NodeVO):Bool return vo != null;
 
     static function makeDurationsByCause():Map<String, Float> {
         return [
             "" => 1,
-            "CavityRule" => 2,
-            "DecayRule" => 2,
-            "DropPieceRule" => 1,
+            "CavityRule" => 3,
+            "DecayRule" => 3,
+            "DropPieceRule" => 2,
             "EatCellsRule" => 1,
             "BiteRule" => 1,
         ];
@@ -368,10 +415,10 @@ class BoardBody extends Body {
             "" => 1,
             "CavityRule" => 1,
             "DecayRule" => 1,
-            "DropPieceRule" => 1,
+            "DropPieceRule" => 0,
             "EatCellsRule" => 0.5,
             "PickPieceRule" => 1,
-            "BiteRule" => 1,
+            "BiteRule" => 0,
         ];
     }
 
