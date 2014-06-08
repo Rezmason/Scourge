@@ -74,7 +74,6 @@ class BasicSmarts extends Smarts {
                 var nodes = game.state.nodes;
                 var itr:Int = 0;
                 for (ike in maxBiteSizeIndex...biteMoves.length) {
-                    trace('---> $itr');
                     var enemy = players[nodes[(cast biteMoves[ike]).bitNodes[0]][occupier_]];
                     var enemySize:Int = enemy[totalArea_];
                     game.chooseMove(biteActionIndex, ike);

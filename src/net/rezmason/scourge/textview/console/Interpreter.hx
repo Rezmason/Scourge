@@ -66,12 +66,12 @@ class Interpreter {
         runningCommand = null;
 
         console.loadStyles([
-            Strings.BREATHING_PROMPT_STYLE,
-            Strings.WAIT_STYLES,
-            Strings.COMMAND_HINT_STYLE,
-            Strings.INPUT_STYLE,
-            Strings.ERROR_STYLES,
-            Strings.INTERPRETER_STYLES,
+            ConsoleStrings.BREATHING_PROMPT_STYLE,
+            ConsoleStrings.WAIT_STYLES,
+            ConsoleStrings.COMMAND_HINT_STYLE,
+            ConsoleStrings.INPUT_STYLE,
+            ConsoleStrings.ERROR_STYLES,
+            ConsoleStrings.INTERPRETER_STYLES,
         ].join(''));
 
         commandHintString = '';
@@ -107,8 +107,8 @@ class Interpreter {
         var b:Float = (color >> 0  & 0xFF) / 0xFF;
 
         prompt =
-        '∂{name:head_prompt_${name}_${Math.random()}, basis:${Strings.BREATHING_PROMPT_STYLENAME}, r:$r, g:$g, b:$b}Ω' +
-        '§{name:prompt_${name}_${Math.random()}, r:$r, g:$g, b:$b} $name§{}${Strings.PROMPT}§{}';
+        '∂{name:head_prompt_${name}_${Math.random()}, basis:${ConsoleStrings.BREATHING_PROMPT_STYLENAME}, r:$r, g:$g, b:$b}Ω' +
+        '§{name:prompt_${name}_${Math.random()}, r:$r, g:$g, b:$b} $name§{}${ConsoleStrings.PROMPT}§{}';
     }
 
     /**
@@ -353,7 +353,7 @@ class Interpreter {
         combinedString = outputString;
 
         if (iState == Executing) {
-            combinedString += '  ' + Strings.WAIT_INDICATOR;
+            combinedString += '  ' + ConsoleStrings.WAIT_INDICATOR;
         } else {
             var hintString:String = '';
             if (cState.finalError != null) hintString = '  ' + styleError(cState.finalError);
@@ -661,12 +661,12 @@ class Interpreter {
      */
     inline function styleToken(token:ConsoleToken, includeCaret:Bool, index:Int):String {
         var str:String = token.text;
-        var styleName:String = Strings.INPUT_STYLENAME;
+        var styleName:String = ConsoleStrings.INPUT_STYLENAME;
         if (token == currentToken && includeCaret) {
             str = sub(str, 0, caretIndex) + CARET + sub(str, caretIndex);
         }
         if (token.next == null && (cState.completeError != null || cState.hintError != null)) {
-            styleName = Strings.ERROR_INPUT_STYLENAME;
+            styleName = ConsoleStrings.ERROR_INPUT_STYLENAME;
         } else if (token.type != null) {
             styleName = styleNamesByType[token.type];
         }
@@ -685,7 +685,7 @@ class Interpreter {
      * Converts a hint to styled text.
      */
      inline function styleHint(hint:ConsoleToken):String {
-        var styleName:String = Strings.INPUT_STYLENAME;
+        var styleName:String = ConsoleStrings.INPUT_STYLENAME;
         if (hint.type != null) styleName = styleNamesByType[hint.type];
         var id:String = hint.text;
         hintsByID[id] = hint;
@@ -726,7 +726,7 @@ class Interpreter {
         cState.commandHints = commandHints;
 
         var commandHintStrings:Array<String> = [];
-        if (str != null) commandHintStrings.push('  §{${Strings.COMMAND_HINT_STYLENAME}}$str§{}');
+        if (str != null) commandHintStrings.push('  §{${ConsoleStrings.COMMAND_HINT_STYLENAME}}$str§{}');
         if (commandHints != null && commandHints.length > 0) commandHintStrings.push(printHints(commandHints));
         commandHintString = commandHintStrings.join('\n');
 
@@ -791,12 +791,12 @@ class Interpreter {
 
     static function makeStyleNamesByType():Map<ConsoleTokenType, String> {
         var styleNamesByType:Map<ConsoleTokenType, String> = new Map();
-        styleNamesByType[Key] = Strings.KEY_STYLENAME;
-        styleNamesByType[Value] = Strings.VALUE_STYLENAME;
-        styleNamesByType[Flag] = Strings.FLAG_STYLENAME;
-        styleNamesByType[CommandName] = Strings.COMMAND_NAME_STYLENAME;
-        styleNamesByType[Tail] = Strings.TAIL_STYLENAME;
-        styleNamesByType[TailMarker] = Strings.TAIL_MARKER_STYLENAME;
+        styleNamesByType[Key] = ConsoleStrings.KEY_STYLENAME;
+        styleNamesByType[Value] = ConsoleStrings.VALUE_STYLENAME;
+        styleNamesByType[Flag] = ConsoleStrings.FLAG_STYLENAME;
+        styleNamesByType[CommandName] = ConsoleStrings.COMMAND_NAME_STYLENAME;
+        styleNamesByType[Tail] = ConsoleStrings.TAIL_STYLENAME;
+        styleNamesByType[TailMarker] = ConsoleStrings.TAIL_MARKER_STYLENAME;
         return styleNamesByType;
     }
 }

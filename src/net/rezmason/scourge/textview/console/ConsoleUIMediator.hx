@@ -46,9 +46,9 @@ class ConsoleUIMediator extends UIMediator {
         isLogDocDirty = false;
         isLogDocAppended = false;
         isInteractiveDocDirty = false;
-        for (span in Parser.parse(Strings.CARET_STYLE).spans) if (Std.is(span.style, AnimatedStyle)) caretSpan = span;
+        for (span in Parser.parse(ConsoleStrings.CARET_STYLE).spans) if (Std.is(span.style, AnimatedStyle)) caretSpan = span;
         caretStyle = cast caretSpan.style;
-        caretCharCode = Utf8.charCodeAt(Strings.CARET_CHAR, 0);
+        caretCharCode = Utf8.charCodeAt(ConsoleStrings.CARET_CHAR, 0);
         addedText = '';
         interactiveText = '';
         frozenQueue = new List();

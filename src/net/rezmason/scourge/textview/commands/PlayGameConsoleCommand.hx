@@ -1,7 +1,8 @@
-package net.rezmason.scourge.textview.console;
+package net.rezmason.scourge.textview.commands;
 
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
+import net.rezmason.scourge.textview.console.ConsoleCommand;
 import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;

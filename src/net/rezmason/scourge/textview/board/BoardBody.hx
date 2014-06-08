@@ -15,6 +15,7 @@ import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
+using net.rezmason.utils.CharCode;
 
 class BoardBody extends Body {
 
@@ -43,12 +44,12 @@ class BoardBody extends Body {
     
     var boardScale:Float;
 
-    var boardCode:Int;
-    var wallCode:Int;
-    var bodyCode:Int;
-    var headCode:Int;
-    var uiCode:Int;
-    var blankCode:Int;
+    inline static var BOARD_CODE:Int = '¤'.code();
+    inline static var WALL_CODE:Int = '#'.code();
+    inline static var BODY_CODE:Int = '•'.code();
+    inline static var HEAD_CODE:Int = 'Ω'.code();
+    inline static var UI_CODE:Int = ''.code();
+    inline static var BLANK_CODE:Int = ' '.code();
 
     var numPlayers:Int;
     var numNodes:Int;
@@ -69,13 +70,6 @@ class BoardBody extends Body {
         homeTransform = new Matrix3D();
         plainTransform = new Matrix3D();
         
-        boardCode = Utf8.charCodeAt('¤', 0);
-        wallCode = Utf8.charCodeAt('#', 0);
-        bodyCode = Utf8.charCodeAt('•', 0);
-        headCode = Utf8.charCodeAt('Ω', 0);
-        uiCode = Utf8.charCodeAt('', 0);
-        blankCode = Utf8.charCodeAt(' ', 0);
-
         boardScale = 1;
         nodeViews = [];
         nodeTweens = [];
@@ -111,13 +105,13 @@ class BoardBody extends Body {
             view.topGlyph.set_xyz(pos.x, pos.y, pos.z + TOP_OFFSET);
             view.uiGlyph.set_xyz(pos.x, pos.y, pos.z + UI_OFFSET);
 
-            view.bottomGlyph.set_char(boardCode, glyphTexture.font);
+            view.bottomGlyph.set_char(BOARD_CODE, glyphTexture.font);
             view.bottomGlyph.set_s(0);
-            view.topGlyph.set_char(bodyCode, glyphTexture.font);
+            view.topGlyph.set_char(BODY_CODE, glyphTexture.font);
             view.topGlyph.set_s(0);
 
             view.uiGlyph.set_color(UI_COLOR);
-            view.uiGlyph.set_char(uiCode, glyphTexture.font);
+            view.uiGlyph.set_char(UI_CODE, glyphTexture.font);
             view.uiGlyph.set_s(0);
         }
 
@@ -342,16 +336,16 @@ class BoardBody extends Body {
                 }
             case Empty:
                 bottom.color = BOARD_COLOR;
-                bottom.char = boardCode;
+                bottom.char = BOARD_CODE;
                 bottom.size = 0.5;
             case Cavity:
                 bottom.color = Colors.mult(TEAM_COLORS[occupier % TEAM_COLORS.length], 0.6);
-                bottom.char = boardCode;
+                bottom.char = BOARD_CODE;
                 bottom.size = 0.5;
             case Body:
                 // if (bitfield == 0xF) top.char = BODY_CHARS.charCodeAt(distance % Utf8.length(BODY_CHARS));
                 // else top.char = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
-                top.char = bodyCode;
+                top.char = BODY_CODE;
                 top.color = TEAM_COLORS[occupier];
                 waveMult = 1;
                 /*
@@ -362,7 +356,7 @@ class BoardBody extends Body {
                 top.size = 1;
             case Head:
                 top.color = TEAM_COLORS[occupier];
-                top.char = headCode;
+                top.char = HEAD_CODE;
                 top.size = 1.5;
                 waveMult = 1;
             case null:

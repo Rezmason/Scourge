@@ -17,5 +17,5 @@ class ConsoleUtils {
         return {text:'', type:null, prev:prev, next:next};
     }
 
-    public inline static function styleError(str:String):String return '§{${Strings.ERROR_OUTPUT_STYLENAME}}$str§{}';
+    public inline static function styleError(str:String):String return '§{${ConsoleStrings.ERROR_OUTPUT_STYLENAME}}$str§{}';
 }
