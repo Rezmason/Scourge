@@ -18,7 +18,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
     inline static var MILLISECONDS_TO_SECONDS:Float = 1 / 1000;
     public inline static var NO_CAUSE:String = "";
     public var updateSignal(default, null):Zig<GameEvent->Void>;
-    public var sequenceStartSignal(default, null):Zig<Int->Array<NodePosition>->Void>;
+    public var sequenceStartSignal(default, null):Zig<Int->Array<XYZ>->Void>;
     public var sequenceUpdateSignal(default, null):Zig<Float->Int->Array<String>->Array<Array<NodeVO>>->Array<Int>->Array<Int>->Void>;
     static var nodeStateMap:Array<NodeState> = makeNodeStateMap();
 
@@ -272,8 +272,8 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         return neighborBitfields;
     }
 
-    private function getNodePositions():Array<NodePosition> {
-        var positions:Array<NodePosition> = [];
+    private function getNodePositions():Array<XYZ> {
+        var positions:Array<XYZ> = [];
         var grid:BoardLocus = game.state.loci[0].run(Gr.s).run(Gr.w);
         var y:Float = 0;
         var x:Float = 0;
@@ -287,7 +287,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         }
 
         for (ike in 0...positions.length) {
-            var position:NodePosition = positions[ike];
+            var position:XYZ = positions[ike];
             position.x = (position.x - (x - 1) / 2) * 0.07;
             position.y = (position.y - (x - 1) / 2) * 0.07;
             position.z = (position.x * position.x + position.y * position.y) * -0.2;

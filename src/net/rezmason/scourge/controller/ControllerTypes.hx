@@ -63,5 +63,3 @@ typedef NodeVO = {
     var state:Null<NodeState>;
     var freshness:Int;
 };
-
-typedef NodePosition = {x:Float, y:Float, z:Float};

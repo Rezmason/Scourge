@@ -23,6 +23,7 @@ class BoardBody extends Body {
     inline static var WALL_TOP_OFFSET:Float = -0.05;
     inline static var TOP_OFFSET:Float = -0.03;
     inline static var UI_OFFSET:Float = -0.06;
+    inline static var WAVE_MAX_AMPLITUDE:Float = 0.1;
     static var TEAM_COLORS:Array<Color> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Colors.fromHex);
     static var BOARD_COLOR:Color = Colors.fromHex(0x303030);
     static var WALL_COLOR:Color = Colors.fromHex(0x606060);
@@ -83,7 +84,7 @@ class BoardBody extends Body {
         numActiveTweens = 0;
     }
 
-    public function presentStart(numPlayers:Int, nodePositions:Array<NodePosition>):Void {
+    public function presentStart(numPlayers:Int, nodePositions:Array<XYZ>):Void {
 
         numNodes = nodePositions.length;
         growTo(numNodes * GLYPHS_PER_NODE);
@@ -98,19 +99,17 @@ class BoardBody extends Body {
             view.topGlyph = glyphs[ike * GLYPHS_PER_NODE + 1];
             view.uiGlyph = glyphs[ike * GLYPHS_PER_NODE + 2];
 
-            var position:NodePosition = nodePositions[ike];
-            view.x = position.x;
-            view.y = position.y;
-            view.z = position.z;
+            var pos:XYZ = nodePositions[ike];
+            view.pos = pos;
 
-            if (minX > view.x) minX = view.x;
-            if (maxX < view.x) maxX = view.x;
+            if (minX > pos.x) minX = pos.x;
+            if (maxX < pos.x) maxX = pos.x;
 
             view.props = null;
 
-            view.bottomGlyph.set_pos(view.x, view.y, view.z);
-            view.topGlyph.set_pos(view.x, view.y, view.z + TOP_OFFSET);
-            view.uiGlyph.set_pos(view.x, view.y, view.z + UI_OFFSET);
+            view.bottomGlyph.set_pos(pos);
+            view.topGlyph.set_xyz(pos.x, pos.y, pos.z + TOP_OFFSET);
+            view.uiGlyph.set_xyz(pos.x, pos.y, pos.z + UI_OFFSET);
 
             view.bottomGlyph.set_char(boardCode, glyphTexture.font);
             view.bottomGlyph.set_s(0);
@@ -179,16 +178,15 @@ class BoardBody extends Body {
                 if (lastFreshness < nodeVO.freshness) lastFreshness = nodeVO.freshness;
                 else start -= delta;
                 var view:NodeView = nodeViews[id];
-                var newProps:NodeProps = makeProps(nodeVO, neighborBitfields[id], distancesFromHead[id]);
+                var newProps:NodeProps = makeProps(view.pos.z, nodeVO, neighborBitfields[id], distancesFromHead[id]);
                 var oldProps:NodeProps = view.props;
-                if (oldProps == null) oldProps = makeProps();
+                if (oldProps == null) oldProps = makeProps(view.pos.z);
 
                 var effect:BoardEffect = BoardEffects.getEffectForStateChange(nodeVOs[id].state, nodeVO.state);
                 effect(view, cause, start, duration, oldProps, newProps, nodeTweens);
 
                 start += delta;
                 view.props = newProps;
-                if (nodeVO.state == Wall) view.topGlyph.set_z(view.z + WALL_TOP_OFFSET);
                 nodeVOs[id] = nodeVO;
             }
         }
@@ -253,6 +251,7 @@ class BoardBody extends Body {
             if (numActiveTweens == 0) nodeTweens = [];
         }
 
+        for (view in nodeViews) view.topGlyph.set_p(view.waveHeight * view.waveMult * WAVE_MAX_AMPLITUDE);
 
         if (!dragging) {
             rawTransform.interpolateTo(plainTransform, 0.1);
@@ -315,23 +314,28 @@ class BoardBody extends Body {
             topGlyph:null,
             bottomGlyph:null,
             uiGlyph:null,
-            x:0,
-            y:0,
-            z:0,
+            pos:null,
+            waveMult:0,
+            waveHeight:0,
             props:null,
         };
     }
 
-    inline function makeProps(nodeVO:NodeVO = null, bitfield:Int = -1, distance:Int = 0):NodeProps {
-        var top:NodeGlyphProps = {size:0, char:-1, color:BLACK, pop:0, thickness:0.5};
-        var bottom:NodeGlyphProps = {size:0, char:-1, color:BLACK, pop:0, thickness:0.5};
+    inline function makeProps(z:Float, nodeVO:NodeVO = null, bitfield:Int = -1, distance:Int = 0):NodeProps {
+        var top:NodeGlyphProps = {size:0, char:-1, color:BLACK, z:z, thickness:0.5};
+        var bottom:NodeGlyphProps = {size:0, char:-1, color:BLACK, z:z, thickness:0.5};
+        var waveMult:Float = 0;
 
-        switch (nodeVO.state) {
+        var state:Null<NodeState> = nodeVO != null ? nodeVO.state : null;
+        var occupier:Int = nodeVO != null ? nodeVO.occupier : -1;
+
+        switch (state) {
             case Wall:
                 if (bitfield != -1) {
                     top.size = 1;
                     top.char = Utf8.charCodeAt(Strings.BOX_SYMBOLS, bitfield);
                     top.color = WALL_COLOR;
+                    top.z += WALL_TOP_OFFSET;
                     bottom.size = 1;
                     bottom.char = top.char;
                     bottom.color = BOARD_COLOR;
@@ -341,14 +345,15 @@ class BoardBody extends Body {
                 bottom.char = boardCode;
                 bottom.size = 0.5;
             case Cavity:
-                bottom.color = Colors.mult(TEAM_COLORS[nodeVO.occupier % TEAM_COLORS.length], 0.6);
+                bottom.color = Colors.mult(TEAM_COLORS[occupier % TEAM_COLORS.length], 0.6);
                 bottom.char = boardCode;
                 bottom.size = 0.5;
             case Body:
                 // if (bitfield == 0xF) top.char = BODY_CHARS.charCodeAt(distance % Utf8.length(BODY_CHARS));
                 // else top.char = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
                 top.char = bodyCode;
-                top.color = TEAM_COLORS[nodeVO.occupier];
+                top.color = TEAM_COLORS[occupier];
+                waveMult = 1;
                 /*
                 var numNeighbors:Int = 0;
                 for (i in 0...4) numNeighbors += (bitfield >> i) & 1;
@@ -356,14 +361,15 @@ class BoardBody extends Body {
                 */
                 top.size = 1;
             case Head:
-                top.color = TEAM_COLORS[nodeVO.occupier];
+                top.color = TEAM_COLORS[occupier];
                 top.char = headCode;
                 top.size = 1.5;
+                waveMult = 1;
             case null:
             case _:
         }
 
-        return {top:top, bottom:bottom};
+        return {top:top, bottom:bottom, waveMult:waveMult};
     }
 
     inline function animateTween(tween:NodeTween, now:Float):Void {
@@ -371,11 +377,12 @@ class BoardBody extends Body {
         if (tween.ease != null) frac = tween.ease(frac);
         animateGlyph(tween.view.topGlyph, tween.from.top, tween.to.top, frac);
         animateGlyph(tween.view.bottomGlyph, tween.from.bottom, tween.to.bottom, frac);
+        tween.view.waveMult = interp(tween.from.waveMult, tween.to.waveMult, frac);
     }
 
     inline function animateGlyph(glyph:Glyph, from:NodeGlyphProps, to:NodeGlyphProps, frac:Float):Void {
         glyph.set_s(interp(from.size, to.size , frac));
-        glyph.set_p(interp(from.pop, to.pop , frac));
+        glyph.set_z(interp(from.z, to.z , frac));
         glyph.set_f(interp(from.thickness, to.thickness , frac));
         glyph.set_rgb(
             interp(from.color.r, to.color.r, frac),

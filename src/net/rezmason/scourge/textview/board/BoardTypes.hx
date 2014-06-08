@@ -18,21 +18,22 @@ typedef NodeGlyphProps = {
     var size:Float;
     var char:Int;
     var color:Color;
-    var pop:Float;
+    var z:Float;
     var thickness:Float;
 }
 
 typedef NodeProps = {
     var top:NodeGlyphProps;
     var bottom:NodeGlyphProps;
+    var waveMult:Float;
 }
 
 typedef NodeView = {
     var bottomGlyph:Glyph;
     var topGlyph:Glyph;
     var uiGlyph:Glyph;
-    var x:Float;
-    var y:Float;
-    var z:Float;
+    var pos:XYZ;
     var props:NodeProps;
+    var waveMult:Float;
+    var waveHeight:Float;
 }

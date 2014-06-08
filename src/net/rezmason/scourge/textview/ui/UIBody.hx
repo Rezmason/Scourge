@@ -215,7 +215,7 @@ class UIBody extends Body {
             for (col in 0...numCols) {
                 var x:Float = ((col + 0.5) / numCols - 0.5);
                 var y:Float = ((row + 0.5) / (numRows - 1) - 0.5);
-                glyphs[id].set_pos(x, y, 0);
+                glyphs[id].set_xyz(x, y, 0);
                 id++;
             }
         }

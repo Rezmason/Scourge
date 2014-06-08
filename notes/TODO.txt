@@ -8,6 +8,7 @@ Board
     Bring back the wave pool
     Figure out how to do "pain"-related things
     Move some types around
+    Pool objects
 
 Human players, GUISystem
     Implement abstract commands

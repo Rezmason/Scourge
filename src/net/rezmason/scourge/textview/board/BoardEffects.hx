@@ -59,11 +59,11 @@ class BoardEffects {
     };
 
     static function animatePieceDropsDown(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
-        from.top.pop = -0.3;
+        from.top.z = view.pos.z - 0.5;
         from.top.color.r = 0;
         from.top.color.g = 0;
         from.top.color.b = 0;
-        //from.top.size = 3;
+        from.top.size = 2;
         from.top.thickness = 0.8;
         var hotProps:NodeProps = cloneProps(to);
         hotProps.top.color.r = 1;
@@ -71,7 +71,7 @@ class BoardEffects {
         hotProps.top.color.b = 1;
         // hotProps.top.size = 1.2;
         hotProps.top.thickness = 0.7;
-        arr.push(makeTween(view, cause, start, duration * 0.3, from, hotProps, Quint.easeIn));
+        arr.push(makeTween(view, cause, start, duration * 0.3, from, hotProps, Quad.easeIn));
         arr.push(makeTween(view, cause, start + duration * 0.3, duration * 0.7, hotProps, to, Quad.easeIn));
     };
 
@@ -117,7 +117,11 @@ class BoardEffects {
     }
 
     inline static function cloneProps(props:NodeProps):NodeProps {
-        return {top:cloneGlyphProps(props.top), bottom:cloneGlyphProps(props.bottom)};
+        return {
+            top:cloneGlyphProps(props.top), 
+            bottom:cloneGlyphProps(props.bottom), 
+            waveMult:props.waveMult,
+        };
     }
 
     inline static function cloneGlyphProps(glyphProps:NodeGlyphProps):NodeGlyphProps {
@@ -129,7 +133,7 @@ class BoardEffects {
         return {
             char:glyphProps.char, 
             size:glyphProps.size, 
-            pop:glyphProps.pop, 
+            z:glyphProps.z, 
             color:copiedColor, 
             thickness:glyphProps.thickness,
         };
