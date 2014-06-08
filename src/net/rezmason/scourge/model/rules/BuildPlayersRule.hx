@@ -14,8 +14,6 @@ typedef BuildPlayersConfig = {
 
 class BuildPlayersRule extends Rule {
 
-
-    var playerAspectTemplate:AspectSet;
     var cfg:BuildPlayersConfig;
 
     public function new(cfg:BuildPlayersConfig):Void {
@@ -26,15 +24,14 @@ class BuildPlayersRule extends Rule {
 
     override private function _prime():Void {
         if (cfg.numPlayers < 1) throw 'Invalid number of players in player config.';
-        playerAspectTemplate = plan.playerAspectTemplate.copy();
         for (ike in 0...cfg.numPlayers) makePlayer();
     }
 
     inline function makePlayer():AspectSet {
-        var player:AspectSet = playerAspectTemplate.copy();
+        var player:AspectSet = plan.playerAspectTemplate.copy();
         player[ident_] = numPlayers();
         state.players.push(player);
-        var histPlayer:AspectSet = playerAspectTemplate.map(cfg.buildCfg.history.alloc);
+        var histPlayer:AspectSet = plan.playerAspectTemplate.map(cfg.buildCfg.history.alloc);
         cfg.buildCfg.historyState.players.push(histPlayer);
 
         return player;

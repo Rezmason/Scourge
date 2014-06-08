@@ -7,7 +7,7 @@ using net.rezmason.utils.Pointers;
 
 class State {
 
-    public var aspects(default, null):AspectSet;
+    public var aspects:AspectSet;
     public var players(default, null):Array<AspectSet>;
     public var nodes(default, null):Array<AspectSet>;
     public var loci(default, null):Array<GridLocus<AspectSet>>; // aka BoardLocus
@@ -18,7 +18,7 @@ class State {
 
         this.key = key;
 
-        aspects = new AspectSet();
+        aspects = null;
         players = [];
         nodes   = [];
         loci    = [];
@@ -26,7 +26,10 @@ class State {
     }
 
     public function wipe():Void {
-        aspects.wipe();
+        if (aspects != null) {
+            aspects.wipe();
+            aspects = null;
+        }
         players.splice(0, players.length);
         nodes.splice  (0, nodes.length);
         loci.splice  (0, loci.length);

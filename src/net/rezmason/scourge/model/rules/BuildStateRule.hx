@@ -26,8 +26,11 @@ class BuildStateRule extends Rule {
     }
 
     override private function _prime():Void {
-        plan.stateAspectTemplate.copyTo(state.aspects, 0);
-        plan.stateAspectTemplate.mapTo(cfg.buildCfg.history.alloc, cfg.buildCfg.historyState.aspects, 0);
-        state.aspects[currentPlayer_] = cfg.firstPlayer;
+        var aspects:AspectSet = plan.stateAspectTemplate.copy();
+        aspects[ident_] = 0;
+        aspects[currentPlayer_] = cfg.firstPlayer;
+        state.aspects = aspects;
+        var histAspects:AspectSet = plan.stateAspectTemplate.map(cfg.buildCfg.history.alloc);
+        cfg.buildCfg.historyState.aspects = histAspects;
     }
 }

@@ -50,7 +50,7 @@ class GameSystem {
         } else {
             while (playerDefs.length < config.numPlayers) {
                 var char:String = playerPattern[playerDefs.length];
-                var pdef = (char == 'b' ? Bot(new RandomSmarts(), thinkPeriod + animatePeriod) : Human);
+                var pdef = (char == 'b' ? Bot(new BasicSmarts(), thinkPeriod + animatePeriod) : Human);
                 playerDefs.push(pdef);
             }
         }

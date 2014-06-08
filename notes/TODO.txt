@@ -2,6 +2,8 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
+Improve history heuristic        
+
 Board
     Bring back the wave pool
     Figure out how to do "pain"-related things
