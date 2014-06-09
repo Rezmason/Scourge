@@ -2,12 +2,12 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
-Improve history heuristic        
+Improve history heuristic
 
 Board
-    Bring back the wave pool
+    Sometimes cavities disappear for some reason
+    Change ripple behavior
     Figure out how to do "pain"-related things
-    Move some types around
     Pool objects
 
 Human players, GUISystem

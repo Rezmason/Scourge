@@ -36,4 +36,7 @@ typedef NodeView = {
     var props:NodeProps;
     var waveMult:Float;
     var waveHeight:Float;
+    var distance:Int;
+    var occupier:Int;
+    var topSize:Float;
 }

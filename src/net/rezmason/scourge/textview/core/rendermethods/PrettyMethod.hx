@@ -20,7 +20,7 @@ class PrettyMethod extends RenderMethod {
     #elseif js
         100
     #else
-        200
+        120
     #end
     ;
 

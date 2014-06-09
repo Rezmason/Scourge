@@ -5,6 +5,10 @@ import haxe.Utf8;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 
+import net.rezmason.scourge.waves.WavePool;
+import net.rezmason.scourge.waves.Ripple;
+import net.rezmason.scourge.waves.WaveFunctions;
+
 import net.rezmason.gl.utils.BufferUtil;
 import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.textview.board.BoardEffects;
@@ -24,13 +28,13 @@ class BoardBody extends Body {
     inline static var WALL_TOP_OFFSET:Float = -0.05;
     inline static var TOP_OFFSET:Float = -0.03;
     inline static var UI_OFFSET:Float = -0.06;
-    inline static var WAVE_MAX_AMPLITUDE:Float = 0.1;
     static var TEAM_COLORS:Array<Color> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Colors.fromHex);
     static var BOARD_COLOR:Color = Colors.fromHex(0x303030);
     static var WALL_COLOR:Color = Colors.fromHex(0x606060);
     static var UI_COLOR:Color = Colors.fromHex(0xFFFFFF);
     static var BODY_CHARS:String = Strings.ALPHANUMERICS;
     static var BLACK:Color = {r:0, g:0, b:0};
+    static var BOARD_CLEANUP_CAUSE:String = "#";
     static var durationsByCause:Map<String, Float> = makeDurationsByCause();
     static var overlapsByCause:Map<String, Float> = makeOverlapsByCause();
 
@@ -57,6 +61,8 @@ class BoardBody extends Body {
     var nodeTweens:Array<NodeTween>;
     var numActiveTweens:Int;
 
+    var wavePools:Array<WavePool>;
+
     var animationTime:Float;
     var totalAnimationTime:Float;
 
@@ -73,6 +79,7 @@ class BoardBody extends Body {
         boardScale = 1;
         nodeViews = [];
         nodeTweens = [];
+        wavePools = [];
         animationTime = 0;
         totalAnimationTime = 0;
         numActiveTweens = 0;
@@ -80,8 +87,18 @@ class BoardBody extends Body {
 
     public function presentStart(numPlayers:Int, nodePositions:Array<XYZ>):Void {
 
+        this.numPlayers = numPlayers;
         numNodes = nodePositions.length;
         growTo(numNodes * GLYPHS_PER_NODE);
+
+        for (ike in 0...numPlayers) {
+            if (wavePools[ike] == null) {
+                wavePools[ike] = new WavePool(1);
+                wavePools[ike].addRipple(new Ripple(WaveFunctions.bolus, 1, 4., 0.5, 20, true));
+            } else {
+                wavePools[ike].size = 1;
+            }
+        }
 
         var minX:Float = 0;
         var maxX:Float = 0;
@@ -132,17 +149,17 @@ class BoardBody extends Body {
     public function presentSequence(time:Float, maxFreshness:Int, causes:Array<String>, steps:Array<Array<NodeVO>>, distancesFromHead:Array<Int>, neighborBitfields:Array<Int>):Void {
         
         if (numActiveTweens > 0) {
-            var lastStr:String = '';
+            //var tweenString:String = '';
             for (tween in nodeTweens) {
                 if (tween != null) {
                     animateTween(tween, tween.start + tween.duration);
-                    lastStr += '*';
+                    //tweenString += '*';
                 } else {
-                    lastStr += ' ';
+                    //tweenString += ' ';
                 }
             }
-            lastStr += '\n';
-            //trace(lastStr);
+            // tweenString += '\n';
+            //trace(tweenString);
         }
 
         animationTime = 0;
@@ -155,8 +172,6 @@ class BoardBody extends Body {
             steps.shift();
             causes.shift();
         }
-
-        //for (ike in 0...causes.length) if (steps[ike].length > 0) trace('$ike ${causes[ike]}');
 
         var start:Float = 0;
         
@@ -185,6 +200,32 @@ class BoardBody extends Body {
             }
         }
 
+        var hasStragglers:Bool = false;
+        var cause:String = BOARD_CLEANUP_CAUSE;
+        var duration:Float = durationsByCause[cause];
+        var maxDistances:Array<Int> = [];
+        for (ike in 0...numPlayers) maxDistances[ike] = 0;
+        for (ike in 0...numNodes) {
+            var view:NodeView = nodeViews[ike];
+            view.distance = distancesFromHead[ike];
+            if (view.distance < 0) view.distance = 0;
+            view.occupier = nodeVOs[ike].occupier;
+            if (maxDistances[view.occupier] < view.distance) maxDistances[view.occupier] = view.distance;
+
+            if (nodeVOs[ike].state == Body) {
+                var neighborBitfield:Int = neighborBitfields[ike];
+                var char:Int = getChar(view.occupier, neighborBitfield, view.distance);
+                if (view.props.top.char != char) {
+                    var newProps:NodeProps = makeProps(view.pos.z, nodeVOs[ike], neighborBitfield, view.distance);
+                    BoardEffects.animateLinear(view, cause, start, duration, view.props, newProps, nodeTweens);
+                    view.props = newProps;
+                    hasStragglers = true;
+                }
+            }
+        }
+        for (ike in 0...numPlayers) wavePools[ike].size = maxDistances[ike] + 1;
+        if (hasStragglers) start += duration;
+
         numActiveTweens = nodeTweens.length;
         
         if (numActiveTweens > 0) {
@@ -200,9 +241,11 @@ class BoardBody extends Body {
             }
         }
 
-        var str:String = '';
-        for (tween in nodeTweens) str += Std.string(causes.indexOf(tween.cause));
-        //trace(str);
+        /*
+        var tweenString:String = '';
+        for (tween in nodeTweens) tweenString += Std.string(causes.indexOf(tween.cause));
+        trace(tweenString);
+        */
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
@@ -218,34 +261,43 @@ class BoardBody extends Body {
 
     override public function update(delta:Float):Void {
         
+        // update animations
         if (numActiveTweens > 0) {
             animationTime += delta;
-            var str:String = '';
+            //var tweenString:String = '';
             for (ike in 0...nodeTweens.length) {
                 var tween:NodeTween = nodeTweens[ike];
                 if (tween != null) {
                     if (animationTime < tween.start) {
-                        str += ' ';
+                        //tweenString += ' ';
                     } else if (animationTime > tween.start + tween.duration) {
-                        str += '•';
+                        //tweenString += '•';
                         animateTween(tween, tween.start + tween.duration);
                         nodeTweens[ike] = null;
                         numActiveTweens--;
                     } else {
-                        str += '|';
+                        //tweenString += '|';
                         animateTween(tween, animationTime);
                     }
                 } else {
-                    str += ' ';
+                    //tweenString += ' ';
                 }
             }
 
-            //trace(str);
+            //trace(tweenString);
 
             if (numActiveTweens == 0) nodeTweens = [];
         }
 
-        for (view in nodeViews) view.topGlyph.set_p(view.waveHeight * view.waveMult * WAVE_MAX_AMPLITUDE);
+        // update waves
+        for (pool in wavePools) pool.update(delta);
+        for (view in nodeViews) {
+            if (view.occupier != -1) {
+                var h:Float = wavePools[view.occupier].getHeightAtIndex(view.distance) * view.waveMult;
+                view.topGlyph.set_p(h * -0.1);
+                view.topGlyph.set_s(view.topSize * (1 - h) + (view.topSize + 0.3) * h);
+            }
+        }
 
         if (!dragging) {
             rawTransform.interpolateTo(plainTransform, 0.1);
@@ -312,7 +364,22 @@ class BoardBody extends Body {
             waveMult:0,
             waveHeight:0,
             props:null,
+            distance:0,
+            occupier:-1,
+            topSize:1,
         };
+    }
+
+    inline function getChar(occupier:Int, bitfield:Int, distance:Int):Int {
+        var char:Int = -1;
+        if (occupier == -1) {
+            char = Utf8.charCodeAt(Strings.BOX_SYMBOLS, bitfield);
+        } else if (bitfield == 0xF) {
+            char = BODY_CHARS.charCodeAt(distance % Utf8.length(BODY_CHARS));
+        } else {
+            char = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
+        }
+        return char;
     }
 
     inline function makeProps(z:Float, nodeVO:NodeVO = null, bitfield:Int = -1, distance:Int = 0):NodeProps {
@@ -327,7 +394,7 @@ class BoardBody extends Body {
             case Wall:
                 if (bitfield != -1) {
                     top.size = 1;
-                    top.char = Utf8.charCodeAt(Strings.BOX_SYMBOLS, bitfield);
+                    top.char = getChar(occupier, bitfield, distance);
                     top.color = WALL_COLOR;
                     top.z += WALL_TOP_OFFSET;
                     bottom.size = 1;
@@ -337,28 +404,31 @@ class BoardBody extends Body {
             case Empty:
                 bottom.color = BOARD_COLOR;
                 bottom.char = BOARD_CODE;
-                bottom.size = 0.5;
+                bottom.size = 0.75;
             case Cavity:
                 bottom.color = Colors.mult(TEAM_COLORS[occupier % TEAM_COLORS.length], 0.6);
                 bottom.char = BOARD_CODE;
-                bottom.size = 0.5;
+                bottom.size = 0.75;
             case Body:
-                // if (bitfield == 0xF) top.char = BODY_CHARS.charCodeAt(distance % Utf8.length(BODY_CHARS));
-                // else top.char = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
-                top.char = BODY_CODE;
+                top.char = getChar(occupier, bitfield, distance);
                 top.color = TEAM_COLORS[occupier];
                 waveMult = 1;
-                /*
                 var numNeighbors:Int = 0;
                 for (i in 0...4) numNeighbors += (bitfield >> i) & 1;
-                top.size = (numNeighbors / 4) * 0.6 + 0.2;
-                */
-                top.size = 1;
+                top.size = (numNeighbors / 4) * 0.6 + 0.45;
+                bottom.char = top.char;
+                bottom.color = Colors.mult(top.color, 0.15);
+                bottom.thickness = 0.8;
+                bottom.size = top.size * 1.5;
             case Head:
                 top.color = TEAM_COLORS[occupier];
                 top.char = HEAD_CODE;
                 top.size = 1.5;
+                bottom.char = top.char;
                 waveMult = 1;
+                bottom.color = Colors.mult(top.color, 0.15);
+                bottom.thickness = 0.8;
+                bottom.size = top.size * 1.5;
             case null:
             case _:
         }
@@ -372,6 +442,7 @@ class BoardBody extends Body {
         animateGlyph(tween.view.topGlyph, tween.from.top, tween.to.top, frac);
         animateGlyph(tween.view.bottomGlyph, tween.from.bottom, tween.to.bottom, frac);
         tween.view.waveMult = interp(tween.from.waveMult, tween.to.waveMult, frac);
+        tween.view.topSize = tween.view.topGlyph.get_s();
     }
 
     inline function animateGlyph(glyph:Glyph, from:NodeGlyphProps, to:NodeGlyphProps, frac:Float):Void {
@@ -386,13 +457,18 @@ class BoardBody extends Body {
         
         if (from.char == -1) {
             if (glyph.get_char() != to.char) glyph.set_char(to.char, glyphTexture.font);
-        } else if (from.char != to.char) {
-            if (frac < 0.5) {
-                glyph.set_f(interp(0.5, 0, frac * 2));
-            } else {
-                glyph.set_f(interp(0, 0.5, frac * 2 - 1));
-                if (glyph.get_char() != to.char) glyph.set_char(to.char, glyphTexture.font);
+        } else {
+
+            if (from.char != to.char) {
+                if (frac < 0.5) {
+                    glyph.set_f(interp(0.5, 0, frac * 2));
+                } else {
+                    glyph.set_f(interp(0, 0.5, frac * 2 - 1));
+                    if (glyph.get_char() != to.char) glyph.set_char(to.char, glyphTexture.font);
+                }
             }
+
+            if (frac < 0.5 && glyph.get_char() != from.char) glyph.set_char(from.char, glyphTexture.font);
         }
     }
 
@@ -408,6 +484,7 @@ class BoardBody extends Body {
             "DropPieceRule" => 2,
             "EatCellsRule" => 1,
             "BiteRule" => 1,
+            BOARD_CLEANUP_CAUSE => 1,
         ];
     }
 

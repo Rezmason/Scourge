@@ -9,7 +9,7 @@ class WaveFunctions {
 
     public inline static function bolus(x:Float):Float {
         x *= Math.PI;
-        return (Math.cos(x) + 1) * -0.5;
+        return (Math.cos(x) + 1) * 0.5;
     }
 
     public inline static function photocopy(func:Float->Float, rez:Int):Float->Float {

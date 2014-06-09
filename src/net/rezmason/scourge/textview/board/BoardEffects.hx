@@ -7,6 +7,7 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.kawa.tween.easing.*;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
+using net.rezmason.utils.CharCode;
 
 typedef BoardEffect = NodeView->String->Float->Float->NodeProps->NodeProps->Array<NodeTween>->Void;
 
@@ -32,7 +33,7 @@ class BoardEffects {
     
     // ------- EFFECTS ------- //
 
-    static function animateLinear(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
+    public static function animateLinear(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
         arr.push(makeTween(view, cause, start, duration, from, to));
     };
 
@@ -47,6 +48,7 @@ class BoardEffects {
         mid.top.color.r = (mid.top.color.r + 0.75) / 2;
         mid.top.color.g = (mid.top.color.g + 0.75) / 2;
         mid.top.color.b = (mid.top.color.b + 0.75) / 2;
+        mid.waveMult = 0;
         arr.push(makeTween(view, cause, start, duration * 0.5, from, mid, Quad.easeInOut));
         arr.push(makeTween(view, cause, start + 0.5 * duration, duration * 0.5, mid, to, Quad.easeIn));
     };
@@ -64,11 +66,15 @@ class BoardEffects {
         from.top.color.g = 0;
         from.top.color.b = 0;
         from.top.size = 2;
-        from.top.thickness = 0.8;
+        from.top.thickness = 0.7;
+        from.top.char = '•'.code();
         var hotProps:NodeProps = cloneProps(to);
         hotProps.top.color.r = 1;
         hotProps.top.color.g = 1;
         hotProps.top.color.b = 1;
+        hotProps.top.char = from.top.char;
+        hotProps.top.size = 1;
+        hotProps.waveMult = 0;
         // hotProps.top.size = 1.2;
         hotProps.top.thickness = 0.7;
         arr.push(makeTween(view, cause, start, duration * 0.3, from, hotProps, Quad.easeIn));

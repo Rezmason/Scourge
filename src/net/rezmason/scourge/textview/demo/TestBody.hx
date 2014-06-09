@@ -58,8 +58,6 @@ class TestBody extends Body {
 
         for (glyph in glyphs) {
 
-            var i:Float = 0.2;
-
             var charCode:Int = CHARS.charCodeAt(glyph.id % CHARS.length);
 
             var rad:Float = Math.sqrt(1 - _z * _z);
@@ -77,7 +75,6 @@ class TestBody extends Body {
 
             glyph.set_shape(x, y, z, 1, 0);
             glyph.set_rgb(r, g, b);
-            glyph.set_i(i);
             glyph.set_char(charCode, glyphTexture.font);
             glyph.set_paint(glyph.id | id << 16);
 
@@ -109,9 +106,10 @@ class TestBody extends Body {
 
             var d1:Float = glyph.get_z();
             var d2:Float = glyph.get_y();
-            var p:Float = (Math.cos(time * 4 + d1 * 20) * 0.500 + 1) * 0.4;
-            var s:Float = (Math.cos(time * 4 + d1 * 30) * 0.200 + 1) * 2.0;
-            var f:Float = (Math.cos(time * 4 + d2 * 10) * 0.040 + 0) + 0.5;
+            var d3:Float = glyph.get_x();
+            var p:Float = (Math.cos(time * 4 + d1 * 20) * 0.500 + 1.0) * 0.4;
+            var s:Float = (Math.cos(time * 4 + d2 * 30) * 0.100 + 1.5) * 2.0;
+            var f:Float = (Math.cos(time * 8 + d3 * 40) * 0.180 + 0.0) + 0.4;
 
             glyph.set_p(p);
             glyph.set_s(s);

@@ -63,6 +63,7 @@ class EatCellsRule extends Rule {
         for (node in newNodes) newNodesByID[getID(node)] = node;
 
         var eatenNodes:Array<AspectSet> = [];
+        var eatenNodeGroups:Array<Array<AspectSet>> = [];
 
         // We search space for uninterrupted regions of player cells that begin and end
         // with cells of the current player. We propagate these searches from cells
@@ -88,6 +89,7 @@ class EatCellsRule extends Rule {
 
                                 eatenNodes[getID(pendingNode)] = pendingNode;
                             }
+                            eatenNodeGroups.push(pendingNodes);
                             break;
                         } else if (headIndices[scoutOccupier] == getID(scout.value)) {
                             // Only eat heads if the config specifies this
@@ -106,13 +108,14 @@ class EatCellsRule extends Rule {
         }
 
         // Update cells in the eaten region
-        for (node in eatenNodes) {
-            if (node != null) {
-                if (node[occupier_] != currentPlayer) {
+        for (group in eatenNodeGroups) {
+            for (node in group) {
+                if (node != null && node[occupier_] != currentPlayer) {
                     node[occupier_] = currentPlayer;
-                    node[freshness_] = maxFreshness++;
+                    node[freshness_] = maxFreshness;
                 }
             }
+            maxFreshness++;
         }
 
         state.aspects[maxFreshness_] = maxFreshness;
