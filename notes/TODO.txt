@@ -2,13 +2,18 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
-Improve history heuristic
+Improve history
+    Make the diffs go backwards
+    And force a full commit occasionally
 
 Board
-    Sometimes cavities disappear for some reason
     Change ripple behavior
     Figure out how to do "pain"-related things
     Pool objects
+    Timing - should be dictated by the view?
+    Easy replay - random seed?
+        Sometimes cavities disappear for some reason
+        Sometimes cavities spill
 
 Human players, GUISystem
     Implement abstract commands

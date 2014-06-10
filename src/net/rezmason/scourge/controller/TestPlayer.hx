@@ -43,7 +43,7 @@ class TestPlayer extends PlayerSystem implements Player {
 
     override private function init(configData:String, saveData:String):Void {
         super.init(configData, saveData);
-        smarts.init(game, config);
+        smarts.init(game, config, index);
     }
 
     override private function connect():Void proxy(game, announceReady);
@@ -51,5 +51,5 @@ class TestPlayer extends PlayerSystem implements Player {
     override private function play():Void proxy(game, choose);
     override private function isMyTurn():Bool return game.hasBegun && game.winner < 0 && game.currentPlayer == index;
     override private function currentPlayer():Player return this;
-    private function choose():Void volley(currentPlayer(), smarts.choose(game));
+    private function choose():Void volley(currentPlayer(), smarts.choose());
 }

@@ -64,7 +64,7 @@ class BotSystem extends PlayerSystem {
 
     override private function init(configData:String, saveData:String):Void {
         super.init(configData, saveData);
-        for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game, config);
+        for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game, config, bot.index);
     }
 
     override private function connect():Void beat(announceReady);
@@ -74,7 +74,7 @@ class BotSystem extends PlayerSystem {
 
     private function choose():Void {
         var playerSmarts:Smarts = botsByIndex[game.currentPlayer].smarts;
-        var eventType:GameEventType = playerSmarts.choose(game);
+        var eventType:GameEventType = playerSmarts.choose();
         // trace('${game.currentPlayer} $eventType');
         volley(currentPlayer(), eventType);
     }

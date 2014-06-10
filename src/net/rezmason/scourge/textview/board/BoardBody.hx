@@ -29,8 +29,8 @@ class BoardBody extends Body {
     inline static var TOP_OFFSET:Float = -0.03;
     inline static var UI_OFFSET:Float = -0.06;
     static var TEAM_COLORS:Array<Color> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Colors.fromHex);
-    static var BOARD_COLOR:Color = Colors.fromHex(0x303030);
-    static var WALL_COLOR:Color = Colors.fromHex(0x606060);
+    static var BOARD_COLOR:Color = Colors.fromHex(0x202020);
+    static var WALL_COLOR:Color = Colors.fromHex(0x808080);
     static var UI_COLOR:Color = Colors.fromHex(0xFFFFFF);
     static var BODY_CHARS:String = Strings.ALPHANUMERICS;
     static var BLACK:Color = {r:0, g:0, b:0};
@@ -404,23 +404,25 @@ class BoardBody extends Body {
             case Empty:
                 bottom.color = BOARD_COLOR;
                 bottom.char = BOARD_CODE;
-                bottom.size = 0.75;
+                bottom.size = 0.9;
             case Cavity:
-                bottom.color = Colors.mult(TEAM_COLORS[occupier % TEAM_COLORS.length], 0.6);
+                bottom.color = Colors.mult(TEAM_COLORS[occupier % TEAM_COLORS.length], 0.4);
                 bottom.char = BOARD_CODE;
-                bottom.size = 0.75;
+                bottom.size = 0.9;
             case Body:
+                top.z += TOP_OFFSET;
                 top.char = getChar(occupier, bitfield, distance);
                 top.color = TEAM_COLORS[occupier];
                 waveMult = 1;
                 var numNeighbors:Int = 0;
                 for (i in 0...4) numNeighbors += (bitfield >> i) & 1;
-                top.size = (numNeighbors / 4) * 0.6 + 0.45;
+                top.size = (numNeighbors / 4) * 0.5 + 0.4;
                 bottom.char = top.char;
                 bottom.color = Colors.mult(top.color, 0.15);
                 bottom.thickness = 0.8;
                 bottom.size = top.size * 1.5;
             case Head:
+                top.z += TOP_OFFSET;
                 top.color = TEAM_COLORS[occupier];
                 top.char = HEAD_CODE;
                 top.size = 1.5;

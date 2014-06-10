@@ -15,7 +15,7 @@ class ReplaySmarts extends Smarts {
         this.log = log;
     }
 
-    override public function choose(game:Game):GameEventType {
+    override public function choose():GameEventType {
         // trace(moves[1].length);
         var type:GameEventType = log.shift().type;
         var params = Type.enumParameters(type);

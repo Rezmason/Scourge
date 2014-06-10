@@ -108,6 +108,9 @@ class Game {
             startAction.chooseMove();
         }
 
+        historian.write();
+        historian.history.forget();
+
         invalidate();
 
         return historian.history.revision;

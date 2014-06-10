@@ -19,8 +19,8 @@ class RandomSmarts extends Smarts {
     private var otherActionIndices:Array<Int>;
     private var canSkip:Bool;
     
-    override public function init(game:Game, config:ScourgeConfig):Void {
-        super.init(game, config);
+    override public function init(game:Game, config:ScourgeConfig, id:Int):Void {
+        super.init(game, config, id);
         dropActionIndex = game.actionIDs.indexOf(DROP_ACTION);
         swapActionIndex = game.actionIDs.indexOf(SWAP_ACTION);
         biteActionIndex = game.actionIDs.indexOf(BITE_ACTION);
@@ -28,7 +28,7 @@ class RandomSmarts extends Smarts {
         canSkip = config.allowNowhereDrop;
     }
 
-    override public function choose(game:Game):GameEventType {
+    override public function choose():GameEventType {
         var type:GameEventType = null;
         var rev:Int = game.revision;
 

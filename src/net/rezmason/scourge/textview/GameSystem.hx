@@ -46,7 +46,7 @@ class GameSystem {
             var log:Array<GameEvent> = referee.lastGame.log.filter(playerActionsOnly);
             var floats:Array<Float> = referee.lastGame.floats.copy();
             randGen = function() return floats.shift();
-            while (playerDefs.length < config.numPlayers) playerDefs.push(Bot(new ReplaySmarts(log), thinkPeriod));
+            while (playerDefs.length < config.numPlayers) playerDefs.push(Bot(new ReplaySmarts(log), thinkPeriod + animatePeriod));
         } else {
             while (playerDefs.length < config.numPlayers) {
                 var char:String = playerPattern[playerDefs.length];
