@@ -3,19 +3,11 @@ package net.rezmason.scourge.model.rules;
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.Rule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
-import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
-
-using Lambda;
-
-//using net.rezmason.ropes.GridUtils;
-using net.rezmason.utils.Pointers;
 
 class EndTurnRule extends Rule {
 
     @player(BodyAspect.HEAD) var head_;
-    @node(FreshnessAspect.FRESHNESS) var freshness_;
-    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     public function new():Void {
@@ -37,11 +29,7 @@ class EndTurnRule extends Rule {
             if (playerID == startPlayerIndex) throw 'No players have heads!';
         }
 
-        // reset freshness on all nodes
-        for (node in eachNode()) node[freshness_] = Aspect.NULL;
-
         state.aspects[currentPlayer_] = playerID;
-        state.aspects[maxFreshness_] = 0;
         signalEvent();
     }
 }

@@ -27,6 +27,7 @@ class ScourgeConfigFactory {
     static var DROP_PIECE:String         = Siphon.getClassName(DropPieceRule);
     static var EAT_CELLS:String          = Siphon.getClassName(EatCellsRule);
     static var END_TURN:String           = Siphon.getClassName(EndTurnRule);
+    static var RESET_FRESHNESS:String    = Siphon.getClassName(ResetFreshnessRule);
     static var FORFEIT:String            = Siphon.getClassName(ForfeitRule);
     static var KILL_HEADLESS_BODY:String = Siphon.getClassName(KillHeadlessBodyRule);
     static var PICK_PIECE:String         = Siphon.getClassName(PickPieceRule);
@@ -110,6 +111,7 @@ class ScourgeConfigFactory {
             REPLENISH => makeReplenishConfig(config, buildCfg),
 
             END_TURN => null,
+            RESET_FRESHNESS => null,
             FORFEIT => null,
             KILL_HEADLESS_BODY => null,
             ONE_LIVING_PLAYER => null,
@@ -127,7 +129,7 @@ class ScourgeConfigFactory {
     public static function makeCombinedRuleCfg(config:ScourgeConfig):Map<String, Array<String>> {
 
         var combinedRuleConfig:Map<String, Array<String>> = [
-            CLEAN_UP => [DECAY, KILL_HEADLESS_BODY, ONE_LIVING_PLAYER],
+            CLEAN_UP => [DECAY, KILL_HEADLESS_BODY, ONE_LIVING_PLAYER, RESET_FRESHNESS],
             WRAP_UP  => [END_TURN, REPLENISH],
 
             START_ACTION => [CLEAN_UP],

@@ -39,7 +39,9 @@ class RefereeTest {
 
         function noop(game:Game, func:Void->Void) {}
 
-        playerDefs = [Test(noop), Test(noop), Test(noop), Test(noop)];
+        var random:Void->Float = Math.random;
+
+        playerDefs = [Test(noop, random), Test(noop, random), Test(noop, random), Test(noop, random)];
         var config:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
         referee.beginGame({playerDefs:playerDefs, randGen:randGen, gameConfig:config});
 
@@ -71,7 +73,9 @@ class RefereeTest {
             deferredCalls.push(func);
         }
 
-        playerDefs = [Test(defer), Test(defer), Test(defer), Test(defer)];
+        var random:Void->Float = Math.random;
+
+        playerDefs = [Test(defer, random), Test(defer, random), Test(defer, random), Test(defer, random)];
 
         Assert.isFalse(referee.gameBegun);
         var config:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();

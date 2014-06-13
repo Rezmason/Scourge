@@ -173,6 +173,8 @@ class BoardBody extends Body {
             causes.shift();
         }
 
+        // trace(causes);
+
         var start:Float = 0;
         
         for (ike in 0...steps.length) {

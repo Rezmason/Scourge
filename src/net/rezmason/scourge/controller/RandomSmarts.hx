@@ -1,7 +1,5 @@
 package net.rezmason.scourge.controller;
 
-import Std.random;
-
 import net.rezmason.ropes.RopesTypes.Move;
 import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
@@ -19,8 +17,8 @@ class RandomSmarts extends Smarts {
     private var otherActionIndices:Array<Int>;
     private var canSkip:Bool;
     
-    override public function init(game:Game, config:ScourgeConfig, id:Int):Void {
-        super.init(game, config, id);
+    override public function init(game:Game, config:ScourgeConfig, id:Int, random:Void->Float):Void {
+        super.init(game, config, id, random);
         dropActionIndex = game.actionIDs.indexOf(DROP_ACTION);
         swapActionIndex = game.actionIDs.indexOf(SWAP_ACTION);
         biteActionIndex = game.actionIDs.indexOf(BITE_ACTION);
@@ -38,7 +36,7 @@ class RandomSmarts extends Smarts {
         if (type == null) {
             var canDrop:Bool = dropMoves.length > (canSkip ? 1 : 0);
             if (canDrop) {
-                choice = random(dropMoves.length - (canSkip ? 1 : 0));
+                choice = randIntRange(dropMoves.length - (canSkip ? 1 : 0));
                 type = PlayerAction(SubmitMove(dropActionIndex, choice));
             }
         }
@@ -46,7 +44,7 @@ class RandomSmarts extends Smarts {
         if (type == null) {
             var swapMoves:Array<Move> = game.getMovesForAction(swapActionIndex);
             if (swapMoves.length > 0) {
-                choice = random(swapMoves.length);
+                choice = randIntRange(swapMoves.length);
                 type = PlayerAction(SubmitMove(swapActionIndex, choice));
             }
         }

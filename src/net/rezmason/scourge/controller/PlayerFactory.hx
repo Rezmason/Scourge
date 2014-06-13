@@ -22,9 +22,9 @@ class PlayerFactory {
 
             var player:Player = null;
             switch (def) {
-                case Test(proxy): player = new TestPlayer(ike, signal, proxy);
-                case Bot(smarts, period):
-                    if (botSystem == null) botSystem = new BotSystem();
+                case Test(proxy, random): player = new TestPlayer(ike, signal, proxy, random);
+                case Bot(smarts, period, random):
+                    if (botSystem == null) botSystem = new BotSystem(random);
                     player = botSystem.createPlayer(ike, signal, smarts, period);
                 // case Human:
                 // case Remote:

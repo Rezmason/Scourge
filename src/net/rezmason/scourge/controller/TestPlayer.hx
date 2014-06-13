@@ -15,15 +15,17 @@ class TestPlayer extends PlayerSystem implements Player {
 
     private var proxy:TestProxy;
     private var smarts:Smarts;
+    private var random:Void->Float;
 
     @:allow(net.rezmason.scourge.controller.Referee)
     private var updateSignal:Zig<GameEvent->Void>;
 
-    public function new(index:Int, playSignal:PlaySignal, proxy:TestProxy):Void {
+    public function new(index:Int, playSignal:PlaySignal, proxy:TestProxy, random:Void->Float):Void {
         super();
         this.index = index;
         this.playSignal = playSignal;
         this.proxy = proxy;
+        this.random = random;
         smarts = new RandomSmarts();
         synced = true; // TestPlayer is always synced
 
@@ -43,7 +45,7 @@ class TestPlayer extends PlayerSystem implements Player {
 
     override private function init(configData:String, saveData:String):Void {
         super.init(configData, saveData);
-        smarts.init(game, config, index);
+        smarts.init(game, config, index, random);
     }
 
     override private function connect():Void proxy(game, announceReady);

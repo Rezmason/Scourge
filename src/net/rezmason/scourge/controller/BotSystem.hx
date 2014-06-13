@@ -11,14 +11,16 @@ class BotSystem extends PlayerSystem {
     private var botSignal:Zig<Int->GameEvent->Void>;
     private var ballots:Array<GameEvent>;
     private var numBots:Int;
+    private var random:Void->Float;
 
-    public function new():Void {
+    public function new(random:Void->Float):Void {
         super();
 
         botsByIndex = new Map();
         botSignal = new Zig();
         botSignal.add(onBotSignal);
         numBots = 0;
+        this.random = random;
     }
 
     public function createPlayer(index:Int, playSignal:PlaySignal, smarts:Smarts, period:Int):Player {
@@ -64,7 +66,7 @@ class BotSystem extends PlayerSystem {
 
     override private function init(configData:String, saveData:String):Void {
         super.init(configData, saveData);
-        for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game, config, bot.index);
+        for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game, config, bot.index, random);
     }
 
     override private function connect():Void beat(announceReady);

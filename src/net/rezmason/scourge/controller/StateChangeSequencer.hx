@@ -68,6 +68,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
             case RefereeAction(type): 
                 processGameEventType(event.type);
             case _:
+                // trace(game.spitBoard());
                 beginSequence();
                 processGameEventType(event.type);
                 endSequence();
@@ -128,22 +129,17 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         // update the head table
         for (ike in 0...game.state.players.length) headNodes[ike] = nodes[game.state.players[ike][head_]];
 
-        // Decay and Cavity rule changes should be timed *simultaneously*
-        if (cause == "CavityRule" && lastCause == "DecayRule") {
-            step = lastStep;
-            cause = lastCause;
-        } else {
-            step = [];
-            steps.push(step);
-            causes.push(cause);
-            lastStep = step;
-            lastCause = cause;
-        }
+        step = [];
+        steps.push(step);
+        causes.push(cause);
+        lastStep = step;
+        lastCause = cause;
 
         for (ike in 0...players.length) headNodes[ike] = nodes[players[ike][head_]];
         for (ike in 0...nodes.length) {
             var freshness:Int = nodes[ike][freshness_];
             if (freshness == Aspect.NULL || freshness <= maxFreshness) continue;
+            //trace('$freshness $maxFreshness');
             
             var next:NodeVO = getNodeVO(nodes[ike], nodeVOs[ike]);
             nodeVOs[ike] = next;

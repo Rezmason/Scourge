@@ -2,18 +2,27 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
-Improve history
-    Make the diffs go backwards
-    And force a full commit occasionally
+CacheRule
+    A Rule that surrounds another Rule
+    Only used when a model needs to be predictive, like the BotSystem
+    Its config contains a reference to a Void->Int, that spits out the current revision
+    Its config also contains a Zig<Int->Void>, which dispatches a revision when it's time to invalidate the cache
+    Get rid of Game's cache
+
+    Cached moves should have a bool property stating whether they're cached or not
+        DropPieceRule and BiteRule
+        CacheRule will set that value to true or false
+        The internal Rule would iterate over its moves, find the ones that aren't cached, and populate the pool with them
 
 Board
     Change ripple behavior
     Figure out how to do "pain"-related things
     Pool objects
     Timing - should be dictated by the view?
-    Easy replay - random seed?
-        Sometimes cavities disappear for some reason
-        Sometimes cavities spill
+
+Improve history
+    Make the diffs go backwards
+    And force a full commit occasionally
 
 Human players, GUISystem
     Implement abstract commands

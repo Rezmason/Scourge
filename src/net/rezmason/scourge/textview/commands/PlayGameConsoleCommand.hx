@@ -22,6 +22,7 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         keys['playerPattern'] = PLAYER_PATTERN;
         keys['thinkPeriod'] = INTEGERS;
         keys['animatePeriod'] = INTEGERS;
+        keys['seed'] = INTEGERS;
         flags.push('replay');
         flags.push('circular');
     }
@@ -41,6 +42,11 @@ class PlayGameConsoleCommand extends ConsoleCommand {
             outputSignal.dispatch(message, true);
             return;
         }
+
+        var seed:UInt = 0;
+
+        if (args.keyValuePairs.exists('seed')) seed = Std.parseInt(args.keyValuePairs['seed']);
+        else seed = Std.int(Math.random() * 0x7FFFFFFF);
 
         var playerPatternString:String = args.keyValuePairs['playerPattern'];
         if (playerPatternString == null) playerPatternString = 'bb';
@@ -74,10 +80,10 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         cfg.maxBites = 5;
         cfg.maxSkips = 0;
 
-        gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animatePeriod, isReplay);
+        gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animatePeriod, isReplay, seed);
         displaySystem.showBody('board', 'main');
 
-        message = 'Starting $numPlayers-player game.';
+        message = 'Starting $numPlayers-player game with seed $seed.';
         outputSignal.dispatch(message, true);
     }
 }

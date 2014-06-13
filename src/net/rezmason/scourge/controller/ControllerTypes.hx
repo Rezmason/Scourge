@@ -6,9 +6,9 @@ import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
 enum PlayerDef {
-    Test(proxy:Game->(Void->Void)->Void);
+    Test(proxy:Game->(Void->Void)->Void, random:Void->Float);
     Human;
-    Bot(smarts:Smarts, period:Int);
+    Bot(smarts:Smarts, period:Int, random:Void->Float);
     Remote;
 }
 
@@ -63,3 +63,4 @@ typedef NodeVO = {
     var state:Null<NodeState>;
     var freshness:Int;
 };
+
