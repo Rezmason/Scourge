@@ -11,7 +11,6 @@ using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.Pointers;
 
 typedef PickPieceConfig = {
-    public var buildCfg:BuildConfig;
     public var pieceTableIDs:Array<Int>; // The list of pieces available at any point in the game
     public var allowFlipping:Bool; // If false, the reflection is left to chance
     public var allowRotating:Bool; // If false, the rotation is left to chance
@@ -47,20 +46,19 @@ class PickPieceRule extends Rule {
 
     @extra(PieceAspect.PIECE_OPTION_ID) var pieceMoveID_;
 
-    @state(PieceAspect.PIECES_PICKED) var piecesPicked_;
-    @state(PieceAspect.PIECE_FIRST) var pieceFirst_;
-    @state(PieceAspect.PIECE_HAT_FIRST) var pieceHatFirst_;
-    @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
-    @state(PieceAspect.PIECE_ROTATION) var pieceRotation_;
-    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
+    @global(PieceAspect.PIECES_PICKED) var piecesPicked_;
+    @global(PieceAspect.PIECE_FIRST) var pieceFirst_;
+    @global(PieceAspect.PIECE_HAT_FIRST) var pieceHatFirst_;
+    @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
+    @global(PieceAspect.PIECE_ROTATION) var pieceRotation_;
+    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
 
-    @state(PieceAspect.PIECE_HAT_PLAYER) var pieceHatPlayer_;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @global(PieceAspect.PIECE_HAT_PLAYER) var pieceHatPlayer_;
+    @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
-    public function new(cfg:PickPieceConfig):Void {
-        super();
+    override public function _init(cfg:Dynamic):Void {
         this.cfg = cfg;
-        if (cfg.hatSize > cfg.pieceTableIDs.length) cfg.hatSize = cfg.pieceTableIDs.length;
+        if (this.cfg.hatSize > this.cfg.pieceTableIDs.length) this.cfg.hatSize = this.cfg.pieceTableIDs.length;
     }
 
     // All this for an overglorified random piece picker!
@@ -75,13 +73,13 @@ class PickPieceRule extends Rule {
             // The hat's been refilled; all piece moves are available as quantum moves
             moves = [pickMove];
             quantumMoves = cast allMoves.copy();
-        } else if (state.aspects[pieceTableID_] == Aspect.NULL) {
+        } else if (state.globals[pieceTableID_] == Aspect.NULL) {
             moves = [pickMove];
 
             // Iterate over the hat's contents and include the corresopnding quantum moves
 
             var quantumPieceMoves:Array<PickPieceMove> = [];
-            var firstHatPiece:AspectSet = getExtra(state.aspects[pieceHatFirst_]);
+            var firstHatPiece:AspectSet = getExtra(state.globals[pieceHatFirst_]);
             var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
             for (piece in hatPieces) quantumPieceMoves.push(allMoves[piece[pieceMoveID_]]);
             quantumMoves = cast quantumPieceMoves;
@@ -162,11 +160,11 @@ class PickPieceRule extends Rule {
             piece[pieceMoveID_] = move.id;
             allPieces.push(piece);
             state.extras.push(piece);
-            cfg.buildCfg.historyState.extras.push(buildHistExtra(cfg.buildCfg.history));
+            allocHistExtra();
         }
 
         allPieces.chainByAspect(pieceID_, pieceNext_, piecePrev_);
-        state.aspects[pieceFirst_] = allPieces[0][pieceID_];
+        state.globals[pieceFirst_] = allPieces[0][pieceID_];
     }
 
     private function generateMove(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):PickPieceMove {
@@ -184,14 +182,14 @@ class PickPieceRule extends Rule {
     }
 
     private function setPiece(pieceTableID:Int, reflection:Int, rotation:Int):Void {
-        state.aspects[pieceTableID_] = pieceTableID;
-        state.aspects[pieceReflection_] = reflection;
-        state.aspects[pieceRotation_] = rotation;
+        state.globals[pieceTableID_] = pieceTableID;
+        state.globals[pieceReflection_] = reflection;
+        state.globals[pieceRotation_] = rotation;
     }
 
     private function pickMoveFromHat(move:PickPieceMove = null):PickPieceMove {
 
-        var firstHatPiece:AspectSet = getExtra(state.aspects[pieceHatFirst_]);
+        var firstHatPiece:AspectSet = getExtra(state.globals[pieceHatFirst_]);
         var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
 
         // Because pieces are differently weighted, we need to use a binary search algo
@@ -216,26 +214,26 @@ class PickPieceRule extends Rule {
         }
 
 
-        state.aspects[piecesPicked_] = state.aspects[piecesPicked_] + 1;
+        state.globals[piecesPicked_] = state.globals[piecesPicked_] + 1;
 
         var nextPiece:AspectSet = pickedPiece.removeSet(state.extras, pieceHatNext_, pieceHatPrev_);
 
         if (pickedPiece == firstHatPiece) {
             firstHatPiece = nextPiece;
-            if (firstHatPiece == null) state.aspects[pieceHatFirst_] = Aspect.NULL;
-            else state.aspects[pieceHatFirst_] = firstHatPiece[pieceID_];
+            if (firstHatPiece == null) state.globals[pieceHatFirst_] = Aspect.NULL;
+            else state.globals[pieceHatFirst_] = firstHatPiece[pieceID_];
         }
 
         return move;
     }
 
     private function buildHat():Void {
-        var firstPiece:AspectSet = getExtra(state.aspects[pieceFirst_]);
+        var firstPiece:AspectSet = getExtra(state.globals[pieceFirst_]);
         var allPieces:Array<AspectSet> = firstPiece.listToArray(state.extras, pieceNext_);
         allPieces.chainByAspect(pieceID_, pieceHatNext_, pieceHatPrev_);
-        state.aspects[pieceHatFirst_] = firstPiece[pieceID_];
-        state.aspects[piecesPicked_] = 0;
-        state.aspects[pieceHatPlayer_] = state.aspects[currentPlayer_];
+        state.globals[pieceHatFirst_] = firstPiece[pieceID_];
+        state.globals[piecesPicked_] = 0;
+        state.globals[pieceHatPlayer_] = state.globals[currentPlayer_];
     }
 
     private function binarySearch(val:Float, list:Array<Float>):Int {
@@ -258,7 +256,7 @@ class PickPieceRule extends Rule {
 
     // We fill the hat up again if it's empty
     private function remakeHat():Bool {
-        return state.aspects[pieceHatPlayer_] != state.aspects[currentPlayer_] ||
-                state.aspects[piecesPicked_] == cfg.hatSize;
+        return state.globals[pieceHatPlayer_] != state.globals[currentPlayer_] ||
+                state.globals[piecesPicked_] == cfg.hatSize;
     }
 }

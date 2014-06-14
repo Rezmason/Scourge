@@ -19,3 +19,5 @@ typedef AspectLookup = Map<String, AspectPtr>; // The indices of property types 
 typedef Move = {id:Int, ?relatedID:Int, ?weight:Float};
 typedef SavedState = {data:String};
 typedef StateHistory = History<Atom>;
+
+typedef RulePrimer = {state:State, plan:StatePlan, history:StateHistory, historyState:State, ?onSignal:String->Void};

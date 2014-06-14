@@ -45,12 +45,13 @@ class TurnRulesTest extends ScourgeRuleTest
         // Should go to the next player who is alive (has a head)
 
         var endTurnRule:EndTurnRule = new EndTurnRule();
+        endTurnRule.init(null);
         makeState([endTurnRule], 4, TestBoards.emptySquareFourPlayerSkirmish);
 
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
 
         var expectedCurrentPlayer:Int = 0;
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = state.globals[currentPlayer_];
 
         Assert.areEqual(expectedCurrentPlayer, currentPlayer);
 
@@ -68,7 +69,7 @@ class TurnRulesTest extends ScourgeRuleTest
         while (expectedCurrentPlayer < 10) {
             expectedCurrentPlayer++;
             endTurnRule.chooseMove();
-            currentPlayer = state.aspects[currentPlayer_];
+            currentPlayer = state.globals[currentPlayer_];
             Assert.areEqual(expectedCurrentPlayer % 3, currentPlayer);
         }
     }
@@ -79,6 +80,7 @@ class TurnRulesTest extends ScourgeRuleTest
         // Should unassign head of current player
 
         var forfeitRule:ForfeitRule = new ForfeitRule();
+        forfeitRule.init(null);
         makeState([forfeitRule], 4, TestBoards.oaf);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
@@ -86,7 +88,7 @@ class TurnRulesTest extends ScourgeRuleTest
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
 
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = state.globals[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
         var playerHead:AspectSet = state.nodes[head];
 
@@ -116,6 +118,7 @@ class TurnRulesTest extends ScourgeRuleTest
         // Should remove heads that are not occupied by their owner
 
         var killHeadlessBodyRule:KillHeadlessBodyRule = new KillHeadlessBodyRule();
+        killHeadlessBodyRule.init(null);
         makeState([killHeadlessBodyRule], 4);
 
         // Change occupier of current player\'s head
@@ -126,7 +129,7 @@ class TurnRulesTest extends ScourgeRuleTest
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
 
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = state.globals[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
         var playerHead:AspectSet = state.nodes[head];
 
@@ -150,7 +153,9 @@ class TurnRulesTest extends ScourgeRuleTest
     public function skipsExhaustedTest():Void {
 
         // Create a four-player game with a max skip of five times
-        var stalemateRule:StalemateRule = new StalemateRule({maxSkips:5});
+        var stalemateRule:StalemateRule = new StalemateRule();
+        stalemateRule.init(null);
+        stalemateRule.init({maxSkips:5});
         makeState([stalemateRule], 4);
 
         var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
@@ -166,7 +171,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         stalemateRule.update();
         stalemateRule.chooseMove();
-        Assert.areEqual(Aspect.NULL, state.aspects[winner_]);
+        Assert.areEqual(Aspect.NULL, state.globals[winner_]);
 
         // Have each player skip one more time, then check for a winner
 
@@ -178,7 +183,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         stalemateRule.update();
         stalemateRule.chooseMove();
-        Assert.areEqual(3, state.aspects[winner_]);
+        Assert.areEqual(3, state.globals[winner_]);
     }
 
     @Test
@@ -186,6 +191,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Create a four-player game
         var oneLivingPlayerRule:OneLivingPlayerRule = new OneLivingPlayerRule();
+        oneLivingPlayerRule.init(null);
         makeState([oneLivingPlayerRule], 4);
 
         var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
@@ -203,6 +209,6 @@ class TurnRulesTest extends ScourgeRuleTest
 
         oneLivingPlayerRule.update();
         oneLivingPlayerRule.chooseMove();
-        Assert.areEqual(1, state.aspects[winner_]);
+        Assert.areEqual(1, state.globals[winner_]);
     }
 }

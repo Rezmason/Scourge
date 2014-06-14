@@ -17,11 +17,12 @@ using net.rezmason.utils.Pointers;
 
     var state:State;
     var plan:StatePlan;
+    var historyState:State;
+    var history:StateHistory;
 
-    public var demiurgic(default, null):Bool;
     public var moves(default, null):Array<Move>;
     public var quantumMoves(default, null):Array<Move>;
-    public var stateAspectRequirements(default, null):AspectRequirements;
+    public var globalAspectRequirements(default, null):AspectRequirements;
     public var playerAspectRequirements(default, null):AspectRequirements;
     public var nodeAspectRequirements(default, null):AspectRequirements;
     public var extraAspectRequirements(default, null):AspectRequirements;
@@ -31,6 +32,7 @@ using net.rezmason.utils.Pointers;
     private var ident_:AspectPtr;
 
     private function _prime():Void {}
+    private function _init(config:Dynamic):Void {}
     private function _update():Void {}
     private function _chooseMove(choice:Int):Void {}
     private function _collectMoves():Void {}
@@ -42,23 +44,28 @@ using net.rezmason.utils.Pointers;
 
     var onSignal:String->Void;
 
-    function new():Void {
-        demiurgic = false;
-        stateAspectRequirements = new AspectRequirements();
+    public function new():Void {
+        globalAspectRequirements = new AspectRequirements();
         playerAspectRequirements = new AspectRequirements();
         nodeAspectRequirements = new AspectRequirements();
         extraAspectRequirements = new AspectRequirements();
         extraAspectTemplate = new AspectSet();
         extraAspectLookup = new AspectLookup();
-        moves = [];
-        quantumMoves = [];
         __initReqs();
     }
 
-    @:final public function prime(state:State, plan:StatePlan, onSignal:String->Void):Void {
-        this.state = state;
-        this.plan = plan;
-        this.onSignal = onSignal;
+    @:final public function init(config:Dynamic):Void {
+        moves = [];
+        quantumMoves = [];
+        _init(config);
+    }
+
+    @:final public function prime(primer:RulePrimer):Void {
+        this.state = primer.state;
+        this.plan = primer.plan;
+        this.onSignal = primer.onSignal;
+        this.history = primer.history;
+        this.historyState = primer.historyState;
 
         ident_ = Ptr.intToPointer(0, state.key);
 
@@ -113,13 +120,15 @@ using net.rezmason.utils.Pointers;
         return name;
     }
 
-    @:final inline function buildExtra():AspectSet {
-        return extraAspectTemplate.copy();
-    }
-
-    @:final inline function buildHistExtra(history:StateHistory):AspectSet {
-        return extraAspectTemplate.map(history.alloc);
-    }
+    @:final inline function buildGlobals():AspectSet return plan.globalAspectTemplate.copy();
+    @:final inline function buildPlayer():AspectSet return plan.playerAspectTemplate.copy();
+    @:final inline function buildNode():AspectSet return plan.nodeAspectTemplate.copy();
+    @:final inline function buildExtra():AspectSet return extraAspectTemplate.copy();
+    
+    @:final inline function allocHistGlobals():Void historyState.globals = plan.globalAspectTemplate.map(history.alloc);
+    @:final inline function allocHistPlayer():Void historyState.players.push(plan.playerAspectTemplate.map(history.alloc));
+    @:final inline function allocHistNode():Void historyState.nodes.push(plan.nodeAspectTemplate.map(history.alloc));
+    @:final inline function allocHistExtra():Void historyState.extras.push(extraAspectTemplate.map(history.alloc));
 
     @:final inline function getID(aspectSet:AspectSet):Int { return aspectSet[ident_]; }
     @:final inline function getNodeLocus(node:AspectSet):BoardLocus { return getLocus(getID(node)); }
@@ -139,13 +148,13 @@ using net.rezmason.utils.Pointers;
     @:final inline function numPlayers():Int { return state.players.length; }
     @:final inline function numExtras():Int { return state.extras.length; }
 
-    @:final inline function addStateAspectRequirement(req:AspectProperty):Void stateAspectRequirements [req.id] = req;
+    @:final inline function addGlobalAspectRequirement(req:AspectProperty):Void globalAspectRequirements [req.id] = req;
     @:final inline function addPlayerAspectRequirement(req:AspectProperty):Void playerAspectRequirements [req.id] = req;
     @:final inline function addNodeAspectRequirement(req:AspectProperty):Void nodeAspectRequirements [req.id] = req;
 
     #if macro
     private static var lkpSources:Map<String, String> = [
-        'state'=>'plan',
+        'global'=>'plan',
         'player'=>'plan',
         'node'=>'plan',
         'extra'=>'this',
@@ -174,6 +183,10 @@ using net.rezmason.utils.Pointers;
         var assignments:Array<Expr> = [];
 
         for (field in fields) {
+
+            if (field.name == 'new') {
+                throw new Error('Rules cannot have their own constructor. Use the _init function instead.', field.pos);
+            }
 
             if (restrictedFields.has(field.name)) {
                 throw new Error('Rules cannot manually override the function ${field.name}', field.pos);

@@ -45,15 +45,14 @@ class BiteRule extends Rule {
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var cfg:BiteConfig;
     private var movePool:Array<BiteMove>;
     private var allMoves:Array<BiteMove>;
 
-    public function new(cfg:BiteConfig):Void {
-        super();
+    override public function _init(cfg:Dynamic):Void {
         this.cfg = cfg;
         movePool = [];
         allMoves = [];
@@ -68,7 +67,7 @@ class BiteRule extends Rule {
         var biteMoves:Array<BiteMove> = [];
 
         // get current player head
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = state.globals[currentPlayer_];
 
         var headIDs:Array<Int> = [];
         for (player in eachPlayer()) headIDs.push(player[head_]);
@@ -174,9 +173,9 @@ class BiteRule extends Rule {
 
             // Grab data from the move
 
-            var currentPlayer:Int = state.aspects[currentPlayer_];
+            var currentPlayer:Int = state.globals[currentPlayer_];
 
-            var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
+            var maxFreshness:Int = state.globals[maxFreshness_] + 1;
             var numBites:Int = getPlayer(currentPlayer)[numBites_] - 1;
 
             // Find the cells removed from each player
@@ -198,7 +197,7 @@ class BiteRule extends Rule {
                 player[bodyFirst_] = bodyFirst;
             }
 
-            state.aspects[maxFreshness_] = maxFreshness;
+            state.globals[maxFreshness_] = maxFreshness;
             getPlayer(currentPlayer)[numBites_] = numBites;
         }
 

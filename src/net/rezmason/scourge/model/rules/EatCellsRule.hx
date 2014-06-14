@@ -32,23 +32,22 @@ class EatCellsRule extends Rule {
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
-    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var cfg:EatCellsConfig;
 
-    public function new(cfg:EatCellsConfig):Void {
-        super();
+    override public function _init(cfg:Dynamic):Void {
         this.cfg = cfg;
         moves.push({id:0});
     }
 
     override private function _chooseMove(choice:Int):Void {
 
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = state.globals[currentPlayer_];
         var head:Int = getPlayer(currentPlayer)[head_];
         var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
-        var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
+        var maxFreshness:Int = state.globals[maxFreshness_] + 1;
 
         // List all the players' heads
 
@@ -118,7 +117,7 @@ class EatCellsRule extends Rule {
             maxFreshness++;
         }
 
-        state.aspects[maxFreshness_] = maxFreshness;
+        state.globals[maxFreshness_] = maxFreshness;
 
         // Clean up the bodyFirst and head pointers for opponent players
         for (player in eachPlayer()) {

@@ -15,7 +15,7 @@ class TestEvaluator extends Evaluator {
         var history:StateHistory = state.history;
 
         var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = state.globals[currentPlayer_];
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var head:Int = state.players[currentPlayer][head_];

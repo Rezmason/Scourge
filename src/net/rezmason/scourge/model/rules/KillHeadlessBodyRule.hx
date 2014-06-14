@@ -21,18 +21,15 @@ class KillHeadlessBodyRule extends Rule {
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
-    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
-    public function new():Void {
-        super();
-        moves.push({id:0});
-    }
+    override public function _init(cfg:Dynamic):Void { moves.push({id:0}); }
 
     override private function _chooseMove(choice:Int):Void {
 
         // trace(state.spitBoard(plan));
 
-        var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
+        var maxFreshness:Int = state.globals[maxFreshness_] + 1;
 
         // Check each player to see if they still have head nodes
 
@@ -57,7 +54,7 @@ class KillHeadlessBodyRule extends Rule {
 
         }
 
-        state.aspects[maxFreshness_] = maxFreshness;
+        state.globals[maxFreshness_] = maxFreshness;
 
         // trace(state.spitBoard(plan));
         // trace('---');

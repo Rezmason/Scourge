@@ -18,15 +18,12 @@ typedef SwapPieceConfig = {
 class SwapPieceRule extends Rule {
 
     @player(SwapAspect.NUM_SWAPS) var numSwaps_;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
-    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
+    @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
 
     var cfg:SwapPieceConfig;
 
-    public function new(cfg:SwapPieceConfig):Void {
-        super();
-        this.cfg = cfg;
-    }
+    override public function _init(cfg:Dynamic):Void { this.cfg = cfg; }
 
     override private function _prime():Void {
         for (player in eachPlayer()) player[numSwaps_] = cfg.startingSwaps;
@@ -35,16 +32,16 @@ class SwapPieceRule extends Rule {
     // This rule basically zaps the current player's piece and takes away a swap.
     override private function _update():Void {
         moves = [];
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = state.globals[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
-        if (numSwaps > 0 && state.aspects[pieceTableID_] != Aspect.NULL) moves.push({id:0});
+        if (numSwaps > 0 && state.globals[pieceTableID_] != Aspect.NULL) moves.push({id:0});
     }
 
     override private function _chooseMove(choice:Int):Void {
-                var currentPlayer:Int = state.aspects[currentPlayer_];
+                var currentPlayer:Int = state.globals[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
         getPlayer(currentPlayer)[numSwaps_] = numSwaps - 1;
-        state.aspects[pieceTableID_] = Aspect.NULL;
+        state.globals[pieceTableID_] = Aspect.NULL;
         signalEvent();
     }
 }

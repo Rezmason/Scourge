@@ -15,7 +15,6 @@ using net.rezmason.utils.Pointers;
 typedef XY = {x:Float, y:Float};
 
 typedef BuildBoardConfig = {
-    public var buildCfg:BuildConfig;
     public var circular:Bool;
     public var initGrid:String;
 }
@@ -34,8 +33,6 @@ class BuildBoardRule extends Rule {
 
     private var cfg:BuildBoardConfig;
 
-    var nodeAspectTemplate:AspectSet;
-
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
@@ -43,15 +40,9 @@ class BuildBoardRule extends Rule {
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
 
-    public function new(cfg:BuildBoardConfig):Void {
-        super();
-        demiurgic = true;
-        this.cfg = cfg;
-    }
+    override public function _init(cfg:Dynamic):Void { this.cfg = cfg; }
 
     override private function _prime():Void {
-
-        nodeAspectTemplate = plan.nodeAspectTemplate.copy();
 
         // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
         // Player 1's head is at a 45 degree angle
@@ -129,15 +120,14 @@ class BuildBoardRule extends Rule {
 
     inline function makeNodeAndLocus():BoardLocus {
         var id:Int = numNodes();
-        var node:AspectSet = nodeAspectTemplate.copy();
+        var node:AspectSet = buildNode();
         node[ident_] = id;
         state.nodes.push(node);
 
         var locus:BoardLocus = new BoardLocus(id, node);
         state.loci.push(locus);
-
-        var histNode:AspectSet = nodeAspectTemplate.map(cfg.buildCfg.history.alloc);
-        cfg.buildCfg.historyState.nodes.push(histNode);
+        
+        allocHistNode();
 
         return locus;
     }

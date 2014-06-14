@@ -7,7 +7,7 @@ using net.rezmason.utils.Pointers;
 
 class State {
 
-    public var aspects:AspectSet;
+    public var globals:AspectSet;
     public var players(default, null):Array<AspectSet>;
     public var nodes(default, null):Array<AspectSet>;
     public var loci(default, null):Array<GridLocus<AspectSet>>; // aka BoardLocus
@@ -18,7 +18,7 @@ class State {
 
         this.key = key;
 
-        aspects = null;
+        globals = null;
         players = [];
         nodes   = [];
         loci    = [];
@@ -26,9 +26,9 @@ class State {
     }
 
     public function wipe():Void {
-        if (aspects != null) {
-            aspects.wipe();
-            aspects = null;
+        if (globals != null) {
+            globals.wipe();
+            globals = null;
         }
         players.splice(0, players.length);
         nodes.splice  (0, nodes.length);
@@ -37,14 +37,14 @@ class State {
     }
 
     function hxSerialize(s:haxe.Serializer):Void {
-        s.serialize(aspects);
+        s.serialize(globals);
         s.serialize(players);
         s.serializeGrid(loci); // implicitly serializes nodes
         s.serialize(extras);
     }
 
     function hxUnserialize(s:haxe.Unserializer):Void {
-        aspects = s.unserialize();
+        globals = s.unserialize();
         players = s.unserialize();
         loci    = s.unserializeGrid();
         extras  = s.unserialize();

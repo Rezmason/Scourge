@@ -8,7 +8,6 @@ import net.rezmason.ropes.RopesTypes;
 using net.rezmason.utils.Pointers;
 
 typedef BuildPlayersConfig = {
-    public var buildCfg:BuildConfig;
     public var numPlayers:Int;
 }
 
@@ -16,11 +15,7 @@ class BuildPlayersRule extends Rule {
 
     var cfg:BuildPlayersConfig;
 
-    public function new(cfg:BuildPlayersConfig):Void {
-        super();
-        demiurgic = true;
-        this.cfg = cfg;
-    }
+    override public function _init(cfg:Dynamic):Void { this.cfg = cfg; }
 
     override private function _prime():Void {
         if (cfg.numPlayers < 1) throw 'Invalid number of players in player config.';
@@ -28,11 +23,11 @@ class BuildPlayersRule extends Rule {
     }
 
     inline function makePlayer():AspectSet {
-        var player:AspectSet = plan.playerAspectTemplate.copy();
+        var player:AspectSet = buildPlayer();
         player[ident_] = numPlayers();
         state.players.push(player);
-        var histPlayer:AspectSet = plan.playerAspectTemplate.map(cfg.buildCfg.history.alloc);
-        cfg.buildCfg.historyState.players.push(histPlayer);
+        
+        allocHistPlayer();
 
         return player;
     }

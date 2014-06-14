@@ -14,6 +14,8 @@ CacheRule
         CacheRule will set that value to true or false
         The internal Rule would iterate over its moves, find the ones that aren't cached, and populate the pool with them
 
+Worker tests are failing in-game on Flash and HTML5 targets
+
 Board
     Change ripple behavior
     Figure out how to do "pain"-related things

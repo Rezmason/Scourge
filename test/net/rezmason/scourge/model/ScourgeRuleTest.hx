@@ -10,7 +10,7 @@ import net.rezmason.ropes.StatePlan;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
-import net.rezmason.scourge.model.rules.BuildStateRule;
+import net.rezmason.scourge.model.rules.BuildGlobalsRule;
 import net.rezmason.scourge.model.rules.BuildPlayersRule;
 
 using net.rezmason.ropes.AspectUtils;
@@ -58,26 +58,25 @@ class ScourgeRuleTest
 
         if (rules == null) rules = [];
 
-        var buildConfig:BuildConfig = {history:history, historyState:historyState};
-
         // make state config and generate state
-        var buildStateConfig:BuildStateConfig = {firstPlayer:0, buildCfg:buildConfig};
-        var buildStateRule:BuildStateRule = new BuildStateRule(buildStateConfig);
+        var buildStateRule:BuildGlobalsRule = new BuildGlobalsRule();
+        buildStateRule.init({firstPlayer:0});
 
         // make player config and generate players
-        var buildPlayersCfg:BuildPlayersConfig = {numPlayers:numPlayers, buildCfg:buildConfig};
-        var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule(buildPlayersCfg);
+        var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule();
+        buildPlayersRule.init({numPlayers:numPlayers});
 
         // make board config and generate board
-        var buildBoardCfg:BuildBoardConfig = {circular:circular, initGrid:initGrid, buildCfg:buildConfig};
-        var buildBoardRule:BuildBoardRule = new BuildBoardRule(buildBoardCfg);
+        var buildBoardRule:BuildBoardRule = new BuildBoardRule();
+        buildBoardRule.init({circular:circular, initGrid:initGrid});
 
         rules.unshift(buildBoardRule);
         rules.unshift(buildPlayersRule);
         rules.unshift(buildStateRule);
 
         plan = new StatePlanner().planState(state, rules);
-        for (rule in rules) rule.prime(state, plan, null);
+        var primer:RulePrimer = {state:state, plan:plan, history:history, historyState:historyState};
+        for (rule in rules) rule.prime(primer);
     }
 
     private function testListLength(expectedLength:Int, first:AspectSet, next:AspectPtr, prev:AspectPtr):Int {

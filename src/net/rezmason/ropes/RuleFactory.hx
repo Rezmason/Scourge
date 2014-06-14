@@ -22,9 +22,8 @@ class RuleFactory {
                 if (ruleDef == null) {
                     trace('Rule not found: $key');
                 } else {
-                    var args:Array<Dynamic> = [cfg[key]];
-                    args.remove(null);
-                    rules[key] = ruleDef.createInstance(args);
+                    rules[key] = ruleDef.createInstance([]);
+                    rules[key].init(cfg[key]);
                 }
             }
         }
@@ -50,7 +49,8 @@ class RuleFactory {
                     else if (cfg.isNotNull(ruleName)) rules.push(makeJointRule(ruleName));
                     else trace('Rule not found: $ruleName');
                 }
-                var jointRule:Rule = new JointRule(rules);
+                var jointRule:Rule = new JointRule();
+                jointRule.init(rules);
                 combinedRules[key] = jointRule;
                 ruleStack.pop();
                 return jointRule;

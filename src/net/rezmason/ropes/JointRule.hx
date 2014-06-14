@@ -6,16 +6,7 @@ class JointRule extends Rule {
 
     var rules:Array<Rule>;
 
-    public function new(rules:Array<Rule>):Void {
-        super();
-        this.rules = rules;
-
-        for (rule in rules) {
-            stateAspectRequirements.absorb(rule.stateAspectRequirements);
-            playerAspectRequirements.absorb(rule.playerAspectRequirements);
-            nodeAspectRequirements.absorb(rule.nodeAspectRequirements);
-        }
-    }
+    override public function _init(cfg:Dynamic):Void { rules = cast cfg; }
 
     override private function _update():Void {
         rules[0].update();

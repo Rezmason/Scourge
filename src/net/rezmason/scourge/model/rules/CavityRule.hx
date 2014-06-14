@@ -24,15 +24,14 @@ class CavityRule extends Rule {
     @player(BodyAspect.CAVITY_FIRST) var cavityFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
     var allEdges:Array<Int>;
     var groupFirstEdges:Array<Int>;
     var groupAngles:Array<Int>;
     var cavityNodes:Array<AspectSet>;
 
-    public function new():Void {
-        super();
+    override public function _init(cfg:Dynamic):Void {
         moves.push({id:0});
 
         allEdges = [];
@@ -42,9 +41,9 @@ class CavityRule extends Rule {
     }
 
     override private function _chooseMove(choice:Int):Void {
-        var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
+        var maxFreshness:Int = state.globals[maxFreshness_] + 1;
         for (player in eachPlayer()) remapCavities(player, maxFreshness);
-        state.aspects[maxFreshness_] = maxFreshness;
+        state.globals[maxFreshness_] = maxFreshness;
         signalEvent();
     }
 

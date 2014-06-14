@@ -11,7 +11,7 @@ import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.scourge.model.aspects.TestAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.rules.BuildStateRule;
+import net.rezmason.scourge.model.rules.BuildGlobalsRule;
 import net.rezmason.scourge.model.rules.TestRule;
 
 using net.rezmason.ropes.GridUtils;
@@ -45,17 +45,27 @@ class StatePlannerTest {
 
         // make state config and generate state
         var planner:StatePlanner = new StatePlanner();
-        var buildStateConfig:BuildStateConfig = {firstPlayer:0, buildCfg:{ history:history, historyState:historyState }};
-        var rules:Array<Rule> = [null, new BuildStateRule(buildStateConfig), new TestRule()];
+        var buildStateRule:BuildGlobalsRule = new BuildGlobalsRule();
+        var testRule:TestRule = new TestRule();
+        buildStateRule.init({firstPlayer:0});
+        testRule.init(null);
+        var rules:Array<Rule> = [null, buildStateRule, testRule];
         var state:State = new State(key);
         var plan:StatePlan = planner.planState(state, rules);
 
-        for (rule in rules) if (rule != null) rule.prime(state, plan, null);
+        var primer:RulePrimer = {
+            state:state, 
+            plan:plan, 
+            history:history, 
+            historyState:historyState
+        };
+
+        for (rule in rules) if (rule != null) rule.prime(primer);
 
         // Make sure there's the right aspects on the state
 
         var stateTestValue_:AspectPtr = plan.onState(TestAspect.VALUE_1);
-        Assert.isNotNull(state.aspects[stateTestValue_]);
+        Assert.isNotNull(state.globals[stateTestValue_]);
 
         // Make sure there's the right aspects on each player
         var playerTestValue_:AspectPtr = plan.onPlayer(TestAspect.VALUE_1);

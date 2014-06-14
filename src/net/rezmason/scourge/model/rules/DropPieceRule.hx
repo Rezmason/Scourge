@@ -50,24 +50,23 @@ class DropPieceRule extends Rule {
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(PlyAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
-    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
-    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
-    @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
-    @state(PieceAspect.PIECE_ROTATION) var pieceRotation_;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
+    @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
+    @global(PieceAspect.PIECE_ROTATION) var pieceRotation_;
+    @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var cfg:DropPieceConfig;
     private var nowhereMove:DropPieceMove;
     private var movePool:Array<DropPieceMove>;
     private var allMoves:Array<DropPieceMove>;
 
-    public function new(cfg:DropPieceConfig):Void {
-        super();
+    override public function _init(cfg:Dynamic):Void {
         this.cfg = cfg;
         movePool = [];
         allMoves = [];
 
-        if (cfg.allowNowhere) {
+        if (this.cfg.allowNowhere) {
             nowhereMove = {
                 targetNode:Aspect.NULL,
                 coord:null,
@@ -94,17 +93,17 @@ class DropPieceRule extends Rule {
 
         var pieceIDs:Array<Int> = [];
         if (cfg.allowPiecePick) for (pieceID in cfg.pieceTableIDs) pieceIDs.push(pieceID);
-        else if (state.aspects[pieceTableID_] != Aspect.NULL) pieceIDs.push(state.aspects[pieceTableID_]);
+        else if (state.globals[pieceTableID_] != Aspect.NULL) pieceIDs.push(state.globals[pieceTableID_]);
 
         // get current player head
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = state.globals[currentPlayer_];
         var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
 
         // Find edge nodes of current player
         var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_).filter(hasFreeEdge);
 
-        var pieceReflection:Int = state.aspects[pieceReflection_];
-        var pieceRotation:Int = state.aspects[pieceRotation_];
+        var pieceReflection:Int = state.globals[pieceReflection_];
+        var pieceRotation:Int = state.globals[pieceRotation_];
 
         for (pieceID in pieceIDs) {
 
@@ -213,7 +212,7 @@ class DropPieceRule extends Rule {
 
         var move:DropPieceMove = cast moves[choice];
 
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = state.globals[currentPlayer_];
         var player:AspectSet = getPlayer(currentPlayer);
 
         if (move.targetNode != Aspect.NULL) {
@@ -221,21 +220,21 @@ class DropPieceRule extends Rule {
             var targetLocus:BoardLocus = getLocus(move.targetNode);
             var coords:Array<IntCoord> = pieceGroup[move.reflection][move.rotation][0];
             var homeCoord:IntCoord = move.coord;
-            var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
+            var maxFreshness:Int = state.globals[maxFreshness_] + 1;
 
             var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
 
             for (coord in coords) bodyNode = fillAndOccupyCell(walkLocus(targetLocus, coord, homeCoord).value, currentPlayer, maxFreshness, bodyNode);
             player[bodyFirst_] = getID(bodyNode);
 
-            state.aspects[maxFreshness_] = maxFreshness;
+            state.globals[maxFreshness_] = maxFreshness;
 
             player[numConsecutiveSkips_] = 0;
         } else {
             player[numConsecutiveSkips_] = player[numConsecutiveSkips_] + 1;
         }
 
-        state.aspects[pieceTableID_] = Aspect.NULL;
+        state.globals[pieceTableID_] = Aspect.NULL;
         signalEvent();
     }
 

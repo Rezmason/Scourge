@@ -33,13 +33,12 @@ class ReplenishRuleTest extends ScourgeRuleTest
     @Test
     public function replenishTest():Void {
         var cfg:ReplenishConfig = {
-            buildCfg: { history:history, historyState:historyState, },
-            stateProperties:null,
+            globalProperties:null,
             playerProperties:null,
             nodeProperties:null,
         };
 
-        cfg.stateProperties = [
+        cfg.globalProperties = [
             { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
             { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
             { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
@@ -57,7 +56,8 @@ class ReplenishRuleTest extends ScourgeRuleTest
             { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
-        var replenishRule:ReplenishRule = new ReplenishRule(cfg);
+        var replenishRule:ReplenishRule = new ReplenishRule();
+        replenishRule.init(cfg);
 
         makeState([replenishRule], 1, TestBoards.emptyPetri);
 
@@ -83,9 +83,9 @@ class ReplenishRuleTest extends ScourgeRuleTest
             var index2:Int = Std.int(Math.min(expectedValues2.length - 1, ike));
             var index3:Int = Std.int(Math.min(expectedValues3.length - 1, ike));
 
-            Assert.areEqual(expectedValues1[index1], state.aspects[stateValue1_]);
-            Assert.areEqual(expectedValues2[index2], state.aspects[stateValue2_]);
-            Assert.areEqual(expectedValues3[index3], state.aspects[stateValue3_]);
+            Assert.areEqual(expectedValues1[index1], state.globals[stateValue1_]);
+            Assert.areEqual(expectedValues2[index2], state.globals[stateValue2_]);
+            Assert.areEqual(expectedValues3[index3], state.globals[stateValue3_]);
 
             for (player in state.players) {
                 Assert.areEqual(expectedValues1[index1], player[playerValue1_]);

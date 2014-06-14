@@ -9,7 +9,6 @@ import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
 
-using Lambda;
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Alphabetizer;
@@ -50,34 +49,35 @@ class Game {
 
         // Build the game from the config
 
-        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, historian.history, historian.historyState);
-        var basicRules:Map<String, Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
+        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction);
+        var basicRulesByName:Map<String, Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
         var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
-
-        var combinedRules:Map<String, Rule> = RuleFactory.combineRules(combinedConfig, basicRules);
-
-        // Find the demiurgic rules
-
-        var basicRulesArray:Array<Rule> = [];
-        var demiurgicRules:Map<String, Rule> = new Map();
-        var rules:Array<Rule> = [];
-        for (key in basicRules.keys().a2z()) {
-            var rule:Rule = basicRules[key];
-            rules.push(rule);
-
-            if (rule.demiurgic) demiurgicRules[key] = rule;
-            else basicRulesArray.push(rule);
+        var combinedRules:Map<String, Rule> = RuleFactory.combineRules(combinedConfig, basicRulesByName);
+        var builderRuleKeys:Array<String> = ScourgeConfigFactory.makeBuilderRuleList();
+        var basicRules:Array<Rule> = [];
+        var builderRules:Array<Rule> = [];
+        for (key in basicRulesByName.keys().a2z()) {
+            var builderRuleIndex:Int = builderRuleKeys.indexOf(key);
+            if (builderRuleIndex == -1) basicRules.push(basicRulesByName[key]);
+            else builderRules[builderRuleIndex] = basicRulesByName[key];
         }
+        while (builderRules.remove(null)) {}
 
         // Plan the state
 
-        plan = planner.planState(state, rules);
+        plan = planner.planState(state, builderRules.concat(basicRules));
 
-        // Prime the rules with the state and plan
+        // Prime the rules
+        var primer:RulePrimer = {
+            state:state,
+            plan:plan,
+            history:historian.history,
+            historyState:historian.historyState,
+            onSignal:alertFunction,
+        };
 
-        // demiurgic ones go first
-        for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules[key].prime(state, plan, alertFunction);
-        for (rule in basicRulesArray) rule.prime(state, plan, alertFunction);
+        for (rule in builderRules) rule.prime(primer);
+        for (rule in basicRules) rule.prime(primer);
 
         // Grab some aspect pointers so we can quickly evaluate the state
 
@@ -221,9 +221,9 @@ class Game {
 
     private function get_revision():Int { return historian.history.revision; }
 
-    private function get_currentPlayer():Int { return historian.state.aspects[currentPlayer_]; }
+    private function get_currentPlayer():Int { return historian.state.globals[currentPlayer_]; }
 
-    private function get_winner():Int { return historian.state.aspects[winner_]; }
+    private function get_winner():Int { return historian.state.globals[winner_]; }
 
     private function get_state():State { return historian.state; }
 

@@ -26,18 +26,18 @@ class StatePlanner {
         rules = rules.copy();
         while (rules.remove(null)) {}
 
-        var stateRequirements:AspectRequirements = new AspectRequirements();
+        var globalRequirements:AspectRequirements = new AspectRequirements();
         var playerRequirements:AspectRequirements = new AspectRequirements();
         var nodeRequirements:AspectRequirements = new AspectRequirements();
 
         for (rule in rules) {
-            stateRequirements.absorb(rule.stateAspectRequirements);
+            globalRequirements.absorb(rule.globalAspectRequirements);
             playerRequirements.absorb(rule.playerAspectRequirements);
             nodeRequirements.absorb(rule.nodeAspectRequirements);
             // trace(Type.getClassName(Type.getClass(rule)));
         }
 
-        planAspects(stateRequirements, plan.stateAspectLookup, plan.stateAspectTemplate, state.key);
+        planAspects(globalRequirements, plan.globalAspectLookup, plan.globalAspectTemplate, state.key);
         planAspects(playerRequirements, plan.playerAspectLookup, plan.playerAspectTemplate, state.key);
         planAspects(nodeRequirements, plan.nodeAspectLookup, plan.nodeAspectTemplate, state.key);
 

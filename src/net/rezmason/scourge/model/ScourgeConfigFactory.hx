@@ -1,6 +1,5 @@
 package net.rezmason.scourge.model;
 
-import net.rezmason.scourge.model.BuildConfig;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.State;
@@ -21,7 +20,7 @@ class ScourgeConfigFactory {
 
     static var BUILD_BOARD:String        = Siphon.getClassName(BuildBoardRule);
     static var BUILD_PLAYERS:String      = Siphon.getClassName(BuildPlayersRule);
-    static var BUILD_STATE:String        = Siphon.getClassName(BuildStateRule);
+    static var BUILD_GLOBALS:String        = Siphon.getClassName(BuildGlobalsRule);
     static var CAVITY:String             = Siphon.getClassName(CavityRule);
     static var DECAY:String              = Siphon.getClassName(DecayRule);
     static var DROP_PIECE:String         = Siphon.getClassName(DropPieceRule);
@@ -41,7 +40,7 @@ class ScourgeConfigFactory {
 
     public inline static function makeDefaultActionList():Array<String> return [DROP_ACTION, QUIT_ACTION];
     public inline static function makeStartAction():String return START_ACTION;
-    public static function makeDemiurgicRuleList():Array<String> return [BUILD_STATE, BUILD_PLAYERS, BUILD_BOARD];
+    public static function makeBuilderRuleList():Array<String> return [BUILD_GLOBALS, BUILD_PLAYERS, BUILD_BOARD];
     public static function makeActionList(config:ScourgeConfig):Array<String> {
 
         var actionList:Array<String> = [QUIT_ACTION, DROP_ACTION/*, PICK_ACTION*/];
@@ -98,17 +97,15 @@ class ScourgeConfigFactory {
         };
     }
 
-    public static function makeRuleConfig(config:ScourgeConfig, randomFunction:Void->Float, history:StateHistory, historyState:State):Map<String, Dynamic> {
-        var buildCfg:BuildConfig = makeBuildConfig(history, historyState);
-
+    public static function makeRuleConfig(config:ScourgeConfig, rand:Void->Float):Map<String, Dynamic> {
         var ruleConfig:Map<String, Dynamic> = [
-            BUILD_STATE => makeBuildStateConfig(config, buildCfg),
-            BUILD_PLAYERS => makeBuildPlayersConfig(config, buildCfg),
-            BUILD_BOARD => makeBuildBoardConfig(config, buildCfg),
+            BUILD_GLOBALS => makeBuildStateConfig(config),
+            BUILD_PLAYERS => makeBuildPlayersConfig(config),
+            BUILD_BOARD => makeBuildBoardConfig(config),
             EAT_CELLS => makeEatCellsConfig(config),
             DECAY => makeDecayConfig(config),
             DROP_PIECE => makeDropPieceConfig(config),
-            REPLENISH => makeReplenishConfig(config, buildCfg),
+            REPLENISH => makeReplenishConfig(config),
 
             END_TURN => null,
             RESET_FRESHNESS => null,
@@ -117,7 +114,7 @@ class ScourgeConfigFactory {
             ONE_LIVING_PLAYER => null,
         ];
 
-        if (!config.allowAllPieces) ruleConfig.set(PICK_PIECE, makePickPieceConfig(config, buildCfg, randomFunction));
+        if (!config.allowAllPieces) ruleConfig.set(PICK_PIECE, makePickPieceConfig(config, rand));
         if (config.includeCavities) ruleConfig.set(CAVITY, null);
         if (!config.allowAllPieces && config.maxSwaps > 0) ruleConfig.set(SWAP_PIECE, makeSwapConfig(config));
         if (config.maxBites > 0) ruleConfig.set(BITE, makeBiteConfig(config));
@@ -150,30 +147,20 @@ class ScourgeConfigFactory {
         return combinedRuleConfig;
     }
 
-    inline static function makeBuildConfig(history:StateHistory, historyState:State):BuildConfig {
+    inline static function makeBuildStateConfig(config:ScourgeConfig) {
         return {
-            history:history,
-            historyState:historyState,
-        };
-    }
-
-    inline static function makeBuildStateConfig(config:ScourgeConfig, buildCfg:BuildConfig) {
-        return {
-            buildCfg:buildCfg,
             firstPlayer:config.firstPlayer,
         };
     }
 
-    inline static function makeBuildPlayersConfig(config:ScourgeConfig, buildCfg:BuildConfig) {
+    inline static function makeBuildPlayersConfig(config:ScourgeConfig) {
         return {
-            buildCfg:buildCfg,
             numPlayers:config.numPlayers,
         };
     }
 
-    inline static function makeBuildBoardConfig(config:ScourgeConfig, buildCfg:BuildConfig) {
+    inline static function makeBuildBoardConfig(config:ScourgeConfig) {
         return {
-            buildCfg:buildCfg,
             circular:config.circular,
             initGrid:config.initGrid,
         };
@@ -194,9 +181,8 @@ class ScourgeConfigFactory {
         };
     }
 
-    inline static function makePickPieceConfig(config:ScourgeConfig, buildCfg:BuildConfig, randomFunction:Void->Float) {
+    inline static function makePickPieceConfig(config:ScourgeConfig, randomFunction:Void->Float) {
         return {
-            buildCfg:buildCfg,
             pieceTableIDs:config.pieceTableIDs,
             allowFlipping:config.allowFlipping,
             allowRotating:config.allowRotating,
@@ -247,7 +233,7 @@ class ScourgeConfigFactory {
         };
     }
 
-    inline static function makeReplenishConfig(config:ScourgeConfig, buildCfg:BuildConfig) {
+    inline static function makeReplenishConfig(config:ScourgeConfig) {
         var stateReplenishProperties:Array<ReplenishableConfig> = [];
 
         if (config.maxSwaps > 0) stateReplenishProperties.push({
@@ -265,8 +251,7 @@ class ScourgeConfigFactory {
         });
 
         return {
-            buildCfg:buildCfg,
-            stateProperties:stateReplenishProperties,
+            globalProperties:stateReplenishProperties,
             playerProperties:[],
             nodeProperties:[],
         };

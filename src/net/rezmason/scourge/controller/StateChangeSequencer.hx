@@ -147,7 +147,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         }
         step.sort(whichNodeIsFresher);
 
-        var mF:Int = game.state.aspects[maxFreshness_];
+        var mF:Int = game.state.globals[maxFreshness_];
         if (maxFreshness < mF) maxFreshness = mF;
 
     }

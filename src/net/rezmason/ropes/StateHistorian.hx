@@ -23,14 +23,14 @@ class StateHistorian {
     }
 
     public function write():Void {
-        writeAspects(state.aspects, historyState.aspects, aItr);
+        writeAspects(state.globals, historyState.globals, aItr);
         writeAspectSets(state.players, historyState.players);
         writeAspectSets(state.nodes, historyState.nodes);
         writeAspectSets(state.extras, historyState.extras);
     }
 
     public function read():Void {
-        readAspects(state.aspects, historyState.aspects, aItr);
+        readAspects(state.globals, historyState.globals, aItr);
         readAspectSets(state.players, historyState.players);
         readAspectSets(state.nodes, historyState.nodes);
         readAspectSets(state.extras, historyState.extras);

@@ -8,10 +8,7 @@ class DebugRule extends Rule {
 
     // @player(BodyAspect.BODY_FIRST) var bodyFirst_;
 
-    public function new():Void {
-        super();
-        moves.push({id:0});
-    }
+    override public function _init(cfg:Dynamic):Void { moves.push({id:0}); }
 
     override private function _chooseMove(choice:Int):Void {
         // trace(state.spitBoard(plan));

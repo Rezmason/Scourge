@@ -112,7 +112,7 @@ class Referee {
 
     public function spitPlan():String {
         return
-        'state:\n${spitAspectLookup(game.plan.stateAspectLookup)}' +
+        'global:\n${spitAspectLookup(game.plan.globalAspectLookup)}' +
         'player:\n${spitAspectLookup(game.plan.playerAspectLookup)}' +
         'node:\n${spitAspectLookup(game.plan.nodeAspectLookup)}';
     }

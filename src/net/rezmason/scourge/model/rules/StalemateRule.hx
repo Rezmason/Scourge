@@ -16,13 +16,12 @@ class StalemateRule extends Rule {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @player(PlyAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
-    @state(WinAspect.WINNER) var winner_;
+    @global(WinAspect.WINNER) var winner_;
 
     private var cfg:SkipsExhaustedConfig;
 
     // This rule discovers whether there is only one remaining player, and makes that player the winner
-    public function new(cfg:SkipsExhaustedConfig):Void {
-        super();
+    override public function _init(cfg:Dynamic):Void {
         this.cfg = cfg;
         moves.push({id:0});
     }
@@ -31,7 +30,7 @@ class StalemateRule extends Rule {
 
         var stalemate:Bool = true;
 
-        if (state.aspects[winner_] != Aspect.NULL) {
+        if (state.globals[winner_] != Aspect.NULL) {
             stalemate = false;
         } else {
             for (player in eachPlayer()) {
@@ -54,7 +53,7 @@ class StalemateRule extends Rule {
                 else if (totalArea == largestArea) largestPlayers.push(playerID);
             }
 
-            state.aspects[winner_] = largestPlayers.pop();
+            state.globals[winner_] = largestPlayers.pop();
             signalEvent();
         }
     }

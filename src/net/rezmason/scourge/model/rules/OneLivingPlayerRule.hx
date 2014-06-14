@@ -10,13 +10,10 @@ using net.rezmason.utils.Pointers;
 class OneLivingPlayerRule extends Rule {
 
     @player(BodyAspect.HEAD) var head_;
-    @state(WinAspect.WINNER) var winner_;
+    @global(WinAspect.WINNER) var winner_;
 
     // This rule discovers whether there is only one remaining player, and makes that player the winner
-    public function new():Void {
-        super();
-        moves.push({id:0});
-    }
+    override public function _init(cfg:Dynamic):Void { moves.push({id:0}); }
 
     override private function _chooseMove(choice:Int):Void {
 
@@ -26,7 +23,7 @@ class OneLivingPlayerRule extends Rule {
             if (headIndex != Aspect.NULL) playersWithHeads.push(getID(player));
         }
 
-        if (playersWithHeads.length == 1) state.aspects[winner_] = playersWithHeads.pop();
+        if (playersWithHeads.length == 1) state.globals[winner_] = playersWithHeads.pop();
     }
 }
 

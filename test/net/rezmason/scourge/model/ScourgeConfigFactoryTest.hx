@@ -37,7 +37,6 @@ class ScourgeConfigFactoryTest
     var historyState:State;
     var plan:StatePlan;
     var config:ScourgeConfig;
-    var basicRules:StringMap<Rule>;
     var combinedRules:StringMap<Rule>;
 
     var startAction:Rule;
@@ -64,7 +63,6 @@ class ScourgeConfigFactoryTest
     public function afterClass():Void {
         stateHistorian.reset();
 
-        basicRules = null;
         combinedRules = null;
         config = null;
         stateHistorian = null;
@@ -79,14 +77,17 @@ class ScourgeConfigFactoryTest
         config = ScourgeConfigFactory.makeDefaultConfig();
         stateHistorian.reset();
 
-        basicRules = null;
         combinedRules = null;
     }
 
     @Test
     public function allActionsRegisteredTest():Void {
         makeState();
-        for (action in ScourgeConfigFactory.makeActionList(config)) Assert.isNotNull(combinedRules.get(action));
+        
+        for (action in ScourgeConfigFactory.makeActionList(config)) {
+            Assert.isNotNull(combinedRules.get(action));
+        }
+        
         Assert.isNotNull(combinedRules.get(ScourgeConfigFactory.makeStartAction()));
     }
 
@@ -125,8 +126,8 @@ class ScourgeConfigFactoryTest
 
         Assert.areEqual(36, state.players[0][totalArea_]);
         Assert.areEqual(Aspect.NULL, state.players[1][head_]);
-        Assert.areEqual(0, state.aspects[winner_]);
-        Assert.areEqual(0, state.aspects[currentPlayer_]);
+        Assert.areEqual(0, state.globals[winner_]);
+        Assert.areEqual(0, state.globals[currentPlayer_]);
     }
 
     @Test
@@ -202,9 +203,9 @@ class ScourgeConfigFactoryTest
             swapAction.update();
             swapAction.chooseMove();
 
-            var piece:Int = state.aspects[pieceTableID_];
+            var piece:Int = state.globals[pieceTableID_];
 
-            Assert.areEqual(config.pieceTableIDs[(ike + 1) % config.pieceHatSize], state.aspects[pieceTableID_]);
+            Assert.areEqual(config.pieceTableIDs[(ike + 1) % config.pieceHatSize], state.globals[pieceTableID_]);
 
             var index:Int = ike % config.pieceHatSize;
             if (pickedPieces[index] == null) pickedPieces[index] = piece;
@@ -229,7 +230,7 @@ class ScourgeConfigFactoryTest
 
         var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
 
-        Assert.areEqual(1, state.aspects[winner_]);
+        Assert.areEqual(1, state.globals[winner_]);
     }
 
     @Test
@@ -266,28 +267,42 @@ class ScourgeConfigFactoryTest
         VisualAssert.assert('player zero dropped another L, ate player one\'s head and body; another cavity', state.spitBoard(plan));
 
         var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
-        Assert.areEqual(0, state.aspects[winner_]);
+        Assert.areEqual(0, state.globals[winner_]);
     }
 
     private function makeState():Void {
-        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction, stateHistorian.history, stateHistorian.historyState);
-        basicRules = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
-        var basicRulesArray:Array<Rule> = [];
-        var demiurgicRules:StringMap<Rule> = new StringMap<Rule>();
-        var rules:Array<Rule> = [];
-        for (key in basicRules.keys().a2z()) {
-            var rule:Rule = basicRules.get(key);
-            rules.push(rule);
+        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction);
+        var basicRulesByName:Map<String, Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
+        var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
+        
+        combinedRules = RuleFactory.combineRules(combinedConfig, basicRulesByName);
+        
+        var builderRuleKeys:Array<String> = ScourgeConfigFactory.makeBuilderRuleList();
+        var basicRules:Array<Rule> = [];
+        var builderRules:Array<Rule> = [];
 
-            if (rule.demiurgic) demiurgicRules.set(key, rule);
-            else basicRulesArray.push(rule);
+        for (key in basicRulesByName.keys().a2z()) {
+            var builderRuleIndex:Int = builderRuleKeys.indexOf(key);
+            if (builderRuleIndex == -1) basicRules.push(basicRulesByName[key]);
+            else builderRules[builderRuleIndex] = basicRulesByName[key];
         }
+        while (builderRules.remove(null)) {}
 
-        combinedRules = RuleFactory.combineRules(ScourgeConfigFactory.makeCombinedRuleCfg(config), basicRules);
+        // Plan the state
 
-        plan = new StatePlanner().planState(state, rules);
-        for (key in ScourgeConfigFactory.makeDemiurgicRuleList()) demiurgicRules.get(key).prime(state, plan, null);
-        for (rule in basicRulesArray) rule.prime(state, plan, null);
+        plan = new StatePlanner().planState(state, builderRules.concat(basicRules));
+
+        // Prime the rules
+        var primer:RulePrimer = {
+            state:state,
+            plan:plan,
+            history:history,
+            historyState:historyState
+        };
+
+        for (rule in builderRules) rule.prime(primer);
+        for (rule in basicRules) rule.prime(primer);
+
         startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
         biteAction = combinedRules.get('biteAction');
         swapAction = combinedRules.get('swapAction');

@@ -14,20 +14,17 @@ typedef TestPieceConfig = {
 
 class TestPieceRule extends Rule {
 
-    @state(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
-    @state(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
-    @state(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
+    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
+    @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
+    @global(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
 
     private var cfg:TestPieceConfig;
 
-    public function new(cfg:TestPieceConfig):Void {
-        super();
-        this.cfg = cfg;
-    }
+    override public function _init(cfg:TestPieceConfig):Void { this.cfg = cfg; }
 
     override public function _prime():Void {
-        state.aspects[pieceTableID_] = cfg.pieceTableID;
-        state.aspects[pieceReflection_] = cfg.reflection;
-        state.aspects[pieceRotation_] = cfg.rotation;
+        state.globals[pieceTableID_] = cfg.pieceTableID;
+        state.globals[pieceReflection_] = cfg.reflection;
+        state.globals[pieceRotation_] = cfg.rotation;
     }
 }

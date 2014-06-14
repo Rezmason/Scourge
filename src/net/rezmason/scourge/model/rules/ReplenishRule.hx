@@ -19,8 +19,7 @@ typedef ReplenishableConfig = {
 }
 
 typedef ReplenishConfig = {
-    var buildCfg:BuildConfig;
-    var stateProperties:Array<ReplenishableConfig>;
+    var globalProperties:Array<ReplenishableConfig>;
     var playerProperties:Array<ReplenishableConfig>;
     var nodeProperties:Array<ReplenishableConfig>;
 }
@@ -35,19 +34,18 @@ class ReplenishRule extends Rule {
     @extra(ReplenishableAspect.REP_PROP_LOOKUP) var repPropLookup_;
     @extra(ReplenishableAspect.REP_STEP) var repStep_;
 
-    @state(ReplenishableAspect.STATE_REP_FIRST) var stateRepFirst_;
-    @state(ReplenishableAspect.PLAYER_REP_FIRST) var playerRepFirst_;
-    @state(ReplenishableAspect.NODE_REP_FIRST) var nodeRepFirst_;
+    @global(ReplenishableAspect.STATE_REP_FIRST) var stateRepFirst_;
+    @global(ReplenishableAspect.PLAYER_REP_FIRST) var playerRepFirst_;
+    @global(ReplenishableAspect.NODE_REP_FIRST) var nodeRepFirst_;
 
     var cfg:ReplenishConfig;
 
-    public function new(cfg:ReplenishConfig):Void {
-        super();
+    override public function _init(cfg:Dynamic):Void {
         this.cfg = cfg;
 
-        for (rProp in cfg.stateProperties ) addStateAspectRequirement (rProp.prop);
-        for (rProp in cfg.playerProperties) addPlayerAspectRequirement(rProp.prop);
-        for (rProp in cfg.nodeProperties  ) addNodeAspectRequirement  (rProp.prop);
+        for (rProp in this.cfg.globalProperties ) addGlobalAspectRequirement (rProp.prop);
+        for (rProp in this.cfg.playerProperties) addPlayerAspectRequirement(rProp.prop);
+        for (rProp in this.cfg.nodeProperties  ) addNodeAspectRequirement  (rProp.prop);
 
         moves.push({id:0});
     }
@@ -61,8 +59,8 @@ class ReplenishRule extends Rule {
         var nodeReps:Array<AspectSet> = [];
 
         // Create the replenishables
-        for (repCfg in cfg.stateProperties) {
-            var replenishable:AspectSet = makeReplenishable(repCfg, plan.stateAspectLookup);
+        for (repCfg in cfg.globalProperties) {
+            var replenishable:AspectSet = makeReplenishable(repCfg, plan.globalAspectLookup);
             repCfg.replenishableID = replenishable[repID_];
             stateReps.push(replenishable);
         }
@@ -83,28 +81,28 @@ class ReplenishRule extends Rule {
 
         if (stateReps.length > 0) {
             stateReps.chainByAspect(repID_, repNext_, repPrev_);
-            state.aspects[stateRepFirst_] = stateReps[0][repID_];
+            state.globals[stateRepFirst_] = stateReps[0][repID_];
         } else {
-            state.aspects[stateRepFirst_] = Aspect.NULL;
+            state.globals[stateRepFirst_] = Aspect.NULL;
         }
 
         if (playerReps.length > 0) {
             playerReps.chainByAspect(repID_, repNext_, repPrev_);
-            state.aspects[playerRepFirst_] = playerReps[0][repID_];
+            state.globals[playerRepFirst_] = playerReps[0][repID_];
         } else {
-            state.aspects[playerRepFirst_] = Aspect.NULL;
+            state.globals[playerRepFirst_] = Aspect.NULL;
         }
 
         if (nodeReps.length > 0) {
             nodeReps.chainByAspect(repID_, repNext_, repPrev_);
-            state.aspects[nodeRepFirst_] = nodeReps[0][repID_];
+            state.globals[nodeRepFirst_] = nodeReps[0][repID_];
         } else {
-            state.aspects[nodeRepFirst_] = Aspect.NULL;
+            state.globals[nodeRepFirst_] = Aspect.NULL;
         }
     }
 
     override private function _chooseMove(choice:Int):Void {
-        updateReps(cfg.stateProperties, [state.aspects]);
+        updateReps(cfg.globalProperties, [state.globals]);
         updateReps(cfg.playerProperties, state.players);
         updateReps(cfg.nodeProperties, state.nodes);
         signalEvent();
@@ -122,7 +120,7 @@ class ReplenishRule extends Rule {
         rep[repID_] = numExtras();
 
         state.extras.push(rep);
-        cfg.buildCfg.historyState.extras.push(buildHistExtra(cfg.buildCfg.history));
+        allocHistExtra();
 
         return rep;
     }

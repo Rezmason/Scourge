@@ -49,7 +49,7 @@ class Siphon {
         try {
             Context.getType(clazz);
         } catch (error:Dynamic) {
-            trace(error);
+            trace('$clazz: $error');
             clazz = null;
         }
 

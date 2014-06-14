@@ -9,8 +9,6 @@ class TestRule extends Rule {
     @extra(TestAspect.VALUE_1) var extraVal_:AspectPtr;
     @node(TestAspect.VALUE_1) var nodeVal_:AspectPtr;
     @player(TestAspect.VALUE_1) var playerVal_:AspectPtr;
-    @state(TestAspect.VALUE_1) var stateVal_:AspectPtr;
-
-    public function new():Void { super(); }
+    @global(TestAspect.VALUE_1) var stateVal_:AspectPtr;
 }
 

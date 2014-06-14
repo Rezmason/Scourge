@@ -8,18 +8,15 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 class EndTurnRule extends Rule {
 
     @player(BodyAspect.HEAD) var head_;
-    @state(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
-    public function new():Void {
-        super();
-        moves.push({id:0});
-    }
+    override public function _init(cfg:Dynamic):Void { moves.push({id:0}); }
 
     override private function _chooseMove(choice:Int):Void {
 
         // Get current player
 
-        var currentPlayer:Int = state.aspects[currentPlayer_];
+        var currentPlayer:Int = state.globals[currentPlayer_];
 
         // Find the next living player
         var startPlayerIndex:Int = (currentPlayer + 1) % numPlayers();
@@ -29,7 +26,7 @@ class EndTurnRule extends Rule {
             if (playerID == startPlayerIndex) throw 'No players have heads!';
         }
 
-        state.aspects[currentPlayer_] = playerID;
+        state.globals[currentPlayer_] = playerID;
         signalEvent();
     }
 }

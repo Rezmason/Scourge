@@ -36,7 +36,8 @@ class EatRuleTest extends ScourgeRuleTest
     @Test
     public function eatScourgeRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:false};
-        var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
+        var eatRule:EatCellsRule = new EatCellsRule();
+        eatRule.init(eatConfig);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -75,7 +76,8 @@ class EatRuleTest extends ScourgeRuleTest
     @Test
     public function eatRecursivelyScourgeRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:false};
-        var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
+        var eatRule:EatCellsRule = new EatCellsRule();
+        eatRule.init(eatConfig);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -111,7 +113,8 @@ class EatRuleTest extends ScourgeRuleTest
     @Test
     public function eatHeadAndBodyScourgeRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:true, orthoOnly:false};
-        var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
+        var eatRule:EatCellsRule = new EatCellsRule();
+        eatRule.init(eatConfig);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -143,7 +146,8 @@ class EatRuleTest extends ScourgeRuleTest
     @Test
     public function eatHeadKillBodyTest():Void {
         var eatConfig:EatCellsConfig = {recursive:false, eatHeads:true, takeBodiesFromHeads:false, orthoOnly:false};
-        var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
+        var eatRule:EatCellsRule = new EatCellsRule();
+        eatRule.init(eatConfig);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -173,7 +177,8 @@ class EatRuleTest extends ScourgeRuleTest
     @Test
     public function eatOrthoScourgeRuleTest():Void {
         var eatConfig:EatCellsConfig = {recursive:true, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:true};
-        var eatRule:EatCellsRule = new EatCellsRule(eatConfig);
+        var eatRule:EatCellsRule = new EatCellsRule();
+        eatRule.init(eatConfig);
         makeState([eatRule], 2, TestBoards.twoPlayerN);
 
         // set up the board for the test

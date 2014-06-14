@@ -28,19 +28,18 @@ class DecayRule extends Rule {
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @state(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
     private var cfg:DecayConfig;
 
-    public function new(cfg:DecayConfig):Void {
-        super();
+    override public function _init(cfg:Dynamic):Void {
         this.cfg = cfg;
         moves.push({id:0});
     }
 
     override private function _chooseMove(choice:Int):Void {
 
-        var maxFreshness:Int = state.aspects[maxFreshness_] + 1;
+        var maxFreshness:Int = state.globals[maxFreshness_] + 1;
 
         // Grab all the player heads
 
@@ -72,7 +71,7 @@ class DecayRule extends Rule {
             player[totalArea_] = totalArea;
         }
 
-        state.aspects[maxFreshness_] = maxFreshness;
+        state.globals[maxFreshness_] = maxFreshness;
         signalEvent();
     }
 
