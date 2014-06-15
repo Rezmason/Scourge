@@ -107,9 +107,9 @@ class TestBody extends Body {
             var d1:Float = glyph.get_z();
             var d2:Float = glyph.get_y();
             var d3:Float = glyph.get_x();
-            var p:Float = (Math.cos(time * 4 + d1 * 20) * 0.500 + 1.0) * 0.4;
-            var s:Float = (Math.cos(time * 4 + d2 * 30) * 0.100 + 1.5) * 2.0;
-            var f:Float = (Math.cos(time * 8 + d3 * 40) * 0.180 + 0.0) + 0.4;
+            var p:Float = Math.cos(time * 4 + d1 * 20) * 0.200 + 0.4;
+            var s:Float = Math.cos(time * 4 + d2 * 30) * 0.200 + 3.0;
+            var f:Float = Math.cos(time * 8 + d3 * 40) * 0.280 + 0.4;
 
             glyph.set_p(p);
             glyph.set_s(s);

@@ -51,9 +51,11 @@ class RenderMethod {
         glyphMat.append(glyphTransform);
         glyphMat.appendScale(glyphMag, glyphMag, 1);
 
+        /*
         #if debug
             if (glyphMat.transformVector(unitVec).length > GLYPH_MAG_LIMIT) throw 'You blew the glyph mag fuse!';
         #end
+        */
     }
 
     public function setSegment(segment:BodySegment):Void { }

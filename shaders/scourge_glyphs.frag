@@ -11,7 +11,10 @@ void main(void) {
 
     float texture = texture2D(uSampler, vUV).b;
     float deriv = (dFdx(vUV.x) + dFdy(vUV.x) + dFdy(vUV.y) + dFdx(vUV.y)) * uDerivMult.x;
+    
     float glyph = 1. - smoothstep(vFat - deriv, vFat + deriv, texture);
+
+    glyph = min(1., max(glyph, (1. - texture) * 2. * vFat));
 
     if (vVid >= 0.3) glyph *= -1.0;
 
