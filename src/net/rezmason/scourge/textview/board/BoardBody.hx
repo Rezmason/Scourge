@@ -449,6 +449,9 @@ class BoardBody extends Body {
 
     inline function animateTween(tween:NodeTween, now:Float):Void {
         var frac:Float = (now - tween.start) / tween.duration;
+        if (frac < 0) frac = 0;
+        else if (frac > 1) frac = 1;
+
         if (tween.ease != null) frac = tween.ease(frac);
         animateGlyph(tween.view.topGlyph, tween.from.top, tween.to.top, frac);
         animateGlyph(tween.view.bottomGlyph, tween.from.bottom, tween.to.bottom, frac);

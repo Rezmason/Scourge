@@ -177,6 +177,10 @@ class GlyphUtils {
     }
 
     private inline static function pop4(vec:VertexArray, glyphOffset:Int, propOffset:Int, step:Int, val:Float):Float {
+        #if debug
+            if (Math.isNaN(val)) throw "NaN value.";
+        #end
+
         if (vec[glyphOffset + propOffset + 0 * step] != val) {
             vec[glyphOffset + propOffset + 0 * step] = val;
             vec[glyphOffset + propOffset + 1 * step] = val;
