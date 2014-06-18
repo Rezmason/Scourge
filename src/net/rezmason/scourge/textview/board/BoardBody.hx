@@ -173,7 +173,7 @@ class BoardBody extends Body {
             causes.shift();
         }
 
-        // trace(causes);
+        var lastCause:Int = 0;
 
         var start:Float = 0;
         
@@ -183,6 +183,7 @@ class BoardBody extends Body {
             var duration:Float = durationsByCause[cause];
             var delta:Float = duration * (1 - overlapsByCause[cause]);
             var lastFreshness:Int = -1;
+            if (step.length > 0) lastCause = ike;
             for (nodeVO in step) {
                 if (nodeVO == null) continue;
                 var id:Int = nodeVO.id;
@@ -202,7 +203,9 @@ class BoardBody extends Body {
             }
         }
 
-        var hasStragglers:Bool = false;
+        // trace(causes.slice(0, lastCause));
+
+        var stragglers:Array<Int> = [];
         var cause:String = BOARD_CLEANUP_CAUSE;
         var duration:Float = durationsByCause[cause];
         var maxDistances:Array<Int> = [];
@@ -221,12 +224,13 @@ class BoardBody extends Body {
                     var newProps:NodeProps = makeProps(view.pos.z, nodeVOs[ike], neighborBitfield, view.distance);
                     BoardEffects.animateLinear(view, cause, start, duration, view.props, newProps, nodeTweens);
                     view.props = newProps;
-                    hasStragglers = true;
+                    stragglers.push(ike);
                 }
             }
         }
         for (ike in 0...numPlayers) wavePools[ike].size = maxDistances[ike] + 1;
-        if (hasStragglers) start += duration;
+        if (stragglers.length > 0) start += duration;
+        // trace('stragglers: $stragglers');
 
         numActiveTweens = nodeTweens.length;
         
@@ -245,7 +249,10 @@ class BoardBody extends Body {
 
         /*
         var tweenString:String = '';
-        for (tween in nodeTweens) tweenString += Std.string(causes.indexOf(tween.cause));
+        for (tween in nodeTweens) {
+            if (tween.cause == BOARD_CLEANUP_CAUSE) tweenString += BOARD_CLEANUP_CAUSE;
+            else tweenString += Std.string(causes.indexOf(tween.cause));
+        }
         trace(tweenString);
         */
     }

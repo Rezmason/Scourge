@@ -2,11 +2,9 @@ package net.rezmason.scourge.textview.board;
 
 import net.rezmason.scourge.controller.ControllerTypes.NodeState;
 import net.rezmason.scourge.textview.board.BoardTypes;
-import net.rezmason.scourge.textview.core.Glyph;
 
 import net.kawa.tween.easing.*;
 
-using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.utils.CharCode;
 
 typedef BoardEffect = NodeView->String->Float->Float->NodeProps->NodeProps->Array<NodeTween>->Void;
