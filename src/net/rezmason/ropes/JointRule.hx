@@ -1,7 +1,5 @@
 package net.rezmason.ropes;
 
-using net.rezmason.utils.MapUtils;
-
 class JointRule extends Rule {
 
     var rules:Array<Rule>;

@@ -15,9 +15,9 @@ class PlayerSystem {
     private var playSignal:PlaySignal;
     private var onAlert:String->Void;
     private var config:ScourgeConfig;
-
-    function new():Void {
-        game = new Game();
+    
+    function new(cacheMoves:Bool):Void {
+        game = new Game(cacheMoves);
         floats = [];
     }
 

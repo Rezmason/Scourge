@@ -8,6 +8,7 @@ import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
+import net.rezmason.utils.Zig;
 
 using net.rezmason.ropes.StatePlan;
 using net.rezmason.scourge.model.BoardUtils;
@@ -31,15 +32,14 @@ class Game {
     var winner_:AspectPtr;
     var currentPlayer_:AspectPtr;
     var planner:StatePlanner;
+    var cacheMoves:Bool;
+    var invalidateSignal:Zig<Int->Void>;
 
-    var moveCache:Array<Array<Move>>;
-    var quantumMoveCache:Array<Array<Move>>;
-
-    public function new():Void {
+    public function new(cacheMoves:Bool):Void {
+        this.cacheMoves = cacheMoves;
         historian = new StateHistorian();
         planner = new StatePlanner();
-        moveCache = [];
-        quantumMoveCache = [];
+        invalidateSignal = new Zig();
     }
 
     public function begin(config:ScourgeConfig, randomFunction:Void->Float, alertFunction:String->Void, savedState:SavedState = null):Int {
@@ -51,6 +51,13 @@ class Game {
 
         var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction);
         var basicRulesByName:Map<String, Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
+
+        if (cacheMoves) {
+            for (key in basicRulesByName.keys().a2z()) {
+                basicRulesByName[key] = RuleFactory.makeCacheRule(basicRulesByName[key], invalidateSignal, get_revision);
+            }
+        }
+
         var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
         var combinedRules:Map<String, Rule> = RuleFactory.combineRules(combinedConfig, basicRulesByName);
         var builderRuleKeys:Array<String> = ScourgeConfigFactory.makeBuilderRuleList();
@@ -111,8 +118,6 @@ class Game {
         historian.write();
         historian.history.forget();
 
-        invalidate();
-
         return historian.history.revision;
     }
 
@@ -124,6 +129,7 @@ class Game {
             throw 'The game cannot end, because it hasn\'t begun.';
 
         historian.reset();
+        invalidateSignal.removeAll();
         actions = null;
         actionIDs = null;
     }
@@ -131,13 +137,19 @@ class Game {
     public function forget():Void { historian.history.forget(); }
 
     public function getMovesForAction(index:Int):Array<Move> {
-        if (moveCache[index] == null) updateAction(index);
-        return moveCache[index];
+        historian.key.lock();
+        actions[index].update();
+        var moves:Array<Move> = actions[index].moves;
+        historian.key.unlock();
+        return moves;
     }
 
     public function getQuantumMovesForAction(index:Int):Array<Move> {
-        if (moveCache[index] == null) updateAction(index);
-        return moveCache[index];
+        historian.key.lock();
+        actions[index].update();
+        var quantumMoves:Array<Move> = actions[index].quantumMoves;
+        historian.key.unlock();
+        return quantumMoves;
     }
 
     public function chooseMove(actionIndex:Int, moveIndex:Int = 0, isQuantum:Bool = false, cleanUp:Bool = true):Int {
@@ -158,20 +170,21 @@ class Game {
             }
         }
 
-        if (cleanUp) collectAllMoves();
-        invalidate();
-        return pushHist();
+        pushHist();
+        if (cleanUp) {
+            collectAllMoves();
+            invalidateSignal.dispatch(revision);
+        }
+        return revision;
     }
 
     public function rewind(revision:Int):Void {
         historian.history.revert(revision);
         historian.read();
-        invalidate();
+        invalidateSignal.dispatch(revision);
     }
 
-    public function spitBoard():String {
-        return state.spitBoard(plan);
-    }
+    public function spitBoard():String return state.spitBoard(plan);
 
     public function spitMoves():String {
         var str:String = '';
@@ -197,23 +210,9 @@ class Game {
         return historian.history.commit();
     }
 
-    private function invalidate():Void {
-        for (ike in 0...actions.length) {
-            moveCache[ike] = null;
-            quantumMoveCache[ike] = null;
-        }
-    }
-
     private function collectAllMoves():Void {
         historian.key.lock();
         for (action in actions) action.collectMoves();
-        historian.key.unlock();
-    }
-
-    private inline function updateAction(index:Int):Void {
-        historian.key.lock();
-        actions[index].update();
-        moveCache[index] = actions[index].moves;
         historian.key.unlock();
     }
 

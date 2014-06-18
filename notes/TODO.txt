@@ -2,18 +2,6 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
-CacheRule
-    A Rule that surrounds another Rule
-    Only used when a model needs to be predictive, like the BotSystem
-    Its config contains a reference to a Void->Int, that spits out the current revision
-    Its config also contains a Zig<Int->Void>, which dispatches a revision when it's time to invalidate the cache
-    Get rid of Game's cache
-
-    Cached moves should have a bool property stating whether they're cached or not
-        DropPieceRule and BiteRule
-        CacheRule will set that value to true or false
-        The internal Rule would iterate over its moves, find the ones that aren't cached, and populate the pool with them
-
 Worker tests are failing in-game on Flash and HTML5 targets
 
 Board

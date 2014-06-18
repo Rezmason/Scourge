@@ -21,7 +21,7 @@ class TestPlayer extends PlayerSystem implements Player {
     private var updateSignal:Zig<GameEvent->Void>;
 
     public function new(index:Int, playSignal:PlaySignal, proxy:TestProxy, random:Void->Float):Void {
-        super();
+        super(false);
         this.index = index;
         this.playSignal = playSignal;
         this.proxy = proxy;

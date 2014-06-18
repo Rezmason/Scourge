@@ -14,7 +14,7 @@ class BotSystem extends PlayerSystem {
     private var random:Void->Float;
 
     public function new(random:Void->Float):Void {
-        super();
+        super(true);
 
         botsByIndex = new Map();
         botSignal = new Zig();

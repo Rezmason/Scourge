@@ -43,7 +43,7 @@ class Referee {
     public var numPlayers(get, never):Int;
 
     public function new():Void {
-        game = new Game();
+        game = new Game(false);
         allReady = false;
         allSynced = true;
         busy = false;

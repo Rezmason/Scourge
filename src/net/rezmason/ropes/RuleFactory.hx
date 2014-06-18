@@ -3,6 +3,7 @@ package net.rezmason.ropes;
 import haxe.ds.ArraySort;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.utils.StringSort;
+import net.rezmason.utils.Zig;
 
 using Lambda;
 using Type;
@@ -28,6 +29,12 @@ class RuleFactory {
             }
         }
         return rules;
+    }
+
+    public static function makeCacheRule(rule:Rule, invalidateSignal:Zig<Int->Void>, revGetter:Void->Int):Rule {
+        var cacheRule:CacheRule = new CacheRule();
+        cacheRule.init({rule:rule, invalidateSignal:invalidateSignal, revGetter:revGetter});
+        return cacheRule;
     }
 
     public static function combineRules(cfg:Map<String, Array<String>>, basicRules:Map<String, Rule>):Map<String, Rule> {

@@ -41,7 +41,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
     var animationPeriod:Float;
     
     public function new():Void {
-        super();
+        super(false);
         updateSignal = new Zig();
         sequenceStartSignal = new Zig();
         sequenceUpdateSignal = new Zig();
