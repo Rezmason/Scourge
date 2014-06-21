@@ -2,7 +2,22 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
+PlayerSystem needs a queue
+    IntMap, actually.
+    Store all float and move messages whose turns are late
+    Iterate through them once they're reached
+
+Timing
+    Animation
+    The board should signal to the player system when it's time to proceed
+    Meanwhile, the player should queue game events
+
 Worker tests are failing in-game on Flash and HTML5 targets
+
+"Frame"
+    White box drawing characters with piece in the middle
+    Symbols on the corners
+        H-flip, V-flip, C-rot, CC-rot
 
 Board
     Change ripple behavior
@@ -27,37 +42,13 @@ Move the logic into a Worker
 Get referee to handle situations where a player takes too long to sync or move
     "Player has been replaced with a bot of Level N"
 
+Timing, continued
+    Shot clock
+        Animation time should be calculated on the server and added to the shot clock
+    Server timeout
+
 Depth of field in frag shader?
     Already got the vZ and deriv
-
-NodeView and BoardBody
-
-    Throb
-
-        Now, stop the pools from looping
-            Drive the heartbeats by a timer
-
-    Basics
-        handleBoardUpdate function
-            Each node view checks for a change in board state
-                Includes connectivity pass
-            (Narratological cues would happen here, like stress level and text unlock)
-        handleUIUpdate function
-            Interpret UI state
-            Check each UI for a change in state
-        updateAnimation
-            (for propagating waves along slimes' bodies)
-        Dialer animation
-            Dispatches keyboard interactions
-    Orchestrate changes in the game
-        Test that board state is properly handled
-
-"Frame"
-    White box drawing characters with piece in the middle
-    Symbols on the corners
-        H-flip, V-flip, C-rot, CC-rot
-        Animation would be nice
-    Swipeable
 
 Implement noneuclidean walking and running
     add() function should create heading data
@@ -103,26 +94,6 @@ And then SPEED EVERYTHING UP
     Also, haxe.List might be better than Array in some situations
 
 ExternalPlayer
-Turn durations
-
-Coarse evaluation
-    Number of nodes (filled and enclosed)
-    Attribute count (bites and swaps) times attribute range
-    Percentage of nodes that are outer edges!
-    Number of nodes
-
-
-A.I. thoughts
-    Shannon Type B
-    Identify and prune the moves that are just fucking stupid
-    Sort by coarse evaluation
-    Only consider the top N possibilities
-    Alpha-Beta pruning
-    Is this even possible?
-    Fretting
-    aka "Permanent brain"
-    Players technically aren't limited to their turn in order to evaluate the board
-
 
 Later
 
@@ -158,11 +129,6 @@ Texture synthesis
     Stripes
     Put them on an environmental map
     Use a shader to map the texture onto a blob! :-)
-
-http://code.google.com/p/hxgk/
-
-Game starts as a primer
-    History of game states and commands allows player to better understand how games progress
 
 Contact Jason Whong?
 

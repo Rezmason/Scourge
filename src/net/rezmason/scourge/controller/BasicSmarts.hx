@@ -38,6 +38,7 @@ class BasicSmarts extends Smarts {
 
     override public function choose():GameEventType {
         var type:GameEventType = null;
+        var rev:Int = game.revision;
         
         var dropMoves:Array<Move> = game.getMovesForAction(dropActionIndex);
         var choice:Int = 0;
@@ -49,7 +50,7 @@ class BasicSmarts extends Smarts {
                 choice = numSkipMoves + randIntRange(dropMoves.length - numSkipMoves);
                 // Too expensive without pruning
                 // choice = findBestMoveIndex(dropActionIndex, numSkipMoves, dropMoves.length, getEnemySize);
-                type = PlayerAction(SubmitMove(dropActionIndex, choice));
+                type = PlayerAction(SubmitMove(rev, dropActionIndex, choice));
             }
         }
 
@@ -57,7 +58,7 @@ class BasicSmarts extends Smarts {
             var swapMoves:Array<Move> = game.getMovesForAction(swapActionIndex);
             if (swapMoves.length > 0) {
                 choice = randIntRange(swapMoves.length);
-                type = PlayerAction(SubmitMove(swapActionIndex, choice));
+                type = PlayerAction(SubmitMove(rev, swapActionIndex, choice));
             }
         }
 
@@ -70,20 +71,20 @@ class BasicSmarts extends Smarts {
                 var maxBiteSizeIndex:Int = biteSizes.indexOf(maxBiteSize);
                 
                 choice = findBestMoveIndex(biteActionIndex, maxBiteSizeIndex, biteMoves.length, getEnemySize);
-                type = PlayerAction(SubmitMove(biteActionIndex, choice));
+                type = PlayerAction(SubmitMove(rev, biteActionIndex, choice));
             }
         }
 
         if (type == null) {
             if (canSkip) {
-                type = PlayerAction(SubmitMove(dropActionIndex, choice));
+                type = PlayerAction(SubmitMove(rev, dropActionIndex, choice));
             }
         }
 
         if (type == null) {
             var quitMoves:Array<Move> = game.getMovesForAction(quitActionIndex);
             if (quitMoves.length > 0) {
-                type = PlayerAction(SubmitMove(quitActionIndex, choice));
+                type = PlayerAction(SubmitMove(rev, quitActionIndex, choice));
             }
         }
 
@@ -99,8 +100,8 @@ class BasicSmarts extends Smarts {
     function findBestMoveIndex(actionIndex:Int, start:Int, end:Int, eval:Void->Int, invert:Bool = false):Int {
         var extreme:Int = 0;
         var index:Int = 0;
+        var rev:Int = game.revision;
         for (ike in start...end) {
-            var rev:Int = game.revision;
             game.chooseMove(actionIndex, ike);
             var value:Int = eval();
             game.rewind(rev);

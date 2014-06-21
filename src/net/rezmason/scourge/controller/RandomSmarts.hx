@@ -37,7 +37,7 @@ class RandomSmarts extends Smarts {
             var canDrop:Bool = dropMoves.length > (canSkip ? 1 : 0);
             if (canDrop) {
                 choice = randIntRange(dropMoves.length - (canSkip ? 1 : 0));
-                type = PlayerAction(SubmitMove(dropActionIndex, choice));
+                type = PlayerAction(SubmitMove(rev, dropActionIndex, choice));
             }
         }
 
@@ -45,7 +45,7 @@ class RandomSmarts extends Smarts {
             var swapMoves:Array<Move> = game.getMovesForAction(swapActionIndex);
             if (swapMoves.length > 0) {
                 choice = randIntRange(swapMoves.length);
-                type = PlayerAction(SubmitMove(swapActionIndex, choice));
+                type = PlayerAction(SubmitMove(rev, swapActionIndex, choice));
             }
         }
 
@@ -53,20 +53,20 @@ class RandomSmarts extends Smarts {
             var biteMoves:Array<Move> = game.getMovesForAction(biteActionIndex);
             if (biteMoves.length > 0) {
                 choice = biteMoves.length - 1;
-                type = PlayerAction(SubmitMove(biteActionIndex, choice));
+                type = PlayerAction(SubmitMove(rev, biteActionIndex, choice));
             }
         }
 
         if (type == null) {
             if (canSkip) {
-                type = PlayerAction(SubmitMove(dropActionIndex, choice));
+                type = PlayerAction(SubmitMove(rev, dropActionIndex, choice));
             }
         }
 
         if (type == null) {
             var quitMoves:Array<Move> = game.getMovesForAction(quitActionIndex);
             if (quitMoves.length > 0) {
-                type = PlayerAction(SubmitMove(quitActionIndex, choice));
+                type = PlayerAction(SubmitMove(rev, quitActionIndex, choice));
             }
         }
 

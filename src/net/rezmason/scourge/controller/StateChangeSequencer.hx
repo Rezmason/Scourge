@@ -13,11 +13,10 @@ using net.rezmason.ropes.StatePlan;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 
-class StateChangeSequencer extends PlayerSystem implements Spectator {
+class StateChangeSequencer implements IPlayerMediator {
 
     inline static var MILLISECONDS_TO_SECONDS:Float = 1 / 1000;
     public inline static var NO_CAUSE:String = "";
-    public var updateSignal(default, null):Zig<GameEvent->Void>;
     public var sequenceStartSignal(default, null):Zig<Int->Array<XYZ>->Void>;
     public var sequenceUpdateSignal(default, null):Zig<Float->Int->Array<String>->Array<Array<NodeVO>>->Array<Int>->Array<Int>->Void>;
     static var nodeStateMap:Array<NodeState> = makeNodeStateMap();
@@ -39,43 +38,23 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
     var headNodes:Array<AspectSet>;
 
     var animationPeriod:Float;
+
+    var game:Game;
     
     public function new():Void {
-        super(false);
-        updateSignal = new Zig();
         sequenceStartSignal = new Zig();
         sequenceUpdateSignal = new Zig();
-        updateSignal.add(onUpdate);
-        onAlert = addStep;
     }
 
     public function setAnimationPeriod(milliseconds:Int):Void {
         animationPeriod = milliseconds * MILLISECONDS_TO_SECONDS;
     }
 
-    override private function connect():Void {}
-    override private function disconnect():Void endGame();
-    
-    override private function init(configData:String, saveData:String):Void {
-        super.init(configData, saveData);
+    public function connect(game:Game):Void {
+        this.game = game;
         initSequence();
     }
     
-    override private function isMyTurn():Bool return false;
-    
-    private function onUpdate(event:GameEvent):Void {
-        switch (event.type) {
-            case RefereeAction(type): 
-                processGameEventType(event.type);
-            case _:
-                // trace(game.spitBoard());
-                beginSequence();
-                processGameEventType(event.type);
-                endSequence();
-                if (game.winner != Aspect.NULL) destroySequence();
-        }
-    }
-
     private inline function initSequence():Void {
         // get props
         ident_ = Ptr.intToPointer(0, game.state.key);
@@ -101,7 +80,7 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         sequenceUpdateSignal.dispatch(animationPeriod, 1, causes, steps, getDistancesFromHead(), getNeighborBitfields());
     }
 
-    private inline function beginSequence():Void {
+    public function moveStarts():Void {
         lastStep = nodeVOs.copy();
         steps = [lastStep];
         lastCause = NO_CAUSE;
@@ -109,16 +88,17 @@ class StateChangeSequencer extends PlayerSystem implements Spectator {
         maxFreshness = 0;
     }
 
-    private inline function endSequence():Void {
+    public function moveStops():Void {
         sequenceUpdateSignal.dispatch(animationPeriod, maxFreshness, causes, steps, getDistancesFromHead(), getNeighborBitfields());
     }
 
-    private inline function destroySequence():Void {
+    public function disconnect():Void {
         nodeVOs = null;
         steps = null;
+        game = null;
     }
 
-    private function addStep(cause:String):Void {
+    public function moveSteps(cause:String):Void {
 
         if (steps == null) return;
 

@@ -21,7 +21,7 @@ class PlayGameConsoleCommand extends ConsoleCommand {
 
         keys['playerPattern'] = PLAYER_PATTERN;
         keys['thinkPeriod'] = INTEGERS;
-        keys['animatePeriod'] = INTEGERS;
+        keys['animateSpeed'] = INTEGERS;
         keys['seed'] = INTEGERS;
         flags.push('replay');
         flags.push('circular');
@@ -62,9 +62,9 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         if (thinkPeriodString == null) thinkPeriodString = '10';
         var thinkPeriod:Int = Std.parseInt(thinkPeriodString);
 
-        var animatePeriodString:String = args.keyValuePairs['animatePeriod'];
-        if (animatePeriodString == null) animatePeriodString = '1000';
-        var animatePeriod:Int = Std.parseInt(animatePeriodString);
+        var animateSpeedString:String = args.keyValuePairs['animateSpeed'];
+        if (animateSpeedString == null) animateSpeedString = '1000';
+        var animateSpeed:Int = Std.parseInt(animateSpeedString);
 
         var circular:Bool = args.flags.has('circular');
 
@@ -80,7 +80,7 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         cfg.maxBites = 5;
         cfg.maxSkips = 0;
 
-        gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animatePeriod, isReplay, seed);
+        gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animateSpeed, isReplay, seed);
         displaySystem.showBody('board', 'main');
 
         message = 'Starting $numPlayers-player game with seed $seed.';

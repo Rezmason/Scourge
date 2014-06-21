@@ -6,9 +6,8 @@ import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
 enum PlayerDef {
-    Test(proxy:Game->(Void->Void)->Void, random:Void->Float);
+    Bot(smarts:Smarts, period:Int);
     Human;
-    Bot(smarts:Smarts, period:Int, random:Void->Float);
     Remote;
 }
 
@@ -16,7 +15,6 @@ typedef GameEvent = {
     var type:GameEventType;
     var timeIssued:Int;
     @:optional var timeReceived:Int;
-    @:optional var player:Int;
 }
 
 typedef SavedGame = {
@@ -26,27 +24,20 @@ typedef SavedGame = {
     var timeSaved:Int;
 }
 
-typedef PlaySignal = Zig<Player->GameEvent->Void>;
-
 enum GameEventType {
-    PlayerAction(action:PlayerActionType);
-    RefereeAction(action:RefereeActionType);
+    PlayerAction(type:PlayerActionType);
+    RefereeAction(type:RefereeActionType);
 }
 
 enum PlayerActionType {
-    SubmitMove(action:Int, move:Int);
-    Ready;
-    Synced;
+    SubmitMove(turn:Int, action:Int, move:Int);
 }
 
 enum RefereeActionType {
-    AllReady;
-    AllSynced;
-    Connect;
-    Disconnect;
-    Save;
     Init(config:String, ?savedState:String);
-    RandomFloats(floats:String);
+    RelayMove(turn:Int, action:Int, move:Int);
+    RandomFloats(turn:Int, floats:String);
+    End;
 }
 
 enum NodeState {

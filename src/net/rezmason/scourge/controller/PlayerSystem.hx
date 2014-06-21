@@ -8,68 +8,88 @@ import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.UnixTime;
 import net.rezmason.utils.Zig;
 
-class PlayerSystem {
+using Lambda;
+
+class PlayerSystem implements IPlayer {
+
+    public var index(default, null):Int;
 
     private var game:Game;
     private var floats:Array<Float>;
-    private var playSignal:PlaySignal;
-    private var onAlert:String->Void;
     private var config:ScourgeConfig;
+    private var mediator:IPlayerMediator;
+
+    @:allow(net.rezmason.scourge.controller.Referee)
+    private var playSignal:Zig<GameEvent->Void>;
     
     function new(cacheMoves:Bool):Void {
         game = new Game(cacheMoves);
         floats = [];
+        mediator = null;
     }
+
+    public function setMediator(med:IPlayerMediator):Void {
+        if (mediator != med) {
+            removeMediator();
+            mediator = med;
+            if (game.hasBegun) mediator.connect(game);
+        }
+    }
+
+    public function removeMediator():Void {
+        if (mediator != null) {
+            mediator.disconnect();
+            mediator = null;
+        }
+    }
+
 
     private function processGameEventType(type:GameEventType):Void {
         switch (type) {
-            case PlayerAction(action):
-                switch (action) {
-                    case SubmitMove(action, move):
-                        if (game.hasBegun) updateGame(action, move);
-                        // if (isMyTurn()) play();
-                    case _:
-                }
             case RefereeAction(action):
                 switch (action) {
-                    case AllReady | AllSynced: if (isMyTurn()) play();
-                    case Connect: connect();
-                    case Disconnect: disconnect();
-                    case Init(configData, saveData): init(configData, saveData);
-                    case RandomFloats(data): appendFloats(Unserializer.run(data));
-                    case Save:
+                    case Init(configData, saveData): 
+                        if (!game.hasBegun) {
+                            init(configData, saveData);
+                            if (mediator != null) mediator.connect(game);
+                            proceed();
+                        }
+                    case RelayMove(turn, action, move):
+                        if (turn == game.revision) {
+                            if (mediator != null) mediator.moveStarts();
+                            if (game.hasBegun) updateGame(action, move);
+                            if (mediator != null) mediator.moveStops();
+                            proceed();
+                        }
+                    case RandomFloats(turn, data): 
+                        if (turn == game.revision) floats = Unserializer.run(data);
+                    case End: 
+                        if (game.hasBegun) {
+                            if (mediator != null) mediator.disconnect();
+                            end();
+                        }
                 }
+            case _:
         }
     }
 
     private function init(configData:String, saveData:String):Void {
         var savedState:SavedState = saveData != null ? Unserializer.run(saveData).state : null;
         config = Unserializer.run(configData);
-        game.begin(config, retrieveRandomFloat, onAlert, savedState);
+        game.begin(config, retrieveRandomFloat, onMoveStep, savedState);
     }
 
-    private function endGame():Void game.end();
+    private inline function onMoveStep(cause:String):Void if (mediator != null) mediator.moveSteps(cause);
 
-    private function announceReady():Void throw "Override this.";
-    private function connect():Void throw "Override this.";
-    private function disconnect():Void throw "Override this.";
+    private function proceed():Void if (isMyTurn()) play();
+    private function end():Void game.end();
     private function updateGame(actionIndex:Int, move:Int):Void game.chooseMove(actionIndex, move);
     private function play():Void throw "Override this.";
-
-    private function appendFloats(moreFloats:Array<Float>):Void floats = floats.concat(moreFloats);
     private function retrieveRandomFloat():Float return floats.shift();
-
-    private function volley(player:Player, eventType:GameEventType):Void {
-        if (eventType != null) playSignal.dispatch(player, {type:eventType, timeIssued:UnixTime.now()});
-    }
+    private function makeGameEvent(type:GameEventType):GameEvent return {type:type, timeIssued:UnixTime.now()};
 
     private function isMyTurn():Bool {
         throw "Override this.";
         return false;
-    }
-
-    private function currentPlayer():Player {
-        throw "Override this.";
-        return null;
     }
 }
