@@ -117,7 +117,11 @@ class Style {
     }
 
     public function connectSpan(span:Span):Void {
-        for (ike in 0...styleFields.length) span.basics[ike] = Std.parseFloat('${values[styleFields[ike]]}');
+        for (ike in 0...styleFields.length) {
+            var val:Float = Std.parseFloat('${values[styleFields[ike]]}');
+            if (Math.isNaN(val)) val = 0;
+            span.basics[ike] = val;
+        }
     }
 
     private function connectStates(bases:Map<String, Style>, stateNames:Array<String>):Void {

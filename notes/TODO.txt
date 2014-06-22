@@ -2,8 +2,6 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
-Styled text has a NaN somewhere.
-
 PlayerSystem needs a queue
     IntMap, actually.
     Store all float and move messages whose turns are late
