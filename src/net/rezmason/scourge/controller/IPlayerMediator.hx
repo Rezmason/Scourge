@@ -13,5 +13,5 @@ interface IPlayerMediator {
     public function moveStops():Void;
     public function moveSteps(cause:String):Void;
 
-    // public var proceedSignal(default, null):Zig<Void->Void>;
+    public var proceedSignal(default, null):Zig<Void->Void>;
 }

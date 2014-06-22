@@ -2,15 +2,12 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
+Styled text has a NaN somewhere.
+
 PlayerSystem needs a queue
     IntMap, actually.
     Store all float and move messages whose turns are late
     Iterate through them once they're reached
-
-Timing
-    Animation
-    The board should signal to the player system when it's time to proceed
-    Meanwhile, the player should queue game events
 
 Worker tests are failing in-game on Flash and HTML5 targets
 

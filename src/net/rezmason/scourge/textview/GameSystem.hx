@@ -29,11 +29,14 @@ class GameSystem {
 
         sequencer.sequenceStartSignal.add(boardBody.presentStart);
         sequencer.sequenceUpdateSignal.add(boardBody.presentSequence);
+        boardBody.setProceedSignal(sequencer.proceedSignal);
     }
 
-    public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, thinkPeriod:Int, animateSpeed:Int, isReplay:Bool, seed:UInt):Void {
+    public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, thinkPeriod:Int, animateMils:Int, isReplay:Bool, seed:UInt):Void {
 
         if (referee.gameBegun) referee.endGame();
+
+        boardBody.setAnimationSpeed(animateMils);
 
         var playerDefs:Array<PlayerDef> = [];
         var randGen:Void->Float = lgm(seed);
@@ -50,7 +53,7 @@ class GameSystem {
             randGen = function() return floats.shift();
             hasBots = true;
             for (ike in 0...config.numPlayers) {
-                playerDefs.push(Bot(new ReplaySmarts(log), thinkPeriod + animateSpeed));
+                playerDefs.push(Bot(new ReplaySmarts(log), thinkPeriod));
             }
         } else {
             while (playerDefs.length < config.numPlayers) {
@@ -58,7 +61,7 @@ class GameSystem {
                 var char:String = playerPattern[playerDefs.length];
                 switch (char) {
                     case 'b':
-                        pdef = Bot(new BasicSmarts(), thinkPeriod + animateSpeed);
+                        pdef = Bot(new BasicSmarts(), thinkPeriod);
                         hasBots = true;
                 }
                 playerDefs.push(pdef);
@@ -72,8 +75,6 @@ class GameSystem {
         } else if (hasHumans) {
             // attach 
         }
-
-        sequencer.setAnimationPeriod(animateSpeed);
 
         var players:Array<IPlayer> = makePlayers(playerDefs, botSystem);
 

@@ -17,12 +17,14 @@ import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.GlyphTexture;
+import net.rezmason.utils.Zig;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.utils.CharCode;
 
 class BoardBody extends Body {
 
+    inline static var MILLISECONDS_TO_SECONDS:Float = 1 / 1000;
     inline static var GLYPHS_PER_NODE:Int = 3;
     inline static var BOARD_MAGNIFICATION:Float = 1.15;
     inline static var WALL_TOP_OFFSET:Float = -0.05;
@@ -45,6 +47,9 @@ class BoardBody extends Body {
     var rawTransform:Matrix3D;
     var homeTransform:Matrix3D;
     var plainTransform:Matrix3D;
+
+    var maxAnimationTime:Float;
+    var animationSpeed:Float;
     
     var boardScale:Float;
 
@@ -64,7 +69,7 @@ class BoardBody extends Body {
     var wavePools:Array<WavePool>;
 
     var animationTime:Float;
-    var totalAnimationTime:Float;
+    var proceedSignal:Zig<Void->Void>;
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
 
@@ -81,8 +86,14 @@ class BoardBody extends Body {
         nodeTweens = [];
         wavePools = [];
         animationTime = 0;
-        totalAnimationTime = 0;
         numActiveTweens = 0;
+
+        maxAnimationTime = 2000;
+        animationSpeed = 1;
+    }
+
+    public function setAnimationSpeed(milliseconds:Float):Void {
+        animationSpeed = milliseconds * MILLISECONDS_TO_SECONDS;
     }
 
     public function presentStart(numPlayers:Int, nodePositions:Array<XYZ>):Void {
@@ -146,7 +157,7 @@ class BoardBody extends Body {
         // Interpret info from UI
     }
 
-    public function presentSequence(time:Float, maxFreshness:Int, causes:Array<String>, steps:Array<Array<NodeVO>>, distancesFromHead:Array<Int>, neighborBitfields:Array<Int>):Void {
+    public function presentSequence(maxFreshness:Int, causes:Array<String>, steps:Array<Array<NodeVO>>, distancesFromHead:Array<Int>, neighborBitfields:Array<Int>):Void {
         
         if (numActiveTweens > 0) {
             //var tweenString:String = '';
@@ -163,7 +174,6 @@ class BoardBody extends Body {
         }
 
         animationTime = 0;
-        totalAnimationTime = time;
         nodeTweens = [];
 
         var nodeVOs:Array<NodeVO> = steps[0];
@@ -180,7 +190,7 @@ class BoardBody extends Body {
         for (ike in 0...steps.length) {
             var step:Array<NodeVO> = steps[ike];
             var cause:String = causes[ike];
-            var duration:Float = durationsByCause[cause];
+            var duration:Float = durationsByCause[cause] * animationSpeed;
             var delta:Float = duration * (1 - overlapsByCause[cause]);
             var lastFreshness:Int = -1;
             if (step.length > 0) lastCause = ike;
@@ -207,7 +217,7 @@ class BoardBody extends Body {
 
         var stragglers:Array<Int> = [];
         var cause:String = BOARD_CLEANUP_CAUSE;
-        var duration:Float = durationsByCause[cause];
+        var duration:Float = durationsByCause[cause] * animationSpeed;
         var maxDistances:Array<Int> = [];
         for (ike in 0...numPlayers) maxDistances[ike] = 0;
         for (ike in 0...numNodes) {
@@ -238,7 +248,7 @@ class BoardBody extends Body {
             var end:Float = 0;
             for (tween in nodeTweens) if (end < tween.start + tween.duration) end = tween.start + tween.duration;
             // If the animation is too long, we need to compress it
-            var scale:Float = time / end;
+            var scale:Float = maxAnimationTime / end;
             if (scale < 1) {
                 for (tween in nodeTweens) {
                     tween.start *= scale;
@@ -246,6 +256,8 @@ class BoardBody extends Body {
                 }
             }
         }
+
+        if (numActiveTweens == 0 && proceedSignal != null) proceedSignal.dispatch();
 
         /*
         var tweenString:String = '';
@@ -255,6 +267,10 @@ class BoardBody extends Body {
         }
         trace(tweenString);
         */
+    }
+
+    public function setProceedSignal(signal:Zig<Void->Void>):Void {
+        proceedSignal = signal;
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
@@ -295,7 +311,10 @@ class BoardBody extends Body {
 
             //trace(tweenString);
 
-            if (numActiveTweens == 0) nodeTweens = [];
+            if (numActiveTweens == 0) {
+                nodeTweens = [];
+                if (proceedSignal != null) proceedSignal.dispatch();
+            }
         }
 
         // update waves
@@ -384,7 +403,7 @@ class BoardBody extends Body {
         if (occupier == -1) {
             char = Utf8.charCodeAt(Strings.BOX_SYMBOLS, bitfield);
         } else if (bitfield == 0xF) {
-            char = BODY_CHARS.charCodeAt(distance % Utf8.length(BODY_CHARS));
+            char = BODY_CHARS.charCodeAt(Std.int(distance / 2) % Utf8.length(BODY_CHARS));
         } else {
             char = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
         }
@@ -492,13 +511,13 @@ class BoardBody extends Body {
 
     static function makeDurationsByCause():Map<String, Float> {
         return [
-            "" => 1,
-            "CavityRule" => 3,
-            "DecayRule" => 3,
-            "DropPieceRule" => 2,
-            "EatCellsRule" => 1,
-            "BiteRule" => 1,
-            BOARD_CLEANUP_CAUSE => 1,
+            "" => 0.5,
+            "CavityRule" => 0.5,
+            "DecayRule" => 1.5,
+            "DropPieceRule" => 0.7,
+            "EatCellsRule" => 0.5,
+            "BiteRule" => 0.5,
+            BOARD_CLEANUP_CAUSE => 0.2,
         ];
     }
 

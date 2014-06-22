@@ -32,17 +32,18 @@ class PlayerSystem implements IPlayer {
         if (mediator != med) {
             removeMediator();
             mediator = med;
+            mediator.proceedSignal.add(proceed);
             if (game.hasBegun) mediator.connect(game);
         }
     }
 
     public function removeMediator():Void {
         if (mediator != null) {
+            mediator.proceedSignal.remove(proceed);
             mediator.disconnect();
             mediator = null;
         }
     }
-
 
     private function processGameEventType(type:GameEventType):Void {
         switch (type) {
@@ -52,14 +53,14 @@ class PlayerSystem implements IPlayer {
                         if (!game.hasBegun) {
                             init(configData, saveData);
                             if (mediator != null) mediator.connect(game);
-                            proceed();
+                            else proceed();
                         }
                     case RelayMove(turn, action, move):
                         if (turn == game.revision) {
                             if (mediator != null) mediator.moveStarts();
                             if (game.hasBegun) updateGame(action, move);
                             if (mediator != null) mediator.moveStops();
-                            proceed();
+                            else proceed();
                         }
                     case RandomFloats(turn, data): 
                         if (turn == game.revision) floats = Unserializer.run(data);

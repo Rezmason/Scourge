@@ -15,10 +15,10 @@ using net.rezmason.utils.Pointers;
 
 class StateChangeSequencer implements IPlayerMediator {
 
-    inline static var MILLISECONDS_TO_SECONDS:Float = 1 / 1000;
     public inline static var NO_CAUSE:String = "";
     public var sequenceStartSignal(default, null):Zig<Int->Array<XYZ>->Void>;
-    public var sequenceUpdateSignal(default, null):Zig<Float->Int->Array<String>->Array<Array<NodeVO>>->Array<Int>->Array<Int>->Void>;
+    public var sequenceUpdateSignal(default, null):Zig<Int->Array<String>->Array<Array<NodeVO>>->Array<Int>->Array<Int>->Void>;
+    public var proceedSignal(default, null):Zig<Void->Void>;
     static var nodeStateMap:Array<NodeState> = makeNodeStateMap();
 
     var nodeVOs:Array<NodeVO>;
@@ -37,17 +37,12 @@ class StateChangeSequencer implements IPlayerMediator {
 
     var headNodes:Array<AspectSet>;
 
-    var animationPeriod:Float;
-
     var game:Game;
     
     public function new():Void {
         sequenceStartSignal = new Zig();
         sequenceUpdateSignal = new Zig();
-    }
-
-    public function setAnimationPeriod(milliseconds:Int):Void {
-        animationPeriod = milliseconds * MILLISECONDS_TO_SECONDS;
+        proceedSignal = new Zig();
     }
 
     public function connect(game:Game):Void {
@@ -77,7 +72,7 @@ class StateChangeSequencer implements IPlayerMediator {
         maxFreshness = 0;
 
         sequenceStartSignal.dispatch(game.state.players.length, getNodePositions());
-        sequenceUpdateSignal.dispatch(animationPeriod, 1, causes, steps, getDistancesFromHead(), getNeighborBitfields());
+        sequenceUpdateSignal.dispatch(1, causes, steps, getDistancesFromHead(), getNeighborBitfields());
     }
 
     public function moveStarts():Void {
@@ -89,7 +84,7 @@ class StateChangeSequencer implements IPlayerMediator {
     }
 
     public function moveStops():Void {
-        sequenceUpdateSignal.dispatch(animationPeriod, maxFreshness, causes, steps, getDistancesFromHead(), getNeighborBitfields());
+        sequenceUpdateSignal.dispatch(maxFreshness, causes, steps, getDistancesFromHead(), getNeighborBitfields());
     }
 
     public function disconnect():Void {
