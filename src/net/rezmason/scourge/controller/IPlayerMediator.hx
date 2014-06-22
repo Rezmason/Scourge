@@ -9,7 +9,7 @@ interface IPlayerMediator {
     public function connect(game:Game):Void;
     public function disconnect():Void;
 
-    public function moveStarts():Void;
+    public function moveStarts(playerIndex:Int, action:Int, move:Int):Void;
     public function moveStops():Void;
     public function moveSteps(cause:String):Void;
 

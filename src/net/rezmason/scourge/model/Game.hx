@@ -163,8 +163,11 @@ class Game {
                 actions[actionIndex].chooseQuantumMove(moveIndex);
             }
         } else {
-            if (moveIndex < 0 || moveIndex > getMovesForAction(actionIndex).length - 1) {
-                throw 'Invalid move for action ${actionIDs[actionIndex]}';
+            var numMovesForAction:Int = getMovesForAction(actionIndex).length - 1;
+            if (moveIndex < 0) {
+                throw 'Invalid move for action ${actionIDs[actionIndex]}: $moveIndex < 0';
+            } else if (moveIndex > numMovesForAction) {
+                throw 'Invalid move for action ${actionIDs[actionIndex]}: $moveIndex > $numMovesForAction';
             } else {
                 actions[actionIndex].chooseMove(moveIndex);
             }

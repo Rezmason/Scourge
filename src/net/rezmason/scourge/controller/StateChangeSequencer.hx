@@ -17,7 +17,7 @@ class StateChangeSequencer implements IPlayerMediator {
 
     public inline static var NO_CAUSE:String = "";
     public var sequenceStartSignal(default, null):Zig<Int->Array<XYZ>->Void>;
-    public var sequenceUpdateSignal(default, null):Zig<Int->Array<String>->Array<Array<NodeVO>>->Array<Int>->Array<Int>->Void>;
+    public var sequenceUpdateSignal(default, null):Zig<Int->String->Int->Array<String>->Array<Array<NodeVO>>->Array<Int>->Array<Int>->Void>;
     public var proceedSignal(default, null):Zig<Void->Void>;
     static var nodeStateMap:Array<NodeState> = makeNodeStateMap();
 
@@ -36,6 +36,8 @@ class StateChangeSequencer implements IPlayerMediator {
     var maxFreshness_:AspectPtr;
 
     var headNodes:Array<AspectSet>;
+    var playerIndex:Int;
+    var move:String;
 
     var game:Game;
     
@@ -70,12 +72,16 @@ class StateChangeSequencer implements IPlayerMediator {
         lastCause = NO_CAUSE;
         causes = [lastCause];
         maxFreshness = 0;
+        playerIndex = -1;
+        move = '';
 
         sequenceStartSignal.dispatch(game.state.players.length, getNodePositions());
-        sequenceUpdateSignal.dispatch(1, causes, steps, getDistancesFromHead(), getNeighborBitfields());
+        sequenceUpdateSignal.dispatch(playerIndex, move, 1, causes, steps, getDistancesFromHead(), getNeighborBitfields());
     }
 
-    public function moveStarts():Void {
+    public function moveStarts(playerIndex:Int, action:Int, move:Int):Void {
+        this.playerIndex = playerIndex;
+        this.move = '[$action : $move]';
         lastStep = nodeVOs.copy();
         steps = [lastStep];
         lastCause = NO_CAUSE;
@@ -84,7 +90,7 @@ class StateChangeSequencer implements IPlayerMediator {
     }
 
     public function moveStops():Void {
-        sequenceUpdateSignal.dispatch(maxFreshness, causes, steps, getDistancesFromHead(), getNeighborBitfields());
+        sequenceUpdateSignal.dispatch(playerIndex, move, maxFreshness, causes, steps, getDistancesFromHead(), getNeighborBitfields());
     }
 
     public function disconnect():Void {

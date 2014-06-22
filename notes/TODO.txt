@@ -2,12 +2,6 @@ REMEMBER:
     If the C++ build fails, try removing inline in the Pointers abstracts
         Bottom up approach
 
-PlayerSystem needs a queue
-    IntMap, actually.
-    Store all float and move messages whose turns are late
-    Iterate through them once they're reached
-
-Worker tests are failing in-game on Flash and HTML5 targets
 
 "Frame"
     White box drawing characters with piece in the middle
@@ -20,13 +14,16 @@ Board
     Pool objects
     Timing - should be dictated by the view?
 
-Improve history
-    Make the diffs go backwards
-    And force a full commit occasionally
-
 Human players, GUISystem
     Implement abstract commands
     THEN figure out how to connect them to the console
+PlayerSystem needs a queue
+    IntMap, actually.
+    Store all float and move messages whose turns are late
+    Iterate through them once they're reached
+Improve history
+    Make the diffs go backwards
+    And force a full commit occasionally
 Refactor the console stuff- within reason
     It's a mess
 Support output hints
@@ -34,6 +31,8 @@ Support output hints
 Code review?
 
 Move the logic into a Worker
+    Worker tests are failing in-game on Flash and HTML5 targets
+
 Get referee to handle situations where a player takes too long to sync or move
     "Player has been replaced with a bot of Level N"
 

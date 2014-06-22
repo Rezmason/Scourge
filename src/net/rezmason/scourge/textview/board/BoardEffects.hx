@@ -67,16 +67,16 @@ class BoardEffects {
         from.top.thickness = 0.7;
         from.top.char = '•'.code();
         var hotProps:NodeProps = cloneProps(to);
-        hotProps.top.color.r = 1;
-        hotProps.top.color.g = 1;
-        hotProps.top.color.b = 1;
+        hotProps.top.color.r = hotProps.top.color.r * 0.4 + 0.6;
+        hotProps.top.color.g = hotProps.top.color.g * 0.4 + 0.6;
+        hotProps.top.color.b = hotProps.top.color.b * 0.4 + 0.6;
         hotProps.top.char = from.top.char;
         hotProps.top.size = 1;
         hotProps.waveMult = 0;
         // hotProps.top.size = 1.2;
         hotProps.top.thickness = 0.7;
-        arr.push(makeTween(view, cause, start, duration * 0.3, from, hotProps, Quad.easeIn));
-        arr.push(makeTween(view, cause, start + duration * 0.3, duration * 0.7, hotProps, to, Quad.easeIn));
+        arr.push(makeTween(view, cause, start, duration * 0.3, from, hotProps, Bounce.easeOut));
+        arr.push(makeTween(view, cause, start + duration * 0.3, duration * 0.7, hotProps, to, Quad.easeInOut));
     };
 
     static function animateHeadEaten(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {

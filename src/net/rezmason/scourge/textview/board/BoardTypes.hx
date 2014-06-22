@@ -40,3 +40,8 @@ typedef NodeView = {
     var occupier:Int;
     var topSize:Float;
 }
+
+typedef CauseTime = {
+    var cause:String;
+    var time:Float;
+};

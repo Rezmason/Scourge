@@ -57,7 +57,7 @@ class PlayerSystem implements IPlayer {
                         }
                     case RelayMove(turn, action, move):
                         if (turn == game.revision) {
-                            if (mediator != null) mediator.moveStarts();
+                            if (mediator != null) mediator.moveStarts(game.currentPlayer, action, move);
                             if (game.hasBegun) updateGame(action, move);
                             if (mediator != null) mediator.moveStops();
                             else proceed();

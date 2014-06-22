@@ -30,10 +30,6 @@ class BoardBody extends Body {
     inline static var WALL_TOP_OFFSET:Float = -0.05;
     inline static var TOP_OFFSET:Float = -0.03;
     inline static var UI_OFFSET:Float = -0.06;
-    static var TEAM_COLORS:Array<Color> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Colors.fromHex);
-    static var BOARD_COLOR:Color = Colors.fromHex(0x202020);
-    static var WALL_COLOR:Color = Colors.fromHex(0x808080);
-    static var UI_COLOR:Color = Colors.fromHex(0xFFFFFF);
     static var BODY_CHARS:String = Strings.ALPHANUMERICS;
     static var BLACK:Color = {r:0, g:0, b:0};
     static var BOARD_CLEANUP_CAUSE:String = "#";
@@ -64,12 +60,16 @@ class BoardBody extends Body {
     var numNodes:Int;
     var nodeViews:Array<NodeView>;
     var nodeTweens:Array<NodeTween>;
+    var causeTimes:Array<CauseTime>;
     var numActiveTweens:Int;
 
     var wavePools:Array<WavePool>;
 
     var animationTime:Float;
     var proceedSignal:Zig<Void->Void>;
+    var consoleSignal:Zig<Color->String->String->Void>;
+
+    var playerIndex:Int;
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
 
@@ -84,6 +84,7 @@ class BoardBody extends Body {
         boardScale = 1;
         nodeViews = [];
         nodeTweens = [];
+        causeTimes = [];
         wavePools = [];
         animationTime = 0;
         numActiveTweens = 0;
@@ -97,6 +98,8 @@ class BoardBody extends Body {
     }
 
     public function presentStart(numPlayers:Int, nodePositions:Array<XYZ>):Void {
+
+        finishSequenceAnimation();
 
         this.numPlayers = numPlayers;
         numNodes = nodePositions.length;
@@ -127,6 +130,11 @@ class BoardBody extends Body {
             if (minX > pos.x) minX = pos.x;
             if (maxX < pos.x) maxX = pos.x;
 
+            view.waveMult = 0;
+            view.waveHeight = 0;
+            view.distance = 0;
+            view.occupier = 0;
+            view.topSize = 0;
             view.props = null;
 
             view.bottomGlyph.set_pos(pos);
@@ -135,12 +143,18 @@ class BoardBody extends Body {
 
             view.bottomGlyph.set_char(BOARD_CODE, glyphTexture.font);
             view.bottomGlyph.set_s(0);
+            view.bottomGlyph.set_p(0);
+            view.bottomGlyph.set_f(0.5);
             view.topGlyph.set_char(BODY_CODE, glyphTexture.font);
             view.topGlyph.set_s(0);
+            view.topGlyph.set_p(0);
+            view.topGlyph.set_f(0.5);
 
-            view.uiGlyph.set_color(UI_COLOR);
+            view.uiGlyph.set_color(ColorPalette.UI_COLOR);
             view.uiGlyph.set_char(UI_CODE, glyphTexture.font);
             view.uiGlyph.set_s(0);
+            view.uiGlyph.set_p(0);
+            view.uiGlyph.set_f(0.5);
         }
 
         boardScale = BOARD_MAGNIFICATION / (maxX - minX);
@@ -157,24 +171,19 @@ class BoardBody extends Body {
         // Interpret info from UI
     }
 
-    public function presentSequence(maxFreshness:Int, causes:Array<String>, steps:Array<Array<NodeVO>>, distancesFromHead:Array<Int>, neighborBitfields:Array<Int>):Void {
+    public function presentSequence(
+        playerIndex:Int, 
+        move:String,
+        maxFreshness:Int, 
+        causes:Array<String>, 
+        steps:Array<Array<NodeVO>>, 
+        distancesFromHead:Array<Int>, 
+        neighborBitfields:Array<Int>
+    ):Void {
         
-        if (numActiveTweens > 0) {
-            //var tweenString:String = '';
-            for (tween in nodeTweens) {
-                if (tween != null) {
-                    animateTween(tween, tween.start + tween.duration);
-                    //tweenString += '*';
-                } else {
-                    //tweenString += ' ';
-                }
-            }
-            // tweenString += '\n';
-            //trace(tweenString);
-        }
+        finishSequenceAnimation();
 
-        animationTime = 0;
-        nodeTweens = [];
+        this.playerIndex = playerIndex;
 
         var nodeVOs:Array<NodeVO> = steps[0];
         
@@ -193,7 +202,10 @@ class BoardBody extends Body {
             var duration:Float = durationsByCause[cause] * animationSpeed;
             var delta:Float = duration * (1 - overlapsByCause[cause]);
             var lastFreshness:Int = -1;
-            if (step.length > 0) lastCause = ike;
+            if (step.length > 0) {
+                lastCause = ike;
+                causeTimes.push({cause:cause, time:start});
+            }
             for (nodeVO in step) {
                 if (nodeVO == null) continue;
                 var id:Int = nodeVO.id;
@@ -267,10 +279,47 @@ class BoardBody extends Body {
         }
         trace(tweenString);
         */
+
+        printPlayerString('Player $playerIndex chose move $move');
+    }
+
+    private function finishSequenceAnimation():Void {
+        if (numActiveTweens > 0) {
+            //var tweenString:String = '';
+            for (tween in nodeTweens) {
+                if (tween != null) {
+                    animateTween(tween, tween.start + tween.duration);
+                    //tweenString += '*';
+                } else {
+                    //tweenString += ' ';
+                }
+            }
+            for (causeTime in causeTimes) {
+                if (causeTime.time > animationTime) {
+                    printPlayerString(causeTime.cause);
+                }
+            }
+            // tweenString += '\n';
+            //trace(tweenString);
+        }
+
+        animationTime = 0;
+        nodeTweens = [];
+        causeTimes = [];
+    }
+
+    private function printPlayerString(str:String):Void {
+        if (playerIndex != -1 && consoleSignal != null) {
+            consoleSignal.dispatch(ColorPalette.TEAM_COLORS[playerIndex], 'player$playerIndex', str);
+        }
     }
 
     public function setProceedSignal(signal:Zig<Void->Void>):Void {
         proceedSignal = signal;
+    }
+
+    public function setConsoleSignal(signal:Zig<Color->String->String->Void>):Void {
+        consoleSignal = signal;
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
@@ -307,6 +356,11 @@ class BoardBody extends Body {
                 } else {
                     //tweenString += ' ';
                 }
+            }
+
+            if (causeTimes.length > 0 && causeTimes[0].time < animationTime) {
+                printPlayerString(causeTimes[0].cause);
+                causeTimes.shift();
             }
 
             //trace(tweenString);
@@ -423,24 +477,24 @@ class BoardBody extends Body {
                 if (bitfield != -1) {
                     top.size = 1;
                     top.char = getChar(occupier, bitfield, distance);
-                    top.color = WALL_COLOR;
+                    top.color = ColorPalette.WALL_COLOR;
                     top.z += WALL_TOP_OFFSET;
                     bottom.size = 1;
                     bottom.char = top.char;
-                    bottom.color = BOARD_COLOR;
+                    bottom.color = ColorPalette.BOARD_COLOR;
                 }
             case Empty:
-                bottom.color = BOARD_COLOR;
+                bottom.color = ColorPalette.BOARD_COLOR;
                 bottom.char = BOARD_CODE;
                 bottom.size = 0.9;
             case Cavity:
-                bottom.color = Colors.mult(TEAM_COLORS[occupier % TEAM_COLORS.length], 0.4);
+                bottom.color = Colors.mult(ColorPalette.TEAM_COLORS[occupier % ColorPalette.TEAM_COLORS.length], 0.4);
                 bottom.char = BOARD_CODE;
                 bottom.size = 0.9;
             case Body:
                 top.z += TOP_OFFSET;
                 top.char = getChar(occupier, bitfield, distance);
-                top.color = TEAM_COLORS[occupier];
+                top.color = ColorPalette.TEAM_COLORS[occupier];
                 waveMult = 1;
                 var numNeighbors:Int = 0;
                 for (i in 0...4) numNeighbors += (bitfield >> i) & 1;
@@ -451,7 +505,7 @@ class BoardBody extends Body {
                 bottom.size = top.size * 1.5;
             case Head:
                 top.z += TOP_OFFSET;
-                top.color = TEAM_COLORS[occupier];
+                top.color = ColorPalette.TEAM_COLORS[occupier];
                 top.char = HEAD_CODE;
                 top.size = 1.5;
                 bottom.char = top.char;
@@ -514,7 +568,7 @@ class BoardBody extends Body {
             "" => 0.5,
             "CavityRule" => 0.5,
             "DecayRule" => 1.5,
-            "DropPieceRule" => 0.7,
+            "DropPieceRule" => 1.5,
             "EatCellsRule" => 0.5,
             "BiteRule" => 0.5,
             BOARD_CLEANUP_CAUSE => 0.2,
@@ -526,7 +580,7 @@ class BoardBody extends Body {
             "" => 1,
             "CavityRule" => 1,
             "DecayRule" => 1,
-            "DropPieceRule" => 0,
+            "DropPieceRule" => 0.3,
             "EatCellsRule" => 0.5,
             "PickPieceRule" => 1,
             "BiteRule" => 0,

@@ -28,6 +28,5 @@ class Smarts {
         return null;
     }
 
-    /*inline*/ function randRange(range:Float):Float return random() * range;
-    /*inline*/ function randIntRange(range:Int):Int return Std.int(randRange(range));
+    inline function randIntRange(range:Int):Int return Std.int(random() * range);
 }
