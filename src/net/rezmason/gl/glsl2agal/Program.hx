@@ -14,6 +14,8 @@ import net.rezmason.gl.glsl2agal.GLSL2AGALTypes;
 import net.rezmason.utils.workers.Golem;
 import net.rezmason.utils.workers.TempAgency;
 
+using haxe.JSON;
+
 /**
 
     The net.rezmason.gl.glsl2agal package is derived from the NME contributions
@@ -48,15 +50,19 @@ class Program {
 
         function onWorkDone(agal:AGALOutput):Void {
 
-            var shader:Shader = new Shader(agal);
+            if (agal.error != null) {
+                throw agal.stringify(null, '\t');
+            } else {
+                var shader:Shader = new Shader(agal);
 
-            if (agal.type == Context3DProgramType.VERTEX) vertShader = shader;
-            else fragShader = shader;
+                if (agal.type == Context3DProgramType.VERTEX) vertShader = shader;
+                else fragShader = shader;
 
-            if (vertShader != null && fragShader != null) {
-                var program:Program = new Program(context3D);
-                program.upload(vertShader, fragShader);
-                onLoaded(program);
+                if (vertShader != null && fragShader != null) {
+                    var program:Program = new Program(context3D);
+                    program.upload(vertShader, fragShader);
+                    onLoaded(program);
+                }
             }
         }
 

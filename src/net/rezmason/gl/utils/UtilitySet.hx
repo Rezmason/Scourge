@@ -4,6 +4,8 @@ import flash.display.Stage;
 
 #if flash
     import flash.events.Event;
+    import flash.display3D.Context3DRenderMode;
+    import flash.display3D.Context3DProfile;
 #else
     import openfl.gl.GL;
 #end
@@ -34,7 +36,7 @@ class UtilitySet {
                 init();
             } else {
                 stage3D.addEventListener(Event.CONTEXT3D_CREATE, onCreate);
-                stage3D.requestContext3D();
+                stage3D.requestContext3D(cast Context3DRenderMode.AUTO, cast Context3DProfile.BASELINE); // STANDARD
             }
         #else
             if (View.isSupported) {

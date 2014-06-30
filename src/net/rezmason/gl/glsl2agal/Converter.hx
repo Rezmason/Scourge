@@ -1,5 +1,7 @@
 package net.rezmason.gl.glsl2agal;
 
+import flash.display3D.Context3DProgramType;
+import com.adobe.utils.AGALMiniAssembler;
 import net.rezmason.gl.glsl2agal.GLSL2AGALTypes;
 import net.rezmason.utils.workers.BasicWorker;
 
@@ -18,14 +20,46 @@ import net.rezmason.utils.workers.BasicWorker;
 
 class Converter extends BasicWorker<GLSLInput, AGALOutput> {
 
+    inline static var AGAL_VERSION:Int = 1; // 2
+
+    static var cModuleInitialized:Bool = false;
+    static var assembler:AGALMiniAssembler;
+
     override function receive(data:GLSLInput):Void send(convert(data));
 
     static function convert(input:GLSLInput):AGALOutput {
-        var type:String = cast input.type;
-        var source = input.source;
-        var json = haxe.JSON.Json.parse((new nme.display3D.shaders.GlslToAgal(source, type, true, true)).compile());
-        var assembler = new com.adobe.utils.AGALMiniAssembler();
-        assembler.assemble(type, json.agalasm);
-        return {type:input.type, json:json, nativeShader:assembler.agalcode};
+        var isFrag:Int = input.type == Context3DProgramType.FRAGMENT ? 1 : 0;
+        var optimize = true;
+        var usegles = true;
+
+        var nativeShader = null;
+        var json = null;
+        var jsonString = null;
+        var error = null;
+
+        try {
+            if (!cModuleInitialized) {
+                untyped __global__["com.adobe.glsl2agal.CModule"].startAsync();
+                cModuleInitialized = true;
+            }
+
+            jsonString = untyped __global__["com.adobe.glsl2agal.compileShader"](
+                input.source, 
+                isFrag, 
+                optimize, 
+                usegles
+            );
+
+            if (assembler == null) assembler = new AGALMiniAssembler();
+
+            json = haxe.JSON.Json.parse(jsonString);
+            assembler.assemble(cast input.type, json.agalasm, AGAL_VERSION);
+            nativeShader = assembler.agalcode;
+            if (nativeShader.length == 0) error = assembler.error;
+        }
+        catch (e:Dynamic) {
+            error = e;
+        }
+        return {type:input.type, json:json, nativeShader:nativeShader, error:error};
     }
 }

@@ -12,4 +12,5 @@ typedef AGALOutput = {
     var type:Context3DProgramType;
     var nativeShader:ByteArray;
     var json:Dynamic;
+    var error:Dynamic;
 }
