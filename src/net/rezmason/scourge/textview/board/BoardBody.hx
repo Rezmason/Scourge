@@ -145,16 +145,19 @@ class BoardBody extends Body {
             view.bottomGlyph.set_s(0);
             view.bottomGlyph.set_p(0);
             view.bottomGlyph.set_f(0.5);
+            view.bottomGlyph.set_a(1);
             view.topGlyph.set_char(BODY_CODE, glyphTexture.font);
             view.topGlyph.set_s(0);
             view.topGlyph.set_p(0);
             view.topGlyph.set_f(0.5);
+            view.topGlyph.set_a(0);
 
             view.uiGlyph.set_color(ColorPalette.UI_COLOR);
             view.uiGlyph.set_char(UI_CODE, glyphTexture.font);
             view.uiGlyph.set_s(0);
             view.uiGlyph.set_p(0);
             view.uiGlyph.set_f(0.5);
+            view.uiGlyph.set_a(0);
         }
 
         boardScale = BOARD_MAGNIFICATION / (maxX - minX);

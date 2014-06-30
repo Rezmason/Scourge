@@ -75,6 +75,7 @@ class TestBody extends Body {
 
             glyph.set_shape(x, y, z, 1, 0);
             glyph.set_rgb(r, g, b);
+            glyph.set_a(1);
             glyph.set_char(charCode, glyphTexture.font);
             glyph.set_paint(glyph.id | id << 16);
 

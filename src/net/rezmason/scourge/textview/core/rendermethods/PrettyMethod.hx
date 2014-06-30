@@ -30,8 +30,7 @@ class PrettyMethod extends RenderMethod {
     var aPop:AttribsLocation;
     var aColor:AttribsLocation;
     var aUV:AttribsLocation;
-    var aVid:AttribsLocation;
-    var aFat:AttribsLocation;
+    var aFX:AttribsLocation;
     var uSampler:UniformLocation;
     var uDerivMult:UniformLocation;
     var uGlyphMat:UniformLocation;
@@ -77,9 +76,8 @@ class PrettyMethod extends RenderMethod {
         aPop    = programUtil.getAttribsLocation(program, 'aPop'   );
         aColor  = programUtil.getAttribsLocation(program, 'aColor' );
         aUV     = programUtil.getAttribsLocation(program, 'aUV'    );
-        aVid    = programUtil.getAttribsLocation(program, 'aVid'   );
-        aFat    = programUtil.getAttribsLocation(program, 'aFat'   );
-
+        aFX     = programUtil.getAttribsLocation(program, 'aFX'   );
+        
         uSampler   = programUtil.getUniformLocation(program, 'uSampler'  );
         uDerivMult = programUtil.getUniformLocation(program, 'uDerivMult');
         uGlyphMat  = programUtil.getUniformLocation(program, 'uGlyphMat' );
@@ -114,8 +112,7 @@ class PrettyMethod extends RenderMethod {
         programUtil.setVertexBufferAt(program, aPop,    shapeBuffer, 6, 1); // aPop contains p
         programUtil.setVertexBufferAt(program, aColor,  colorBuffer, 0, 3); // aColor contains r,g,b
         programUtil.setVertexBufferAt(program, aUV,     colorBuffer, 3, 2); // aUV contains u,v
-        programUtil.setVertexBufferAt(program, aVid,    colorBuffer, 5, 1); // aVid contains i
-        programUtil.setVertexBufferAt(program, aFat,    colorBuffer, 6, 1); // aFat contains f
+        programUtil.setVertexBufferAt(program, aFX,     colorBuffer, 5, 3); // aFX contains i,f,a
     }
 }
 
