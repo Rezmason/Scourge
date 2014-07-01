@@ -19,7 +19,6 @@ class GameSystem {
     public var sequencer(default, null):StateChangeSequencer;
     public var boardBody(default, null):BoardBody;
 
-    var consoleSignal:Zig<Color->String->String->Void>;
     var console:ConsoleUIMediator;
 
     public function new(boardBody:BoardBody, console:ConsoleUIMediator):Void {
@@ -28,13 +27,10 @@ class GameSystem {
         
         this.boardBody = boardBody;
         this.console = console;
-        consoleSignal = new Zig();
-        consoleSignal.add(printToConsole);
-
+        
         sequencer.sequenceStartSignal.add(boardBody.presentStart);
         sequencer.sequenceUpdateSignal.add(boardBody.presentSequence);
         boardBody.setProceedSignal(sequencer.proceedSignal);
-        boardBody.setConsoleSignal(consoleSignal);
     }
 
     public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, thinkPeriod:Int, animateMils:Int, isReplay:Bool, seed:UInt):Void {
@@ -124,9 +120,5 @@ class GameSystem {
             n = (n * a) % div;
             return n / div;
         }
-    }
-
-    function printToConsole(color:Color, name:String, text:String):Void {
-        console.addToText('§{name:$name,r:${color.r},g:${color.g},b:${color.b}}$text§{}\n');
     }
 }

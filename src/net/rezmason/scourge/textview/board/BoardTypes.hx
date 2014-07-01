@@ -18,7 +18,7 @@ typedef NodeGlyphProps = {
     var size:Float;
     var char:Int;
     var color:Color;
-    var z:Float;
+    var pos:XYZ;
     var thickness:Float;
 }
 
@@ -39,6 +39,7 @@ typedef NodeView = {
     var distance:Int;
     var occupier:Int;
     var topSize:Float;
+    var topZ:Float;
 }
 
 typedef CauseTime = {

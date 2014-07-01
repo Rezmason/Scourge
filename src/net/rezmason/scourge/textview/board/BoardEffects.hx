@@ -36,9 +36,22 @@ class BoardEffects {
     };
 
     static function animateBodyEaten(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
-        arr.push(makeTween(view, cause, start, duration, from, to)); // TEMPORARY
+        //arr.push(makeTween(view, cause, start, duration, from, to)); // TEMPORARY
         // Raise out, then drop in
         // change color linearly
+
+        var raisedProps:NodeProps = cloneProps(to);
+        raisedProps.top.color.r = raisedProps.top.color.r * 0.2 + 0.8;
+        raisedProps.top.color.g = raisedProps.top.color.g * 0.2 + 0.8;
+        raisedProps.top.color.b = raisedProps.top.color.b * 0.2 + 0.8;
+        raisedProps.top.char = from.top.char;
+        raisedProps.top.size = 1.2;
+        raisedProps.waveMult = 0;
+        // raisedProps.top.size = 1.2;
+        raisedProps.top.thickness = 0.7;
+        arr.push(makeTween(view, cause, start, duration * 0.5, from, raisedProps, Quad.easeIn));
+        arr.push(makeTween(view, cause, start + duration * 0.5, duration * 0.5, raisedProps, to, Quad.easeIn));
+        
     };
 
     static function animateBodyKilled(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
@@ -47,8 +60,13 @@ class BoardEffects {
         mid.top.color.g = (mid.top.color.g + 0.75) / 2;
         mid.top.color.b = (mid.top.color.b + 0.75) / 2;
         mid.waveMult = 0;
-        arr.push(makeTween(view, cause, start, duration * 0.5, from, mid, Quad.easeInOut));
-        arr.push(makeTween(view, cause, start + 0.5 * duration, duration * 0.5, mid, to, Quad.easeIn));
+        mid.bottom = to.bottom;
+        to.top.thickness = 0.8;
+        to.top.char = from.top.char;
+        to.top.pos.z = view.pos.z + 0.15;
+        to.top.size = 2;
+        arr.push(makeTween(view, cause, start, duration * 0.7, from, mid, Quad.easeInOut));
+        arr.push(makeTween(view, cause, start + 0.7 * duration, duration * 0.3, mid, to, Linear.easeIn));
     };
 
     static function animateCavityFade(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
@@ -59,34 +77,37 @@ class BoardEffects {
     };
 
     static function animatePieceDropsDown(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
-        from.top.z = view.pos.z - 0.5;
+        from.top.pos.z = view.pos.z - 0.5;
+        from.top.pos.x = view.pos.x;
+        from.top.pos.y = view.pos.y;
         from.top.color.r = 0;
         from.top.color.g = 0;
         from.top.color.b = 0;
-        from.top.size = 2;
+        from.top.size = 1.2;
         from.top.thickness = 0.7;
-        from.top.char = '•'.code();
+        // from.top.char = '•'.code();
+        from.top.char = to.top.char;
         var hotProps:NodeProps = cloneProps(to);
+        hotProps.top.pos.x = view.pos.x;
+        hotProps.top.pos.y = view.pos.y;
         hotProps.top.color.r = hotProps.top.color.r * 0.4 + 0.6;
         hotProps.top.color.g = hotProps.top.color.g * 0.4 + 0.6;
         hotProps.top.color.b = hotProps.top.color.b * 0.4 + 0.6;
         hotProps.top.char = from.top.char;
-        hotProps.top.size = 1;
         hotProps.waveMult = 0;
-        // hotProps.top.size = 1.2;
+        hotProps.top.size = 1.2;
         hotProps.top.thickness = 0.7;
-        arr.push(makeTween(view, cause, start, duration * 0.3, from, hotProps, Bounce.easeOut));
-        arr.push(makeTween(view, cause, start + duration * 0.3, duration * 0.7, hotProps, to, Quad.easeInOut));
+        hotProps.bottom = from.bottom;
+        arr.push(makeTween(view, cause, start, duration * 0.6, from, hotProps, Quart.easeInOut));
+        arr.push(makeTween(view, cause, start + duration * 0.6, duration * 0.4, hotProps, to, Quad.easeInOut));
     };
 
     static function animateHeadEaten(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
-        arr.push(makeTween(view, cause, start, duration, from, to)); // TEMPORARY
-        // TODO - deserves special effect?
+        animateBodyEaten(view, cause, start, duration, from, to, arr);
     };
 
     static function animateHeadKilled(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
-        arr.push(makeTween(view, cause, start, duration, from, to)); // TEMPORARY
-        // TODO - deserves special effect?
+        animateBodyKilled(view, cause, start, duration, from, to, arr);
     };
 
     inline static function makeTween(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, ease:Float->Float = null):NodeTween {
@@ -137,10 +158,12 @@ class BoardEffects {
         return {
             char:glyphProps.char, 
             size:glyphProps.size, 
-            z:glyphProps.z, 
+            pos:clonePos(glyphProps.pos), 
             color:copiedColor, 
             thickness:glyphProps.thickness,
         };
     }
+
+    inline static function clonePos(pos:XYZ):XYZ return {x:pos.x, y:pos.y, z:pos.z};
 }
 

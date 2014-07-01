@@ -30,11 +30,13 @@ class BoardBody extends Body {
     inline static var WALL_TOP_OFFSET:Float = -0.05;
     inline static var TOP_OFFSET:Float = -0.03;
     inline static var UI_OFFSET:Float = -0.06;
+    inline static var NUDGE_MAG:Float = 0.01;
     static var BODY_CHARS:String = Strings.ALPHANUMERICS;
     static var BLACK:Color = {r:0, g:0, b:0};
     static var BOARD_CLEANUP_CAUSE:String = "#";
     static var durationsByCause:Map<String, Float> = makeDurationsByCause();
     static var overlapsByCause:Map<String, Float> = makeOverlapsByCause();
+    static var nudgeArray:Array<XYZ> = makeNudgeArray();
 
     var dragging:Bool;
     var dragX:Float;
@@ -60,15 +62,13 @@ class BoardBody extends Body {
     var numNodes:Int;
     var nodeViews:Array<NodeView>;
     var nodeTweens:Array<NodeTween>;
-    var causeTimes:Array<CauseTime>;
     var numActiveTweens:Int;
 
     var wavePools:Array<WavePool>;
 
     var animationTime:Float;
     var proceedSignal:Zig<Void->Void>;
-    var consoleSignal:Zig<Color->String->String->Void>;
-
+    
     var playerIndex:Int;
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
@@ -84,7 +84,6 @@ class BoardBody extends Body {
         boardScale = 1;
         nodeViews = [];
         nodeTweens = [];
-        causeTimes = [];
         wavePools = [];
         animationTime = 0;
         numActiveTweens = 0;
@@ -135,6 +134,7 @@ class BoardBody extends Body {
             view.distance = 0;
             view.occupier = 0;
             view.topSize = 0;
+            view.topZ = 0;
             view.props = null;
 
             view.bottomGlyph.set_pos(pos);
@@ -202,22 +202,35 @@ class BoardBody extends Body {
         for (ike in 0...steps.length) {
             var step:Array<NodeVO> = steps[ike];
             var cause:String = causes[ike];
+            if (cause == 'DecayRule' && step.length > 0) {
+                step = step.copy();
+                var minFreshness:Int = step[0].freshness;
+                var num:Int = step.length;
+                while (num > 0) {
+                    var randIndex:Int = Std.random(num);
+                    num--;
+                    var swap:NodeVO = step[num];
+                    step[num] = step[randIndex];
+                    step[randIndex] = swap;
+                }
+                for (nodeVO in step) {
+                    nodeVO.freshness = minFreshness;
+                    minFreshness++;
+                }
+            }
             var duration:Float = durationsByCause[cause] * animationSpeed;
             var delta:Float = duration * (1 - overlapsByCause[cause]);
             var lastFreshness:Int = -1;
-            if (step.length > 0) {
-                lastCause = ike;
-                causeTimes.push({cause:cause, time:start});
-            }
+            if (step.length > 0) lastCause = ike;
             for (nodeVO in step) {
                 if (nodeVO == null) continue;
                 var id:Int = nodeVO.id;
                 if (lastFreshness < nodeVO.freshness) lastFreshness = nodeVO.freshness;
                 else start -= delta;
                 var view:NodeView = nodeViews[id];
-                var newProps:NodeProps = makeProps(view.pos.z, nodeVO, neighborBitfields[id], distancesFromHead[id]);
+                var newProps:NodeProps = makeProps(view.pos, nodeVO, neighborBitfields[id], distancesFromHead[id]);
                 var oldProps:NodeProps = view.props;
-                if (oldProps == null) oldProps = makeProps(view.pos.z);
+                if (oldProps == null) oldProps = makeProps(view.pos);
 
                 var effect:BoardEffect = BoardEffects.getEffectForStateChange(nodeVOs[id].state, nodeVO.state);
                 effect(view, cause, start, duration, oldProps, newProps, nodeTweens);
@@ -246,7 +259,7 @@ class BoardBody extends Body {
                 var neighborBitfield:Int = neighborBitfields[ike];
                 var char:Int = getChar(view.occupier, neighborBitfield, view.distance);
                 if (view.props.top.char != char) {
-                    var newProps:NodeProps = makeProps(view.pos.z, nodeVOs[ike], neighborBitfield, view.distance);
+                    var newProps:NodeProps = makeProps(view.pos, nodeVOs[ike], neighborBitfield, view.distance);
                     BoardEffects.animateLinear(view, cause, start, duration, view.props, newProps, nodeTweens);
                     view.props = newProps;
                     stragglers.push(ike);
@@ -273,7 +286,6 @@ class BoardBody extends Body {
         }
 
         if (numActiveTweens == 0 && proceedSignal != null) proceedSignal.dispatch();
-
         /*
         var tweenString:String = '';
         for (tween in nodeTweens) {
@@ -282,8 +294,6 @@ class BoardBody extends Body {
         }
         trace(tweenString);
         */
-
-        printPlayerString('Player $playerIndex chose move $move');
     }
 
     private function finishSequenceAnimation():Void {
@@ -297,32 +307,16 @@ class BoardBody extends Body {
                     //tweenString += ' ';
                 }
             }
-            for (causeTime in causeTimes) {
-                if (causeTime.time > animationTime) {
-                    printPlayerString(causeTime.cause);
-                }
-            }
-            // tweenString += '\n';
+            //tweenString += '\n';
             //trace(tweenString);
         }
 
         animationTime = 0;
         nodeTweens = [];
-        causeTimes = [];
-    }
-
-    private function printPlayerString(str:String):Void {
-        if (playerIndex != -1 && consoleSignal != null) {
-            consoleSignal.dispatch(ColorPalette.TEAM_COLORS[playerIndex], 'player$playerIndex', str);
-        }
     }
 
     public function setProceedSignal(signal:Zig<Void->Void>):Void {
         proceedSignal = signal;
-    }
-
-    public function setConsoleSignal(signal:Zig<Color->String->String->Void>):Void {
-        consoleSignal = signal;
     }
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
@@ -361,11 +355,6 @@ class BoardBody extends Body {
                 }
             }
 
-            if (causeTimes.length > 0 && causeTimes[0].time < animationTime) {
-                printPlayerString(causeTimes[0].cause);
-                causeTimes.shift();
-            }
-
             //trace(tweenString);
 
             if (numActiveTweens == 0) {
@@ -379,8 +368,8 @@ class BoardBody extends Body {
         for (view in nodeViews) {
             if (view.occupier != -1) {
                 var h:Float = wavePools[view.occupier].getHeightAtIndex(view.distance) * view.waveMult;
-                view.topGlyph.set_p(h * -0.1);
-                view.topGlyph.set_s(view.topSize * (1 - h) + (view.topSize + 0.3) * h);
+                view.topGlyph.set_z(view.topZ + h * -0.04);
+                view.topGlyph.set_s(view.topSize * (1 - h) + (view.topSize + 0.5) * h);
             }
         }
 
@@ -452,6 +441,7 @@ class BoardBody extends Body {
             distance:0,
             occupier:-1,
             topSize:1,
+            topZ:0,
         };
     }
 
@@ -467,9 +457,11 @@ class BoardBody extends Body {
         return char;
     }
 
-    inline function makeProps(z:Float, nodeVO:NodeVO = null, bitfield:Int = -1, distance:Int = 0):NodeProps {
-        var top:NodeGlyphProps = {size:0, char:-1, color:BLACK, z:z, thickness:0.5};
-        var bottom:NodeGlyphProps = {size:0, char:-1, color:BLACK, z:z, thickness:0.5};
+    inline function clonePos(pos:XYZ):XYZ return {x:pos.x, y:pos.y, z:pos.z};
+
+    inline function makeProps(pos:XYZ, nodeVO:NodeVO = null, bitfield:Int = -1, distance:Int = 0):NodeProps {
+        var top:NodeGlyphProps = {size:0, char:-1, color:BLACK, pos:clonePos(pos), thickness:0.5};
+        var bottom:NodeGlyphProps = {size:0, char:-1, color:BLACK, pos:clonePos(pos), thickness:0.5};
         var waveMult:Float = 0;
 
         var state:Null<NodeState> = nodeVO != null ? nodeVO.state : null;
@@ -481,7 +473,7 @@ class BoardBody extends Body {
                     top.size = 1;
                     top.char = getChar(occupier, bitfield, distance);
                     top.color = ColorPalette.WALL_COLOR;
-                    top.z += WALL_TOP_OFFSET;
+                    top.pos.z += WALL_TOP_OFFSET;
                     bottom.size = 1;
                     bottom.char = top.char;
                     bottom.color = ColorPalette.BOARD_COLOR;
@@ -495,7 +487,7 @@ class BoardBody extends Body {
                 bottom.char = BOARD_CODE;
                 bottom.size = 0.9;
             case Body:
-                top.z += TOP_OFFSET;
+                top.pos.z += TOP_OFFSET;
                 top.char = getChar(occupier, bitfield, distance);
                 top.color = ColorPalette.TEAM_COLORS[occupier];
                 waveMult = 1;
@@ -506,8 +498,17 @@ class BoardBody extends Body {
                 bottom.color = Colors.mult(top.color, 0.15);
                 bottom.thickness = 0.8;
                 bottom.size = top.size * 1.5;
+                if (bitfield != -1) {
+                    var nudgePos:XYZ = nudgeArray[bitfield];
+                    top.pos.x += nudgePos.x * NUDGE_MAG;
+                    top.pos.y += nudgePos.y * NUDGE_MAG;
+                    top.pos.z += nudgePos.z * NUDGE_MAG;
+                    bottom.pos.x += nudgePos.x * NUDGE_MAG * 0.5;
+                    bottom.pos.y += nudgePos.y * NUDGE_MAG * 0.5;
+                    bottom.pos.z += nudgePos.z * NUDGE_MAG * 0.5;
+                }
             case Head:
-                top.z += TOP_OFFSET;
+                top.pos.z += TOP_OFFSET;
                 top.color = ColorPalette.TEAM_COLORS[occupier];
                 top.char = HEAD_CODE;
                 top.size = 1.5;
@@ -533,33 +534,25 @@ class BoardBody extends Body {
         animateGlyph(tween.view.bottomGlyph, tween.from.bottom, tween.to.bottom, frac);
         tween.view.waveMult = interp(tween.from.waveMult, tween.to.waveMult, frac);
         tween.view.topSize = tween.view.topGlyph.get_s();
+        tween.view.topZ = tween.view.topGlyph.get_z();
     }
 
     inline function animateGlyph(glyph:Glyph, from:NodeGlyphProps, to:NodeGlyphProps, frac:Float):Void {
         glyph.set_s(interp(from.size, to.size , frac));
-        glyph.set_z(interp(from.z, to.z , frac));
+        glyph.set_x(interp(from.pos.x, to.pos.x , frac));
+        glyph.set_y(interp(from.pos.y, to.pos.y , frac));
+        glyph.set_z(interp(from.pos.z, to.pos.z , frac));
         glyph.set_f(interp(from.thickness, to.thickness , frac));
         glyph.set_rgb(
             interp(from.color.r, to.color.r, frac),
             interp(from.color.g, to.color.g, frac),
             interp(from.color.b, to.color.b, frac)
         );
-        
-        if (from.char == -1) {
-            if (glyph.get_char() != to.char) glyph.set_char(to.char, glyphTexture.font);
-        } else {
 
-            if (from.char != to.char) {
-                if (frac < 0.5) {
-                    glyph.set_f(interp(0.5, 0, frac * 2));
-                } else {
-                    glyph.set_f(interp(0, 0.5, frac * 2 - 1));
-                    if (glyph.get_char() != to.char) glyph.set_char(to.char, glyphTexture.font);
-                }
-            }
-
-            if (frac < 0.5 && glyph.get_char() != from.char) glyph.set_char(from.char, glyphTexture.font);
-        }
+        if (from.char == -1) from.char = to.char;
+        if (from.char != to.char) glyph.set_f(Math.abs(frac - 0.5));
+        var char:Int = frac < 0.5 ? from.char : to.char;
+        if (glyph.get_char() != char) glyph.set_char(char, glyphTexture.font);
     }
 
     inline static function interp(val1:Float, val2:Float, frac:Float):Float return val1 * (1 - frac) + val2 * frac;
@@ -568,12 +561,12 @@ class BoardBody extends Body {
 
     static function makeDurationsByCause():Map<String, Float> {
         return [
-            "" => 0.5,
-            "CavityRule" => 0.5,
-            "DecayRule" => 1.5,
-            "DropPieceRule" => 1.5,
-            "EatCellsRule" => 0.5,
-            "BiteRule" => 0.5,
+            "" => 0.4,
+            "CavityRule" => 0.4,
+            "DecayRule" => 1.0,
+            "DropPieceRule" => 1,
+            "EatCellsRule" => 0.4,
+            "BiteRule" => 1.0,
             BOARD_CLEANUP_CAUSE => 0.2,
         ];
     }
@@ -582,7 +575,7 @@ class BoardBody extends Body {
         return [
             "" => 1,
             "CavityRule" => 1,
-            "DecayRule" => 1,
+            "DecayRule" => 0.995,
             "DropPieceRule" => 0.3,
             "EatCellsRule" => 0.5,
             "PickPieceRule" => 1,
@@ -590,4 +583,28 @@ class BoardBody extends Body {
         ];
     }
 
+    static function makeNudgeArray():Array<XYZ> {
+        var up:Float = 1;
+        var lt:Float = -1;
+        var dn:Float = -up;
+        var rt:Float = -lt;
+        return [
+            {x:0       , y:0       , z:0},
+            {x:0       , y:up      , z:0},
+            {x:rt      , y:0       , z:0},
+            {x:rt      , y:up      , z:0},
+            {x:0       , y:dn      , z:0},
+            {x:0       , y:0       , z:0},
+            {x:rt      , y:dn      , z:0},
+            {x:rt * 0.5, y:0       , z:0},
+            {x:lt      , y:0       , z:0},
+            {x:lt      , y:up      , z:0},
+            {x:0       , y:0       , z:0},
+            {x:0       , y:up * 0.5, z:0},
+            {x:lt      , y:dn      , z:0},
+            {x:lt * 0.5, y:0       , z:0},
+            {x:0       , y:dn * 0.5, z:0},
+            {x:0       , y:0       , z:0},
+        ];
+    }
 }

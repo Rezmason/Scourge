@@ -17,7 +17,6 @@ Board
     Change ripple behavior
     Figure out how to do "pain"-related things
     Pool objects
-    Timing - should be dictated by the view?
 
 Human players, GUISystem
     Implement abstract commands
@@ -71,6 +70,9 @@ GDC articles
     http://www.gamasutra.com/view/news/189251/7_practical_tips_for_making_a_moral_game.php
     http://www.gamasutra.com/view/news/189345/How_to_use_live_events_to_promote_your_game.php
     http://www.gamasutra.com/view/news/189353/Designing_without_a_pitch__An_FTL_postmortem.php
+
+Other stuff
+    http://www.nationalgeographic.com/china-caves/
 
 Hey, this game is a Roguelike!
     Figure out what solutions they have to UI challenges

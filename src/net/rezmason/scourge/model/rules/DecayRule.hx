@@ -62,8 +62,12 @@ class DecayRule extends Rule {
             var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != Aspect.NULL) {
                 for (node in getNode(bodyFirst).iterate(state.nodes, bodyNext_)) {
-                    if (livingBodyNeighbors[getID(node)] == null) bodyFirst = killCell(node, maxFreshness, bodyFirst);
-                    else totalArea++;
+                    if (livingBodyNeighbors[getID(node)] == null) {
+                        bodyFirst = killCell(node, maxFreshness, bodyFirst);
+                        maxFreshness++;
+                    } else {
+                        totalArea++;
+                    }
                 }
             }
 
@@ -80,10 +84,10 @@ class DecayRule extends Rule {
         return me[occupier_] == you[occupier_];
     }
 
-    function killCell(node:AspectSet, maxFreshness:Int, firstIndex:Int):Int {
+    function killCell(node:AspectSet, freshness:Int, firstIndex:Int):Int {
         node[isFilled_] = Aspect.FALSE;
         node[occupier_] = Aspect.NULL;
-        node[freshness_] = maxFreshness;
+        node[freshness_] = freshness;
 
         var nextNode:AspectSet = node.removeSet(state.nodes, bodyNext_, bodyPrev_);
         if (firstIndex == getID(node)) {
