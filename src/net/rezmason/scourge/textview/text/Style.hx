@@ -150,7 +150,7 @@ class Style {
     static function makeEaseLibrary():Map<String, Float->Float> {
         var lib:Map<String, Float->Float> = new Map();
 
-        var easeClasses:Map<String, Class<Dynamic>> = cast Siphon.getDefs('net.kawa.tween.easing', 'src');
+        var easeClasses:Map<String, Class<Dynamic>> = cast Siphon.getDefs('net.kawa.tween.easing', 'thirdparty/kawanet_ktween/src/');
 
         for (key in easeClasses.keys()) {
             var clazz = easeClasses[key];

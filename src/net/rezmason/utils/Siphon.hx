@@ -8,17 +8,13 @@ import sys.FileSystem;
 
 class Siphon {
 
-    macro public static function getDefs(pkg:String = null, base:String = null, classFilter:String = null):Expr {
+    macro public static function getDefs(pkg:String, base:String, classFilter:String = null):Expr {
 
         var exprs:Array<Expr> = [];
 
-        // The default package is the top-level package
-        if (pkg == null) pkg = '';
         var pkgArray:Array<String> = pkg.split('.');
-
-        // The default base is the source folder of the Siphon file
-        if (base == null) base = Context.getPosInfos(Context.currentPos()).file;
-        var path:String = base.split('/')[0] + '/' + pkgArray.join('/');
+        while (base.charAt(base.length - 1) == '/') base = base.substr(0, base.length - 1);
+        var path:String = base + '/' + pkgArray.join('/');
 
         // The default regex matches all file names
         if (classFilter == null) classFilter = '';
