@@ -69,7 +69,6 @@ class Context {
             'alphabet'  => AlphabetBody,
             'sdf'       => GlyphBody,
             'test'      => TestBody,
-            // #if flash 'video'     => VideoBody, #end
         ];
         for (bodyName in bodies.keys()) {
             var body:Body = Type.createInstance(bodies[bodyName], [utils.bufferUtil, fullTexture]);
