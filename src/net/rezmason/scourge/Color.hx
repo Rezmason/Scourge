@@ -1,7 +1,7 @@
 package net.rezmason.scourge;
 
 typedef Color = {
-    var r:Float;
-    var g:Float;
-    var b:Float;
+    var r(default, null):Float;
+    var g(default, null):Float;
+    var b(default, null):Float;
 }

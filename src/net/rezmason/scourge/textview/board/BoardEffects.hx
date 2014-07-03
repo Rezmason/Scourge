@@ -2,6 +2,7 @@ package net.rezmason.scourge.textview.board;
 
 import net.rezmason.scourge.controller.ControllerTypes.NodeState;
 import net.rezmason.scourge.textview.board.BoardTypes;
+import net.rezmason.scourge.textview.ColorPalette;
 
 import net.kawa.tween.easing.*;
 
@@ -41,9 +42,11 @@ class BoardEffects {
         // change color linearly
 
         var raisedProps:NodeProps = cloneProps(to);
-        raisedProps.top.color.r = raisedProps.top.color.r * 0.2 + 0.8;
-        raisedProps.top.color.g = raisedProps.top.color.g * 0.2 + 0.8;
-        raisedProps.top.color.b = raisedProps.top.color.b * 0.2 + 0.8;
+        raisedProps.top.color = {
+            r:raisedProps.top.color.r * 0.2 + 0.8,
+            g:raisedProps.top.color.g * 0.2 + 0.8,
+            b:raisedProps.top.color.b * 0.2 + 0.8,
+        };
         raisedProps.top.char = from.top.char;
         raisedProps.top.size = 1.2;
         raisedProps.waveMult = 0;
@@ -56,14 +59,16 @@ class BoardEffects {
 
     static function animateBodyKilled(view:NodeView, cause:String, start:Float, duration:Float, from:NodeProps, to:NodeProps, arr:Array<NodeTween>):Void {
         var mid:NodeProps = cloneProps(from);
-        mid.top.color.r = (mid.top.color.r + 0.75) / 2;
-        mid.top.color.g = (mid.top.color.g + 0.75) / 2;
-        mid.top.color.b = (mid.top.color.b + 0.75) / 2;
+        mid.top.color = {
+            r:mid.top.color.r * 0.5 + 0.4,
+            g:mid.top.color.g * 0.5 + 0.4,
+            b:mid.top.color.b * 0.5 + 0.4,
+        };
         mid.waveMult = 0;
         mid.bottom = to.bottom;
         to.top.thickness = 0.8;
         to.top.char = from.top.char;
-        to.top.pos.z = view.pos.z + 0.15;
+        //to.top.pos.z = view.pos.z + 0.05;
         to.top.size = 2;
         arr.push(makeTween(view, cause, start, duration * 0.7, from, mid, Quad.easeInOut));
         arr.push(makeTween(view, cause, start + 0.7 * duration, duration * 0.3, mid, to, Linear.easeIn));
@@ -80,20 +85,23 @@ class BoardEffects {
         from.top.pos.z = view.pos.z - 0.5;
         from.top.pos.x = view.pos.x;
         from.top.pos.y = view.pos.y;
-        from.top.color.r = 0;
-        from.top.color.g = 0;
-        from.top.color.b = 0;
+        
+        from.top.color = ColorPalette.BLACK;
         from.top.size = 1.2;
         from.top.thickness = 0.7;
-        // from.top.char = '•'.code();
-        from.top.char = to.top.char;
+        from.top.stretch = 1;
+        from.top.char = '•'.code();
+        // from.top.char = to.top.char;
         var hotProps:NodeProps = cloneProps(to);
         hotProps.top.pos.x = view.pos.x;
         hotProps.top.pos.y = view.pos.y;
-        hotProps.top.color.r = hotProps.top.color.r * 0.4 + 0.6;
-        hotProps.top.color.g = hotProps.top.color.g * 0.4 + 0.6;
-        hotProps.top.color.b = hotProps.top.color.b * 0.4 + 0.6;
+        hotProps.top.color = {
+            r:hotProps.top.color.r * 0.4 + 0.6,
+            g:hotProps.top.color.g * 0.4 + 0.6,
+            b:hotProps.top.color.b * 0.4 + 0.6,
+        };
         hotProps.top.char = from.top.char;
+        hotProps.top.stretch = 1;
         hotProps.waveMult = 0;
         hotProps.top.size = 1.2;
         hotProps.top.thickness = 0.7;
@@ -161,6 +169,7 @@ class BoardEffects {
             pos:clonePos(glyphProps.pos), 
             color:copiedColor, 
             thickness:glyphProps.thickness,
+            stretch:glyphProps.stretch,
         };
     }
 

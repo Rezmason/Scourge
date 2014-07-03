@@ -44,7 +44,7 @@ class AlphabetBody extends Body {
 
             var charCode:Int = Utf8.charCodeAt(CHARS, ike % CHARS.length);
 
-            glyph.set_shape(x, y, 0, 1, 0);
+            glyph.set_xyz(x, y, 0);
             glyph.set_rgb(1, 1, 1);
             glyph.set_i(0.1);
             glyph.set_char(charCode, glyphTexture.font);

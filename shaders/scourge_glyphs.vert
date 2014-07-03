@@ -1,7 +1,6 @@
 attribute vec3 aPos;
 attribute vec2 aCorner;
-attribute float aScale;
-attribute float aPop;
+attribute vec3 aDistort;
 attribute vec3 aColor;
 attribute vec2 aUV;
 attribute vec3 aFX;
@@ -16,9 +15,9 @@ varying vec3 vFX;
 
 void main(void) {
     vec4 pos = uBodyMat * vec4(aPos, 1.0);
-    pos.z += aPop;
+    pos.z += aDistort.z;
     pos = uCameraMat * pos;
-    pos.xy += ((uGlyphMat * vec4(aCorner, 1.0, 1.0)).xy) * aScale;
+    pos.xy += ((uGlyphMat * vec4(aCorner.x * aDistort.x, aCorner.y, 1.0, 1.0)).xy) * aDistort.y;
 
     vColor = aColor * clamp(2.0 - pos.z, 0.0, 1.0);
     vUV = aUV;

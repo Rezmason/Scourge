@@ -47,7 +47,6 @@ class RenderMethod {
 
     public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
         glyphMat.identity();
-        glyphMat.append(glyphTexture.matrix);
         glyphMat.append(glyphTransform);
         glyphMat.appendScale(glyphMag, glyphMag, 1);
 

@@ -18,16 +18,15 @@ class PrettyMethod extends RenderMethod {
     #if flash
         0.3
     #elseif js
-        100
+        80
     #else
-        120
+        80
     #end
     ;
 
     var aPos:AttribsLocation;
     var aCorner:AttribsLocation;
-    var aScale:AttribsLocation;
-    var aPop:AttribsLocation;
+    var aDistort:AttribsLocation;
     var aColor:AttribsLocation;
     var aUV:AttribsLocation;
     var aFX:AttribsLocation;
@@ -70,13 +69,12 @@ class PrettyMethod extends RenderMethod {
 
     override function connectToShaders():Void {
 
-        aPos    = programUtil.getAttribsLocation(program, 'aPos'   );
-        aCorner = programUtil.getAttribsLocation(program, 'aCorner');
-        aScale  = programUtil.getAttribsLocation(program, 'aScale' );
-        aPop    = programUtil.getAttribsLocation(program, 'aPop'   );
-        aColor  = programUtil.getAttribsLocation(program, 'aColor' );
-        aUV     = programUtil.getAttribsLocation(program, 'aUV'    );
-        aFX     = programUtil.getAttribsLocation(program, 'aFX'   );
+        aPos     = programUtil.getAttribsLocation(program, 'aPos'    );
+        aCorner  = programUtil.getAttribsLocation(program, 'aCorner' );
+        aDistort = programUtil.getAttribsLocation(program, 'aDistort');
+        aColor   = programUtil.getAttribsLocation(program, 'aColor'  );
+        aUV      = programUtil.getAttribsLocation(program, 'aUV'     );
+        aFX      = programUtil.getAttribsLocation(program, 'aFX'     );
         
         uSampler   = programUtil.getUniformLocation(program, 'uSampler'  );
         uDerivMult = programUtil.getUniformLocation(program, 'uDerivMult');
@@ -106,13 +104,12 @@ class PrettyMethod extends RenderMethod {
             colorBuffer = segment.colorBuffer;
         }
 
-        programUtil.setVertexBufferAt(program, aPos,    shapeBuffer, 0, 3); // aPos contains x,y,z
-        programUtil.setVertexBufferAt(program, aCorner, shapeBuffer, 3, 2); // aCorner contains h,v
-        programUtil.setVertexBufferAt(program, aScale,  shapeBuffer, 5, 1); // aScale contains s
-        programUtil.setVertexBufferAt(program, aPop,    shapeBuffer, 6, 1); // aPop contains p
-        programUtil.setVertexBufferAt(program, aColor,  colorBuffer, 0, 3); // aColor contains r,g,b
-        programUtil.setVertexBufferAt(program, aUV,     colorBuffer, 3, 2); // aUV contains u,v
-        programUtil.setVertexBufferAt(program, aFX,     colorBuffer, 5, 3); // aFX contains i,f,a
+        programUtil.setVertexBufferAt(program, aPos,     shapeBuffer, 0, 3); // aPos contains x,y,z
+        programUtil.setVertexBufferAt(program, aCorner,  shapeBuffer, 3, 2); // aCorner contains h,v
+        programUtil.setVertexBufferAt(program, aDistort, shapeBuffer, 5, 3); // aScale contains h,s,p
+        programUtil.setVertexBufferAt(program, aColor,   colorBuffer, 0, 3); // aColor contains r,g,b
+        programUtil.setVertexBufferAt(program, aUV,      colorBuffer, 3, 2); // aUV contains u,v
+        programUtil.setVertexBufferAt(program, aFX,      colorBuffer, 5, 3); // aFX contains i,f,a
     }
 }
 

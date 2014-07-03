@@ -50,6 +50,12 @@ class GlyphUtils {
         set_b(gl, color.b);
     }
 
+    public inline static function set_fx(gl:Glyph, i, f, a) {
+        set_i(gl, i);
+        set_f(gl, f);
+        set_a(gl, a);
+    }
+
     // Shape
 
     public inline static function get_x(gl:Glyph) return gl.shape[gl.id * SHAPE_FLOATS_PER_GLYPH + X_OFFSET];
@@ -65,11 +71,8 @@ class GlyphUtils {
     public inline static function get_p(gl:Glyph) return gl.shape[gl.id * SHAPE_FLOATS_PER_GLYPH + P_OFFSET];
     public inline static function set_p(gl:Glyph, v) return pop4(gl.shape, gl.id * SHAPE_FLOATS_PER_GLYPH, P_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
 
-    public inline static function set_shape(gl:Glyph, x, y, z, s, p) {
-        set_xyz(gl, x, y, z);
-        set_s(gl, s);
-        set_p(gl, p);
-    }
+    public inline static function get_h(gl:Glyph) return gl.shape[gl.id * SHAPE_FLOATS_PER_GLYPH + H_OFFSET];
+    public inline static function set_h(gl:Glyph, v) return pop4(gl.shape, gl.id * SHAPE_FLOATS_PER_GLYPH, H_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
 
     public inline static function set_xyz(gl:Glyph, x, y, z) {
         set_x(gl, x);
@@ -83,17 +86,23 @@ class GlyphUtils {
         set_z(gl, pos.z);
     }
 
+    public inline static function set_distort(gl:Glyph, h, s, p) {
+        set_h(gl, h);
+        set_s(gl, s);
+        set_p(gl, p);
+    }
+
     public inline static function makeCorners(gl:Glyph):Void {
         var glyphOffset:Int = gl.id * SHAPE_FLOATS_PER_GLYPH;
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, 0);
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX, 0);
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX, 1);
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, 1);
+        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -0.5);
+        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX, -0.5);
+        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  0.5);
+        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX,  0.5);
 
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, 0);
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX, 1);
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX, 1);
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, 0);
+        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -0.5);
+        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX,  0.5);
+        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  0.5);
+        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, -0.5);
     }
 
     // Character
@@ -166,10 +175,10 @@ class GlyphUtils {
     }
 
     public inline static function reset(gl:Glyph):Void {
+        set_distort(gl, 1, 1, 0);
+        set_xyz(gl, 0, 0, 0);
         set_rgb(gl, 1, 1, 1);
-        set_s(gl, 1);
-        set_f(gl, 0.5);
-        set_a(gl, 0);
+        set_fx(gl, 0, 0.5, 0);
         set_char(gl, -1, null);
     }
 

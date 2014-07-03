@@ -31,7 +31,7 @@ class BoardBody extends Body {
     inline static var TOP_OFFSET:Float = -0.03;
     inline static var UI_OFFSET:Float = -0.06;
     inline static var NUDGE_MAG:Float = 0.01;
-    static var BODY_CHARS:String = Strings.ALPHANUMERICS;
+    static var BODY_CHARS:String = 'abcdefghijklmnopqrstuvwxyz';
     static var BLACK:Color = {r:0, g:0, b:0};
     static var BOARD_CLEANUP_CAUSE:String = "#";
     static var durationsByCause:Map<String, Float> = makeDurationsByCause();
@@ -51,8 +51,9 @@ class BoardBody extends Body {
     
     var boardScale:Float;
 
-    inline static var BOARD_CODE:Int = '¤'.code();
-    inline static var WALL_CODE:Int = '#'.code();
+    inline static var BOARD_CODE:Int = '+'.code(); // ¤
+    inline static var WALL_CODE:Int = '╋'.code();
+    inline static var CAVITY_CODE:Int = '#'.code();
     inline static var BODY_CODE:Int = '•'.code();
     inline static var HEAD_CODE:Int = 'Ω'.code();
     inline static var UI_CODE:Int = ''.code();
@@ -137,27 +138,19 @@ class BoardBody extends Body {
             view.topZ = 0;
             view.props = null;
 
+            view.bottomGlyph.reset();
+            view.topGlyph.reset();
+            view.uiGlyph.reset();
+
             view.bottomGlyph.set_pos(pos);
             view.topGlyph.set_xyz(pos.x, pos.y, pos.z + TOP_OFFSET);
             view.uiGlyph.set_xyz(pos.x, pos.y, pos.z + UI_OFFSET);
 
             view.bottomGlyph.set_char(BOARD_CODE, glyphTexture.font);
-            view.bottomGlyph.set_s(0);
-            view.bottomGlyph.set_p(0);
-            view.bottomGlyph.set_f(0.5);
-            view.bottomGlyph.set_a(1);
             view.topGlyph.set_char(BODY_CODE, glyphTexture.font);
-            view.topGlyph.set_s(0);
-            view.topGlyph.set_p(0);
-            view.topGlyph.set_f(0.5);
-            view.topGlyph.set_a(0);
-
-            view.uiGlyph.set_color(ColorPalette.UI_COLOR);
             view.uiGlyph.set_char(UI_CODE, glyphTexture.font);
+            view.uiGlyph.set_color(ColorPalette.UI_COLOR);
             view.uiGlyph.set_s(0);
-            view.uiGlyph.set_p(0);
-            view.uiGlyph.set_f(0.5);
-            view.uiGlyph.set_a(0);
         }
 
         boardScale = BOARD_MAGNIFICATION / (maxX - minX);
@@ -326,8 +319,7 @@ class BoardBody extends Body {
         var rectSize:Float = Math.min(viewRect.width * stageWidth, viewRect.height * stageHeight) / screenSize;
 
         var glyphWidth:Float = rectSize * 0.1 * boardScale;
-        var glyphScreenRatio:Float = glyphTexture.font.glyphRatio * stageWidth / stageHeight;
-        setGlyphScale(glyphWidth, glyphWidth * glyphScreenRatio);
+        setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
 
     override public function update(delta:Float):Void {
@@ -369,6 +361,7 @@ class BoardBody extends Body {
             if (view.occupier != -1) {
                 var h:Float = wavePools[view.occupier].getHeightAtIndex(view.distance) * view.waveMult;
                 view.topGlyph.set_z(view.topZ + h * -0.04);
+                view.topGlyph.set_a(0.5 + h * 0.5);
                 view.topGlyph.set_s(view.topSize * (1 - h) + (view.topSize + 0.5) * h);
             }
         }
@@ -454,14 +447,15 @@ class BoardBody extends Body {
         } else {
             char = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
         }
+
         return char;
     }
 
     inline function clonePos(pos:XYZ):XYZ return {x:pos.x, y:pos.y, z:pos.z};
 
     inline function makeProps(pos:XYZ, nodeVO:NodeVO = null, bitfield:Int = -1, distance:Int = 0):NodeProps {
-        var top:NodeGlyphProps = {size:0, char:-1, color:BLACK, pos:clonePos(pos), thickness:0.5};
-        var bottom:NodeGlyphProps = {size:0, char:-1, color:BLACK, pos:clonePos(pos), thickness:0.5};
+        var top:NodeGlyphProps = {size:0, char:-1, color:BLACK, pos:clonePos(pos), thickness:0.5, stretch:1};
+        var bottom:NodeGlyphProps = {size:0, char:-1, color:BLACK, pos:clonePos(pos), thickness:0.5, stretch:1};
         var waveMult:Float = 0;
 
         var state:Null<NodeState> = nodeVO != null ? nodeVO.state : null;
@@ -474,18 +468,21 @@ class BoardBody extends Body {
                     top.char = getChar(occupier, bitfield, distance);
                     top.color = ColorPalette.WALL_COLOR;
                     top.pos.z += WALL_TOP_OFFSET;
+                    top.thickness = 0.4;
+                    top.stretch = glyphTexture.font.glyphRatio;
                     bottom.size = 1;
                     bottom.char = top.char;
                     bottom.color = ColorPalette.BOARD_COLOR;
+                    bottom.stretch = glyphTexture.font.glyphRatio;
                 }
             case Empty:
                 bottom.color = ColorPalette.BOARD_COLOR;
                 bottom.char = BOARD_CODE;
-                bottom.size = 0.9;
+                bottom.size = 0.7;
             case Cavity:
-                bottom.color = Colors.mult(ColorPalette.TEAM_COLORS[occupier % ColorPalette.TEAM_COLORS.length], 0.4);
-                bottom.char = BOARD_CODE;
-                bottom.size = 0.9;
+                bottom.color = Colors.mult(ColorPalette.TEAM_COLORS[occupier % ColorPalette.TEAM_COLORS.length], 0.125);
+                bottom.char = CAVITY_CODE;
+                bottom.size = 2;
             case Body:
                 top.pos.z += TOP_OFFSET;
                 top.char = getChar(occupier, bitfield, distance);
@@ -493,13 +490,16 @@ class BoardBody extends Body {
                 waveMult = 1;
                 var numNeighbors:Int = 0;
                 for (i in 0...4) numNeighbors += (bitfield >> i) & 1;
-                top.size = (numNeighbors / 4) * 0.5 + 0.4;
+                top.size = (numNeighbors / 4) * 0.5 + 0.5;
+                //top.stretch = glyphTexture.font.glyphRatio;
                 bottom.char = top.char;
                 bottom.color = Colors.mult(top.color, 0.15);
                 bottom.thickness = 0.8;
                 bottom.size = top.size * 1.5;
+                //bottom.stretch = glyphTexture.font.glyphRatio;
                 if (bitfield != -1) {
-                    var nudgePos:XYZ = nudgeArray[bitfield];
+                    var nudgePos:Null<XYZ> = nudgeArray[bitfield];
+                    if (nudgePos == null) nudgePos = {x:Math.random() - 0.5, y:Math.random() - 0.5, z:0};
                     top.pos.x += nudgePos.x * NUDGE_MAG;
                     top.pos.y += nudgePos.y * NUDGE_MAG;
                     top.pos.z += nudgePos.z * NUDGE_MAG;
@@ -552,7 +552,10 @@ class BoardBody extends Body {
         if (from.char == -1) from.char = to.char;
         if (from.char != to.char) glyph.set_f(Math.abs(frac - 0.5));
         var char:Int = frac < 0.5 ? from.char : to.char;
-        if (glyph.get_char() != char) glyph.set_char(char, glyphTexture.font);
+        if (glyph.get_char() != char) {
+            glyph.set_h(to.stretch);
+            glyph.set_char(char, glyphTexture.font);
+        }
     }
 
     inline static function interp(val1:Float, val2:Float, frac:Float):Float return val1 * (1 - frac) + val2 * frac;
@@ -579,7 +582,7 @@ class BoardBody extends Body {
             "DropPieceRule" => 0.3,
             "EatCellsRule" => 0.5,
             "PickPieceRule" => 1,
-            "BiteRule" => 0,
+            "BiteRule" => 1,
         ];
     }
 
@@ -589,22 +592,22 @@ class BoardBody extends Body {
         var dn:Float = -up;
         var rt:Float = -lt;
         return [
-            {x:0       , y:0       , z:0},
-            {x:0       , y:up      , z:0},
-            {x:rt      , y:0       , z:0},
-            {x:rt      , y:up      , z:0},
-            {x:0       , y:dn      , z:0},
-            {x:0       , y:0       , z:0},
-            {x:rt      , y:dn      , z:0},
-            {x:rt * 0.5, y:0       , z:0},
-            {x:lt      , y:0       , z:0},
-            {x:lt      , y:up      , z:0},
-            {x:0       , y:0       , z:0},
-            {x:0       , y:up * 0.5, z:0},
-            {x:lt      , y:dn      , z:0},
-            {x:lt * 0.5, y:0       , z:0},
-            {x:0       , y:dn * 0.5, z:0},
-            {x:0       , y:0       , z:0},
+            {x:0       , y:0       , z:0}, // 
+            {x:0       , y:up      , z:0}, // ╹
+            {x:rt      , y:0       , z:0}, // ╺
+            {x:rt      , y:up      , z:0}, // ┗
+            {x:0       , y:dn      , z:0}, // ╻
+            {x:0       , y:0       , z:0}, // ┃
+            {x:rt      , y:dn      , z:0}, // ┏
+            {x:rt * 0.5, y:0       , z:0}, // ┣
+            {x:lt      , y:0       , z:0}, // ╸
+            {x:lt      , y:up      , z:0}, // ┛
+            {x:0       , y:0       , z:0}, // ━
+            {x:0       , y:up * 0.5, z:0}, // ┻
+            {x:lt      , y:dn      , z:0}, // ┓
+            {x:lt * 0.5, y:0       , z:0}, // ┫
+            {x:0       , y:dn * 0.5, z:0}, // ┳
+            null                           // ╋
         ];
     }
 }

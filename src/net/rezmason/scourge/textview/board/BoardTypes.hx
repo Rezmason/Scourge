@@ -20,6 +20,7 @@ typedef NodeGlyphProps = {
     var color:Color;
     var pos:XYZ;
     var thickness:Float;
+    var stretch:Float;
 }
 
 typedef NodeProps = {

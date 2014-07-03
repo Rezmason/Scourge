@@ -73,7 +73,7 @@ class TestBody extends Body {
             var g:Float = ramp(y + 0.5);
             var b:Float = ramp(z + 0.5);
 
-            glyph.set_shape(x, y, z, 1, 0);
+            glyph.set_xyz(x, y, z);
             glyph.set_rgb(r, g, b);
             glyph.set_a(1);
             glyph.set_char(charCode, glyphTexture.font);

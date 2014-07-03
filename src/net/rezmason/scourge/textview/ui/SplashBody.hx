@@ -39,16 +39,12 @@ class SplashBody extends Body {
 
     var glyphTowers:Array<Array<Glyph>>;
 
-    var baseCamera:Matrix3D;
-
     var time:Float;
     var lines:Array<String>;
 
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
 
         super(bufferUtil, glyphTexture);
-
-        baseCamera = new Matrix3D();
 
         scaleMode = WIDTH_FIT;
 
@@ -91,8 +87,8 @@ class SplashBody extends Body {
                     var glyph:Glyph = glyphs[glyphID];
 
                     glyphTower.push(glyph);
-
-                    glyph.set_shape(x, y, z, 1, 0);
+                    
+                    glyph.set_xyz(x, y, z);
                     glyph.set_color(color);
                     glyph.set_i(0);
                     glyph.set_char(charCode, glyphTexture.font);
@@ -115,24 +111,10 @@ class SplashBody extends Body {
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
         super.adjustLayout(stageWidth, stageHeight);
-
-        // baseCamera.copyFrom(camera);
         var glyphWidth:Float = viewRect.width * 0.03;
         setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
 
-    /*
-    override public function receiveInteraction(id:Int, interaction:Interaction):Void {
-        var glyph:Glyph = glyphs[id];
-        switch (interaction) {
-            case MOUSE(MOVE, x, y):
-                applyVP(x - 0.5, y - 0.5);
-            case _:
-        }
-    }
-    */
-
-    //*
     override public function update(delta:Float):Void {
         time += delta;
 
@@ -145,21 +127,14 @@ class SplashBody extends Body {
             var f:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.3 + 0.1;
             var s:Float = (Math.cos(time * 3 + d * 300) * 0.5 + 1) * 0.1 + 0.9;
 
-            //var rgb:RGB = hsv2rgb(hues[ike] + s * 0.1);
-
             for (glyph in glyphTower) {
                 glyph.set_p(p);
                 glyph.set_f(f);
                 glyph.set_s(s * (glyph.get_z() + 1));
                 s *= 2;
             }
-
-            //glyph.set_color(rgb.r, rgb.g, rgb.b);
         }
-
-        // transform.appendRotation(1, Vector3D.X_AXIS);
 
         super.update(delta);
     }
-    /**/
 }

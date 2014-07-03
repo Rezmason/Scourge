@@ -8,7 +8,7 @@ uniform vec4 uDerivMult;
 void main(void) {
 
     float texture = texture2D(uSampler, vUV).b;
-    //float deriv = (dFdx(vUV.x) + dFdy(vUV.x) + dFdy(vUV.y) + dFdx(vUV.y)) * uDerivMult.x;
+    //float deriv = dFdx(vUV.x) * uDerivMult.x;
       float deriv = uDerivMult.x;
     float glyph = 1. - smoothstep(vFX.y - deriv, vFX.y + deriv, texture);
 
