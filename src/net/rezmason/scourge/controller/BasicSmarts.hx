@@ -10,8 +10,11 @@ import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.rules.DropPieceRule.DropPieceMove;
+import net.rezmason.ropes.Aspect;
 
 using net.rezmason.ropes.StatePlan;
+using net.rezmason.ropes.GridUtils;
 
 class BasicSmarts extends Smarts {
 
@@ -23,6 +26,7 @@ class BasicSmarts extends Smarts {
     private var canSkip:Bool;
     private var totalArea_:AspectPtr;
     private var occupier_:AspectPtr;
+    private var isFilled_:AspectPtr;
     
     override public function init(game:Game, config:ScourgeConfig, id:Int, random:Void->Float):Void {
         super.init(game, config, id, random);
@@ -34,6 +38,7 @@ class BasicSmarts extends Smarts {
 
         totalArea_ = game.plan.onPlayer(BodyAspect.TOTAL_AREA);
         occupier_ = game.plan.onNode(OwnershipAspect.OCCUPIER);
+        isFilled_ = game.plan.onNode(OwnershipAspect.IS_FILLED);
     }
 
     override public function choose():GameEventType {
@@ -47,9 +52,12 @@ class BasicSmarts extends Smarts {
         if (type == null) {
             var canDrop:Bool = dropMoves.length > numSkipMoves;
             if (canDrop) {
-                choice = numSkipMoves + randIntRange(dropMoves.length - numSkipMoves);
-                // Too expensive without pruning
-                // choice = findBestMoveIndex(dropActionIndex, numSkipMoves, dropMoves.length, getEnemySize);
+                var prunedMoves:Array<Int> = pruneMoves(dropMoves, dropMoveHugsEdges);
+                if (dropMoves.length - numSkipMoves > 15) {
+                    choice = numSkipMoves + prunedMoves[randIntRange(prunedMoves.length)];
+                } else {
+                    choice = findBestMoveIndex(dropActionIndex, prunedMoves.iterator(), getSizeDelta);
+                }
                 type = PlayerAction(SubmitMove(rev, dropActionIndex, choice));
             }
         }
@@ -70,7 +78,7 @@ class BasicSmarts extends Smarts {
                 var maxBiteSize:Int = biteSizes[biteSizes.length - 1];
                 var maxBiteSizeIndex:Int = biteSizes.indexOf(maxBiteSize);
                 
-                choice = findBestMoveIndex(biteActionIndex, maxBiteSizeIndex, biteMoves.length, getEnemySize);
+                choice = findBestMoveIndex(biteActionIndex, maxBiteSizeIndex...biteMoves.length, getSizeDelta);
                 type = PlayerAction(SubmitMove(rev, biteActionIndex, choice));
             }
         }
@@ -91,25 +99,49 @@ class BasicSmarts extends Smarts {
         return type;
     }
 
-    function getEnemySize():Int {
+    function getSizeDelta():Int {
         var sum:Int = 0;
-        for (ike in 0...game.state.players.length) if (ike != id) sum += game.state.players[ike][totalArea_];
+        for (ike in 0...game.state.players.length) {
+            if (ike == id) sum -= game.state.players[ike][totalArea_];
+            else sum += game.state.players[ike][totalArea_];
+        }
         return sum;
     }
 
-    function findBestMoveIndex(actionIndex:Int, start:Int, end:Int, eval:Void->Int, invert:Bool = false):Int {
-        var extreme:Int = 0;
-        var index:Int = 0;
-        var rev:Int = game.revision;
-        for (ike in start...end) {
-            game.chooseMove(actionIndex, ike);
-            var value:Int = eval();
-            game.rewind(rev);
-            if (extreme > value != invert) {
-                extreme = value;
-                index = ike;
+    function dropMoveHugsEdges(move:Move):Bool {
+        var dropMove:DropPieceMove = cast move;
+        if (dropMove.addedNodes.length == 0) return false;
+        for (nodeID in dropMove.addedNodes) {
+            for (neighborLocus in game.state.loci[nodeID].orthoNeighbors()) {
+                if (neighborLocus.value[isFilled_] == Aspect.TRUE && neighborLocus.value[occupier_] == Aspect.NULL) {
+                    return true;
+                }
             }
         }
-        return index;
+        return false;
+    }
+
+    function pruneMoves(moves:Array<Move>, eval:Move->Bool):Array<Int> {
+        var prunedIndices:Array<Int> = [];
+        for (index in 0...moves.length) if (eval(moves[index])) prunedIndices.push(index);
+        if (prunedIndices.length == 0) for (index in 0...moves.length) prunedIndices.push(index);
+        return prunedIndices;
+    }
+
+    function findBestMoveIndex(actionIndex:Int, itr:Iterator<Int>, eval:Void->Int):Int {
+        var extreme:Null<Int> = null;
+        var extremeIndex:Int = 0;
+        var rev:Int = game.revision;
+        while (itr.hasNext()) {
+            var index:Int = itr.next();
+            game.chooseMove(actionIndex, index);
+            var value:Int = eval();
+            game.rewind(rev);
+            if (extreme == null || extreme > value) {
+                extreme = value;
+                extremeIndex = index;
+            }
+        }
+        return extremeIndex;
     }
 }

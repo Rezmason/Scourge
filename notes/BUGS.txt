@@ -1,12 +1,7 @@
 Open cavity bug
-    2-player circular
-    567560832
+    4-player circular
+    495789735
 
-Leftover cavity
-    2-player square
-    676076664
-
-Blank spots
-    2-player square
-    398918435
-
+Lingering cavity
+    4-player circular
+    1685493695
