@@ -20,7 +20,11 @@ class Strings {
 
     public inline static var SYMBOLS:String = '<>[]{}-=!@#$%^*()_+';
     public inline static var WEIRD_SYMBOLS:String = '¤¬ÎøΔΩ•◊';
-    public inline static var BOX_SYMBOLS:String = ' ++└+│┌├+┘─┴┐┤┬┼';
+    //public inline static var BOX_SYMBOLS:String = ' ╹╺┗╻┃┏┣╸┛━┻┓┫┳╋';
+    //public inline static var BOX_SYMBOLS:String = ' ╹╺╰╻┃╭┣╸╯━┻╮┫┳╋';
+    //public inline static var BOX_SYMBOLS:String = ' ╵╶└╷│┌├╴┘─┴┐┤┬┼';
+      public inline static var BOX_SYMBOLS:String = ' ╵╶╰╷│╭├╴╯─┴╮┤┬┼';
+
 
     public inline static var BODY_GLYPHS:String = ' iebjlrkadswntm!';
     public inline static var PUNCTUATION:String = '\'\"?!.,;:-~/\\`|&';
