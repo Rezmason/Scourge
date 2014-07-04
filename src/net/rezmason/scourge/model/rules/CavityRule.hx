@@ -42,12 +42,23 @@ class CavityRule extends Rule {
 
     override private function _chooseMove(choice:Int):Void {
         var maxFreshness:Int = state.globals[maxFreshness_] + 1;
-        for (player in eachPlayer()) remapCavities(player, maxFreshness);
+        for (player in eachPlayer()) eraseCavities(player, maxFreshness);
+        for (player in eachPlayer()) makeCavities(player, maxFreshness);
         state.globals[maxFreshness_] = maxFreshness;
         signalEvent();
     }
 
-    private function remapCavities(player:AspectSet, maxFreshness:Int):Void {
+    private function eraseCavities(player:AspectSet, maxFreshness):Void {
+        var cavityFirst:Int = player[cavityFirst_];
+        var oldCavityNodes:Array<AspectSet> = [];
+        if (cavityFirst != Aspect.NULL) {
+            oldCavityNodes = getNode(cavityFirst).listToAssocArray(state.nodes, cavityNext_, ident_);
+            for (node in oldCavityNodes) if (node != null) clearCavityCell(node, maxFreshness);
+            player[cavityFirst_] = Aspect.NULL;
+        }
+    }
+
+    private function makeCavities(player:AspectSet, maxFreshness:Int):Void {
 
         var edgeGroupIDs:Array<Null<Int>> = [];
         var numEdges:Int = 0;
@@ -59,8 +70,9 @@ class CavityRule extends Rule {
         var bodyNode:AspectSet = getNode(player[bodyFirst_]);
 
         if (bodyNode != null) {
+            var occupier:Int = bodyNode[occupier_];
             var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_);
-            edgeNodes = edgeNodes.filter(hasDifferentNeighbor.bind(bodyNode[occupier_]));
+            edgeNodes = edgeNodes.filter(hasDifferentNeighbor.bind(occupier));
 
             // For each edge node,
             for (edgeNode in edgeNodes) {
@@ -68,7 +80,7 @@ class CavityRule extends Rule {
                 // For each empty ortho neighbor,
                 for (direction in GridUtils.orthoDirections()) {
                     var neighbor = edgeLocus.neighbors[direction];
-                    if (neighbor.value[isFilled_] == Aspect.FALSE) {
+                    if (neighbor.value[isFilled_] == Aspect.FALSE || neighbor.value[occupier_] != occupier) {
                         // make an edge that's in-no-group
                         currentEdge = makeEdge(getID(edgeNode), direction);
                         edgeGroupIDs[currentEdge] = -1;
@@ -146,15 +158,6 @@ class CavityRule extends Rule {
             }
         }
 
-        // We destroy the existing cavity list
-        var cavityFirst:Int = player[cavityFirst_];
-        var oldCavityNodes:Array<AspectSet> = [];
-        if (cavityFirst != Aspect.NULL) {
-            oldCavityNodes = getNode(cavityFirst).listToAssocArray(state.nodes, cavityNext_, ident_);
-            for (node in oldCavityNodes) if (node != null) clearCavityCell(node, maxFreshness);
-            player[cavityFirst_] = Aspect.NULL;
-        }
-
         var numCavityNodes:Int = 0;
         for (locus in loci.expandGraphSequence(true, isEmpty)) {
             cavityNodes[numCavityNodes] = locus.value;
@@ -167,7 +170,7 @@ class CavityRule extends Rule {
 
             // Cavity nodes that haven't changed don't get freshened
             var playerID:Int = getID(player);
-            for (node in cavityNodes) createCavity(playerID, oldCavityNodes[getID(node)] != null ? 0 : maxFreshness, node);
+            for (node in cavityNodes) createCavity(playerID, maxFreshness, node);
 
             cavityNodes.chainByAspect(ident_, cavityNext_, cavityPrev_);
             player[cavityFirst_] = cavityNodes[0][ident_];

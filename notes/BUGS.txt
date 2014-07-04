@@ -1,7 +1,0 @@
-Open cavity bug
-    4-player circular
-    495789735
-
-Lingering cavity
-    4-player circular
-    1685493695

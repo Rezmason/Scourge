@@ -206,7 +206,7 @@ class TestBoards {
         'X           X\n' +
         'XXXXXXXXXXXXX';
 
-   public static var fourSquares:String = '\n' +
+    public static var fourSquares:String = '\n' +
         'XXXXXXXXXXXXXXXXXXXXXXXX\n' +
         'X                      X\n' +
         'X                      X\n' +
