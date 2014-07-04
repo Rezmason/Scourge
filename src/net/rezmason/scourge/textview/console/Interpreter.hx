@@ -14,6 +14,7 @@ import net.rezmason.utils.Utf8Utils.*;
 using Lambda;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.utils.ArrayUtils;
+using net.rezmason.utils.CharCode;
 
 /**
  * An Interpreter sits atop a ConsoleUIMediator, interpreting interactions of that mediator and populating it with text.
@@ -189,7 +190,7 @@ class Interpreter {
             var stateString:String = stringifyState();
             if (length(stateString) > 0 && (cHistory.length <= 1 || cHistory[cHistory.length - 2] != stateString)) {
                 cHistory.pop();
-                cHistory.push(stateString);
+                cHistory.push(stateString + ' ');
                 cHistory.push('');
             }
             mHistory = cHistory.copy();
@@ -261,7 +262,6 @@ class Interpreter {
             mHistory[mHistIndex] = stringifyState();
             mHistIndex--;
             loadStateFromString(mHistory[mHistIndex]);
-            validateState(true);
         }
     }
 
@@ -271,7 +271,6 @@ class Interpreter {
             mHistIndex++;
 
             loadStateFromString(mHistory[mHistIndex]);
-            validateState(true);
         }
     }
 
