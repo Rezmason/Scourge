@@ -21,40 +21,36 @@ import net.rezmason.utils.display.FlatFontGenerator;
 import net.rezmason.scourge.Strings;
 
 @:font("assets/fonts/ProFontX.ttf") class ProFont extends Font {}
+@:font("assets/fonts/werf - Profont Cyrillic/werfProFont.ttf") class ProFont_Cy extends Font {}
 @:font("assets/fonts/SourceCodePro_FontsOnly-1.013/TTF/SourceCodePro-Semibold.ttf") class SourceProFont extends Font {}
 
 class ScourgeAssetGen {
 
-    static var font1:FlatFont = null;
-    static var font2:FlatFont = null;
-
     public static function main():Void {
 
-        var requiredString:String = [
+        var current:Sprite = Lib.current;
+        current.stage.addEventListener(flash.events.MouseEvent.MOUSE_MOVE, function(e) {
+            if (current.width <= current.stage.stageWidth) current.x = 0;
+            else current.x = (current.stage.mouseX / current.stage.stageWidth ) * (current.stage.stageWidth  - current.width );
+
+            if (current.height <= current.stage.stageHeight) current.y = 0;
+            else current.y = (current.stage.mouseY / current.stage.stageHeight) * (current.stage.stageHeight - current.height);
+        });
+
+        var profontChars:String = [
             Strings.ALPHANUMERICS,
             Strings.PUNCTUATION,
             Strings.SYMBOLS,
             Strings.WEIRD_SYMBOLS,
-            Strings.BOX_SYMBOLS,
         ].join("");
 
-        FlatFontGenerator.flatten(new ProFont(), 300, requiredString, 72, 72, 1, 20, function(ff) {
-            font1 = ff;
-            if (font1 != null && font2 != null) proceed();
-        });
+        var sets:Array<CharacterSet> = [
+            {chars:profontChars, size:300, font:new ProFont()},
+            {chars:Strings.SMALL_CYRILLICS, size:384, font:new ProFont_Cy()},
+            {chars:Strings.BOX_SYMBOLS, size:300, font:new ScourgeAssetGen.SourceProFont()},
+        ];
 
-        FlatFontGenerator.flatten(new SourceProFont(), 300, requiredString, 72, 72, 1, 20, function(ff) {
-            font2 = ff;
-            if (font1 != null && font2 != null) proceed();
-        });
-    }
-
-    static function proceed():Void {
-        var font3:FlatFont = FlatFontGenerator.combine(font1, [font2]);
-
-        deploy(font1, "profont");
-        deploy(font2, "source");
-        deploy(font3, "full");
+        FlatFontGenerator.flatten(sets, 72, 72, 1, 20, deploy.bind(_, "full"));
     }
 
     static function deploy(font:FlatFont, id:String):Void {

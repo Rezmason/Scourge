@@ -69,7 +69,11 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         var circular:Bool = args.flags.has('circular');
 
         var cfg:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
-        cfg.pieceTableIDs = cfg.pieces.getAllPieceIDsOfSize(4);
+
+        var pieceTableIDs:Array<Int> = [];
+        for (ike in 0...4) pieceTableIDs = pieceTableIDs.concat(cfg.pieces.getAllPieceIDsOfSize(ike + 1));
+
+        cfg.pieceTableIDs = pieceTableIDs;
         cfg.allowRotating = true;
         cfg.circular = circular;
         cfg.allowNowhereDrop = false;

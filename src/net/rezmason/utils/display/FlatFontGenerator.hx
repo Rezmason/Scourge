@@ -30,35 +30,40 @@ typedef SerializedBitmap = {
     var bytes:ByteArray;
 }
 
+typedef CharacterSet = {
+    var font:Font;
+    var chars:String;
+    var size:Float;
+}
+
 class FlatFontGenerator {
 
     static var sdfAgency:TempAgency<{source:SerializedBitmap, cutoff:Int}, SerializedBitmap>;
 
-    public static function flatten(font:Font, fontSize:Int, charString:String, glyphWidth:Int, glyphHeight:Int, spacing:Int, cutoff:Int, cbk:FlatFont->Void):Void {
+    public static function flatten(sets:Array<CharacterSet>, glyphWidth:UInt, glyphHeight:UInt, spacing:UInt, cutoff:Int, cbk:FlatFont->Void):Void {
 
         if (sdfAgency == null) {
             sdfAgency = new TempAgency(Golem.rise('SDFWorker.hxml'), 10);
             sdfAgency.onDone = sdfAgency.die;
         }
 
-        if (fontSize < 1) fontSize = 72;
-        if (glyphWidth  < 0) glyphWidth  = 1;
-        if (glyphHeight < 0) glyphHeight = 1;
-        if (spacing < 0) spacing = 0;
-
+        if (glyphWidth  == 0) glyphWidth  = 1;
+        if (glyphHeight == 0) glyphHeight = 1;
+        
         var charCoordJSON:Dynamic = {};
         var missingChars:Array<Int> = [];
-        var requiredChars:Map<String, Bool> = new Map();
+        var requiredChars:Map<String, Null<Int>> = new Map();
         var numChars:Int = 0;
 
-        for (char in charString.split('')) {
-            if (!requiredChars.exists(char)) {
-                numChars++;
-                if (font.hasGlyphs(char)) {
-                    requiredChars[char] = true;
-                } else {
-                    missingChars.push(char.charCodeAt(0));
-                    requiredChars[char] = false;
+        for (ike in 0...sets.length) {
+            for (char in sets[ike].chars.split('')) {
+                if (!requiredChars.exists(char)) {
+                    numChars++;
+                    requiredChars[char] = null;
+                }
+
+                if (requiredChars[char] == null && sets[ike].font.hasGlyphs(char)) {
+                    requiredChars[char] = ike;
                 }
             }
         }
@@ -67,7 +72,10 @@ class FlatFontGenerator {
         var numRows:Int = Std.int(numChars / numColumns) + 1;
 
         var chars:Array<String> = [];
-        for (char in requiredChars.keys().a2z()) chars.push(char);
+        for (char in requiredChars.keys().a2z()) {
+            chars.push(char);
+            if (requiredChars[char] == null) missingChars.push(char.charCodeAt(0));
+        }
 
         var glyphs:Array<TextLine> = [];
         var bds:Array<BitmapData> = [];
@@ -76,17 +84,23 @@ class FlatFontGenerator {
         var imageBounds:Rectangle = null;
         var sdfBounds:Rectangle = null;
 
-        var format:ElementFormat = new ElementFormat(new FontDescription(font.fontName));
-        format.fontSize = fontSize;
-        format.color = 0xFFFFFF;
+        var formats:Array<ElementFormat> = [];
+        for (ike in 0...sets.length) {
+            var format:ElementFormat = new ElementFormat(new FontDescription(sets[ike].font.fontName));
+            format.fontSize = sets[ike].size;
+            format.color = 0xFFFFFF;
+            formats.push(format);
+        }
         var textBlock:TextBlock = new TextBlock();
-        var glyphBounds:Rectangle = new Rectangle();
+        var glyphBounds:Rectangle = null;
 
         for (char in chars) {
-            textBlock.content = new TextElement(char, format);
+            textBlock.content = new TextElement(char, formats[requiredChars[char]]);
             var textLine:TextLine = textBlock.createTextLine(null);
             glyphs.push(textLine);
-            glyphBounds = glyphBounds.union(textLine.getBounds(textLine));
+            var bounds:Rectangle = textLine.getBounds(textLine);
+            if (glyphBounds == null) glyphBounds = bounds;
+            else glyphBounds = glyphBounds.union(bounds);
         }
 
         imageBounds = glyphBounds.clone();
@@ -109,7 +123,9 @@ class FlatFontGenerator {
 
         function proceed():Void {
 
-            var width:Int = largestPowerOfTwo(Std.int(Math.max(glyphWidth * numColumns, glyphHeight * numRows)));
+            var width :Int = largestPowerOfTwo(Math.ceil(glyphWidth  * numColumns));
+            var height:Int = largestPowerOfTwo(Math.ceil(glyphHeight * numRows   ));
+            
             var bitmapData:BitmapData = new BitmapData(width, width, true, 0xFF0000FF);
 
             var x:Int = 0;
@@ -126,7 +142,7 @@ class FlatFontGenerator {
                 Reflect.setField(charCoordJSON, '_' + chars[ike].charCodeAt(0), {x: outputMat.tx, y: outputMat.ty});
 
                 x++;
-                if (x > numColumns) {
+                if (x >= numColumns) {
                     x = 0;
                     y++;
                 }
@@ -164,56 +180,6 @@ class FlatFontGenerator {
             var sb:SerializedBitmap = {width:bd.width, height:bd.height, bytes:bd.getPixels(bd.rect)};
             sdfAgency.addWork({source:sb, cutoff:cutoff}, addSDF.bind(ike));
         }
-    }
-
-    public static function combine(flatFont:FlatFont, otherFlatFonts:Array<FlatFont>):FlatFont {
-
-        var otherBDs:Array<BitmapData> = [];
-        for (otherFlatFont in otherFlatFonts) otherBDs.push(otherFlatFont.getBitmapDataClone());
-
-        var copyMat:Matrix = new Matrix();
-        var clipRect:Rectangle = new Rectangle(0, 0, flatFont.glyphWidth, flatFont.glyphHeight);
-        var bitmapData:BitmapData = flatFont.getBitmapDataClone();
-        var missingChars:Array<Int> = [];
-
-        for (char in flatFont.missingChars) {
-            var stillMissing:Bool = true;
-            for (ike in 0...otherFlatFonts.length) {
-                var otherFlatFont:FlatFont = otherFlatFonts[ike];
-
-                if (!otherFlatFont.missingChars.has(char)) {
-
-                    var dstMat:Matrix = flatFont.getCharCodeMatrix(char);
-                    var srcMat:Matrix = otherFlatFont.getCharCodeMatrix(char);
-                    var otherBD:BitmapData = otherBDs[ike];
-
-                    // Copy the character from the other font bitmap to the cloned font bitmap
-                    copyMat.identity();
-                    copyMat.concat(srcMat);
-                    copyMat.invert();
-                    copyMat.concat(dstMat);
-
-                    clipRect.x = -dstMat.tx;
-                    clipRect.y = -dstMat.ty;
-                    bitmapData.draw(otherBD, copyMat, null, BlendMode.NORMAL, clipRect, true);
-
-                    stillMissing = false;
-                    break;
-                }
-            }
-
-            if (stillMissing) missingChars.push(char);
-        }
-
-        var json:FlatFontJSON = {
-            glyphWidth:flatFont.glyphWidth,
-            glyphHeight:flatFont.glyphHeight,
-            glyphRatio:flatFont.glyphRatio,
-            charCoords:flatFont.jsonString.parse().charCoords,
-            missingChars:missingChars
-        };
-
-        return new FlatFont(bitmapData, json.stringify());
     }
 
     inline static function largestPowerOfTwo(input:Int):Int {

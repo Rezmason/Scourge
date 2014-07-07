@@ -41,7 +41,7 @@ class Context {
 
     function makeFontTextures():Void {
         fontTextures = new Map();
-        for (name in ['source', 'profont', 'full']) {
+        for (name in ['full']) {
             var path:String = 'flatfonts/${name}_flat';
             var font:FlatFont = new FlatFont(getBitmapData('$path.png'), getText('$path.json'));
             fontTextures[name] = cast new GlyphTexture(utils.textureUtil, font);

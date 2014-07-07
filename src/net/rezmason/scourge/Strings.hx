@@ -18,14 +18,19 @@ class Strings {
         '0123456789' +
         '';
 
+    public inline static var CYRILLICS:String = 
+        'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ' +
+        'абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+
+    public inline static var SMALL_CYRILLICS:String = 
+        'абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+
     public inline static var SYMBOLS:String = '<>[]{}-=!@#$%^*()_+';
-    public inline static var WEIRD_SYMBOLS:String = '¤¬ÎøΔΩ•◊';
+    public inline static var WEIRD_SYMBOLS:String = '¤¬øΔΩ•◊';
     //public inline static var BOX_SYMBOLS:String = ' ╹╺┗╻┃┏┣╸┛━┻┓┫┳╋';
     //public inline static var BOX_SYMBOLS:String = ' ╹╺╰╻┃╭┣╸╯━┻╮┫┳╋';
     //public inline static var BOX_SYMBOLS:String = ' ╵╶└╷│┌├╴┘─┴┐┤┬┼';
-      public inline static var BOX_SYMBOLS:String = ' ╵╶╰╷│╭├╴╯─┴╮┤┬┼';
-
-
-    public inline static var BODY_GLYPHS:String = ' iebjlrkadswntm!';
+    public inline static var BOX_SYMBOLS:String = ' ╵╶╰╷│╭├╴╯─┴╮┤┬┼';
+    public inline static var BODY_GLYPHS:String = ' пгчцълкпрншьэм!';
     public inline static var PUNCTUATION:String = '\'\"?!.,;:-~/\\`|&';
 }

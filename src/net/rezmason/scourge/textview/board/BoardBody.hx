@@ -53,7 +53,7 @@ class BoardBody extends Body {
 
     inline static var BOARD_CODE:Int = '+'.code(); // ¤
     inline static var WALL_CODE:Int = '╋'.code();
-    inline static var CAVITY_CODE:Int = '#'.code();
+    inline static var CAVITY_CODE:Int = 'ж'.code();
     inline static var BODY_CODE:Int = '•'.code();
     inline static var HEAD_CODE:Int = 'Ω'.code();
     inline static var UI_CODE:Int = ''.code();
@@ -490,7 +490,7 @@ class BoardBody extends Body {
                 waveMult = 1;
                 var numNeighbors:Int = 0;
                 for (i in 0...4) numNeighbors += (bitfield >> i) & 1;
-                top.size = (numNeighbors / 4) * 0.5 + 0.5;
+                top.size = (numNeighbors / 4) * 0.6 + 0.4;
                 //top.stretch = glyphTexture.font.glyphRatio;
                 bottom.char = top.char;
                 bottom.color = Colors.mult(top.color, 0.15);

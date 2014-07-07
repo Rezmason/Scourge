@@ -13,7 +13,6 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 class UIMediator {
 
     inline static var LINE_TOKEN:String = '¬¬¬';
-    inline static var GLYPH_MARGIN:Float = 0.04;
 
     public var isDirty(default, null):Bool;
 
@@ -69,9 +68,9 @@ class UIMediator {
                         caretGlyphID = id;
                     case _:
                         var glyph:Glyph = glyphs[id];
-                            glyph.set_char(charCode, font, GLYPH_MARGIN);
-                            currentSpan.addGlyph(glyph);
-                            glyph.set_z(0);
+                        glyph.set_char(charCode, font);
+                        currentSpan.addGlyph(glyph);
+                        glyph.set_z(0);
                         id++;
                 }
             }

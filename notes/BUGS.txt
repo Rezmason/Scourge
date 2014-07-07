@@ -1,0 +1,4 @@
+Game froze
+    Four players
+    animateMils 100
+    seed 416855773
