@@ -8,7 +8,6 @@ import net.rezmason.utils.Zig;
 class BotSystem extends PlayerSystem {
 
     private var botsByIndex:Map<Int, BotPlayer>;
-    private var botSignal:Zig<Int->GameEvent->Void>;
     private var numBots:Int;
     private var random:Void->Float;
 
@@ -16,14 +15,13 @@ class BotSystem extends PlayerSystem {
         super(true);
 
         botsByIndex = new Map();
-        botSignal = new Zig();
-        botSignal.add(onBotSignal);
         numBots = 0;
         this.random = random;
     }
 
     public function createPlayer(index:Int, smarts:Smarts, period:Int):IPlayer {
-        var bot:BotPlayer = new BotPlayer(botSignal, index, smarts, period);
+        var bot:BotPlayer = new BotPlayer(index, smarts, period);
+        bot.playSignal.add(onBotSignal.bind(index));
         botsByIndex[index] = bot;
         numBots++;
         return bot;

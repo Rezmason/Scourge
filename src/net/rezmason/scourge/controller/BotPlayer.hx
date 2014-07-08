@@ -15,12 +15,11 @@ class BotPlayer implements IPlayer {
     @:allow(net.rezmason.scourge.controller.BotSystem)
     private var playSignal:Zig<GameEvent->Void>;
 
-    private function new(parentSignal:Zig<Int->GameEvent->Void>, index:Int, smarts:Smarts, period:Int):Void {
+    private function new(index:Int, smarts:Smarts, period:Int):Void {
         this.index = index;
         this.smarts = smarts;
         this.period = period;
 
         playSignal = new Zig();
-        playSignal.add(parentSignal.dispatch.bind(index));
     }
 }

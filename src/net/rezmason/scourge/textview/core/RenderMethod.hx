@@ -15,7 +15,7 @@ class RenderMethod {
 
     public var program(default, null):Program;
     public var backgroundColor(default, null):Int;
-    public var loadedSignal:Zig<Void->Void>;
+    public var loadedSignal(default, null):Zig<Void->Void>;
     var programUtil:ProgramUtil;
     var glyphMat:Matrix3D;
     var glyphMag:Float;
