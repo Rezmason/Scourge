@@ -2,3 +2,7 @@ Game froze
     Four players
     animateMils 100
     seed 416855773
+
+HTML5 - Game freezes all the fucking time
+Flash - 'Hiccups' in Safari
+    Probably just Safari being a douche to plugins

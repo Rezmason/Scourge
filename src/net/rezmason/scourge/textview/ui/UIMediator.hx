@@ -7,6 +7,7 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.text.*;
 import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
+import net.rezmason.utils.Zig;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -15,9 +16,10 @@ class UIMediator {
     inline static var LINE_TOKEN:String = '¬¬¬';
 
     public var isDirty(default, null):Bool;
+    public var mouseSignal(default, null):Zig<String->MouseInteractionType->Void>;
 
-    var numRows:Int;
-    var numCols:Int;
+    public var numRows(default, null):Int;
+    public var numCols(default, null):Int;
 
     var logDoc:Document;
     var compositeDoc:Document;
@@ -27,7 +29,8 @@ class UIMediator {
     var lineStyleIndices:Array<Int>;
 
     var mainText:String;
-    function new():Void {
+    
+    public function new():Void {
         mainText = '';
         logDoc = new Document();
         compositeDoc = new Document();
@@ -35,6 +38,7 @@ class UIMediator {
         numRows = 0;
         numCols = 0;
         isDirty = false;
+        mouseSignal = new Zig();
     }
 
     public function adjustLayout(numRows:Int, numCols:Int):Void {
@@ -200,6 +204,7 @@ class UIMediator {
 
     function handleSpanMouseInteraction(span:Span, type:MouseInteractionType):Void {
         span.receiveInteraction(type);
+        mouseSignal.dispatch(span.id, type);
     }
 
     inline function swapTabsWithSpaces(input:String):String {

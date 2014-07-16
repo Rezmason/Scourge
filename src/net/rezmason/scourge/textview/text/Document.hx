@@ -11,7 +11,7 @@ abstract Document(ParsedOutput) {
     public inline function clear():Void this = Parser.makeEmptyOutput();
     public inline function loadStyles(input:String):Void Parser.parse(input, this.styles, 0);
     public inline function getSpanByIndex(index:Int):Span return this.spans[index];
-    public inline function getSpanByMouseID(id:Int):Span return this.interactiveSpans[id - 1];
+    public inline function getSpanByMouseID(id:Int):Span return this.interactiveSpans[id];
     public inline function getStyleByName(name:String):Style return this.styles[name];
     public inline function removeAllGlyphs():Void  for (span in this.spans) span.removeAllGlyphs();
 
@@ -63,7 +63,7 @@ abstract Document(ParsedOutput) {
 
         spans.shift();
 
-        for (ike in 0...interactiveSpans.length) interactiveSpans[ike].setMouseID(this.interactiveSpans.length + ike + 1);
+        for (ike in 0...interactiveSpans.length) interactiveSpans[ike].setMouseID(this.interactiveSpans.length + ike);
 
         this.spans = this.spans.concat(spans);
 

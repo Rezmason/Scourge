@@ -192,21 +192,23 @@ class UIBody extends Body {
         }
     }
 
-    inline function resize():Void {
-        numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
-        numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
+    function resize():Void {
+        if (croppedViewRect != null) {
+            numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
+            numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
 
-        setGlyphScale(croppedViewRect.width / numCols * 2, croppedViewRect.height / (numRows - 1) * 2);
+            setGlyphScale(croppedViewRect.width / numCols * 2, croppedViewRect.height / (numRows - 1) * 2);
 
-        growTo(numRows * numCols + 1);
+            growTo(numRows * numCols + 1);
 
-        caretGlyph = glyphs[numGlyphs - 1];
+            caretGlyph = glyphs[numGlyphs - 1];
 
-        lastRedrawPos = Math.NaN;
-        reorderGlyphs();
+            lastRedrawPos = Math.NaN;
+            reorderGlyphs();
 
-        uiMediator.adjustLayout(numRows, numCols);
-        uiMediator.styleCaret(caretGlyph, glyphTexture.font);
+            uiMediator.adjustLayout(numRows, numCols);
+            uiMediator.styleCaret(caretGlyph, glyphTexture.font);
+        }
     }
 
     inline function reorderGlyphs():Void {

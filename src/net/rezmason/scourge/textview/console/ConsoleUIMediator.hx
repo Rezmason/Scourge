@@ -18,8 +18,7 @@ class ConsoleUIMediator extends UIMediator {
 
     public var frozen(default, null):Bool;
     public var keyboardSignal(default, null):Zig<UInt->UInt->Bool->Bool->Void>;
-    public var clickSignal(default, null):Zig<String->MouseInteractionType->Void>;
-
+    
     var caretStyle:AnimatedStyle;
     var caretSpan:Span;
 
@@ -54,7 +53,6 @@ class ConsoleUIMediator extends UIMediator {
         frozenQueue = new List();
         frozen = false;
         keyboardSignal = new Zig();
-        clickSignal = new Zig();
     }
 
     public inline function loadStyles(dec:String):Void compositeDoc.loadStyles(dec);
@@ -103,11 +101,6 @@ class ConsoleUIMediator extends UIMediator {
                 case _: super.receiveInteraction(id, interaction);
             }
         }
-    }
-
-    override function handleSpanMouseInteraction(span:Span, type:MouseInteractionType):Void {
-        super.handleSpanMouseInteraction(span, type);
-        clickSignal.dispatch(span.id, type);
     }
 
     override public function updateSpans(delta:Float):Void {

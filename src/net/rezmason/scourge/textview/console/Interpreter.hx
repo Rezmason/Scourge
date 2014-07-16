@@ -56,7 +56,7 @@ class Interpreter {
         setPrompt('scourge', 0x3060FF);
         this.console = console;
         this.console.keyboardSignal.add(handleKeyboard);
-        this.console.clickSignal.add(handleMouseInteraction);
+        this.console.mouseSignal.add(handleMouseInteraction);
         cState = blankState();
         cHistory = [''];
         mHistory = cHistory.copy();
@@ -190,7 +190,9 @@ class Interpreter {
             var stateString:String = stringifyState();
             if (length(stateString) > 0 && (cHistory.length <= 1 || cHistory[cHistory.length - 2] != stateString)) {
                 cHistory.pop();
-                cHistory.push(stateString + ' ');
+                var tokenType:ConsoleTokenType = currentToken.type;
+                if (tokenType == CommandName || tokenType == Flag || tokenType == TailMarker) stateString += ' ';
+                cHistory.push(stateString);
                 cHistory.push('');
             }
             mHistory = cHistory.copy();

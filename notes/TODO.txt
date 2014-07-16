@@ -8,10 +8,25 @@ AGAL2
         Recompile latest AGALMiniAssembler into SWC
         Recompile latest GLSL2AGAL SWC
 
-"Frame"
-    White box drawing characters with piece in the middle
-    Symbols on the corners
-        H-flip, V-flip, C-rot, CC-rot
+You know what? Time for some serious view stuff.
+    NavSystem
+        Page - bodies and rects
+        Signal to send nav system to other pages
+    Splash page
+        Splash
+        Menu (UIBody, UIMediator)
+    Game page
+        Board
+            Game UI - you wrote a lot of fucking notes on this already
+        Game console/chat
+    About page
+    Settings page
+    Game config page
+
+Paragraph styles
+
+Wait. Haxe 3 supports inline variable initialization?!
+    RABLFLABL
 
 Board
     Change ripple behavior

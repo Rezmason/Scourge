@@ -18,25 +18,25 @@ class ScourgeConfigFactory {
     inline static var CLEAN_UP:String = 'cleanUp';
     inline static var WRAP_UP:String = 'wrapUp';
 
-    static var BUILD_BOARD:String        = Siphon.getClassName(BuildBoardRule);
-    static var BUILD_PLAYERS:String      = Siphon.getClassName(BuildPlayersRule);
-    static var BUILD_GLOBALS:String        = Siphon.getClassName(BuildGlobalsRule);
-    static var CAVITY:String             = Siphon.getClassName(CavityRule);
-    static var DECAY:String              = Siphon.getClassName(DecayRule);
-    static var DROP_PIECE:String         = Siphon.getClassName(DropPieceRule);
-    static var EAT_CELLS:String          = Siphon.getClassName(EatCellsRule);
-    static var END_TURN:String           = Siphon.getClassName(EndTurnRule);
-    static var RESET_FRESHNESS:String    = Siphon.getClassName(ResetFreshnessRule);
-    static var FORFEIT:String            = Siphon.getClassName(ForfeitRule);
-    static var KILL_HEADLESS_BODY:String = Siphon.getClassName(KillHeadlessBodyRule);
-    static var PICK_PIECE:String         = Siphon.getClassName(PickPieceRule);
-    static var REPLENISH:String          = Siphon.getClassName(ReplenishRule);
-    static var STALEMATE:String          = Siphon.getClassName(StalemateRule);
-    static var ONE_LIVING_PLAYER:String  = Siphon.getClassName(OneLivingPlayerRule);
-    static var BITE:String               = Siphon.getClassName(BiteRule);
-    static var SWAP_PIECE:String         = Siphon.getClassName(SwapPieceRule);
+    static var BUILD_BOARD:String        = Type.getClassName(BuildBoardRule);
+    static var BUILD_PLAYERS:String      = Type.getClassName(BuildPlayersRule);
+    static var BUILD_GLOBALS:String      = Type.getClassName(BuildGlobalsRule);
+    static var CAVITY:String             = Type.getClassName(CavityRule);
+    static var DECAY:String              = Type.getClassName(DecayRule);
+    static var DROP_PIECE:String         = Type.getClassName(DropPieceRule);
+    static var EAT_CELLS:String          = Type.getClassName(EatCellsRule);
+    static var END_TURN:String           = Type.getClassName(EndTurnRule);
+    static var RESET_FRESHNESS:String    = Type.getClassName(ResetFreshnessRule);
+    static var FORFEIT:String            = Type.getClassName(ForfeitRule);
+    static var KILL_HEADLESS_BODY:String = Type.getClassName(KillHeadlessBodyRule);
+    static var PICK_PIECE:String         = Type.getClassName(PickPieceRule);
+    static var REPLENISH:String          = Type.getClassName(ReplenishRule);
+    static var STALEMATE:String          = Type.getClassName(StalemateRule);
+    static var ONE_LIVING_PLAYER:String  = Type.getClassName(OneLivingPlayerRule);
+    static var BITE:String               = Type.getClassName(BiteRule);
+    static var SWAP_PIECE:String         = Type.getClassName(SwapPieceRule);
 
-    public static var ruleDefs:Map<String, Class<Rule>> = cast Siphon.getDefs('net.rezmason.scourge.model.rules', 'src', 'Rule');
+    public static var ruleDefs:Map<String, Class<Rule>> = cast Siphon.getDefs('net.rezmason.scourge.model.rules', 'src', false, 'Rule');
 
     public inline static function makeDefaultActionList():Array<String> return [DROP_ACTION, QUIT_ACTION];
     public inline static function makeStartAction():String return START_ACTION;

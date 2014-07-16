@@ -12,7 +12,7 @@ void main(void) {
       float deriv = uDerivMult.x;
     float glyph = 1. - smoothstep(vFX.y - deriv, vFX.y + deriv, texture);
 
-    if (vFX.z > 0.0) glyph = min(1., max(glyph, (1. - texture) * 2. * vFX.y * vFX.z));
+    //if (vFX.z > 0.0) glyph = min(1., max(glyph, (1. - texture) * 2. * vFX.y * vFX.z));
 
     if (vFX.x >= 0.3) glyph *= -1.0;
 

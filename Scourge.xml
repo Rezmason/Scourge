@@ -38,6 +38,8 @@
 	<!-- <haxedef name="dce" value="no" if="flash"/> -->
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 
+	<!-- <compilerflag name="--macro" value="this.is.how.you.run.a.Compiler.macro()"/> -->
+
 
 	<set name="html5-backend" value="openfl-html5-dom" />
 	<haxelib name="openfl" />
