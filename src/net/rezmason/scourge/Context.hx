@@ -7,7 +7,9 @@ import flash.events.Event;
 import flash.geom.Rectangle;
 
 import net.rezmason.gl.utils.UtilitySet;
-import net.rezmason.scourge.textview.*;
+import net.rezmason.scourge.textview.pages.*;
+import net.rezmason.scourge.textview.NavSystem;
+import net.rezmason.scourge.textview.GameSystem;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.GlyphTexture;
@@ -15,9 +17,8 @@ import net.rezmason.scourge.textview.console.*;
 import net.rezmason.scourge.textview.commands.*;
 import net.rezmason.scourge.textview.demo.*;
 import net.rezmason.scourge.textview.ui.UIBody;
-
-import net.rezmason.scourge.textview.board.BoardBody;
 import net.rezmason.scourge.textview.ui.SplashBody;
+import net.rezmason.scourge.textview.board.BoardBody;
 
 import net.rezmason.utils.display.FlatFont;
 
@@ -27,7 +28,7 @@ class Context {
     var stage:Stage;
     var utils:UtilitySet;
     var fontTextures:Map<String, GlyphTexture>;
-    var displaySystem:DisplaySystem;
+    var navSystem:NavSystem;
     var gameSystem:GameSystem;
 
     public function new(utils:UtilitySet, stage:Stage):Void {
@@ -50,10 +51,17 @@ class Context {
 
     function init():Void {
         addListeners();
-        displaySystem = new DisplaySystem(engine);
+        var fullTexture:GlyphTexture = fontTextures['full'];
+        /*
+        navSystem = new NavSystem(engine);
+        navSystem.addPage('splash', new SplashPage(utils.bufferUtil, fullTexture));
+
+        navSystem.goto(Page('splash'));
+        /**/
+        //*
+        var displaySystem:net.rezmason.scourge.DisplaySystem = new net.rezmason.scourge.DisplaySystem(engine);
         var console = new ConsoleUIMediator();
         var interpreter = new Interpreter(console);
-        var fullTexture:GlyphTexture = fontTextures['full'];
 
         var regions:Map<String, Rectangle> = [
             'full'      => new Rectangle(0.0, 0.0, 1.0, 1.0),
@@ -93,6 +101,7 @@ class Context {
             interpreter.addCommand(new QuitConsoleCommand());
         #end
         interpreter.addCommand(new PlayGameConsoleCommand(displaySystem, gameSystem));
+        /**/
     }
 
     function addListeners():Void {
