@@ -351,7 +351,7 @@ class Interpreter {
      * Combines input, output, errors, hints and command hints into a single string to send to the console.
      */
     function combineStrings(includeCaret:Bool = true):Void {
-        combinedString = outputString;
+        combinedString = outputString + '¶{}';
 
         if (iState == Executing) {
             combinedString += '  ' + ConsoleStrings.WAIT_INDICATOR;

@@ -1,29 +1,6 @@
-REMEMBER:
-    If the C++ build fails, try removing inline in the Pointers abstracts
-        Bottom up approach
-
-AGAL2
-    Recompile GLSL2AGAL worker
-        AGAL_VERSION should be 2
-        Recompile latest AGALMiniAssembler into SWC
-        Recompile latest GLSL2AGAL SWC
-
-You know what? Time for some serious view stuff.
-    NavSystem
-        Page - bodies and rects
-        Signal to send nav system to other pages
-    Splash page
-        Splash
-        Menu (UIBody, UIMediator)
-    Game page
-        Board
-            Game UI - you wrote a lot of fucking notes on this already
-        Game console/chat
-    About page
-    Settings page
-    Game config page
-
-Paragraph styles
+About page
+Settings page
+Game config page
 
 Wait. Haxe 3 supports inline variable initialization?!
     RABLFLABL
@@ -32,6 +9,12 @@ Board
     Change ripple behavior
     Figure out how to do "pain"-related things
     Pool objects
+
+AGAL2
+    Recompile GLSL2AGAL worker
+        AGAL_VERSION should be 2
+        Recompile latest AGALMiniAssembler into SWC
+        Recompile latest GLSL2AGAL SWC
 
 Human players, GUISystem
     Implement abstract commands
@@ -48,6 +31,12 @@ Refactor the console stuff- within reason
 Support output hints
 
 Code review?
+
+Music box inspired microfluidic lab controller:
+https://www.youtube.com/watch?v=kNQToOEFNmY
+
+hashed turn based network games:
+http://vimeo.com/87682214
 
 Move the logic into a Worker
     Worker tests are failing in-game on Flash and HTML5 targets

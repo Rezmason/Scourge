@@ -14,11 +14,11 @@ class SetFontConsoleCommand extends ConsoleCommand {
     var uiBody:UIBody;
     var fontTextures:Map<String, GlyphTexture>;
 
-    public function new(uiBody:UIBody, fontTextures:Map<String, GlyphTexture>):Void {
+    public function new(uiBody:UIBody, fontTextures:Map<String, GlyphTexture> = null):Void {
         super();
         name = 'setFont';
 
-        keys['fontName'] = ALPHANUMERICS;
+        if (fontTextures != null) keys['fontName'] = ALPHANUMERICS;
         keys['size'] = INTEGERS;
 
         this.uiBody = uiBody;
@@ -36,7 +36,8 @@ class SetFontConsoleCommand extends ConsoleCommand {
                 if (size < 14) message = 'Size is too small.';
                 if (size > 72) message = 'Size is too large.';
             }
-        } else if (args.pendingKey == 'fontName') {
+        } 
+        else if (fontTextures != null && args.pendingKey == 'fontName') {
             var val:String = args.pendingValue;
             if (val == null) val = '';
             hints = fontTextures.keys().intoArray().filter(startsWith.bind(_, val)).map(argToHint.bind(_, Value));
@@ -60,12 +61,14 @@ class SetFontConsoleCommand extends ConsoleCommand {
 
         message = null;
 
-        var fontName:String = args.keyValuePairs['fontName'];
-        if (fontName != null) {
-            var fontWorked:Bool = uiBody.setFontTexture(fontTextures[fontName]);
-            if (fontWorked) message = 'Font set to $fontName.';
-            else message = styleError('Invalid font name: $fontName.');
-            outputSignal.dispatch(message, false);
+        if (fontTextures != null) {
+            var fontName:String = args.keyValuePairs['fontName'];
+            if (fontName != null) {
+                var fontWorked:Bool = uiBody.setFontTexture(fontTextures[fontName]);
+                if (fontWorked) message = 'Font set to $fontName.';
+                else message = styleError('Invalid font name: $fontName.');
+                outputSignal.dispatch(message, false);
+            }
         }
 
         outputSignal.dispatch(null, true);

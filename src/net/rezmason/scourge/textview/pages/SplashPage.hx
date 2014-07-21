@@ -14,7 +14,8 @@ class SplashPage extends NavPage {
     '§{name:splashUp,   p: 0.00, f:0.5, r:0.7, g:0.7, b:0.7}' +
     '§{name:splashOver, p:-0.01, f:0.6, r:0.9, g:0.9, b:0.9}' +
     '§{name:splashDown, p: 0.01, f:0.4, r:0.5, g:0.5, b:0.5}' +
-    'µ{name:splashButton, up:splashUp, over:splashOver, down:splashDown, period:0.2, i:1}§{}';
+    'µ{name:splashButton, up:splashUp, over:splashOver, down:splashDown, period:0.2, i:1}§{}' +
+    '¶{name:main, align:center}';
 
     var splashBody:SplashBody;
     var uiBody:UIBody;
@@ -41,7 +42,7 @@ class SplashPage extends NavPage {
             makeButton('LEAVE', quitGame),
         ];
 
-        var uiText:String = BUTTON_STYLE + buttons.join('\n\n');
+        var uiText:String = BUTTON_STYLE + buttons.join('  ');
         uiMed.setText(uiText);
     }
 
@@ -52,7 +53,7 @@ class SplashPage extends NavPage {
     }
 
     private function playGame():Void {
-        navToSignal.dispatch(Page('GAME'));
+        navToSignal.dispatch(Page(ScourgeNavPageAddresses.GAME));
     }
 
     private function quitGame():Void {
@@ -60,6 +61,6 @@ class SplashPage extends NavPage {
     }
 
     private function aboutGame():Void {
-        navToSignal.dispatch(Page('ABOUT'));
+        navToSignal.dispatch(Page(ScourgeNavPageAddresses.ABOUT));
     }
 }

@@ -8,6 +8,7 @@ using Lambda;
 class Parser {
 
     static var defaultStyle(default, null):Style = makeDefaultStyle();
+    static var defaultParagraphStyle(default, null):ParagraphStyle = makeDefaultParagraphStyle();
 
     static var styleTypes:Map<String, Class<Style>> = [
         STYLE => Style,
@@ -17,37 +18,70 @@ class Parser {
 
     public inline static function makeEmptyOutput():ParsedOutput {
         var span:Span = getSpan();
-        return {input:'', output:'§', spans:[span], interactiveSpans:[], styles:[''=>defaultStyle], recycledSpans:[], spansByStyleName:[''=>[span]]};
+        var paragraph:Paragraph = getParagraph();
+        return {
+            input:'',
+            output:'§',
+            spans:[span],
+            interactiveSpans:[],
+            paragraphs:[paragraph],
+            styles:[''=>defaultStyle],
+            paragraphStyles:[''=>defaultParagraphStyle],
+            recycledSpans:[],
+            recycledParagraphs:[],
+            spansByStyleName:[''=>[span]],
+        };
     }
 
-    public static inline function parse(input:String, styles:Map<String, Style> = null, startMouseID:Int = 0, recycledSpans:Array<Span> = null):ParsedOutput {
+    public static inline function parse(
+        input:String, 
+        styles:Map<String, Style> = null, 
+        paragraphStyles:Map<String, ParagraphStyle> = null, 
+        startMouseID:Int = 0, 
+        recycledSpans:Array<Span> = null,
+        recycledParagraphs:Array<Paragraph> = null
+    ):ParsedOutput {
+
         var newStyles:Array<Style> = [];
+        var newParagraphStyles:Array<ParagraphStyle> = [];
         var spans:Array<Span> = [];
         var interactiveSpans:Array<Span> = [null];
+        var paragraphs:Array<Paragraph> = [];
         var currentMouseID:Int = startMouseID + 1;
         var spansByStyleName:Map<String, Array<Span>> = new Map();
+        var paragraphsByParagraphStyleName:Map<String, Array<Paragraph>> = new Map();
 
         if (styles == null) styles = [''=>defaultStyle];
         for (style in styles) spansByStyleName[style.name] = [];
         if (recycledSpans == null) recycledSpans = [];
 
+        if (paragraphStyles == null) paragraphStyles = [''=>defaultParagraphStyle];
+        for (paragraphStyle in paragraphStyles) paragraphsByParagraphStyleName[paragraphStyle.name] = [];
+        if (recycledParagraphs == null) recycledParagraphs = [];
+
         var initSpan:Span = getSpan(recycledSpans, defaultStyle, startMouseID);
         spans.push(initSpan);
         spansByStyleName[''].push(initSpan);
+
+        var initParagraph:Paragraph = getParagraph(recycledParagraphs, defaultParagraphStyle);
+        paragraphs.push(initParagraph);
+        paragraphsByParagraphStyleName[''].push(initParagraph);
 
         var left:String = '';
         var right:String = input;
         while (right.length > 0) {
             var startIndex:Int = -1;
             var styleType:Class<Style> = null;
+            var isParagraphStyle:Bool = false;
 
             // Find the next sigil
 
-            for (sigil in [STYLE, ANIMATED_STYLE, BUTTON_STYLE]) {
+            for (sigil in [STYLE, ANIMATED_STYLE, BUTTON_STYLE, PARAGRAPH_STYLE]) {
                 var index:Int = right.indexOf(sigil);
                 if (index != -1 && (startIndex == -1 || startIndex > index)) {
                     startIndex = index;
                     styleType = styleTypes[sigil];
+                    isParagraphStyle = sigil == PARAGRAPH_STYLE;
                 }
             }
 
@@ -68,35 +102,56 @@ class Parser {
 
                     var tag:Dynamic = guts.indexOf(':') == -1 ? {name:guts} : parseTag(guts);
 
-                    var style:Style = getStyle(styleType, tag, styles);
-                    if (style != defaultStyle && styles[style.name] == null) {
-                        styles[style.name] = style;
-                        spansByStyleName[style.name] = [];
-                        newStyles.push(style);
-                    }
-
-                    right = right.substr(endIndex, right.length);
-                    right = Utf8.sub(right, 1, Utf8.length(right));
-
-                    var skipSpan:Bool = false;
-                    for (sigil in [STYLE, ANIMATED_STYLE, BUTTON_STYLE]) {
-                        if (right.indexOf(sigil) == 0) {
-                            skipSpan = true;
-                            break;
-                        }
-                    }
-
-                    if (!skipSpan) {
-                        var span:Span = getSpan(recycledSpans, style, style.isInteractive ? currentMouseID : startMouseID, tag.id);
-                        spans.push(span);
-                        spansByStyleName[style.name].push(span);
-
-                        if (style.isInteractive) {
-                            interactiveSpans.push(span);
-                            currentMouseID++;
+                    if (isParagraphStyle) {
+                        var paragraphStyle:ParagraphStyle = getParagraphStyle(tag, paragraphStyles);
+                        if (paragraphStyle != defaultParagraphStyle && paragraphStyles[paragraphStyle.name] == null) {
+                            paragraphStyles[paragraphStyle.name] = paragraphStyle;
+                            paragraphsByParagraphStyleName[paragraphStyle.name] = [];
+                            newParagraphStyles.push(paragraphStyle);
                         }
 
-                        left = left + STYLE;
+                        right = right.substr(endIndex, right.length);
+                        right = Utf8.sub(right, 1, Utf8.length(right));
+
+                        if (right.indexOf(PARAGRAPH_STYLE) != 0) {
+                            var paragraph:Paragraph = getParagraph(recycledParagraphs, paragraphStyle, tag.id);
+                            paragraphs.push(paragraph);
+                            paragraphsByParagraphStyleName[paragraphStyle.name].push(paragraph);
+
+                            left = left + PARAGRAPH_STYLE;
+                        }
+
+                    } else {
+                        var style:Style = getStyle(styleType, tag, styles);
+                        if (style != defaultStyle && styles[style.name] == null) {
+                            styles[style.name] = style;
+                            spansByStyleName[style.name] = [];
+                            newStyles.push(style);
+                        }
+
+                        right = right.substr(endIndex, right.length);
+                        right = Utf8.sub(right, 1, Utf8.length(right));
+
+                        var skipSpan:Bool = false;
+                        for (sigil in [STYLE, ANIMATED_STYLE, BUTTON_STYLE]) {
+                            if (right.indexOf(sigil) == 0) {
+                                skipSpan = true;
+                                break;
+                            }
+                        }
+
+                        if (!skipSpan) {
+                            var span:Span = getSpan(recycledSpans, style, style.isInteractive ? currentMouseID : startMouseID, tag.id);
+                            spans.push(span);
+                            spansByStyleName[style.name].push(span);
+
+                            if (style.isInteractive) {
+                                interactiveSpans.push(span);
+                                currentMouseID++;
+                            }
+
+                            left = left + STYLE;
+                        }
                     }
                 }
             } else {
@@ -140,9 +195,12 @@ class Parser {
             input:input,
             output:left + right,
             styles:styles,
+            paragraphStyles:paragraphStyles,
             spans:spans,
             interactiveSpans:interactiveSpans,
+            paragraphs:paragraphs,
             recycledSpans:recycledSpans,
+            recycledParagraphs:recycledParagraphs,
             spansByStyleName:spansByStyleName
         };
     }
@@ -154,6 +212,13 @@ class Parser {
         return style;
     }
 
+    inline static function getParagraphStyle(tag:Dynamic, paragraphStyles:Map<String, ParagraphStyle>):ParagraphStyle {
+        if (tag.name == null) throw 'Paragraph style declaration must include name, hombre: ( $tag )';
+        var paragraphStyle:ParagraphStyle = paragraphStyles[cast tag.name];
+        if (paragraphStyle == null) paragraphStyle = new ParagraphStyle(tag);
+        return paragraphStyle;
+    }
+
     inline static function getSpan(recycledSpans:Array<Span> = null, style:Style = null, mouseID:Int = 0, id:String = null):Span {
         var span:Span = (recycledSpans == null ? null : recycledSpans.pop());
         if (span == null) span = new Span();
@@ -163,10 +228,23 @@ class Parser {
         return span;
     }
 
+    inline static function getParagraph(recycledParagraphs:Array<Paragraph> = null, paragraphStyle:ParagraphStyle = null, id:String = null):Paragraph {
+        var paragraph:Paragraph = (recycledParagraphs == null ? null : recycledParagraphs.pop());
+        if (paragraph == null) paragraph = new Paragraph();
+        if (paragraphStyle == null) paragraphStyle = defaultParagraphStyle;
+        else paragraph.reset();
+        paragraph.init(paragraphStyle, id);
+        return paragraph;
+    }
+
     inline static function makeDefaultStyle():Style {
         var style:Style = new Style(defaultStyleTag());
         style.flatten();
         return style;
+    }
+
+    inline static function makeDefaultParagraphStyle():ParagraphStyle {
+        return new ParagraphStyle(defaultParagraphStyleTag());
     }
 
     inline static function parseTag(input:String):Dynamic {
@@ -236,4 +314,5 @@ class Parser {
     }
 
     inline static function defaultStyleTag():Dynamic return {name:'', r:1, g:1, b:1, i:0, f:0.5, s:1, p:0};
+    inline static function defaultParagraphStyleTag():Dynamic return {name:'', align:'left'};
 }

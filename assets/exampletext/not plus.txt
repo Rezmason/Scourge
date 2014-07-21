@@ -1,98 +1,98 @@
-RM: When will Haxe have => ?
-RM: Like, by default?
+¶{name:RM, align:left}¶{name:MS, align:right}§{name:RM, r:1, g:0.2, b:0.2}§{name:MS, r:0.2, g:0.2, b:1}§{}¶{}
+¶{RM}§{RM}When will Haxe have => ?
+¶{RM}§{RM}Like, by default?
 
-MS: Doubt it will ever have =>
-MS: NC is very resistant
+¶{MS}§{MS}Doubt it will ever have =>
+¶{MS}§{MS}NC is very resistant
 
-RM: What about !+ ?
+¶{RM}§{RM}What about !+ ?
 
-MS: What the fuck is !+
+¶{MS}§{MS}What the fuck is !+
 
-RM: Booleancrement.
+¶{RM}§{RM}Booleancrement.
 
-MS: I have never in my life heard of that
-MS: !+true //false?
-MS: Oh
-MS: wait
-MS: 10 !+ true //11?
+¶{MS}§{MS}I have never in my life heard of that
+¶{MS}§{MS}!+true //false?
+¶{MS}§{MS}Oh
+¶{MS}§{MS}wait
+¶{MS}§{MS}10 !+ true //11?
 
-RM: No, trace(!+false); // not 11
+¶{RM}§{RM}No, trace(!+false); // not 11
 
-MS: .. what?
-MS: that makes no sense at all
+¶{MS}§{MS}.. what?
+¶{MS}§{MS}that makes no sense at all
 
-RM: What do you mean?
+¶{RM}§{RM}What do you mean?
 
-MS: Give a real world example
+¶{MS}§{MS}Give a real world example
 
-RM: var n:Booleint = !+false;
+¶{RM}§{RM}var n:Booleint = !+false;
     trace(n != 11); // true
-RM: It's not eleven.
-RM: What's ambiguous about that?
+¶{RM}§{RM}It's not eleven.
+¶{RM}§{RM}What's ambiguous about that?
 
-MS: That has absolutely no use case at all
-MS: Zero
+¶{MS}§{MS}That has absolutely no use case at all
+¶{MS}§{MS}Zero
 
-RM: :-/
-RM: Last time I checked, there's roughly 2^32 - 1 integers that aren't eleven.
-RM: AS3 already has this built in. if (val) expands to whether or not val == 0.
+¶{RM}§{RM}:-/
+¶{RM}§{RM}Last time I checked, there's roughly 2^32 - 1 integers that aren't eleven.
+¶{RM}§{RM}AS3 already has this built in. if (val) expands to whether or not val == 0.
 
-MS: Haxe does not do that on purpose
+¶{MS}§{MS}Haxe does not do that on purpose
 
-RM: Right, because it needs Booleints.
+¶{RM}§{RM}Right, because it needs Booleints.
 
-MS: No it doesn't
-MS: if statements must always evaluate to a bool in haxe
+¶{MS}§{MS}No it doesn't
+¶{MS}§{MS}if statements must always evaluate to a bool in haxe
 
-RM: Look.
+¶{RM}§{RM}Look.
 
-MS: For === safety
+¶{MS}§{MS}For === safety
 
-RM: What's the size of a Boolean?
-RM: It's one bit, right? Optimally?
+¶{RM}§{RM}What's the size of a Boolean?
+¶{RM}§{RM}It's one bit, right? Optimally?
 
-MS: No
-MS: It's one byte
+¶{MS}§{MS}No
+¶{MS}§{MS}It's one byte
 
-RM: Fine.
+¶{RM}§{RM}Fine.
 
-MS: at least for as3 afaik
+¶{MS}§{MS}at least for as3 afaik
 
-RM: Now, if you have an integer,
-RM: and it *isn't eleven,*
-RM: wouldn't you benefit from storing an Int in a single byte?
+¶{RM}§{RM}Now, if you have an integer,
+¶{RM}§{RM}and it *isn't eleven,*
+¶{RM}§{RM}wouldn't you benefit from storing an Int in a single byte?
 
-MS: Are  you talking about a whole number, or an int
-MS: an int is a whole number of a certain number of bits
-MS: int is most commonly associated with 32 bits
+¶{MS}§{MS}Are  you talking about a whole number, or an int
+¶{MS}§{MS}an int is a whole number of a certain number of bits
+¶{MS}§{MS}int is most commonly associated with 32 bits
 
-RM: Right, but most of those bits represent which number the value *is*.
-RM: How about the ones that represent which number it *isn't*?
+¶{RM}§{RM}Right, but most of those bits represent which number the value *is*.
+¶{RM}§{RM}How about the ones that represent which number it *isn't*?
 
-MS: Yes.. not all the bits are set, I have no clue where you're going with this
+¶{MS}§{MS}Yes.. not all the bits are set, I have no clue where you're going with this
 
-RM: Off the deep end.
-RM: I'm just joshing you, dude. (rofl)
+¶{RM}§{RM}Off the deep end.
+¶{RM}§{RM}I'm just joshing you, dude. (rofl)
 
-MS: I can never tell if you're being serious
+¶{MS}§{MS}I can never tell if you're being serious
 
-RM: It's a typo of != and I do it all the time.
+¶{RM}§{RM}It's a typo of != and I do it all the time.
 
-MS: I need to drink.. a lot now
+¶{MS}§{MS}I need to drink.. a lot now
 
-RM: How much?
-RM: Not eleven?
-RM: In a similar vein, Jon Kisor and I are going to do a spike sooner or later during which we'll investigate puns, write a formal description of "pun" and apply the concept to programming.
+¶{RM}§{RM}How much?
+¶{RM}§{RM}Not eleven?
 
-MS: I'm never talking to you again
-MS: My mind can't take it anymore
+¶{MS}§{MS}I'm never talking to you again
+¶{MS}§{MS}My mind can't take it anymore
 
-RM: I believe that that is impossible.
-RM: Or an amazing achievement.
+¶{RM}§{RM}I believe that that is impossible.
+¶{RM}§{RM}Or an amazing achievement.
 
-MS: I can't fucking believe I just got trolled
+¶{MS}§{MS}I can't fucking believe I just got trolled
 
-RM: :D Booleancrement!
-RM: Hey, have you heard of the xx operator?
-RM: trace(val xx); // poop
-RM: It's called excrement.
+¶{RM}§{RM}:D Booleancrement!
+¶{RM}§{RM}Hey, have you heard of the xx operator?
+¶{RM}§{RM}trace(val xx); // poop
+¶{RM}§{RM}It's called excrement.

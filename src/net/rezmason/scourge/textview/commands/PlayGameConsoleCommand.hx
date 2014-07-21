@@ -10,12 +10,12 @@ using Lambda;
 
 class PlayGameConsoleCommand extends ConsoleCommand {
     
-    var displaySystem:DisplaySystem;
+    var showBody:String->Void;
     var gameSystem:GameSystem;
 
-    public function new(displaySystem:DisplaySystem, gameSystem:GameSystem):Void {
+    public function new(showBody:String->Void, gameSystem:GameSystem):Void {
         super();
-        this.displaySystem = displaySystem;
+        this.showBody = showBody;
         this.gameSystem = gameSystem;
         name = 'play';
 
@@ -85,7 +85,7 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         cfg.maxSkips = 0;
 
         gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animateMils, isReplay, seed);
-        displaySystem.showBody('board', 'main');
+        showBody('board');
 
         message = 'Starting $numPlayers-player game with seed $seed.';
         outputSignal.dispatch(message, true);

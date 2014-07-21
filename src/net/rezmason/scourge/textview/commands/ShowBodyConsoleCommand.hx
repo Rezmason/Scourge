@@ -4,24 +4,25 @@ import openfl.Assets.*;
 import net.rezmason.scourge.textview.console.ConsoleCommand;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
-import net.rezmason.scourge.DisplaySystem;
 
 class ShowBodyConsoleCommand extends ConsoleCommand {
 
-    var displaySystem:DisplaySystem;
+    var hasBody:String->Bool;
+    var showBody:String->Void;
 
-    public function new(displaySystem:DisplaySystem):Void {
+    public function new(hasBody:String->Bool, showBody:String->Void):Void {
         super();
         name = 'show';
-        this.displaySystem = displaySystem;
+        this.hasBody = hasBody;
+        this.showBody = showBody;
     }
 
     override public function execute(args:ConsoleCommandArgs):Void {
         var bodyName:String = args.tail;
         var message:String = null;
-        if (displaySystem.hasBody(bodyName)) {
+        if (hasBody(bodyName)) {
             message = 'Showing $bodyName';
-            displaySystem.showBody(bodyName, 'main');
+            showBody(bodyName);
         } else {
             message = styleError('Body "$bodyName" not found.');
         }

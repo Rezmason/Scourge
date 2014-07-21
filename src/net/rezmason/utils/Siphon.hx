@@ -43,18 +43,18 @@ class Siphon {
         return macro [$a{exprs}];
     }
 
-    static function getSubdirectories(root:String):Array<String> {
-        var dirPaths:Array<String> = [root];
-        var itr:Int = 0;
-        while (itr < dirPaths.length) {
-            /*
-            for (path in FileSystem.readDirectory(dirPaths[itr])) {
-                var fullPath:String = '${dirPaths[itr]}$path';
-                if (FileSystem.isDirectory(fullPath)) dirPaths.push('$fullPath/');
+    #if macro
+        static inline function getSubdirectories(root:String):Array<String> {
+            var dirPaths:Array<String> = [root];
+            var itr:Int = 0;
+            while (itr < dirPaths.length) {
+                for (path in FileSystem.readDirectory(dirPaths[itr])) {
+                    var fullPath:String = '${dirPaths[itr]}$path';
+                    if (FileSystem.isDirectory(fullPath)) dirPaths.push('$fullPath/');
+                }
+                itr++;
             }
-            */
-            itr++;
+            return dirPaths;
         }
-        return dirPaths;
-    }
+    #end
 }

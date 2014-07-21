@@ -2,12 +2,14 @@ package net.rezmason.scourge.textview.ui;
 
 import haxe.Utf8;
 
-import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Glyph;
+import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.*;
-import net.rezmason.utils.display.FlatFont;
+import net.rezmason.scourge.textview.text.ParagraphAlign;
+import net.rezmason.scourge.textview.text.Sigil.*;
 import net.rezmason.utils.Utf8Utils.*;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.display.FlatFont;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -65,11 +67,13 @@ class UIMediator {
             for (index in 0...length(line)) {
                 var charCode:Int = Utf8.charCodeAt(line, index);
                 switch (charCode) {
-                    case Sigil.STYLE_CODE:
+                    case STYLE_CODE:
                         spanIndex++;
                         currentSpan = compositeDoc.getSpanByIndex(spanIndex);
-                    case Sigil.CARET_CODE:
+                    case CARET_CODE:
                         caretGlyphID = id;
+                    case PARAGRAPH_STYLE_CODE:
+                        // nada
                     case _:
                         var glyph:Glyph = glyphs[id];
                         glyph.set_char(charCode, font);
@@ -101,17 +105,22 @@ class UIMediator {
 
                 // Add blank lines to the end, to reach the minimum page length (numRows)
 
-                var blankParagraph:String = rpad('', ' ', numCols);
+                var blankLine:String = rpad('', ' ', numCols);
                 pageLength = page.length;
-                while (page.length < numRows) page.push(blankParagraph);
+                while (page.length < numRows) page.push(blankLine);
 
                 // Count the sigils in each line, for style lookup
 
                 var lineStyleIndex:Int = 0;
                 lineStyleIndices = [lineStyleIndex];
-                for (line in page) {
-                    lineStyleIndex += line.split(Sigil.STYLE).length - 1;
+                var lineParagraphIndex:Int = 0;
+                for (ike in 0...page.length) {
+                    var line = page[ike];
+                    lineStyleIndex += line.split(STYLE).length - 1;
                     lineStyleIndices.push(lineStyleIndex);
+
+                    lineParagraphIndex += line.split(PARAGRAPH_STYLE).length - 1;
+                    page[ike] = padLineWithParagraph(line, compositeDoc.getParagraphByIndex(lineParagraphIndex));
                 }
             }
         }
@@ -130,17 +139,24 @@ class UIMediator {
         compositeDoc.setText(swapTabsWithSpaces(mainText));
     }
 
-    inline function padLine(line:String):String {
+    inline function padLineWithParagraph(line:String, paragraph:Paragraph):String {
         var count:Int = 0;
 
         function check(char:Int):Void {
-           if (char == Sigil.STYLE_CODE || char == Sigil.CARET_CODE) count++;
+           if (char == STYLE_CODE || char == CARET_CODE || char == PARAGRAPH_STYLE_CODE) count++;
         }
 
         Utf8.iter(line, check);
 
         // Pads a string until its length, ignoring sigils, is numCols
-        return rpad(line, ' ', numCols + count);
+
+        switch (paragraph.style.align) {
+            case ALIGN_LEFT: line = rpad(line, ' ', numCols + count);
+            case ALIGN_RIGHT: line = lpad(line, ' ', numCols + count);
+            case ALIGN_CENTER: line = cpad(line, ' ', numCols + count);
+        }
+
+        return line;
     }
 
     inline function wrapLines(s:String):String {
@@ -161,7 +177,7 @@ class UIMediator {
 
         while (index < len) {
             var char:Int = charCodes[index];
-            if (char != Sigil.STYLE_CODE && char != Sigil.CARET_CODE) {
+            if (char != STYLE_CODE && char != CARET_CODE && char != PARAGRAPH_STYLE_CODE) {
                 count++;
                 countFromLastSpaceIndex++;
                 if (char == spaceChar) {
@@ -187,8 +203,6 @@ class UIMediator {
         if (wrappedLines.length == 0 || count > 0) {
             wrappedLines.push(sub(s, lastIndex, index - lastIndex));
         }
-
-        wrappedLines = wrappedLines.map(padLine);
 
         return wrappedLines.join(LINE_TOKEN);
     }

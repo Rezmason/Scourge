@@ -3,11 +3,31 @@ package net.rezmason.utils;
 import haxe.Utf8;
 
 class Utf8Utils {
+    public inline static function lpad(input:String, pad:String, len:Int):String {
+        len = len - length(input);
+        var str:String = '';
+        while (length(str) < len) str = str + pad;
+        return str + input;
+    }
+
     public inline static function rpad(input:String, pad:String, len:Int):String {
         len = len - length(input);
         var str:String = '';
-        while (str.length < len) str = str + pad;
+        while (length(str) < len) str = str + pad;
         return input + str;
+    }
+
+    public inline static function cpad(input:String, pad:String, len:Int):String {
+        len = len - length(input);
+        var itr:Int = 0;
+        var leftStr:String = '';
+        var rightStr:String = '';
+        while (length(leftStr) + length(rightStr) < len) {
+            if (itr % 2 == 0) rightStr = rightStr + pad;
+            else leftStr = leftStr + pad;
+            itr++;
+        }
+        return leftStr + input + rightStr;
     }
 
     public inline static function sub(input:String, pos:Int, len:Int = -1):String {

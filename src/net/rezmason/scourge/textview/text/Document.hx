@@ -9,8 +9,11 @@ abstract Document(ParsedOutput) {
 
     public inline function new():Void clear();
     public inline function clear():Void this = Parser.makeEmptyOutput();
-    public inline function loadStyles(input:String):Void Parser.parse(input, this.styles, 0);
+    public inline function loadStyles(input:String):Void {
+        Parser.parse(input, this.styles, this.paragraphStyles, 0);
+    }
     public inline function getSpanByIndex(index:Int):Span return this.spans[index];
+    public inline function getParagraphByIndex(index:Int):Paragraph return this.paragraphs[index];
     public inline function getSpanByMouseID(id:Int):Span return this.interactiveSpans[id];
     public inline function getStyleByName(name:String):Style return this.styles[name];
     public inline function removeAllGlyphs():Void  for (span in this.spans) span.removeAllGlyphs();
@@ -28,10 +31,26 @@ abstract Document(ParsedOutput) {
             this.styles = that.styles;
         }
 
+        // share paragraph styles
+        if (this.paragraphStyles != that.paragraphStyles) {
+            for (paragraphStyle in this.paragraphStyles) {
+                if (that.paragraphStyles[paragraphStyle.name] == null) {
+                    that.paragraphStyles[paragraphStyle.name] = paragraphStyle;
+                }
+            }
+            this.paragraphStyles = that.paragraphStyles;
+        }
+
         // share recycled spans
         if (this.recycledSpans != that.recycledSpans) {
             for (span in this.recycledSpans) that.recycledSpans.push(span);
             this.recycledSpans = that.recycledSpans;
+        }
+
+        // share recycled paragraphs
+        if (this.recycledParagraphs != that.recycledParagraphs) {
+            for (paragraph in this.recycledParagraphs) that.recycledParagraphs.push(paragraph);
+            this.recycledParagraphs = that.recycledParagraphs;
         }
     }
 
@@ -60,19 +79,25 @@ abstract Document(ParsedOutput) {
             this.spansByStyleName[copy.style.name].push(copy);
             spans.push(copy);
         }
-
         spans.shift();
-
         for (ike in 0...interactiveSpans.length) interactiveSpans[ike].setMouseID(this.interactiveSpans.length + ike);
 
-        this.spans = this.spans.concat(spans);
+        var paragraphs:Array<Paragraph> = [];
+        for (paragraph in that.paragraphs) {
+            var copy:Paragraph = paragraph.copyTo(this.recycledParagraphs.pop());
+            paragraphs.push(copy);
+        }
+        paragraphs.shift();
 
+        this.spans = this.spans.concat(spans);
         this.interactiveSpans = this.interactiveSpans.concat(interactiveSpans);
+        this.paragraphs = this.paragraphs.concat(paragraphs);
     }
 
     public inline function setText(input:String):Void {
         for (span in this.spans) this.recycledSpans.push(span);
-        this = Parser.parse(input, this.styles, 0, this.recycledSpans);
+        for (paragraph in this.paragraphs) this.recycledParagraphs.push(paragraph);
+        this = Parser.parse(input, this.styles, this.paragraphStyles, 0, this.recycledSpans, this.recycledParagraphs);
     }
 
     inline function guts():ParsedOutput return this;
