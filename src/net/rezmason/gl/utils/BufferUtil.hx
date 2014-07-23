@@ -5,9 +5,9 @@ import net.rezmason.gl.utils.Util;
 
 class BufferUtil extends Util {
 
-    public inline function createVertexBuffer(numVertices:Int, footprint:Int):VertexBuffer {
-        #if flash return context.createVertexBuffer(numVertices, footprint);
-        #else return new VertexBuffer(numVertices, footprint);
+    public inline function createVertexBuffer(numVertices:Int, footprint:Int #if !flash , ?usage:BufferUsage #end):VertexBuffer {
+        #if flash return context.createVertexBuffer(numVertices, footprint/*, usage*/);
+        #else return new VertexBuffer(numVertices, footprint, usage);
         #end
     }
 

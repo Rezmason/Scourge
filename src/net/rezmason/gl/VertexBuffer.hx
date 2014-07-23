@@ -13,10 +13,13 @@ package net.rezmason.gl;
         public var footprint(default, null):Int;
         public var numVertices(default, null):Int;
         var array:VertexArray;
+        var usage:BufferUsage;
 
-        public function new(numVertices:Int, footprint:Int):Void {
+        public function new(numVertices:Int, footprint:Int, ?usage:BufferUsage):Void {
             this.footprint = footprint;
             this.numVertices = numVertices;
+            if (usage == null) usage = BufferUsage.STATIC_DRAW;
+            this.usage = usage;
             buf = GL.createBuffer();
             array = new VertexArray(footprint * numVertices);
         }
@@ -37,7 +40,7 @@ package net.rezmason.gl;
                 #end
 
                 GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-                GL.bufferData(GL.ARRAY_BUFFER, array, GL.STATIC_DRAW);
+                GL.bufferData(GL.ARRAY_BUFFER, array, usage);
             }
         }
 
