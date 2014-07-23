@@ -30,6 +30,56 @@ class Utf8Utils {
         return leftStr + input + rightStr;
     }
 
+    public inline static function jpad(input:String, pad:String, len:Int, secondary):String {
+
+        input = trim(input, pad);
+
+        var output:String = '';
+        var delta:Int = len - length(input);
+
+        if (delta == len) {
+            output = rpad(input, pad, len);
+        } else if (delta > 0) {
+            var pieces:Array<String> = [];
+            var spaceCode:Int = ' '.charCodeAt(0);
+            var lastCode:Int = 0;
+            var start:Int = 0;
+            var end:Int = 0;
+            var reachedNonSpace:Bool = false;
+            Utf8.iter(input, function(code:Int) {
+                if (lastCode == spaceCode && code != spaceCode) {
+                    if (reachedNonSpace) pieces.push(sub(input, start, end - start));
+                    start = end;
+                }
+                if (code != spaceCode) reachedNonSpace = true;
+                lastCode = code;
+                end++;
+            });
+            if (start < end) pieces.push(sub(input, start, end - start));
+            var lastPiece:String = pieces.pop();
+            var numPieces:Int = pieces.length;
+
+            if (numPieces > 0) {
+                var itr:Int = 0;
+                for (ike in 0...delta) {
+                    var index:Int = Std.int((numPieces - itr * (itr % 2 * 2 - 1) - numPieces % 2) / 2);
+                    pieces[index] = pieces[index] + pad;
+                    itr = (itr + 1) % numPieces;
+                }
+
+                for (piece in pieces) output = output + piece;
+            }
+
+            output = output + lastPiece;
+
+            if (length(output) != len) output = secondary(output, pad, len);
+        } else {
+            output = input;
+        }
+
+        return output;
+    }
+
     public inline static function sub(input:String, pos:Int, len:Int = -1):String {
         var output:String = '';
         if (len == -1) len = length(input);
@@ -53,12 +103,12 @@ class Utf8Utils {
     }
 
     public inline static function ltrim(input:String, char:String = ' '):String {
-        while (charAt(input, 0) == char) input = sub(input, 1);
+        if (length(input) > 0) while (charAt(input, 0) == char) input = sub(input, 1);
         return input;
     }
 
     public inline static function rtrim(input:String, char:String = ' '):String {
-        while (charAt(input, length(input) - 1) == char) input = sub(input, 0, length(input) - 1);
+        if (length(input) > 0) while (charAt(input, length(input) - 1) == char) input = sub(input, 0, length(input) - 1);
         return input;
     }
 }

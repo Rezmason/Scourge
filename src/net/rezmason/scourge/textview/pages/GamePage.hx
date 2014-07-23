@@ -64,7 +64,7 @@ class GamePage extends NavPage {
             showBodyByName(bodyName);
             message = 'Showing $bodyName.';
         } else {
-            message = ConsoleUtils.styleError('Body "$bodyName" not found.');
+            message = ConsoleUtils.styleError('"$bodyName" not found.');
         }
         outputSignal.dispatch(message, true);
     }
@@ -72,7 +72,7 @@ class GamePage extends NavPage {
     function hasBodyByName(name:String):Bool return bodiesByName[name] != null;
 
     function showBodyByName(name:String):Void {
-        if (currentBodyName != null && currentBodyName != name) bodies.remove(bodiesByName[currentBodyName]);
+        if (currentBodyName != null) bodies.remove(bodiesByName[currentBodyName]);
         currentBodyName = name;
         bodies.push(bodiesByName[currentBodyName]);
         updateViewSignal.dispatch();

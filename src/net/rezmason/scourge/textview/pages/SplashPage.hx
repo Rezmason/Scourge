@@ -10,6 +10,8 @@ import net.rezmason.scourge.textview.ui.UIMediator;
 
 class SplashPage extends NavPage {
 
+    inline static var h:String = Strings.HARD_SPACE;
+
     inline static var BUTTON_STYLE:String = 
     '§{name:splashUp,   p: 0.00, f:0.5, r:0.7, g:0.7, b:0.7}' +
     '§{name:splashOver, p:-0.01, f:0.6, r:0.9, g:0.9, b:0.9}' +
@@ -49,7 +51,7 @@ class SplashPage extends NavPage {
     public function makeButton(text:String, cbk:Void->Void):String {
         var id:String = 'button_' + text;
         uiMed.mouseSignal.add(function(str, type) if (str == id && type == CLICK) cbk());
-        return 'µ{name:splashButton, id:$id}   $text   §{}';
+        return 'µ{name:splashButton, id:$id}$h$h$h$text$h$h$h§{}';
     }
 
     private function playGame():Void {

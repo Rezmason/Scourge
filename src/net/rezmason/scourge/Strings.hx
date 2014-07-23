@@ -1,5 +1,7 @@
 package net.rezmason.scourge;
 
+using net.rezmason.utils.CharCode;
+
 class Strings {
 
     public inline static var SPLASH:String =
@@ -33,4 +35,10 @@ class Strings {
     public inline static var BOX_SYMBOLS:String = ' ╵╶╰╷│╭├╴╯─┴╮┤┬┼';
     public inline static var BODY_GLYPHS:String = ' пгчцълкпрншьэм!';
     public inline static var PUNCTUATION:String = '\'\"?!.,;:-~/\\`|&';
+
+    public inline static var SPACE:String = ' ';
+    public inline static var SPACE_CODE:Int = SPACE.code();
+
+    public inline static var HARD_SPACE:String = ' ';
+    public inline static var HARD_SPACE_CODE:Int = HARD_SPACE.code();
 }

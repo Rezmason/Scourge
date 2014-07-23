@@ -35,6 +35,10 @@ class ParagraphStyle {
             'left' => ALIGN_LEFT,
             'center' => ALIGN_CENTER,
             'right' => ALIGN_RIGHT,
+            'justify' => ALIGN_JUSTIFY(ALIGN_LEFT),
+            'justify-left' => ALIGN_JUSTIFY(ALIGN_LEFT),
+            'justify-center' => ALIGN_JUSTIFY(ALIGN_CENTER),
+            'justify-right' => ALIGN_JUSTIFY(ALIGN_RIGHT),
         ];
     }
 }

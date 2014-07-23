@@ -76,6 +76,7 @@ class UIMediator {
                         // nada
                     case _:
                         var glyph:Glyph = glyphs[id];
+                        if (charCode == Strings.HARD_SPACE_CODE) charCode = Strings.SPACE_CODE;
                         glyph.set_char(charCode, font);
                         currentSpan.addGlyph(glyph);
                         glyph.set_z(0);
@@ -154,6 +155,14 @@ class UIMediator {
             case ALIGN_LEFT: line = rpad(line, ' ', numCols + count);
             case ALIGN_RIGHT: line = lpad(line, ' ', numCols + count);
             case ALIGN_CENTER: line = cpad(line, ' ', numCols + count);
+            case ALIGN_JUSTIFY(secondaryAlign): 
+                var secondary = rpad;
+                switch (secondaryAlign) {
+                    case ALIGN_RIGHT: secondary = lpad;
+                    case ALIGN_CENTER: secondary = cpad;
+                    case _:
+                }
+                line = jpad(line, ' ', numCols + count, secondary);
         }
 
         return line;
@@ -173,14 +182,13 @@ class UIMediator {
         var lastSpaceIndex:Int = -1;
         var countFromLastSpaceIndex:Int = 0;
         var len:Int = charCodes.length;
-        var spaceChar:Int = ' '.charCodeAt(0);
-
+        
         while (index < len) {
             var char:Int = charCodes[index];
             if (char != STYLE_CODE && char != CARET_CODE && char != PARAGRAPH_STYLE_CODE) {
                 count++;
                 countFromLastSpaceIndex++;
-                if (char == spaceChar) {
+                if (char == Strings.SPACE_CODE) {
                     lastSpaceIndex = index + 1;
                     countFromLastSpaceIndex = 0;
                 }
