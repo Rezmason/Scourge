@@ -121,7 +121,8 @@ class UIMediator {
                     lineStyleIndices.push(lineStyleIndex);
 
                     lineParagraphIndex += line.split(PARAGRAPH_STYLE).length - 1;
-                    page[ike] = padLineWithParagraph(line, compositeDoc.getParagraphByIndex(lineParagraphIndex));
+                    var isFinal:Bool = ike == page.length - 1 || lengthWithoutSigils(page[ike + 1]) == 0;
+                    page[ike] = padLineWithParagraph(line, compositeDoc.getParagraphByIndex(lineParagraphIndex), isFinal);
                 }
             }
         }
@@ -140,29 +141,36 @@ class UIMediator {
         compositeDoc.setText(swapTabsWithSpaces(mainText));
     }
 
-    inline function padLineWithParagraph(line:String, paragraph:Paragraph):String {
+    inline function lengthWithoutSigils(line:String):Int {
         var count:Int = 0;
-
         function check(char:Int):Void {
            if (char == STYLE_CODE || char == CARET_CODE || char == PARAGRAPH_STYLE_CODE) count++;
         }
-
         Utf8.iter(line, check);
+        return length(line) - count;
+    }
 
+    inline function padLineWithParagraph(line:String, paragraph:Paragraph, isFinal:Bool):String {
+
+        var numSigils:Int = length(line) - lengthWithoutSigils(line);
         // Pads a string until its length, ignoring sigils, is numCols
 
         switch (paragraph.style.align) {
-            case ALIGN_LEFT: line = rpad(line, ' ', numCols + count);
-            case ALIGN_RIGHT: line = lpad(line, ' ', numCols + count);
-            case ALIGN_CENTER: line = cpad(line, ' ', numCols + count);
+            case ALIGN_LEFT: line = rpad(line, ' ', numCols + numSigils);
+            case ALIGN_RIGHT: line = lpad(line, ' ', numCols + numSigils);
+            case ALIGN_CENTER: line = cpad(line, ' ', numCols + numSigils);
             case ALIGN_JUSTIFY(secondaryAlign): 
-                var secondary = rpad;
-                switch (secondaryAlign) {
-                    case ALIGN_RIGHT: secondary = lpad;
-                    case ALIGN_CENTER: secondary = cpad;
-                    case _:
+                if (isFinal) {
+                    var secondary = rpad;
+                    switch (secondaryAlign) {
+                        case ALIGN_RIGHT: secondary = lpad;
+                        case ALIGN_CENTER: secondary = cpad;
+                        case _:
+                    }
+                    line = secondary(line, ' ', numCols + numSigils);
+                } else {
+                    line = jpad(line, ' ', numCols + numSigils);
                 }
-                line = jpad(line, ' ', numCols + count, secondary);
         }
 
         return line;

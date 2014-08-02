@@ -30,7 +30,7 @@ class Utf8Utils {
         return leftStr + input + rightStr;
     }
 
-    public inline static function jpad(input:String, pad:String, len:Int, secondary):String {
+    public inline static function jpad(input:String, pad:String, len:Int):String {
 
         input = trim(input, pad);
 
@@ -71,8 +71,6 @@ class Utf8Utils {
             }
 
             output = output + lastPiece;
-
-            if (length(output) != len) output = secondary(output, pad, len);
         } else {
             output = input;
         }
