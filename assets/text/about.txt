@@ -1,0 +1,32 @@
+¶{name:c, align:center}¶{name:j, align:justify-left}¶{}§{name:header, r:2, g:2, b:2}§{}
+
+
+
+
+
+
+
+¶{c}§{header}Spectrally Controlled Organisms, Using Remote Gene Expression§{}
+
+
+     Daryl Agn           Lilly Tikka           Paul Donnvale    
+daryl@bio.misk.edu   ltikka@bio.misk.edu   pdonnv2@chem.misk.edu
+
+March 23, 19A7
+¶{}
+
+
+¶{c}§{header}Abstract§{}
+
+¶{j}Domestication of animals for use in industry and defense is conventionally limited to organisms of significant cellular differentiation. We present a method for efficiently sustaining a colony of extremophilic plasmodium of the genus Fuligo in a simulated lunar environment; for remotely seeding complex behaviors of individuals in said colony; and for causally associating environmental triggers with learned behavioral responses. The method builds on exciting discoveries from recent vertical genomic surveying expeditions to the Balleny archipelago.
+
+
+¶{c}§{header}Introduction§{}
+
+¶{j}Historically, the economic feasibility of employing animals to perform useful functions has depended on the animal's suitability for accomplishing a given task, the cost of keeping it alive, and the ability to modify its behavior. Beasts of burden played a pivotal role in humanity's transition from nomadic tribes to neolithic societies, as it freed people from menial labor, granting them the opportunity to better defend their territory. But domesticating other species wasn't feasible until Homo sapiens could exercise physical dominance over other megafauna, tame them and protect them from predators. The emerging field of biotechnology has the potential to transform humanity similarly; while our relationship with microorganisms is as ancient and nuanced as our relationship with animals, their size and structural simplicity present obstacles to the bona fide domestication of microbiota.
+
+A recent expedition to the Antarctic Circle discovered an unidentified organism that reacted strongly to their laser-guided geological surveying equipment. Genetic analysis of their samples reveal that what they witnessed was in fact two the interaction of two organisms- a novel, hardy species of the genus Fuligo, and an oddly uniform algal lattice upon which it was situated. 
+
+This hasn't exactly been written yet.
+
+http://abacus.bates.edu/~ganderso/biology/resources/writing/HTWsections.html

@@ -45,6 +45,7 @@ class Context {
         
         navSystem = new NavSystem(engine);
         navSystem.addPage(ScourgeNavPageAddresses.SPLASH, new SplashPage(utils.bufferUtil, fullTexture));
+        navSystem.addPage(ScourgeNavPageAddresses.ABOUT, new AboutPage(utils.bufferUtil, fullTexture));
         navSystem.addPage(ScourgeNavPageAddresses.GAME, new GamePage(utils.bufferUtil, fullTexture));
 
         navSystem.goto(Page(ScourgeNavPageAddresses.SPLASH));

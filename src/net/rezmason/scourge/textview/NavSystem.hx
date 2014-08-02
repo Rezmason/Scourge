@@ -7,12 +7,14 @@ import net.rezmason.utils.Zig;
 class NavSystem {
 
     var pages:Map<String, NavPage>;
+    var pageHistory:Array<NavPage>;
     var currentPage:NavPage;
     var currentBodies:Array<Body>;
     var engine:Engine;
 
     public function new(engine:Engine):Void {
         pages = new Map();
+        pageHistory = [];
         this.engine = engine;
     }
 
@@ -42,6 +44,7 @@ class NavSystem {
         switch (address) {
             case Page(id):
                 if (pages[id] != null) {
+                    pageHistory.push(currentPage);
                     currentPage = pages[id];
                     updateCurrentView();
                 }
@@ -49,6 +52,11 @@ class NavSystem {
                 #if (neko || cpp)
                     Sys.exit(0);
                 #end
+            case Back:
+                if (pageHistory.length > 0) {
+                    currentPage = pageHistory.pop();
+                    updateCurrentView();
+                }
             case _:
         }
     }
