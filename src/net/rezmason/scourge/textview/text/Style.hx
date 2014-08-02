@@ -18,7 +18,7 @@ class Style {
 
     static var easeLibrary:Map<String, Float->Float> = makeEaseLibrary();
 
-    static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 'f', 's', 'p'];
+    static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 'f', 'a', 'h', 's', 'p'];
 
     public function new(dec:Dynamic):Void {
         stateStyles = [];
@@ -45,13 +45,17 @@ class Style {
         var b:Float = basics[2];
         var i:Float = basics[3];
         var f:Float = basics[4];
-        var s:Float = basics[5];
-        var p:Float = basics[6];
+        var a:Float = basics[5];
+        var h:Float = basics[6];
+        var s:Float = basics[7];
+        var p:Float = basics[8];
 
         for (glyph in glyphs) {
             glyph.set_rgb(r, g, b);
             glyph.set_i(i);
             glyph.set_f(f);
+            glyph.set_a(a);
+            glyph.set_h(h);
             glyph.set_s(s);
             glyph.set_p(p);
         }
