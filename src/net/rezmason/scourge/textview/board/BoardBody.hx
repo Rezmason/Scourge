@@ -318,7 +318,7 @@ class BoardBody extends Body {
         var screenSize:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
         var rectSize:Float = Math.min(viewRect.width * stageWidth, viewRect.height * stageHeight) / screenSize;
 
-        var glyphWidth:Float = rectSize * 0.1 * boardScale;
+        var glyphWidth:Float = rectSize * 0.05 * boardScale;
         setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
 

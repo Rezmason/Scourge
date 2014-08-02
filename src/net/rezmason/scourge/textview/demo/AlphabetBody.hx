@@ -54,7 +54,7 @@ class AlphabetBody extends Body {
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
         super.adjustLayout(stageWidth, stageHeight);
-        setGlyphScale(0.05, 0.05 * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
+        setGlyphScale(0.025, 0.025 * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
 
         transform.identity();
         transform.appendScale(1, -1, 1);

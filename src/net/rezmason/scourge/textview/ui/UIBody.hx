@@ -196,8 +196,8 @@ class UIBody extends Body {
         if (croppedViewRect != null) {
             numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
             numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
+            setGlyphScale(croppedViewRect.width / numCols, croppedViewRect.height / (numRows - 1));
 
-            setGlyphScale(croppedViewRect.width / numCols * 2, croppedViewRect.height / (numRows - 1) * 2);
 
             growTo(numRows * numCols + 1);
 

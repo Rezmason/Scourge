@@ -111,7 +111,7 @@ class SplashBody extends Body {
 
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
         super.adjustLayout(stageWidth, stageHeight);
-        var glyphWidth:Float = viewRect.width * 0.03;
+        var glyphWidth:Float = viewRect.width * 0.015;
         setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
 
