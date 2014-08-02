@@ -225,7 +225,7 @@ class UIMediator {
 
     public function receiveInteraction(id:Int, interaction:Interaction):Void {
         switch (interaction) {
-            case MOUSE(type, x, y) if (id != 0):
+            case MOUSE(type, x, y) if (id > 0):
                 var targetSpan:Span = compositeDoc.getSpanByMouseID(id);
                 if (targetSpan != null) handleSpanMouseInteraction(targetSpan, type);
             case _:

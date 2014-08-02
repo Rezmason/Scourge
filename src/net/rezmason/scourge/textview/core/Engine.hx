@@ -1,6 +1,7 @@
 package net.rezmason.scourge.textview.core;
 
 import flash.display.Stage;
+import flash.geom.Rectangle;
 
 import haxe.Timer;
 
@@ -72,7 +73,7 @@ class Engine {
         readyCheck();
         if (bodiesByID[body.id] == null) {
             bodiesByID[body.id] = body;
-            body.redrawHitSignal.add(mouseSystem.invalidate);
+            body.redrawHitSignal.add(updateMouseSystem);
             body.adjustLayout(width, height);
         }
     }
@@ -81,7 +82,7 @@ class Engine {
         readyCheck();
         if (bodiesByID[body.id] == body) {
             bodiesByID.remove(body.id);
-            body.redrawHitSignal.remove(mouseSystem.invalidate);
+            body.redrawHitSignal.remove(updateMouseSystem);
         }
     }
 
@@ -192,40 +193,27 @@ class Engine {
         lastTimeStamp = timeStamp;
     }
 
+    function updateMouseSystem():Void {
+        var viewRectsByBodyID:Map<Int, Rectangle> = new Map();
+        for (body in bodiesByID) if (body.catchMouseInRect) viewRectsByBodyID[body.id] = body.viewRect;
+        mouseSystem.setRectRegions(viewRectsByBodyID);
+        mouseSystem.invalidate();
+    }
+
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();
 
-    function handleInteraction(source:InteractionSource, interaction:Interaction):Void {
+    function handleInteraction(bodyID:Null<Int>, glyphID:Null<Int>, interaction:Interaction):Void {
 
-        var bodyID:Int = source.bodyID;
-        var glyphID:Int = source.glyphID;
         var target:Body = bodiesByID[bodyID];
 
         switch (interaction) {
             case MOUSE(type, oX, oY):
-                if (target == null) {
-
-                    if (type == DROP && mouseDownTarget != null) {
-                        target = mouseDownTarget;
-                        mouseDownTarget = null;
-                    } else {
-                        for (body in bodiesByID) {
-                            if (!body.catchMouseInRect) continue;
-                            if (body.viewRect.contains(oX / stage.stageWidth, oY / stage.stageHeight)) {
-                                glyphID = -1;
-                                bodyID = body.id;
-                                target = body;
-                                if (type == MOUSE_DOWN) mouseDownTarget = body;
-                                break;
-                            }
-                        }
-                    }
-                }
-
                 if (type == CLICK) keyboardSystem.focusBodyID = bodyID;
 
                 if (target != null) {
-                    var nX:Float = (oX / stage.stageWidth  - target.viewRect.x) / target.viewRect.width;
-                    var nY:Float = (oY / stage.stageHeight - target.viewRect.y) / target.viewRect.height;
+                    var rect:Rectangle = target.viewRect;
+                    var nX:Float = (oX / stage.stageWidth  - rect.x) / rect.width;
+                    var nY:Float = (oY / stage.stageHeight - rect.y) / rect.height;
                     interaction = MOUSE(type, nX, nY);
                 }
 

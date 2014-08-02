@@ -8,7 +8,7 @@ import net.rezmason.utils.Zig;
 
 class KeyboardSystem {
 
-    public var interact(default, null):Zig<InteractionSource->Interaction->Void>;
+    public var interact(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
 
     #if (!flash && !js)
         var shiftKeyCount:Int;
@@ -18,7 +18,7 @@ class KeyboardSystem {
 
     var keysDown:Map<Int, Bool>;
     var stage:Stage;
-    public var focusBodyID:Int;
+    public var focusBodyID:Null<Int>;
 
     public function new(stage:Stage):Void {
         interact = new Zig();
@@ -26,7 +26,7 @@ class KeyboardSystem {
         this.stage = stage;
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
         stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-        focusBodyID = -1;
+        focusBodyID = null;
 
         #if (!flash && !js)
             shiftKeyCount = 0;
@@ -36,7 +36,7 @@ class KeyboardSystem {
     }
 
     public function detach():Void {
-        focusBodyID = -1;
+        focusBodyID = null;
 
         #if (!flash && !js)
             shiftKeyCount = 0;
@@ -96,7 +96,7 @@ class KeyboardSystem {
 
         // trace(keyCode, charCode, shiftKey, altKey, ctrlKey);
 
-        if (!ignore) interact.dispatch({bodyID:focusBodyID, glyphID:-1}, KEYBOARD(type, keyCode, charCode, shiftKey, altKey, ctrlKey));
+        if (!ignore) interact.dispatch(focusBodyID, null, KEYBOARD(type, keyCode, charCode, shiftKey, altKey, ctrlKey));
     }
 
 }

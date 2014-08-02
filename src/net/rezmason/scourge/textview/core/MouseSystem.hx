@@ -8,7 +8,6 @@ import flash.geom.Rectangle;
 import flash.geom.Matrix;
 import flash.utils.ByteArray;
 import flash.Vector;
-// import flash.external.ExternalInterface;
 
 import net.rezmason.gl.utils.DrawUtil;
 import net.rezmason.gl.OutputBuffer;
@@ -17,21 +16,28 @@ import net.rezmason.utils.Zig;
 
 import net.rezmason.scourge.textview.core.Interaction;
 
+typedef Hit = {
+    var bodyID:Null<Int>;
+    var glyphID:Null<Int>;
+}
+
 class MouseSystem {
 
-    inline static var NULL_ID:Int = -1;
+    static var NULL_HIT:Hit = {bodyID:null, glyphID:null};
 
     public var outputBuffer(default, null):OutputBuffer;
     // public var view(get, null):Sprite;
     public var invalid(default, null):Bool;
-    public var interact(default, null):Zig<InteractionSource->Interaction->Void>;
+    public var interact(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
     public var updateSignal(default, null):Zig<Void->Void>;
     var data:ReadbackData;
     var bitmapData:BitmapData;
+    var rectRegionsByID:Map<Int, Rectangle>;
+    var lastRectRegionID:Null<Int>;
     // var _view:MouseView;
 
-    var hoverRawID:Int;
-    var pressRawID:Int;
+    var hoverHit:Hit;
+    var pressHit:Hit;
     var lastMoveEvent:MouseEvent;
     var width:Int;
     var height:Int;
@@ -45,25 +51,20 @@ class MouseSystem {
         interact = new Zig();
         this.drawUtil = drawUtil;
         updateSignal = new Zig<Void->Void>();
+        rectRegionsByID = null;
+        lastRectRegionID = null;
 
         target.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
         target.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
         target.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-        //target.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 
-        hoverRawID = NULL_ID;
-        pressRawID = NULL_ID;
+        hoverHit = NULL_HIT;
+        pressHit = NULL_HIT;
 
         width = 0;
         height = 0;
         initialized = false;
         invalidate();
-
-        /*
-        #if flash
-            if (ExternalInterface.available) ExternalInterface.addCallback('externalMouseEvent', onExternalWheel);
-        #end
-        */
 
         outputBuffer = drawUtil.createOutputBuffer();
     }
@@ -83,11 +84,15 @@ class MouseSystem {
         }
     }
 
+    public function setRectRegions(rectRegionsByID:Map<Int, Rectangle>):Void {
+        this.rectRegionsByID = rectRegionsByID;
+    }
+
     public function invalidate():Void invalid = true;
 
-    function getRawID(x:Float, y:Float):Int {
+    function getHit(x:Float, y:Float):Hit {
 
-        if (data == null || data.length < cast width * height * 4) return NULL_ID;
+        if (data == null || data.length < cast width * height * 4) return NULL_HIT;
 
         if (x < 0) x = 0;
         if (x >= width) x = width - 1;
@@ -110,14 +115,35 @@ class MouseSystem {
                     if (col < 0 || col >= width) continue; // Skip edges
 
                     // Blurry edge test
-                    if (getRawIDFromIndex((row * width + col) * 4 + offset) != rawID) return NULL_ID;
+                    if (getRawIDFromIndex((row * width + col) * 4 + offset) != rawID) return NULL_HIT;
                 }
             }
         #end
 
+        var bodyID:Null<Int> = null;
+        var glyphID:Null<Int> = null;
+
+        if (rawID == 0xFFFFFF) {
+            if (lastRectRegionID != null && rectRegionsByID[lastRectRegionID].contains(x / width, y / height)) {
+                bodyID = lastRectRegionID;
+            } else {
+                for (id in rectRegionsByID.keys()) {
+                    if (rectRegionsByID[id].contains(x / width, y / height)) {
+                        bodyID = id;
+                        break;
+                    }
+                }
+            }
+            lastRectRegionID = bodyID;
+        } else {
+            lastRectRegionID = null;
+            bodyID = rawID >> 16 & 0xFF;
+            glyphID = rawID & 0xFFFF;
+        }
+
         // _view.update(x, y, rawID);
 
-        return rawID;
+        return {bodyID:bodyID, glyphID:glyphID};
     }
 
     inline function getRawIDFromIndex(index:Int):Int {
@@ -167,45 +193,36 @@ class MouseSystem {
             invalid = false;
         }
 
-        var rawID:Int = getRawID(event.stageX, event.stageY);
-        if (rawID == hoverRawID) {
-            sendInteraction(rawID, event, MOVE);
+        var hit:Hit = getHit(event.stageX, event.stageY);
+        if (hitsEqual(hit, hoverHit)) {
+            sendInteraction(hit, event, MOVE);
         } else {
-            sendInteraction(hoverRawID, event, EXIT);
-            hoverRawID = rawID;
-            sendInteraction(hoverRawID, event, ENTER);
+            sendInteraction(hoverHit, event, EXIT);
+            hoverHit = hit;
+            sendInteraction(hoverHit, event, ENTER);
         }
 
         lastMoveEvent = event;
     }
-    /*
-    function onMouseWheel(event:MouseEvent):Void {
-        sendInteraction(getRawID(event.stageX, event.stageY), event, WHEEL);
-    }
-
-    function onExternalWheel(delta:Float):Void {
-        if (lastMoveEvent != null) {
-            lastMoveEvent.delta = Std.int(delta);
-            onMouseWheel(lastMoveEvent);
-        }
-    }
-    */
+    
     function onMouseDown(event:MouseEvent):Void {
-        pressRawID = getRawID(event.stageX, event.stageY);
-        sendInteraction(pressRawID, event, MOUSE_DOWN);
+        pressHit = getHit(event.stageX, event.stageY);
+        sendInteraction(pressHit, event, MOUSE_DOWN);
     }
 
     function onMouseUp(event:MouseEvent):Void {
-        var rawID:Int = getRawID(event.stageX, event.stageY);
-        sendInteraction(rawID, event, MOUSE_UP);
-        sendInteraction(pressRawID, event, rawID == pressRawID ? CLICK : DROP);
-        pressRawID = NULL_ID;
+        var hit:Hit = getHit(event.stageX, event.stageY);
+        sendInteraction(hit, event, MOUSE_UP);
+        sendInteraction(pressHit, event, hitsEqual(hit, pressHit) ? CLICK : DROP);
+        pressHit = NULL_HIT;
     }
 
-    inline function sendInteraction(rawID:Int, event:MouseEvent, type:MouseInteractionType):Void {
-        var bodyID:Int = rawID >> 16 & 0xFF;
-        var glyphID:Int = rawID & 0xFFFF;
-        if (bodyID >= 0) interact.dispatch({bodyID:bodyID, glyphID:glyphID}, MOUSE(type, event.stageX, event.stageY));
+    inline function sendInteraction(hit:Hit, event:MouseEvent, type:MouseInteractionType):Void {
+        if (hit.bodyID != null) {
+            var x:Float = event == null ? Math.NaN : event.stageX;
+            var y:Float = event == null ? Math.NaN : event.stageY;
+            interact.dispatch(hit.bodyID, hit.glyphID, MOUSE(type, x, y));
+        }
     }
 
     /*
@@ -213,6 +230,13 @@ class MouseSystem {
         return _view;
     }
     */
+
+    inline function hitsEqual(h1:Hit, h2:Hit):Bool {
+        var val:Bool = false;
+        if (h1 == null && h2 == null) val = true;
+        else if (h1 != null && h2 != null) val = h1.bodyID == h2.bodyID && h1.glyphID == h2.glyphID;
+        return val;
+    }
 
 }
 
