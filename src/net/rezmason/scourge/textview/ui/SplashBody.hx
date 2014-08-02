@@ -3,7 +3,7 @@ package net.rezmason.scourge.textview.ui;
 import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
-
+import openfl.Assets;
 import net.rezmason.gl.utils.BufferUtil;
 
 import net.rezmason.scourge.textview.core.Glyph;
@@ -50,9 +50,9 @@ class SplashBody extends Body {
 
         time = 0;
 
-        lines = Strings.SPLASH.split('\n');
+        lines = Assets.getText('text/splash.txt').split('\n');
         lines.pop();
-        lines.pop();
+        //lines.pop();
 
         growTo(3 * lines.length * lines[0].length);
 

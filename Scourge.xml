@@ -48,6 +48,7 @@
 
 	<assets path="assets/flatfonts" rename="flatfonts" />
 	<assets path="assets/exampletext" rename="exampletext" />
+	<assets path="assets/text" rename="text" />
 
 	<!-- <ndll name="std" /> -->
 	<!-- <ndll name="regexp" /> -->

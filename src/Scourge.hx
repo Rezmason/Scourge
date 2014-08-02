@@ -1,7 +1,7 @@
 package;
 
 import flash.Lib;
-
+import openfl.Assets;
 import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.scourge.Strings;
 
@@ -11,7 +11,7 @@ class Scourge {
 
     public static function main():Void {
         #if flash Lib.redirectTraces(); #end
-        trace('\n${Strings.SPLASH}');
+        trace('\n${Assets.getText('text/splash.txt')}');
         utils = new UtilitySet(Lib.current.stage, init);
     }
 
