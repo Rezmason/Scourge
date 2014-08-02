@@ -107,7 +107,7 @@ class Body {
 
         this.numGlyphs = numGlyphs;
 
-        for (ike in numGlyphs...trueNumGlyphs) glyphs[ike].set_s(0);
+        for (ike in numGlyphs...trueNumGlyphs) glyphs[ike].reset();
         for (glyph in glyphs) glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id << 16);
     }
 

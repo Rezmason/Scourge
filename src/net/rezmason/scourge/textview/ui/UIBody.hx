@@ -23,6 +23,8 @@ class UIBody extends Body {
     var glyphHeightInPoints:Float;
     var glyphWidthInPixels:Float;
     var glyphHeightInPixels:Float;
+    var glyphWidth:Float;
+    var glyphHeight:Float;
     var baseTransform:Matrix3D;
 
     var croppedViewRect:Rectangle;
@@ -30,6 +32,7 @@ class UIBody extends Body {
     var viewPixelHeight:Float;
 
     var currentScrollPos:Float;
+    var scrollY:Float;
     var glideGoal:Float;
     var gliding:Bool;
     var lastRedrawPos:Float;
@@ -37,6 +40,8 @@ class UIBody extends Body {
     var caretGlyph:Glyph;
     var caretGlyphID:Int;
     var caretGlyphGuide:Glyph;
+    var scrollerTrackGlyph:Glyph;
+    var scrollerThumbGlyph:Glyph;
 
     var dragging:Bool;
     var dragStartY:Float;
@@ -44,14 +49,23 @@ class UIBody extends Body {
 
     var numRows:Int;
     var numCols:Int;
+    var numTextCols:Int;
 
     var bodyPaint:Int;
 
     var uiMediator:UIMediator;
 
+    public var showScrollBar(default, set):Bool;
+    var scrollBarVisible:Bool;
+    var scrollBarFade:Float;
+
     public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, uiMediator:UIMediator):Void {
 
         super(bufferUtil, glyphTexture);
+
+        showScrollBar = false;
+        scrollBarVisible = false;
+        scrollBarFade = 0;
 
         bodyPaint = id << 16;
         spaceCode = ' '.charCodeAt(0);
@@ -64,10 +78,12 @@ class UIBody extends Body {
         glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
 
         currentScrollPos = Math.NaN;
+        scrollY = 0;
         gliding = false;
 
         numRows = 0;
         numCols = 0;
+        numTextCols = 0;
 
         scaleMode = EXACT_FIT;
 
@@ -106,10 +122,11 @@ class UIBody extends Body {
             redrawHitSignal.dispatch();
         }
 
-        updateGlide();
+        updateGlide(delta);
         uiMediator.updateSpans(delta);
         findAndPositionCaret();
         taperScrollEdges();
+        if (showScrollBar) updateScrollFade(delta);
 
         super.update(delta);
     }
@@ -117,11 +134,13 @@ class UIBody extends Body {
     override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
         croppedViewRect = viewRect;
         var originalViewRect:Rectangle = viewRect.clone();
-        viewRect.inflate(-0.02, -0.02);
         super.adjustLayout(stageWidth, stageHeight);
         viewPixelHeight = viewRect.height * stageHeight;
         viewPixelWidth  = viewRect.width  * stageWidth;
         viewRect = originalViewRect;
+        glyphWidth = glyphWidthInPixels / stageWidth;
+        glyphHeight = glyphHeightInPixels / stageHeight;
+        setGlyphScale(glyphWidth, glyphHeight);
         resize();
     }
 
@@ -131,21 +150,26 @@ class UIBody extends Body {
     }
 
     override public function receiveInteraction(id:Int, interaction:Interaction):Void {
+
         switch (interaction) {
-            case MOUSE(type, x, y) if (dragging || id == 0):
-                if (dragging) {
-                    switch (type) {
-                        case DROP, CLICK: dragging = false;
-                        case ENTER, EXIT, MOVE: glideTextToPos(dragStartPos + (dragStartY - y) * (numRows - 1));
-                        case _:
-                    }
-                } else if (id == 0 && type == MOUSE_DOWN) {
-                    dragging = true;
-                    dragStartY = y;
-                    dragStartPos = currentScrollPos;
+            case MOUSE(type, x, y):
+                switch (type) {
+                    case DROP, CLICK if (dragging): dragging = false;
+                    case ENTER, EXIT, MOVE if (dragging): glideTextToPos(dragStartPos + (dragStartY - y) * (numRows - 1));
+                    case MOUSE_DOWN if (id <= 0): 
+                        dragging = true;
+                        dragStartY = y;
+                        dragStartPos = currentScrollPos;
+                    
+                    case ENTER if (showScrollBar): scrollBarVisible = true;
+                    case EXIT if (showScrollBar): scrollBarVisible = false;
+
+                    case _:
                 }
-            case _: uiMediator.receiveInteraction(id, interaction);
+            case _:
         }
+
+        uiMediator.receiveInteraction(id, interaction);
     }
 
     inline function findAndPositionCaret():Void {
@@ -196,17 +220,37 @@ class UIBody extends Body {
         if (croppedViewRect != null) {
             numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
             numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
-            setGlyphScale(croppedViewRect.width / numCols, croppedViewRect.height / (numRows - 1));
+            numTextCols = numCols + (showScrollBar ? -1 : 0);
 
+            growTo(numRows * numTextCols + 2 + 1);
 
-            growTo(numRows * numCols + 1);
+            for (ike in numRows * numTextCols...numGlyphs) glyphs[ike].reset();
 
             caretGlyph = glyphs[numGlyphs - 1];
 
+            if (showScrollBar) {
+                scrollerTrackGlyph = glyphs[numRows * numTextCols];
+                scrollerThumbGlyph = glyphs[numRows * numTextCols + 1];
+
+                scrollerTrackGlyph.set_rgb(1, 1, 1);
+                scrollerTrackGlyph.set_i(0.1);
+                scrollerTrackGlyph.set_paint(bodyPaint);
+                scrollerTrackGlyph.set_s(numRows);
+                scrollerTrackGlyph.set_h(0.95 / numRows);
+
+                scrollerThumbGlyph.set_rgb(1, 1, 1);
+                scrollerThumbGlyph.set_i(1);
+                scrollerThumbGlyph.set_paint(bodyPaint);
+            } else {
+                scrollerTrackGlyph = null;
+                scrollerThumbGlyph = null;
+            }
+
             lastRedrawPos = Math.NaN;
             reorderGlyphs();
+            updateScroller();
 
-            uiMediator.adjustLayout(numRows, numCols);
+            uiMediator.adjustLayout(numRows, numTextCols);
             uiMediator.styleCaret(caretGlyph, glyphTexture.font);
         }
     }
@@ -214,12 +258,36 @@ class UIBody extends Body {
     inline function reorderGlyphs():Void {
         var id:Int = 0;
         for (row in 0...numRows) {
-            for (col in 0...numCols) {
-                var x:Float = ((col + 0.5) / numCols - 0.5);
-                var y:Float = ((row + 0.5) / (numRows - 1) - 0.5);
+            var y:Float = (row + 0.5 - (numRows - 1) / 2) * glyphHeight / viewRect.height;
+            for (col in 0...numTextCols) {
+                var x:Float = (col + 0.5 - numCols / 2) * glyphWidth / viewRect.width;
                 glyphs[id].set_xyz(x, y, 0);
                 id++;
             }
+        }
+    }
+
+    inline function updateScroller():Void {
+        if (showScrollBar) {
+
+            var thumbHeight:Float = numRows / (numRows + uiMediator.bottomPos());
+
+            if (thumbHeight >= 1) {
+                scrollerTrackGlyph.set_rgb(0, 0, 0);
+                scrollerThumbGlyph.set_rgb(0, 0, 0);
+            } else {
+                scrollerTrackGlyph.set_rgb(1, 1, 1);
+                scrollerThumbGlyph.set_rgb(1, 1, 1);
+            }
+
+            var thumbY:Float = (currentScrollPos / uiMediator.bottomPos() - 0.5) * (1 - thumbHeight);
+
+            scrollerThumbGlyph.set_s(thumbHeight * numRows);
+            scrollerThumbGlyph.set_h(0.65 / (thumbHeight * numRows));
+            
+            var scrollX:Float = ((numTextCols + 0.5) / numCols - 0.5);
+            scrollerTrackGlyph.set_xyz(scrollX, scrollY, 0);
+            scrollerThumbGlyph.set_xyz(scrollX, scrollY + thumbY, 0);
         }
     }
 
@@ -229,16 +297,18 @@ class UIBody extends Body {
         caretGlyphID = uiMediator.stylePage(scrollStartIndex, glyphs, caretGlyph, glyphTexture.font);
         findAndPositionCaret();
         taperScrollEdges();
+        scrollY = (currentScrollPos - scrollStartIndex) / (numRows - 1);
         transform.identity();
         transform.append(baseTransform);
-        transform.appendTranslation(0, (currentScrollPos - scrollStartIndex) / (numRows - 1), 0);
+        transform.appendTranslation(0, scrollY, 0);
+        updateScroller();
     }
 
     inline function taperScrollEdges():Void {
         var offset:Float = ((currentScrollPos % 1) + 1) % 1;
-        var lastRow:Int = (numRows - 1) * numCols;
+        var lastRow:Int = (numRows - 1) * numTextCols;
         var glyph:Glyph;
-        for (col in 0...numCols) {
+        for (col in 0...numTextCols) {
             glyph = glyphs[col];
             glyph.set_color(Colors.mult(glyph.get_color(), 1 - offset));
             if (glyph == caretGlyphGuide) caretGlyph.set_color(Colors.mult(caretGlyph.get_color(), 1 - offset));
@@ -249,11 +319,13 @@ class UIBody extends Body {
         }
     }
 
-    inline function updateGlide():Void {
+    inline function updateGlide(delta:Float):Void {
         if (gliding) {
             gliding = Math.abs(glideGoal - currentScrollPos) > 0.001;
             if (gliding) {
-                setScrollPos(currentScrollPos * glideEase + glideGoal * (1 - glideEase));
+                delta *= 40;
+                var nextScrollPos:Float = currentScrollPos * glideEase + glideGoal * (1 - glideEase);
+                setScrollPos(nextScrollPos * delta + currentScrollPos * (1 - delta));
             } else {
                 setScrollPos(glideGoal);
                 if (lastRedrawPos != glideGoal) {
@@ -264,6 +336,25 @@ class UIBody extends Body {
         }
     }
 
+    inline function updateScrollFade(delta:Float):Void {
+        var changed:Bool = false;
+        var scrollBarFadeGoal:Float = 0;
+        if (scrollBarVisible && scrollBarFade < 1) {
+            scrollBarFadeGoal = 1;
+            changed = true;
+        } else if (!scrollBarVisible && scrollBarFade > 0) {
+            scrollBarFadeGoal = 0;
+            changed = true;
+        }
+
+        if (changed) {
+            delta *= 10;
+            scrollBarFade = scrollBarFade * (1 - delta) + scrollBarFadeGoal * delta;
+            scrollerTrackGlyph.set_rgb(scrollBarFade, scrollBarFade, scrollBarFade);
+            scrollerThumbGlyph.set_rgb(scrollBarFade, scrollBarFade, scrollBarFade);
+        }
+    }
+
     inline function getScreenDPI():Float {
         #if flash
             var dpi:Null<Float> = Reflect.field(flash.Lib.current.loaderInfo.parameters, 'dpi');
@@ -271,5 +362,11 @@ class UIBody extends Body {
             return dpi;
         #else return Capabilities.screenDPI;
         #end
+    }
+
+    inline function set_showScrollBar(val:Bool):Bool {
+        showScrollBar = val;
+        resize();
+        return val;
     }
 }

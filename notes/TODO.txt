@@ -62,8 +62,6 @@ Implement noneuclidean walking and running
     heading data should be available after a walk
     Turtle?
 
-Scroll indicator in UIBody
-
 It'd be fun to make a branch that renders glyphs as points
 
 Finalize ROPES classes
