@@ -17,6 +17,7 @@ import flash.net.FileReference;
 
 import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.display.FlatFontGenerator;
+import net.rezmason.utils.display.MetaballTextureGenerator;
 
 import net.rezmason.scourge.Strings;
 
@@ -36,7 +37,7 @@ class ScourgeAssetGen {
             if (current.height <= current.stage.stageHeight) current.y = 0;
             else current.y = (current.stage.mouseY / current.stage.stageHeight) * (current.stage.stageHeight - current.height);
         });
-
+        
         var profontChars:String = [
             Strings.ALPHANUMERICS,
             Strings.PUNCTUATION,
@@ -49,11 +50,13 @@ class ScourgeAssetGen {
             {chars:Strings.SMALL_CYRILLICS, size:384, font:new ProFont_Cy()},
             {chars:Strings.BOX_SYMBOLS, size:300, font:new ScourgeAssetGen.SourceProFont()},
         ];
+        FlatFontGenerator.flatten(sets, 72, 72, 1, 20, deployFont.bind(_, "full"));
+        
+        MetaballTextureGenerator.makeTexture(25, 25, deployImage.bind(_, "metaball"));
 
-        FlatFontGenerator.flatten(sets, 72, 72, 1, 20, deploy.bind(_, "full"));
     }
 
-    static function deploy(font:FlatFont, id:String):Void {
+    static function deployFont(font:FlatFont, id:String):Void {
         var fontBD:BitmapData = font.getBitmapDataClone();
 
         var sprite:Sprite = new Sprite();
@@ -79,6 +82,23 @@ class ScourgeAssetGen {
             fileRef.addEventListener("complete", savePNG);
             fileRef.save(json, id + "_flat.json");
 
+        });
+
+        Lib.current.addChild(sprite);
+    }
+
+    static function deployImage(image:BitmapData, id:String):Void {
+        var sprite:Sprite = new Sprite();
+        sprite.addChild(new Bitmap(image));
+        var fileRef = null;
+        sprite.addEventListener("click", function(_) {
+            var bytesOutput:BytesOutput = new BytesOutput();
+            var writer:Writer = new Writer(bytesOutput);
+            var data = Tools.build32ARGB(image.width, image.height, Bytes.ofData(image.getPixels(image.rect)));
+            writer.write(data);
+            fileRef = new FileReference();
+            fileRef.save(bytesOutput.getBytes().getData(), id + ".png");
+            Lib.current.removeChild(sprite);
         });
 
         Lib.current.addChild(sprite);

@@ -47,6 +47,7 @@
 	<haxelib name="openfl-html5-revised" if="html5" />
 
 	<assets path="assets/flatfonts" rename="flatfonts" />
+	<assets path="assets/metaballs" rename="metaballs" />
 	<assets path="assets/exampletext" rename="exampletext" />
 	<assets path="assets/text" rename="text" />
 

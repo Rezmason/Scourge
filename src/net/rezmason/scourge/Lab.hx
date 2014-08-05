@@ -16,75 +16,21 @@ import net.rezmason.utils.display.FlatFont;
 
 class Lab {
 
-    static var fragShader:String = #if !desktop 'precision mediump float;' + #end '
-        varying vec3 vColor;
-        varying vec2 vUV;
-        varying float vVid;
-        varying float vZ;
-
-        uniform sampler2D uSampler;
-
-        void main(void) {
-            float glyph = texture2D(uSampler, vUV).b + 0.2;
-            glyph = 1.0 - glyph * glyph;
-            vec3 texture = vec3(glyph, glyph, glyph);
-            if (vVid >= 0.3) texture *= -1.0;
-            gl_FragColor = vec4(vColor * (texture + vVid) * clamp(2.0 - vZ, 0.0, 1.0), 1.0);
-        }
-    ';
-
-    static var vertShader:String = '
-        attribute vec3 aPos;
-        attribute vec2 aCorner;
-        attribute float aScale;
-        attribute float aPop;
-        attribute vec3 aColor;
-        attribute vec2 aUV;
-        attribute float aVid;
-
-        uniform mat4 uCameraMat;
-        uniform mat4 uGlyphMat;
-        uniform mat4 uBodyMat;
-
-        varying vec3 vColor;
-        varying vec2 vUV;
-        varying float vVid;
-        varying float vZ;
-
-        void main(void) {
-            vec4 pos = uBodyMat * vec4(aPos, 1.0);
-            pos.z += aPop;
-            pos = uCameraMat * pos;
-            pos.xy += ((uGlyphMat * vec4(aCorner, 1.0, 1.0)).xy) * aScale;
-
-            vColor = aColor;
-            vUV = aUV;
-            vVid = aVid;
-            vZ = pos.z;
-
-            pos.z = clamp(pos.z, 0.0, 1.0);
-            gl_Position = pos;
-        }
-    ';
-
-    var uBodyMat:UniformLocation;
-    var uCameraMat:UniformLocation;
-    var uGlyphMat:UniformLocation;
-
-    var uSampler:UniformLocation;
-
     var aPos:AttribsLocation;
     var aCorner:AttribsLocation;
     var aScale:AttribsLocation;
-    var aPop:AttribsLocation;
-    var aColor:AttribsLocation;
     var aUV:AttribsLocation;
-    var aVid:AttribsLocation;
+    
+    var uSampler:UniformLocation;
+    var uParams:UniformLocation;
+    var uCameraMat:UniformLocation;
+    var uBodyMat:UniformLocation;
 
     var glyphTexture:GlyphTexture;
     var program:Program;
 
-    var body:Body;
+    var bodyTransform:Matrix3D;
+    var cameraTransform:Matrix3D;
 
     var numTriangles:Int;
     var mainOutputBuffer:OutputBuffer;
@@ -101,17 +47,16 @@ class Lab {
     var height:Int;
 
     var t:Float;
-    var segment:BodySegment;
-
-    var data:ReadbackData;
 
     public function new(utils:UtilitySet, stage:Stage):Void {
         this.utils = utils;
         this.stage = stage;
 
-        var path = 'flatfonts/full_flat';
-        var font:FlatFont = new FlatFont(getBitmapData('$path.png'), getText('$path.json'));
+        var font:FlatFont = new FlatFont(getBitmapData('metaballs/metaball.png'), '{}');
         this.glyphTexture = new GlyphTexture(utils.textureUtil, font);
+
+        bodyTransform = new Matrix3D();
+        cameraTransform = makeProjection();
 
         width = stage.stageWidth;
         height = stage.stageHeight;
@@ -122,48 +67,73 @@ class Lab {
         secondBuffer = utils.drawUtil.createOutputBuffer();
         secondBuffer.resize(width, height);
 
-        data = utils.drawUtil.createReadbackData(width * height * 4);
-
         // Create program
+
+        var vertShader = '
+            attribute vec3 aPos;
+            attribute vec2 aCorner;
+            attribute float aScale;
+            attribute vec2 aUV;
+
+            uniform mat4 uCameraMat;
+            uniform mat4 uBodyMat;
+
+            varying vec2 vUV;
+
+            void main(void) {
+                vec4 pos = uBodyMat * vec4(aPos, 1.0);
+                pos = uCameraMat * pos;
+                pos.xy += ((vec4(aCorner.x, aCorner.y, 1.0, 1.0)).xy) * aScale;
+
+                vUV = aUV;
+
+                pos.z = clamp(pos.z, 0.0, 1.0);
+                gl_Position = pos;
+            }
+        ';
+        var fragShader = '
+            varying vec2 vUV;
+
+            uniform sampler2D uSampler;
+            uniform vec4 uParams;
+
+            void main(void) {
+                gl_FragColor = texture2D(uSampler, vUV);
+            }
+        ';
 
         utils.programUtil.loadProgram(vertShader, fragShader, onProgramLoaded);
 
         // Create geometry
 
-        body = new TestBody(utils.bufferUtil, glyphTexture, 10);
+        var body:Body = new GlyphBody(utils.bufferUtil, glyphTexture);
+        body.adjustLayout(stage.stageWidth, stage.stageHeight);
         body.update(0);
-        segment = body.segments[0];
 
-        var scale:Float = 0.1;
-        body.glyphTransform.identity();
-        body.glyphTransform.append(glyphTexture.matrix);
-        body.glyphTransform.appendScale(scale, scale, 1);
+        cameraTransform = body.camera;
 
-        /*
-        var shapeVertices:Vector<Float> = Vector.ofArray(cast [
-        //  x, y, z,   h, v,   s,   p,
-            0, 0, 0,   0, 0,   1,   0,
-            0, 0, 0,   0, 1,   1,   0,
-            0, 0, 0,   1, 1,   1,   0,
-            0, 0, 0,   1, 0,   1,   0,
-        ]);
+        trace(cameraTransform.rawData);
 
-        var colorVertices:Vector<Float> = Vector.ofArray(cast [
-        //  r, g, b,   u, v,     i,
-            1, 0, 0,   0, 0,   0.2,
-            1, 0, 0,   0, 1,   0.2,
-            1, 0, 0,   1, 1,   0.2,
-            1, 0, 0,   1, 0,   0.2,
-        ]);
+        var spv:Int = 3 + 2 + 1;
+        var cpv:Int = 2;
 
-        var charUV = glyphTexture.font.getCharCodeUVs('A'.charCodeAt(0));
-        var cpv:Int = 6;
-        colorVertices[3 + 0 * cpv] = charUV[3].u; colorVertices[4 + 0 * cpv] = charUV[3].v;
-        colorVertices[3 + 1 * cpv] = charUV[0].u; colorVertices[4 + 1 * cpv] = charUV[0].v;
-        colorVertices[3 + 2 * cpv] = charUV[1].u; colorVertices[4 + 2 * cpv] = charUV[1].v;
-        colorVertices[3 + 3 * cpv] = charUV[2].u; colorVertices[4 + 3 * cpv] = charUV[2].v;
+        var shapeVertices:VertexArray = arrToVertexArray([
+        //  x,y,z, h, v,s,
+            0,0,0,-1,-1,0.1,
+            0,0,0,-1, 1,0.1,
+            0,0,0, 1, 1,0.1,
+            0,0,0, 1,-1,0.1,
+        ], spv);
 
-        var indices:Vector<UInt> = Vector.ofArray(cast [
+        var colorVertices:VertexArray = arrToVertexArray([
+        //  u,v,
+            0,1,
+            0,0,
+            1,0,
+            1,1,
+        ], cpv);
+
+        var indices:IndexArray = arrToIndexArray([
             0, 1, 2,
             0, 2, 3,
         ]);
@@ -172,60 +142,42 @@ class Lab {
         var numVertices:Int = 4;
         numTriangles = 2;
 
-        shapeBuffer = utils.bufferUtil.createVertexBuffer(numVertices, 3 + 2 + 2);
+        shapeBuffer = utils.bufferUtil.createVertexBuffer(numVertices, spv);
         shapeBuffer.uploadFromVector(shapeVertices, 0, numVertices);
-
-        colorBuffer = utils.bufferUtil.createVertexBuffer(numVertices, 3 + 2 + 1);
+        colorBuffer = utils.bufferUtil.createVertexBuffer(numVertices, cpv);
         colorBuffer.uploadFromVector(colorVertices, 0, numVertices);
-
         indexBuffer = utils.bufferUtil.createIndexBuffer(numIndices);
         indexBuffer.uploadFromVector(indices, 0, numIndices);
-        */
-
-        shapeBuffer = segment.shapeBuffer;
-        colorBuffer = segment.colorBuffer;
-        indexBuffer = segment.indexBuffer;
-
-        numTriangles = Std.int(segment.numGlyphs * 2);
 
         t = 0;
     }
 
     function onProgramLoaded(program:Program):Void {
         this.program = program;
+        utils.programUtil.setFourProgramConstants(this.program, uParams, [0, 0, 0, 0]);
 
         // Connect to shader
 
-        uBodyMat = utils.programUtil.getUniformLocation(program, 'uBodyMat');
+        aPos     = utils.programUtil.getAttribsLocation(program, 'aPos'    );
+        aCorner  = utils.programUtil.getAttribsLocation(program, 'aCorner' );
+        aScale   = utils.programUtil.getAttribsLocation(program, 'aScale');
+        aUV      = utils.programUtil.getAttribsLocation(program, 'aUV'     );
+        
+        uSampler   = utils.programUtil.getUniformLocation(program, 'uSampler'  );
+        uParams    = utils.programUtil.getUniformLocation(program, 'uParams');
         uCameraMat = utils.programUtil.getUniformLocation(program, 'uCameraMat');
-        uGlyphMat = utils.programUtil.getUniformLocation(program, 'uGlyphMat');
-
-        uSampler = utils.programUtil.getUniformLocation(program, 'uSampler');
-
-        aPos = utils.programUtil.getAttribsLocation(program, 'aPos');
-        aCorner = utils.programUtil.getAttribsLocation(program, 'aCorner');
-        aScale = utils.programUtil.getAttribsLocation(program, 'aScale');
-        aPop = utils.programUtil.getAttribsLocation(program, 'aPop');
-        aColor = utils.programUtil.getAttribsLocation(program, 'aColor');
-        aUV = utils.programUtil.getAttribsLocation(program, 'aUV');
-        aVid = utils.programUtil.getAttribsLocation(program, 'aVid');
+        uBodyMat   = utils.programUtil.getUniformLocation(program, 'uBodyMat'  );
 
         utils.drawUtil.addRenderCall(onRender);
     }
 
     function update():Void {
-        /*
         t += 0.1;
-        var scale:Float = Math.sin(t) * 0.25 + 1;
+        var nudgeX:Float = Math.cos(t) * 0.0625;
+        var nudgeY:Float = Math.sin(t) * 0.0625;
 
-        scale *= 0.03;
-
-        body.glyphTransform.identity();
-        body.glyphTransform.append(glyphTexture.matrix);
-        body.glyphTransform.appendScale(scale, scale, 1);
-        */
-
-        body.update(0.1);
+        bodyTransform.identity();
+        bodyTransform.appendTranslation(nudgeX, nudgeY, 0);
     }
 
     function onRender(w:Int, h:Int):Void {
@@ -238,36 +190,15 @@ class Lab {
         utils.programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         utils.programUtil.setDepthTest(false);
 
-        utils.programUtil.setProgramConstantsFromMatrix(program, uBodyMat, body.transform); // uBodyMat contains the body's matrix
-        utils.programUtil.setProgramConstantsFromMatrix(program, uCameraMat, body.camera); // uCameraMat contains the camera matrix
-        utils.programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, body.glyphTransform); // uGlyphMat contains the character matrix
-
+        utils.programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyTransform); // uBodyMat contains the body's matrix
+        utils.programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraTransform); // uCameraMat contains the camera matrix
+        
         utils.programUtil.setTextureAt(program, uSampler, glyphTexture.texture); // uSampler contains our texture
 
         utils.programUtil.setVertexBufferAt(program, aPos,     shapeBuffer, 0, 3); // aPos contains x,y,z
         utils.programUtil.setVertexBufferAt(program, aCorner,  shapeBuffer, 3, 2); // aCorner contains h,v
         utils.programUtil.setVertexBufferAt(program, aScale,   shapeBuffer, 5, 1); // aScale contains s
-        utils.programUtil.setVertexBufferAt(program, aPop,     shapeBuffer, 6, 1); // aPop contains p
-        utils.programUtil.setVertexBufferAt(program, aColor,   colorBuffer, 0, 3); // aColor contains r,g,b
-        utils.programUtil.setVertexBufferAt(program, aUV,      colorBuffer, 3, 2); // aUV contains u,v
-        utils.programUtil.setVertexBufferAt(program, aVid,     colorBuffer, 5, 1); // aVid contains i
-
-        //*
-        utils.drawUtil.setOutputBuffer(secondBuffer);
-        utils.drawUtil.clear(0xFF000000);
-        utils.drawUtil.drawTriangles(indexBuffer, 0, numTriangles);
-        utils.drawUtil.finishOutputBuffer(secondBuffer);
-
-        utils.drawUtil.readBack(secondBuffer, width, height, data);
-
-        var whiteCount:Int = 0;
-
-        for (i in 0...width * height) {
-            var pixel:Int = (data[i * 4 + 3] << 24) | (data[i * 4 + 1] << 16) | (data[i * 4 + 1] << 8) | (data[i * 4 + 2] << 0);
-            if (pixel == 0xFFFFFFFF) whiteCount++;
-        }
-
-        /**/
+        utils.programUtil.setVertexBufferAt(program, aUV,      colorBuffer, 0, 2); // aUV contains u,v
 
         //*
         utils.drawUtil.setOutputBuffer(mainOutputBuffer);
@@ -286,5 +217,17 @@ class Lab {
         rawData[15] =  0;
         mat.rawData = rawData;
         return mat;
+    }
+
+    inline function arrToVertexArray(arr:Array<Float>, num):VertexArray {
+        var va:VertexArray = new VertexArray(arr.length * num);
+        for (i in 0...arr.length) va[i] = arr[i];
+        return va;
+    }
+
+    inline function arrToIndexArray(arr:Array<UInt>):IndexArray {
+        var ia:IndexArray = new IndexArray(arr.length);
+        for (i in 0...arr.length) ia[i] = arr[i];
+        return ia;
     }
 }
