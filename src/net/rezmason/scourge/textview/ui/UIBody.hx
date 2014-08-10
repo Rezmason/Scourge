@@ -281,6 +281,7 @@ class UIBody extends Body {
             }
 
             var thumbY:Float = (currentScrollPos / uiMediator.bottomPos() - 0.5) * (1 - thumbHeight);
+            if (Math.isNaN(thumbY)) thumbY = 0;
 
             scrollerThumbGlyph.set_s(thumbHeight * numRows);
             scrollerThumbGlyph.set_h(0.65 / (thumbHeight * numRows));

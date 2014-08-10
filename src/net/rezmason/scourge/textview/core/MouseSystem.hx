@@ -124,13 +124,15 @@ class MouseSystem {
         var glyphID:Null<Int> = null;
 
         if (rawID == 0xFFFFFF) {
-            if (lastRectRegionID != null && rectRegionsByID[lastRectRegionID].contains(x / width, y / height)) {
-                bodyID = lastRectRegionID;
-            } else {
-                for (id in rectRegionsByID.keys()) {
-                    if (rectRegionsByID[id].contains(x / width, y / height)) {
-                        bodyID = id;
-                        break;
+            if (rectRegionsByID != null) {
+                if (lastRectRegionID != null && rectRegionsByID[lastRectRegionID].contains(x / width, y / height)) {
+                    bodyID = lastRectRegionID;
+                } else {
+                    for (id in rectRegionsByID.keys()) {
+                        if (rectRegionsByID[id].contains(x / width, y / height)) {
+                            bodyID = id;
+                            break;
+                        }
                     }
                 }
             }
