@@ -9,12 +9,16 @@ import flash.geom.Vector3D;
 import net.rezmason.gl.utils.*;
 import net.rezmason.gl.*;
 import net.rezmason.gl.Data;
-import net.rezmason.scourge.textview.*;
-import net.rezmason.scourge.textview.core.*;
-import net.rezmason.scourge.textview.demo.*;
-import net.rezmason.utils.display.FlatFont;
 
 class Lab {
+
+    inline static var GRID_WIDTH:Int = 10;
+    inline static var NUM_BALLS:Int = GRID_WIDTH * GRID_WIDTH;
+
+    inline static var FpBV:Int = 3 + 2 + 1 + 2; // floats per ball vertex
+    inline static var VpB:Int = 4; // vertices per ball
+    inline static var IpB:Int = 6; // indices per ball
+    inline static var TpB:Int = 2; // triangles per ball
 
     var aPos:AttribsLocation;
     var aCorner:AttribsLocation;
@@ -26,18 +30,19 @@ class Lab {
     var uCameraMat:UniformLocation;
     var uBodyMat:UniformLocation;
 
-    var glyphTexture:GlyphTexture;
+    var texture:Texture;
     var program:Program;
 
     var bodyTransform:Matrix3D;
     var cameraTransform:Matrix3D;
 
-    var numTriangles:Int;
     var mainOutputBuffer:OutputBuffer;
-    var secondBuffer:OutputBuffer;
 
+    var phases:Array<Null<Float>>;
+
+    var shapeVertices:VertexArray;
     var shapeBuffer:VertexBuffer;
-    var colorBuffer:VertexBuffer;
+    var indices:IndexArray;
     var indexBuffer:IndexBuffer;
 
     var utils:UtilitySet;
@@ -52,20 +57,17 @@ class Lab {
         this.utils = utils;
         this.stage = stage;
 
-        var font:FlatFont = new FlatFont(getBitmapData('metaballs/metaball.png'), '{}');
-        this.glyphTexture = new GlyphTexture(utils.textureUtil, font);
+        texture = utils.textureUtil.createTexture(getBitmapData('metaballs/metaball.png'));
 
         bodyTransform = new Matrix3D();
-        cameraTransform = makeProjection();
+        cameraTransform = new Matrix3D();
+        cameraTransform.rawData = Vector.ofArray([2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1]);
 
         width = stage.stageWidth;
         height = stage.stageHeight;
 
         mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
         mainOutputBuffer.resize(width, height);
-
-        secondBuffer = utils.drawUtil.createOutputBuffer();
-        secondBuffer.resize(width, height);
 
         // Create program
 
@@ -106,48 +108,75 @@ class Lab {
 
         // Create geometry
 
-        var body:Body = new GlyphBody(utils.bufferUtil, glyphTexture);
-        body.adjustLayout(stage.stageWidth, stage.stageHeight);
-        body.update(0);
+        phases = [];
+        shapeVertices = new VertexArray(NUM_BALLS * VpB * FpBV);
+        indices = new IndexArray(NUM_BALLS * IpB);
 
-        cameraTransform = body.camera;
+        var drunkX:Int = Std.int(GRID_WIDTH / 2);
+        var drunkY:Int = Std.int(GRID_WIDTH / 2);
+        for (ike in 0...Std.int(GRID_WIDTH * 2.5)) {
+            var index:Int = drunkX + drunkY * GRID_WIDTH;
+            phases[index] = 0;
+            if (Std.random(2) == 0) {
+                drunkX = Std.int(Math.min(GRID_WIDTH - 1, Math.max(0, drunkX + Std.random(2) * 2 - 1)));
+            } else {
+                drunkY = Std.int(Math.min(GRID_WIDTH - 1, Math.max(0, drunkY + Std.random(2) * 2 - 1)));
+            }
+        }
 
-        trace(cameraTransform.rawData);
+        var center:Float = (GRID_WIDTH - 1) / (2 * GRID_WIDTH);
 
-        var spv:Int = 3 + 2 + 1;
-        var cpv:Int = 2;
+        for (ike in 0...NUM_BALLS) {
 
-        var shapeVertices:VertexArray = arrToVertexArray([
-        //  x,y,z, h, v,s,
-            0,0,0,-1,-1,0.1,
-            0,0,0,-1, 1,0.1,
-            0,0,0, 1, 1,0.1,
-            0,0,0, 1,-1,0.1,
-        ], spv);
+            var vBall:Int = ike * VpB;
 
-        var colorVertices:VertexArray = arrToVertexArray([
-        //  u,v,
-            0,1,
-            0,0,
-            1,0,
-            1,1,
-        ], cpv);
+            var x:Float = (ike % GRID_WIDTH) / GRID_WIDTH - center;
+            var y:Float = Math.floor(ike / GRID_WIDTH) / GRID_WIDTH - center;
+            var z:Float = 0;
+            
+            if (phases[ike] == 0) phases[ike] = Math.random() * Math.PI * 2;
 
-        var indices:IndexArray = arrToIndexArray([
-            0, 1, 2,
-            0, 2, 3,
-        ]);
+            // set up vertices
+            for (jen in 0...VpB) {
+                shapeVertices[(vBall + jen) * FpBV + 0] = x * 0.8;
+                shapeVertices[(vBall + jen) * FpBV + 1] = y * 0.8;
+                shapeVertices[(vBall + jen) * FpBV + 2] = z;
+                shapeVertices[(vBall + jen) * FpBV + 5] = 0;
+            }
 
-        var numIndices:Int = 6;
-        var numVertices:Int = 4;
-        numTriangles = 2;
+            shapeVertices[(vBall + 0) * FpBV + 3] = -1;
+            shapeVertices[(vBall + 1) * FpBV + 3] = -1;
+            shapeVertices[(vBall + 2) * FpBV + 3] =  1;
+            shapeVertices[(vBall + 3) * FpBV + 3] =  1;
 
-        shapeBuffer = utils.bufferUtil.createVertexBuffer(numVertices, spv);
-        shapeBuffer.uploadFromVector(shapeVertices, 0, numVertices);
-        colorBuffer = utils.bufferUtil.createVertexBuffer(numVertices, cpv);
-        colorBuffer.uploadFromVector(colorVertices, 0, numVertices);
-        indexBuffer = utils.bufferUtil.createIndexBuffer(numIndices);
-        indexBuffer.uploadFromVector(indices, 0, numIndices);
+            shapeVertices[(vBall + 0) * FpBV + 4] = -1;
+            shapeVertices[(vBall + 1) * FpBV + 4] =  1;
+            shapeVertices[(vBall + 2) * FpBV + 4] =  1;
+            shapeVertices[(vBall + 3) * FpBV + 4] = -1;
+
+            shapeVertices[(vBall + 0) * FpBV + 6] =  0;
+            shapeVertices[(vBall + 1) * FpBV + 6] =  0;
+            shapeVertices[(vBall + 2) * FpBV + 6] =  1;
+            shapeVertices[(vBall + 3) * FpBV + 6] =  1;
+
+            shapeVertices[(vBall + 0) * FpBV + 7] =  1;
+            shapeVertices[(vBall + 1) * FpBV + 7] =  0;
+            shapeVertices[(vBall + 2) * FpBV + 7] =  0;
+            shapeVertices[(vBall + 3) * FpBV + 7] =  1;
+
+            // set up indices
+            indices[ike * IpB + 0] = ike * VpB + 0;
+            indices[ike * IpB + 1] = ike * VpB + 1;
+            indices[ike * IpB + 2] = ike * VpB + 2;
+            indices[ike * IpB + 3] = ike * VpB + 0;
+            indices[ike * IpB + 4] = ike * VpB + 2;
+            indices[ike * IpB + 5] = ike * VpB + 3;
+        }
+
+        shapeBuffer = utils.bufferUtil.createVertexBuffer(NUM_BALLS * VpB, FpBV);
+        indexBuffer = utils.bufferUtil.createIndexBuffer(NUM_BALLS * IpB);
+
+        update();
 
         t = 0;
     }
@@ -173,11 +202,18 @@ class Lab {
 
     function update():Void {
         t += 0.1;
-        var nudgeX:Float = Math.cos(t) * 0.0625;
-        var nudgeY:Float = Math.sin(t) * 0.0625;
+        
+        //bodyTransform.appendRotation(1, Vector3D.Z_AXIS);
 
-        bodyTransform.identity();
-        bodyTransform.appendTranslation(nudgeX, nudgeY, 0);
+        for (ike in 0...NUM_BALLS) {
+            if (phases[ike] == null) continue;
+            var vBall:Int = ike * VpB;
+            var s:Float = (Math.sin(phases[ike] + t) + 1) * 0.2 + 0.8;
+            for (jen in 0...VpB) shapeVertices[(vBall + jen) * FpBV + 5] = s * 2.5 / GRID_WIDTH;
+        }
+
+        shapeBuffer.uploadFromVector(shapeVertices, 0, NUM_BALLS * VpB);
+        indexBuffer.uploadFromVector(indices, 0, NUM_BALLS * IpB);
     }
 
     function onRender(w:Int, h:Int):Void {
@@ -193,30 +229,19 @@ class Lab {
         utils.programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyTransform); // uBodyMat contains the body's matrix
         utils.programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraTransform); // uCameraMat contains the camera matrix
         
-        utils.programUtil.setTextureAt(program, uSampler, glyphTexture.texture); // uSampler contains our texture
+        utils.programUtil.setTextureAt(program, uSampler, texture); // uSampler contains our texture
 
         utils.programUtil.setVertexBufferAt(program, aPos,     shapeBuffer, 0, 3); // aPos contains x,y,z
         utils.programUtil.setVertexBufferAt(program, aCorner,  shapeBuffer, 3, 2); // aCorner contains h,v
         utils.programUtil.setVertexBufferAt(program, aScale,   shapeBuffer, 5, 1); // aScale contains s
-        utils.programUtil.setVertexBufferAt(program, aUV,      colorBuffer, 0, 2); // aUV contains u,v
+        utils.programUtil.setVertexBufferAt(program, aUV,      shapeBuffer, 6, 2); // aUV contains u,v
 
         //*
         utils.drawUtil.setOutputBuffer(mainOutputBuffer);
         utils.drawUtil.clear(0xFF000000);
-        utils.drawUtil.drawTriangles(indexBuffer, 0, numTriangles);
+        utils.drawUtil.drawTriangles(indexBuffer, 0, TpB * NUM_BALLS);
         utils.drawUtil.finishOutputBuffer(mainOutputBuffer);
         /**/
-    }
-
-    inline function makeProjection():Matrix3D {
-        var mat:Matrix3D = new Matrix3D();
-        var rawData:Vector<Float> = mat.rawData;
-        rawData[10] =  2;
-        rawData[11] =  1;
-        rawData[14] = -2;
-        rawData[15] =  0;
-        mat.rawData = rawData;
-        return mat;
     }
 
     inline function arrToVertexArray(arr:Array<Float>, num):VertexArray {

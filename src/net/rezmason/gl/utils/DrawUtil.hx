@@ -88,17 +88,17 @@ class DrawUtil extends Util {
         return new ReadbackData(#if !flash size #end);
     }
 
-    public inline function readBack(outputBuffer:OutputBuffer, width:Int, height:Int, data:ReadbackData):Void {
+    public inline function readBack(outputBuffer:OutputBuffer, data:ReadbackData):Void {
         #if flash
             if (outputBuffer.bitmapData != null) {
-                var rect:Rectangle = new Rectangle(0, 0, width, height);
+                var rect:Rectangle = new Rectangle(0, 0, outputBuffer.width, outputBuffer.height);
                 data.position = 0;
                 outputBuffer.bitmapData.copyPixelsToByteArray(rect, data);
                 data.position = 0;
             }
         #else
             setOutputBuffer(outputBuffer);
-            GL.readPixels(0, 0, width, height, GL.RGBA, GL.UNSIGNED_BYTE, data);
+            GL.readPixels(0, 0, outputBuffer.width, outputBuffer.height, GL.RGBA, GL.UNSIGNED_BYTE, data);
         #end
     }
 

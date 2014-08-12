@@ -22,10 +22,11 @@ class OutputBuffer {
     #end
 
     var empty:Bool;
-    var width:Int;
-    var height:Int;
+    public var width(default, null):Int;
+    public var height(default, null):Int;
 
-    public function new(?empty:Bool #if flash, ?context:Context3D #end):Void {
+    @:allow(net.rezmason.gl)
+    function new(?empty:Bool #if flash, ?context:Context3D #end):Void {
         this.empty = empty;
 
         #if flash

@@ -189,7 +189,7 @@ class MouseSystem {
             if (data == null) data = drawUtil.createReadbackData(width * height * 4);
 
             updateSignal.dispatch();
-            drawUtil.readBack(outputBuffer, width, height, data);
+            drawUtil.readBack(outputBuffer, data);
             // fartBD();
 
             invalid = false;
