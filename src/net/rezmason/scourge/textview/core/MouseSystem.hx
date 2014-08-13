@@ -66,7 +66,7 @@ class MouseSystem {
         initialized = false;
         invalidate();
 
-        outputBuffer = drawUtil.createOutputBuffer();
+        outputBuffer = drawUtil.createOutputBuffer(READBACK);
     }
 
     public function setSize(width:Int, height:Int):Void {

@@ -66,7 +66,7 @@ class Lab {
         width = stage.stageWidth;
         height = stage.stageHeight;
 
-        mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
+        mainOutputBuffer = utils.drawUtil.createOutputBuffer(VIEWPORT);
         mainOutputBuffer.resize(width, height);
 
         // Create program

@@ -60,26 +60,27 @@ class DrawUtil extends Util {
         #end
     }
 
-    public inline function createOutputBuffer():OutputBuffer {
-        return new OutputBuffer(false);
-    }
-
-    public inline function getMainOutputBuffer():OutputBuffer {
-        return new OutputBuffer(true #if flash, context #end);
+    public inline function createOutputBuffer(type:OutputBufferType):OutputBuffer {
+        return new OutputBuffer(type, context);
     }
 
     public inline function setOutputBuffer(outputBuffer:OutputBuffer):Void {
-        #if !flash
+        #if flash
+            switch (outputBuffer.type) {
+                case TEXTURE: // context.setRenderToTexture(outputBuffer.texture);
+                case _: context.setRenderToBackBuffer();
+            }
+        #else
             GL.bindFramebuffer(GL.FRAMEBUFFER, outputBuffer.frameBuffer);
         #end
     }
 
     public inline function finishOutputBuffer(outputBuffer:OutputBuffer):Void {
         #if flash
-            if (outputBuffer.bitmapData == null) context.present();
-            else {
-                context.drawToBitmapData(outputBuffer.bitmapData);
-                // outputBuffer.bitmapData.fillRect(new Rectangle(0, 200, 100, 100), 0xFF000000 | Std.int(Math.random() * 0xFFFFFF));
+            switch (outputBuffer.type) {
+                case VIEWPORT: context.present();
+                case READBACK: context.drawToBitmapData(outputBuffer.bitmapData);
+                case _:
             }
         #end
     }

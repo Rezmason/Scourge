@@ -98,7 +98,7 @@ class Engine {
 
         mouseDownTarget = null;
         // stage.addChild(mouseSystem.view);
-        mainOutputBuffer = utils.drawUtil.getMainOutputBuffer();
+        mainOutputBuffer = utils.drawUtil.createOutputBuffer(VIEWPORT);
         addListeners();
 
         if (!ready) {
