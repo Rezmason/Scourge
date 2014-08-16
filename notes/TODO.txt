@@ -1,4 +1,5 @@
 METABALLS, because I'm bored!
+RectangleTexture support
 
 About page text
 
