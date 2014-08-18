@@ -10,7 +10,223 @@ import net.rezmason.gl.utils.*;
 import net.rezmason.gl.*;
 import net.rezmason.gl.Data;
 
+import net.rezmason.utils.Zig;
+
 class Lab {
+
+    var utils:UtilitySet;
+    var metaballSystem:MetaballSystem;
+    var postSystem:PostSystem;
+
+    public function new(utils:UtilitySet, stage:Stage):Void {
+        this.utils = utils;
+        var width:Int = stage.stageWidth;
+        var height:Int = stage.stageHeight;
+
+        metaballSystem = new MetaballSystem(utils, width, height);
+        metaballSystem.loadSig.add(onLoaded);
+        postSystem = new PostSystem(utils, width, height, metaballSystem);
+        postSystem.loadSig.add(onLoaded);
+        
+        metaballSystem.init();
+        postSystem.init();
+    }
+
+    function onLoaded():Void {
+        if (metaballSystem.ready && postSystem.ready) {
+            utils.drawUtil.addRenderCall(onRender);
+        }
+    }
+
+    function onRender(w:Int, h:Int):Void {
+        metaballSystem.render();
+        postSystem.render();
+    }
+
+    public static function makeExtensions(utils:UtilitySet):String {
+        var str = '';
+        #if js
+            var extensions = [];
+
+            utils.programUtil.enableExtension("OES_standard_derivatives");
+            extensions.push('#extension GL_OES_standard_derivatives : enable');
+
+            utils.programUtil.enableExtension("OES_float_linear");
+            extensions.push('#extension GL_OES_float_linear : enable');
+
+            str = '${extensions.join("\n")}\nprecision mediump float;';
+        #end
+        return str;
+    }
+}
+
+class LabSystem {
+    public var loadSig:Zig<Void->Void>;
+    public var ready:Bool;
+    var utils:UtilitySet;
+    var width:Int;
+    var height:Int;
+    public function new(utils:UtilitySet, width:Int, height:Int):Void {
+        this.utils = utils;
+        this.width = width;
+        this.height = height;
+        loadSig = new Zig();
+        ready = false;
+    }
+
+    public function init():Void {
+
+    }
+
+    function update():Void {}
+    function draw():Void {}
+
+    public function render():Void {
+        if (ready) {
+            update();
+            draw();
+        }
+    }
+}
+
+class PostSystem extends LabSystem {
+
+    inline static var FpBV:Int = 3 + 2 + 2 + 1; // floats per ball vertex
+    inline static var VpB:Int = 4; // vertices per ball
+    
+    var metaballSystem:MetaballSystem;
+
+    var aPos:AttribsLocation;
+    var aUV:AttribsLocation;
+    var uSampler:UniformLocation;
+    var uParams:UniformLocation;
+    
+    var texture:Texture;
+    var program:Program;
+
+    public var buffer:OutputBuffer;
+
+    var phases:Array<Null<Float>>;
+
+    var vertBuffer:VertexBuffer;
+    var indexBuffer:IndexBuffer;
+
+    var t:Float;
+
+    public function new(utils:UtilitySet, width:Int, height:Int, metaballSystem:MetaballSystem):Void {
+        super(utils, width, height);
+        this.metaballSystem = metaballSystem;
+        
+    }
+
+    override public function init():Void {
+
+        t = 0;
+        
+        texture = metaballSystem.buffer.texture;
+
+        buffer = utils.drawUtil.createOutputBuffer(VIEWPORT);
+        buffer.resize(width, height);
+
+        var vertShader = '
+            attribute vec3 aPos;
+            attribute vec2 aUV;
+
+            varying vec2 vUV;
+
+            void main(void) {
+                vUV = aUV;
+                vec4 pos = vec4(aPos, 1.0);
+                pos.z = clamp(pos.z, 0.0, 1.0);
+                gl_Position = pos;
+            }
+        ';
+        var fragShader = '
+            varying vec2 vUV;
+
+            uniform sampler2D uSampler;
+            uniform vec4 uParams;
+
+            void main(void) {
+                float inv = 1.0 - texture2D(uSampler, vUV).b;
+                float brightness = 1.0 - inv * inv;
+                
+                float glob = brightness * 11.0 - 9.5;
+                
+                gl_FragColor = glob * vec4(0.2, 1.0, 0.2, 1.0);
+            }
+        ';
+
+        fragShader = Lab.makeExtensions(utils) + fragShader;
+
+        utils.programUtil.loadProgram(vertShader, fragShader, onProgramLoaded);
+
+        // Create geometry
+
+        var vertices:VertexArray = new VertexArray(VpB * FpBV);
+        var vert = [
+            -1,-1,0,0,1,0,0,1,
+            -1, 1,0,0,0,0,0,1,
+             1, 1,0,1,0,0,0,1,
+             1,-1,0,1,1,0,0,1,
+        ];
+        for (ike in 0...VpB * FpBV) vertices[ike] = vert[ike];
+        vertBuffer = utils.bufferUtil.createVertexBuffer(VpB, FpBV);
+        vertBuffer.uploadFromVector(vertices, 0, VpB);
+
+        var indices:IndexArray = new IndexArray(6);
+        var ind = [
+            0, 1, 2,
+            0, 2, 3,
+        ];
+        for (ike in 0...6) indices[ike] = ind[ike];
+        indexBuffer = utils.bufferUtil.createIndexBuffer(6);
+        indexBuffer.uploadFromVector(indices, 0, 6);
+    }
+
+    function onProgramLoaded(program:Program):Void {
+        this.program = program;
+
+        // Connect to shader
+
+        aPos     = utils.programUtil.getAttribsLocation(program, 'aPos'    );
+        aUV      = utils.programUtil.getAttribsLocation(program, 'aUV'     );
+        
+        uSampler   = utils.programUtil.getUniformLocation(program, 'uSampler'  );
+        uParams    = utils.programUtil.getUniformLocation(program, 'uParams');
+        
+        utils.programUtil.setFourProgramConstants(this.program, uParams, [0, 0, 0, 0]);
+        ready = true;
+        loadSig.dispatch();
+    }
+
+    override function update():Void {
+        t += 0.1;
+    }
+
+    override function draw():Void {
+        //*
+        utils.programUtil.setProgram(program);
+        utils.programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        utils.programUtil.setDepthTest(false);
+
+        utils.programUtil.setTextureAt(program, uSampler, texture); // uSampler contains our texture
+
+        utils.programUtil.setVertexBufferAt(program, aPos,     vertBuffer, 0, 3); // aPos contains x,y,z
+        utils.programUtil.setVertexBufferAt(program, aUV,      vertBuffer, 3, 2); // aUV contains u,v
+
+        utils.drawUtil.setOutputBuffer(buffer);
+        utils.drawUtil.clear(0xFF000000);
+        utils.drawUtil.drawTriangles(indexBuffer, 0, 2);
+        utils.drawUtil.finishOutputBuffer(buffer);
+
+        utils.programUtil.setVertexBufferAt(program, aPos,     null, 0, 3); // aPos contains x,y,z
+        utils.programUtil.setVertexBufferAt(program, aUV,      null, 3, 2); // aUV contains u,v
+        /**/
+    }
+}
+
+class MetaballSystem extends LabSystem {
 
     inline static var GRID_WIDTH:Int = 10;
     inline static var NUM_BALLS:Int = GRID_WIDTH * GRID_WIDTH;
@@ -36,7 +252,7 @@ class Lab {
     var bodyTransform:Matrix3D;
     var cameraTransform:Matrix3D;
 
-    var mainOutputBuffer:OutputBuffer;
+    public var buffer:OutputBuffer;
 
     var phases:Array<Null<Float>>;
 
@@ -45,31 +261,20 @@ class Lab {
     var indices:IndexArray;
     var indexBuffer:IndexBuffer;
 
-    var utils:UtilitySet;
-    var stage:Stage;
-
-    var width:Int;
-    var height:Int;
-
     var t:Float;
 
-    public function new(utils:UtilitySet, stage:Stage):Void {
-        this.utils = utils;
-        this.stage = stage;
+    override public function init():Void {
 
-        texture = utils.textureUtil.createTexture(getBitmapData('metaballs/metaball.png'));
+        t = 0;
+
+        texture = utils.textureUtil.createBitmapDataTexture(getBitmapData('metaballs/metaball.png'));
 
         bodyTransform = new Matrix3D();
         cameraTransform = new Matrix3D();
-        cameraTransform.rawData = Vector.ofArray([2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1]);
+        cameraTransform.rawData = Vector.ofArray(cast [2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1]);
 
-        width = stage.stageWidth;
-        height = stage.stageHeight;
-
-        mainOutputBuffer = utils.drawUtil.createOutputBuffer(VIEWPORT);
-        mainOutputBuffer.resize(width, height);
-
-        // Create program
+        buffer = utils.drawUtil.createOutputBuffer(TEXTURE);
+        buffer.resize(width, height);
 
         var vertShader = '
             attribute vec3 aPos;
@@ -103,6 +308,8 @@ class Lab {
                 gl_FragColor = texture2D(uSampler, vUV);
             }
         ';
+
+        fragShader = Lab.makeExtensions(utils) + fragShader;
 
         utils.programUtil.loadProgram(vertShader, fragShader, onProgramLoaded);
 
@@ -175,15 +382,10 @@ class Lab {
 
         shapeBuffer = utils.bufferUtil.createVertexBuffer(NUM_BALLS * VpB, FpBV);
         indexBuffer = utils.bufferUtil.createIndexBuffer(NUM_BALLS * IpB);
-
-        update();
-
-        t = 0;
     }
 
     function onProgramLoaded(program:Program):Void {
         this.program = program;
-        utils.programUtil.setFourProgramConstants(this.program, uParams, [0, 0, 0, 0]);
 
         // Connect to shader
 
@@ -197,10 +399,12 @@ class Lab {
         uCameraMat = utils.programUtil.getUniformLocation(program, 'uCameraMat');
         uBodyMat   = utils.programUtil.getUniformLocation(program, 'uBodyMat'  );
 
-        utils.drawUtil.addRenderCall(onRender);
+        utils.programUtil.setFourProgramConstants(this.program, uParams, [0, 0, 0, 0]);
+        ready = true;
+        loadSig.dispatch();
     }
 
-    function update():Void {
+    override function update():Void {
         t += 0.1;
         
         //bodyTransform.appendRotation(1, Vector3D.Z_AXIS);
@@ -216,12 +420,8 @@ class Lab {
         indexBuffer.uploadFromVector(indices, 0, NUM_BALLS * IpB);
     }
 
-    function onRender(w:Int, h:Int):Void {
-
-        if (program == null) return;
-
-        update();
-
+    override function draw():Void {
+        //*
         utils.programUtil.setProgram(program);
         utils.programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         utils.programUtil.setDepthTest(false);
@@ -236,23 +436,15 @@ class Lab {
         utils.programUtil.setVertexBufferAt(program, aScale,   shapeBuffer, 5, 1); // aScale contains s
         utils.programUtil.setVertexBufferAt(program, aUV,      shapeBuffer, 6, 2); // aUV contains u,v
 
-        //*
-        utils.drawUtil.setOutputBuffer(mainOutputBuffer);
+        utils.drawUtil.setOutputBuffer(buffer);
         utils.drawUtil.clear(0xFF000000);
         utils.drawUtil.drawTriangles(indexBuffer, 0, TpB * NUM_BALLS);
-        utils.drawUtil.finishOutputBuffer(mainOutputBuffer);
+        utils.drawUtil.finishOutputBuffer(buffer);
+
+        utils.programUtil.setVertexBufferAt(program, aPos,     null, 0, 3); // aPos contains x,y,z
+        utils.programUtil.setVertexBufferAt(program, aCorner,  null, 3, 2); // aCorner contains h,v
+        utils.programUtil.setVertexBufferAt(program, aScale,   null, 5, 1); // aScale contains s
+        utils.programUtil.setVertexBufferAt(program, aUV,      null, 6, 2); // aUV contains u,v
         /**/
-    }
-
-    inline function arrToVertexArray(arr:Array<Float>, num):VertexArray {
-        var va:VertexArray = new VertexArray(arr.length * num);
-        for (i in 0...arr.length) va[i] = arr[i];
-        return va;
-    }
-
-    inline function arrToIndexArray(arr:Array<UInt>):IndexArray {
-        var ia:IndexArray = new IndexArray(arr.length);
-        for (i in 0...arr.length) ia[i] = arr[i];
-        return ia;
     }
 }

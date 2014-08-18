@@ -14,12 +14,10 @@ class GlyphTexture {
     public function new(textureUtil:TextureUtil, font:FlatFont):Void {
         this.font = font;
         var bmp:BitmapData = font.getBitmapDataClone();
-        texture = textureUtil.createTexture(customize(bmp));
+        texture = textureUtil.createBitmapDataTexture(bmp);
 
         #if flash
             bmp.dispose();
         #end
     }
-
-    function customize(src:BitmapData):BitmapData { return src; }
 }

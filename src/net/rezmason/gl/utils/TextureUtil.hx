@@ -10,37 +10,14 @@ import net.rezmason.gl.utils.Util;
 
 class TextureUtil extends Util {
 
-    public inline function createTexture(src:BitmapData):Texture {
+    public inline function createBitmapDataTexture(bmd:BitmapData):Texture {
         #if flash
-            var size:Int = src.width;
-            var texture:Texture = context.createTexture(size, size, Context3DTextureFormat.BGRA, false);
-
-            /*
-            var lev:Int = 0;
-            while (size > 0) {
-                var bmp:BitmapData = getResizedBitmapData(src, size);
-                texture.uploadFromBitmapData(bmp, lev);
-                bmp.dispose();
-                lev++;
-                size = Std.int(size / 2);
-            }
-            */
-
-            texture.uploadFromBitmapData(src);
-
-            return texture;
+            var size:Int = bmd.width;
+            var tex = context.createTexture(size, size, Context3DTextureFormat.BGRA, false);
+            tex.uploadFromBitmapData(bmd);
+            return TEX(tex);
         #else
-            return src;
+            return BMD(bmd);
         #end
-    }
-
-    inline function getResizedBitmapData(bmp:BitmapData, width:UInt):BitmapData {
-        var mat:Matrix = new Matrix();
-        mat.scale(width / bmp.width, width / bmp.width);
-
-        var bd:BitmapData = new BitmapData(width, width, bmp.transparent, 0x00FFFFFF);
-        bd.draw(bmp, mat);
-
-        return bd;
     }
 }

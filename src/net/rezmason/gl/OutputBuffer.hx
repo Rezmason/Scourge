@@ -2,6 +2,7 @@ package net.rezmason.gl;
 
 #if flash
     import flash.display.BitmapData;
+    import flash.display3D.Context3DTextureFormat;
 #else
     import openfl.gl.GL;
     import openfl.gl.GLFramebuffer;
@@ -16,11 +17,13 @@ class OutputBuffer {
 
     var context:Context;
 
+    public var texture(default, null):Texture;
+
     #if flash
         var bitmapData:BitmapData;
     #else
         var frameBuffer:GLFramebuffer;
-        var texture:GLTexture;
+        var glTexture:GLTexture;
         var renderBuffer:GLRenderbuffer;
     #end
 
@@ -32,21 +35,24 @@ class OutputBuffer {
     @:allow(net.rezmason.gl)
     function new(type:OutputBufferType, context:Context):Void {
         this.type = type;
-
         this.context = context;
 
-        switch (type) {
-            case VIEWPORT:
-            case READBACK:
-                #if flash
-                    bitmapData = new BitmapData(1, 1, true, 0);
-                #else
+        #if flash
+            switch (type) {
+                case VIEWPORT:
+                case READBACK: bitmapData = new BitmapData(1, 1, true, 0);
+                case TEXTURE: texture = TEX(context.createTexture(1, 1, Context3DTextureFormat.BGRA, true));
+            }
+        #else
+            switch (type) {
+                case VIEWPORT:
+                case _:
                     frameBuffer = GL.createFramebuffer();
-                    texture = GL.createTexture();
+                    glTexture = GL.createTexture();
                     renderBuffer = GL.createRenderbuffer();
-                #end
-            case TEXTURE:
-        }
+                    texture = TEX(glTexture);
+            }
+        #end
     }
 
     public function resize(width:Int, height:Int):Void {
@@ -56,37 +62,47 @@ class OutputBuffer {
         this.width = width;
         this.height = height;
 
-        switch (type) {
-            case VIEWPORT:
-                #if flash
-                    context.configureBackBuffer(width, height, 2, true);
-                #else
-                    GL.viewport(0, 0, width, height);
-                #end
-            case READBACK:
-                #if flash
+        #if flash
+            switch (type) {
+                case VIEWPORT: context.configureBackBuffer(width, height, 2, true);
+                case READBACK:
                     if (bitmapData != null) bitmapData.dispose();
                     bitmapData = new BitmapData(width, height, true, 0);
-                #else
+                case TEXTURE:
+                    var size:Int = width > height ? width : height;
+                    size = largestPowerOfTwo(size);
+                    texture = TEX(context.createTexture(size, size, Context3DTextureFormat.BGRA, true));
+            }
+        #else
+            switch (type) {
+                case VIEWPORT: GL.viewport(0, 0, width, height);
+                case _:
                     GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
 
-                    GL.bindTexture(GL.TEXTURE_2D, texture);
+                    GL.bindTexture(GL.TEXTURE_2D, glTexture);
                     GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
                     GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+                    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
                     GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, null);
 
                     GL.bindRenderbuffer(GL.RENDERBUFFER, renderBuffer);
                     GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, width, height);
 
-                    GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, texture, 0);
+                    GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, glTexture, 0);
                     GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderBuffer);
 
                     GL.bindTexture(GL.TEXTURE_2D, null);
                     GL.bindRenderbuffer(GL.RENDERBUFFER, null);
                     GL.bindFramebuffer(GL.FRAMEBUFFER, null);
-                #end
-            case TEXTURE:
-        }
+            }
+        #end
+    }
+
+    inline static function largestPowerOfTwo(input:Int):Int {
+        var output:Int = 1;
+        while (output < input) output = output * 2;
+        return output;
     }
 }

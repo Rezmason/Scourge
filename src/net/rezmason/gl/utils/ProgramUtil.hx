@@ -119,17 +119,22 @@ class ProgramUtil extends Util {
     }
 
     public inline function setTextureAt(program:Program, location:UniformLocation, texture:Texture):Void {
-
         #if flash
-            program.setTextureAt(location, texture);
+            switch (texture) {
+                case TEX(tex): program.setTextureAt(location, tex);
+                case _:
+            }
         #else
             if (texture != null) {
                 GL.activeTexture(GL.TEXTURE0);
-                GL.bindBitmapDataTexture(cast texture);
+                switch (texture) {
+                    case BMD(bmd): GL.bindBitmapDataTexture(bmd);
+                    case TEX(tex): GL.bindTexture(GL.TEXTURE_2D, tex);
+                }
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-
-                // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
-                // GL.generateMipmap(GL.TEXTURE_2D);
+                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
                 GL.uniform1i(location, 0);
             } else {

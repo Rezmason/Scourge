@@ -1,5 +1,11 @@
-METABALLS, because I'm bored!
 RectangleTexture support
+
+The Loupe
+    Get it to traverse the board
+    Then, get it to display the current piece
+    Then, give it buttons
+
+Add Metaballs to the game
 
 About page text
 

@@ -67,7 +67,11 @@ class DrawUtil extends Util {
     public inline function setOutputBuffer(outputBuffer:OutputBuffer):Void {
         #if flash
             switch (outputBuffer.type) {
-                case TEXTURE: // context.setRenderToTexture(outputBuffer.texture);
+                case TEXTURE: 
+                    switch (outputBuffer.texture) {
+                        case TEX(tex): context.setRenderToTexture(tex);
+                        case _:
+                    }
                 case _: context.setRenderToBackBuffer();
             }
         #else
