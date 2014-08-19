@@ -13,7 +13,7 @@ class TextureUtil extends Util {
     public inline function createBitmapDataTexture(bmd:BitmapData):Texture {
         #if flash
             var size:Int = bmd.width;
-            var tex = context.createTexture(size, size, Context3DTextureFormat.BGRA, false);
+            var tex = context.createRectangleTexture(size, size, Context3DTextureFormat.BGRA, false);
             tex.uploadFromBitmapData(bmd);
             return TEX(tex);
         #else

@@ -118,9 +118,10 @@ class ProgramUtil extends Util {
         #end
     }
 
-    public inline function setTextureAt(program:Program, location:UniformLocation, texture:Texture):Void {
+    public inline function setTextureAt(program:Program, location:UniformLocation, texture:Null<Texture>):Void {
         #if flash
             switch (texture) {
+                case null: program.setTextureAt(location, null);
                 case TEX(tex): program.setTextureAt(location, tex);
                 case _:
             }

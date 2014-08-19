@@ -53,7 +53,13 @@ class Converter extends BasicWorker<GLSLInput, AGALOutput> {
             if (assembler == null) assembler = new AGALMiniAssembler();
 
             json = haxe.JSON.Json.parse(jsonString);
-            assembler.assemble(cast input.type, json.agalasm, AGAL_VERSION);
+
+            var asm = json.agalasm;
+            if (input.texParam != null) {
+                asm = ~/<linear mipdisable repeat 2d>/g.replace(asm, input.texParam);
+            }
+
+            assembler.assemble(cast input.type, asm, AGAL_VERSION);
             nativeShader = assembler.agalcode;
             if (nativeShader.length == 0) error = assembler.error;
         }

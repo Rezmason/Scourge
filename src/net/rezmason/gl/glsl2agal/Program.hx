@@ -5,7 +5,7 @@ import flash.display3D.Context3DProgramType;
 import flash.display3D.Context3DVertexBufferFormat;
 import flash.display3D.Program3D;
 import flash.display3D.VertexBuffer3D;
-import flash.display3D.textures.Texture;
+import flash.display3D.textures.TextureBase;
 import flash.geom.Matrix3D;
 import flash.utils.ByteArray;
 import flash.Vector;
@@ -55,6 +55,8 @@ class Program {
             } else {
                 var shader:Shader = new Shader(agal);
 
+                trace (agal.json.agalasm);
+
                 if (agal.type == Context3DProgramType.VERTEX) vertShader = shader;
                 else fragShader = shader;
 
@@ -67,7 +69,7 @@ class Program {
         }
 
         agency.addWork({type:Context3DProgramType.VERTEX, source:vertSource}, onWorkDone);
-        agency.addWork({type:Context3DProgramType.FRAGMENT, source:fragSource}, onWorkDone);
+        agency.addWork({type:Context3DProgramType.FRAGMENT, source:fragSource, texParam:'<linear mipdisable clamp 2d>'}, onWorkDone);
     }
 
     public function new(context3D:Context3D) {
@@ -124,7 +126,7 @@ class Program {
     // TODO set from vector and byte array
 
     // AGAL only allows texture for fragment shader
-    public inline function setTextureAt(loc:Int, texture:Texture) {
+    public inline function setTextureAt(loc:Int, texture:TextureBase) {
         fragmentShader.setTextureAt(context3D, getLocIndex(loc), texture);
     }
 

@@ -36,7 +36,7 @@ class UtilitySet {
                 init();
             } else {
                 stage3D.addEventListener(Event.CONTEXT3D_CREATE, onCreate);
-                stage3D.requestContext3D(cast Context3DRenderMode.AUTO, cast Context3DProfile.BASELINE); // STANDARD
+                stage3D.requestContext3D(cast Context3DRenderMode.AUTO, cast Context3DProfile.BASELINE_EXTENDED); // STANDARD
             }
         #else
             if (View.isSupported) {

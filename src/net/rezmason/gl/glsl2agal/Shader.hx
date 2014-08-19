@@ -5,7 +5,7 @@ import flash.display3D.Context3D;
 import flash.display3D.Context3DProgramType;
 import flash.display3D.Context3DVertexBufferFormat;
 import flash.display3D.VertexBuffer3D;
-import flash.display3D.textures.Texture;
+import flash.display3D.textures.TextureBase;
 import flash.geom.Matrix3D;
 import flash.utils.Endian;
 import flash.utils.ByteArray;
@@ -79,7 +79,7 @@ class Shader {
         return Std.parseInt(registerName.substr(2)); //vc#, fc#, fs#
     }
 
-    inline function setTextureAt(context3D:Context3D, index:Int, texture:Texture) {
+    inline function setTextureAt(context3D:Context3D, index:Int, texture:TextureBase) {
         if (type == Context3DProgramType.FRAGMENT)
             context3D.setTextureAt( index, texture);
     }

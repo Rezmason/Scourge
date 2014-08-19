@@ -41,7 +41,7 @@ class OutputBuffer {
             switch (type) {
                 case VIEWPORT:
                 case READBACK: bitmapData = new BitmapData(1, 1, true, 0);
-                case TEXTURE: texture = TEX(context.createTexture(1, 1, Context3DTextureFormat.BGRA, true));
+                case TEXTURE: texture = TEX(context.createRectangleTexture(1, 1, Context3DTextureFormat.BGRA, true));
             }
         #else
             switch (type) {
@@ -69,9 +69,7 @@ class OutputBuffer {
                     if (bitmapData != null) bitmapData.dispose();
                     bitmapData = new BitmapData(width, height, true, 0);
                 case TEXTURE:
-                    var size:Int = width > height ? width : height;
-                    size = largestPowerOfTwo(size);
-                    texture = TEX(context.createTexture(size, size, Context3DTextureFormat.BGRA, true));
+                    texture = TEX(context.createRectangleTexture(width, height, Context3DTextureFormat.BGRA, true));
             }
         #else
             switch (type) {
@@ -98,11 +96,5 @@ class OutputBuffer {
                     GL.bindFramebuffer(GL.FRAMEBUFFER, null);
             }
         #end
-    }
-
-    inline static function largestPowerOfTwo(input:Int):Int {
-        var output:Int = 1;
-        while (output < input) output = output * 2;
-        return output;
     }
 }

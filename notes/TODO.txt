@@ -1,5 +1,3 @@
-RectangleTexture support
-
 The Loupe
     Get it to traverse the board
     Then, get it to display the current piece
@@ -14,6 +12,7 @@ Game config page
 
 Wait. Haxe 3 supports inline variable initialization?!
     RABLFLABL
+    ~/^    .*var [^=;]+;$/g
 
 Board
     Change ripple behavior

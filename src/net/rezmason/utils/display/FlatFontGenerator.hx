@@ -123,8 +123,8 @@ class FlatFontGenerator {
 
         function proceed():Void {
 
-            var width :Int = largestPowerOfTwo(Math.ceil(glyphWidth  * numColumns));
-            var height:Int = largestPowerOfTwo(Math.ceil(glyphHeight * numRows   ));
+            var width :Int = Std.int(Math.ceil(glyphWidth  * numColumns));
+            var height:Int = Std.int(Math.ceil(glyphHeight * numRows   ));
             
             var bitmapData:BitmapData = new BitmapData(width, width, true, 0xFF0000FF);
 
@@ -180,11 +180,5 @@ class FlatFontGenerator {
             var sb:SerializedBitmap = {width:bd.width, height:bd.height, bytes:bd.getPixels(bd.rect)};
             sdfAgency.addWork({source:sb, cutoff:cutoff}, addSDF.bind(ike));
         }
-    }
-
-    inline static function largestPowerOfTwo(input:Int):Int {
-        var output:Int = 1;
-        while (output < input) output = output * 2;
-        return output;
     }
 }

@@ -6,6 +6,7 @@ import flash.utils.ByteArray;
 typedef GLSLInput = {
     var type:Context3DProgramType;
     var source:String;
+    @:optional var texParam:String;
 }
 
 typedef AGALOutput = {
