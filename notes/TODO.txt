@@ -1,18 +1,30 @@
+Handle context loss
+    UtilitySet should handle it directly
+    onRender belongs there too
+
+Break down BoardBody
+
 The Loupe
+    Get it ON the board
+        "Scene graph" logic; two bodies share transform info, camera
     Get it to traverse the board
+        BoardBody needs to expose glyph position somehow
     Then, get it to display the current piece
     Then, give it buttons
 
-Add Metaballs to the game
+Where does the loupe live?
+    SwipeView 2.0
+        Round rectangles showing information
+        You pull them out, they expand to loupes
+            One for placement
+            One for biting
+            One for player stats
+            One for DNA?
 
-About page text
+Add Metaballs to the game
 
 Settings page
 Game config page
-
-Wait. Haxe 3 supports inline variable initialization?!
-    RABLFLABL
-    ~/^    .*var [^=;]+;$/g
 
 Board
     Change ripple behavior
@@ -44,6 +56,8 @@ Refactor the console stuff- within reason
 Support output hints
 
 Code review?
+
+About page text
 
 Music box inspired microfluidic lab controller:
 https://www.youtube.com/watch?v=kNQToOEFNmY
@@ -130,23 +144,14 @@ Later
     Destination goal rule
     Allow goal rules to apply to specific players
 
-Metaballs should be simpler now
-    Particles are added-together blurcles
-    Screen-size quad gets textured and shaded in another pass
-    Third pass renders the "real geom" and then overlays the metaballs on top
-
-Alternative: 2D metaballs in displacement map
-    Vertex shader:
-        - combines displacement map with normal map to increase height (with a curve)
-        - passes info to fragment shader; transition from surface to slime might be different for texture than for geom
-
 Texture synthesis
     Dots
     Stripes
     Put them on an environmental map
     Use a shader to map the texture onto a blob! :-)
 
-Contact Jason Whong?
+Contact Jason Whong
+Contact "OpenFungus" group
 
 http://twitter.com/CPriestman/status/422042402484801537
     When announcing a game:
