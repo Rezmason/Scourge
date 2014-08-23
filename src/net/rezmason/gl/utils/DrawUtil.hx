@@ -14,29 +14,6 @@ using Lambda;
 
 class DrawUtil extends Util {
 
-    var renderCalls:Array<Int->Int->Void>;
-
-    #if flash
-        var stageRect:Rectangle;
-    #end
-
-    public function new(view:View, context:Context):Void {
-        super(view, context);
-        renderCalls = [];
-
-        #if flash
-            stageRect = new Rectangle(0, 0, 1, 1);
-            view.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-            view.addEventListener(Event.RESIZE, onResize);
-        #else
-            view.render = onRender;
-        #end
-    }
-
-    public inline function addRenderCall(func:Int->Int->Void):Void { renderCalls.push(func); }
-
-    public inline function removeRenderCall(func:Int->Int->Void):Void { renderCalls.remove(func); }
-
     public inline function clear(color:Int = 0x0, alpha:Float = 1):Void {
         var red:Float   = ((color >> 16) & 0xFF) / 0xFF;
         var green:Float = ((color >>  8) & 0xFF) / 0xFF;
@@ -106,21 +83,4 @@ class DrawUtil extends Util {
             GL.readPixels(0, 0, outputBuffer.width, outputBuffer.height, GL.RGBA, outputBuffer.format, data);
         #end
     }
-
-    function onRender(rect:Rectangle):Void {
-        var w:Int = Std.int(rect.width);
-        var h:Int = Std.int(rect.height);
-        for (func in renderCalls) func(w, h);
-    }
-
-    #if flash
-    function onResize(event:Event):Void {
-        stageRect.width = view.stageWidth;
-        stageRect.height = view.stageHeight;
-    }
-
-    function onEnterFrame(event:Event):Void {
-        onRender(stageRect);
-    }
-    #end
 }

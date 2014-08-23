@@ -39,7 +39,7 @@ class Lab {
 
     function onLoaded():Void {
         if (metaballSystem.ready && postSystem.ready) {
-            utils.drawUtil.addRenderCall(onRender);
+            utils.onRender = onRender;
         }
     }
 

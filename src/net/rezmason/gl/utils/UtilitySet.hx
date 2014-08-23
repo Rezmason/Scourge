@@ -1,6 +1,7 @@
 package net.rezmason.gl.utils;
 
 import flash.display.Stage;
+import flash.geom.Rectangle;
 
 #if flash
     import flash.events.Event;
@@ -21,9 +22,12 @@ class UtilitySet {
     public var programUtil(default, null):ProgramUtil;
     public var bufferUtil(default, null):BufferUtil;
 
+    public var onRender:Int->Int->Void;
+
     var cbk:Void->Void;
     var view:View;
     var context:Context;
+    #if flash var stageRect:Rectangle; #end
 
     public function new(stage:Stage, cbk:Void->Void):Void {
         this.cbk = cbk;
@@ -68,6 +72,29 @@ class UtilitySet {
         programUtil = new ProgramUtil(view, context);
         bufferUtil = new BufferUtil(view, context);
 
+        #if flash
+            stageRect = new Rectangle(0, 0, 1, 1);
+            view.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+            view.addEventListener(Event.RESIZE, onResize);
+        #else
+            view.render = handleRender;
+        #end
+
         haxe.Timer.delay(cbk, 0);
     }
+
+    function handleRender(rect:Rectangle):Void {
+        if (onRender != null) onRender(Std.int(rect.width), Std.int(rect.height));
+    }
+
+    #if flash
+        function onResize(event:Event):Void {
+            stageRect.width = view.stageWidth;
+            stageRect.height = view.stageHeight;
+        }
+
+        function onEnterFrame(event:Event):Void {
+            handleRender(stageRect);
+        }
+    #end
 }

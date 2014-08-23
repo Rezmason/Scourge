@@ -108,7 +108,7 @@ class Engine {
     }
 
     function addListeners():Void {
-        utils.drawUtil.addRenderCall(onRender);
+        utils.onRender = onRender;
         // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
