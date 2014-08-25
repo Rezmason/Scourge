@@ -97,6 +97,9 @@ class UIBody extends Body {
             glyphHeightInPoints = size;
             glyphHeightInPixels = glyphHeightInPoints * getScreenDPI() / NATIVE_DPI;
             glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
+            glyphWidth = glyphWidthInPixels / stageWidth;
+            glyphHeight = glyphHeightInPixels / stageHeight;
+            setGlyphScale(glyphWidth, glyphHeight);
             resize();
         }
         return worked;

@@ -31,6 +31,9 @@ class Body {
     var trueNumGlyphs:Int;
     var vanishingPoint:Point;
 
+    var stageWidth:Int;
+    var stageHeight:Int;
+
     var projection:Matrix3D;
 
     public var glyphs:Array<Glyph>;
@@ -38,6 +41,8 @@ class Body {
     var bufferUtil:BufferUtil;
 
     function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+        stageWidth = 0;
+        stageHeight = 0;
         redrawHitSignal = new Zig<Void->Void>();
         id = ++_ids;
         this.bufferUtil = bufferUtil;
@@ -113,6 +118,9 @@ class Body {
 
     public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
 
+        this.stageWidth = stageWidth;
+        this.stageHeight = stageHeight;
+
         var cameraRect:Rectangle = viewRect.clone();
         cameraRect.offset(-0.5, -0.5);
         cameraRect.x *= 2;
@@ -121,7 +129,7 @@ class Body {
         cameraRect.height *= 2;
 
         camera.identity();
-        camera.append(scaleModeBox(viewRect, stageWidth, stageHeight));
+        camera.append(scaleModeBox(viewRect, scaleMode, stageWidth, stageHeight));
         camera.appendScale(cameraRect.width, cameraRect.height, 1);
         camera.appendTranslation((cameraRect.left + cameraRect.right) * 0.5, (cameraRect.top + cameraRect.bottom) * -0.5, 0);
 
@@ -159,7 +167,7 @@ class Body {
         camera.rawData = rawData;
     }
 
-    inline function scaleModeBox(rect:Rectangle, stageWidth:Float, stageHeight:Float):Matrix3D {
+    inline static function scaleModeBox(rect:Rectangle, scaleMode:BodyScaleMode, stageWidth:Int, stageHeight:Int):Matrix3D {
         var box:Matrix3D = new Matrix3D();
 
         var doubleRatio:Float = (rect.width / rect.height) * (stageWidth / stageHeight);
