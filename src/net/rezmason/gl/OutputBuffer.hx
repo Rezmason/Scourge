@@ -25,6 +25,7 @@ class OutputBuffer {
         var frameBuffer:GLFramebuffer;
         var glTexture:GLTexture;
         var renderBuffer:GLRenderbuffer;
+        var format:Int;
     #end
 
     var type:net.rezmason.gl.OutputBufferType;
@@ -41,9 +42,10 @@ class OutputBuffer {
             switch (type) {
                 case VIEWPORT:
                 case READBACK: bitmapData = new BitmapData(1, 1, true, 0);
-                case TEXTURE: texture = TEX(context.createRectangleTexture(1, 1, Context3DTextureFormat.BGRA, true));
+                case TEXTURE: texture = TEX(context.createRectangleTexture(1, 1, cast "rgbaHalfFloat", true)); // Context3DTextureFormat.RGBA_HALF_FLOAT
             }
         #else
+            format = type == READBACK ? GL.UNSIGNED_BYTE : GL.FLOAT;
             switch (type) {
                 case VIEWPORT:
                 case _:
@@ -69,7 +71,7 @@ class OutputBuffer {
                     if (bitmapData != null) bitmapData.dispose();
                     bitmapData = new BitmapData(width, height, true, 0);
                 case TEXTURE:
-                    texture = TEX(context.createRectangleTexture(width, height, Context3DTextureFormat.BGRA, true));
+                    texture = TEX(context.createRectangleTexture(width, height, cast "rgbaHalfFloat", true)); // Context3DTextureFormat.RGBA_HALF_FLOAT
             }
         #else
             switch (type) {
@@ -83,7 +85,7 @@ class OutputBuffer {
                     GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
                     GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
-                    GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, null);
+                    GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, format, null);
 
                     GL.bindRenderbuffer(GL.RENDERBUFFER, renderBuffer);
                     GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, width, height);

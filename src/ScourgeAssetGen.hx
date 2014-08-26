@@ -52,7 +52,7 @@ class ScourgeAssetGen {
         ];
         FlatFontGenerator.flatten(sets, 72, 72, 1, 20, deployFont.bind(_, "full"));
         
-        MetaballTextureGenerator.makeTexture(25, 25, deployImage.bind(_, "metaball"));
+        MetaballTextureGenerator.makeTexture(30, 0.62, 20, deployImage.bind(_, "metaball"));
 
     }
 

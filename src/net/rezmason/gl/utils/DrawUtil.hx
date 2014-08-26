@@ -103,7 +103,7 @@ class DrawUtil extends Util {
             }
         #else
             setOutputBuffer(outputBuffer);
-            GL.readPixels(0, 0, outputBuffer.width, outputBuffer.height, GL.RGBA, GL.UNSIGNED_BYTE, data);
+            GL.readPixels(0, 0, outputBuffer.width, outputBuffer.height, GL.RGBA, outputBuffer.format, data);
         #end
     }
 
