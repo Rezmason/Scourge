@@ -26,7 +26,13 @@ class Lab {
 
     function init():Void {
 
-        var params = [0., 0., 0., 0.];
+        var threshold:Float = 0.7;
+        var envelope:Float = 0.02;
+
+        var lower:Float = threshold - envelope;
+        var upper:Float = threshold + envelope;
+
+        var params = [lower, upper, 0., 0.];
 
         metaballSystem = new MetaballSystem(utils, stage.stageWidth, stage.stageHeight, params);
         metaballSystem.loadSig.add(onLoaded);
@@ -108,11 +114,14 @@ class PostSystem extends LabSystem {
 
     var aPos:AttribsLocation;
     var aUV:AttribsLocation;
-    var uSampler:UniformLocation;
+    var uMetaballSampler:UniformLocation;
+    var uGlobSampler:UniformLocation;
     var uParams:UniformLocation;
     var uColor:UniformLocation;
+    var uGlobMat:UniformLocation;
     
-    var texture:Texture;
+    var metaballTexture:Texture;
+    var globTexture:Texture;
     var program:Program;
 
     public var buffer:OutputBuffer;
@@ -124,19 +133,22 @@ class PostSystem extends LabSystem {
 
     var color:Array<Float>;
 
+    var globMat:Matrix3D;
     var t:Float;
 
     public function new(utils:UtilitySet, width:Int, height:Int, params:Array<Float>, metaballSystem:MetaballSystem):Void {
         super(utils, width, height, params);
         this.metaballSystem = metaballSystem;
-        color = [1.0, 0.0, 0.56, 1.0];
     }
 
     override public function init():Void {
 
         t = 0;
+        color = [1.0, 0.0, 0.56, 1.0];
+        globMat = new Matrix3D();
         
-        texture = metaballSystem.buffer.texture;
+        metaballTexture = metaballSystem.buffer.texture;
+        globTexture = utils.textureUtil.createBitmapDataTexture(getBitmapData('metaballs/glob.png'));
 
         buffer = utils.drawUtil.createOutputBuffer(VIEWPORT);
         buffer.resize(width, height);
@@ -157,24 +169,40 @@ class PostSystem extends LabSystem {
         var fragShader = '
             varying vec2 vUV;
 
-            uniform sampler2D uSampler;
+            uniform sampler2D uMetaballSampler;
+            uniform sampler2D uGlobSampler;
             uniform vec4 uParams;
             uniform vec4 uColor;
+            uniform mat4 uGlobMat;
 
             void main(void) {
-                float brightness = texture2D(uSampler, vUV).b;
                 
-                float threshold = 0.7;
-                float envelope = 0.02;
+                float tex = texture2D(uMetaballSampler, vUV).b;
+                
+                float lower = uParams.x;
+                float upper = uParams.y;
 
-                float lower = threshold - envelope;
-                float upper = threshold + envelope;
-
-                if (brightness < lower) brightness = 0.4 * (brightness / lower);
-                else if (brightness < upper) brightness = mix(0.4, 1.0, (brightness - lower) / (upper - lower));
+                float brightness = 0.0;
+                if (tex < lower) brightness = 0.4 * (tex / lower);
+                else if (tex < upper) brightness = mix(0.4, 1.0, (tex - lower) / (upper - lower));
                 else brightness = 1.0;
-                
-                gl_FragColor = vec4(brightness * uColor.rgb, 1.0);
+
+                float speculars = 0.0;
+                if (brightness > 0.4) {
+                    float x1 = clamp(texture2D(uMetaballSampler, vUV - vec2(0.005, 0.000)).b - lower, 0.0, 1.0);
+                    float y1 = clamp(texture2D(uMetaballSampler, vUV - vec2(0.000, 0.005)).b - lower, 0.0, 1.0);
+
+                    float x2 = clamp(texture2D(uMetaballSampler, vUV + vec2(0.005, 0.000)).b - lower, 0.0, 1.0);
+                    float y2 = clamp(texture2D(uMetaballSampler, vUV + vec2(0.000, 0.005)).b - lower, 0.0, 1.0);
+
+                    vec2 diff = vec2(x2 - x1, y2 - y1) * 0.8;
+
+                    diff = (uGlobMat * vec4(diff, 0.0, 1.0)).xy;
+                    
+                    speculars = texture2D(uGlobSampler, diff + 0.5).g;
+                }
+
+                gl_FragColor = vec4(brightness * (uColor.rgb + speculars), 1.0);
             }
         ';
 
@@ -213,9 +241,11 @@ class PostSystem extends LabSystem {
         aPos     = utils.programUtil.getAttribsLocation(program, 'aPos'    );
         aUV      = utils.programUtil.getAttribsLocation(program, 'aUV'     );
         
-        uSampler   = utils.programUtil.getUniformLocation(program, 'uSampler'  );
+        uMetaballSampler   = utils.programUtil.getUniformLocation(program, 'uMetaballSampler'  );
+        uGlobSampler = utils.programUtil.getUniformLocation(program, 'uGlobSampler'  );
         uParams    = utils.programUtil.getUniformLocation(program, 'uParams');
         uColor     = utils.programUtil.getUniformLocation(program, 'uColor');
+        uGlobMat = utils.programUtil.getUniformLocation(program, 'uGlobMat');
         
         ready = true;
         loadSig.dispatch();
@@ -223,6 +253,7 @@ class PostSystem extends LabSystem {
 
     override function update():Void {
         t += 0.1;
+        globMat.appendRotation(2, Vector3D.Z_AXIS);
     }
 
     override function draw():Void {
@@ -231,9 +262,11 @@ class PostSystem extends LabSystem {
         utils.programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         utils.programUtil.setDepthTest(false);
 
-        utils.programUtil.setTextureAt(program, uSampler, texture); // uSampler contains our texture
-        utils.programUtil.setFourProgramConstants(this.program, uParams, params);
-        utils.programUtil.setFourProgramConstants(this.program, uColor, color);
+        utils.programUtil.setTextureAt(program, uMetaballSampler, metaballTexture); // uMetaballSampler contains our metaball texture
+        utils.programUtil.setTextureAt(program, uGlobSampler, globTexture, 1); // uGlobSampler contains our glob texture
+        utils.programUtil.setFourProgramConstants(program, uParams, params);
+        utils.programUtil.setFourProgramConstants(program, uColor, color);
+        utils.programUtil.setProgramConstantsFromMatrix(program, uGlobMat, globMat);
 
         utils.programUtil.setVertexBufferAt(program, aPos,     vertBuffer, 0, 3); // aPos contains x,y,z
         utils.programUtil.setVertexBufferAt(program, aUV,      vertBuffer, 3, 2); // aUV contains u,v
@@ -243,8 +276,8 @@ class PostSystem extends LabSystem {
         utils.drawUtil.drawTriangles(indexBuffer, 0, 2);
         utils.drawUtil.finishOutputBuffer(buffer);
 
-        utils.programUtil.setVertexBufferAt(program, aPos,     null, 0, 3); // aPos contains x,y,z
-        utils.programUtil.setVertexBufferAt(program, aUV,      null, 3, 2); // aUV contains u,v
+        utils.programUtil.setVertexBufferAt(program, aPos,     null, 0, 3);
+        utils.programUtil.setVertexBufferAt(program, aUV,      null, 3, 2);
         /**/
     }
 }
@@ -345,9 +378,15 @@ class MetaballSystem extends LabSystem {
 
         var drunkX:Int = Std.int(GRID_WIDTH / 2);
         var drunkY:Int = Std.int(GRID_WIDTH / 2);
-        for (ike in 0...Std.int(GRID_WIDTH * 2.5)) {
+        var numPopulated:Int = 0;
+        while (numPopulated < GRID_WIDTH * GRID_WIDTH / 3) {
+            
             var index:Int = drunkX + drunkY * GRID_WIDTH;
-            phases[index] = 0;
+            if (phases[index] == null) {
+                phases[index] = 0;
+                numPopulated++;
+            }
+
             if (Std.random(2) == 0) {
                 drunkX = Std.int(Math.min(GRID_WIDTH - 1, Math.max(0, drunkX + Std.random(2) * 2 - 1)));
             } else {
@@ -454,7 +493,7 @@ class MetaballSystem extends LabSystem {
         utils.programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraTransform); // uCameraMat contains the camera matrix
         
         utils.programUtil.setTextureAt(program, uSampler, texture); // uSampler contains our texture
-        utils.programUtil.setFourProgramConstants(this.program, uParams, params);
+        utils.programUtil.setFourProgramConstants(program, uParams, params);
         
         utils.programUtil.setVertexBufferAt(program, aPos,     shapeBuffer, 0, 3); // aPos contains x,y,z
         utils.programUtil.setVertexBufferAt(program, aCorner,  shapeBuffer, 3, 2); // aCorner contains h,v
@@ -466,10 +505,10 @@ class MetaballSystem extends LabSystem {
         utils.drawUtil.drawTriangles(indexBuffer, 0, TpB * NUM_BALLS);
         utils.drawUtil.finishOutputBuffer(buffer);
 
-        utils.programUtil.setVertexBufferAt(program, aPos,     null, 0, 3); // aPos contains x,y,z
-        utils.programUtil.setVertexBufferAt(program, aCorner,  null, 3, 2); // aCorner contains h,v
-        utils.programUtil.setVertexBufferAt(program, aScale,   null, 5, 1); // aScale contains s
-        utils.programUtil.setVertexBufferAt(program, aUV,      null, 6, 2); // aUV contains u,v
+        utils.programUtil.setVertexBufferAt(program, aPos,     null, 0, 3);
+        utils.programUtil.setVertexBufferAt(program, aCorner,  null, 3, 2);
+        utils.programUtil.setVertexBufferAt(program, aScale,   null, 5, 1);
+        utils.programUtil.setVertexBufferAt(program, aUV,      null, 6, 2);
         /**/
     }
 }

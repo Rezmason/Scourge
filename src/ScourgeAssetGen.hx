@@ -18,6 +18,7 @@ import flash.net.FileReference;
 import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.display.FlatFontGenerator;
 import net.rezmason.utils.display.MetaballTextureGenerator;
+import net.rezmason.utils.display.GlobTextureGenerator;
 
 import net.rezmason.scourge.Strings;
 
@@ -50,9 +51,10 @@ class ScourgeAssetGen {
             {chars:Strings.SMALL_CYRILLICS, size:384, font:new ProFont_Cy()},
             {chars:Strings.BOX_SYMBOLS, size:300, font:new ScourgeAssetGen.SourceProFont()},
         ];
+
         FlatFontGenerator.flatten(sets, 72, 72, 1, 20, deployFont.bind(_, "full"));
-        
         MetaballTextureGenerator.makeTexture(30, 0.62, 20, deployImage.bind(_, "metaball"));
+        GlobTextureGenerator.makeTexture(512, deployImage.bind(_, "glob"));
 
     }
 

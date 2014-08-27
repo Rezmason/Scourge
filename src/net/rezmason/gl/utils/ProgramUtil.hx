@@ -90,7 +90,7 @@ class ProgramUtil extends Util {
     public inline function setFourProgramConstants(program:Program, location:UniformLocation, vals:Array<Float>):Void {
 
         #if flash
-            for (i in 0...4) vec[i] = vals[i];
+            for (i in 0...4) vec[i] = vals == null ? 0 : vals[i];
         #end
 
         #if flash
@@ -118,7 +118,7 @@ class ProgramUtil extends Util {
         #end
     }
 
-    public inline function setTextureAt(program:Program, location:UniformLocation, texture:Null<Texture>):Void {
+    public inline function setTextureAt(program:Program, location:UniformLocation, texture:Null<Texture>, index:Int = 0):Void {
         #if flash
             switch (texture) {
                 case null: program.setTextureAt(location, null);
@@ -127,17 +127,19 @@ class ProgramUtil extends Util {
             }
         #else
             if (texture != null) {
-                GL.activeTexture(GL.TEXTURE0);
-                switch (texture) {
-                    case BMD(bmd): GL.bindBitmapDataTexture(bmd);
-                    case TEX(tex): GL.bindTexture(GL.TEXTURE_2D, tex);
-                }
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+                if (index != -1) {
+                    GL.activeTexture(GL.TEXTURE0 + index);
+                    switch (texture) {
+                        case BMD(bmd): GL.bindBitmapDataTexture(bmd);
+                        case TEX(tex): GL.bindTexture(GL.TEXTURE_2D, tex);
+                    }
+                    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+                    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+                    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
-                GL.uniform1i(location, 0);
+                    GL.uniform1i(location, index);
+                }
             } else {
 
             }
