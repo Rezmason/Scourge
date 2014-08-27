@@ -1,6 +1,17 @@
 Handle context loss
-    UtilitySet should handle it directly
-    onRender belongs there too
+    Util should create GLMirror<T, GLContract>s
+    A GLMirror is an object that inherently handles context loss
+    A GLContract is an object that loads data from the CPU to the GPU
+        Textures
+        Shaders
+        VertexBuffers
+        IndexBuffers
+        OutputBuffers
+
+    When the UtilitySet detects context loss and restore, 
+        for each GLMirror it's created, 
+            mirror:: (connect or disconnect)
+
 
 Break down BoardBody
 
