@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
     <meta title="ScourgeLab" description="" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" />
-    <app title="ScourgeLab" file="ScourgeLab" main="ScourgeLab" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="11.8"/>
+    <app title="ScourgeLab" file="ScourgeLab" main="ScourgeLab" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="12.0"/>
     <set name="fullscreen" unless="mac"/>
     <haxedef name="advanced-telemetry" if="flash"/>
     <window width="720" height="720" fps="30" orientation="portrait" background="#000000" resizable="false" />

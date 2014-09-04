@@ -96,7 +96,8 @@ class ProgramUtil extends Util {
         #if flash
             program.setUniformFromVector(location, vec, 1);
         #else
-            GL.uniform4f(location, vals[0], vals[1], vals[2], vals[3]);
+            if (vals == null) GL.uniform4f(location, 0, 0, 0, 0);
+            else GL.uniform4f(location, vals[0], vals[1], vals[2], vals[3]);
         #end
     }
 

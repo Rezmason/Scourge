@@ -20,7 +20,7 @@ import net.rezmason.utils.workers.BasicWorker;
 
 class Converter extends BasicWorker<GLSLInput, AGALOutput> {
 
-    inline static var AGAL_VERSION:Int = 1; // 2
+    inline static var AGAL_VERSION:Int = 2;
 
     static var cModuleInitialized:Bool = false;
     static var assembler:AGALMiniAssembler;

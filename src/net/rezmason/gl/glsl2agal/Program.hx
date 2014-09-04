@@ -55,7 +55,7 @@ class Program {
             } else {
                 var shader:Shader = new Shader(agal);
 
-                trace (agal.json.agalasm);
+                trace (agal.json);
 
                 if (agal.type == Context3DProgramType.VERTEX) vertShader = shader;
                 else fragShader = shader;

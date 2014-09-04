@@ -1,3 +1,16 @@
+Logically rectangular grid
+    http://www.llnl.gov/casc
+
+C., Rankin and Ramon
+
+Wrap shaders in a soft fuzzy blanket, so they don't fucking piss themselves
+    GLSL2AGAL output includes stuff that helps validate parameter setting and so on
+    Skim GLSL shaders for this data, too
+    We may also get texture indices from here, too
+
+    Flash test - the commented out example output in the metaball post shader should just plain work
+    GLSL test - texture indices should no longer be necessary
+
 Handle context loss
     Util should create GLMirror<T, GLContract>s
     A GLMirror is an object that inherently handles context loss
@@ -11,7 +24,6 @@ Handle context loss
     When the UtilitySet detects context loss and restore, 
         for each GLMirror it's created, 
             mirror:: (connect or disconnect)
-
 
 Break down BoardBody
 
