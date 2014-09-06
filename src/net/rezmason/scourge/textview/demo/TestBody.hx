@@ -5,8 +5,6 @@ import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import flash.ui.Keyboard;
 
-import net.rezmason.gl.utils.BufferUtil;
-
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
@@ -30,9 +28,9 @@ class TestBody extends Body {
     var rawTransform:Matrix3D;
     var setBackTransform:Matrix3D;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, num:Int = 2400):Void {
+    public function new(num:Int = 2400):Void {
 
-        super(bufferUtil, glyphTexture);
+        super();
 
         time = 0;
 

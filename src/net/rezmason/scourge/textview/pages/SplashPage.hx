@@ -1,8 +1,6 @@
 package net.rezmason.scourge.textview.pages;
 
 import flash.geom.Rectangle;
-import net.rezmason.gl.utils.BufferUtil;
-import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.ui.SplashBody;
 import net.rezmason.scourge.textview.ui.UIBody;
@@ -23,15 +21,15 @@ class SplashPage extends NavPage {
     var uiBody:UIBody;
     var uiMed:UIMediator;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+    public function new():Void {
         super();
 
-        splashBody = new SplashBody(bufferUtil, glyphTexture);
+        splashBody = new SplashBody();
         splashBody.viewRect = new Rectangle(0.0, 0.0, 1.0, 0.4);
         bodies.push(splashBody);
 
         uiMed = new UIMediator();
-        uiBody = new UIBody(bufferUtil, glyphTexture, uiMed);
+        uiBody = new UIBody(uiMed);
         var uiRect:Rectangle = new Rectangle(0.0, 0.4, 1.0, 0.6);
         uiRect.inflate(-0.02, -0.02);
         uiBody.viewRect = uiRect;

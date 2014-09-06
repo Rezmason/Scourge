@@ -7,10 +7,12 @@ import haxe.Timer;
 
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.utils.UtilitySet;
+import net.rezmason.gl.utils.DrawUtil;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.rendermethods.*;
 import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.santa.Present;
 
 using Lambda;
 
@@ -28,9 +30,9 @@ class Engine {
     var lastTimeStamp:Float;
 
     var utils:UtilitySet;
+    var drawUtil:DrawUtil;
     var bodiesByID:Map<Int, Body>;
-    var fontTextures:Map<String, GlyphTexture>;
-
+    
     var mouseSystem:MouseSystem;
     var keyboardSystem:KeyboardSystem;
     var mouseDownTarget:Body;
@@ -38,13 +40,13 @@ class Engine {
     var prettyMethod:RenderMethod;
     var mainOutputBuffer:OutputBuffer;
 
-    public function new(utils:UtilitySet, stage:Stage, fontTextures:Map<String, GlyphTexture>):Void {
+    public function new():Void {
         active = false;
         ready = false;
         readySignal = new Zig<Void->Void>();
-        this.utils = utils;
-        this.stage = stage;
-        this.fontTextures = fontTextures;
+        this.utils = new Present(UtilitySet);
+        drawUtil = utils.drawUtil;
+        this.stage = new Present(Stage);
 
         width = 1;
         height = 1;
@@ -62,8 +64,8 @@ class Engine {
             prettyMethod.loadedSignal.add(onMethodLoaded);
             mouseMethod.loadedSignal.add(onMethodLoaded);
 
-            prettyMethod.load(utils.programUtil);
-            mouseMethod.load(utils.programUtil);
+            prettyMethod.load();
+            mouseMethod.load();
         }
     }
 
@@ -89,7 +91,7 @@ class Engine {
     function onMethodLoaded():Void if (prettyMethod.program != null && mouseMethod.program != null) initScene();
 
     function initScene():Void {
-        mouseSystem = new MouseSystem(utils.drawUtil, stage);
+        mouseSystem = new MouseSystem(stage);
         mouseSystem.updateSignal.add(renderMouse);
         keyboardSystem = new KeyboardSystem(stage);
 
@@ -98,7 +100,7 @@ class Engine {
 
         mouseDownTarget = null;
         // stage.addChild(mouseSystem.view);
-        mainOutputBuffer = utils.drawUtil.createOutputBuffer(VIEWPORT);
+        mainOutputBuffer = drawUtil.createOutputBuffer(VIEWPORT);
         addListeners();
 
         if (!ready) {
@@ -129,8 +131,8 @@ class Engine {
 
         method.activate();
 
-        utils.drawUtil.setOutputBuffer(outputBuffer);
-        utils.drawUtil.clear(method.backgroundColor);
+        drawUtil.setOutputBuffer(outputBuffer);
+        drawUtil.clear(method.backgroundColor);
 
         for (body in bodiesByID) {
             if (body.numGlyphs == 0) continue;
@@ -139,13 +141,13 @@ class Engine {
 
             for (segment in body.segments) {
                 method.setSegment(segment);
-                utils.drawUtil.drawTriangles(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+                drawUtil.drawTriangles(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
             }
         }
 
         method.setSegment(null);
         method.deactivate();
-        utils.drawUtil.finishOutputBuffer(outputBuffer);
+        drawUtil.finishOutputBuffer(outputBuffer);
     }
 
     public function setSize(width:Int, height:Int):Void {

@@ -2,12 +2,10 @@ package net.rezmason.scourge.textview.pages;
 
 import flash.geom.Rectangle;
 
-import net.rezmason.gl.utils.BufferUtil;
 import net.rezmason.scourge.textview.board.BoardBody;
 import net.rezmason.scourge.textview.commands.*;
 import net.rezmason.scourge.textview.console.*;
 import net.rezmason.scourge.textview.core.Body;
-import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.demo.*;
 import net.rezmason.scourge.textview.ui.UIBody;
 import net.rezmason.utils.Zig;
@@ -19,18 +17,18 @@ class GamePage extends NavPage {
     var currentBodyName:String;
     var console:ConsoleUIMediator;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+    public function new():Void {
         super();
 
         console = new ConsoleUIMediator();
         var interpreter = new Interpreter(console);
-        var boardBody:BoardBody  = new BoardBody(bufferUtil, glyphTexture);
-        var uiBody:UIBody = new UIBody(bufferUtil, glyphTexture, console);
+        var boardBody:BoardBody  = new BoardBody();
+        var uiBody:UIBody = new UIBody(console);
 
         bodiesByName = new Map();
-        bodiesByName['alphabet'] = new AlphabetBody(bufferUtil, glyphTexture);
-        bodiesByName['sdf']      = new GlyphBody(bufferUtil, glyphTexture);
-        bodiesByName['test']     = new TestBody(bufferUtil, glyphTexture);
+        bodiesByName['alphabet'] = new AlphabetBody();
+        bodiesByName['sdf']      = new GlyphBody();
+        bodiesByName['test']     = new TestBody();
         bodiesByName['board']    = boardBody;
 
         for (key in bodiesByName.keys()) {

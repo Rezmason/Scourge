@@ -1,54 +1,49 @@
 package net.rezmason.scourge;
 
-import openfl.Assets.*;
-
 import flash.display.Stage;
 import flash.events.Event;
 
-import net.rezmason.gl.utils.UtilitySet;
 import net.rezmason.scourge.textview.NavSystem;
 import net.rezmason.scourge.textview.ScourgeNavPageAddresses;
 import net.rezmason.scourge.textview.core.Engine;
-import net.rezmason.scourge.textview.core.GlyphTexture;
+import net.rezmason.scourge.textview.core.FontManager;
 import net.rezmason.scourge.textview.pages.*;
-import net.rezmason.utils.display.FlatFont;
+import net.rezmason.gl.utils.*;
+import net.rezmason.utils.santa.Santa;
 
 class Context {
 
-    var engine:Engine;
     var stage:Stage;
-    var utils:UtilitySet;
-    var fontTextures:Map<String, GlyphTexture>;
+    var engine:Engine;
     var navSystem:NavSystem;
+    var utils:UtilitySet;
 
-    public function new(utils:UtilitySet, stage:Stage):Void {
-        this.utils = utils;
+    public function new(stage:Stage):Void {
         this.stage = stage;
-        makeFontTextures();
-        engine = new Engine(utils, stage, fontTextures);
-        engine.readySignal.add(init);
+        this.utils = new UtilitySet(stage, onUtils);
+    }
+
+    function onUtils():Void {
+        Santa.mapToClass(UtilitySet, Singleton(utils));
+        Santa.mapToClass(BufferUtil, Singleton(utils.bufferUtil));
+        Santa.mapToClass(DrawUtil, Singleton(utils.drawUtil));
+        Santa.mapToClass(ProgramUtil, Singleton(utils.programUtil));
+        Santa.mapToClass(TextureUtil, Singleton(utils.textureUtil));
+        Santa.mapToClass(Stage, Singleton(stage));
+        Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));
+
+        makeEngine();
+    }
+
+    function makeEngine():Void {
+        engine = new Engine();
+        engine.readySignal.add(onEngine);
         engine.init();
     }
 
-    function makeFontTextures():Void {
-        fontTextures = new Map();
-        for (name in ['full']) {
-            var path:String = 'flatfonts/${name}_flat';
-            var font:FlatFont = new FlatFont(getBitmapData('$path.png'), getText('$path.json'));
-            fontTextures[name] = cast new GlyphTexture(utils.textureUtil, font);
-        }
-    }
-
-    function init():Void {
+    function onEngine():Void {
         addListeners();
-        var fullTexture:GlyphTexture = fontTextures['full'];
-        
-        navSystem = new NavSystem(engine);
-        navSystem.addPage(ScourgeNavPageAddresses.SPLASH, new SplashPage(utils.bufferUtil, fullTexture));
-        navSystem.addPage(ScourgeNavPageAddresses.ABOUT, new AboutPage(utils.bufferUtil, fullTexture));
-        navSystem.addPage(ScourgeNavPageAddresses.GAME, new GamePage(utils.bufferUtil, fullTexture));
-
-        navSystem.goto(Page(ScourgeNavPageAddresses.SPLASH));
+        makeNavSystem();
     }
 
     function addListeners():Void {
@@ -59,6 +54,15 @@ class Context {
         // these kind of already happened, so we just trigger them
         onResize();
         onActivate();
+    }
+
+    function makeNavSystem():Void {
+        navSystem = new NavSystem(engine);
+        navSystem.addPage(ScourgeNavPageAddresses.SPLASH, new SplashPage());
+        navSystem.addPage(ScourgeNavPageAddresses.ABOUT, new AboutPage());
+        navSystem.addPage(ScourgeNavPageAddresses.GAME, new GamePage());
+
+        navSystem.goto(Page(ScourgeNavPageAddresses.SPLASH));
     }
 
     function onResize(?event:Event):Void engine.setSize(stage.stageWidth, stage.stageHeight);

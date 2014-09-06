@@ -2,8 +2,6 @@ package net.rezmason.scourge.textview.pages;
 
 import flash.geom.Rectangle;
 import openfl.Assets;
-import net.rezmason.gl.utils.BufferUtil;
-import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.ui.UIBody;
 import net.rezmason.scourge.textview.ui.UIMediator;
@@ -25,17 +23,17 @@ class AboutPage extends NavPage {
     var navBody:UIBody;
     var navMed:UIMediator;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+    public function new():Void {
         super();
 
         paperMed = new UIMediator();
-        paperBody = new UIBody(bufferUtil, glyphTexture, paperMed);
+        paperBody = new UIBody(paperMed);
         paperBody.viewRect = new Rectangle(0.1, 0, 0.8, 0.9);
         paperBody.setFontSize(14);
         bodies.push(paperBody);
 
         navMed = new UIMediator();
-        navBody = new UIBody(bufferUtil, glyphTexture, navMed);
+        navBody = new UIBody(navMed);
         navBody.viewRect = new Rectangle(0, 0.9, 1, 0.1);
         navBody.setFontSize(14);
         bodies.push(navBody);

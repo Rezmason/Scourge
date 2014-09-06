@@ -13,6 +13,7 @@ import net.rezmason.gl.utils.DrawUtil;
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.Data;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.santa.Present;
 
 import net.rezmason.scourge.textview.core.Interaction;
 
@@ -44,12 +45,12 @@ class MouseSystem {
     var initialized:Bool;
     var drawUtil:DrawUtil;
 
-    public function new(drawUtil:DrawUtil, target:EventDispatcher):Void {
+    public function new(target:EventDispatcher):Void {
         // _view = new MouseView(0.2, 1);
         // _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
         interact = new Zig();
-        this.drawUtil = drawUtil;
+        drawUtil = new Present(DrawUtil);
         updateSignal = new Zig<Void->Void>();
         rectRegionsByID = null;
         lastRectRegionID = null;

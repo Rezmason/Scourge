@@ -4,16 +4,20 @@ import flash.display.BitmapData;
 import net.rezmason.utils.display.FlatFont;
 import net.rezmason.gl.Texture;
 import net.rezmason.gl.utils.TextureUtil;
+import net.rezmason.utils.santa.Present;
 
 class GlyphTexture {
 
     public var texture(default, null):Texture;
     public var font(default, null):FlatFont;
     public var aspectRatio(default, null):Float;
+    public var name(default, null):String;
 
-    public function new(textureUtil:TextureUtil, font:FlatFont):Void {
+    public function new(name:String, font:FlatFont):Void {
+        this.name = name;
         this.font = font;
         var bmp:BitmapData = font.getBitmapDataClone();
+        var textureUtil:TextureUtil = new Present(TextureUtil);
         texture = textureUtil.createBitmapDataTexture(bmp);
 
         #if flash

@@ -2,8 +2,6 @@ package net.rezmason.scourge.textview.demo;
 
 import haxe.Utf8;
 
-import net.rezmason.gl.utils.BufferUtil;
-
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Interaction;
@@ -20,9 +18,9 @@ class AlphabetBody extends Body {
         Strings.BOX_SYMBOLS +
     '';
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+    public function new():Void {
 
-        super(bufferUtil, glyphTexture);
+        super();
 
         var totalChars:Int = CHARS.length;
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));

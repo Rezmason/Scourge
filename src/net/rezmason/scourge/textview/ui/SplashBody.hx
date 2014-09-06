@@ -4,7 +4,6 @@ import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import openfl.Assets;
-import net.rezmason.gl.utils.BufferUtil;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
@@ -42,9 +41,9 @@ class SplashBody extends Body {
     var time:Float;
     var lines:Array<String>;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+    public function new():Void {
 
-        super(bufferUtil, glyphTexture);
+        super();
 
         scaleMode = WIDTH_FIT;
 

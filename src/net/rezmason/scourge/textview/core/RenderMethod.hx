@@ -4,6 +4,7 @@ import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.santa.Present;
 
 import net.rezmason.gl.utils.ProgramUtil;
 import net.rezmason.gl.Program;
@@ -26,8 +27,8 @@ class RenderMethod {
         loadedSignal = new Zig<Void->Void>();
     }
 
-    public function load(programUtil:ProgramUtil):Void {
-        this.programUtil = programUtil;
+    public function load():Void {
+        programUtil = new Present(ProgramUtil);
 
         init();
         composeShaders();

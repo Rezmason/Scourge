@@ -6,8 +6,9 @@ import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import flash.Vector;
 
-import net.rezmason.gl.utils.BufferUtil;
+import net.rezmason.scourge.textview.core.FontManager;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.santa.Present;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -22,12 +23,13 @@ class Body {
     public var camera:Matrix3D;
     public var glyphTransform:Matrix3D;
     public var numGlyphs(default, null):Int;
-    public var glyphTexture(default, set):GlyphTexture;
+    public var glyphTexture(default, null):GlyphTexture;
     public var scaleMode(default, null):BodyScaleMode;
     public var catchMouseInRect(default, null):Bool;
     public var viewRect(default, set):Rectangle;
     public var redrawHitSignal(default, null):Zig<Void->Void>;
 
+    var fontManager:FontManager;
     var trueNumGlyphs:Int;
     var vanishingPoint:Point;
 
@@ -38,18 +40,17 @@ class Body {
 
     public var glyphs:Array<Glyph>;
 
-    var bufferUtil:BufferUtil;
-
-    function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+    function new():Void {
         stageWidth = 0;
         stageHeight = 0;
         redrawHitSignal = new Zig<Void->Void>();
         id = ++_ids;
-        this.bufferUtil = bufferUtil;
         scaleMode = SHOW_ALL;
         catchMouseInRect = true;
         glyphs = [];
-        this.glyphTexture = glyphTexture;
+        fontManager = new Present(FontManager);
+        fontManager.onFontChange.add(updateGlyphTexture);
+        glyphTexture = fontManager.defaultFont;
         viewRect = DEFAULT_VIEW_RECT();
 
         projection = makeProjection();
@@ -89,7 +90,7 @@ class Body {
                     segment = donor;
                     segment.numGlyphs = len;
                 } else {
-                    segment = new BodySegment(bufferUtil, segmentID, len, donor);
+                    segment = new BodySegment(segmentID, len, donor);
                     if (donor != null) donor.destroy();
                 }
 
@@ -221,9 +222,10 @@ class Body {
         return rect;
     }
 
-    inline function set_glyphTexture(gt:GlyphTexture):GlyphTexture {
-        this.glyphTexture = gt;
-        for (glyph in glyphs) glyph.set_char(glyph.get_char(), gt.font);
-        return gt;
+    inline function updateGlyphTexture(glyphTexture:GlyphTexture):Void {
+        if (this.glyphTexture != glyphTexture) {
+            this.glyphTexture = glyphTexture;
+            for (glyph in glyphs) glyph.set_char(glyph.get_char(), glyphTexture.font);
+        }
     }
 }

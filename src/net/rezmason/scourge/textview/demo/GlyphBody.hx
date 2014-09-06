@@ -5,8 +5,6 @@ import net.kawa.tween.easing.Linear;
 
 import haxe.Utf8;
 
-import net.rezmason.gl.utils.BufferUtil;
-
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Interaction;
@@ -34,7 +32,7 @@ class GlyphBody extends Body {
 
     var mouseIsDown:Bool;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+    public function new():Void {
 
         currentCharIndex = 0;
         currentPhase = 1;
@@ -42,7 +40,7 @@ class GlyphBody extends Body {
         currentColor = 0;
         mouseIsDown = false;
 
-        super(bufferUtil, glyphTexture);
+        super();
         growTo(1);
 
         glyphs[0].set_char(Utf8.charCodeAt(CHARS, currentCharIndex), glyphTexture.font);

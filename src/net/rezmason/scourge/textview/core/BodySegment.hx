@@ -5,6 +5,8 @@ import net.rezmason.gl.Data;
 import net.rezmason.gl.VertexBuffer;
 import net.rezmason.gl.utils.BufferUtil;
 
+import net.rezmason.utils.santa.Present;
+
 #if !flash
     import net.rezmason.gl.BufferUsage;
 #end
@@ -31,10 +33,10 @@ class BodySegment {
     var _trueGlyphs:Array<Glyph>;
     var _glyphs:Array<Glyph>;
 
-    public function new(bufferUtil:BufferUtil, segmentID:Int, numGlyphs:Int, donor:BodySegment = null):Void {
+    public function new(segmentID:Int, numGlyphs:Int, donor:BodySegment = null):Void {
         if (numGlyphs < 0) numGlyphs = 0;
         id = segmentID;
-        createBuffersAndVectors(numGlyphs, bufferUtil);
+        createBuffersAndVectors(numGlyphs, new Present(BufferUtil));
         createGlyphs(numGlyphs, donor);
         this.numGlyphs = numGlyphs;
         update();

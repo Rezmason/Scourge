@@ -4,7 +4,6 @@ import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
 import flash.system.Capabilities;
 
-import net.rezmason.gl.utils.BufferUtil;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.GlyphTexture;
@@ -59,9 +58,9 @@ class UIBody extends Body {
     var scrollBarVisible:Bool;
     var scrollBarFade:Float;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture, uiMediator:UIMediator):Void {
+    public function new(uiMediator:UIMediator):Void {
 
-        super(bufferUtil, glyphTexture);
+        super();
 
         showScrollBar = false;
         scrollBarVisible = false;

@@ -9,7 +9,6 @@ import net.rezmason.scourge.waves.WavePool;
 import net.rezmason.scourge.waves.Ripple;
 import net.rezmason.scourge.waves.WaveFunctions;
 
-import net.rezmason.gl.utils.BufferUtil;
 import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.textview.board.BoardEffects;
 import net.rezmason.scourge.textview.board.BoardTypes;
@@ -72,9 +71,9 @@ class BoardBody extends Body {
     
     var playerIndex:Int;
 
-    public function new(bufferUtil:BufferUtil, glyphTexture:GlyphTexture):Void {
+    public function new():Void {
 
-        super(bufferUtil, glyphTexture);
+        super();
 
         dragging = false;
         dragStartTransform = new Matrix3D();
