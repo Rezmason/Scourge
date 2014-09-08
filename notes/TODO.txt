@@ -12,9 +12,6 @@ Handle context loss
         for each GLMirror it's created, 
             mirror:: (connect or disconnect)
 
-Fucking board bug,
-    the one where the piece just appears, rather than plopping down, probably NaN eh?
-
 Logically rectangular grid
     http://www.llnl.gov/casc
 

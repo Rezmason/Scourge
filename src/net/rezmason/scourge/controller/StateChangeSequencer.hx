@@ -27,6 +27,7 @@ class StateChangeSequencer implements IPlayerMediator {
     var lastStep:Array<NodeVO>;
     var lastCause:String;
     var maxFreshness:Int;
+    var moveStarted:Bool;
     
     var ident_:AspectPtr;
     var occupier_:AspectPtr;
@@ -45,6 +46,7 @@ class StateChangeSequencer implements IPlayerMediator {
         sequenceStartSignal = new Zig();
         sequenceUpdateSignal = new Zig();
         proceedSignal = new Zig();
+        moveStarted = false;
     }
 
     public function connect(game:Game):Void {
@@ -75,11 +77,14 @@ class StateChangeSequencer implements IPlayerMediator {
         playerIndex = -1;
         move = '';
 
+
         sequenceStartSignal.dispatch(game.state.players.length, getNodePositions());
         sequenceUpdateSignal.dispatch(playerIndex, move, 1, causes, steps, getDistancesFromHead(), getNeighborBitfields());
+
     }
 
     public function moveStarts(playerIndex:Int, action:Int, move:Int):Void {
+        moveStarted = true;
         this.playerIndex = playerIndex;
         this.move = '[$action : $move]';
         lastStep = nodeVOs.copy();
@@ -90,6 +95,7 @@ class StateChangeSequencer implements IPlayerMediator {
     }
 
     public function moveStops():Void {
+        moveStarted = false;
         sequenceUpdateSignal.dispatch(playerIndex, move, maxFreshness, causes, steps, getDistancesFromHead(), getNeighborBitfields());
     }
 
@@ -101,7 +107,7 @@ class StateChangeSequencer implements IPlayerMediator {
 
     public function moveSteps(cause:String):Void {
 
-        if (steps == null) return;
+        if (!moveStarted || steps == null) return;
 
         // Append a step to the sequence.
         var nodes:Array<AspectSet> = game.state.nodes;

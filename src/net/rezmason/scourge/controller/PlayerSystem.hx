@@ -18,6 +18,7 @@ class PlayerSystem implements IPlayer {
     private var floats:Array<Float>;
     private var config:ScourgeConfig;
     private var mediator:IPlayerMediator;
+    private var mediatorMoveStarted:Bool;
 
     @:allow(net.rezmason.scourge.controller.Referee)
     private var playSignal:Zig<GameEvent->Void>;
@@ -26,6 +27,7 @@ class PlayerSystem implements IPlayer {
         game = new Game(cacheMoves);
         floats = [];
         mediator = null;
+        mediatorMoveStarted = false;
     }
 
     public function setMediator(med:IPlayerMediator):Void {
@@ -58,7 +60,9 @@ class PlayerSystem implements IPlayer {
                     case RelayMove(turn, action, move):
                         if (turn == game.revision) {
                             if (mediator != null) mediator.moveStarts(game.currentPlayer, action, move);
+                            mediatorMoveStarted = true;
                             if (game.hasBegun) updateGame(action, move);
+                            mediatorMoveStarted = false;
                             if (mediator != null) mediator.moveStops();
                             else proceed();
                         }
@@ -80,7 +84,9 @@ class PlayerSystem implements IPlayer {
         game.begin(config, retrieveRandomFloat, onMoveStep, savedState);
     }
 
-    private inline function onMoveStep(cause:String):Void if (mediator != null) mediator.moveSteps(cause);
+    private inline function onMoveStep(cause:String):Void {
+        if (mediatorMoveStarted && mediator != null) mediator.moveSteps(cause);
+    }
 
     private function proceed():Void if (isMyTurn()) play();
     private function end():Void game.end();
