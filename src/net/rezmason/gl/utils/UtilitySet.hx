@@ -3,6 +3,8 @@ package net.rezmason.gl.utils;
 import flash.display.Stage;
 import flash.geom.Rectangle;
 
+import net.rezmason.gl.GLTypes;
+
 #if flash
     import flash.events.Event;
     import flash.display3D.Context3DRenderMode;
@@ -10,8 +12,6 @@ import flash.geom.Rectangle;
 #else
     import openfl.gl.GL;
 #end
-
-import net.rezmason.gl.utils.Util;
 
 using Lambda;
 

@@ -1,45 +1,52 @@
 package net.rezmason.gl;
 
-#if flash
-    typedef IndexBuffer = flash.display3D.IndexBuffer3D;
-#else
+import net.rezmason.gl.GLTypes;
+import net.rezmason.gl.Data;
+
+#if !flash
     import openfl.gl.GL;
-    import openfl.gl.GLBuffer;
-    import net.rezmason.gl.Data;
+#end
 
-    class IndexBuffer {
+@:allow(net.rezmason.gl) 
+class IndexBuffer {
 
-        @:allow(net.rezmason.gl) var buf:GLBuffer;
-        public var numIndices(default, null):Int;
-        var array:IndexArray;
+    var buf:NativeIndexBuffer;
+    var array:IndexArray;
+    public var numIndices(default, null):Int;
 
-        public function new(numIndices:Int):Void {
-            this.numIndices = numIndices;
+    function new(context:Context, numIndices:Int, ?usage:BufferUsage):Void {
+        this.numIndices = numIndices;
+        #if flash 
+            buf = context.createIndexBuffer(numIndices/*, usage*/);
+        #else
             buf = GL.createBuffer();
             array = new IndexArray(numIndices);
-        }
+        #end
+    }
 
-        public inline function uploadFromVector(data:IndexArray, offset:Int, num:Int):Void {
-            if (offset < 0 || offset > numIndices) {
+    public inline function uploadFromVector(data:IndexArray, offset:Int, num:Int):Void {
+        if (offset < 0 || offset > numIndices) {
 
-            } else {
-                if (offset + num > numIndices) num = numIndices - offset;
+        } else {
+            if (offset + num > numIndices) num = numIndices - offset;
 
-                #if js
-                    if (num < data.length) data = data.subarray(0, num);
-                    array.set(data, offset);
-                #else
-                    for (ike in 0...num) array[ike + offset] = data[ike];
-                #end
-
+            #if flash
+                buf.uploadFromVector(data, offset, num);
+            #elseif js
+                if (num < data.length) data = data.subarray(0, num);
+                array.set(data, offset);
                 GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
                 GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, array, GL.STATIC_DRAW);
-            }
-        }
-
-        public inline function dispose():Void {
-            array = null;
-            numIndices = -1;
+            #else
+                for (ike in 0...num) array[ike + offset] = data[ike];
+                GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
+                GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, array, GL.STATIC_DRAW);
+            #end
         }
     }
-#end
+
+    public inline function dispose():Void {
+        array = null;
+        numIndices = -1;
+    }
+}

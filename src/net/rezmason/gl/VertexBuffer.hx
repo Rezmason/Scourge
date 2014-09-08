@@ -1,53 +1,68 @@
 package net.rezmason.gl;
 
-#if flash
-    typedef VertexBuffer = flash.display3D.VertexBuffer3D;
-#else
+import net.rezmason.gl.GLTypes;
+import net.rezmason.gl.BufferUsage;
+import net.rezmason.gl.Data;
+
+#if !flash
     import openfl.gl.GL;
-    import openfl.gl.GLBuffer;
-    import net.rezmason.gl.Data;
+#end
 
-    class VertexBuffer {
-
-        @:allow(net.rezmason.gl) var buf:GLBuffer;
-        public var footprint(default, null):Int;
-        public var numVertices(default, null):Int;
+@:allow(net.rezmason.gl)
+class VertexBuffer {
+    var buf:NativeVertexBuffer;
+    public var footprint(default, null):Int;
+    public var numVertices(default, null):Int;
+    #if !flash
         var array:VertexArray;
-        var usage:BufferUsage;
+    #end
+    var usage:BufferUsage;
 
-        public function new(numVertices:Int, footprint:Int, ?usage:BufferUsage):Void {
-            this.footprint = footprint;
-            this.numVertices = numVertices;
-            if (usage == null) usage = BufferUsage.STATIC_DRAW;
-            this.usage = usage;
+    public function new(context:Context, numVertices:Int, footprint:Int, ?usage:BufferUsage):Void {
+        this.footprint = footprint;
+        this.numVertices = numVertices;
+        if (usage == null) usage = BufferUsage.STATIC_DRAW;
+        this.usage = usage;
+        #if flash
+            buf = context.createVertexBuffer(numVertices, footprint/*, usage*/);
+        #else
             buf = GL.createBuffer();
             array = new VertexArray(footprint * numVertices);
-        }
+        #end
+    }
 
-        public inline function uploadFromVector(data:VertexArray, offset:Int, num:Int):Void {
-            if (offset < 0 || offset > numVertices) {
+    public inline function uploadFromVector(data:VertexArray, offset:Int, num:Int):Void {
+        if (offset < 0 || offset > numVertices) {
 
-            } else {
-                if (offset + num > numVertices) num = numVertices - offset;
+        } else {
+            if (offset + num > numVertices) num = numVertices - offset;
 
-                #if js
-                    if (num * footprint < data.length) data = data.subarray(0, num * footprint);
-                    array.set(data, offset);
-                #else
-                    for (ike in 0...num * footprint) {
-                        array[ike + offset * footprint] = data[ike];
-                    }
-                #end
-
+            #if flash
+                buf.uploadFromVector(data, offset, num);
+            #elseif js
+                if (num * footprint < data.length) data = data.subarray(0, num * footprint);
+                array.set(data, offset);
                 GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-                GL.bufferData(GL.ARRAY_BUFFER, array, usage);
-            }
-        }
-
-        public inline function dispose():Void {
-            array = null;
-            footprint = -1;
-            numVertices = -1;
+                GL.bufferData(GL.ARRAY_BUFFER, array, cast usage);
+            #else
+                for (ike in 0...num * footprint) {
+                    array[ike + offset * footprint] = data[ike];
+                }
+                GL.bindBuffer(GL.ARRAY_BUFFER, buf);
+                GL.bufferData(GL.ARRAY_BUFFER, array, cast usage);
+            #end
         }
     }
-#end
+
+    public inline function dispose():Void {
+        #if flash 
+            if (buf != null) buf.dispose(); 
+        #else
+            array = null;
+        #end
+        
+        buf = null;
+        footprint = -1;
+        numVertices = -1;
+    }
+}

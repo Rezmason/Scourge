@@ -1,5 +1,6 @@
 package net.rezmason.scourge;
 
+import flash.Lib;
 import flash.display.Stage;
 import flash.events.Event;
 
@@ -18,9 +19,9 @@ class Context {
     var navSystem:NavSystem;
     var utils:UtilitySet;
 
-    public function new(stage:Stage):Void {
-        this.stage = stage;
-        this.utils = new UtilitySet(stage, onUtils);
+    public function new():Void {
+        stage = Lib.current.stage;
+        utils = new UtilitySet(stage, onUtils);
     }
 
     function onUtils():Void {

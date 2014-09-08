@@ -1,5 +1,7 @@
 package net.rezmason.gl;
 
+import net.rezmason.gl.GLTypes;
+
 #if flash
     import flash.display.BitmapData;
     import flash.display3D.Context3DTextureFormat;
@@ -9,8 +11,6 @@ package net.rezmason.gl;
     import openfl.gl.GLRenderbuffer;
     import openfl.gl.GLTexture;
 #end
-
-typedef Context = #if flash flash.display3D.Context3D #else Class<openfl.gl.GL> #end ;
 
 @:allow(net.rezmason.gl)
 class OutputBuffer {
@@ -28,12 +28,11 @@ class OutputBuffer {
         var format:Int;
     #end
 
-    var type:net.rezmason.gl.OutputBufferType;
+    var type:OutputBufferType;
 
     public var width(default, null):Int;
     public var height(default, null):Int;
 
-    @:allow(net.rezmason.gl)
     function new(type:OutputBufferType, context:Context):Void {
         this.type = type;
         this.context = context;

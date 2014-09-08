@@ -1,6 +1,7 @@
 package net.rezmason.scourge.textview.core;
 
 import net.rezmason.gl.IndexBuffer;
+import net.rezmason.gl.BufferUsage;
 import net.rezmason.gl.Data;
 import net.rezmason.gl.VertexBuffer;
 import net.rezmason.gl.utils.BufferUtil;
@@ -45,11 +46,12 @@ class BodySegment {
     inline function createBuffersAndVectors(numGlyphs:Int, bufferUtil:BufferUtil):Void {
         var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
         var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
+        var bufferUsage:BufferUsage = DYNAMIC_DRAW;
 
-        shapeBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.SHAPE_FLOATS_PER_VERTEX #if !flash , BufferUsage.DYNAMIC_DRAW #end);
-        colorBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX #if !flash , BufferUsage.DYNAMIC_DRAW #end);
-        paintBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.PAINT_FLOATS_PER_VERTEX #if !flash , BufferUsage.DYNAMIC_DRAW #end);
-        indexBuffer = bufferUtil.createIndexBuffer(numGlyphIndices);
+        shapeBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.SHAPE_FLOATS_PER_VERTEX, bufferUsage);
+        colorBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX, bufferUsage);
+        paintBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.PAINT_FLOATS_PER_VERTEX, bufferUsage);
+        indexBuffer = bufferUtil.createIndexBuffer(numGlyphIndices, bufferUsage);
 
         shapeVertices = new VertexArray(numGlyphVertices * Almanac.SHAPE_FLOATS_PER_VERTEX);
         colorVertices = new VertexArray(numGlyphVertices * Almanac.COLOR_FLOATS_PER_VERTEX);

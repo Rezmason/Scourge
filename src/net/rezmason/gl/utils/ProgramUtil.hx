@@ -1,5 +1,7 @@
 package net.rezmason.gl.utils;
 
+import net.rezmason.gl.GLTypes;
+
 import flash.geom.Matrix3D;
 #if flash
     import flash.display.Stage;
@@ -148,22 +150,23 @@ class ProgramUtil extends Util {
     }
 
     public inline function setVertexBufferAt(program:Program, location:AttribsLocation, buffer:VertexBuffer, offset:Int = 0, size:Int = -1, ?normalized:Bool):Void {
-
-        #if flash
-            if (size < 0) size = 1;
-            program.setVertexBufferAt(location, buffer, offset, formats[size]);
-        #else
-            if (buffer != null) {
-                if (size < 0) size = buffer.footprint;
-
+        if (size < 0) size = buffer.footprint;
+        if (buffer != null) {
+            #if flash
+                program.setVertexBufferAt(location, buffer.buf, offset, formats[size]);
+            #else
                 GL.bindBuffer(GL.ARRAY_BUFFER, buffer.buf);
                 GL.vertexAttribPointer(location, size, GL.FLOAT, normalized, 4 * buffer.footprint, 4 * offset);
 
                 GL.enableVertexAttribArray(location);
-            } else {
+            #end
+        } else {
+            #if flash
+                program.setVertexBufferAt(location, null, offset, formats[size]);
+            #else
                 GL.disableVertexAttribArray(location);
-            }
-        #end
+            #end
+        }
     }
 
     public inline function getUniformLocation(program:Program, name:String):UniformLocation {

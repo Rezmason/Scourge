@@ -29,7 +29,7 @@ class DrawUtil extends Util {
 
     public inline function drawTriangles(indexBuffer:IndexBuffer, firstIndex:Int = 0, numTriangles:Int = 0):Void {
         #if flash
-            context.drawTriangles(indexBuffer, firstIndex, numTriangles);
+            context.drawTriangles(indexBuffer.buf, firstIndex, numTriangles);
         #else
             GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buf);
             GL.drawElements(GL.TRIANGLES, numTriangles * 3, GL.UNSIGNED_SHORT, firstIndex);
