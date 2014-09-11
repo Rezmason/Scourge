@@ -262,16 +262,16 @@ class PostSystem extends LabSystem {
     function onProgramLoaded(program:Program):Void {
         this.program = program;
 
-        aPos     = utils.programUtil.getAttribsLocation(program, 'aPos'    );
-        aUV      = utils.programUtil.getAttribsLocation(program, 'aUV'     );
+        aPos     = program.getAttribsLocation('aPos'    );
+        aUV      = program.getAttribsLocation('aUV'     );
         
-        uMetaballSampler   = utils.programUtil.getUniformLocation(program, 'uMetaballSampler'  );
-        uGlobSampler = utils.programUtil.getUniformLocation(program, 'uGlobSampler'  );
-        uParams    = utils.programUtil.getUniformLocation(program, 'uParams');
-        uParams2    = utils.programUtil.getUniformLocation(program, 'uParams2');
-        uColor     = utils.programUtil.getUniformLocation(program, 'uColor');
-        uLight     = utils.programUtil.getUniformLocation(program, 'uLight');
-        uGlobMat = utils.programUtil.getUniformLocation(program, 'uGlobMat');
+        uMetaballSampler   = program.getUniformLocation('uMetaballSampler'  );
+        uGlobSampler = program.getUniformLocation('uGlobSampler'  );
+        uParams    = program.getUniformLocation('uParams');
+        uParams2    = program.getUniformLocation('uParams2');
+        uColor     = program.getUniformLocation('uColor');
+        uLight     = program.getUniformLocation('uLight');
+        uGlobMat = program.getUniformLocation('uGlobMat');
         
         ready = true;
         loadSig.dispatch();
@@ -294,27 +294,27 @@ class PostSystem extends LabSystem {
         utils.programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         utils.programUtil.setDepthTest(false);
 
-        utils.programUtil.setTextureAt(program, uMetaballSampler, metaballTexture); // uMetaballSampler contains our metaballTexture
-        utils.programUtil.setTextureAt(program, uGlobSampler, globTexture, 1); // uGlobSampler contains our glob texture
-        utils.programUtil.setFourProgramConstants(program, uParams, params);
-        utils.programUtil.setFourProgramConstants(program, uParams2, params2);
-        utils.programUtil.setFourProgramConstants(program, uColor, color);
-        utils.programUtil.setFourProgramConstants(program, uLight, light);
-        utils.programUtil.setProgramConstantsFromMatrix(program, uGlobMat, globMat);
+        program.setTextureAt(uMetaballSampler, metaballTexture); // uMetaballSampler contains our metaballTexture
+        program.setTextureAt(uGlobSampler, globTexture, 1); // uGlobSampler contains our glob texture
+        program.setFourProgramConstants(uParams, params);
+        program.setFourProgramConstants(uParams2, params2);
+        program.setFourProgramConstants(uColor, color);
+        program.setFourProgramConstants(uLight, light);
+        program.setProgramConstantsFromMatrix(uGlobMat, globMat);
         
-        utils.programUtil.setVertexBufferAt(program, aPos,     vertBuffer, 0, 3); // aPos contains x,y,z
-        utils.programUtil.setVertexBufferAt(program, aUV,      vertBuffer, 3, 2); // aUV contains u,v
+        program.setVertexBufferAt(aPos,     vertBuffer, 0, 3); // aPos contains x,y,z
+        program.setVertexBufferAt(aUV,      vertBuffer, 3, 2); // aUV contains u,v
 
         utils.drawUtil.setOutputBuffer(buffer);
         utils.drawUtil.clear(0xFF000000);
         utils.drawUtil.drawTriangles(indexBuffer, 0, 2);
         utils.drawUtil.finishOutputBuffer(buffer);
 
-        utils.programUtil.setVertexBufferAt(program, aPos,     null, 0, 3);
-        utils.programUtil.setVertexBufferAt(program, aUV,      null, 3, 2);
+        program.setVertexBufferAt(aPos,     null, 0, 3);
+        program.setVertexBufferAt(aUV,      null, 3, 2);
 
-        utils.programUtil.setTextureAt(program, uMetaballSampler, null);
-        utils.programUtil.setTextureAt(program, uGlobSampler, null, 1);
+        program.setTextureAt(uMetaballSampler, null);
+        program.setTextureAt(uGlobSampler, null, 1);
     }
 }
 
@@ -503,14 +503,14 @@ class MetaballSystem extends LabSystem {
     function onProgramLoaded(program:Program):Void {
         this.program = program;
 
-        aPos     = utils.programUtil.getAttribsLocation(program, 'aPos'    );
-        aCorner  = utils.programUtil.getAttribsLocation(program, 'aCorner' );
-        aScale   = utils.programUtil.getAttribsLocation(program, 'aScale');
-        aUV      = utils.programUtil.getAttribsLocation(program, 'aUV'     );
+        aPos     = program.getAttribsLocation('aPos'    );
+        aCorner  = program.getAttribsLocation('aCorner' );
+        aScale   = program.getAttribsLocation('aScale');
+        aUV      = program.getAttribsLocation('aUV'     );
         
-        uSampler   = utils.programUtil.getUniformLocation(program, 'uSampler'  );
-        uCameraMat = utils.programUtil.getUniformLocation(program, 'uCameraMat');
-        uBodyMat   = utils.programUtil.getUniformLocation(program, 'uBodyMat'  );
+        uSampler   = program.getUniformLocation('uSampler'  );
+        uCameraMat = program.getUniformLocation('uCameraMat');
+        uBodyMat   = program.getUniformLocation('uBodyMat'  );
 
         ready = true;
         loadSig.dispatch();
@@ -556,26 +556,26 @@ class MetaballSystem extends LabSystem {
         utils.programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         utils.programUtil.setDepthTest(false);
 
-        utils.programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyTransform); // uBodyMat contains the body's matrix
-        utils.programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraTransform); // uCameraMat contains the camera matrix
+        program.setProgramConstantsFromMatrix(uBodyMat, bodyTransform); // uBodyMat contains the body's matrix
+        program.setProgramConstantsFromMatrix(uCameraMat, cameraTransform); // uCameraMat contains the camera matrix
         
-        utils.programUtil.setTextureAt(program, uSampler, texture); // uSampler contains our texture
+        program.setTextureAt(uSampler, texture); // uSampler contains our texture
         
-        utils.programUtil.setVertexBufferAt(program, aPos,     vertBuffer, 0, 3); // aPos contains x,y,z
-        utils.programUtil.setVertexBufferAt(program, aCorner,  vertBuffer, 3, 2); // aCorner contains h,v
-        utils.programUtil.setVertexBufferAt(program, aScale,   vertBuffer, 5, 1); // aScale contains s
-        utils.programUtil.setVertexBufferAt(program, aUV,      vertBuffer, 6, 2); // aUV contains u,v
+        program.setVertexBufferAt(aPos,     vertBuffer, 0, 3); // aPos contains x,y,z
+        program.setVertexBufferAt(aCorner,  vertBuffer, 3, 2); // aCorner contains h,v
+        program.setVertexBufferAt(aScale,   vertBuffer, 5, 1); // aScale contains s
+        program.setVertexBufferAt(aUV,      vertBuffer, 6, 2); // aUV contains u,v
 
         utils.drawUtil.setOutputBuffer(buffer);
         utils.drawUtil.clear(0xFF000000);
         utils.drawUtil.drawTriangles(indexBuffer, 0, TpB * NUM_BALLS);
         utils.drawUtil.finishOutputBuffer(buffer);
 
-        utils.programUtil.setVertexBufferAt(program, aPos,     null, 0, 3);
-        utils.programUtil.setVertexBufferAt(program, aCorner,  null, 3, 2);
-        utils.programUtil.setVertexBufferAt(program, aScale,   null, 5, 1);
-        utils.programUtil.setVertexBufferAt(program, aUV,      null, 6, 2);
+        program.setVertexBufferAt(aPos,     null, 0, 3);
+        program.setVertexBufferAt(aCorner,  null, 3, 2);
+        program.setVertexBufferAt(aScale,   null, 5, 1);
+        program.setVertexBufferAt(aUV,      null, 6, 2);
 
-        utils.programUtil.setTextureAt(program, uSampler, null); // uSampler contains our texture
+        program.setTextureAt(uSampler, null); // uSampler contains our texture
     }
 }

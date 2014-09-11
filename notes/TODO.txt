@@ -1,7 +1,6 @@
 Handle context loss
 
     Make solid, like OutputBuffer:
-        Program
         Texture
 
     Util should create GLMirror<T, GLContract>s

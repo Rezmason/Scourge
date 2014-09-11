@@ -43,11 +43,11 @@ class PrettyMethod extends RenderMethod {
         programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         programUtil.setDepthTest(false);
 
-        programUtil.setFourProgramConstants(program, uDerivMult, [DERIV_MULT, 0, 0, 0]);
+        program.setFourProgramConstants(uDerivMult, [DERIV_MULT, 0, 0, 0]);
     }
 
     override public function deactivate():Void {
-        programUtil.setTextureAt(program, uSampler, null);
+        program.setTextureAt(uSampler, null);
         programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         programUtil.setDepthTest(true);
     }
@@ -69,29 +69,29 @@ class PrettyMethod extends RenderMethod {
 
     override function connectToShaders():Void {
 
-        aPos     = programUtil.getAttribsLocation(program, 'aPos'    );
-        aCorner  = programUtil.getAttribsLocation(program, 'aCorner' );
-        aDistort = programUtil.getAttribsLocation(program, 'aDistort');
-        aColor   = programUtil.getAttribsLocation(program, 'aColor'  );
-        aUV      = programUtil.getAttribsLocation(program, 'aUV'     );
-        aFX      = programUtil.getAttribsLocation(program, 'aFX'     );
+        aPos     = program.getAttribsLocation('aPos'    );
+        aCorner  = program.getAttribsLocation('aCorner' );
+        aDistort = program.getAttribsLocation('aDistort');
+        aColor   = program.getAttribsLocation('aColor'  );
+        aUV      = program.getAttribsLocation('aUV'     );
+        aFX      = program.getAttribsLocation('aFX'     );
         
-        uSampler   = programUtil.getUniformLocation(program, 'uSampler'  );
-        uDerivMult = programUtil.getUniformLocation(program, 'uDerivMult');
-        uGlyphMat  = programUtil.getUniformLocation(program, 'uGlyphMat' );
-        uCameraMat = programUtil.getUniformLocation(program, 'uCameraMat');
-        uBodyMat   = programUtil.getUniformLocation(program, 'uBodyMat'  );
+        uSampler   = program.getUniformLocation('uSampler'  );
+        uDerivMult = program.getUniformLocation('uDerivMult');
+        uGlyphMat  = program.getUniformLocation('uGlyphMat' );
+        uCameraMat = program.getUniformLocation('uCameraMat');
+        uBodyMat   = program.getUniformLocation('uBodyMat'  );
     }
 
     override public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
         super.setGlyphTexture(glyphTexture, glyphTransform);
-        programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, glyphMat); // uGlyphMat contains the character matrix
-        programUtil.setTextureAt(program, uSampler, glyphTexture.texture); // uSampler contains our texture
+        program.setProgramConstantsFromMatrix(uGlyphMat, glyphMat); // uGlyphMat contains the character matrix
+        program.setTextureAt(uSampler, glyphTexture.texture); // uSampler contains our texture
     }
 
     override public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void {
-        programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat); // uCameraMat contains the camera matrix
-        programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat); // uBodyMat contains the body's matrix
+        program.setProgramConstantsFromMatrix(uCameraMat, cameraMat); // uCameraMat contains the camera matrix
+        program.setProgramConstantsFromMatrix(uBodyMat, bodyMat); // uBodyMat contains the body's matrix
     }
 
     override public function setSegment(segment:BodySegment):Void {
@@ -104,12 +104,12 @@ class PrettyMethod extends RenderMethod {
             colorBuffer = segment.colorBuffer;
         }
 
-        programUtil.setVertexBufferAt(program, aPos,     shapeBuffer, 0, 3); // aPos contains x,y,z
-        programUtil.setVertexBufferAt(program, aCorner,  shapeBuffer, 3, 2); // aCorner contains h,v
-        programUtil.setVertexBufferAt(program, aDistort, shapeBuffer, 5, 3); // aScale contains h,s,p
-        programUtil.setVertexBufferAt(program, aColor,   colorBuffer, 0, 3); // aColor contains r,g,b
-        programUtil.setVertexBufferAt(program, aUV,      colorBuffer, 3, 2); // aUV contains u,v
-        programUtil.setVertexBufferAt(program, aFX,      colorBuffer, 5, 3); // aFX contains i,f,a
+        program.setVertexBufferAt(aPos,     shapeBuffer, 0, 3); // aPos contains x,y,z
+        program.setVertexBufferAt(aCorner,  shapeBuffer, 3, 2); // aCorner contains h,v
+        program.setVertexBufferAt(aDistort, shapeBuffer, 5, 3); // aScale contains h,s,p
+        program.setVertexBufferAt(aColor,   colorBuffer, 0, 3); // aColor contains r,g,b
+        program.setVertexBufferAt(aUV,      colorBuffer, 3, 2); // aUV contains u,v
+        program.setVertexBufferAt(aFX,      colorBuffer, 5, 3); // aFX contains i,f,a
     }
 }
 

@@ -44,23 +44,23 @@ class MouseMethod extends RenderMethod {
     }
 
     override function connectToShaders():Void {
-        aPos    = programUtil.getAttribsLocation(program, 'aPos'   );
-        aCorner = programUtil.getAttribsLocation(program, 'aCorner');
-        aPaint  = programUtil.getAttribsLocation(program, 'aPaint' );
+        aPos    = program.getAttribsLocation('aPos'   );
+        aCorner = program.getAttribsLocation('aCorner');
+        aPaint  = program.getAttribsLocation('aPaint' );
 
-        uGlyphMat  = programUtil.getUniformLocation(program, 'uGlyphMat' );
-        uCameraMat = programUtil.getUniformLocation(program, 'uCameraMat');
-        uBodyMat   = programUtil.getUniformLocation(program, 'uBodyMat'  );
+        uGlyphMat  = program.getUniformLocation('uGlyphMat' );
+        uCameraMat = program.getUniformLocation('uCameraMat');
+        uBodyMat   = program.getUniformLocation('uBodyMat'  );
     }
 
     override public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
         super.setGlyphTexture(glyphTexture, glyphTransform);
-        programUtil.setProgramConstantsFromMatrix(program, uGlyphMat, glyphMat);
+        program.setProgramConstantsFromMatrix(uGlyphMat, glyphMat);
     }
 
     override public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void {
-        programUtil.setProgramConstantsFromMatrix(program, uCameraMat, cameraMat);
-        programUtil.setProgramConstantsFromMatrix(program, uBodyMat, bodyMat);
+        program.setProgramConstantsFromMatrix(uCameraMat, cameraMat);
+        program.setProgramConstantsFromMatrix(uBodyMat, bodyMat);
     }
 
     override public function setSegment(segment:BodySegment):Void {
@@ -73,9 +73,9 @@ class MouseMethod extends RenderMethod {
             paintBuffer = segment.paintBuffer;
         }
 
-        programUtil.setVertexBufferAt(program, aPos,    shapeBuffer, 0, 3);
-        programUtil.setVertexBufferAt(program, aCorner, shapeBuffer, 3, 2);
-        programUtil.setVertexBufferAt(program, aPaint,  paintBuffer, 0, 3);
+        program.setVertexBufferAt(aPos,    shapeBuffer, 0, 3);
+        program.setVertexBufferAt(aCorner, shapeBuffer, 3, 2);
+        program.setVertexBufferAt(aPaint,  paintBuffer, 0, 3);
     }
 }
 
