@@ -9,7 +9,7 @@ import flash.geom.Matrix;
 import flash.utils.ByteArray;
 import flash.Vector;
 
-import net.rezmason.gl.utils.DrawUtil;
+import net.rezmason.gl.GLSystem;
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.Data;
 import net.rezmason.utils.Zig;
@@ -43,14 +43,14 @@ class MouseSystem {
     var width:Int;
     var height:Int;
     var initialized:Bool;
-    var drawUtil:DrawUtil;
+    var util:GLSystem;
 
     public function new(target:EventDispatcher):Void {
         // _view = new MouseView(0.2, 1);
         // _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
         interact = new Zig();
-        drawUtil = new Present(DrawUtil);
+        util = new Present(GLSystem);
         updateSignal = new Zig<Void->Void>();
         rectRegionsByID = null;
         lastRectRegionID = null;
@@ -67,7 +67,7 @@ class MouseSystem {
         initialized = false;
         invalidate();
 
-        outputBuffer = drawUtil.createOutputBuffer(READBACK);
+        outputBuffer = util.createOutputBuffer(READBACK);
     }
 
     public function setSize(width:Int, height:Int):Void {
@@ -187,10 +187,10 @@ class MouseSystem {
             }
 
             outputBuffer.resize(width, height);
-            if (data == null) data = drawUtil.createReadbackData(width * height * 4);
+            if (data == null) data = util.createReadbackData(width * height * 4);
 
             updateSignal.dispatch();
-            drawUtil.readBack(outputBuffer, data);
+            util.readBack(outputBuffer, data);
             // fartBD();
 
             invalid = false;

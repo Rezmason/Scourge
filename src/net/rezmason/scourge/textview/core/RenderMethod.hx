@@ -6,7 +6,7 @@ import flash.geom.Vector3D;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
-import net.rezmason.gl.utils.ProgramUtil;
+import net.rezmason.gl.GLSystem;
 import net.rezmason.gl.Program;
 
 class RenderMethod {
@@ -17,7 +17,7 @@ class RenderMethod {
     public var program(default, null):Program;
     public var backgroundColor(default, null):Int;
     public var loadedSignal(default, null):Zig<Void->Void>;
-    var programUtil:ProgramUtil;
+    var util:GLSystem;
     var glyphMat:Matrix3D;
     var glyphMag:Float;
     var vertShader:String;
@@ -28,12 +28,12 @@ class RenderMethod {
     }
 
     public function load():Void {
-        programUtil = new Present(ProgramUtil);
+        util = new Present(GLSystem);
 
         init();
         composeShaders();
 
-        programUtil.loadProgram(vertShader, fragShader, onProgramLoaded);
+        util.loadProgram(vertShader, fragShader, onProgramLoaded);
     }
 
     function onProgramLoaded(program:Program):Void {

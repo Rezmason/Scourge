@@ -39,17 +39,17 @@ class PrettyMethod extends RenderMethod {
     public function new():Void super();
 
     override public function activate():Void {
-        programUtil.setProgram(program);
-        programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
-        programUtil.setDepthTest(false);
+        util.setProgram(program);
+        util.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        util.setDepthTest(false);
 
         program.setFourProgramConstants(uDerivMult, [DERIV_MULT, 0, 0, 0]);
     }
 
     override public function deactivate():Void {
         program.setTextureAt(uSampler, null);
-        programUtil.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
-        programUtil.setDepthTest(true);
+        util.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
+        util.setDepthTest(true);
     }
 
     override function composeShaders():Void {
@@ -60,7 +60,7 @@ class PrettyMethod extends RenderMethod {
         #if flash
             fragShader = getText('shaders/scourge_glyphs_flash.frag');
         #elseif js
-            programUtil.enableExtension("OES_standard_derivatives");
+            util.enableExtension("OES_standard_derivatives");
             fragShader = '#extension GL_OES_standard_derivatives : enable \n precision mediump float;' + frag;
         #else
             fragShader = frag;

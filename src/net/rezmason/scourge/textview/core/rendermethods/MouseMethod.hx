@@ -26,7 +26,7 @@ class MouseMethod extends RenderMethod {
     public function new():Void super();
 
     override public function activate():Void {
-        programUtil.setProgram(program);
+        util.setProgram(program);
     }
 
     override public function deactivate():Void {

@@ -4,7 +4,7 @@ import net.rezmason.gl.IndexBuffer;
 import net.rezmason.gl.BufferUsage;
 import net.rezmason.gl.Data;
 import net.rezmason.gl.VertexBuffer;
-import net.rezmason.gl.utils.BufferUtil;
+import net.rezmason.gl.GLSystem;
 
 import net.rezmason.utils.santa.Present;
 
@@ -37,21 +37,21 @@ class BodySegment {
     public function new(segmentID:Int, numGlyphs:Int, donor:BodySegment = null):Void {
         if (numGlyphs < 0) numGlyphs = 0;
         id = segmentID;
-        createBuffersAndVectors(numGlyphs, new Present(BufferUtil));
+        createBuffersAndVectors(numGlyphs, new Present(GLSystem));
         createGlyphs(numGlyphs, donor);
         this.numGlyphs = numGlyphs;
         update();
     }
 
-    inline function createBuffersAndVectors(numGlyphs:Int, bufferUtil:BufferUtil):Void {
+    inline function createBuffersAndVectors(numGlyphs:Int, util:GLSystem):Void {
         var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
         var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
         var bufferUsage:BufferUsage = DYNAMIC_DRAW;
 
-        shapeBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.SHAPE_FLOATS_PER_VERTEX, bufferUsage);
-        colorBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX, bufferUsage);
-        paintBuffer = bufferUtil.createVertexBuffer(numGlyphVertices, Almanac.PAINT_FLOATS_PER_VERTEX, bufferUsage);
-        indexBuffer = bufferUtil.createIndexBuffer(numGlyphIndices, bufferUsage);
+        shapeBuffer = util.createVertexBuffer(numGlyphVertices, Almanac.SHAPE_FLOATS_PER_VERTEX, bufferUsage);
+        colorBuffer = util.createVertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX, bufferUsage);
+        paintBuffer = util.createVertexBuffer(numGlyphVertices, Almanac.PAINT_FLOATS_PER_VERTEX, bufferUsage);
+        indexBuffer = util.createIndexBuffer(numGlyphIndices, bufferUsage);
 
         shapeVertices = new VertexArray(numGlyphVertices * Almanac.SHAPE_FLOATS_PER_VERTEX);
         colorVertices = new VertexArray(numGlyphVertices * Almanac.COLOR_FLOATS_PER_VERTEX);

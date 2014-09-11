@@ -9,7 +9,7 @@ import net.rezmason.scourge.textview.ScourgeNavPageAddresses;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.FontManager;
 import net.rezmason.scourge.textview.pages.*;
-import net.rezmason.gl.utils.*;
+import net.rezmason.gl.*;
 import net.rezmason.utils.santa.Santa;
 
 class Context {
@@ -17,19 +17,15 @@ class Context {
     var stage:Stage;
     var engine:Engine;
     var navSystem:NavSystem;
-    var utils:UtilitySet;
+    var util:GLSystem;
 
     public function new():Void {
         stage = Lib.current.stage;
-        utils = new UtilitySet(stage, onUtils);
+        util = new GLSystem(stage, onUtils);
     }
 
     function onUtils():Void {
-        Santa.mapToClass(UtilitySet, Singleton(utils));
-        Santa.mapToClass(BufferUtil, Singleton(utils.bufferUtil));
-        Santa.mapToClass(DrawUtil, Singleton(utils.drawUtil));
-        Santa.mapToClass(ProgramUtil, Singleton(utils.programUtil));
-        Santa.mapToClass(TextureUtil, Singleton(utils.textureUtil));
+        Santa.mapToClass(GLSystem, Singleton(util));
         Santa.mapToClass(Stage, Singleton(stage));
         Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));
 

@@ -6,8 +6,7 @@ import flash.geom.Rectangle;
 import haxe.Timer;
 
 import net.rezmason.gl.OutputBuffer;
-import net.rezmason.gl.utils.UtilitySet;
-import net.rezmason.gl.utils.DrawUtil;
+import net.rezmason.gl.GLSystem;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.rendermethods.*;
 import net.rezmason.utils.display.FlatFont;
@@ -29,8 +28,7 @@ class Engine {
     var updateTimer:Timer;
     var lastTimeStamp:Float;
 
-    var utils:UtilitySet;
-    var drawUtil:DrawUtil;
+    var util:GLSystem;
     var bodiesByID:Map<Int, Body>;
     
     var mouseSystem:MouseSystem;
@@ -44,9 +42,8 @@ class Engine {
         active = false;
         ready = false;
         readySignal = new Zig<Void->Void>();
-        this.utils = new Present(UtilitySet);
-        drawUtil = utils.drawUtil;
-        this.stage = new Present(Stage);
+        util = new Present(GLSystem);
+        stage = new Present(Stage);
 
         width = 1;
         height = 1;
@@ -100,7 +97,7 @@ class Engine {
 
         mouseDownTarget = null;
         // stage.addChild(mouseSystem.view);
-        mainOutputBuffer = drawUtil.createOutputBuffer(VIEWPORT);
+        mainOutputBuffer = util.createOutputBuffer(VIEWPORT);
         addListeners();
 
         if (!ready) {
@@ -110,7 +107,7 @@ class Engine {
     }
 
     function addListeners():Void {
-        utils.onRender = onRender;
+        util.onRender = onRender;
         // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
@@ -131,8 +128,8 @@ class Engine {
 
         method.activate();
 
-        drawUtil.setOutputBuffer(outputBuffer);
-        drawUtil.clear(method.backgroundColor);
+        util.setOutputBuffer(outputBuffer);
+        util.clear(method.backgroundColor);
 
         for (body in bodiesByID) {
             if (body.numGlyphs == 0) continue;
@@ -141,13 +138,13 @@ class Engine {
 
             for (segment in body.segments) {
                 method.setSegment(segment);
-                drawUtil.drawTriangles(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+                util.drawTriangles(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
             }
         }
 
         method.setSegment(null);
         method.deactivate();
-        drawUtil.finishOutputBuffer(outputBuffer);
+        util.finishOutputBuffer(outputBuffer);
     }
 
     public function setSize(width:Int, height:Int):Void {
