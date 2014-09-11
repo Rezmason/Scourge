@@ -1,5 +1,3 @@
-Game timer troubles in HTML5 target
-
 Handle context loss
 
     Make solid, like OutputBuffer:

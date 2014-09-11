@@ -69,7 +69,7 @@ using net.rezmason.utils.Pointers;
 
         ident_ = Ptr.intToPointer(0, state.key);
 
-        var itr:Int = 0;
+        var itr:Int = 1; // Index 0 is reserved for the aspects' ID
         for (id in extraAspectRequirements.keys().a2z()) {
             var prop:AspectProperty = extraAspectRequirements[id];
             var ptr:AspectPtr = extraAspectTemplate.ptr(itr, state.key);
@@ -120,15 +120,48 @@ using net.rezmason.utils.Pointers;
         return name;
     }
 
-    @:final inline function buildGlobals():AspectSet return plan.globalAspectTemplate.copy();
-    @:final inline function buildPlayer():AspectSet return plan.playerAspectTemplate.copy();
-    @:final inline function buildNode():AspectSet return plan.nodeAspectTemplate.copy();
-    @:final inline function buildExtra():AspectSet return extraAspectTemplate.copy();
-    
-    @:final inline function allocHistGlobals():Void historyState.globals = plan.globalAspectTemplate.map(history.alloc);
-    @:final inline function allocHistPlayer():Void historyState.players.push(plan.playerAspectTemplate.map(history.alloc));
-    @:final inline function allocHistNode():Void historyState.nodes.push(plan.nodeAspectTemplate.map(history.alloc));
-    @:final inline function allocHistExtra():Void historyState.extras.push(extraAspectTemplate.map(history.alloc));
+    @:final inline function addGlobals():AspectSet {
+        var globals:AspectSet = plan.globalAspectTemplate.copy();
+        globals[ident_] = 0;
+        state.globals = globals;
+        plan.globalAspectTemplate[ident_] = 0;
+        historyState.globals = plan.globalAspectTemplate.map(history.alloc);
+        return globals;
+    }
+
+    @:final inline function addPlayer():AspectSet {
+        var player:AspectSet = plan.playerAspectTemplate.copy();
+        var playerID:Int = numPlayers();
+        player[ident_] = playerID;
+        state.players.push(player);
+        plan.playerAspectTemplate[ident_] = playerID;
+        historyState.players.push(plan.playerAspectTemplate.map(history.alloc));
+        return player;
+    }
+
+    @:final inline function addNode():AspectSet {
+        var node:AspectSet = plan.nodeAspectTemplate.copy();
+        var nodeID:Int = numNodes();
+        node[ident_] = nodeID;
+        state.nodes.push(node);
+        plan.nodeAspectTemplate[ident_] = nodeID;
+        historyState.nodes.push(plan.nodeAspectTemplate.map(history.alloc));
+
+        var locus:BoardLocus = new BoardLocus(nodeID, node);
+        state.loci.push(locus);
+        
+        return node;
+    }
+
+    @:final inline function addExtra():AspectSet {
+        var extra:AspectSet = extraAspectTemplate.copy();
+        var extraID:Int = numExtras();
+        extra[ident_] = extraID;
+        state.extras.push(extra);
+        extraAspectTemplate[ident_] = extraID;
+        historyState.extras.push(extraAspectTemplate.map(history.alloc));
+        return extra;
+    }
 
     @:final inline function getID(aspectSet:AspectSet):Int { return aspectSet[ident_]; }
     @:final inline function getNodeLocus(node:AspectSet):BoardLocus { return getLocus(getID(node)); }

@@ -46,8 +46,6 @@ abstract PtrSet<T>(Array<T>) {
         #end
     }
 
-    public inline function goFuckYourself():String return this.join('_');
-
     @:allow(net.rezmason.utils.PtrIterator) public inline function size():Int return this.length;
 
     public inline function ptr(i:Int, k:PtrKey):Ptr<T> return new Ptr(i, k);

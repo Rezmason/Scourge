@@ -19,16 +19,6 @@ class BuildPlayersRule extends Rule {
 
     override private function _prime():Void {
         if (cfg.numPlayers < 1) throw 'Invalid number of players in player config.';
-        for (ike in 0...cfg.numPlayers) makePlayer();
-    }
-
-    inline function makePlayer():AspectSet {
-        var player:AspectSet = buildPlayer();
-        player[ident_] = numPlayers();
-        state.players.push(player);
-        
-        allocHistPlayer();
-
-        return player;
+        for (ike in 0...cfg.numPlayers) addPlayer();
     }
 }

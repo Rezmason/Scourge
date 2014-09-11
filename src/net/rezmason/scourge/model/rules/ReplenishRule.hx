@@ -27,7 +27,6 @@ typedef ReplenishConfig = {
 class ReplenishRule extends Rule {
 
     // state, extra for each replenishable
-    @extra(ReplenishableAspect.REP_ID) var repID_;
     @extra(ReplenishableAspect.REP_NEXT) var repNext_;
     @extra(ReplenishableAspect.REP_PREV) var repPrev_;
 
@@ -61,41 +60,41 @@ class ReplenishRule extends Rule {
         // Create the replenishables
         for (repCfg in cfg.globalProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.globalAspectLookup);
-            repCfg.replenishableID = replenishable[repID_];
+            repCfg.replenishableID = replenishable[ident_];
             stateReps.push(replenishable);
         }
 
         for (repCfg in cfg.playerProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.playerAspectLookup);
-            repCfg.replenishableID = replenishable[repID_];
+            repCfg.replenishableID = replenishable[ident_];
             playerReps.push(replenishable);
         }
 
         for (repCfg in cfg.nodeProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.nodeAspectLookup);
-            repCfg.replenishableID = replenishable[repID_];
+            repCfg.replenishableID = replenishable[ident_];
             nodeReps.push(replenishable);
         }
 
         // List the replenishables
 
         if (stateReps.length > 0) {
-            stateReps.chainByAspect(repID_, repNext_, repPrev_);
-            state.globals[stateRepFirst_] = stateReps[0][repID_];
+            stateReps.chainByAspect(ident_, repNext_, repPrev_);
+            state.globals[stateRepFirst_] = stateReps[0][ident_];
         } else {
             state.globals[stateRepFirst_] = Aspect.NULL;
         }
 
         if (playerReps.length > 0) {
-            playerReps.chainByAspect(repID_, repNext_, repPrev_);
-            state.globals[playerRepFirst_] = playerReps[0][repID_];
+            playerReps.chainByAspect(ident_, repNext_, repPrev_);
+            state.globals[playerRepFirst_] = playerReps[0][ident_];
         } else {
             state.globals[playerRepFirst_] = Aspect.NULL;
         }
 
         if (nodeReps.length > 0) {
-            nodeReps.chainByAspect(repID_, repNext_, repPrev_);
-            state.globals[nodeRepFirst_] = nodeReps[0][repID_];
+            nodeReps.chainByAspect(ident_, repNext_, repPrev_);
+            state.globals[nodeRepFirst_] = nodeReps[0][ident_];
         } else {
             state.globals[nodeRepFirst_] = Aspect.NULL;
         }
@@ -114,14 +113,8 @@ class ReplenishRule extends Rule {
         // on a value stored in a particular aspect set, at a specific index
 
         // We represent replenishables as extras
-        var rep:AspectSet = buildExtra();
-
+        var rep:AspectSet = addExtra();
         rep[repPropLookup_] = lookup[repCfg.prop.id].toInt();
-        rep[repID_] = numExtras();
-
-        state.extras.push(rep);
-        allocHistExtra();
-
         return rep;
     }
 

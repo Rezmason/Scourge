@@ -40,7 +40,6 @@ class PickPieceRule extends Rule {
     @extra(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_;
     @extra(PieceAspect.PIECE_HAT_PREV) var pieceHatPrev_;
 
-    @extra(PieceAspect.PIECE_ID) var pieceID_;
     @extra(PieceAspect.PIECE_NEXT) var pieceNext_;
     @extra(PieceAspect.PIECE_PREV) var piecePrev_;
 
@@ -154,17 +153,14 @@ class PickPieceRule extends Rule {
         // Create a hat extra for every move
         var allPieces:Array<AspectSet> = [];
         for (move in allMoves) {
-            extraAspectTemplate[pieceID_] = numExtras();
             move.hatIndex = numExtras();
-            var piece:AspectSet = buildExtra();
+            var piece:AspectSet = addExtra();
             piece[pieceMoveID_] = move.id;
             allPieces.push(piece);
-            state.extras.push(piece);
-            allocHistExtra();
         }
 
-        allPieces.chainByAspect(pieceID_, pieceNext_, piecePrev_);
-        state.globals[pieceFirst_] = allPieces[0][pieceID_];
+        allPieces.chainByAspect(ident_, pieceNext_, piecePrev_);
+        state.globals[pieceFirst_] = allPieces[0][ident_];
     }
 
     private function generateMove(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):PickPieceMove {
@@ -221,7 +217,7 @@ class PickPieceRule extends Rule {
         if (pickedPiece == firstHatPiece) {
             firstHatPiece = nextPiece;
             if (firstHatPiece == null) state.globals[pieceHatFirst_] = Aspect.NULL;
-            else state.globals[pieceHatFirst_] = firstHatPiece[pieceID_];
+            else state.globals[pieceHatFirst_] = firstHatPiece[ident_];
         }
 
         return move;
@@ -230,8 +226,8 @@ class PickPieceRule extends Rule {
     private function buildHat():Void {
         var firstPiece:AspectSet = getExtra(state.globals[pieceFirst_]);
         var allPieces:Array<AspectSet> = firstPiece.listToArray(state.extras, pieceNext_);
-        allPieces.chainByAspect(pieceID_, pieceHatNext_, pieceHatPrev_);
-        state.globals[pieceHatFirst_] = firstPiece[pieceID_];
+        allPieces.chainByAspect(ident_, pieceHatNext_, pieceHatPrev_);
+        state.globals[pieceHatFirst_] = firstPiece[ident_];
         state.globals[piecesPicked_] = 0;
         state.globals[pieceHatPlayer_] = state.globals[currentPlayer_];
     }

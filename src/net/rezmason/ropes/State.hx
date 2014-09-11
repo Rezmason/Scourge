@@ -47,10 +47,8 @@ class State {
         globals = s.unserialize();
         players = s.unserialize();
         loci    = s.unserializeGrid();
+        nodes = [for (locus in loci) locus.value];
         extras  = s.unserialize();
-
-        nodes = [];
-        for (locus in loci) nodes.push(locus.value);
     }
 
     public function set_key(val:PtrKey):PtrKey {

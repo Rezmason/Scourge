@@ -118,30 +118,16 @@ class BuildBoardRule extends Rule {
         return {x:maxX, y:maxY};
     }
 
-    inline function makeNodeAndLocus():BoardLocus {
-        var id:Int = numNodes();
-        var node:AspectSet = buildNode();
-        node[ident_] = id;
-        state.nodes.push(node);
-
-        var locus:BoardLocus = new BoardLocus(id, node);
-        state.loci.push(locus);
-        
-        allocHistNode();
-
-        return locus;
-    }
-
     inline function makeSquareGraph(width:Int):BoardLocus {
 
         // Make a connected grid of nodes with default values
-        var locus:BoardLocus = makeNodeAndLocus();
-        for (ike in 1...width) locus = locus.attach(makeNodeAndLocus(), Gr.e);
+        var locus:BoardLocus = getNodeLocus(addNode());
+        for (ike in 1...width) locus = locus.attach(getNodeLocus(addNode()), Gr.e);
 
         var row:BoardLocus = locus.run(Gr.w);
         for (ike in 1...width) {
             for (column in row.walk(Gr.e)) {
-                var next:BoardLocus = makeNodeAndLocus();
+                var next:BoardLocus = getNodeLocus(addNode());
                 column.attach(next, Gr.s);
                 next.attach(column.w(), Gr.nw);
                 next.attach(column.e(), Gr.ne);

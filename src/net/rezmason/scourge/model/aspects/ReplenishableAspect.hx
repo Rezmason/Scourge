@@ -9,7 +9,6 @@ class ReplenishableAspect extends Aspect {
 
     @aspect(null) var REP_NEXT;
     @aspect(null) var REP_PREV;
-    @aspect(null) var REP_ID;
 
     @aspect(null) var REP_PROP_LOOKUP;
     @aspect(0) var REP_STEP;

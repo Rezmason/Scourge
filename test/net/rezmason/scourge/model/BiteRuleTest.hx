@@ -20,8 +20,7 @@ using net.rezmason.utils.Pointers;
 class BiteRuleTest extends ScourgeRuleTest
 {
     private static var PIECE_SIZE:Int = 4;
-    private static var freshnessBoardMod:Map<String, String> = [FreshnessAspect.FRESHNESS.id=>'F'];
-
+    
     #if TIME_TESTS
     var time:Float;
 
@@ -55,7 +54,7 @@ class BiteRuleTest extends ScourgeRuleTest
         biteRule.init(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        VisualAssert.assert('two player bite', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite', state.spitBoard(plan));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -67,7 +66,7 @@ class BiteRuleTest extends ScourgeRuleTest
         Assert.areEqual(20, numCells); // 20 cells for player 1
         biteRule.chooseMove();
 
-        VisualAssert.assert('two player bite, bite taken up top', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite, bite taken up top', state.spitBoard(plan));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(20 - 1, numCells); // 19 cells for player 1
@@ -93,7 +92,7 @@ class BiteRuleTest extends ScourgeRuleTest
         biteRule.init(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        VisualAssert.assert('two player bite', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite', state.spitBoard(plan));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -111,7 +110,7 @@ class BiteRuleTest extends ScourgeRuleTest
             }
         }
 
-        VisualAssert.assert('two player bite, three-unit bite down from top', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite, three-unit bite down from top', state.spitBoard(plan));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(20 - biteConfig.maxReach, numCells); // 19 cells for player 1
@@ -137,7 +136,7 @@ class BiteRuleTest extends ScourgeRuleTest
         biteRule.init(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        VisualAssert.assert('two player bite', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite', state.spitBoard(plan));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -157,7 +156,7 @@ class BiteRuleTest extends ScourgeRuleTest
             }
         }
 
-        VisualAssert.assert('two player bite, three-unit bite down-diagonal from top', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite, three-unit bite down-diagonal from top', state.spitBoard(plan));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(20 - biteConfig.maxReach, numCells); // 19 cells for player 1
@@ -183,7 +182,7 @@ class BiteRuleTest extends ScourgeRuleTest
         biteRule.init(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        VisualAssert.assert('two player bite', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite', state.spitBoard(plan));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -201,7 +200,7 @@ class BiteRuleTest extends ScourgeRuleTest
             }
         }
 
-        VisualAssert.assert('two player bite, two-unit byte along top going east', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite, two-unit byte along top going east', state.spitBoard(plan));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(20 - biteConfig.maxReach, numCells); // 19 cells for player 1
@@ -230,7 +229,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var enemyHeadID:Int = state.players[1][head_];
 
-        VisualAssert.assert('two player bite', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite', state.spitBoard(plan));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -247,7 +246,7 @@ class BiteRuleTest extends ScourgeRuleTest
                 break;
             }
         }
-        VisualAssert.assert('two player bite, player one\'s noggin bit', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite, player one\'s noggin bit', state.spitBoard(plan));
 
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
@@ -275,7 +274,7 @@ class BiteRuleTest extends ScourgeRuleTest
         biteRule.init(biteConfig);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        VisualAssert.assert('two player bite', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite', state.spitBoard(plan));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -295,7 +294,7 @@ class BiteRuleTest extends ScourgeRuleTest
         }
         biteRule.chooseMove(thickestMoveID);
 
-        VisualAssert.assert('two player bite, deep bite right through the middle', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite, deep bite right through the middle', state.spitBoard(plan));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(20 - numBitNodes, numCells); // 19 cells for player 1
@@ -328,7 +327,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var cavity:BoardLocus = enemyHead.s().s().e();
         cavity.value[occupier_] = 1;
 
-        VisualAssert.assert('two player bite with small cavity in player one', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite with small cavity in player one', state.spitBoard(plan));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -347,7 +346,7 @@ class BiteRuleTest extends ScourgeRuleTest
             }
         }
 
-        VisualAssert.assert('two player bite, cavity bitten', state.spitBoard(plan, true, freshnessBoardMod));
+        VisualAssert.assert('two player bite, cavity bitten', state.spitBoard(plan));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(20 - 1, numCells); // 19 cells for player 1

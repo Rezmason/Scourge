@@ -19,12 +19,8 @@ class BoardUtils {
         return state.loci[0].run(Gr.nw).run(Gr.w).run(Gr.n).run(Gr.s, south).run(Gr.e, east);
     }
 
-    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, otherNodeAspects:Map<String, String> = null):String {
+    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, evaluator:AspectSet->String = null):String {
         if (state.loci.length == 0) return 'empty grid';
-
-        if (otherNodeAspects == null) otherNodeAspects = new Map();
-        var otherAspectPtrs:Map<String, AspectPtr> = new Map();
-        for (id in otherNodeAspects.keys()) otherAspectPtrs[id] = plan.nodeAspectLookup[id];
 
         var str:String = '';
 
@@ -36,28 +32,20 @@ class BoardUtils {
         for (row in grid.walk(Gr.s)) {
             str += '\n';
             for (column in row.walk(Gr.e)) {
-
-                var otherAspectFound:Bool = false;
-
-                for (id in otherAspectPtrs.keys()) {
-                    var ptr:AspectPtr = otherAspectPtrs[id];
-                    if (column.value[ptr] > 0) {
-                        otherAspectFound = true;
-                        str += otherNodeAspects[id];
-                        break;
-                    }
-                }
-
-                if (!otherAspectFound) {
+                var char:String = null;
+                if (evaluator != null) char = evaluator(column.value);
+                if (char == null) {
                     var occupier:Null<Int> = column.value[occupier_];
                     var isFilled:Null<Int> = column.value[isFilled_];
 
-                    if (occupier == null) str += 'n';
-                    else if (occupier != Aspect.NULL && isFilled == Aspect.FALSE) str += String.fromCharCode(ALPHABET() + occupier);
-                    else if (occupier != Aspect.NULL) str += '' + occupier;
-                    else if (isFilled == Aspect.TRUE) str += 'X';
-                    else if (isFilled == Aspect.FALSE && occupier == Aspect.NULL) str += ' ';
+                    if (occupier == null) char = 'n';
+                    else if (occupier != Aspect.NULL && isFilled == Aspect.FALSE) char = String.fromCharCode(ALPHABET() + occupier);
+                    else if (occupier != Aspect.NULL) char = '' + occupier;
+                    else if (isFilled == Aspect.TRUE) char = 'X';
+                    else if (isFilled == Aspect.FALSE && occupier == Aspect.NULL) char = ' ';
                 }
+
+                str += char;
             }
         }
 

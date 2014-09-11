@@ -13,45 +13,45 @@ typedef SpreadFilter<T> = T->T->Bool;
 class GridUtils {
 
     // Creates an iterator for walking along a grid in one direction
-    public inline static function walk<T> (node:GridLocus<T>, direction:Int):GridWalker<T> {
-        return new GridWalker<T>(node, direction);
+    public inline static function walk<T> (locus:GridLocus<T>, direction:Int):GridWalker<T> {
+        return new GridWalker<T>(locus, direction);
     }
 
     public inline static function allDirections():Iterator<Int> { return 0...8; }
 
     public inline static function orthoDirections():Iterator<Int> { return [0, 2, 4, 6].iterator(); }
 
-    // Returns the furthest reachable node from the given node in the specified direction
-    public inline static function run<T> (node:GridLocus<T>, direction:Int, maxDist:Int = -1):GridLocus<T> {
+    // Returns the furthest reachable locus from the given locus in the specified direction
+    public inline static function run<T> (locus:GridLocus<T>, direction:Int, maxDist:Int = -1):GridLocus<T> {
         var distance:Int = 0;
-        while (node.neighbors[direction] != null && distance != maxDist) {
-            node = node.neighbors[direction];
+        while (locus.neighbors[direction] != null && distance != maxDist) {
+            locus = locus.neighbors[direction];
             distance++;
         }
-        return node;
+        return locus;
     }
 
-    public inline static function attach<T> (node1:GridLocus<T>, node2:GridLocus<T>, directionForward:Int, directionBack:Int = -1):GridLocus<T> {
-        if (node1 != null) {
-            node1.neighbors[directionForward] = node2;
-            node1.headingOffsets[directionForward] = 0;
+    public inline static function attach<T> (locus1:GridLocus<T>, locus2:GridLocus<T>, directionForward:Int, directionBack:Int = -1):GridLocus<T> {
+        if (locus1 != null) {
+            locus1.neighbors[directionForward] = locus2;
+            locus1.headingOffsets[directionForward] = 0;
         }
-        if (node2 != null) {
+        if (locus2 != null) {
             if (directionBack == -1) directionBack = (directionForward + 4) % 8;
-            node2.neighbors[directionBack] = node1;
-            node1.headingOffsets[directionBack] = 0;
+            locus2.neighbors[directionBack] = locus1;
+            locus1.headingOffsets[directionBack] = 0;
         }
-        return node2;
+        return locus2;
     }
 
-    public inline static function orthoNeighbors<T>(node:GridLocus<T>):Array<GridLocus<T>> {
-        if (node._orthoNeighbors == null) node._orthoNeighbors = [n(node), e(node), s(node), w(node)];
-        return node._orthoNeighbors;
+    public inline static function orthoNeighbors<T>(locus:GridLocus<T>):Array<GridLocus<T>> {
+        if (locus._orthoNeighbors == null) locus._orthoNeighbors = [n(locus), e(locus), s(locus), w(locus)];
+        return locus._orthoNeighbors;
     }
 
-    public inline static function diagNeighbors<T>(node:GridLocus<T>):Array<GridLocus<T>> {
-        if (node._diagNeighbors == null) node._diagNeighbors = [ne(node), se(node), sw(node), nw(node)];
-        return node._diagNeighbors;
+    public inline static function diagNeighbors<T>(locus:GridLocus<T>):Array<GridLocus<T>> {
+        if (locus._diagNeighbors == null) locus._diagNeighbors = [ne(locus), se(locus), sw(locus), nw(locus)];
+        return locus._diagNeighbors;
     }
 
     public inline static function getGraph<T>(source:GridLocus<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
@@ -59,25 +59,25 @@ class GridUtils {
     }
 
     public inline static function expandGraph<T>(sources:Array<GridLocus<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
-        var nodes:Array<GridLocus<T>> = [];
-        for (node in sources) nodes[node.id] = node;
-        var newNodes:ShitList<GridLocus<T>> = new ShitList(sources);
+        var loci:Array<GridLocus<T>> = [];
+        for (locus in sources) loci[locus.id] = locus;
+        var newLoci:ShitList<GridLocus<T>> = new ShitList(sources);
 
-        var node:GridLocus<T> = newNodes.pop();
-        while (node != null) {
+        var locus:GridLocus<T> = newLoci.pop();
+        while (locus != null) {
 
-            var neighbors:Array<GridLocus<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
+            var neighbors:Array<GridLocus<T>> = orthoOnly ? orthoNeighbors(locus) : locus.neighbors;
 
             for (neighbor in neighbors) {
-                if (neighbor != null && nodes[neighbor.id] == null && (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
-                    nodes[neighbor.id] = neighbor;
-                    newNodes.add(neighbor);
+                if (neighbor != null && loci[neighbor.id] == null && (spreadFilter == null || spreadFilter(neighbor.value, locus.value))) {
+                    loci[neighbor.id] = neighbor;
+                    newLoci.add(neighbor);
                 }
             }
-            node = newNodes.pop();
+            locus = newLoci.pop();
         }
 
-        return nodes;
+        return loci;
     }
 
     public inline static function getGraphSequence<T>(source:GridLocus<T>, orthoOnly:Null<Bool> = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
@@ -85,40 +85,40 @@ class GridUtils {
     }
 
     public inline static function expandGraphSequence<T>(sources:Array<GridLocus<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<GridLocus<T>> {
-        var nodes:Array<GridLocus<T>> = sources.copy();
-        var newNodes:ShitList<GridLocus<T>> = new ShitList(sources);
+        var loci:Array<GridLocus<T>> = sources.copy();
+        var newLoci:ShitList<GridLocus<T>> = new ShitList(sources);
 
-        var nodesByID:Array<GridLocus<T>> = [];
-        for (node in nodes) nodesByID[node.id] = node;
+        var lociByID:Array<GridLocus<T>> = [];
+        for (locus in loci) lociByID[locus.id] = locus;
 
-        var node:GridLocus<T> = newNodes.pop();
-        while (node != null) {
+        var locus:GridLocus<T> = newLoci.pop();
+        while (locus != null) {
 
-            var neighbors:Array<GridLocus<T>> = orthoOnly ? orthoNeighbors(node) : node.neighbors;
+            var neighbors:Array<GridLocus<T>> = orthoOnly ? orthoNeighbors(locus) : locus.neighbors;
 
             for (neighbor in neighbors) {
-                if (neighbor != null && nodesByID[neighbor.id] == null && (spreadFilter == null || spreadFilter(neighbor.value, node.value))) {
-                    nodes.push(neighbor);
-                    newNodes.add(neighbor);
-                    nodesByID[neighbor.id] = neighbor;
+                if (neighbor != null && lociByID[neighbor.id] == null && (spreadFilter == null || spreadFilter(neighbor.value, locus.value))) {
+                    loci.push(neighbor);
+                    newLoci.add(neighbor);
+                    lociByID[neighbor.id] = neighbor;
                 }
             }
-            node = newNodes.pop();
+            locus = newLoci.pop();
         }
 
-        return nodes;
+        return loci;
     }
 
     public inline static function serializeGrid<T>(s:Serializer, sourceList:Array<GridLocus<T>>):Void {
         var data:Array<Array<Dynamic>> = [];
 
-        for (node in sourceList) {
+        for (locus in sourceList) {
             var neighbors:Array<Null<Int>> = [];
-            for (ike in 0...node.neighbors.length) {
-                if (node.neighbors[ike] != null) neighbors[ike] = node.neighbors[ike].id;
+            for (ike in 0...locus.neighbors.length) {
+                if (locus.neighbors[ike] != null) neighbors[ike] = locus.neighbors[ike].id;
                 else neighbors[ike] = -1;
             }
-            data.push([node.value, neighbors, node.headingOffsets]);
+            data.push([locus.value, neighbors, locus.headingOffsets]);
         }
 
         s.serialize(data);
@@ -127,49 +127,48 @@ class GridUtils {
     public inline static function unserializeGrid<T>(s:Unserializer):Array<GridLocus<T>> {
         var data:Array<Array<Dynamic>> = s.unserialize();
 
-        var nodes:Array<GridLocus<T>> = [];
+        var loci:Array<GridLocus<T>> = [for (ike in 0...data.length) new GridLocus<T>(ike, data[ike][0])];
 
-        for (ike in 0...data.length) nodes.push(new GridLocus<T>(ike, data[ike][0]));
-        for (ike in 0...nodes.length) {
+        for (ike in 0...loci.length) {
             var neighbors:Array<Null<Int>> = data[ike][1];
             var headingOffsets:Array<Null<Int>> = data[ike][2];
-            var node:GridLocus<T> = nodes[ike];
-            for (ike in 0...neighbors.length) if (neighbors[ike] != -1) node.neighbors[ike] = nodes[neighbors[ike]];
-            for (ike in 0...headingOffsets.length) node.headingOffsets[ike] = headingOffsets[ike];
+            var locus:GridLocus<T> = loci[ike];
+            for (ike in 0...neighbors.length) if (neighbors[ike] != -1) locus.neighbors[ike] = loci[neighbors[ike]];
+            for (ike in 0...headingOffsets.length) locus.headingOffsets[ike] = headingOffsets[ike];
         }
 
-        return nodes;
+        return loci;
     }
 
     // Shortcuts
-    public inline static function nw<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.nw]; }
-    public inline static function  n<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.n ]; }
-    public inline static function ne<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.ne]; }
-    public inline static function  e<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.e ]; }
-    public inline static function se<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.se]; }
-    public inline static function  s<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.s ]; }
-    public inline static function sw<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.sw]; }
-    public inline static function  w<T> (node:GridLocus<T>):GridLocus<T> { return node.neighbors[Gr.w ]; }
+    public inline static function nw<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.nw]; }
+    public inline static function  n<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.n ]; }
+    public inline static function ne<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.ne]; }
+    public inline static function  e<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.e ]; }
+    public inline static function se<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.se]; }
+    public inline static function  s<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.s ]; }
+    public inline static function sw<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.sw]; }
+    public inline static function  w<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.w ]; }
 }
 
 class GridWalker<T> {
 
-    var node:GridLocus<T>;
+    var locus:GridLocus<T>;
     var direction:Int;
 
-    public function new(_node:GridLocus<T>, _direction:Int):Void {
-        node = _node;
+    public function new(_locus:GridLocus<T>, _direction:Int):Void {
+        locus = _locus;
         direction = _direction;
     }
 
     public function hasNext():Bool {
-        return node != null;
+        return locus != null;
     }
 
     public function next():GridLocus<T> {
-        var lastNode:GridLocus<T> = node;
-        node = node.neighbors[direction];
-        return lastNode;
+        var lastLocus:GridLocus<T> = locus;
+        locus = locus.neighbors[direction];
+        return lastLocus;
     }
 
 }

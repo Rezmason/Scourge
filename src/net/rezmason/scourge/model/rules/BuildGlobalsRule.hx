@@ -21,11 +21,7 @@ class BuildGlobalsRule extends Rule {
     override public function _init(cfg:Dynamic):Void { this.cfg = cfg; }
 
     override private function _prime():Void {
-        var globals:AspectSet = buildGlobals();
-        globals[ident_] = 0;
-        globals[currentPlayer_] = cfg.firstPlayer;
-        state.globals = globals;
-        
-        allocHistGlobals();
+        addGlobals();
+        state.globals[currentPlayer_] = cfg.firstPlayer;
     }
 }
