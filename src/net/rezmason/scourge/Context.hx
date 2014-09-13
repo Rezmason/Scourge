@@ -17,15 +17,15 @@ class Context {
     var stage:Stage;
     var engine:Engine;
     var navSystem:NavSystem;
-    var util:GLSystem;
+    var glSys:GLSystem;
 
     public function new():Void {
         stage = Lib.current.stage;
-        util = new GLSystem(stage, onUtils);
+        glSys = new GLSystem(stage, onUtils);
     }
 
     function onUtils():Void {
-        Santa.mapToClass(GLSystem, Singleton(util));
+        Santa.mapToClass(GLSystem, Singleton(glSys));
         Santa.mapToClass(Stage, Singleton(stage));
         Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));
 

@@ -17,7 +17,7 @@ class RenderMethod {
     public var program(default, null):Program;
     public var backgroundColor(default, null):Int;
     public var loadedSignal(default, null):Zig<Void->Void>;
-    var util:GLSystem;
+    var glSys:GLSystem;
     var glyphMat:Matrix3D;
     var glyphMag:Float;
     var vertShader:String;
@@ -28,12 +28,12 @@ class RenderMethod {
     }
 
     public function load():Void {
-        util = new Present(GLSystem);
+        glSys = new Present(GLSystem);
 
         init();
         composeShaders();
 
-        util.loadProgram(vertShader, fragShader, onProgramLoaded);
+        glSys.loadProgram(vertShader, fragShader, onProgramLoaded);
     }
 
     function onProgramLoaded(program:Program):Void {

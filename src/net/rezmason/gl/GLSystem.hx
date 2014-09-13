@@ -5,7 +5,6 @@ import flash.display.Stage;
 import flash.geom.Rectangle;
 
 import net.rezmason.gl.GLTypes;
-import net.rezmason.gl.Data;
 
 #if flash
     import flash.display3D.Context3DCompareMode;
@@ -26,8 +25,10 @@ class GLSystem {
     var cbk:Void->Void;
     var view:View;
     var context:Context;
-    #if flash var stageRect:Rectangle; #end
 
+    public var currentOutputBuffer(default, null):OutputBuffer;
+    public var viewportOutputBuffer(get, null):ViewportOutputBuffer;
+    
     public function new(stage:Stage, cbk:Void->Void):Void {
         this.cbk = cbk;
 
@@ -38,6 +39,13 @@ class GLSystem {
                 context = stage3D.context3D;
                 init();
             } else {
+
+                function onCreate(event:Event):Void {
+                    event.target.removeEventListener(Event.CONTEXT3D_CREATE, onCreate);
+                    context = view.stage3Ds[0].context3D;
+                    init();
+                }
+
                 stage3D.addEventListener(Event.CONTEXT3D_CREATE, onCreate);
                 stage3D.requestContext3D(cast Context3DRenderMode.AUTO, cast "standard"); // Context3DProfile.STANDARD
             }
@@ -53,44 +61,34 @@ class GLSystem {
         #end
     }
 
-    #if flash
-        function onCreate(event:Event):Void {
-            event.target.removeEventListener(Event.CONTEXT3D_CREATE, onCreate);
-            context = view.stage3Ds[0].context3D;
-            init();
-        }
-    #end
-
     function init():Void {
-
-        var cbk:Void->Void = this.cbk;
-        this.cbk = null;
-
         #if flash
-            stageRect = new Rectangle(0, 0, 1, 1);
+            var stageRect:Rectangle = new Rectangle(0, 0, 1, 1);
+
+            function onEnterFrame(event:Event):Void {
+                handleRender(stageRect);
+            }
+
+            function onResize(event:Event):Void {
+                stageRect.width = view.stageWidth;
+                stageRect.height = view.stageHeight;
+            }
+
             view.addEventListener(Event.ENTER_FRAME, onEnterFrame);
             view.addEventListener(Event.RESIZE, onResize);
         #else
             view.render = handleRender;
         #end
 
+        var cbk:Void->Void = this.cbk;
+        this.cbk = null;
         haxe.Timer.delay(cbk, 0);
+        cbk = null;
     }
 
     function handleRender(rect:Rectangle):Void {
         if (onRender != null) onRender(Std.int(rect.width), Std.int(rect.height));
     }
-
-    #if flash
-        function onResize(event:Event):Void {
-            stageRect.width = view.stageWidth;
-            stageRect.height = view.stageHeight;
-        }
-
-        function onEnterFrame(event:Event):Void {
-            handleRender(stageRect);
-        }
-    #end
 
     public inline function createVertexBuffer(numVertices:Int, footprint:Int, ?usage:BufferUsage):VertexBuffer {
         return new VertexBuffer(context, numVertices, footprint, usage);
@@ -105,9 +103,29 @@ class GLSystem {
         program.load(vertSource, fragSource, function() onLoaded(program));
     }
 
+    public inline function createTextureOutputBuffer():TextureOutputBuffer {
+        return new TextureOutputBuffer(context);
+    }
+
+    public inline function createReadbackOutputBuffer():ReadbackOutputBuffer {
+        return new ReadbackOutputBuffer(context);
+    }
+    
+    public inline function createBitmapDataTexture(bmd:BitmapData):Texture {
+        #if flash
+            var tex = context.createRectangleTexture(bmd.width, bmd.height, cast "rgbaHalfFloat", false); // Context3DTextureFormat.RGBA_HALF_FLOAT
+            tex.uploadFromBitmapData(bmd);
+            return TEX(tex);
+        #else
+            return BMD(bmd);
+        #end
+    }
+
     public inline function setProgram(program:Program):Void {
-        #if flash program.prog.attach();
-        #else GL.useProgram(program.prog);
+        #if flash 
+            program.prog.attach();
+        #else 
+            GL.useProgram(program.prog);
         #end
     }
 
@@ -135,7 +153,6 @@ class GLSystem {
         #end
     }
 
-
     public inline function clear(color:Int = 0x0, alpha:Float = 1):Void {
         var red:Float   = ((color >> 16) & 0xFF) / 0xFF;
         var green:Float = ((color >>  8) & 0xFF) / 0xFF;
@@ -149,7 +166,7 @@ class GLSystem {
         #end
     }
 
-    public inline function drawTriangles(indexBuffer:IndexBuffer, firstIndex:Int = 0, numTriangles:Int = 0):Void {
+    public inline function draw(indexBuffer:IndexBuffer, firstIndex:Int = 0, numTriangles:Int = 0):Void {
         #if flash
             context.drawTriangles(indexBuffer.buf, firstIndex, numTriangles);
         #else
@@ -159,61 +176,22 @@ class GLSystem {
         #end
     }
 
-    public inline function createOutputBuffer(type:OutputBufferType):OutputBuffer {
-        return new OutputBuffer(type, context);
+    public inline function start(outputBuffer:OutputBuffer):Void {
+        if (currentOutputBuffer != outputBuffer) {
+            currentOutputBuffer = outputBuffer;
+            outputBuffer.activate();
+        }
     }
 
-    public inline function setOutputBuffer(outputBuffer:OutputBuffer):Void {
-        #if flash
-            switch (outputBuffer.type) {
-                case TEXTURE: 
-                    switch (outputBuffer.texture) {
-                        case TEX(tex): context.setRenderToTexture(tex);
-                        case _:
-                    }
-                case _: context.setRenderToBackBuffer();
-            }
-        #else
-            GL.bindFramebuffer(GL.FRAMEBUFFER, outputBuffer.frameBuffer);
-        #end
+    public inline function finish():Void {
+        if (currentOutputBuffer != null) {
+            currentOutputBuffer.deactivate();
+            currentOutputBuffer = null;
+        }
     }
 
-    public inline function finishOutputBuffer(outputBuffer:OutputBuffer):Void {
-        #if flash
-            switch (outputBuffer.type) {
-                case VIEWPORT: context.present();
-                case READBACK: context.drawToBitmapData(outputBuffer.bitmapData);
-                case _:
-            }
-        #end
-    }
-
-    public inline function createReadbackData(size:Int = 0):ReadbackData {
-        return new ReadbackData(#if !flash size #end);
-    }
-
-    public inline function readBack(outputBuffer:OutputBuffer, data:ReadbackData):Void {
-        #if flash
-            if (outputBuffer.bitmapData != null) {
-                var rect:Rectangle = new Rectangle(0, 0, outputBuffer.width, outputBuffer.height);
-                data.position = 0;
-                outputBuffer.bitmapData.copyPixelsToByteArray(rect, data);
-                data.position = 0;
-            }
-        #else
-            setOutputBuffer(outputBuffer);
-            GL.readPixels(0, 0, outputBuffer.width, outputBuffer.height, GL.RGBA, outputBuffer.format, data);
-        #end
-    }
-
-    public inline function createBitmapDataTexture(bmd:BitmapData):Texture {
-        #if flash
-            var size:Int = bmd.width;
-            var tex = context.createRectangleTexture(size, size, cast "rgbaHalfFloat", false); // Context3DTextureFormat.RGBA_HALF_FLOAT
-            tex.uploadFromBitmapData(bmd);
-            return TEX(tex);
-        #else
-            return BMD(bmd);
-        #end
+    public inline function get_viewportOutputBuffer():ViewportOutputBuffer {
+        if (viewportOutputBuffer == null) viewportOutputBuffer = new ViewportOutputBuffer(context);
+        return viewportOutputBuffer;
     }
 }

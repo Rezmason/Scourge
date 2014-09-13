@@ -28,7 +28,7 @@ class Engine {
     var updateTimer:Timer;
     var lastTimeStamp:Float;
 
-    var util:GLSystem;
+    var glSys:GLSystem;
     var bodiesByID:Map<Int, Body>;
     
     var mouseSystem:MouseSystem;
@@ -36,13 +36,13 @@ class Engine {
     var mouseDownTarget:Body;
     var mouseMethod:RenderMethod;
     var prettyMethod:RenderMethod;
-    var mainOutputBuffer:OutputBuffer;
+    var viewportOutputBuffer:OutputBuffer;
 
     public function new():Void {
         active = false;
         ready = false;
         readySignal = new Zig<Void->Void>();
-        util = new Present(GLSystem);
+        glSys = new Present(GLSystem);
         stage = new Present(Stage);
 
         width = 1;
@@ -97,7 +97,7 @@ class Engine {
 
         mouseDownTarget = null;
         // stage.addChild(mouseSystem.view);
-        mainOutputBuffer = util.createOutputBuffer(VIEWPORT);
+        viewportOutputBuffer = glSys.viewportOutputBuffer;
         addListeners();
 
         if (!ready) {
@@ -107,12 +107,12 @@ class Engine {
     }
 
     function addListeners():Void {
-        util.onRender = onRender;
+        glSys.onRender = onRender;
         // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
     function onRender(width:Int, height:Int):Void {
-        if (active) render(prettyMethod, mainOutputBuffer);
+        if (active) render(prettyMethod, viewportOutputBuffer);
     }
 
     function renderMouse():Void {
@@ -128,8 +128,8 @@ class Engine {
 
         method.activate();
 
-        util.setOutputBuffer(outputBuffer);
-        util.clear(method.backgroundColor);
+        glSys.start(outputBuffer);
+        glSys.clear(method.backgroundColor);
 
         for (body in bodiesByID) {
             if (body.numGlyphs == 0) continue;
@@ -138,13 +138,13 @@ class Engine {
 
             for (segment in body.segments) {
                 method.setSegment(segment);
-                util.drawTriangles(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+                glSys.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
             }
         }
 
         method.setSegment(null);
         method.deactivate();
-        util.finishOutputBuffer(outputBuffer);
+        glSys.finish();
     }
 
     public function setSize(width:Int, height:Int):Void {
@@ -153,7 +153,7 @@ class Engine {
         this.height = height;
         for (body in bodiesByID) body.adjustLayout(width, height);
         mouseSystem.setSize(width, height);
-        mainOutputBuffer.resize(width, height);
+        viewportOutputBuffer.resize(width, height);
     }
 
     public function activate():Void {

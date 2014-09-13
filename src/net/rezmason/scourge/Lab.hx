@@ -18,20 +18,20 @@ import net.rezmason.utils.Zig;
 class Lab {
 
     var stage:Stage;
-    var util:GLSystem;
+    var glSys:GLSystem;
     var metaballSystem:MetaballSystem;
     var postSystem:PostSystem;
 
     public function new(stage:Stage):Void {
         this.stage = stage;
-        util = new GLSystem(stage, init);
+        glSys = new GLSystem(stage, init);
     }
 
     function init():Void {
-        metaballSystem = new MetaballSystem(util, stage.stageWidth, stage.stageHeight);
+        metaballSystem = new MetaballSystem(glSys, stage.stageWidth, stage.stageHeight);
         metaballSystem.loadSig.add(onLoaded);
         
-        postSystem = new PostSystem(util, stage.stageWidth, stage.stageHeight, metaballSystem);
+        postSystem = new PostSystem(glSys, stage.stageWidth, stage.stageHeight, metaballSystem);
         postSystem.loadSig.add(onLoaded);
         
         metaballSystem.init();
@@ -40,7 +40,7 @@ class Lab {
 
     function onLoaded():Void {
         if (metaballSystem.ready && postSystem.ready) {
-            util.onRender = onRender;
+            glSys.onRender = onRender;
         }
     }
 
@@ -49,18 +49,18 @@ class Lab {
         postSystem.render();
     }
 
-    public static function makeExtensions(util:GLSystem):String {
+    public static function makeExtensions(glSys:GLSystem):String {
         var str = '';
         #if js
             var extensions = [];
 
-            util.enableExtension("OES_texture_float");
+            glSys.enableExtension("OES_texture_float");
             extensions.push('#extension GL_OES_texture_float : enable');
 
-            util.enableExtension("OES_standard_derivatives");
+            glSys.enableExtension("OES_standard_derivatives");
             extensions.push('#extension GL_OES_standard_derivatives : enable');
 
-            util.enableExtension("OES_float_linear");
+            glSys.enableExtension("OES_float_linear");
             extensions.push('#extension GL_OES_float_linear : enable');
 
             str = '${extensions.join("\n")}\nprecision mediump float;';
@@ -72,11 +72,11 @@ class Lab {
 class LabSystem {
     public var loadSig:Zig<Void->Void>;
     public var ready:Bool;
-    var util:GLSystem;
+    var glSys:GLSystem;
     var width:Int;
     var height:Int;
-    public function new(util:GLSystem, width:Int, height:Int):Void {
-        this.util = util;
+    public function new(glSys:GLSystem, width:Int, height:Int):Void {
+        this.glSys = glSys;
         this.width = width;
         this.height = height;
         loadSig = new Zig();
@@ -133,8 +133,8 @@ class PostSystem extends LabSystem {
     var globMat:Matrix3D;
     var time:Float;
 
-    public function new(util:GLSystem, width:Int, height:Int, metaballSystem:MetaballSystem):Void {
-        super(util, width, height);
+    public function new(glSys:GLSystem, width:Int, height:Int, metaballSystem:MetaballSystem):Void {
+        super(glSys, width, height);
         this.metaballSystem = metaballSystem;
     }
 
@@ -163,10 +163,10 @@ class PostSystem extends LabSystem {
 
         globMat = new Matrix3D();
         
-        metaballTexture = metaballSystem.buffer.texture;
-        globTexture = util.createBitmapDataTexture(getBitmapData('metaballs/glob.png'));
+        metaballTexture = cast(metaballSystem.buffer, TextureOutputBuffer).getTexture();
+        globTexture = glSys.createBitmapDataTexture(getBitmapData('metaballs/glob.png'));
 
-        buffer = util.createOutputBuffer(VIEWPORT);
+        buffer = glSys.viewportOutputBuffer;
         buffer.resize(width, height);
 
         var vertShader = '
@@ -233,9 +233,9 @@ class PostSystem extends LabSystem {
             }
         ';
 
-        fragShader = Lab.makeExtensions(util) + fragShader;
+        fragShader = Lab.makeExtensions(glSys) + fragShader;
 
-        util.loadProgram(vertShader, fragShader, onProgramLoaded);
+        glSys.loadProgram(vertShader, fragShader, onProgramLoaded);
 
         var vertices:VertexArray = new VertexArray(VpB * FpV);
         var vert = [
@@ -245,7 +245,7 @@ class PostSystem extends LabSystem {
              1,-1,0,1,1,
         ];
         for (ike in 0...VpB * FpV) vertices[ike] = vert[ike];
-        vertBuffer = util.createVertexBuffer(VpB, FpV);
+        vertBuffer = glSys.createVertexBuffer(VpB, FpV);
         vertBuffer.uploadFromVector(vertices, 0, VpB);
 
         var indices:IndexArray = new IndexArray(6);
@@ -254,7 +254,7 @@ class PostSystem extends LabSystem {
             0, 2, 3,
         ];
         for (ike in 0...6) indices[ike] = ind[ike];
-        indexBuffer = util.createIndexBuffer(6);
+        indexBuffer = glSys.createIndexBuffer(6);
         indexBuffer.uploadFromVector(indices, 0, 6);
     }
 
@@ -289,9 +289,9 @@ class PostSystem extends LabSystem {
     }
 
     override function draw():Void {
-        util.setProgram(program);
-        util.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
-        util.setDepthTest(false);
+        glSys.setProgram(program);
+        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        glSys.setDepthTest(false);
 
         program.setTextureAt(uMetaballSampler, metaballTexture); // uMetaballSampler contains our metaballTexture
         program.setTextureAt(uGlobSampler, globTexture, 1); // uGlobSampler contains our glob texture
@@ -304,10 +304,10 @@ class PostSystem extends LabSystem {
         program.setVertexBufferAt(aPos,     vertBuffer, 0, 3); // aPos contains x,y,z
         program.setVertexBufferAt(aUV,      vertBuffer, 3, 2); // aUV contains u,v
 
-        util.setOutputBuffer(buffer);
-        util.clear(0xFF000000);
-        util.drawTriangles(indexBuffer, 0, 2);
-        util.finishOutputBuffer(buffer);
+        glSys.start(buffer);
+        glSys.clear(0xFF000000);
+        glSys.draw(indexBuffer, 0, 2);
+        glSys.finish();
 
         program.setVertexBufferAt(aPos,     null, 0, 3);
         program.setVertexBufferAt(aUV,      null, 3, 2);
@@ -363,14 +363,14 @@ class MetaballSystem extends LabSystem {
 
         time = 0;
 
-        util.enableExtension("OES_texture_float"); // THIS IS NEEDED for all textures to be floating point
-        texture = util.createBitmapDataTexture(getBitmapData('metaballs/metaball.png'));
+        glSys.enableExtension("OES_texture_float"); // THIS IS NEEDED for all textures to be floating point
+        texture = glSys.createBitmapDataTexture(getBitmapData('metaballs/metaball.png'));
 
         bodyTransform = new Matrix3D();
         cameraTransform = new Matrix3D();
         cameraTransform.rawData = Vector.ofArray(cast [2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1]);
 
-        buffer = util.createOutputBuffer(TEXTURE);
+        buffer = glSys.createTextureOutputBuffer();
         buffer.resize(width, height);
 
         var vertShader = '
@@ -405,9 +405,9 @@ class MetaballSystem extends LabSystem {
             }
         ';
 
-        fragShader = Lab.makeExtensions(util) + fragShader;
+        fragShader = Lab.makeExtensions(glSys) + fragShader;
 
-        util.loadProgram(vertShader, fragShader, onProgramLoaded);
+        glSys.loadProgram(vertShader, fragShader, onProgramLoaded);
 
         phases = [];
         twitches = [];
@@ -495,8 +495,8 @@ class MetaballSystem extends LabSystem {
             indices[ike * IpB + 5] = ike * VpB + 3;
         }
 
-        vertBuffer = util.createVertexBuffer(NUM_BALLS * VpB, FpBV);
-        indexBuffer = util.createIndexBuffer(NUM_BALLS * IpB);
+        vertBuffer = glSys.createVertexBuffer(NUM_BALLS * VpB, FpBV);
+        indexBuffer = glSys.createIndexBuffer(NUM_BALLS * IpB);
     }
 
     function onProgramLoaded(program:Program):Void {
@@ -551,9 +551,9 @@ class MetaballSystem extends LabSystem {
     }
 
     override function draw():Void {
-        util.setProgram(program);
-        util.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
-        util.setDepthTest(false);
+        glSys.setProgram(program);
+        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        glSys.setDepthTest(false);
 
         program.setProgramConstantsFromMatrix(uBodyMat, bodyTransform); // uBodyMat contains the body's matrix
         program.setProgramConstantsFromMatrix(uCameraMat, cameraTransform); // uCameraMat contains the camera matrix
@@ -565,10 +565,10 @@ class MetaballSystem extends LabSystem {
         program.setVertexBufferAt(aScale,   vertBuffer, 5, 1); // aScale contains s
         program.setVertexBufferAt(aUV,      vertBuffer, 6, 2); // aUV contains u,v
 
-        util.setOutputBuffer(buffer);
-        util.clear(0xFF000000);
-        util.drawTriangles(indexBuffer, 0, TpB * NUM_BALLS);
-        util.finishOutputBuffer(buffer);
+        glSys.start(buffer);
+        glSys.clear(0xFF000000);
+        glSys.draw(indexBuffer, 0, TpB * NUM_BALLS);
+        glSys.finish();
 
         program.setVertexBufferAt(aPos,     null, 0, 3);
         program.setVertexBufferAt(aCorner,  null, 3, 2);

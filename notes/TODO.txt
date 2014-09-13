@@ -1,7 +1,6 @@
 Handle context loss
 
-    OutputBuffers are really weird
-        Clean 'em up
+    Extensions should be handled by GLSystem, too
 
     GLSystem should create GLMirror<T, GLContract>s
     A GLMirror is an object that inherently handles context loss
@@ -20,6 +19,9 @@ Logically rectangular grid
     http://www.llnl.gov/casc
 
 C., Rankin and Ramon
+
+GLSL2AGAL
+    Add support for ddx, ddy
 
 Wrap shaders in a soft fuzzy blanket, so they don't fucking piss themselves
     GLSL2AGAL output includes stuff that helps validate parameter setting and so on

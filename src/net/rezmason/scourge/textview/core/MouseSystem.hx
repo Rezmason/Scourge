@@ -10,7 +10,7 @@ import flash.utils.ByteArray;
 import flash.Vector;
 
 import net.rezmason.gl.GLSystem;
-import net.rezmason.gl.OutputBuffer;
+import net.rezmason.gl.ReadbackOutputBuffer;
 import net.rezmason.gl.Data;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
@@ -26,7 +26,7 @@ class MouseSystem {
 
     static var NULL_HIT:Hit = {bodyID:null, glyphID:null};
 
-    public var outputBuffer(default, null):OutputBuffer;
+    public var outputBuffer(default, null):ReadbackOutputBuffer;
     // public var view(get, null):Sprite;
     public var invalid(default, null):Bool;
     public var interact(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
@@ -43,14 +43,14 @@ class MouseSystem {
     var width:Int;
     var height:Int;
     var initialized:Bool;
-    var util:GLSystem;
+    var glSys:GLSystem;
 
     public function new(target:EventDispatcher):Void {
         // _view = new MouseView(0.2, 1);
         // _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
         interact = new Zig();
-        util = new Present(GLSystem);
+        glSys = new Present(GLSystem);
         updateSignal = new Zig<Void->Void>();
         rectRegionsByID = null;
         lastRectRegionID = null;
@@ -67,7 +67,7 @@ class MouseSystem {
         initialized = false;
         invalidate();
 
-        outputBuffer = util.createOutputBuffer(READBACK);
+        outputBuffer = glSys.createReadbackOutputBuffer();
     }
 
     public function setSize(width:Int, height:Int):Void {
@@ -187,10 +187,10 @@ class MouseSystem {
             }
 
             outputBuffer.resize(width, height);
-            if (data == null) data = util.createReadbackData(width * height * 4);
+            if (data == null) data = outputBuffer.createReadbackData();
 
             updateSignal.dispatch();
-            util.readBack(outputBuffer, data);
+            outputBuffer.readBack(outputBuffer, data);
             // fartBD();
 
             invalid = false;

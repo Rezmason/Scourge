@@ -17,8 +17,8 @@ class GlyphTexture {
         this.name = name;
         this.font = font;
         var bmp:BitmapData = font.getBitmapDataClone();
-        var util:GLSystem = new Present(GLSystem);
-        texture = util.createBitmapDataTexture(bmp);
+        var glSys:GLSystem = new Present(GLSystem);
+        texture = glSys.createBitmapDataTexture(bmp);
 
         #if flash
             bmp.dispose();
