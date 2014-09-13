@@ -1,8 +1,7 @@
 package net.rezmason.gl;
 
 import flash.display.BitmapData;
-
-typedef NativeTexture = #if flash flash.display3D.textures.TextureBase #else openfl.gl.GLTexture #end;
+import net.rezmason.gl.GLTypes;
 
 enum Texture {
     BMD(bmd:BitmapData);

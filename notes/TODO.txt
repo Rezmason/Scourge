@@ -1,9 +1,7 @@
 Handle context loss
 
-    Make solid, like OutputBuffer:
-        Texture
-            BitmapDataTexture
-            OutputBufferTexture
+    OutputBuffers are really weird
+        Clean 'em up
 
     GLSystem should create GLMirror<T, GLContract>s
     A GLMirror is an object that inherently handles context loss
