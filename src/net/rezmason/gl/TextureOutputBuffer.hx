@@ -32,6 +32,7 @@ class TextureOutputBuffer extends OutputBuffer {
         if (!super.resize(width, height)) return false;
 
         #if flash
+            if (tex != null) tex.dispose();
             tex = context.createRectangleTexture(width, height, cast "rgbaHalfFloat", true); // Context3DTextureFormat.RGBA_HALF_FLOAT
         #else
             buf.resize(width, height);
