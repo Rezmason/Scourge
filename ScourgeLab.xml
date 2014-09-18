@@ -14,6 +14,7 @@
     <haxedef name="haxeJSON" />
     <set name="html5-backend" value="openfl-html5-dom" />
     <haxelib name="openfl" />
+    <haxelib name="golems" />
     <set name="custom-html5-backend" />
     <haxelib name="openfl-html5-revised" if="html5" />
     <assets path="assets/metaballs" rename="metaballs" />

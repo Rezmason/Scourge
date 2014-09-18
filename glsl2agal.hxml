@@ -5,6 +5,7 @@
 -swf golems/GLSL2AGALConverter.swf
 -swf-version 11.4
 -cp src
+-lib golems
 #-debug
 -D advanced-telemetry
 -D haxeJSON

@@ -10,6 +10,7 @@
 	<classpath name="src" />
 	<classpath name="thirdparty/kawanet_ktween/src" />
 	<haxelib name="munit" />
+	<haxelib name="golems" />
 	<classpath name="test" />
 	<assets path="tables" include="*.txt" />
 	<assets path="shaders" include="*.vert|*.frag" />

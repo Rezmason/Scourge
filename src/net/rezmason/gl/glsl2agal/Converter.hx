@@ -1,6 +1,7 @@
 package net.rezmason.gl.glsl2agal;
 
 import flash.display3D.Context3DProgramType;
+import haxe.io.Bytes;
 import com.adobe.utils.AGALMiniAssembler;
 import net.rezmason.gl.glsl2agal.GLSL2AGALTypes;
 import net.rezmason.utils.workers.BasicWorker;
@@ -60,7 +61,7 @@ class Converter extends BasicWorker<GLSLInput, AGALOutput> {
             }
 
             assembler.assemble(cast input.type, asm, AGAL_VERSION);
-            nativeShader = assembler.agalcode;
+            nativeShader = Bytes.ofData(assembler.agalcode);
             if (nativeShader.length == 0) error = assembler.error;
         }
         catch (e:Dynamic) {

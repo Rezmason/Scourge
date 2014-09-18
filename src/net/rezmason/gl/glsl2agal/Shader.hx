@@ -39,7 +39,7 @@ class Shader {
         var json:Dynamic = agal.json;
         populateVarTable(json.varnames);
         populateConstTable(json.consts);
-        nativeShader = agal.nativeShader;
+        nativeShader = agal.nativeShader.getData();
         nativeShader.endian = Endian.LITTLE_ENDIAN;
     }
 

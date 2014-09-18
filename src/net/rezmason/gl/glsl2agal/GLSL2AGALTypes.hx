@@ -1,7 +1,7 @@
 package net.rezmason.gl.glsl2agal;
 
 import flash.display3D.Context3DProgramType;
-import flash.utils.ByteArray;
+import haxe.io.Bytes;
 
 typedef GLSLInput = {
     var type:Context3DProgramType;
@@ -11,7 +11,7 @@ typedef GLSLInput = {
 
 typedef AGALOutput = {
     var type:Context3DProgramType;
-    var nativeShader:ByteArray;
+    var nativeShader:Bytes;
     var json:Dynamic;
     var error:Dynamic;
 }

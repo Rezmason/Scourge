@@ -3,6 +3,7 @@
 -lib hamcrest
 -lib munit
 -lib msignal
+-lib golems
 -cp src
 -debug
 -resource tables/pieces.json.txt@tables/pieces.json.txt
@@ -24,6 +25,7 @@
 -lib hamcrest
 -lib munit
 -lib msignal
+-lib golems
 -cp src
 -debug
 -resource tables/pieces.json.txt@tables/pieces.json.txt
@@ -46,6 +48,7 @@
 -lib hamcrest
 -lib munit
 -lib msignal
+-lib golems
 -cp src
 -debug
 -resource tables/pieces.json.txt@tables/pieces.json.txt
