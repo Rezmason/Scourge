@@ -43,13 +43,13 @@ class VertexBuffer {
                 if (num * footprint < data.length) data = data.subarray(0, num * footprint);
                 array.set(data, offset);
                 GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-                GL.bufferData(GL.ARRAY_BUFFER, array, cast usage);
+                GL.bufferData(GL.ARRAY_BUFFER, array, usage);
             #else
                 for (ike in 0...num * footprint) {
                     array[ike + offset * footprint] = data[ike];
                 }
                 GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-                GL.bufferData(GL.ARRAY_BUFFER, array, cast usage);
+                GL.bufferData(GL.ARRAY_BUFFER, array, usage);
             #end
         }
     }

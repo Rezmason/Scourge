@@ -12,43 +12,24 @@ import net.rezmason.gl.Data;
 
 class TextureOutputBuffer extends OutputBuffer {
 
-    var tex:NativeTexture;
-
-    #if !flash
-        var buf:GLOutputBuffer;
-    #end
+    public var texture(default, null):BufferTexture;
 
     override function init():Void {
-        #if flash
-            tex = context.createRectangleTexture(1, 1, cast "rgbaHalfFloat", true); // Context3DTextureFormat.RGBA_HALF_FLOAT
-        #else
-            buf = new GLOutputBuffer(GL.FLOAT);
-            tex = buf.texture;
-        #end
+        texture = new BufferTexture(context, FLOAT);
     }
 
     override public function resize(width:Int, height:Int):Bool {
-
         if (!super.resize(width, height)) return false;
-
-        #if flash
-            if (tex != null) tex.dispose();
-            tex = context.createRectangleTexture(width, height, cast "rgbaHalfFloat", true); // Context3DTextureFormat.RGBA_HALF_FLOAT
-        #else
-            buf.resize(width, height);
-        #end
-
+        texture.resize(width, height);
         return true;
     }
-
-    public inline function getTexture():Texture return TEX(tex);
 
     @:allow(net.rezmason.gl)
     override function activate():Void {
         #if flash
-            context.setRenderToTexture(tex);
+            context.setRenderToTexture(texture.nativeTexture);
         #else
-            GL.bindFramebuffer(GL.FRAMEBUFFER, buf.frameBuffer);
+            GL.bindFramebuffer(GL.FRAMEBUFFER, texture.frameBuffer);
         #end
     }
 }

@@ -91,32 +91,15 @@ class Program {
         #end
     }
 
-    public inline function setTextureAt(location:UniformLocation, texture:Null<Texture>, index:Int = 0):Void {
-        #if flash
-            switch (texture) {
-                case null: prog.setTextureAt(location, null);
-                case TEX(tex): prog.setTextureAt(location, tex);
-                case _:
-            }
-        #else
-            if (texture != null) {
-                if (index != -1) {
-                    GL.activeTexture(GL.TEXTURE0 + index);
-                    switch (texture) {
-                        case BMD(bmd): GL.bindBitmapDataTexture(bmd);
-                        case TEX(tex): GL.bindTexture(GL.TEXTURE_2D, tex);
-                    }
-                    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-                    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-                    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-
-                    GL.uniform1i(location, index);
-                }
-            } else {
-
-            }
-        #end
+    public inline function setTextureAt(location:UniformLocation, texture:Texture, index:Int = 0):Void {
+        if (texture == null) {
+            #if flash
+                prog.setTextureAt(location, null);
+            #else
+            #end
+        } else {
+            texture.setAtProgLocation(prog, location, index);
+        }
     }
 
     public inline function setVertexBufferAt(location:AttribsLocation, buffer:VertexBuffer, offset:Int = 0, size:Int = -1, ?normalized:Bool):Void {

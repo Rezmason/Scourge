@@ -15,14 +15,14 @@ class ReadbackOutputBuffer extends OutputBuffer {
     #if flash
         var bitmapData:BitmapData;
     #else
-        var buf:GLOutputBuffer;
+        var texture:BufferTexture;
     #end
 
     override function init():Void {
         #if flash
             bitmapData = new BitmapData(1, 1, true, 0);
         #else
-            buf = new GLOutputBuffer(GL.UNSIGNED_BYTE);
+            texture = new BufferTexture(context, UNSIGNED_BYTE);
         #end
     }
 
@@ -34,7 +34,7 @@ class ReadbackOutputBuffer extends OutputBuffer {
             if (bitmapData != null) bitmapData.dispose();
             bitmapData = new BitmapData(width, height, true, 0);
         #else
-            buf.resize(width, height);
+            texture.resize(width, height);
         #end
 
         return true;
@@ -52,8 +52,8 @@ class ReadbackOutputBuffer extends OutputBuffer {
                 data.position = 0;
             }
         #else
-            GL.bindFramebuffer(GL.FRAMEBUFFER, buf.frameBuffer);
-            GL.readPixels(0, 0, width, height, GL.RGBA, buf.format, data);
+            GL.bindFramebuffer(GL.FRAMEBUFFER, texture.frameBuffer);
+            GL.readPixels(0, 0, width, height, GL.RGBA, texture.format, data);
         #end
     }
 
@@ -62,7 +62,7 @@ class ReadbackOutputBuffer extends OutputBuffer {
         #if flash
             context.setRenderToBackBuffer();
         #else
-            GL.bindFramebuffer(GL.FRAMEBUFFER, buf.frameBuffer);
+            GL.bindFramebuffer(GL.FRAMEBUFFER, texture.frameBuffer);
         #end
     }
 

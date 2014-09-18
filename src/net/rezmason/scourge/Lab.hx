@@ -163,7 +163,7 @@ class PostSystem extends LabSystem {
 
         globMat = new Matrix3D();
         
-        metaballTexture = cast(metaballSystem.buffer, TextureOutputBuffer).getTexture();
+        metaballTexture = cast(metaballSystem.buffer, TextureOutputBuffer).texture;
         globTexture = glSys.createBitmapDataTexture(getBitmapData('metaballs/glob.png'));
 
         buffer = glSys.viewportOutputBuffer;

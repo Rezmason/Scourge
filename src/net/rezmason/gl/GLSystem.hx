@@ -111,14 +111,8 @@ class GLSystem {
         return new ReadbackOutputBuffer(context);
     }
     
-    public inline function createBitmapDataTexture(bmd:BitmapData):Texture {
-        #if flash
-            var tex = context.createRectangleTexture(bmd.width, bmd.height, cast "rgbaHalfFloat", false); // Context3DTextureFormat.RGBA_HALF_FLOAT
-            tex.uploadFromBitmapData(bmd);
-            return TEX(tex);
-        #else
-            return BMD(bmd);
-        #end
+    public inline function createBitmapDataTexture(bmd:BitmapData):BitmapDataTexture {
+        return new BitmapDataTexture(context, bmd);
     }
 
     public inline function setProgram(program:Program):Void {

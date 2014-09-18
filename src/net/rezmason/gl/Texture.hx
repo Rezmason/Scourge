@@ -1,9 +1,12 @@
 package net.rezmason.gl;
 
-import flash.display.BitmapData;
 import net.rezmason.gl.GLTypes;
+import net.rezmason.gl.Data;
 
-enum Texture {
-    BMD(bmd:BitmapData);
-    TEX(tex:NativeTexture);
+class Texture {
+    
+    public function new():Void {}
+
+    @:allow(net.rezmason.gl)
+    function setAtProgLocation(prog:NativeProgram, location:UniformLocation, index:Int):Void {}
 }
