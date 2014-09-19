@@ -20,6 +20,9 @@ class Program extends Artifact {
     var prog:NativeProgram;
     var vertSource:String;
     var fragSource:String;
+
+    var uniformLocations:Map<String, UniformLocation>;
+    var attribsLocations:Map<String, AttribsLocation>;
     
     #if flash
         static var formats:Array<Context3DVertexBufferFormat> = [
@@ -37,6 +40,8 @@ class Program extends Artifact {
         this.vertSource = vertSource;
         this.fragSource = fragSource;
         loaded = false;
+        uniformLocations = new Map();
+        attribsLocations = new Map();
     }
 
     override function connectToContext(context:Context):Void {
@@ -76,73 +81,89 @@ class Program extends Artifact {
         #end
     }
 
-    public inline function setProgramConstantsFromMatrix(location:UniformLocation, matrix:Matrix3D):Void {
-
-        #if flash
-            prog.setUniformFromMatrix(location, matrix, true);
-        #else
-            GL.uniformMatrix3D(location, false, matrix);
-        #end
-    }
-
-    public inline function setFourProgramConstants(location:UniformLocation, vals:Array<Float>):Void {
-
-        #if flash
-            for (i in 0...4) vec[i] = vals == null ? 0 : vals[i];
-        #end
-
-        #if flash
-            prog.setUniformFromVector(location, vec, 1);
-        #else
-            if (vals == null) GL.uniform4f(location, 0, 0, 0, 0);
-            else GL.uniform4f(location, vals[0], vals[1], vals[2], vals[3]);
-        #end
-    }
-
-    public inline function setTextureAt(location:UniformLocation, texture:Texture, index:Int = 0):Void {
-        if (texture == null) {
+    public inline function setProgramConstantsFromMatrix(uName:String, matrix:Matrix3D):Void {
+        var location = getUniformLocation(uName);
+        if (location != null) {
             #if flash
-                prog.setTextureAt(location, null);
+                prog.setUniformFromMatrix(location, matrix, true);
             #else
-            #end
-        } else {
-            texture.setAtProgLocation(prog, location, index);
-        }
-    }
-
-    public inline function setVertexBufferAt(location:AttribsLocation, buffer:VertexBuffer, offset:Int = 0, size:Int = -1, ?normalized:Bool):Void {
-        if (size < 0) size = buffer.footprint;
-        if (buffer != null) {
-            #if flash
-                prog.setVertexBufferAt(location, buffer.buf, offset, formats[size]);
-            #else
-                GL.bindBuffer(GL.ARRAY_BUFFER, buffer.buf);
-                GL.vertexAttribPointer(location, size, GL.FLOAT, normalized, 4 * buffer.footprint, 4 * offset);
-
-                GL.enableVertexAttribArray(location);
-            #end
-        } else {
-            #if flash
-                prog.setVertexBufferAt(location, null, offset, formats[size]);
-            #else
-                GL.disableVertexAttribArray(location);
+                GL.uniformMatrix3D(location, false, matrix);
             #end
         }
     }
 
-    public inline function getUniformLocation(name:String):UniformLocation {
-        #if flash
-            return prog.getUniformLocation(name);
-        #else
-            return GL.getUniformLocation(prog, name);
-        #end
+    public inline function setFourProgramConstants(uName:String, vals:Array<Float>):Void {
+        var location = getUniformLocation(uName);
+        if (location != null) {
+            #if flash
+                for (i in 0...4) vec[i] = vals == null ? 0 : vals[i];
+            #end
+
+            #if flash
+                prog.setUniformFromVector(location, vec, 1);
+            #else
+                if (vals == null) GL.uniform4f(location, 0, 0, 0, 0);
+                else GL.uniform4f(location, vals[0], vals[1], vals[2], vals[3]);
+            #end
+        }
     }
 
-    public inline function getAttribsLocation(name:String):AttribsLocation {
-        #if flash
-            return prog.getAttribLocation(name);
-        #else
-            return GL.getAttribLocation(prog, name);
-        #end
+    public inline function setTextureAt(uName:String, texture:Texture, index:Int = 0):Void {
+        var location = getUniformLocation(uName);
+        if (location != null) {
+            if (texture == null) {
+                #if flash
+                    prog.setTextureAt(location, null);
+                #else
+                #end
+            } else {
+                texture.setAtProgLocation(prog, location, index);
+            }
+        }
+    }
+
+    public inline function setVertexBufferAt(aName:String, buffer:VertexBuffer, offset:Int = 0, size:Int = -1, ?normalized:Bool):Void {
+        var location = getAttribsLocation(aName);
+        if (location != null) {
+            if (size < 0) size = buffer.footprint;
+            if (buffer != null) {
+                #if flash
+                    prog.setVertexBufferAt(location, buffer.buf, offset, formats[size]);
+                #else
+                    GL.bindBuffer(GL.ARRAY_BUFFER, buffer.buf);
+                    GL.vertexAttribPointer(location, size, GL.FLOAT, normalized, 4 * buffer.footprint, 4 * offset);
+
+                    GL.enableVertexAttribArray(location);
+                #end
+            } else {
+                #if flash
+                    prog.setVertexBufferAt(location, null, offset, formats[size]);
+                #else
+                    GL.disableVertexAttribArray(location);
+                #end
+            }
+        }
+    }
+
+    inline function getUniformLocation(name:String):UniformLocation {
+        if (!uniformLocations.exists(name)) {
+            #if flash
+                uniformLocations[name] = prog.getUniformLocation(name);
+            #else
+                uniformLocations[name] = GL.getUniformLocation(prog, name);
+            #end
+        }
+        return uniformLocations[name];
+    }
+
+    inline function getAttribsLocation(name:String):AttribsLocation {
+        if (!attribsLocations.exists(name)) {
+            #if flash
+                attribsLocations[name] = prog.getAttribLocation(name);
+            #else
+                attribsLocations[name] = GL.getAttribLocation(prog, name);
+            #end
+        }
+        return attribsLocations[name];
     }
 }

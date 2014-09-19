@@ -15,14 +15,6 @@ class MouseMethod extends RenderMethod {
 
     //inline static var FAT_FINGERS:Float = 2; // TODO: Fat finger support needs to wait till we can z-order buttons
 
-    var aPos:AttribsLocation;
-    var aCorner:AttribsLocation;
-    var aPaint:AttribsLocation;
-
-    var uGlyphMat:UniformLocation;
-    var uCameraMat:UniformLocation;
-    var uBodyMat:UniformLocation;
-
     public function new():Void super();
 
     override public function activate():Void {
@@ -43,24 +35,14 @@ class MouseMethod extends RenderMethod {
         fragShader = #if !desktop 'precision mediump float;' + #end getText('shaders/mousepicking.frag');
     }
 
-    override function connectToShaders():Void {
-        aPos    = program.getAttribsLocation('aPos'   );
-        aCorner = program.getAttribsLocation('aCorner');
-        aPaint  = program.getAttribsLocation('aPaint' );
-
-        uGlyphMat  = program.getUniformLocation('uGlyphMat' );
-        uCameraMat = program.getUniformLocation('uCameraMat');
-        uBodyMat   = program.getUniformLocation('uBodyMat'  );
-    }
-
     override public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
         super.setGlyphTexture(glyphTexture, glyphTransform);
-        program.setProgramConstantsFromMatrix(uGlyphMat, glyphMat);
+        program.setProgramConstantsFromMatrix('uGlyphMat', glyphMat);
     }
 
     override public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void {
-        program.setProgramConstantsFromMatrix(uCameraMat, cameraMat);
-        program.setProgramConstantsFromMatrix(uBodyMat, bodyMat);
+        program.setProgramConstantsFromMatrix('uCameraMat', cameraMat);
+        program.setProgramConstantsFromMatrix('uBodyMat', bodyMat);
     }
 
     override public function setSegment(segment:BodySegment):Void {
@@ -73,9 +55,9 @@ class MouseMethod extends RenderMethod {
             paintBuffer = segment.paintBuffer;
         }
 
-        program.setVertexBufferAt(aPos,    shapeBuffer, 0, 3);
-        program.setVertexBufferAt(aCorner, shapeBuffer, 3, 2);
-        program.setVertexBufferAt(aPaint,  paintBuffer, 0, 3);
+        program.setVertexBufferAt('aPos',    shapeBuffer, 0, 3);
+        program.setVertexBufferAt('aCorner', shapeBuffer, 3, 2);
+        program.setVertexBufferAt('aPaint',  paintBuffer, 0, 3);
     }
 }
 

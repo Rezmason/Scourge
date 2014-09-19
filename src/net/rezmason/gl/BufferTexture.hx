@@ -1,7 +1,6 @@
 package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
-import net.rezmason.gl.Data;
 
 #if !flash
     import openfl.gl.GL;

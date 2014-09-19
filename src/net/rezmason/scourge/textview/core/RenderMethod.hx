@@ -15,6 +15,7 @@ class RenderMethod {
     static var unitVec:Vector3D = new Vector3D(1, 0, 0);
 
     public var program(default, null):Program;
+    public var programLoaded(get, null):Bool;
     public var backgroundColor(default, null):Int;
     public var loadedSignal(default, null):Zig<Void->Void>;
     var glSys:GLSystem;
@@ -39,7 +40,6 @@ class RenderMethod {
     }
 
     function onProgramLoaded():Void {
-        connectToShaders();
         loadedSignal.dispatch();
     }
 
@@ -68,8 +68,9 @@ class RenderMethod {
     }
 
     function composeShaders():Void { }
-    function connectToShaders():Void { }
     function makeVertexShader():String { return ''; }
     function makeFragmentShader():String { return ''; }
+
+    inline function get_programLoaded():Bool return program != null && program.loaded;
 }
 

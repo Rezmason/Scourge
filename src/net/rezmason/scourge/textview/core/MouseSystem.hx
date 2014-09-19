@@ -2,7 +2,7 @@ package net.rezmason.scourge.textview.core;
 
 import flash.display.BitmapData;
 import flash.display.Sprite;
-import flash.events.EventDispatcher;
+import flash.display.Stage;
 import flash.events.MouseEvent;
 import flash.geom.Rectangle;
 import flash.geom.Matrix;
@@ -44,20 +44,23 @@ class MouseSystem {
     var height:Int;
     var initialized:Bool;
     var glSys:GLSystem;
+    var stage:Stage;
 
-    public function new(target:EventDispatcher):Void {
+    public function new():Void {
         // _view = new MouseView(0.2, 1);
         // _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
+        // stage.addChild(_view);
         interact = new Zig();
+        stage = new Present(Stage);
         glSys = new Present(GLSystem);
         updateSignal = new Zig<Void->Void>();
         rectRegionsByID = null;
         lastRectRegionID = null;
 
-        target.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-        target.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-        target.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+        stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+        stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+        stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 
         hoverHit = NULL_HIT;
         pressHit = NULL_HIT;
@@ -180,6 +183,8 @@ class MouseSystem {
 
     function onMouseMove(event:MouseEvent):Void {
 
+        if (!initialized) return;
+
         if (invalid) {
             if (bitmapData == null) {
                 bitmapData = new BitmapData(width, height, false, 0xFF00FF);
@@ -209,11 +214,13 @@ class MouseSystem {
     }
     
     function onMouseDown(event:MouseEvent):Void {
+        if (!initialized) return;
         pressHit = getHit(event.stageX, event.stageY);
         sendInteraction(pressHit, event, MOUSE_DOWN);
     }
 
     function onMouseUp(event:MouseEvent):Void {
+        if (!initialized) return;
         var hit:Hit = getHit(event.stageX, event.stageY);
         sendInteraction(hit, event, MOUSE_UP);
         sendInteraction(pressHit, event, hitsEqual(hit, pressHit) ? CLICK : DROP);

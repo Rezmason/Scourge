@@ -1,11 +1,11 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.display.Stage;
 import flash.geom.Rectangle;
 
 import haxe.Timer;
 
 import net.rezmason.gl.OutputBuffer;
+import net.rezmason.gl.GLFlowControl;
 import net.rezmason.gl.GLSystem;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.rendermethods.*;
@@ -18,7 +18,6 @@ using Lambda;
 class Engine {
 
     var active:Bool;
-    var stage:Stage;
     public var framerate(default, set):Float;
     public var width(default, null):Int;
     public var height(default, null):Int;
@@ -29,6 +28,7 @@ class Engine {
     var lastTimeStamp:Float;
 
     var glSys:GLSystem;
+    var glFlow:GLFlowControl;
     var bodiesByID:Map<Int, Body>;
     
     var mouseSystem:MouseSystem;
@@ -38,13 +38,13 @@ class Engine {
     var prettyMethod:RenderMethod;
     var viewportOutputBuffer:OutputBuffer;
 
-    public function new():Void {
+    public function new(glFlow:GLFlowControl):Void {
+        this.glFlow = glFlow;
         active = false;
         ready = false;
         readySignal = new Zig<Void->Void>();
         glSys = new Present(GLSystem);
-        stage = new Present(Stage);
-
+        
         width = 1;
         height = 1;
         framerate = 1000 / 30;
@@ -85,18 +85,17 @@ class Engine {
         }
     }
 
-    function onMethodLoaded():Void if (prettyMethod.program != null && mouseMethod.program != null) initScene();
+    function onMethodLoaded():Void if (prettyMethod.programLoaded && mouseMethod.programLoaded) initScene();
 
     function initScene():Void {
-        mouseSystem = new MouseSystem(stage);
+        mouseSystem = new MouseSystem();
         mouseSystem.updateSignal.add(renderMouse);
-        keyboardSystem = new KeyboardSystem(stage);
+        keyboardSystem = new KeyboardSystem();
 
         mouseSystem.interact.add(handleInteraction);
         keyboardSystem.interact.add(handleInteraction);
 
         mouseDownTarget = null;
-        // stage.addChild(mouseSystem.view);
         viewportOutputBuffer = glSys.viewportOutputBuffer;
         addListeners();
 
@@ -107,7 +106,7 @@ class Engine {
     }
 
     function addListeners():Void {
-        glSys.onRender = onRender;
+        glFlow.onRender = onRender;
         // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
@@ -211,8 +210,8 @@ class Engine {
 
                 if (target != null) {
                     var rect:Rectangle = target.viewRect;
-                    var nX:Float = (oX / stage.stageWidth  - rect.x) / rect.width;
-                    var nY:Float = (oY / stage.stageHeight - rect.y) / rect.height;
+                    var nX:Float = (oX / width  - rect.x) / rect.width;
+                    var nY:Float = (oY / height - rect.y) / rect.height;
                     interaction = MOUSE(type, nX, nY);
                 }
 

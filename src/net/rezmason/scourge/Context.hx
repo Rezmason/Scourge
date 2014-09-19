@@ -18,15 +18,18 @@ class Context {
     var engine:Engine;
     var navSystem:NavSystem;
     var glSys:GLSystem;
+    var glFlow:GLFlowControl;
 
     public function new():Void {
         stage = Lib.current.stage;
         glSys = new GLSystem();
-        glSys.onInit = onGLInit;
-        if (glSys.initialized) onGLInit();
+        glFlow = glSys.getFlowControl();
+        glFlow.onConnect = onGLConnect;
+        glFlow.connect();
     }
 
-    function onGLInit():Void {
+    function onGLConnect():Void {
+        glFlow.onConnect = null;
         Santa.mapToClass(GLSystem, Singleton(glSys));
         Santa.mapToClass(Stage, Singleton(stage));
         Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));
@@ -35,7 +38,7 @@ class Context {
     }
 
     function makeEngine():Void {
-        engine = new Engine();
+        engine = new Engine(glFlow);
         engine.readySignal.add(onEngine);
         engine.init();
     }

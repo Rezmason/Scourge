@@ -21,33 +21,34 @@ using Lambda;
 
 class GLSystem {
 
-    public var onRender:Int->Int->Void;
-    public var onInit:Void->Void;
-
-    public var initialized(default, null):Bool;
+    public var connected(default, null):Bool;
 
     var view:View;
     var context:Context;
-    public var artifacts:Array<Artifact>;
+    var flowControl:GLFlowControl;
+    var artifacts:Array<Artifact>;
 
     public var currentOutputBuffer(default, null):OutputBuffer;
     public var viewportOutputBuffer(get, null):ViewportOutputBuffer;
     
     public function new():Void {
-        initialized = false;
+        connected = false;
         artifacts = [];
+    }
+
+    function connect():Void {
         #if flash
             view = Lib.current.stage;
             var stage3D = view.stage3Ds[0];
             if (stage3D.context3D != null) {
                 context = stage3D.context3D;
-                init();
+                onConnect();
             } else {
 
                 function onCreate(event:Event):Void {
                     event.target.removeEventListener(Event.CONTEXT3D_CREATE, onCreate);
                     context = view.stage3Ds[0].context3D;
-                    init();
+                    onConnect();
                 }
 
                 stage3D.addEventListener(Event.CONTEXT3D_CREATE, onCreate);
@@ -58,15 +59,57 @@ class GLSystem {
                 view = new View();
                 context = GL;
                 Lib.current.stage.addChild(view);
-                init();
+                onConnect();
             } else {
                 trace('OpenGLView isn\'t supported.');
             }
         #end
     }
 
-    function init():Void {
-        initialized = true;
+    function disconnect():Void {
+        // Destroy all the stuff in connect
+        onDisconnect();
+    }
+
+    public function getFlowControl():GLFlowControl {
+        if (flowControl != null) return null;
+        
+        var flo:GLFlowControl = null;
+        var floConnect = connect;
+        var floDisconnect = disconnect;
+        var floRelinquish = null;
+
+        floRelinquish = function() {
+            if (flo != null) {
+                flo.onRender = null;
+                flo.onConnect = null;
+                flo.onDisconnect = null;
+                flo = null;
+
+                floConnect = null;
+                floDisconnect = null;
+                floRelinquish = null;
+
+                flowControl = null;
+            }
+        }
+
+        flo = {
+            onRender:null,
+            onConnect:null,
+            onDisconnect:null,
+
+            connect: function() floConnect(),
+            disconnect: function() floDisconnect(),
+            relinquish: floRelinquish,
+        };
+
+        flowControl = flo;
+        return flo;
+    }
+
+    function onConnect():Void {
+        connected = true;
         #if flash
             var stageRect:Rectangle = new Rectangle(0, 0, 1, 1);
 
@@ -85,17 +128,27 @@ class GLSystem {
             view.render = handleRender;
         #end
 
-        if (onInit != null) onInit();
+        for (artifact in artifacts) artifact.connectToContext(context);
+
+        if (flowControl != null && flowControl.onConnect != null) flowControl.onConnect();
+    }
+
+    function onDisconnect():Void {
+        connected = false;
+        for (artifact in artifacts) artifact.disconnectFromContext();
+        if (flowControl != null && flowControl.onDisconnect != null) flowControl.onDisconnect();
     }
 
     function handleRender(rect:Rectangle):Void {
-        if (onRender != null) onRender(Std.int(rect.width), Std.int(rect.height));
+        if (flowControl != null && flowControl.onRender != null) {
+            flowControl.onRender(Std.int(rect.width), Std.int(rect.height));
+        }
     }
 
     inline function registerArtifact<T:(Artifact)>(artifact:T):T {
-        if (initialized && artifacts.indexOf(artifact) == -1) {
+        if (connected && artifacts.indexOf(artifact) == -1) {
             artifacts.push(artifact);
-            artifact.connectToContext(context);
+            if (connected) artifact.connectToContext(context);
         }
         return artifact;
     }
@@ -193,7 +246,7 @@ class GLSystem {
         }
     }
 
-    public inline function get_viewportOutputBuffer():ViewportOutputBuffer {
+    inline function get_viewportOutputBuffer():ViewportOutputBuffer {
         if (viewportOutputBuffer == null) {
             viewportOutputBuffer = registerArtifact(new ViewportOutputBuffer());
         }

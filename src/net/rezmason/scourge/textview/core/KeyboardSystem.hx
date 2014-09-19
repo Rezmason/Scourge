@@ -5,6 +5,7 @@ import flash.events.KeyboardEvent;
 
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.santa.Present;
 
 class KeyboardSystem {
 
@@ -20,10 +21,10 @@ class KeyboardSystem {
     var stage:Stage;
     public var focusBodyID:Null<Int>;
 
-    public function new(stage:Stage):Void {
+    public function new():Void {
         interact = new Zig();
         keysDown = new Map();
-        this.stage = stage;
+        stage = new Present(Stage);
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
         stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
         focusBodyID = null;
