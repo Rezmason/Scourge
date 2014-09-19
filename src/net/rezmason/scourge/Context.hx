@@ -21,10 +21,12 @@ class Context {
 
     public function new():Void {
         stage = Lib.current.stage;
-        glSys = new GLSystem(stage, onUtils);
+        glSys = new GLSystem();
+        glSys.onInit = onGLInit;
+        if (glSys.initialized) onGLInit();
     }
 
-    function onUtils():Void {
+    function onGLInit():Void {
         Santa.mapToClass(GLSystem, Singleton(glSys));
         Santa.mapToClass(Stage, Singleton(stage));
         Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));

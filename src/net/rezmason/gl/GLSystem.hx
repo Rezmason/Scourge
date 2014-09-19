@@ -3,6 +3,7 @@ package net.rezmason.gl;
 import flash.display.BitmapData;
 import flash.display.Stage;
 import flash.geom.Rectangle;
+import flash.Lib;
 
 import net.rezmason.gl.GLTypes;
 
@@ -21,19 +22,20 @@ using Lambda;
 class GLSystem {
 
     public var onRender:Int->Int->Void;
+    public var onInit:Void->Void;
 
-    var cbk:Void->Void;
+    public var initialized(default, null):Bool;
+
     var view:View;
     var context:Context;
 
     public var currentOutputBuffer(default, null):OutputBuffer;
     public var viewportOutputBuffer(get, null):ViewportOutputBuffer;
     
-    public function new(stage:Stage, cbk:Void->Void):Void {
-        this.cbk = cbk;
-
+    public function new():Void {
+        initialized = false;
         #if flash
-            view = stage;
+            view = Lib.current.stage;
             var stage3D = view.stage3Ds[0];
             if (stage3D.context3D != null) {
                 context = stage3D.context3D;
@@ -53,7 +55,7 @@ class GLSystem {
             if (View.isSupported) {
                 view = new View();
                 context = GL;
-                stage.addChild(view);
+                Lib.current.stage.addChild(view);
                 init();
             } else {
                 trace('OpenGLView isn\'t supported.');
@@ -62,6 +64,7 @@ class GLSystem {
     }
 
     function init():Void {
+        initialized = true;
         #if flash
             var stageRect:Rectangle = new Rectangle(0, 0, 1, 1);
 
@@ -80,10 +83,7 @@ class GLSystem {
             view.render = handleRender;
         #end
 
-        var cbk:Void->Void = this.cbk;
-        this.cbk = null;
-        haxe.Timer.delay(cbk, 0);
-        cbk = null;
+        if (onInit != null) onInit();
     }
 
     function handleRender(rect:Rectangle):Void {
