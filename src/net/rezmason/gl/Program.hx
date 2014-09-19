@@ -13,11 +13,14 @@ import net.rezmason.gl.GLTypes;
 #end
 
 @:allow(net.rezmason.gl)
-class Program {
+class Program extends Artifact {
 
+    public var loaded(default, null):Bool;
+    public var onLoad:Void->Void;
     var prog:NativeProgram;
-    var context:Context;
-
+    var vertSource:String;
+    var fragSource:String;
+    
     #if flash
         static var formats:Array<Context3DVertexBufferFormat> = [
             BYTES_4,
@@ -30,15 +33,19 @@ class Program {
         static var vec:Vector<Float> = new Vector();
     #end
 
-    function new(context:Context):Void {
-        this.context = context;
+    function new(vertSource:String, fragSource:String):Void {
+        this.vertSource = vertSource;
+        this.fragSource = fragSource;
+        loaded = false;
     }
 
-    function load(vertSource:String, fragSource:String, onLoaded:Void->Void):Void {
+    override function connectToContext(context:Context):Void {
+        super.connectToContext(context);
         #if flash
             NativeProgram.load(context, vertSource, fragSource, function(prog) {
                 this.prog = prog;
-                onLoaded();
+                loaded = true;
+                if (onLoad != null) onLoad();
             });
         #else
             prog = GL.createProgram();
@@ -64,7 +71,8 @@ class Program {
                 if (result != '') throw result;
             }
 
-            onLoaded();
+            loaded = true;
+            if (onLoad != null) onLoad();
         #end
     }
 

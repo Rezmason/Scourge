@@ -10,20 +10,21 @@ import net.rezmason.gl.Data;
 
 class BitmapDataTexture extends Texture {
 
+    var bitmapData:BitmapData;
     #if flash
         var nativeTexture:NativeTexture;
-    #else
-        var bitmapData:BitmapData;
     #end
 
-    public function new(context:Context, bitmapData:BitmapData):Void {
-        super();
+    public function new(bitmapData:BitmapData):Void {
+        this.bitmapData = bitmapData;
+    }
+
+    override function connectToContext(context:Context):Void {
+        super.connectToContext(context);
         #if flash
             var recTex = context.createRectangleTexture(bitmapData.width, bitmapData.height, cast "rgbaHalfFloat", false); // Context3DTextureFormat.RGBA_HALF_FLOAT
             recTex.uploadFromBitmapData(bitmapData);
             nativeTexture = recTex;
-        #else
-            this.bitmapData = bitmapData;
         #end
     }
 

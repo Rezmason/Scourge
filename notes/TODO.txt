@@ -1,21 +1,20 @@
 Handle context loss
 
-    Make classes extend GLArtifact
-        Textures, Programs, VertexBuffers, IndexBuffers, OutputBuffers, etc 
-    GLSystem then keeps track of the GLArtifacts it creates
-        On connect, it makes each of them connect to a context
-        On disconnect, it makes each of them disconnect
-        
+    Flash: "Invalid BitmapData" on initial mouse move
+
+    UniformLocation and AttribsLocation could be made private
+
+    Implement disconnect on Artifact subclasses
+        Some of their components may need to become Artifacts as well
+
+    Make registration connect artifacts IF the system is on
+    Implement connect and disconnect on system
+        No init necessary!
+    Connect and disconnect all artifacts in functions
 
     For now, fake context loss
         Stage3D: dispose of the context, request new one
         WebGL, OpenGL: null it, dispose all created stuff, create new one
-
-    When the GLSystem detects context loss and restore, 
-        for each GLArtifact it's created, 
-            mirror:: (connect or disconnect)
-    
-    Extensions should be handled by GLSystem, too
 
 Logically rectangular grid
     http://www.llnl.gov/casc

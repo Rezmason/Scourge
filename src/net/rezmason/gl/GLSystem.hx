@@ -28,12 +28,14 @@ class GLSystem {
 
     var view:View;
     var context:Context;
+    public var artifacts:Array<Artifact>;
 
     public var currentOutputBuffer(default, null):OutputBuffer;
     public var viewportOutputBuffer(get, null):ViewportOutputBuffer;
     
     public function new():Void {
         initialized = false;
+        artifacts = [];
         #if flash
             view = Lib.current.stage;
             var stage3D = view.stage3Ds[0];
@@ -90,29 +92,36 @@ class GLSystem {
         if (onRender != null) onRender(Std.int(rect.width), Std.int(rect.height));
     }
 
+    inline function registerArtifact<T:(Artifact)>(artifact:T):T {
+        if (initialized && artifacts.indexOf(artifact) == -1) {
+            artifacts.push(artifact);
+            artifact.connectToContext(context);
+        }
+        return artifact;
+    }
+
     public inline function createVertexBuffer(numVertices:Int, footprint:Int, ?usage:BufferUsage):VertexBuffer {
-        return new VertexBuffer(context, numVertices, footprint, usage);
+        return registerArtifact(new VertexBuffer(numVertices, footprint, usage));
     }
 
     public inline function createIndexBuffer(numIndices:Int, ?usage:BufferUsage):IndexBuffer {
-        return new IndexBuffer(context, numIndices, usage);
+        return registerArtifact(new IndexBuffer(numIndices, usage));
     }
 
-    public inline function loadProgram(vertSource:String, fragSource:String, onLoaded:Program->Void):Void {
-        var program:Program = new Program(context);
-        program.load(vertSource, fragSource, function() onLoaded(program));
+    public inline function createProgram(vertSource:String, fragSource:String):Program {
+        return registerArtifact(new Program(vertSource, fragSource));
     }
 
     public inline function createTextureOutputBuffer():TextureOutputBuffer {
-        return new TextureOutputBuffer(context);
+        return registerArtifact(new TextureOutputBuffer());
     }
 
     public inline function createReadbackOutputBuffer():ReadbackOutputBuffer {
-        return new ReadbackOutputBuffer(context);
+        return registerArtifact(new ReadbackOutputBuffer());
     }
     
     public inline function createBitmapDataTexture(bmd:BitmapData):BitmapDataTexture {
-        return new BitmapDataTexture(context, bmd);
+        return registerArtifact(new BitmapDataTexture(bmd));
     }
 
     public inline function setProgram(program:Program):Void {
@@ -185,7 +194,9 @@ class GLSystem {
     }
 
     public inline function get_viewportOutputBuffer():ViewportOutputBuffer {
-        if (viewportOutputBuffer == null) viewportOutputBuffer = new ViewportOutputBuffer(context);
+        if (viewportOutputBuffer == null) {
+            viewportOutputBuffer = registerArtifact(new ViewportOutputBuffer());
+        }
         return viewportOutputBuffer;
     }
 }

@@ -14,8 +14,14 @@ class TextureOutputBuffer extends OutputBuffer {
 
     public var texture(default, null):BufferTexture;
 
-    override function init():Void {
-        texture = new BufferTexture(context, FLOAT);
+    function new():Void {
+        super();
+        texture = new BufferTexture(FLOAT);
+    }
+
+    override function connectToContext(context:Context):Void {
+        super.connectToContext(context);
+        texture.connectToContext(context);
     }
 
     override public function resize(width:Int, height:Int):Bool {

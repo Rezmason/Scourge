@@ -33,11 +33,12 @@ class RenderMethod {
         init();
         composeShaders();
 
-        glSys.loadProgram(vertShader, fragShader, onProgramLoaded);
+        program = glSys.createProgram(vertShader, fragShader);
+        if (program.loaded) onProgramLoaded();
+        else program.onLoad = onProgramLoaded;
     }
 
-    function onProgramLoaded(program:Program):Void {
-        this.program = program;
+    function onProgramLoaded():Void {
         connectToShaders();
         loadedSignal.dispatch();
     }

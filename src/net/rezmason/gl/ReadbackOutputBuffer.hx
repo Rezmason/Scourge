@@ -18,11 +18,20 @@ class ReadbackOutputBuffer extends OutputBuffer {
         var texture:BufferTexture;
     #end
 
-    override function init():Void {
+    function new():Void {
+        super();
+        #if !flash
+            texture = new BufferTexture(UNSIGNED_BYTE);
+        #end
+    }
+
+    override function connectToContext(context:Context):Void {
+        super.connectToContext(context);
+     
         #if flash
             bitmapData = new BitmapData(1, 1, true, 0);
         #else
-            texture = new BufferTexture(context, UNSIGNED_BYTE);
+            texture.connectToContext(context);
         #end
     }
 

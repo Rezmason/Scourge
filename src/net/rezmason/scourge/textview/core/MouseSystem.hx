@@ -242,7 +242,7 @@ class MouseSystem {
     }
 
 }
-
+/*
 #if js
 
     // This is only used for visual debugging, so I'm kind of okay with not including it in OpenFL
@@ -262,3 +262,4 @@ class MouseSystem {
         }
     }
 #end
+*/

@@ -8,14 +8,21 @@ import net.rezmason.gl.Data;
 #end
 
 @:allow(net.rezmason.gl) 
-class IndexBuffer {
+class IndexBuffer extends Artifact {
 
     var buf:NativeIndexBuffer;
     var array:IndexArray;
+    var usage:BufferUsage;
     public var numIndices(default, null):Int;
 
-    function new(context:Context, numIndices:Int, ?usage:BufferUsage):Void {
+    function new(numIndices:Int, ?usage:BufferUsage):Void {
         this.numIndices = numIndices;
+        this.usage = usage;
+    }
+
+    override function connectToContext(context:Context):Void {
+        super.connectToContext(context);
+        
         #if flash 
             buf = context.createIndexBuffer(numIndices/*, usage*/);
         #else

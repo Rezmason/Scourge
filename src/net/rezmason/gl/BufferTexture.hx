@@ -12,7 +12,6 @@ import net.rezmason.gl.Data;
 @:allow(net.rezmason.gl)
 class BufferTexture extends Texture {
 
-    var context:Context;
     var format:TextureFormat;
     var nativeTexture:NativeTexture;
     #if !flash
@@ -20,10 +19,12 @@ class BufferTexture extends Texture {
         var renderBuffer:GLRenderbuffer;
     #end
 
-    function new(context:Context, format:TextureFormat):Void {
-        super();
-        this.context = context;
+    function new(format:TextureFormat):Void {
         this.format = format;
+    }
+
+    override function connectToContext(context:Context):Void {
+        super.connectToContext(context);
         #if flash
             // TODO: make this dependent on format?
             nativeTexture = context.createRectangleTexture(1, 1, cast TextureFormat.FLOAT, true);

@@ -24,7 +24,9 @@ class Lab {
 
     public function new(stage:Stage):Void {
         this.stage = stage;
-        glSys = new GLSystem(stage, init);
+        glSys = new GLSystem();
+        glSys.onInit = init;
+        if (glSys.initialized) init();
     }
 
     function init():Void {
@@ -235,8 +237,6 @@ class PostSystem extends LabSystem {
 
         fragShader = Lab.makeExtensions(glSys) + fragShader;
 
-        glSys.loadProgram(vertShader, fragShader, onProgramLoaded);
-
         var vertices:VertexArray = new VertexArray(VpB * FpV);
         var vert = [
             -1,-1,0,0,1,
@@ -256,10 +256,13 @@ class PostSystem extends LabSystem {
         for (ike in 0...6) indices[ike] = ind[ike];
         indexBuffer = glSys.createIndexBuffer(6);
         indexBuffer.uploadFromVector(indices, 0, 6);
+
+        program = glSys.createProgram(vertShader, fragShader);
+        if (program.loaded) onProgramLoaded();
+        else program.onLoad = onProgramLoaded;
     }
 
-    function onProgramLoaded(program:Program):Void {
-        this.program = program;
+    function onProgramLoaded():Void {
 
         aPos     = program.getAttribsLocation('aPos'    );
         aUV      = program.getAttribsLocation('aUV'     );
@@ -407,8 +410,6 @@ class MetaballSystem extends LabSystem {
 
         fragShader = Lab.makeExtensions(glSys) + fragShader;
 
-        glSys.loadProgram(vertShader, fragShader, onProgramLoaded);
-
         phases = [];
         twitches = [];
         for (ike in 0...GRID_WIDTH) {
@@ -497,11 +498,13 @@ class MetaballSystem extends LabSystem {
 
         vertBuffer = glSys.createVertexBuffer(NUM_BALLS * VpB, FpBV);
         indexBuffer = glSys.createIndexBuffer(NUM_BALLS * IpB);
+
+        program = glSys.createProgram(vertShader, fragShader);
+        if (program.loaded) onProgramLoaded();
+        else program.onLoad = onProgramLoaded;
     }
 
-    function onProgramLoaded(program:Program):Void {
-        this.program = program;
-
+    function onProgramLoaded():Void {
         aPos     = program.getAttribsLocation('aPos'    );
         aCorner  = program.getAttribsLocation('aCorner' );
         aScale   = program.getAttribsLocation('aScale');

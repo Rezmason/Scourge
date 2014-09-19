@@ -9,7 +9,7 @@ import net.rezmason.gl.Data;
 #end
 
 @:allow(net.rezmason.gl)
-class VertexBuffer {
+class VertexBuffer extends Artifact {
     var buf:NativeVertexBuffer;
     public var footprint(default, null):Int;
     public var numVertices(default, null):Int;
@@ -18,11 +18,15 @@ class VertexBuffer {
     #end
     var usage:BufferUsage;
 
-    public function new(context:Context, numVertices:Int, footprint:Int, ?usage:BufferUsage):Void {
+    public function new(numVertices:Int, footprint:Int, ?usage:BufferUsage):Void {
         this.footprint = footprint;
         this.numVertices = numVertices;
         if (usage == null) usage = BufferUsage.STATIC_DRAW;
         this.usage = usage;
+    }
+
+    override function connectToContext(context:Context):Void {
+        super.connectToContext(context);
         #if flash
             buf = context.createVertexBuffer(numVertices, footprint/*, usage*/);
         #else
