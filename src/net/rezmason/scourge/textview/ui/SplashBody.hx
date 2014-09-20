@@ -122,12 +122,10 @@ class SplashBody extends Body {
             var topGlyph:Glyph = glyphTower[0];
 
             var d:Float = ike / glyphTowers.length;
-            var p:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.001;
-            var f:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.3 + 0.1;
-            var s:Float = (Math.cos(time * 3 + d * 300) * 0.5 + 1) * 0.1 + 0.9;
+            var f:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.3 + 0.25;
+            var s:Float = (Math.cos(time * 3 + d * 300) * 0.5 + 1) * 0.3 + 0.5;
 
             for (glyph in glyphTower) {
-                glyph.set_p(p);
                 glyph.set_f(f);
                 glyph.set_s(s * (glyph.get_z() + 1));
                 s *= 2;
