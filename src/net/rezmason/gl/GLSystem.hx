@@ -1,29 +1,34 @@
 package net.rezmason.gl;
 
 import flash.display.BitmapData;
-import flash.display.Stage;
 import flash.geom.Rectangle;
 import flash.Lib;
 
 import net.rezmason.gl.GLTypes;
 
 #if flash
+    import flash.display.Stage;
     import flash.display3D.Context3DCompareMode;
     import flash.display3D.Context3DProfile;
     import flash.display3D.Context3DRenderMode;
     import flash.display3D.Context3DTextureFormat;
     import flash.events.Event;
 #else
+    import openfl.display.OpenGLView;
     import openfl.gl.GL;
 #end
-
-using Lambda;
 
 class GLSystem {
 
     public var connected(default, null):Bool;
 
-    var view:View;
+    #if flash
+        var stage:Stage;
+        var stageRect:Rectangle;
+    #else
+        var openGLView:OpenGLView;
+    #end
+
     var context:Context;
     var flowControl:GLFlowControl;
     var artifacts:Array<Artifact>;
@@ -38,8 +43,8 @@ class GLSystem {
 
     function connect():Void {
         #if flash
-            view = Lib.current.stage;
-            var stage3D = view.stage3Ds[0];
+            stage = Lib.current.stage;
+            var stage3D = stage.stage3Ds[0];
             if (stage3D.context3D != null) {
                 context = stage3D.context3D;
                 onConnect();
@@ -47,7 +52,7 @@ class GLSystem {
 
                 function onCreate(event:Event):Void {
                     event.target.removeEventListener(Event.CONTEXT3D_CREATE, onCreate);
-                    context = view.stage3Ds[0].context3D;
+                    context = stage.stage3Ds[0].context3D;
                     onConnect();
                 }
 
@@ -55,10 +60,10 @@ class GLSystem {
                 stage3D.requestContext3D(cast Context3DRenderMode.AUTO, cast "standard"); // Context3DProfile.STANDARD
             }
         #else
-            if (View.isSupported) {
-                view = new View();
+            if (OpenGLView.isSupported) {
+                openGLView = new OpenGLView();
                 context = GL;
-                Lib.current.stage.addChild(view);
+                Lib.current.stage.addChild(openGLView);
                 onConnect();
             } else {
                 trace('OpenGLView isn\'t supported.');
@@ -111,21 +116,11 @@ class GLSystem {
     function onConnect():Void {
         connected = true;
         #if flash
-            var stageRect:Rectangle = new Rectangle(0, 0, 1, 1);
-
-            function onEnterFrame(event:Event):Void {
-                handleRender(stageRect);
-            }
-
-            function onResize(event:Event):Void {
-                stageRect.width = view.stageWidth;
-                stageRect.height = view.stageHeight;
-            }
-
-            view.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-            view.addEventListener(Event.RESIZE, onResize);
+            stageRect = new Rectangle(0, 0, 1, 1);
+            stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+            stage.addEventListener(Event.RESIZE, onResize);
         #else
-            view.render = handleRender;
+            openGLView.render = handleRender;
         #end
 
         for (artifact in artifacts) artifact.connectToContext(context);
@@ -133,14 +128,26 @@ class GLSystem {
         if (flowControl != null && flowControl.onConnect != null) flowControl.onConnect();
     }
 
+    #if flash
+        function onEnterFrame(event:Event):Void {
+            handleRender(stageRect);
+        }
+
+        function onResize(event:Event):Void {
+            stageRect.width = stage.stageWidth;
+            stageRect.height = stage.stageHeight;
+        }
+    #end
+
     function onDisconnect():Void {
         connected = false;
+
         for (artifact in artifacts) artifact.disconnectFromContext();
         if (flowControl != null && flowControl.onDisconnect != null) flowControl.onDisconnect();
     }
 
     function handleRender(rect:Rectangle):Void {
-        if (flowControl != null && flowControl.onRender != null) {
+        if (connected && flowControl != null && flowControl.onRender != null) {
             flowControl.onRender(Std.int(rect.width), Std.int(rect.height));
         }
     }

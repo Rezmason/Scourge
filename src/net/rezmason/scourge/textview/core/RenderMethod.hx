@@ -26,22 +26,20 @@ class RenderMethod {
 
     function new():Void {
         loadedSignal = new Zig<Void->Void>();
+        glyphMag = 1;
+        backgroundColor = 0x0;
+        glyphMat = new Matrix3D();
+        composeShaders();
+        glSys = new Present(GLSystem);
     }
 
     public function load():Void {
-        glSys = new Present(GLSystem);
-
-        init();
-        composeShaders();
-
-        program = glSys.createProgram(vertShader, fragShader);
+        if (program == null) program = glSys.createProgram(vertShader, fragShader);
         if (program.loaded) onProgramLoaded();
         else program.onLoad = onProgramLoaded;
     }
 
-    function onProgramLoaded():Void {
-        loadedSignal.dispatch();
-    }
+    function onProgramLoaded():Void loadedSignal.dispatch();
 
     public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void { }
     public function activate():Void { }
@@ -60,12 +58,6 @@ class RenderMethod {
     }
 
     public function setSegment(segment:BodySegment):Void { }
-
-    function init():Void {
-        glyphMag = 1;
-        backgroundColor = 0x0;
-        glyphMat = new Matrix3D();
-    }
 
     function composeShaders():Void { }
     function makeVertexShader():String { return ''; }

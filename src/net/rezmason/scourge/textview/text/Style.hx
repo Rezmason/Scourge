@@ -1,7 +1,7 @@
 package net.rezmason.scourge.textview.text;
 
 import net.rezmason.scourge.textview.core.Glyph;
-import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.core.MouseInteractionType;
 import net.rezmason.utils.Siphon;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;

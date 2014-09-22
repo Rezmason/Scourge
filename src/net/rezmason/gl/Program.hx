@@ -40,11 +40,11 @@ class Program extends Artifact {
         this.vertSource = vertSource;
         this.fragSource = fragSource;
         loaded = false;
-        uniformLocations = new Map();
-        attribsLocations = new Map();
     }
 
     override function connectToContext(context:Context):Void {
+        uniformLocations = new Map();
+        attribsLocations = new Map();
         super.connectToContext(context);
         #if flash
             NativeProgram.load(context, vertSource, fragSource, function(prog) {
@@ -79,6 +79,18 @@ class Program extends Artifact {
             loaded = true;
             if (onLoad != null) onLoad();
         #end
+    }
+
+    override function disconnectFromContext():Void {
+        super.disconnectFromContext();
+        #if flash
+            prog.dispose();
+        #end
+
+        prog = null;
+        uniformLocations = null;
+        attribsLocations = null;
+        loaded = false;
     }
 
     public inline function setProgramConstantsFromMatrix(uName:String, matrix:Matrix3D):Void {

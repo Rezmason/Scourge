@@ -9,5 +9,5 @@ class Artifact {
 
     function connectToContext(context:Context):Void this.context = context;
     function disconnectFromContext():Void context = null;
-    function isConnectedToContext():Bool return this.context != null;
+    public function isConnectedToContext():Bool return context != null;
 }

@@ -18,16 +18,24 @@ class IndexBuffer extends Artifact {
     function new(numIndices:Int, ?usage:BufferUsage):Void {
         this.numIndices = numIndices;
         this.usage = usage;
+        #if !flash
+            array = new IndexArray(numIndices);
+        #end
     }
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-        
         #if flash 
             buf = context.createIndexBuffer(numIndices/*, usage*/);
         #else
             buf = GL.createBuffer();
-            array = new IndexArray(numIndices);
+        #end
+    }
+
+    override function disconnectFromContext():Void {
+        super.disconnectFromContext();
+        #if flash
+            buf.dispose();
         #end
     }
 
@@ -53,6 +61,10 @@ class IndexBuffer extends Artifact {
     }
 
     public inline function dispose():Void {
+        #if flash
+            buf.dispose();
+        #end
+        buf = null;
         array = null;
         numIndices = -1;
     }

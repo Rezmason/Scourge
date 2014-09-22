@@ -1,12 +1,13 @@
 Handle context loss
+    Bugs
+        Programs should compile and connect separately
+        Resizing during a disconnect throws errors
+    Fake it till you make it
+        Ask Josh Granick?
 
-    Implement disconnect on GLSystem
-        This should also happen automatically during context loss
-        For now, fake context loss
-            Stage3D: dispose of the context, request new one
-            WebGL, OpenGL: null it, dispose all created stuff, create new one
-    Implement disconnect on Artifact subclasses
-        Some of their components may need to become Artifacts as well
+    Keyboard and mouse systems shouldn't know about Stage, actually
+        Mouse system should use width and height from Engine
+        Keyboard system's target should be passed into the Engine
 
 Logically rectangular grid
     http://www.llnl.gov/casc

@@ -27,7 +27,14 @@ class BitmapDataTexture extends Texture {
         #end
     }
 
-    @:allow(net.rezmason.gl)
+    override function disconnectFromContext():Void {
+        super.disconnectFromContext();
+        #if flash
+            nativeTexture.dispose();
+            nativeTexture = null;
+        #end
+    }
+
     override function setAtProgLocation(prog:NativeProgram, location:UniformLocation, index:Int):Void {
         if (index != -1) {
             #if flash

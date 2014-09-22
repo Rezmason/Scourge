@@ -7,7 +7,7 @@ import haxe.Utf8;
 
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
-import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.core.MouseInteractionType;
 import net.rezmason.scourge.textview.text.Sigil.*;
 import net.rezmason.utils.Utf8Utils.*;
 

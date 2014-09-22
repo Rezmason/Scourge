@@ -23,6 +23,9 @@ class VertexBuffer extends Artifact {
         this.numVertices = numVertices;
         if (usage == null) usage = BufferUsage.STATIC_DRAW;
         this.usage = usage;
+        #if !flash
+            array = new VertexArray(footprint * numVertices);
+        #end
     }
 
     override function connectToContext(context:Context):Void {
@@ -31,8 +34,15 @@ class VertexBuffer extends Artifact {
             buf = context.createVertexBuffer(numVertices, footprint/*, usage*/);
         #else
             buf = GL.createBuffer();
-            array = new VertexArray(footprint * numVertices);
         #end
+    }
+
+    override function disconnectFromContext():Void {
+        super.disconnectFromContext();
+        #if flash
+            buf.dispose();
+        #end
+        buf = null;
     }
 
     public inline function uploadFromVector(data:VertexArray, offset:Int, num:Int):Void {

@@ -107,11 +107,21 @@ class Engine {
 
     function addListeners():Void {
         glFlow.onRender = onRender;
+        glFlow.onDisconnect = onDisconnect;
+        glFlow.onConnect = onConnect;
         // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
     function onRender(width:Int, height:Int):Void {
         if (active) render(prettyMethod, viewportOutputBuffer);
+    }
+
+    function onDisconnect():Void {
+
+    }
+
+    function onConnect():Void {
+        
     }
 
     function renderMouse():Void {
@@ -217,7 +227,13 @@ class Engine {
 
                 keyboardSystem.attach();
 
-            case _:
+            case KEYBOARD(type, key, char, shift, alt, ctrl):
+                if (type == KEY_UP && String.fromCharCode(char) == 'd') {
+                    trace('Disconnecting...');
+                    glFlow.disconnect();
+                    trace('Reconnecting in 3 seconds...');
+                    haxe.Timer.delay(glFlow.connect, 3000);
+                }
         }
 
         if (target != null) target.receiveInteraction(glyphID, interaction);

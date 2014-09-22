@@ -24,6 +24,11 @@ class TextureOutputBuffer extends OutputBuffer {
         texture.connectToContext(context);
     }
 
+    override function disconnectFromContext():Void {
+        super.disconnectFromContext();
+        texture.disconnectFromContext();
+    }
+
     override public function resize(width:Int, height:Int):Bool {
         if (!super.resize(width, height)) return false;
         texture.resize(width, height);

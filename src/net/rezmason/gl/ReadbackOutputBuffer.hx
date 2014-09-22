@@ -20,18 +20,24 @@ class ReadbackOutputBuffer extends OutputBuffer {
 
     function new():Void {
         super();
-        #if !flash
+        #if flash
+            bitmapData = new BitmapData(1, 1, true, 0);
+        #else
             texture = new BufferTexture(UNSIGNED_BYTE);
         #end
     }
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-     
-        #if flash
-            bitmapData = new BitmapData(1, 1, true, 0);
-        #else
+        #if !flash
             texture.connectToContext(context);
+        #end
+    }
+
+    override function disconnectFromContext():Void {
+        super.disconnectFromContext();
+        #if !flash
+            texture.disconnectFromContext();
         #end
     }
 

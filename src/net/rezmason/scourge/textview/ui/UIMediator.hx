@@ -4,6 +4,7 @@ import haxe.Utf8;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.core.MouseInteractionType;
 import net.rezmason.scourge.textview.text.*;
 import net.rezmason.scourge.textview.text.ParagraphAlign;
 import net.rezmason.scourge.textview.text.Sigil.*;

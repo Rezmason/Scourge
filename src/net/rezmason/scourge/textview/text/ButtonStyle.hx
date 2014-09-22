@@ -2,7 +2,7 @@ package net.rezmason.scourge.textview.text;
 
 import net.kawa.tween.easing.Quad;
 
-import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.core.MouseInteractionType;
 
 typedef ButtonSpanState = {
     var time:Float;

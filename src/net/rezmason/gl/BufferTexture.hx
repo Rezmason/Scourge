@@ -34,6 +34,18 @@ class BufferTexture extends Texture {
         #end
     }
 
+    override function disconnectFromContext():Void {
+        super.disconnectFromContext();
+        #if flash
+            nativeTexture.dispose();
+        #else
+            frameBuffer = null;
+            renderBuffer = null;
+        #end
+        
+        nativeTexture = null;
+    }
+
     @:allow(net.rezmason.gl)
     override function setAtProgLocation(prog:NativeProgram, location:UniformLocation, index:Int):Void {
         if (index != -1) {

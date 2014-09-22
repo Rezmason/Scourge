@@ -16,12 +16,7 @@ class GlyphTexture {
     public function new(name:String, font:FlatFont):Void {
         this.name = name;
         this.font = font;
-        var bmp:BitmapData = font.getBitmapDataClone();
         var glSys:GLSystem = new Present(GLSystem);
-        texture = glSys.createBitmapDataTexture(bmp);
-
-        #if flash
-            bmp.dispose();
-        #end
+        texture = glSys.createBitmapDataTexture(font.getBitmapDataClone());
     }
 }

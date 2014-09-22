@@ -15,19 +15,17 @@ class MouseMethod extends RenderMethod {
 
     //inline static var FAT_FINGERS:Float = 2; // TODO: Fat finger support needs to wait till we can z-order buttons
 
-    public function new():Void super();
+    public function new():Void {
+        super();
+        backgroundColor = 0xFFFFFF;
+        //glyphMag = FAT_FINGERS;
+    }
 
     override public function activate():Void {
         glSys.setProgram(program);
     }
 
     override public function deactivate():Void {
-    }
-
-    override function init():Void {
-        super.init();
-        backgroundColor = 0xFFFFFF;
-        //glyphMag = FAT_FINGERS;
     }
 
     override function composeShaders():Void {
