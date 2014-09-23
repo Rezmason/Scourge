@@ -36,20 +36,26 @@ class Program {
     private var vertexShader:Shader;
     private var fragmentShader:Shader;
 
+    public var loaded(default, null):Bool;
+    public var onLoad:Void->Void;
+
     static var agency:TempAgency<GLSLInput, AGALOutput> = null;
 
-    public static function load(context3D:Context3D, vertSource:String, fragSource:String, onLoaded:Program->Void):Void {
+    public function new():Void {
+        loaded = false;
+    }
+
+    public function load(vertSource:String, fragSource:String):Void {
 
         if (agency == null) {
             agency = new TempAgency(Golem.rise('glsl2agal.hxml'), 2);
             // agency.onDone = agency.die;
         }
 
-        var vertShader:Shader = null;
-        var fragShader:Shader = null;
+        vertexShader = null;
+        fragmentShader = null;
 
         function onWorkDone(agal:AGALOutput):Void {
-
             if (agal.error != null) {
                 throw agal.stringify(null, '\t');
             } else {
@@ -57,13 +63,14 @@ class Program {
 
                 // trace (agal.json);
 
-                if (agal.type == Context3DProgramType.VERTEX) vertShader = shader;
-                else fragShader = shader;
+                if (agal.type == Context3DProgramType.VERTEX) vertexShader = shader;
+                else fragmentShader = shader;
 
-                if (vertShader != null && fragShader != null) {
-                    var program:Program = new Program(context3D);
-                    program.upload(vertShader, fragShader);
-                    onLoaded(program);
+                if (vertexShader != null && fragmentShader != null) {
+                    if (nativeProgram != null) {
+                        nativeProgram.upload(vertexShader.nativeShader, fragmentShader.nativeShader);
+                    }
+                    if (onLoad != null) onLoad();
                 }
             }
         }
@@ -72,19 +79,20 @@ class Program {
         agency.addWork({type:Context3DProgramType.FRAGMENT, source:fragSource, texParam:'<linear mipdisable clamp 2d>'}, onWorkDone);
     }
 
-    public function new(context3D:Context3D) {
+    public function connectToContext(context3D:Context3D):Void {
         this.context3D = context3D;
-        nativeProgram = context3D.createProgram();
+        if (nativeProgram == null) nativeProgram = context3D.createProgram();
+        if (vertexShader != null && fragmentShader != null) {
+            nativeProgram.upload(vertexShader.nativeShader, fragmentShader.nativeShader);
+        }
     }
 
-    public inline function upload(vertexShader:Shader, fragmentShader:Shader):Void {
-        nativeProgram.upload(vertexShader.nativeShader, fragmentShader.nativeShader);
-        this.vertexShader = vertexShader;
-        this.fragmentShader = fragmentShader;
-    }
-
-    public inline function dispose():Void {
-        nativeProgram.dispose();
+    public function disconnectFromContext():Void {
+        if (nativeProgram != null) {
+            nativeProgram.dispose();
+            nativeProgram = null;
+        }
+        context3D = null;
     }
 
     public inline function attach():Void {

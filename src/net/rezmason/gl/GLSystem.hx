@@ -32,27 +32,36 @@ class GLSystem {
     var context:Context;
     var flowControl:GLFlowControl;
     var artifacts:Array<Artifact>;
+    var initialized:Bool;
 
     public var currentOutputBuffer(default, null):OutputBuffer;
     public var viewportOutputBuffer(get, null):ViewportOutputBuffer;
     
     public function new():Void {
         connected = false;
+        initialized = false;
         artifacts = [];
     }
 
     function connect():Void {
+        if (!initialized) init();
+        else onConnect();
+    }
+
+    function init():Void {
         #if flash
             stage = Lib.current.stage;
             var stage3D = stage.stage3Ds[0];
             if (stage3D.context3D != null) {
                 context = stage3D.context3D;
+                initialized = true;
                 onConnect();
             } else {
 
                 function onCreate(event:Event):Void {
                     event.target.removeEventListener(Event.CONTEXT3D_CREATE, onCreate);
                     context = stage.stage3Ds[0].context3D;
+                    initialized = true;
                     onConnect();
                 }
 
@@ -64,6 +73,7 @@ class GLSystem {
                 openGLView = new OpenGLView();
                 context = GL;
                 Lib.current.stage.addChild(openGLView);
+                initialized = true;
                 onConnect();
             } else {
                 trace('OpenGLView isn\'t supported.');
@@ -113,24 +123,24 @@ class GLSystem {
         return flo;
     }
 
+    var b:Bool = false;
+
     function onConnect():Void {
-        connected = true;
         #if flash
             stageRect = new Rectangle(0, 0, 1, 1);
             stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
             stage.addEventListener(Event.RESIZE, onResize);
         #else
-            openGLView.render = handleRender;
+            openGLView.render = onRender;
         #end
-
         for (artifact in artifacts) artifact.connectToContext(context);
-
+        connected = true;
         if (flowControl != null && flowControl.onConnect != null) flowControl.onConnect();
     }
 
     #if flash
         function onEnterFrame(event:Event):Void {
-            handleRender(stageRect);
+            onRender(stageRect);
         }
 
         function onResize(event:Event):Void {
@@ -141,19 +151,18 @@ class GLSystem {
 
     function onDisconnect():Void {
         connected = false;
-
         for (artifact in artifacts) artifact.disconnectFromContext();
         if (flowControl != null && flowControl.onDisconnect != null) flowControl.onDisconnect();
     }
 
-    function handleRender(rect:Rectangle):Void {
+    function onRender(rect:Rectangle):Void {
         if (connected && flowControl != null && flowControl.onRender != null) {
             flowControl.onRender(Std.int(rect.width), Std.int(rect.height));
         }
     }
 
     inline function registerArtifact<T:(Artifact)>(artifact:T):T {
-        if (connected && artifacts.indexOf(artifact) == -1) {
+        if (artifacts.indexOf(artifact) == -1) {
             artifacts.push(artifact);
             if (connected) artifact.connectToContext(context);
         }

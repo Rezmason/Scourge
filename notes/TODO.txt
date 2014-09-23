@@ -1,6 +1,5 @@
 Handle context loss
     Bugs
-        Programs should compile and connect separately
         Resizing during a disconnect throws errors
     Fake it till you make it
         Ask Josh Granick?

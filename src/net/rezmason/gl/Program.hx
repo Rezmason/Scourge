@@ -39,7 +39,20 @@ class Program extends Artifact {
     function new(vertSource:String, fragSource:String):Void {
         this.vertSource = vertSource;
         this.fragSource = fragSource;
-        loaded = false;
+
+        function handleLoad():Void {
+            loaded = true;
+            if (onLoad != null) onLoad();
+        }
+
+        #if flash
+            loaded = false;
+            prog = new NativeProgram();
+            prog.onLoad = handleLoad;
+            prog.load(vertSource, fragSource);
+        #else
+            handleLoad();
+        #end
     }
 
     override function connectToContext(context:Context):Void {
@@ -47,11 +60,7 @@ class Program extends Artifact {
         attribsLocations = new Map();
         super.connectToContext(context);
         #if flash
-            NativeProgram.load(context, vertSource, fragSource, function(prog) {
-                this.prog = prog;
-                loaded = true;
-                if (onLoad != null) onLoad();
-            });
+            prog.connectToContext(context);
         #else
             prog = GL.createProgram();
 
@@ -75,22 +84,19 @@ class Program extends Artifact {
                 var result:String = GL.getProgramInfoLog(prog);
                 if (result != '') throw result;
             }
-
-            loaded = true;
-            if (onLoad != null) onLoad();
         #end
     }
 
     override function disconnectFromContext():Void {
         super.disconnectFromContext();
         #if flash
-            prog.dispose();
+            prog.disconnectFromContext();
+        #else
+            prog = null;
         #end
 
-        prog = null;
         uniformLocations = null;
         attribsLocations = null;
-        loaded = false;
     }
 
     public inline function setProgramConstantsFromMatrix(uName:String, matrix:Matrix3D):Void {
