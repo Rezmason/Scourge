@@ -133,7 +133,10 @@ class GLSystem {
         #else
             openGLView.render = onRender;
         #end
-        for (artifact in artifacts) artifact.connectToContext(context);
+        for (artifact in artifacts) {
+            if (artifact.isDisposed) artifacts.remove(artifact);
+            else artifact.connectToContext(context);
+        }
         connected = true;
         if (flowControl != null && flowControl.onConnect != null) flowControl.onConnect();
     }
@@ -151,7 +154,10 @@ class GLSystem {
 
     function onDisconnect():Void {
         connected = false;
-        for (artifact in artifacts) artifact.disconnectFromContext();
+        for (artifact in artifacts) {
+            if (artifact.isDisposed) artifacts.remove(artifact);
+            else artifact.disconnectFromContext();
+        }
         if (flowControl != null && flowControl.onDisconnect != null) flowControl.onDisconnect();
     }
 

@@ -10,6 +10,7 @@ import net.rezmason.utils.santa.Present;
 class KeyboardSystem {
 
     public var interact(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
+    public var isAttached(default, null):Bool;
 
     #if (!flash && !js)
         var shiftKeyCount:Int;
@@ -22,21 +23,10 @@ class KeyboardSystem {
     public var focusBodyID:Null<Int>;
 
     public function new():Void {
+        isAttached = false;
         interact = new Zig();
         keysDown = new Map();
         stage = new Present(Stage);
-        stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-        stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-        focusBodyID = null;
-
-        #if (!flash && !js)
-            shiftKeyCount = 0;
-            altKeyCount = 0;
-            ctrlKeyCount = 0;
-        #end
-    }
-
-    public function detach():Void {
         focusBodyID = null;
 
         #if (!flash && !js)
@@ -47,7 +37,26 @@ class KeyboardSystem {
     }
 
     public function attach():Void {
-        stage.focus = stage;
+        if (!isAttached) {
+            isAttached = true;
+            stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+            stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+            stage.focus = stage;
+        }
+    }
+
+    public function detach():Void {
+        if (isAttached) {
+            isAttached = false;
+            stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+            stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+            
+            #if (!flash && !js)
+                shiftKeyCount = 0;
+                altKeyCount = 0;
+                ctrlKeyCount = 0;
+            #end
+        }
     }
 
     function onKeyDown(event:KeyboardEvent):Void {

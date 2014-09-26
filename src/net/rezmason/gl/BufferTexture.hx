@@ -13,25 +13,29 @@ class BufferTexture extends Texture {
 
     var format:TextureFormat;
     var nativeTexture:NativeTexture;
+    var width:Int;
+    var height:Int;
     #if !flash
         var frameBuffer:GLFramebuffer;
         var renderBuffer:GLRenderbuffer;
     #end
 
     function new(format:TextureFormat):Void {
+        super();
         this.format = format;
+        width = 1;
+        height = 1;
     }
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-        #if flash
-            // TODO: make this dependent on format?
-            nativeTexture = context.createRectangleTexture(1, 1, cast TextureFormat.FLOAT, true);
-        #else
+        #if !flash
             nativeTexture = GL.createTexture();
             frameBuffer = GL.createFramebuffer();
             renderBuffer = GL.createRenderbuffer();
         #end
+
+        resize(width, height);
     }
 
     override function disconnectFromContext():Void {
@@ -64,30 +68,36 @@ class BufferTexture extends Texture {
     }
 
     function resize(width:Int, height:Int):Void {
-        #if flash
-            if (nativeTexture != null) nativeTexture.dispose();
-            // TODO: make this dependent on format?
-            nativeTexture = context.createRectangleTexture(width, height, cast "rgbaHalfFloat", true);
-        #else
-            GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
+        if (width  < 1) width = 1;
+        if (height < 1) height = 1;
+        this.width = width;
+        this.height = height;
+        if (isConnectedToContext()) {
+            #if flash
+                if (nativeTexture != null) nativeTexture.dispose();
+                // TODO: make this dependent on format?
+                nativeTexture = context.createRectangleTexture(width, height, cast "rgbaHalfFloat", true);
+            #else
+                GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
 
-            GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
-            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+                GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
+                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
-            GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, cast format, null);
+                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, cast format, null);
 
-            GL.bindRenderbuffer(GL.RENDERBUFFER, renderBuffer);
-            GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, width, height);
+                GL.bindRenderbuffer(GL.RENDERBUFFER, renderBuffer);
+                GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, width, height);
 
-            GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, nativeTexture, 0);
-            GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderBuffer);
+                GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, nativeTexture, 0);
+                GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderBuffer);
 
-            GL.bindTexture(GL.TEXTURE_2D, null);
-            GL.bindRenderbuffer(GL.RENDERBUFFER, null);
-            GL.bindFramebuffer(GL.FRAMEBUFFER, null);
-        #end
+                GL.bindTexture(GL.TEXTURE_2D, null);
+                GL.bindRenderbuffer(GL.RENDERBUFFER, null);
+                GL.bindFramebuffer(GL.FRAMEBUFFER, null);
+            #end
+        }
     }
 }

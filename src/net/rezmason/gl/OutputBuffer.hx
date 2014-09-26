@@ -7,8 +7,6 @@ class OutputBuffer extends Artifact {
     public var width(default, null):Int;
     public var height(default, null):Int;
 
-    @:allow(net.rezmason.gl) function new():Void {}
-
     public function resize(width:Int, height:Int):Bool {
         if (this.width == width && this.height == height) return false;
         this.width = width;

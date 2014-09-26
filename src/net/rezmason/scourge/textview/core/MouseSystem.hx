@@ -26,6 +26,7 @@ class MouseSystem {
 
     static var NULL_HIT:Hit = {bodyID:null, glyphID:null};
 
+    public var isAttached(default, null):Bool;
     public var outputBuffer(default, null):ReadbackOutputBuffer;
     // public var view(get, null):Sprite;
     public var invalid(default, null):Bool;
@@ -51,16 +52,13 @@ class MouseSystem {
         // _view = new MouseView(0.2, 40);
         // _view = new MouseView(1.0, 40, 0.5);
         // stage.addChild(_view);
+        isAttached = false;
         interact = new Zig();
         stage = new Present(Stage);
         glSys = new Present(GLSystem);
         updateSignal = new Zig<Void->Void>();
         rectRegionsByID = null;
         lastRectRegionID = null;
-
-        stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-        stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-        stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 
         hoverHit = NULL_HIT;
         pressHit = NULL_HIT;
@@ -71,6 +69,25 @@ class MouseSystem {
         invalidate();
 
         outputBuffer = glSys.createReadbackOutputBuffer();
+    }
+
+    public function attach():Void {
+        if (!isAttached) {
+            isAttached = true;
+            stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+            stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+            stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+            invalidate();
+        }
+    }
+
+    public function detach():Void {
+        if (isAttached) {
+            isAttached = false;
+            stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+            stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+            stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+        }
     }
 
     public function setSize(width:Int, height:Int):Void {

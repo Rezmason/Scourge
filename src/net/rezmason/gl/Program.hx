@@ -37,6 +37,7 @@ class Program extends Artifact {
     #end
 
     function new(vertSource:String, fragSource:String):Void {
+        super();
         this.vertSource = vertSource;
         this.fragSource = fragSource;
 

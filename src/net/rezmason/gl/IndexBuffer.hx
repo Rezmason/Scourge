@@ -16,6 +16,7 @@ class IndexBuffer extends Artifact {
     public var numIndices(default, null):Int;
 
     function new(numIndices:Int, ?usage:BufferUsage):Void {
+        super();
         this.numIndices = numIndices;
         this.usage = usage;
         #if !flash
@@ -29,14 +30,17 @@ class IndexBuffer extends Artifact {
             buf = context.createIndexBuffer(numIndices/*, usage*/);
         #else
             buf = GL.createBuffer();
+            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
+            GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, array, GL.STATIC_DRAW);
         #end
     }
 
     override function disconnectFromContext():Void {
         super.disconnectFromContext();
         #if flash
-            buf.dispose();
+            if (buf != null) buf.dispose();
         #end
+        buf = null;
     }
 
     public inline function uploadFromVector(data:IndexArray, offset:Int, num:Int):Void {
@@ -60,7 +64,8 @@ class IndexBuffer extends Artifact {
         }
     }
 
-    public inline function dispose():Void {
+    override public function dispose():Void {
+        super.dispose();
         #if flash
             buf.dispose();
         #end

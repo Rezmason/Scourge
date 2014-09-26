@@ -1,28 +1,5 @@
 Handle context loss
-    Bugs
-        Resizing during a disconnect throws errors
-    Fake it till you make it
-        Ask Josh Granick?
-
-    Keyboard and mouse systems shouldn't know about Stage, actually
-        Mouse system should use width and height from Engine
-        Keyboard system's target should be passed into the Engine
-
-Logically rectangular grid
-    http://www.llnl.gov/casc
-
-C., Rankin and Ramon
-
-GLSL2AGAL
-    Add support for ddx, ddy
-
-Wrap shaders in a soft fuzzy blanket, so they don't fucking piss themselves
-    GLSL2AGAL output includes stuff that helps validate parameter setting and so on
-    Skim GLSL shaders for this data, too
-    We may also get texture indices from here, too
-
-    Flash test - the commented out example output in the metaball post shader should just plain work
-    GLSL test - texture indices should no longer be necessary
+    Ask Josh Granick how to actually trigger context loss with OpenGLView
 
 Break down BoardBody
 
@@ -43,8 +20,6 @@ Where does the loupe live?
             One for player stats
             One for DNA?
 
-Add Metaballs to the game
-
 Settings page
 Game config page
 
@@ -56,6 +31,16 @@ Board
 Flash 12 support
     Context3DBufferUsage
     Context3D::createVertexBuffer
+
+Wrap shaders in a soft fuzzy blanket, so they don't fucking piss themselves
+    GLSL2AGAL output includes stuff that helps validate parameter setting and so on
+    Skim GLSL shaders for this data, too
+    We may also get texture indices from here, too
+
+    Flash test - the commented out example output in the metaball post shader should just plain work
+    GLSL test - texture indices should no longer be necessary
+
+Add Metaballs to the game
 
 AGAL2
     Recompile GLSL2AGAL worker

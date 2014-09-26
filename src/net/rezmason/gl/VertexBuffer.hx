@@ -19,6 +19,7 @@ class VertexBuffer extends Artifact {
     var usage:BufferUsage;
 
     public function new(numVertices:Int, footprint:Int, ?usage:BufferUsage):Void {
+        super();
         this.footprint = footprint;
         this.numVertices = numVertices;
         if (usage == null) usage = BufferUsage.STATIC_DRAW;
@@ -34,13 +35,15 @@ class VertexBuffer extends Artifact {
             buf = context.createVertexBuffer(numVertices, footprint/*, usage*/);
         #else
             buf = GL.createBuffer();
+            GL.bindBuffer(GL.ARRAY_BUFFER, buf);
+            GL.bufferData(GL.ARRAY_BUFFER, array, usage);
         #end
     }
 
     override function disconnectFromContext():Void {
         super.disconnectFromContext();
         #if flash
-            buf.dispose();
+            if (buf != null) buf.dispose();
         #end
         buf = null;
     }
@@ -68,7 +71,8 @@ class VertexBuffer extends Artifact {
         }
     }
 
-    public inline function dispose():Void {
+    override public function dispose():Void {
+        super.dispose();
         #if flash 
             if (buf != null) buf.dispose(); 
         #else

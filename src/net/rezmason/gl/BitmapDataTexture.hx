@@ -15,6 +15,7 @@ class BitmapDataTexture extends Texture {
     #end
 
     public function new(bitmapData:BitmapData):Void {
+        super();
         this.bitmapData = bitmapData;
     }
 

@@ -117,11 +117,11 @@ class Engine {
     }
 
     function onDisconnect():Void {
-
+        regulateUserInput();
     }
 
     function onConnect():Void {
-        
+        regulateUserInput();
     }
 
     function renderMouse():Void {
@@ -129,31 +129,32 @@ class Engine {
     }
 
     function render(method:RenderMethod, outputBuffer:OutputBuffer):Void {
+        //trace('rendering with method ${Std.is(method, PrettyMethod) ? "pretty" : "mouse"}');
+        if (glSys.connected) {
+            if (method == null) {
+                trace('Null method.');
+            } else {
+                method.activate();
 
-        if (method == null) {
-            trace('Null method.');
-            return;
-        }
+                glSys.start(outputBuffer);
+                glSys.clear(method.backgroundColor);
 
-        method.activate();
+                for (body in bodiesByID) {
+                    if (body.numGlyphs == 0) continue;
+                    method.setMatrices(body.camera, body.transform);
+                    method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
 
-        glSys.start(outputBuffer);
-        glSys.clear(method.backgroundColor);
+                    for (segment in body.segments) {
+                        method.setSegment(segment);
+                        glSys.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+                    }
+                }
 
-        for (body in bodiesByID) {
-            if (body.numGlyphs == 0) continue;
-            method.setMatrices(body.camera, body.transform);
-            method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
-
-            for (segment in body.segments) {
-                method.setSegment(segment);
-                glSys.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+                method.setSegment(null);
+                method.deactivate();
+                glSys.finish();
             }
         }
-
-        method.setSegment(null);
-        method.deactivate();
-        glSys.finish();
     }
 
     public function setSize(width:Int, height:Int):Void {
@@ -175,7 +176,7 @@ class Engine {
         lastTimeStamp = Timer.stamp();
         setSize(width, height);
         onTimer();
-        keyboardSystem.attach();
+        regulateUserInput();
     }
 
     public function deactivate():Void {
@@ -184,7 +185,17 @@ class Engine {
         active = false;
         updateTimer.stop();
         updateTimer = null;
-        keyboardSystem.detach();
+        regulateUserInput();
+    }
+
+    function regulateUserInput():Void {
+        if (active && glSys.connected) {
+            keyboardSystem.attach();
+            mouseSystem.attach();
+        } else {
+            keyboardSystem.detach();
+            mouseSystem.detach();
+        }
     }
 
     public function setKeyboardFocus(body:Body):Void {
