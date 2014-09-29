@@ -28,6 +28,9 @@ Board
     Figure out how to do "pain"-related things
     Pool objects
 
+OpenFL 2.0 support
+    Remember, munit breaks the HTML5 build target
+
 Flash 12 support
     Context3DBufferUsage
     Context3D::createVertexBuffer

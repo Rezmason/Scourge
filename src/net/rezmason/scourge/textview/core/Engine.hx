@@ -7,13 +7,9 @@ import haxe.Timer;
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.GLFlowControl;
 import net.rezmason.gl.GLSystem;
-import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.rendermethods.*;
-import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
-
-using Lambda;
 
 class Engine {
 
@@ -36,7 +32,6 @@ class Engine {
     var mouseDownTarget:Body;
     var mouseMethod:RenderMethod;
     var prettyMethod:RenderMethod;
-    var viewportOutputBuffer:OutputBuffer;
 
     public function new(glFlow:GLFlowControl):Void {
         this.glFlow = glFlow;
@@ -55,14 +50,9 @@ class Engine {
         if (ready) {
             readySignal.dispatch();
         } else {
-            prettyMethod = new PrettyMethod();
-            mouseMethod = new MouseMethod();
-
-            prettyMethod.loadedSignal.add(onMethodLoaded);
-            mouseMethod.loadedSignal.add(onMethodLoaded);
-
-            prettyMethod.load();
-            mouseMethod.load();
+            initInteractionSystems();
+            initRenderMethods();
+            addListeners();
         }
     }
 
@@ -85,9 +75,7 @@ class Engine {
         }
     }
 
-    function onMethodLoaded():Void if (prettyMethod.programLoaded && mouseMethod.programLoaded) initScene();
-
-    function initScene():Void {
+    function initInteractionSystems():Void {
         mouseSystem = new MouseSystem();
         mouseSystem.updateSignal.add(renderMouse);
         keyboardSystem = new KeyboardSystem();
@@ -96,10 +84,21 @@ class Engine {
         keyboardSystem.interact.add(handleInteraction);
 
         mouseDownTarget = null;
-        viewportOutputBuffer = glSys.viewportOutputBuffer;
-        addListeners();
+    }
 
-        if (!ready) {
+    function initRenderMethods():Void {
+        prettyMethod = new PrettyMethod();
+        mouseMethod = new MouseMethod();
+
+        prettyMethod.loadedSignal.add(onMethodLoaded);
+        mouseMethod.loadedSignal.add(onMethodLoaded);
+
+        prettyMethod.load();
+        mouseMethod.load();
+    }
+
+    function onMethodLoaded():Void {
+        if (!ready && prettyMethod.programLoaded && mouseMethod.programLoaded) {
             ready = true;
             readySignal.dispatch();
         }
@@ -113,7 +112,7 @@ class Engine {
     }
 
     function onRender(width:Int, height:Int):Void {
-        if (active) render(prettyMethod, viewportOutputBuffer);
+        if (active) render(prettyMethod, glSys.viewportOutputBuffer);
     }
 
     function onDisconnect():Void {
@@ -163,7 +162,7 @@ class Engine {
         this.height = height;
         for (body in bodiesByID) body.adjustLayout(width, height);
         mouseSystem.setSize(width, height);
-        viewportOutputBuffer.resize(width, height);
+        glSys.viewportOutputBuffer.resize(width, height);
     }
 
     public function activate():Void {
@@ -203,8 +202,6 @@ class Engine {
         if (bodiesByID[body.id] == body) keyboardSystem.focusBodyID = body.id;
     }
 
-    public function eachBody():Iterator<Body> return bodiesByID.iterator();
-
     function onTimer():Void {
         var timeStamp:Float = Timer.stamp();
         var delta:Float = timeStamp - lastTimeStamp;
@@ -217,6 +214,13 @@ class Engine {
         for (body in bodiesByID) if (body.catchMouseInRect) viewRectsByBodyID[body.id] = body.viewRect;
         mouseSystem.setRectRegions(viewRectsByBodyID);
         mouseSystem.invalidate();
+    }
+
+    function testDisconnect(mils:UInt):Void {
+        if (glSys.connected) {
+            glFlow.disconnect();
+            Timer.delay(glFlow.connect, mils);
+        }
     }
 
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();
@@ -235,16 +239,7 @@ class Engine {
                     var nY:Float = (oY / height - rect.y) / rect.height;
                     interaction = MOUSE(type, nX, nY);
                 }
-
-                keyboardSystem.attach();
-
-            case KEYBOARD(type, key, char, shift, alt, ctrl):
-                if (type == KEY_UP && String.fromCharCode(char) == 'd') {
-                    trace('Disconnecting...');
-                    glFlow.disconnect();
-                    trace('Reconnecting in 3 seconds...');
-                    haxe.Timer.delay(glFlow.connect, 3000);
-                }
+            case _:
         }
 
         if (target != null) target.receiveInteraction(glyphID, interaction);
