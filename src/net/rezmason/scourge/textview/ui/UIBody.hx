@@ -26,7 +26,6 @@ class UIBody extends Body {
     var glyphHeight:Float;
     var baseTransform:Matrix3D;
 
-    var croppedViewRect:Rectangle;
     var viewPixelWidth:Float;
     var viewPixelHeight:Float;
 
@@ -58,10 +57,12 @@ class UIBody extends Body {
     var scrollBarVisible:Bool;
     var scrollBarFade:Float;
 
+    var sized:Bool;
+
     public function new(uiMediator:UIMediator):Void {
 
         super();
-
+        sized = false;
         showScrollBar = false;
         scrollBarVisible = false;
         scrollBarFade = 0;
@@ -84,7 +85,7 @@ class UIBody extends Body {
         numCols = 0;
         numTextCols = 0;
 
-        scaleMode = EXACT_FIT;
+        camera.scaleMode = EXACT_FIT;
 
         this.uiMediator = uiMediator;
     }
@@ -99,7 +100,7 @@ class UIBody extends Body {
             glyphWidth = glyphWidthInPixels / stageWidth;
             glyphHeight = glyphHeightInPixels / stageHeight;
             setGlyphScale(glyphWidth, glyphHeight);
-            resize();
+            recalculateGeometry();
         }
         return worked;
     }
@@ -110,7 +111,7 @@ class UIBody extends Body {
             worked = true;
             glyphTexture = tex;
             glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
-            resize();
+            recalculateGeometry();
         }
         return worked;
     }
@@ -133,17 +134,17 @@ class UIBody extends Body {
         super.update(delta);
     }
 
-    override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
-        croppedViewRect = viewRect;
-        var originalViewRect:Rectangle = viewRect.clone();
-        super.adjustLayout(stageWidth, stageHeight);
-        viewPixelHeight = viewRect.height * stageHeight;
-        viewPixelWidth  = viewRect.width  * stageWidth;
-        viewRect = originalViewRect;
+    override public function resize(stageWidth:Int, stageHeight:Int):Void {
+        sized = true;
+        var originalViewRect:Rectangle = camera.rect.clone();
+        super.resize(stageWidth, stageHeight);
+        viewPixelHeight = camera.rect.height * stageHeight;
+        viewPixelWidth  = camera.rect.width  * stageWidth;
+        camera.rect = originalViewRect;
         glyphWidth = glyphWidthInPixels / stageWidth;
         glyphHeight = glyphHeightInPixels / stageHeight;
         setGlyphScale(glyphWidth, glyphHeight);
-        resize();
+        recalculateGeometry();
     }
 
     function glideTextToPos(pos:Float):Void {
@@ -218,8 +219,8 @@ class UIBody extends Body {
         }
     }
 
-    function resize():Void {
-        if (croppedViewRect != null) {
+    function recalculateGeometry():Void {
+        if (sized) {
             numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
             numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
             numTextCols = numCols + (showScrollBar ? -1 : 0);
@@ -260,9 +261,9 @@ class UIBody extends Body {
     inline function reorderGlyphs():Void {
         var id:Int = 0;
         for (row in 0...numRows) {
-            var y:Float = (row + 0.5 - (numRows - 1) / 2) * glyphHeight / viewRect.height;
+            var y:Float = (row + 0.5 - (numRows - 1) / 2) * glyphHeight / camera.rect.height;
             for (col in 0...numTextCols) {
-                var x:Float = (col + 0.5 - numCols / 2) * glyphWidth / viewRect.width;
+                var x:Float = (col + 0.5 - numCols / 2) * glyphWidth / camera.rect.width;
                 glyphs[id].set_xyz(x, y, 0);
                 id++;
             }
@@ -369,7 +370,7 @@ class UIBody extends Body {
 
     inline function set_showScrollBar(val:Bool):Bool {
         showScrollBar = val;
-        resize();
+        recalculateGeometry();
         return val;
     }
 }

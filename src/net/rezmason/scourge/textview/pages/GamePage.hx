@@ -32,10 +32,10 @@ class GamePage extends NavPage {
         bodiesByName['board']    = boardBody;
 
         for (key in bodiesByName.keys()) {
-            bodiesByName[key].viewRect = new Rectangle(0, 0, 0.6, 1);
+            bodiesByName[key].camera.rect = new Rectangle(0, 0, 0.6, 1);
         }
 
-        uiBody.viewRect = new Rectangle(0.6, 0, 0.4, 1);
+        uiBody.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
         uiBody.showScrollBar = true;
         bodies.push(uiBody);
         gameSystem = new GameSystem(boardBody, console); // Doesn't really belong in here

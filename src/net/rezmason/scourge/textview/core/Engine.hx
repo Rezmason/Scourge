@@ -63,7 +63,7 @@ class Engine {
         if (bodiesByID[body.id] == null) {
             bodiesByID[body.id] = body;
             body.redrawHitSignal.add(updateMouseSystem);
-            body.adjustLayout(width, height);
+            body.resize(width, height);
         }
     }
 
@@ -140,7 +140,7 @@ class Engine {
 
                 for (body in bodiesByID) {
                     if (body.numGlyphs == 0) continue;
-                    method.setMatrices(body.camera, body.transform);
+                    method.setMatrices(body.camera.transform, body.transform);
                     method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
 
                     for (segment in body.segments) {
@@ -160,7 +160,7 @@ class Engine {
         readyCheck();
         this.width = width;
         this.height = height;
-        for (body in bodiesByID) body.adjustLayout(width, height);
+        for (body in bodiesByID) body.resize(width, height);
         mouseSystem.setSize(width, height);
         glSys.viewportOutputBuffer.resize(width, height);
     }
@@ -210,9 +210,9 @@ class Engine {
     }
 
     function updateMouseSystem():Void {
-        var viewRectsByBodyID:Map<Int, Rectangle> = new Map();
-        for (body in bodiesByID) if (body.catchMouseInRect) viewRectsByBodyID[body.id] = body.viewRect;
-        mouseSystem.setRectRegions(viewRectsByBodyID);
+        var rectsByBodyID:Map<Int, Rectangle> = new Map();
+        for (body in bodiesByID) if (body.catchMouseInRect) rectsByBodyID[body.id] = body.camera.rect;
+        mouseSystem.setRectRegions(rectsByBodyID);
         mouseSystem.invalidate();
     }
 
@@ -234,7 +234,7 @@ class Engine {
                 if (type == CLICK) keyboardSystem.focusBodyID = bodyID;
 
                 if (target != null) {
-                    var rect:Rectangle = target.viewRect;
+                    var rect:Rectangle = target.camera.rect;
                     var nX:Float = (oX / width  - rect.x) / rect.width;
                     var nY:Float = (oY / height - rect.y) / rect.height;
                     interaction = MOUSE(type, nX, nY);

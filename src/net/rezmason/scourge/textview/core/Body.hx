@@ -1,12 +1,8 @@
 package net.rezmason.scourge.textview.core;
 
 import flash.geom.Matrix3D;
-import flash.geom.Point;
 import flash.geom.Rectangle;
-import flash.geom.Vector3D;
-import flash.Vector;
 
-import net.rezmason.scourge.textview.core.FontManager;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
@@ -14,29 +10,23 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class Body {
 
-    inline static function DEFAULT_VIEW_RECT():Rectangle return new Rectangle(0, 0, 1, 1);
     static var _ids:Int = 0;
 
     public var segments(default, null):Array<BodySegment>;
     public var id(default, null):Int;
-    public var transform:Matrix3D;
-    public var camera:Matrix3D;
+    public var transform(default, null):Matrix3D;
+    public var camera(default, null):Camera;
     public var glyphTransform:Matrix3D;
     public var numGlyphs(default, null):Int;
     public var glyphTexture(default, null):GlyphTexture;
-    public var scaleMode(default, null):BodyScaleMode;
     public var catchMouseInRect(default, null):Bool;
-    public var viewRect(default, set):Rectangle;
     public var redrawHitSignal(default, null):Zig<Void->Void>;
 
     var fontManager:FontManager;
     var trueNumGlyphs:Int;
-    var vanishingPoint:Point;
 
     var stageWidth:Int;
     var stageHeight:Int;
-
-    var projection:Matrix3D;
 
     public var glyphs:Array<Glyph>;
 
@@ -45,16 +35,11 @@ class Body {
         stageHeight = 0;
         redrawHitSignal = new Zig<Void->Void>();
         id = ++_ids;
-        scaleMode = SHOW_ALL;
         catchMouseInRect = true;
         glyphs = [];
         fontManager = new Present(FontManager);
         fontManager.onFontChange.add(updateGlyphTexture);
         glyphTexture = fontManager.defaultFont;
-        viewRect = DEFAULT_VIEW_RECT();
-
-        projection = makeProjection();
-        vanishingPoint = new Point();
 
         numGlyphs = 0;
         trueNumGlyphs = 0;
@@ -63,7 +48,7 @@ class Body {
         glyphs = [];
 
         transform = new Matrix3D();
-        camera = new Matrix3D();
+        camera = new Camera();
         glyphTransform = new Matrix3D();
         glyphTransform.appendScale(0.0001, 0.0001, 1); // Prevents blowouts
     }
@@ -117,30 +102,10 @@ class Body {
         for (glyph in glyphs) glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id << 16);
     }
 
-    public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
-
+    public function resize(stageWidth:Int, stageHeight:Int):Void {
         this.stageWidth = stageWidth;
         this.stageHeight = stageHeight;
-
-        var cameraRect:Rectangle = viewRect.clone();
-        cameraRect.offset(-0.5, -0.5);
-        cameraRect.x *= 2;
-        cameraRect.y *= 2;
-        cameraRect.width *= 2;
-        cameraRect.height *= 2;
-
-        camera.identity();
-        camera.append(scaleModeBox(viewRect, scaleMode, stageWidth, stageHeight));
-        camera.appendScale(cameraRect.width, cameraRect.height, 1);
-        camera.appendTranslation((cameraRect.left + cameraRect.right) * 0.5, (cameraRect.top + cameraRect.bottom) * -0.5, 0);
-
-        camera.appendTranslation(0, 0, 1); // Set the camera back one unit
-        camera.append(projection); // Apply perspective
-
-        vanishingPoint.x = (viewRect.left + viewRect.right) * 0.5;
-        vanishingPoint.y = (viewRect.top + viewRect.bottom) * 0.5;
-
-        applyVP(0, 0);
+        camera.resize(stageWidth, stageHeight);
     }
 
     public function update(delta:Float):Void {
@@ -161,65 +126,9 @@ class Body {
     }
     */
 
-    inline function applyVP(x:Float, y:Float):Void {
-        var rawData:Vector<Float> = camera.rawData;
-        rawData[8] =  ((x + vanishingPoint.x) * 2 - 1);
-        rawData[9] = -((y + vanishingPoint.y) * 2 - 1);
-        camera.rawData = rawData;
-    }
-
-    inline static function scaleModeBox(rect:Rectangle, scaleMode:BodyScaleMode, stageWidth:Int, stageHeight:Int):Matrix3D {
-        var box:Matrix3D = new Matrix3D();
-
-        var doubleRatio:Float = (rect.width / rect.height) * (stageWidth / stageHeight);
-
-        switch (scaleMode) {
-            case EXACT_FIT:
-                // Distort the aspect ratio to fit the body in the rectangle
-                box.appendScale(1, 1, 1);
-            case NO_BORDER:
-                // Scale the body uniformly to match the dimension of the largest side of the screen
-                if (doubleRatio > 1) box.appendScale(1, doubleRatio, 1);
-                else box.appendScale(1 / doubleRatio, 1, 1);
-            case NO_SCALE:
-                // Perform no scaling logic
-                box.appendScale(rect.width / stageWidth, rect.height / stageHeight, 1);
-            case SHOW_ALL:
-                // Scale the body uniformly to match the dimension of the smallest side of the screen
-                if (doubleRatio < 1) box.appendScale(1, doubleRatio, 1);
-                else box.appendScale(1 / doubleRatio, 1, 1);
-            case WIDTH_FIT:
-                // Scale the body uniformly to match the width of the screen
-                box.appendScale(1, doubleRatio, 1);
-            case HEIGHT_FIT:
-                // Scale the body uniformly to match the height of the screen
-                box.appendScale(1 / doubleRatio, 1, 1);
-        }
-
-        return box;
-    }
-
     inline function setGlyphScale(sX:Float, sY:Float):Void {
         glyphTransform.identity();
         glyphTransform.appendScale(sX, sY, 1);
-    }
-
-    inline function makeProjection():Matrix3D {
-        var mat:Matrix3D = new Matrix3D();
-        var rawData:Vector<Float> = mat.rawData;
-        rawData[10] =  2;
-        rawData[11] =  1;
-        rawData[14] = -2;
-        rawData[15] =  0;
-        mat.rawData = rawData;
-        return mat;
-    }
-
-    inline function set_viewRect(rect:Rectangle):Rectangle {
-        if (rect == null) rect = DEFAULT_VIEW_RECT();
-        if (rect.width <= 0 || rect.height <= 0) throw 'Body view rects cannot be null.';
-        viewRect = rect;
-        return rect;
     }
 
     inline function updateGlyphTexture(glyphTexture:GlyphTexture):Void {

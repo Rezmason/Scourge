@@ -25,14 +25,14 @@ class SplashPage extends NavPage {
         super();
 
         splashBody = new SplashBody();
-        splashBody.viewRect = new Rectangle(0.0, 0.0, 1.0, 0.4);
+        splashBody.camera.rect = new Rectangle(0.0, 0.0, 1.0, 0.4);
         bodies.push(splashBody);
 
         uiMed = new UIMediator();
         uiBody = new UIBody(uiMed);
         var uiRect:Rectangle = new Rectangle(0.0, 0.4, 1.0, 0.6);
         uiRect.inflate(-0.02, -0.02);
-        uiBody.viewRect = uiRect;
+        uiBody.camera.rect = uiRect;
         uiBody.setFontSize(28);
         bodies.push(uiBody);
 

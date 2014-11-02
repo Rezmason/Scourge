@@ -47,8 +47,8 @@ class GlyphBody extends Body {
         glyphs[0].set_color(COLORS[currentColor]);
     }
 
-    override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
-        super.adjustLayout(stageWidth, stageHeight);
+    override public function resize(stageWidth:Int, stageHeight:Int):Void {
+        super.resize(stageWidth, stageHeight);
         setGlyphScale(0.4, 0.4 * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
         transform.identity();
         transform.appendScale(1, -1, 1);

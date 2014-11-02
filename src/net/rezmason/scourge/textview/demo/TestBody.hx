@@ -84,12 +84,10 @@ class TestBody extends Body {
 
     inline function ramp(num:Float):Float return (2 - num) * num;
 
-    override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
-        super.adjustLayout(stageWidth, stageHeight);
+    override public function resize(stageWidth:Int, stageHeight:Int):Void {
+        super.resize(stageWidth, stageHeight);
 
-        var screenSize:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
-        var rectSize:Float = Math.min(viewRect.width * stageWidth, viewRect.height * stageHeight) / screenSize;
-        var glyphWidth:Float = rectSize * 0.015;
+        var glyphWidth:Float = camera.rectScale * 0.015;
         setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
 

@@ -28,13 +28,13 @@ class AboutPage extends NavPage {
 
         paperMed = new UIMediator();
         paperBody = new UIBody(paperMed);
-        paperBody.viewRect = new Rectangle(0.1, 0, 0.8, 0.9);
+        paperBody.camera.rect = new Rectangle(0.1, 0, 0.8, 0.9);
         paperBody.setFontSize(14);
         bodies.push(paperBody);
 
         navMed = new UIMediator();
         navBody = new UIBody(navMed);
-        navBody.viewRect = new Rectangle(0, 0.9, 1, 0.1);
+        navBody.camera.rect = new Rectangle(0, 0.9, 1, 0.1);
         navBody.setFontSize(14);
         bodies.push(navBody);
 

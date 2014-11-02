@@ -42,16 +42,11 @@ class SplashBody extends Body {
     var lines:Array<String>;
 
     public function new():Void {
-
         super();
-
-        scaleMode = WIDTH_FIT;
-
+        camera.scaleMode = WIDTH_FIT;
         time = 0;
-
         lines = Assets.getText('text/splash.txt').split('\n');
         lines.pop();
-        //lines.pop();
 
         growTo(3 * lines.length * lines[0].length);
 
@@ -108,9 +103,9 @@ class SplashBody extends Body {
         transform.appendRotation(20, Vector3D.X_AXIS);
     }
 
-    override public function adjustLayout(stageWidth:Int, stageHeight:Int):Void {
-        super.adjustLayout(stageWidth, stageHeight);
-        var glyphWidth:Float = viewRect.width * 0.015;
+    override public function resize(stageWidth:Int, stageHeight:Int):Void {
+        super.resize(stageWidth, stageHeight);
+        var glyphWidth:Float = camera.rect.width * 0.015;
         setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
 

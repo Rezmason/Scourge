@@ -1,5 +1,5 @@
-Handle context loss
-    Ask Josh Granick how to actually trigger context loss with OpenGLView
+Break down Body
+    Most things that extend Body should be their own classes, that use a Body
 
 Break down BoardBody
 
