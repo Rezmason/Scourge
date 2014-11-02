@@ -50,8 +50,6 @@ class GlyphBody extends Body {
     override public function resize(stageWidth:Int, stageHeight:Int):Void {
         super.resize(stageWidth, stageHeight);
         setGlyphScale(0.4, 0.4 * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
-        transform.identity();
-        transform.appendScale(1, -1, 1);
     }
 
     override public function update(delta:Float):Void {
