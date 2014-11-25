@@ -8,3 +8,4 @@ tables/*.json
 Export
 golems
 dump
+projects/PolyformGenerator/cpp
