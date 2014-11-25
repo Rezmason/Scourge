@@ -13,7 +13,7 @@ class BasicWorkerTest
 
     }
 
-    @Test
+    @Test @Ignore('Test BasicWorker more thoroughly once the game has a client-server architecture.')
     public function constructTest():Void
     {
         var boss:TestBoss = new TestBoss(null, null);
@@ -21,7 +21,7 @@ class BasicWorkerTest
         boss.die();
     }
 
-    @AsyncTest
+    @AsyncTest @Ignore('Test BasicWorker more thoroughly once the game has a client-server architecture.')
     public function volleyTest(factory:AsyncFactory):Void
     {
         var boss:TestBoss = null;
@@ -47,7 +47,7 @@ class BasicWorkerTest
         boss.send(last);
     }
 
-    @AsyncTest
+    @AsyncTest @Ignore('Test BasicWorker more thoroughly once the game has a client-server architecture.')
     public function errorTest(factory:AsyncFactory):Void
     {
         var boss:TestBoss = null;
