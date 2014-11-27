@@ -51,10 +51,10 @@ class PieceRulesTest extends ScourgeRuleTest
     // Y                    Y                   72
 
     @Test
-    public function placePieceScourgeRuleTestOrtho():Void {
+    public function placePieceOrtho():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
+            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -103,10 +103,10 @@ class PieceRulesTest extends ScourgeRuleTest
     }
 
     @Test
-    public function placePieceScourgeRuleTestOrthoNoSpace():Void {
+    public function placePieceOrthoNoSpace():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
+            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 4), // 'I block'
             reflection:0,
             rotation:0,
         };
@@ -142,10 +142,10 @@ class PieceRulesTest extends ScourgeRuleTest
     }
 
     @Test
-    public function placePieceScourgeRuleTestOrthoNoFlipping():Void {
+    public function placePieceOrthoNoFlipping():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
+            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -183,10 +183,10 @@ class PieceRulesTest extends ScourgeRuleTest
     }
 
     @Test
-    public function placePieceScourgeRuleTestOrthoNoSpinning():Void {
+    public function placePieceOrthoNoSpinning():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
+            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -224,10 +224,10 @@ class PieceRulesTest extends ScourgeRuleTest
     }
 
     @Test
-    public function placePieceScourgeRuleTestOrthoNoSpinningOrFlipping():Void {
+    public function placePieceOrthoNoSpinningOrFlipping():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
+            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -265,10 +265,10 @@ class PieceRulesTest extends ScourgeRuleTest
     }
 
     @Test
-    public function placePieceScourgeRuleTestOrthoSelf():Void {
+    public function placePieceOrthoSelf():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
+            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -306,7 +306,7 @@ class PieceRulesTest extends ScourgeRuleTest
     }
 
     @Test
-    public function placePieceScourgeRuleTestOrthoAllowNowhere():Void {
+    public function placePieceOrthoAllowNowhere():Void {
 
         var dropConfig:DropPieceConfig = {
             overlapSelf:false,
@@ -346,7 +346,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function pickPieceTest():Void {
 
         var hatSize:Int = 3;
-        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4];
+        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         var pickPieceCfg:PickPieceConfig = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
@@ -377,12 +377,12 @@ class PieceRulesTest extends ScourgeRuleTest
     public function pickPieceTestNoFlipping():Void {
 
         var hatSize:Int = 3;
-        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 5]; // 5 is an L/J block
+        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         var pickPieceCfg:PickPieceConfig = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:false,
             allowRotating:true,
-            hatSize:3,
+            hatSize:hatSize,
             randomFunction:function() return 0,
             pieces:pieces,
         };
@@ -395,19 +395,19 @@ class PieceRulesTest extends ScourgeRuleTest
         pickPieceRule.update();
 
         Assert.areEqual(1, pickPieceRule.moves.length);
-        Assert.areEqual(6, pickPieceRule.quantumMoves.length);
+        Assert.areEqual(12, pickPieceRule.quantumMoves.length);
     }
 
     @Test
     public function pickPieceTestNoSpinning():Void {
 
         var hatSize:Int = 3;
-        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4];
+        var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         var pickPieceCfg:PickPieceConfig = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:false,
-            hatSize:3,
+            hatSize:hatSize,
             randomFunction:function() return 0,
             pieces:pieces,
         };
@@ -420,14 +420,14 @@ class PieceRulesTest extends ScourgeRuleTest
         pickPieceRule.update();
 
         Assert.areEqual(1, pickPieceRule.moves.length);
-        Assert.areEqual(11, pickPieceRule.quantumMoves.length);
+        Assert.areEqual(23, pickPieceRule.quantumMoves.length);
     }
 
     @Test
-    public function placePieceScourgeRuleTestDiag():Void {
+    public function placePieceDiag():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
+            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -465,10 +465,10 @@ class PieceRulesTest extends ScourgeRuleTest
     }
 
     @Test
-    public function placePieceScourgeRuleTestOrthoDiag():Void {
+    public function placePieceOrthoDiag():Void {
 
         var testPieceCfg:TestPieceConfig = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 1), // 'L/J block'
+            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };

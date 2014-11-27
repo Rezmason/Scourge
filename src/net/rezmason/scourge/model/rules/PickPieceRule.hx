@@ -126,7 +126,8 @@ class PickPieceRule extends Rule {
             var freq:Null<Int> = pieceFrequencies[pieceTableID];
             if (freq == 0 || freq == null) continue;
 
-            var piece:PieceGroup = cfg.pieces.getPieceById(pieceTableID);
+            var freePiece:FreePiece = cfg.pieces.getPieceById(pieceTableID);
+            var numRotations = freePiece.numRotations();
 
             // A piece that can't be flipped or rotated has its multiple symmetries
             // added to the hat, and so it has more moves
@@ -135,16 +136,16 @@ class PickPieceRule extends Rule {
                 if (cfg.allowRotating) {
                     generateMove(pieceTableID, 0, 0, freq);
                 } else {
-                    var spinWeight:Int = Std.int(piece[0].length / 4);
-                    for (rotation in 0...piece[0].length) generateMove(pieceTableID, 0, rotation, freq * spinWeight);
+                    var spinWeight:Int = Std.int(numRotations / 4);
+                    for (rotation in 0...numRotations) generateMove(pieceTableID, 0, rotation, freq * spinWeight);
                 }
             } else {
-                for (flip in 0...piece.length) {
+                for (flip in 0...freePiece.numReflections()) {
                     if (cfg.allowRotating) {
                         generateMove(pieceTableID, flip, 0, freq);
                     } else {
-                        var spinWeight:Int = Std.int(piece[flip].length / 4);
-                        for (rotation in 0...piece[flip].length) generateMove(pieceTableID, flip, rotation, freq * spinWeight);
+                        var spinWeight:Int = Std.int(numRotations / 4);
+                        for (rotation in 0...numRotations) generateMove(pieceTableID, flip, rotation, freq * spinWeight);
                     }
                 }
             }

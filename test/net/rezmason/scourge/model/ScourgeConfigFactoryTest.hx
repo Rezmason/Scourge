@@ -235,13 +235,26 @@ class ScourgeConfigFactoryTest
 
     @Test
     public function dropActionTest():Void {
-
+        /*
+        // Useful for interpreting drop moves
+        function hilightNodes(move, node) {
+            var id:Int = state.nodes.indexOf(node);
+            var addedNodes:Array<Int> = (cast move).addedNodes;
+            if (addedNodes.indexOf(id) != -1) return '@';
+            return null;
+        }
+        for (move in dropAction.moves) {
+            trace(move);
+            trace(state.spitBoard(plan, true, hilightNodes.bind(move)));
+        }
+        /**/
+        
         var pieces:Pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
 
         // dropPiece, eatCells, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
         config.numPlayers = 2;
-        config.pieceTableIDs = [pieces.getPieceIdBySizeAndIndex(4, 1)]; // 'L/J block'
+        config.pieceTableIDs = [pieces.getPieceIdBySizeAndIndex(3, 1)]; // '--- block'
         config.initGrid = TestBoards.twoPlayerGrab;
         makeState();
         startAction.update();
@@ -252,9 +265,9 @@ class ScourgeConfigFactoryTest
         VisualAssert.assert('two player grab', state.spitBoard(plan));
 
         dropAction.update();
-        dropAction.chooseMove(35); // drop, eat
+        dropAction.chooseMove(110); // drop, eat
 
-        VisualAssert.assert('player zero dropped an L, ate player one\'s leg; small new cavity', state.spitBoard(plan));
+        VisualAssert.assert('player zero dropped an ---, ate player one\'s leg; small new cavity', state.spitBoard(plan));
 
         dropAction.update();
         dropAction.chooseMove(); // skip
@@ -262,9 +275,9 @@ class ScourgeConfigFactoryTest
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
         dropAction.update();
-        dropAction.chooseMove(32); // drop, eat, kill
-
-        VisualAssert.assert('player zero dropped another L, ate player one\'s head and body; another cavity', state.spitBoard(plan));
+        dropAction.chooseMove(104); // drop, eat, kill
+        
+        VisualAssert.assert('player zero dropped another ---, ate player one\'s head and body; another cavity', state.spitBoard(plan));
 
         var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
         Assert.areEqual(0, state.globals[winner_]);

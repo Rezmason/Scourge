@@ -1,16 +1,20 @@
-package;
+package net.rezmason.polyform;
 
-import Step.*;
-using PolyformPlotter;
+import net.rezmason.polyform.Step.*;
+using net.rezmason.polyform.PolyformPlotter;
 
 class PolyformGenerator {
+    #if !(js || flash)
     static function main() {
         var args = Sys.args();
-        if (args.length > 0) generate(Std.parseInt(args[0]), args[1] == 'true', args[2]);
-        else generate(5, false, null);
+        if (args.length > 0) {
+            println(generate(Std.parseInt(args[0]), args[1] == 'true', true));
+        }
+        else println(generate(5, false, true));
     }
+    #end
 
-    public static function generate(limit, generateFixed, outputPath) {
+    public static function generate(limit:Int, generateFixed:Bool, ?verbose:Bool) {
         var rules = [
             [R, R] => [S, R, R, S],
             [S, R] => [L, R, R, S],
@@ -31,32 +35,25 @@ class PolyformGenerator {
             } else if (ike == 1) {
                 matches.push(Polyform.monoform(4));
             } else {
-                for (poly in lastMatches) {
-                    for (expansion in poly.expand(stringRules)) {
-                        matchMap.remove(expansion.reflect());
-                        matchMap[expansion] = expansion;
-                    }
-                }
+                for (poly in lastMatches) for (expansion in poly.expand(stringRules)) matchMap[expansion] = expansion;
                 for (poly in matchMap) {
                     if (poly.winding() != 4) throw 'Invalid: $poly'; // This actually tests the rules, not the pieces.
                     if (!hasCoincidentPerimeter(poly)) matches.push(poly);
                 }
             }
             matches.sort(Polyform.sortFunction);
-            printPolyforms(ike, matches, generateFixed);
-            polyominoes[ike] = generateData(matches, generateFixed);
+            if (verbose) printPolyforms(ike, matches, generateFixed);
+            polyominoes.push([for (poly in matches) generateData(poly, generateFixed)]);
             lastMatches = matches;
         }
-        if (outputPath == null) Sys.println(polyominoes);
-        else sys.io.File.saveContent(outputPath, haxe.Json.stringify(polyominoes));
+        return polyominoes;
     }
 
-    inline static function generateData(matches:Array<Polyform>, generateFixed:Bool) {
-        return [ for (poly in matches) 
-            [ for (flip in 0...(generateFixed ? poly.numReflections() : 1)) 
-                [ for (rot in 0...(generateFixed ? poly.numRotations() : 1)) 
-                    (flip == 1 ? poly.reflect(false) : poly).rotate(rot).render().compact().toData()
-                ]
+    inline static function generateData(poly:Polyform, generateFixed:Bool) {
+        return 
+        [ for (flip in 0...(generateFixed ? poly.numReflections() : 1)) 
+            [ for (rot in 0...(generateFixed ? poly.numRotations() : 1)) 
+                (flip == 1 ? poly.reflect() : poly).rotate(rot).render().compact().toData()
             ]
         ];
     }
@@ -67,22 +64,22 @@ class PolyformGenerator {
         for (poly in polys) {
             freeCount++;
             fixedCount += poly.numReflections() * poly.numRotations();
-            Sys.println('$size $freeCount $poly(${poly.numReflections()},${poly.numRotations()})');
+            println('$size $freeCount $poly(${poly.numReflections()},${poly.numRotations()})');
             if (generateFixed) {
                 var numRot = poly.numRotations();
                 for (flip in 0...poly.numReflections()) {
-                    var flippedPoly = (flip == 1 ? poly.reflect(false) : poly);
+                    var flippedPoly = (flip == 1 ? poly.reflect() : poly);
                     for (rot in 0...numRot) {
                         var transformedPoly = flippedPoly.rotate(rot);
-                        Sys.println('$flip,$rot\n${transformedPoly.render().compact().print()}');
+                        println('$flip,$rot\n${transformedPoly.render().compact().print()}');
                     }
                 }
             } else {
-                Sys.println(poly.render().print());
+                println(poly.render().print());
             }
         }
-        Sys.println('There are $freeCount free polyominoes of size $size with no holes.');
-        Sys.println('There are $fixedCount fixed polyominoes of size $size with no holes.');
+        println('There are $freeCount free polyominoes of size $size with no holes.');
+        println('There are $fixedCount fixed polyominoes of size $size with no holes.');
     }
 
     inline static function hasCoincidentPerimeter(poly:Polyform) {
@@ -103,4 +100,6 @@ class PolyformGenerator {
         }
         return found;
     }
+
+    inline static function println(str:Dynamic) { #if !(js || flash) Sys.println(str); #end }
 }

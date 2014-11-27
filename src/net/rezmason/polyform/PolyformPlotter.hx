@@ -1,7 +1,7 @@
-package;
+package net.rezmason.polyform;
 
-import Step.*;
-import Ornament.*;
+import net.rezmason.polyform.Step.*;
+import net.rezmason.polyform.Ornament.*;
 
 class PolyformPlotter {
     public inline static function render(poly:Polyform) {

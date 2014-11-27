@@ -107,32 +107,28 @@ class DropPieceRule extends Rule {
 
         for (pieceID in pieceIDs) {
 
-            var pieceGroup:PieceGroup = cfg.pieces.getPieceById(pieceID);
+            var freePiece:FreePiece = cfg.pieces.getPieceById(pieceID);
 
             // For each allowed reflection,
-            var allowedReflectionIndex:Int = pieceReflection % pieceGroup.length;
-            for (reflectionIndex in 0...pieceGroup.length) {
+            var allowedReflectionIndex:Int = pieceReflection % freePiece.numReflections();
+            for (reflectionIndex in 0...freePiece.numReflections()) {
 
                 if (!cfg.allowFlipping && reflectionIndex != allowedReflectionIndex) continue;
-                var reflection:Array<Piece> = pieceGroup[reflectionIndex];
-
+                
                 // For each allowed rotation,
-                var allowedRotationIndex:Int = pieceRotation % reflection.length;
+                var allowedRotationIndex:Int = pieceRotation % freePiece.numRotations();
 
-                for (rotationIndex in 0...reflection.length) {
+                for (rotationIndex in 0...freePiece.numRotations()) {
 
                     if (!cfg.allowRotating && rotationIndex != allowedRotationIndex) continue;
-                    var rotation:Piece = reflection[rotationIndex];
+                    var piece:Piece = freePiece.getPiece(reflectionIndex, rotationIndex);
 
                     // For each edge node,
                     for (node in edgeNodes) {
 
                         // Generate the piece's footprint
 
-                        var footprint:Array<IntCoord> = [];
-                        if (cfg.overlapSelf) footprint = footprint.concat(rotation[0]);
-                        if (!cfg.diagOnly) footprint = footprint.concat(rotation[1]);
-                        if (!cfg.orthoOnly) footprint = footprint.concat(rotation[2]);
+                        var footprint = piece.footprint(cfg.overlapSelf, !cfg.diagOnly, !cfg.orthoOnly);
 
                         // Using each footprint coord as a home coord (aka the point of connection),
                         for (homeCoord in footprint) {
@@ -144,7 +140,7 @@ class DropPieceRule extends Rule {
                             var numAddedNodes:Int = 0;
                             var addedNodes:Array<Int> = [];
 
-                            for (coord in rotation[0]) {
+                            for (coord in piece.cells()) {
                                 var nodeAtCoord:AspectSet = walkLocus(getNodeLocus(node), coord, homeCoord).value;
                                 addedNodes.push(getID(nodeAtCoord));
                                 numAddedNodes++;
@@ -216,9 +212,9 @@ class DropPieceRule extends Rule {
         var player:AspectSet = getPlayer(currentPlayer);
 
         if (move.targetNode != Aspect.NULL) {
-            var pieceGroup:PieceGroup = cfg.pieces.getPieceById(move.pieceID);
+            var freePiece:FreePiece = cfg.pieces.getPieceById(move.pieceID);
             var targetLocus:BoardLocus = getLocus(move.targetNode);
-            var coords:Array<IntCoord> = pieceGroup[move.reflection][move.rotation][0];
+            var coords:Array<IntCoord> = freePiece.getPiece(move.reflection, move.rotation).cells();
             var homeCoord:IntCoord = move.coord;
             var maxFreshness:Int = state.globals[maxFreshness_] + 1;
 
@@ -283,8 +279,8 @@ class DropPieceRule extends Rule {
     inline function walkLocus(locus:BoardLocus, fromCoord:IntCoord, toCoord:IntCoord):BoardLocus {
         var dn:Int = 0;
         var dw:Int = 0;
-        var de:Int = toCoord[0] - fromCoord[0];
-        var ds:Int = toCoord[1] - fromCoord[1];
+        var de:Int = toCoord.x() - fromCoord.x();
+        var ds:Int = toCoord.y() - fromCoord.y();
 
         if (de < 0) {
             dw = -de;

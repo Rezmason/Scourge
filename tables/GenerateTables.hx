@@ -1,25 +1,14 @@
 package tables;
 
-import sys.FileSystem;
 import sys.io.File;
 
-import net.rezmason.scourge.model.PieceTypes;
-import net.rezmason.scourge.tools.PieceGenerator;
+import net.rezmason.polyform.PolyformGenerator;
 
 using haxe.Json;
 
 class GenerateTables {
 
     static function main():Void {
-        generatePieceTable();
-    }
-
-    static function generatePieceTable():Void {
-        var pieceGroupsBySize:Array<Array<PieceGroup>> = [];
-        for (size in 0...4) {
-            pieceGroupsBySize.push(PieceGenerator.generateGroups(size + 1));
-        }
-
-        File.write("./tables/pieces.json.txt", false).writeString(pieceGroupsBySize.stringify());
+        File.saveContent("./tables/pieces.json.txt", PolyformGenerator.generate(4, true, true).stringify());
     }
 }

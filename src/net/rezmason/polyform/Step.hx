@@ -1,4 +1,4 @@
-package;
+package net.rezmason.polyform;
 
 @:enum abstract Step(String) {
     @:to public inline function toString():String return cast this;

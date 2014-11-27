@@ -1,6 +1,6 @@
-package;
+package net.rezmason.polyform;
 
-import Step.*;
+import net.rezmason.polyform.Step.*;
 
 abstract Polyform(String) {
     
@@ -10,20 +10,35 @@ abstract Polyform(String) {
     public inline static function nihiloform() return new Polyform('');
     public inline function length() return this.length;
     public inline function perimeter() return this.length;
-
-    public inline static function sortFunction(p1:Polyform, p2:Polyform) {
-        return (p1.toString() < p2.toString()) ? -1 : (p1.toString() == p2.toString()) ? 0 : 1;
-    }
+    public inline static function sortFunction(p1:Polyform, p2:Polyform) return (p1 < p2) ? -1 : (p1 == p2) ? 0 : 1;
+    @:op(A < B) public function isLowerThan(rhs):Bool return toString() < rhs.toString();
+    @:op(A == B) public function isEqualTo(rhs):Bool return toString() == rhs.toString();
+    @:op(A > B) public function isGreaterThan(rhs):Bool return toString() > rhs.toString();
 
     public inline function eachStep() {
         var itr = 0;
         return { hasNext:function() return itr < length(), next:function() return this.charAt(itr++) };
     }
 
-    public inline function reflect(neat = true) {
+    inline function min() {
+        var mirror = reflect().minRot();
+        var self = minRot();
+        return mirror < self ? mirror : self;
+    }
+
+    inline function minRot() {
+        var lowestString = this;
+        for (ike in 1...length()) {
+            var candidate = this.substr(length() - ike) + this;
+            if (candidate < lowestString) lowestString = candidate;
+        }
+        return new Polyform(lowestString.substr(0, length()));
+    }
+
+    public inline function reflect() {
         var str = '';
         for (step in eachStep()) str = step + str;
-        return new Polyform(neat ? minRot(str) : str);
+        return new Polyform(str);
     }
 
     public inline function rotate(amount) {
@@ -37,16 +52,14 @@ abstract Polyform(String) {
         return new Polyform(this.substr(cut) + this.substr(0, cut));
     }
 
-    public inline function numReflections() return reflect() == this ? 1 : 2;
+    public inline function numReflections() return reflect().minRot() == this ? 1 : 2;
 
     public inline function numRotations() {
         return
-            if (this.substr(this.length >> 2) + this.substr(0, this.length >> 2) == this) 1
-            else if (this.substr(this.length >> 1) + this.substr(0, this.length >> 1) == this) 2
-            else 4;
+            if      (this.substr(Std.int(this.length / 4)) + this.substr(0, Std.int(this.length / 4)) == this) 1
+            else if (this.substr(Std.int(this.length / 2)) + this.substr(0, Std.int(this.length / 2)) == this) 2
+            else    4;
     }
-
-    public inline function numTransforms() return numReflections() * numRotations();
 
     public inline function expand(rules:Map<String, String>) {
         var expansions = new Map();
@@ -67,8 +80,10 @@ abstract Polyform(String) {
                     if (matched) {
                         var overrun = ike + pLen - len;
                         if (overrun < 0) overrun = 0;
-                        var string = minRot(this.substr(overrun, ike - overrun) + rep + this.substr(ike + pLen - overrun));
-                        expansions[string] = new Polyform(string);
+                        var start = this.substr(overrun, ike - overrun);
+                        var end = this.substr(pLen + ike - overrun);
+                        var expansion = new Polyform('$start$rep$end').min();
+                        expansions[expansion] = expansion;
                     }
                 }
             }
@@ -97,14 +112,5 @@ abstract Polyform(String) {
         var val = 0;
         for (step in eachStep()) val += (step == R) ? 1 : (step == L) ? -1 : 0;
         return val;
-    }
-
-    inline function minRot(str:String) {
-        var lowestString = str;
-        for (ike in 1...str.length) {
-            var candidate = str.substr(str.length - ike) + str;
-            if (candidate < lowestString) lowestString = candidate;
-        }
-        return lowestString.substr(0, str.length);
     }
 }
