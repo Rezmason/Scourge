@@ -31,6 +31,7 @@ class TestBody extends Body {
     public function new(num:Int = 2400):Void {
 
         super();
+        interactionSignal.add(receiveInteraction);
 
         time = 0;
 
@@ -87,9 +88,7 @@ class TestBody extends Body {
 
     override public function resize(stageWidth:Int, stageHeight:Int):Void {
         super.resize(stageWidth, stageHeight);
-
-        var glyphWidth:Float = camera.rectScale * 0.015;
-        setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
+        glyphScale = camera.rectScale * 0.015;
     }
 
     override public function update(delta:Float):Void {
@@ -117,7 +116,7 @@ class TestBody extends Body {
         super.update(delta);
     }
 
-    override public function receiveInteraction(id:Int, interaction:Interaction):Void {
+    function receiveInteraction(id:Int, interaction:Interaction):Void {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {

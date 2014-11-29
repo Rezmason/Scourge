@@ -41,16 +41,13 @@ class GlyphBody extends Body {
         mouseIsDown = false;
 
         super();
+        interactionSignal.add(receiveInteraction);
+        glyphScale = 0.4;
         growTo(1);
 
         glyphs[0].set_font(glyphTexture.font);
         glyphs[0].set_char(Utf8.charCodeAt(CHARS, currentCharIndex));
         glyphs[0].set_color(COLORS[currentColor]);
-    }
-
-    override public function resize(stageWidth:Int, stageHeight:Int):Void {
-        super.resize(stageWidth, stageHeight);
-        setGlyphScale(0.4, 0.4 * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
     }
 
     override public function update(delta:Float):Void {
@@ -76,7 +73,7 @@ class GlyphBody extends Body {
         super.update(delta);
     }
 
-    override public function receiveInteraction(id:Int, interaction:Interaction):Void {
+    function receiveInteraction(id:Int, interaction:Interaction):Void {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {

@@ -268,7 +268,7 @@ class Engine {
             case _:
         }
 
-        if (target != null) target.receiveInteraction(glyphID, interaction);
+        if (target != null) target.interactionSignal.dispatch(glyphID, interaction);
     }
 
     inline function readyCheck():Void if (!ready) throw "Engine hasn't initialized yet.";

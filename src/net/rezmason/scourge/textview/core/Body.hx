@@ -16,10 +16,12 @@ class Body {
     public var id(default, null):Int;
     public var transform(default, null):Matrix3D;
     public var camera(default, null):Camera;
-    public var glyphTransform:Matrix3D;
+    public var glyphTransform(default, null):Matrix3D;
+    public var glyphScale(default, set):Float;
     public var numGlyphs(default, null):Int;
     public var glyphTexture(default, null):GlyphTexture;
     public var redrawHitSignal(default, null):Zig<Void->Void>;
+    public var interactionSignal(default, null):Zig<Int->Interaction->Void>;
 
     var fontManager:FontManager;
     var trueNumGlyphs:Int;
@@ -29,10 +31,11 @@ class Body {
 
     var glyphs:Array<Glyph>;
 
-    function new():Void {
+    public function new():Void {
         stageWidth = 0;
         stageHeight = 0;
         redrawHitSignal = new Zig();
+        interactionSignal = new Zig();
         id = ++_ids;
         glyphs = [];
         fontManager = new Present(FontManager);
@@ -48,10 +51,10 @@ class Body {
         transform = new Matrix3D();
         camera = new Camera();
         glyphTransform = new Matrix3D();
-        glyphTransform.appendScale(0.0001, 0.0001, 1); // Prevents blowouts
+        glyphScale = 1;
     }
 
-    function growTo(numGlyphs:Int):Void {
+    public function growTo(numGlyphs:Int):Void {
         if (trueNumGlyphs < numGlyphs) {
 
             var oldSegments:Array<BodySegment> = segments;
@@ -107,15 +110,14 @@ class Body {
         this.stageWidth = stageWidth;
         this.stageHeight = stageHeight;
         camera.resize(stageWidth, stageHeight);
+        set_glyphScale(glyphScale);
     }
 
     public function update(delta:Float):Void {
         for (segment in segments) segment.update();
     }
 
-    public function receiveInteraction(id:Int, interaction:Interaction):Void {
-
-    }
+    public inline function getGlyphByID(id:Int):Glyph return glyphs[id];
 
     /*
     inline function spitGlyphs():Void {
@@ -127,9 +129,12 @@ class Body {
     }
     */
 
-    inline function setGlyphScale(sX:Float, sY:Float):Void {
+    inline function set_glyphScale(val:Float):Float {
+        if (Math.isNaN(val)) val = 0;
+        glyphScale = val;
         glyphTransform.identity();
-        glyphTransform.appendScale(sX, sY, 1);
+        glyphTransform.appendScale(val, val * glyphTexture.font.glyphRatio * stageWidth / stageHeight, 1);
+        return glyphScale;
     }
 
     inline function updateGlyphTexture(glyphTexture:GlyphTexture):Void {

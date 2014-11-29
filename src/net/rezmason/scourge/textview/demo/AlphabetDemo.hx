@@ -9,7 +9,7 @@ import net.rezmason.scourge.textview.core.GlyphTexture;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class AlphabetBody extends Body {
+class AlphabetDemo {
 
     inline static var CHARS:String =
         Strings.ALPHANUMERICS +
@@ -18,48 +18,41 @@ class AlphabetBody extends Body {
         Strings.BOX_SYMBOLS +
     '';
 
-    public function new():Void {
+    public var body(default, null):Body;
 
-        super();
+    public function new():Void {
 
         var totalChars:Int = CHARS.length;
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));
         var numCols:Int = Std.int(Math.ceil(totalChars / numRows));
 
-        growTo(totalChars);
+        body = new Body();
+        body.growTo(totalChars);
+        body.glyphScale = 0.025;
+        body.transform.identity();
+        body.transform.appendScale(1, -1, 1);
+        body.interactionSignal.add(receiveInteraction);
 
-        for (ike in 0...numGlyphs) {
+        for (ike in 0...body.numGlyphs) {
 
-            var glyph:Glyph = glyphs[ike];
-
+            var glyph:Glyph = body.getGlyphByID(ike);
             var col:Int = ike % numCols;
             var row:Int = Std.int(ike / numCols);
-
             var x:Float = ((col + 0.5) / numCols - 0.5);
             var y:Float = ((row + 0.5) / numRows    - 0.5);
-
             var charCode:Int = Utf8.charCodeAt(CHARS, ike % CHARS.length);
 
             glyph.set_xyz(x, y, 0);
             glyph.set_rgb(1, 1, 1);
             glyph.set_i(0.1);
-            glyph.set_font(glyphTexture.font);
             glyph.set_char(charCode);
-            glyph.set_paint((glyph.id + 1) | id << 16);
+            glyph.set_paint((glyph.id + 1) | body.id << 16); // necessary?
         }
     }
 
-    override public function resize(stageWidth:Int, stageHeight:Int):Void {
-        super.resize(stageWidth, stageHeight);
-        setGlyphScale(0.025, 0.025 * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
-
-        transform.identity();
-        transform.appendScale(1, -1, 1);
-    }
-
-    override public function receiveInteraction(id:Int, interaction:Interaction):Void {
+    function receiveInteraction(id:Int, interaction:Interaction):Void {
         if (id == 0) return;
-        var glyph:Glyph = glyphs[id - 1];
+        var glyph:Glyph = body.getGlyphByID(id - 1);
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {

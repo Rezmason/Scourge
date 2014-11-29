@@ -33,8 +33,10 @@ class GamePage extends NavPage {
         var boardBody:BoardBody  = new BoardBody();
         var uiBody:UIBody = new UIBody(console);
 
+        var alphabetDemo:AlphabetDemo = new AlphabetDemo();
+
         bodiesByName = new Map();
-        bodiesByName['alphabet'] = new AlphabetBody();
+        bodiesByName['alphabet'] = alphabetDemo.body;
         bodiesByName['sdf']      = new GlyphBody();
         bodiesByName['test']     = new TestBody();
         bodiesByName['board']    = boardBody;

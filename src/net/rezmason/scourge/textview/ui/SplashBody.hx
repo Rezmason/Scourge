@@ -106,8 +106,7 @@ class SplashBody extends Body {
 
     override public function resize(stageWidth:Int, stageHeight:Int):Void {
         super.resize(stageWidth, stageHeight);
-        var glyphWidth:Float = camera.rect.width * 0.015;
-        setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
+        glyphScale = camera.rect.width * 0.015;
     }
 
     override public function update(delta:Float):Void {

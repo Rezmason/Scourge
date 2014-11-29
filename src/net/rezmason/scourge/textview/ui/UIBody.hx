@@ -62,6 +62,7 @@ class UIBody extends Body {
     public function new(uiMediator:UIMediator):Void {
 
         super();
+        interactionSignal.add(receiveInteraction);
         sized = false;
         showScrollBar = false;
         scrollBarVisible = false;
@@ -99,7 +100,7 @@ class UIBody extends Body {
             glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
             glyphWidth = glyphWidthInPixels / stageWidth;
             glyphHeight = glyphHeightInPixels / stageHeight;
-            setGlyphScale(glyphWidth, glyphHeight);
+            glyphScale = glyphWidth;
             recalculateGeometry();
         }
         return worked;
@@ -143,7 +144,7 @@ class UIBody extends Body {
         camera.rect = originalViewRect;
         glyphWidth = glyphWidthInPixels / stageWidth;
         glyphHeight = glyphHeightInPixels / stageHeight;
-        setGlyphScale(glyphWidth, glyphHeight);
+        glyphScale = glyphWidth;
         recalculateGeometry();
     }
 
@@ -152,7 +153,7 @@ class UIBody extends Body {
         glideGoal = Math.round(Math.max(0, Math.min(uiMediator.bottomPos(), pos)));
     }
 
-    override public function receiveInteraction(id:Int, interaction:Interaction):Void {
+    function receiveInteraction(id:Int, interaction:Interaction):Void {
 
         switch (interaction) {
             case MOUSE(type, x, y):

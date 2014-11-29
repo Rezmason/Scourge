@@ -74,6 +74,7 @@ class BoardBody extends Body {
     public function new():Void {
 
         super();
+        interactionSignal.add(receiveInteraction);
 
         dragging = false;
         dragStartTransform = new Matrix3D();
@@ -313,9 +314,7 @@ class BoardBody extends Body {
 
     override public function resize(stageWidth:Int, stageHeight:Int):Void {
         super.resize(stageWidth, stageHeight);
-
-        var glyphWidth:Float = camera.rectScale * 0.05 * boardScale;
-        setGlyphScale(glyphWidth, glyphWidth * glyphTexture.font.glyphRatio * stageWidth / stageHeight);
+        glyphScale = camera.rectScale * 0.05 * boardScale;
     }
 
     override public function update(delta:Float):Void {
@@ -371,7 +370,7 @@ class BoardBody extends Body {
         super.update(delta);
     }
 
-    override public function receiveInteraction(id:Int, interaction:Interaction):Void {
+    function receiveInteraction(id:Int, interaction:Interaction):Void {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {
