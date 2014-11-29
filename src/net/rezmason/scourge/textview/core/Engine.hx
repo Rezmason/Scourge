@@ -11,6 +11,8 @@ import net.rezmason.scourge.textview.core.rendermethods.*;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
+using Lambda;
+
 class Engine {
 
     var active:Bool;
@@ -26,6 +28,7 @@ class Engine {
     var glSys:GLSystem;
     var glFlow:GLFlowControl;
     var bodiesByID:Map<Int, Body>;
+    var scenes:Array<Scene>;
     
     var mouseSystem:MouseSystem;
     var keyboardSystem:KeyboardSystem;
@@ -44,6 +47,7 @@ class Engine {
         height = 1;
         framerate = 1000 / 30;
         bodiesByID = new Map();
+        scenes = [];
     }
 
     public function init():Void {
@@ -58,21 +62,37 @@ class Engine {
 
     public function set_framerate(f:Float):Float return framerate = (f >= 0 ? f : 0);
 
-    public function addBody(body:Body):Void {
+    public function addScene(scene:Scene):Void {
         readyCheck();
-        if (bodiesByID[body.id] == null) {
-            bodiesByID[body.id] = body;
-            body.redrawHitSignal.add(updateMouseSystem);
-            body.resize(width, height);
+        if (!scenes.has(scene)) {
+            scenes.push(scene);
+            scene.redrawHitSignal.add(updateMouseSystem);
+            scene.bodyAddedSignal.add(addBody);
+            scene.bodyRemovedSignal.add(removeBody);
+            for (body in scene.bodies) addBody(body);
+            scene.resize(width, height);
         }
     }
 
-    public function removeBody(body:Body):Void {
+    public function removeScene(scene:Scene):Void {
         readyCheck();
-        if (bodiesByID[body.id] == body) {
-            bodiesByID.remove(body.id);
-            body.redrawHitSignal.remove(updateMouseSystem);
+        if (scenes.has(scene)) {
+            scenes.remove(scene);
+            scene.redrawHitSignal.remove(updateMouseSystem);
+            scene.bodyAddedSignal.remove(addBody);
+            scene.bodyRemovedSignal.remove(removeBody);
+            for (body in scene.bodies) removeBody(body);
         }
+    }
+
+    function addBody(body:Body):Void {
+        readyCheck();
+        bodiesByID[body.id] = body;
+    }
+
+    function removeBody(body:Body):Void {
+        readyCheck();
+        bodiesByID.remove(body.id);
     }
 
     function initInteractionSystems():Void {
@@ -138,14 +158,16 @@ class Engine {
                 glSys.start(outputBuffer);
                 glSys.clear(method.backgroundColor);
 
-                for (body in bodiesByID) {
-                    if (body.numGlyphs == 0) continue;
-                    method.setMatrices(body.camera.transform, body.transform);
-                    method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
+                for (scene in scenes) {
+                    for (body in scene.bodies) {
+                        if (body.numGlyphs == 0) continue;
+                        method.setMatrices(body.camera.transform, body.transform);
+                        method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
 
-                    for (segment in body.segments) {
-                        method.setSegment(segment);
-                        glSys.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+                        for (segment in body.segments) {
+                            method.setSegment(segment);
+                            glSys.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+                        }
                     }
                 }
 

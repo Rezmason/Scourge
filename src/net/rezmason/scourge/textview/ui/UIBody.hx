@@ -223,7 +223,7 @@ class UIBody extends Body {
         if (sized) {
             numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
             numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
-            numTextCols = numCols + (showScrollBar ? -1 : 0);
+            numTextCols = Std.int(Math.max(0, numCols + (showScrollBar ? -1 : 0)));
 
             growTo(numRows * numTextCols + 2 + 1);
 

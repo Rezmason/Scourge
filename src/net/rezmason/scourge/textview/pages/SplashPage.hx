@@ -2,6 +2,7 @@ package net.rezmason.scourge.textview.pages;
 
 import flash.geom.Rectangle;
 import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.core.Scene;
 import net.rezmason.scourge.textview.ui.SplashBody;
 import net.rezmason.scourge.textview.ui.UIBody;
 import net.rezmason.scourge.textview.ui.UIMediator;
@@ -17,6 +18,8 @@ class SplashPage extends NavPage {
     'µ{name:splashButton, up:splashUp, over:splashOver, down:splashDown, period:0.2, i:1}§{}' +
     '¶{name:main, align:center}';
 
+    var splashScene:Scene;
+    var uiScene:Scene;
     var splashBody:SplashBody;
     var uiBody:UIBody;
     var uiMed:UIMediator;
@@ -26,7 +29,9 @@ class SplashPage extends NavPage {
 
         splashBody = new SplashBody();
         splashBody.camera.rect = new Rectangle(0.0, 0.0, 1.0, 0.4);
-        bodies.push(splashBody);
+        splashScene = new Scene();
+        splashScene.addBody(splashBody);
+        scenes.push(splashScene);
 
         uiMed = new UIMediator();
         uiBody = new UIBody(uiMed);
@@ -34,7 +39,9 @@ class SplashPage extends NavPage {
         uiRect.inflate(-0.02, -0.02);
         uiBody.camera.rect = uiRect;
         uiBody.setFontSize(28);
-        bodies.push(uiBody);
+        uiScene = new Scene();
+        uiScene.addBody(uiBody);
+        scenes.push(uiScene);
 
         var buttons:Array<String> = [
             makeButton('BEGIN', playGame),

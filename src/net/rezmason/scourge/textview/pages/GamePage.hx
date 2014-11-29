@@ -6,6 +6,7 @@ import net.rezmason.scourge.textview.board.BoardBody;
 import net.rezmason.scourge.textview.commands.*;
 import net.rezmason.scourge.textview.console.*;
 import net.rezmason.scourge.textview.core.Body;
+import net.rezmason.scourge.textview.core.Scene;
 import net.rezmason.scourge.textview.demo.*;
 import net.rezmason.scourge.textview.ui.UIBody;
 import net.rezmason.utils.Zig;
@@ -16,9 +17,16 @@ class GamePage extends NavPage {
     var bodiesByName:Map<String, Body>;
     var currentBodyName:String;
     var console:ConsoleUIMediator;
+    var mainScene:Scene;
+    var sideScene:Scene;
 
     public function new():Void {
         super();
+
+        mainScene = new Scene();
+        sideScene = new Scene();
+        scenes.push(mainScene);
+        scenes.push(sideScene);
 
         console = new ConsoleUIMediator();
         var interpreter = new Interpreter(console);
@@ -37,7 +45,7 @@ class GamePage extends NavPage {
 
         uiBody.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
         uiBody.showScrollBar = true;
-        bodies.push(uiBody);
+        sideScene.addBody(uiBody);
         gameSystem = new GameSystem(boardBody, console); // Doesn't really belong in here
 
         interpreter.addCommand(new RunTestsConsoleCommand());
@@ -71,9 +79,9 @@ class GamePage extends NavPage {
     function hasBodyByName(name:String):Bool return bodiesByName[name] != null;
 
     function showBodyByName(name:String):Void {
-        if (currentBodyName != null) bodies.remove(bodiesByName[currentBodyName]);
+        if (currentBodyName != null) mainScene.removeBody(bodiesByName[currentBodyName]);
         currentBodyName = name;
-        bodies.push(bodiesByName[currentBodyName]);
+        mainScene.addBody(bodiesByName[currentBodyName]);
         updateViewSignal.dispatch();
     }
 }

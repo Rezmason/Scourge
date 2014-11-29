@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview;
 
-import net.rezmason.scourge.textview.core.Body;
+import net.rezmason.scourge.textview.core.Scene;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.utils.Zig;
 
@@ -9,7 +9,7 @@ class NavSystem {
     var pages:Map<String, NavPage>;
     var pageHistory:Array<NavPage>;
     var currentPage:NavPage;
-    var currentBodies:Array<Body>;
+    var currentScenes:Array<Scene>;
     var engine:Engine;
 
     public function new(engine:Engine):Void {
@@ -62,12 +62,12 @@ class NavSystem {
     }
 
     private function updateCurrentView():Void {
-        if (currentBodies != null) for (body in currentBodies) engine.removeBody(body);
+        if (currentScenes != null) for (scene in currentScenes) engine.removeScene(scene);
         if (currentPage != null) {
-            currentBodies = currentPage.bodies.copy();
-            for (body in currentBodies) engine.addBody(body);
+            currentScenes = currentPage.scenes.copy();
+            for (scene in currentScenes) engine.addScene(scene);
         } else {
-            currentBodies = null;
+            currentScenes = null;
         }
     }
 }
