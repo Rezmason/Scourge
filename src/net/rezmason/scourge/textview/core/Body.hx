@@ -33,7 +33,7 @@ class Body {
     function new():Void {
         stageWidth = 0;
         stageHeight = 0;
-        redrawHitSignal = new Zig<Void->Void>();
+        redrawHitSignal = new Zig();
         id = ++_ids;
         catchMouseInRect = true;
         glyphs = [];

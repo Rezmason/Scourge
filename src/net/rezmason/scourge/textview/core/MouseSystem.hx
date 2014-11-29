@@ -56,7 +56,7 @@ class MouseSystem {
         interact = new Zig();
         stage = new Present(Stage);
         glSys = new Present(GLSystem);
-        updateSignal = new Zig<Void->Void>();
+        updateSignal = new Zig();
         rectRegionsByID = null;
         lastRectRegionID = null;
 

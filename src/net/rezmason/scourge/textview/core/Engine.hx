@@ -37,7 +37,7 @@ class Engine {
         this.glFlow = glFlow;
         active = false;
         ready = false;
-        readySignal = new Zig<Void->Void>();
+        readySignal = new Zig();
         glSys = new Present(GLSystem);
         
         width = 1;

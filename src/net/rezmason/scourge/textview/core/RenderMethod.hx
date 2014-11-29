@@ -25,7 +25,7 @@ class RenderMethod {
     var fragShader:String;
 
     function new():Void {
-        loadedSignal = new Zig<Void->Void>();
+        loadedSignal = new Zig();
         glyphMag = 1;
         backgroundColor = 0x0;
         glyphMat = new Matrix3D();
