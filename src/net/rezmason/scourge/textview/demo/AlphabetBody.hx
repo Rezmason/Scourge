@@ -43,8 +43,9 @@ class AlphabetBody extends Body {
             glyph.set_xyz(x, y, 0);
             glyph.set_rgb(1, 1, 1);
             glyph.set_i(0.1);
-            glyph.set_char(charCode, glyphTexture.font);
-            glyph.set_paint(glyph.id | id << 16);
+            glyph.set_font(glyphTexture.font);
+            glyph.set_char(charCode);
+            glyph.set_paint((glyph.id + 1) | id << 16);
         }
     }
 
@@ -57,7 +58,8 @@ class AlphabetBody extends Body {
     }
 
     override public function receiveInteraction(id:Int, interaction:Interaction):Void {
-        var glyph:Glyph = glyphs[id];
+        if (id == 0) return;
+        var glyph:Glyph = glyphs[id - 1];
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {

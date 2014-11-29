@@ -145,9 +145,9 @@ class BoardBody extends Body {
             view.topGlyph.set_xyz(pos.x, pos.y, pos.z + TOP_OFFSET);
             view.uiGlyph.set_xyz(pos.x, pos.y, pos.z + UI_OFFSET);
 
-            view.bottomGlyph.set_char(BOARD_CODE, glyphTexture.font);
-            view.topGlyph.set_char(BODY_CODE, glyphTexture.font);
-            view.uiGlyph.set_char(UI_CODE, glyphTexture.font);
+            view.bottomGlyph.set_char(BOARD_CODE);
+            view.topGlyph.set_char(BODY_CODE);
+            view.uiGlyph.set_char(UI_CODE);
             view.uiGlyph.set_color(ColorPalette.UI_COLOR);
             view.uiGlyph.set_s(0);
         }
@@ -372,7 +372,6 @@ class BoardBody extends Body {
     }
 
     override public function receiveInteraction(id:Int, interaction:Interaction):Void {
-        var glyph:Glyph = glyphs[id];
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {
@@ -550,7 +549,7 @@ class BoardBody extends Body {
         var char:Int = frac < 0.5 ? from.char : to.char;
         if (glyph.get_char() != char) {
             glyph.set_h(to.stretch);
-            glyph.set_char(char, glyphTexture.font);
+            glyph.set_char(char);
         }
     }
 

@@ -107,9 +107,22 @@ class GlyphUtils {
 
     // Character
 
+    public inline static function get_font(gl:Glyph) return gl.font;
+
+    public inline static function set_font(gl:Glyph, font:FlatFont) {
+        if (gl.font != font) {
+            gl.font = font;
+            if (gl.charCode != -1) {
+                var char = gl.charCode;
+                gl.charCode = -1;
+                set_char(gl, char);
+            }
+        }
+    }
+
     public inline static function get_char(gl:Glyph) return gl.charCode;
 
-    public inline static function set_char(gl:Glyph, code:Int, font:FlatFont, crop:Float = 0) {
+    public inline static function set_char(gl:Glyph, code:Int) {
         if (get_char(gl) != code) {
 
             var glyphOffset:Int = gl.id * COLOR_FLOATS_PER_GLYPH;
@@ -119,17 +132,22 @@ class GlyphUtils {
                 pop4(gl.color, glyphOffset, V_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
                 gl.charCode = -1;
             } else {
-                var charUVs:Array<UV> = font.getCharCodeUVs(code, crop);
+                if (gl.font != null) {
+                    var charUVs:Array<UV> = gl.font.getCharCodeUVs(code);
 
-                pop1(gl.color, glyphOffset, U_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[3].u);
-                pop1(gl.color, glyphOffset, U_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[0].u);
-                pop1(gl.color, glyphOffset, U_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[1].u);
-                pop1(gl.color, glyphOffset, U_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[2].u);
+                    pop1(gl.color, glyphOffset, U_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[3].u);
+                    pop1(gl.color, glyphOffset, U_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[0].u);
+                    pop1(gl.color, glyphOffset, U_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[1].u);
+                    pop1(gl.color, glyphOffset, U_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[2].u);
 
-                pop1(gl.color, glyphOffset, V_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[3].v);
-                pop1(gl.color, glyphOffset, V_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[0].v);
-                pop1(gl.color, glyphOffset, V_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[1].v);
-                pop1(gl.color, glyphOffset, V_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[2].v);
+                    pop1(gl.color, glyphOffset, V_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[3].v);
+                    pop1(gl.color, glyphOffset, V_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[0].v);
+                    pop1(gl.color, glyphOffset, V_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[1].v);
+                    pop1(gl.color, glyphOffset, V_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[2].v);
+                } else {
+                    pop4(gl.color, glyphOffset, U_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
+                    pop4(gl.color, glyphOffset, V_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
+                }
                 gl.charCode = code;
             }
         }
@@ -179,7 +197,8 @@ class GlyphUtils {
         set_xyz(gl, 0, 0, 0);
         set_rgb(gl, 1, 1, 1);
         set_fx(gl, 0, 0.5, 0);
-        set_char(gl, -1, null);
+        // We don't reset the font.
+        set_char(gl, -1);
     }
 
     public inline static function toString(gl:Glyph):String return String.fromCharCode(gl.charCode);

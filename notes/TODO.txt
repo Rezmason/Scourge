@@ -1,5 +1,7 @@
 Break down Body
 
+    Most things that extend Body should be their own classes, that use a Body
+    
     Scene
         Camera
     Engine iterates over scenes
@@ -8,7 +10,6 @@ Break down Body
     Allow bodies to have parent-child relationships
         Replace Scene::children with Scene::root
 
-    Most things that extend Body should be their own classes, that use a Body
 
 Break down BoardBody
 

@@ -85,7 +85,8 @@ class SplashBody extends Body {
                     glyph.set_xyz(x, y, z);
                     glyph.set_color(color);
                     glyph.set_i(0);
-                    glyph.set_char(charCode, glyphTexture.font);
+                    glyph.set_font(glyphTexture.font);
+                    glyph.set_char(charCode);
                     glyph.set_paint(glyph.id | id << 16);
 
                     z += 0.01;

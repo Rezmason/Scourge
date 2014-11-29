@@ -254,7 +254,7 @@ class UIBody extends Body {
             updateScroller();
 
             uiMediator.adjustLayout(numRows, numTextCols);
-            uiMediator.styleCaret(caretGlyph, glyphTexture.font);
+            uiMediator.styleCaret(caretGlyph);
         }
     }
 
@@ -298,7 +298,7 @@ class UIBody extends Body {
     inline function setScrollPos(pos:Float):Void {
         currentScrollPos = pos;
         var scrollStartIndex:Int = Std.int(currentScrollPos);
-        caretGlyphID = uiMediator.stylePage(scrollStartIndex, glyphs, caretGlyph, glyphTexture.font);
+        caretGlyphID = uiMediator.stylePage(scrollStartIndex, glyphs, caretGlyph);
         findAndPositionCaret();
         taperScrollEdges();
         scrollY = (currentScrollPos - scrollStartIndex) / (numRows - 1);

@@ -6,7 +6,6 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.text.*;
 import net.rezmason.scourge.textview.ui.UIMediator;
-import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.Utf8Utils.*;
 import net.rezmason.utils.Zig;
 
@@ -57,10 +56,10 @@ class ConsoleUIMediator extends UIMediator {
 
     public inline function loadStyles(dec:String):Void compositeDoc.loadStyles(dec);
 
-    override public function styleCaret(caretGlyph:Glyph, font:FlatFont):Void {
+    override public function styleCaret(caretGlyph:Glyph):Void {
         caretSpan.removeAllGlyphs();
         caretSpan.addGlyph(caretGlyph);
-        caretGlyph.set_char(caretCharCode, font);
+        caretGlyph.set_char(caretCharCode);
     }
 
     override function combineDocs():Void {

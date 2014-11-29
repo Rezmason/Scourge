@@ -10,7 +10,6 @@ import net.rezmason.scourge.textview.text.ParagraphAlign;
 import net.rezmason.scourge.textview.text.Sigil.*;
 import net.rezmason.utils.Utf8Utils.*;
 import net.rezmason.utils.Zig;
-import net.rezmason.utils.display.FlatFont;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -50,13 +49,13 @@ class UIMediator {
         this.isDirty = true;
     }
 
-    public function stylePage(startIndex:Int, glyphs:Array<Glyph>, caretGlyph:Glyph, font:FlatFont):Int {
+    public function stylePage(startIndex:Int, glyphs:Array<Glyph>, caretGlyph:Glyph):Int {
         var id:Int = 0;
         var pageSegment:Array<String> = page.slice(startIndex, startIndex + numRows);
         var spanIndex:Int = lineStyleIndices[startIndex];
 
         compositeDoc.removeAllGlyphs();
-        styleCaret(caretGlyph, font);
+        styleCaret(caretGlyph);
 
         var currentSpan:Span = compositeDoc.getSpanByIndex(spanIndex);
 
@@ -78,7 +77,7 @@ class UIMediator {
                     case _:
                         var glyph:Glyph = glyphs[id];
                         if (charCode == Strings.HARD_SPACE_CODE) charCode = Strings.SPACE_CODE;
-                        glyph.set_char(charCode, font);
+                        glyph.set_char(charCode);
                         currentSpan.addGlyph(glyph);
                         glyph.set_z(0);
                         id++;
@@ -136,7 +135,7 @@ class UIMediator {
         isDirty = true;
     }
 
-    public function styleCaret(caretGlyph:Glyph, font:FlatFont):Void {}
+    public function styleCaret(caretGlyph:Glyph):Void {}
 
     function combineDocs():Void {
         compositeDoc.setText(swapTabsWithSpaces(mainText));

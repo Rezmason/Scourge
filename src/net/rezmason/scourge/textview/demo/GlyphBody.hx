@@ -43,7 +43,8 @@ class GlyphBody extends Body {
         super();
         growTo(1);
 
-        glyphs[0].set_char(Utf8.charCodeAt(CHARS, currentCharIndex), glyphTexture.font);
+        glyphs[0].set_font(glyphTexture.font);
+        glyphs[0].set_char(Utf8.charCodeAt(CHARS, currentCharIndex));
         glyphs[0].set_color(COLORS[currentColor]);
     }
 
@@ -60,7 +61,7 @@ class GlyphBody extends Body {
             currentPhase = (currentPhase + 1) % NUM_PHASES;
             if (currentPhase == 0) {
                 currentCharIndex = (currentCharIndex + 1) % Utf8.length(CHARS);
-                glyphs[0].set_char(Utf8.charCodeAt(CHARS, currentCharIndex), glyphTexture.font);
+                glyphs[0].set_char(Utf8.charCodeAt(CHARS, currentCharIndex));
                 currentColor = (currentColor + 1) % COLORS.length;
             }
         }

@@ -74,7 +74,8 @@ class TestBody extends Body {
             glyph.set_xyz(x, y, z);
             glyph.set_rgb(r, g, b);
             glyph.set_a(1);
-            glyph.set_char(charCode, glyphTexture.font);
+            glyph.set_font(glyphTexture.font);
+            glyph.set_char(charCode);
             glyph.set_paint(glyph.id | id << 16);
 
             _z -= dZ;
@@ -117,7 +118,6 @@ class TestBody extends Body {
     }
 
     override public function receiveInteraction(id:Int, interaction:Interaction):Void {
-        var glyph:Glyph = glyphs[id];
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {
@@ -162,7 +162,7 @@ class TestBody extends Body {
     }
 
     inline function setGlobalChar(charCode:Int):Void {
-        for (glyph in glyphs) glyph.set_char(charCode, glyphTexture.font);
+        for (glyph in glyphs) glyph.set_char(charCode);
     }
 
 }

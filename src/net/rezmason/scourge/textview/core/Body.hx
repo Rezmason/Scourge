@@ -27,7 +27,7 @@ class Body {
     var stageWidth:Int;
     var stageHeight:Int;
 
-    public var glyphs:Array<Glyph>;
+    var glyphs:Array<Glyph>;
 
     function new():Void {
         stageWidth = 0;
@@ -97,7 +97,10 @@ class Body {
         this.numGlyphs = numGlyphs;
 
         for (ike in numGlyphs...trueNumGlyphs) glyphs[ike].reset();
-        for (glyph in glyphs) glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id << 16);
+        for (glyph in glyphs) {
+            glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id << 16);
+            glyph.set_font(glyphTexture.font);
+        }
     }
 
     public function resize(stageWidth:Int, stageHeight:Int):Void {
@@ -132,7 +135,7 @@ class Body {
     inline function updateGlyphTexture(glyphTexture:GlyphTexture):Void {
         if (this.glyphTexture != glyphTexture) {
             this.glyphTexture = glyphTexture;
-            for (glyph in glyphs) glyph.set_char(glyph.get_char(), glyphTexture.font);
+            for (glyph in glyphs) glyph.set_font(glyphTexture.font);
         }
     }
 }

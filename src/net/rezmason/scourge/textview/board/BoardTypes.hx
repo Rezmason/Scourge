@@ -2,7 +2,6 @@ package net.rezmason.scourge.textview.board;
 
 import net.rezmason.scourge.textview.board.BoardEffects;
 import net.rezmason.scourge.textview.core.Glyph;
-import net.rezmason.utils.display.FlatFont;
 
 typedef NodeTween = {
     var from:NodeProps;
