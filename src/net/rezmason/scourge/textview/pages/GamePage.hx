@@ -82,6 +82,7 @@ class GamePage extends NavPage {
         if (currentBodyName != null) mainScene.removeBody(bodiesByName[currentBodyName]);
         currentBodyName = name;
         mainScene.addBody(bodiesByName[currentBodyName]);
+        mainScene.focus = bodiesByName[currentBodyName];
         updateViewSignal.dispatch();
     }
 }

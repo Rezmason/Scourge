@@ -95,6 +95,10 @@ class Engine {
         bodiesByID.remove(body.id);
     }
 
+    function updateSceneFocus(scene:Scene, body:Body):Void {
+
+    }
+
     function initInteractionSystems():Void {
         mouseSystem = new MouseSystem();
         mouseSystem.updateSignal.add(renderMouse);
@@ -233,7 +237,7 @@ class Engine {
 
     function updateMouseSystem():Void {
         var rectsByBodyID:Map<Int, Rectangle> = new Map();
-        for (body in bodiesByID) if (body.catchMouseInRect) rectsByBodyID[body.id] = body.camera.rect;
+        for (scene in scenes) if (scene.focus != null) rectsByBodyID[scene.focus.id] = scene.focus.camera.rect;
         mouseSystem.setRectRegions(rectsByBodyID);
         mouseSystem.invalidate();
     }

@@ -1,15 +1,9 @@
 Break down Body
 
     Scene
-        Children
-            addBody
-            removeBody
-        Resize signal
         Camera
     Engine iterates over scenes
-        Sets camera
-        Iterates over bodies to draw
-    NavPages are scenes with bodies in them
+        Grabs camera from there
 
     Allow bodies to have parent-child relationships
         Replace Scene::children with Scene::root

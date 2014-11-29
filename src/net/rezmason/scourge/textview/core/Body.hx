@@ -19,7 +19,6 @@ class Body {
     public var glyphTransform:Matrix3D;
     public var numGlyphs(default, null):Int;
     public var glyphTexture(default, null):GlyphTexture;
-    public var catchMouseInRect(default, null):Bool;
     public var redrawHitSignal(default, null):Zig<Void->Void>;
 
     var fontManager:FontManager;
@@ -35,7 +34,6 @@ class Body {
         stageHeight = 0;
         redrawHitSignal = new Zig();
         id = ++_ids;
-        catchMouseInRect = true;
         glyphs = [];
         fontManager = new Present(FontManager);
         fontManager.onFontChange.add(updateGlyphTexture);

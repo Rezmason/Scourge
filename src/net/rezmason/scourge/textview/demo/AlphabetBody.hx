@@ -28,8 +28,6 @@ class AlphabetBody extends Body {
 
         growTo(totalChars);
 
-        catchMouseInRect = false;
-
         for (ike in 0...numGlyphs) {
 
             var glyph:Glyph = glyphs[ike];
