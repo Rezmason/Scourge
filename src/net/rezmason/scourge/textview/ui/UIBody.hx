@@ -97,10 +97,6 @@ class UIBody extends Body {
             worked = true;
             glyphHeightInPoints = size;
             glyphHeightInPixels = glyphHeightInPoints * getScreenDPI() / NATIVE_DPI;
-            glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
-            glyphWidth = glyphWidthInPixels / stageWidth;
-            glyphHeight = glyphHeightInPixels / stageHeight;
-            glyphScale = glyphWidth;
             recalculateGeometry();
         }
         return worked;
@@ -111,7 +107,6 @@ class UIBody extends Body {
         if (tex != null) {
             worked = true;
             glyphTexture = tex;
-            glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
             recalculateGeometry();
         }
         return worked;
@@ -142,9 +137,6 @@ class UIBody extends Body {
         viewPixelHeight = camera.rect.height * stageHeight;
         viewPixelWidth  = camera.rect.width  * stageWidth;
         camera.rect = originalViewRect;
-        glyphWidth = glyphWidthInPixels / stageWidth;
-        glyphHeight = glyphHeightInPixels / stageHeight;
-        glyphScale = glyphWidth;
         recalculateGeometry();
     }
 
@@ -221,42 +213,47 @@ class UIBody extends Body {
     }
 
     function recalculateGeometry():Void {
-        if (sized) {
-            numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
-            numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
-            numTextCols = Std.int(Math.max(0, numCols + (showScrollBar ? -1 : 0)));
+        if (stageWidth == 0 || stageHeight == 0) return;
 
-            growTo(numRows * numTextCols + 2 + 1);
+        glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
+        glyphWidth = glyphWidthInPixels / stageWidth;
+        glyphHeight = glyphHeightInPixels / stageHeight;
+        glyphScale = glyphWidth;
 
-            for (ike in numRows * numTextCols...numGlyphs) glyphs[ike].reset();
+        numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
+        numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
+        numTextCols = Std.int(Math.max(0, numCols + (showScrollBar ? -1 : 0)));
 
-            caretGlyph = glyphs[numGlyphs - 1];
+        growTo(numRows * numTextCols + 2 + 1);
 
-            if (showScrollBar) {
-                scrollerTrackGlyph = glyphs[numRows * numTextCols];
-                scrollerThumbGlyph = glyphs[numRows * numTextCols + 1];
+        for (ike in numRows * numTextCols...numGlyphs) glyphs[ike].reset();
 
-                scrollerTrackGlyph.set_rgb(1, 1, 1);
-                scrollerTrackGlyph.set_i(0.1);
-                scrollerTrackGlyph.set_paint(bodyPaint);
-                scrollerTrackGlyph.set_s(numRows);
-                scrollerTrackGlyph.set_h(0.95 / numRows);
+        caretGlyph = glyphs[numGlyphs - 1];
 
-                scrollerThumbGlyph.set_rgb(1, 1, 1);
-                scrollerThumbGlyph.set_i(1);
-                scrollerThumbGlyph.set_paint(bodyPaint);
-            } else {
-                scrollerTrackGlyph = null;
-                scrollerThumbGlyph = null;
-            }
+        if (showScrollBar) {
+            scrollerTrackGlyph = glyphs[numRows * numTextCols];
+            scrollerThumbGlyph = glyphs[numRows * numTextCols + 1];
 
-            lastRedrawPos = Math.NaN;
-            reorderGlyphs();
-            updateScroller();
+            scrollerTrackGlyph.set_rgb(1, 1, 1);
+            scrollerTrackGlyph.set_i(0.1);
+            scrollerTrackGlyph.set_paint(bodyPaint);
+            scrollerTrackGlyph.set_s(numRows);
+            scrollerTrackGlyph.set_h(0.95 / numRows);
 
-            uiMediator.adjustLayout(numRows, numTextCols);
-            uiMediator.styleCaret(caretGlyph);
+            scrollerThumbGlyph.set_rgb(1, 1, 1);
+            scrollerThumbGlyph.set_i(1);
+            scrollerThumbGlyph.set_paint(bodyPaint);
+        } else {
+            scrollerTrackGlyph = null;
+            scrollerThumbGlyph = null;
         }
+
+        lastRedrawPos = Math.NaN;
+        reorderGlyphs();
+        updateScroller();
+
+        uiMediator.adjustLayout(numRows, numTextCols);
+        uiMediator.styleCaret(caretGlyph);
     }
 
     inline function reorderGlyphs():Void {

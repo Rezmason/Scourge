@@ -4,25 +4,25 @@ import net.rezmason.scourge.textview.console.ConsoleCommand;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
+import net.rezmason.scourge.textview.core.FontManager;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.ui.UIBody;
-
-using net.rezmason.utils.ArrayUtils;
+import net.rezmason.utils.santa.Present;
 
 class SetFontConsoleCommand extends ConsoleCommand {
 
     var uiBody:UIBody;
-    var fontTextures:Map<String, GlyphTexture>;
+    var fontManager:FontManager;
 
-    public function new(uiBody:UIBody, fontTextures:Map<String, GlyphTexture> = null):Void {
+    public function new(uiBody:UIBody):Void {
         super();
         name = 'setFont';
 
-        if (fontTextures != null) keys['fontName'] = ALPHANUMERICS;
+        keys['fontName'] = ALPHANUMERICS;
         keys['size'] = INTEGERS;
 
         this.uiBody = uiBody;
-        this.fontTextures = fontTextures;
+        fontManager = new Present(FontManager);
     }
 
     override public function hint(args:ConsoleCommandArgs):Void {
@@ -37,10 +37,10 @@ class SetFontConsoleCommand extends ConsoleCommand {
                 if (size > 72) message = 'Size is too large.';
             }
         } 
-        else if (fontTextures != null && args.pendingKey == 'fontName') {
+        else if (args.pendingKey == 'fontName') {
             var val:String = args.pendingValue;
             if (val == null) val = '';
-            hints = fontTextures.keys().intoArray().filter(startsWith.bind(_, val)).map(argToHint.bind(_, Value));
+            hints = fontManager.fontNames().filter(startsWith.bind(_, val)).map(argToHint.bind(_, Value));
             if (hints.length == 0) message = styleError('No matches found.');
         }
 
@@ -61,14 +61,10 @@ class SetFontConsoleCommand extends ConsoleCommand {
 
         message = null;
 
-        if (fontTextures != null) {
-            var fontName:String = args.keyValuePairs['fontName'];
-            if (fontName != null) {
-                var fontWorked:Bool = uiBody.setFontTexture(fontTextures[fontName]);
-                if (fontWorked) message = 'Font set to $fontName.';
-                else message = styleError('Invalid font name: $fontName.');
-                outputSignal.dispatch(message, false);
-            }
+        var fontName:String = args.keyValuePairs['fontName'];
+        if (fontName != null) {
+            uiBody.setFontTexture(fontManager.getFontByName(fontName));
+            outputSignal.dispatch('Font set to $fontName.', false);
         }
 
         outputSignal.dispatch(null, true);

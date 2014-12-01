@@ -23,6 +23,8 @@ class FontManager {
 
     }
 
+    public function fontNames():Array<String> return [for (fontTexture in fontTextures) fontTexture.name];
+
     public function getFontByName(name:String):GlyphTexture return fontTextures[name];
 
     public function set_defaultFont(font:GlyphTexture):GlyphTexture {
