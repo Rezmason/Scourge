@@ -12,12 +12,14 @@ import net.rezmason.scourge.textview.core.GlyphTexture;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class TestBody extends Body {
+class EyeCandyDemo {
 
     inline static var COLOR_RANGE:Int = 6;
     inline static var CHARS:String =
         Strings.ALPHANUMERICS +
     '';
+
+    public var body(default, null):Body;
 
     var time:Float;
 
@@ -30,8 +32,10 @@ class TestBody extends Body {
 
     public function new(num:Int = 2400):Void {
 
-        super();
-        interactionSignal.add(receiveInteraction);
+        body = new Body();
+        body.interactionSignal.add(receiveInteraction);
+        body.updateSignal.add(update);
+        body.glyphScale = 0.007;
 
         time = 0;
 
@@ -42,21 +46,20 @@ class TestBody extends Body {
         rawTransform.appendRotation(315, Vector3D.Z_AXIS);
         setBackTransform = rawTransform.clone();
         setBackTransform.appendTranslation(0, 0, 0.5);
-        transform.copyFrom(setBackTransform);
+        body.transform.copyFrom(setBackTransform);
 
         setSize(num); // 40000, 240
     }
 
     inline function setSize(num:Int):Void {
-        growTo(num);
+        body.growTo(num);
 
         var dTheta:Float = Math.PI * (3 - Math.sqrt(5));
-        var dZ:Float = 2 / (this.numGlyphs + 1);
+        var dZ:Float = 2 / (body.numGlyphs + 1);
         var theta:Float = 0;
         var _z:Float = 1 - dZ / 2;
 
-        for (glyph in glyphs) {
-
+        for (glyph in body.eachGlyph()) {
             var charCode:Int = CHARS.charCodeAt(glyph.id % CHARS.length);
 
             var rad:Float = Math.sqrt(1 - _z * _z);
@@ -75,9 +78,8 @@ class TestBody extends Body {
             glyph.set_xyz(x, y, z);
             glyph.set_rgb(r, g, b);
             glyph.set_a(1);
-            glyph.set_font(glyphTexture.font);
             glyph.set_char(charCode);
-            glyph.set_paint(glyph.id | id << 16);
+            glyph.set_paint(glyph.id | body.id << 16);
 
             _z -= dZ;
             theta += dTheta;
@@ -86,34 +88,18 @@ class TestBody extends Body {
 
     inline function ramp(num:Float):Float return (2 - num) * num;
 
-    override public function resize(stageWidth:Int, stageHeight:Int):Void {
-        super.resize(stageWidth, stageHeight);
-        glyphScale = camera.rectScale * 0.015;
-    }
-
-    override public function update(delta:Float):Void {
+    public function update(delta:Float):Void {
         time += delta;
 
-        transform.identity();
-        transform.appendRotation(time * 30, Vector3D.Z_AXIS);
-        transform.append(setBackTransform);
+        body.transform.identity();
+        body.transform.appendRotation(time * 30, Vector3D.Z_AXIS);
+        body.transform.append(setBackTransform);
 
-        for (ike in 0...glyphs.length) {
-            var glyph:Glyph = glyphs[ike];
-
-            var d1:Float = glyph.get_z();
-            var d2:Float = glyph.get_y();
-            var d3:Float = glyph.get_x();
-            var p:Float = Math.cos(time * 4 + d1 * 20) * 0.200 + 0.4;
-            var s:Float = Math.cos(time * 4 + d2 * 30) * 0.200 + 3.0;
-            var f:Float = Math.cos(time * 8 + d3 * 40) * 0.280 + 0.4;
-
-            glyph.set_p(p);
-            glyph.set_s(s);
-            glyph.set_f(f);
+        for (glyph in body.eachGlyph()) {
+            glyph.set_p(Math.cos(time * 4 + glyph.get_x() * 20) * 0.200 + 0.4);
+            glyph.set_s(Math.cos(time * 4 + glyph.get_y() * 30) * 0.200 + 3.0);
+            glyph.set_f(Math.cos(time * 8 + glyph.get_z() * 40) * 0.280 + 0.4);
         }
-
-        super.update(delta);
     }
 
     function receiveInteraction(id:Int, interaction:Interaction):Void {
@@ -129,8 +115,8 @@ class TestBody extends Body {
             case KEYBOARD(type, key, char, shift, alt, ctrl):
                 if (type == KEY_DOWN) {
                     switch (key) {
-                        case Keyboard.LEFT:  setSize(Std.int(numGlyphs * (shift ? 0.666 : 0.9)));
-                        case Keyboard.RIGHT: setSize(Std.int(numGlyphs * (shift ? 1.500 : 1.1)));
+                        case Keyboard.LEFT:  setSize(Std.int(body.numGlyphs * (shift ? 0.666 : 0.9)));
+                        case Keyboard.RIGHT: setSize(Std.int(body.numGlyphs * (shift ? 1.500 : 1.1)));
                         case _: setGlobalChar(cast char);
                     }
                 }
@@ -157,11 +143,11 @@ class TestBody extends Body {
     }
 
     inline function setGlobalColor(r:Float, g:Float, b:Float):Void {
-        for (glyph in glyphs) glyph.set_rgb(r, g, b);
+        for (ike in 0...body.numGlyphs) body.getGlyphByID(ike).set_rgb(r, g, b);
     }
 
     inline function setGlobalChar(charCode:Int):Void {
-        for (glyph in glyphs) glyph.set_char(charCode);
+        for (ike in 0...body.numGlyphs) body.getGlyphByID(ike).set_char(charCode);
     }
 
 }

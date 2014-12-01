@@ -13,7 +13,7 @@ import net.rezmason.scourge.textview.core.Interaction;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class SplashBody extends Body {
+class SplashDemo {
 
     /*
         {r:1.00, g:0.00, b:0.56}
@@ -36,19 +36,21 @@ class SplashBody extends Body {
         'E' => {r:0.18, g:0.18, b:1.00},
     ];
 
+    public var body(default, null):Body;
     var glyphTowers:Array<Array<Glyph>>;
-
     var time:Float;
     var lines:Array<String>;
 
     public function new():Void {
-        super();
-        camera.scaleMode = WIDTH_FIT;
+        body = new Body();
+        body.updateSignal.add(update);
+        body.camera.scaleMode = WIDTH_FIT;
         time = 0;
         lines = Assets.getText('text/splash.txt').split('\n');
         lines.pop();
 
-        growTo(3 * lines.length * lines[0].length);
+        body.growTo(3 * lines.length * lines[0].length);
+        body.glyphScale = 0.015;
 
         var numRows:Int = lines.length;
         var numCols:Int = lines[0].length;
@@ -78,16 +80,15 @@ class SplashBody extends Body {
                 var glyphTower:Array<Glyph> = [];
 
                 for (ike in 0...thickness) {
-                    var glyph:Glyph = glyphs[glyphID];
+                    var glyph:Glyph = body.getGlyphByID(glyphID);
 
                     glyphTower.push(glyph);
                     
                     glyph.set_xyz(x, y, z);
                     glyph.set_color(color);
                     glyph.set_i(0);
-                    glyph.set_font(glyphTexture.font);
                     glyph.set_char(charCode);
-                    glyph.set_paint(glyph.id | id << 16);
+                    glyph.set_paint(glyph.id | body.id << 16);
 
                     z += 0.01;
                     color = Colors.mult(color, 0.2);
@@ -99,17 +100,12 @@ class SplashBody extends Body {
             }
         }
 
-        transform.appendScale(1, -1, 1);
-        transform.appendScale(0.9, 0.9, 0.9);
-        transform.appendRotation(20, Vector3D.X_AXIS);
+        body.transform.appendScale(1, -1, 1);
+        body.transform.appendScale(0.9, 0.9, 0.9);
+        body.transform.appendRotation(20, Vector3D.X_AXIS);
     }
 
-    override public function resize(stageWidth:Int, stageHeight:Int):Void {
-        super.resize(stageWidth, stageHeight);
-        glyphScale = camera.rect.width * 0.015;
-    }
-
-    override public function update(delta:Float):Void {
+    function update(delta:Float):Void {
         time += delta;
 
         for (ike in 0...glyphTowers.length) {
@@ -126,7 +122,5 @@ class SplashBody extends Body {
                 s *= 2;
             }
         }
-
-        super.update(delta);
     }
 }

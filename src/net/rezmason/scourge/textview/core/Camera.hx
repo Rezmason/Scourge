@@ -12,7 +12,6 @@ class Camera {
     public var transform(default, null):Matrix3D;
     public var scaleMode:BodyScaleMode;
     public var rect(default, set):Rectangle;
-    public var rectScale(default, null):Float;
     
     var vanishingPoint:Point;
 
@@ -55,10 +54,6 @@ class Camera {
         vanishingPoint.y = (rect.top + rect.bottom) * 0.5;
 
         applyVP(0, 0);
-
-        var screenDiag:Float = Math.sqrt(stageWidth * stageWidth + stageHeight * stageHeight);
-        rectScale = Math.min(rect.width * stageWidth, rect.height * stageHeight) / screenDiag;
-
     }
 
     inline function applyVP(x:Float, y:Float):Void {
@@ -114,6 +109,7 @@ class Camera {
         if (val == null) val = DEFAULT_VIEW_RECT();
         if (val.width <= 0 || val.height <= 0) throw 'Camera rects cannot be null.';
         rect = val;
+        if (transform != null) resize(stageWidth, stageHeight);
         return val;
     }
 }

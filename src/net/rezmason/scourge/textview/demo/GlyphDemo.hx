@@ -12,7 +12,7 @@ import net.rezmason.scourge.textview.core.GlyphTexture;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class GlyphBody extends Body {
+class GlyphDemo {
 
     static var COLORS:Array<Color> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Colors.fromHex);
     inline static var TWEEN_LENGTH:Float = 0.25;
@@ -24,13 +24,14 @@ class GlyphBody extends Body {
     static var tweenData:Array<Array<Float>> = [[0,1],[1,1],[1,0]];
     static var tweens:Array<Float->Float> = [Quint.easeOut, Linear.easeIn, Quint.easeIn];
     inline static var CHARS:String = 'ΩSCOURGE';
-    var currentCharIndex:Int;
 
+    public var body(default, null):Body;
+    var currentCharIndex:Int;
     var phaseTime:Float;
     var currentPhase:Int;
     var currentColor:Int;
-
     var mouseIsDown:Bool;
+    var glyph:Glyph;
 
     public function new():Void {
 
@@ -40,17 +41,18 @@ class GlyphBody extends Body {
         currentColor = 0;
         mouseIsDown = false;
 
-        super();
-        interactionSignal.add(receiveInteraction);
-        glyphScale = 0.4;
-        growTo(1);
+        body = new Body();
+        body.interactionSignal.add(receiveInteraction);
+        body.updateSignal.add(update);
+        body.glyphScale = 0.4;
+        body.growTo(1);
 
-        glyphs[0].set_font(glyphTexture.font);
-        glyphs[0].set_char(Utf8.charCodeAt(CHARS, currentCharIndex));
-        glyphs[0].set_color(COLORS[currentColor]);
+        glyph = body.getGlyphByID(0);
+        glyph.set_char(Utf8.charCodeAt(CHARS, currentCharIndex));
+        glyph.set_color(COLORS[currentColor]);
     }
 
-    override public function update(delta:Float):Void {
+    function update(delta:Float):Void {
         phaseTime += delta * (mouseIsDown ? 0.2 : 1);
 
         if (phaseTime > periods[currentPhase]) {
@@ -58,7 +60,7 @@ class GlyphBody extends Body {
             currentPhase = (currentPhase + 1) % NUM_PHASES;
             if (currentPhase == 0) {
                 currentCharIndex = (currentCharIndex + 1) % Utf8.length(CHARS);
-                glyphs[0].set_char(Utf8.charCodeAt(CHARS, currentCharIndex));
+                glyph.set_char(Utf8.charCodeAt(CHARS, currentCharIndex));
                 currentColor = (currentColor + 1) % COLORS.length;
             }
         }
@@ -67,10 +69,8 @@ class GlyphBody extends Body {
 
         var val:Float = tweens[currentPhase](percent);
         val = tweenData[currentPhase][0] * (1 - val) + tweenData[currentPhase][1] * val;
-        glyphs[0].set_f(val * 0.5);
-        glyphs[0].set_color(Colors.mult(COLORS[currentColor], val * (1 + FADE_AMT) - FADE_AMT));
-
-        super.update(delta);
+        glyph.set_f(val * 0.5);
+        glyph.set_color(Colors.mult(COLORS[currentColor], val * (1 + FADE_AMT) - FADE_AMT));
     }
 
     function receiveInteraction(id:Int, interaction:Interaction):Void {

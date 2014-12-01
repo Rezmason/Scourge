@@ -1,7 +1,10 @@
 Break down Body
 
     Most things that extend Body should be their own classes, that use a Body
+        Separate pan behavior into its own class
     
+    Rethink glyph transform
+
     Scene
         Camera
     Engine iterates over scenes

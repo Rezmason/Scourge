@@ -3,7 +3,7 @@ package net.rezmason.scourge.textview.pages;
 import flash.geom.Rectangle;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Scene;
-import net.rezmason.scourge.textview.ui.SplashBody;
+import net.rezmason.scourge.textview.ui.SplashDemo;
 import net.rezmason.scourge.textview.ui.UIBody;
 import net.rezmason.scourge.textview.ui.UIMediator;
 
@@ -20,17 +20,17 @@ class SplashPage extends NavPage {
 
     var splashScene:Scene;
     var uiScene:Scene;
-    var splashBody:SplashBody;
+    var splashDemo:SplashDemo;
     var uiBody:UIBody;
     var uiMed:UIMediator;
 
     public function new():Void {
         super();
 
-        splashBody = new SplashBody();
-        splashBody.camera.rect = new Rectangle(0.0, 0.0, 1.0, 0.4);
+        splashDemo = new SplashDemo();
+        splashDemo.body.camera.rect = new Rectangle(0.0, 0.0, 1.0, 0.4);
         splashScene = new Scene();
-        splashScene.addBody(splashBody);
+        splashScene.addBody(splashDemo.body);
         scenes.push(splashScene);
 
         uiMed = new UIMediator();

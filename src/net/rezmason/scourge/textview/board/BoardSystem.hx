@@ -21,7 +21,7 @@ import net.rezmason.utils.Zig;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.utils.CharCode;
 
-class BoardBody extends Body {
+class BoardSystem {
 
     inline static var MILLISECONDS_TO_SECONDS:Float = 1 / 1000;
     inline static var GLYPHS_PER_NODE:Int = 3;
@@ -36,6 +36,8 @@ class BoardBody extends Body {
     static var durationsByCause:Map<String, Float> = makeDurationsByCause();
     static var overlapsByCause:Map<String, Float> = makeOverlapsByCause();
     static var nudgeArray:Array<XYZ> = makeNudgeArray();
+
+    public var body(default, null):Body;
 
     var dragging:Bool;
     var dragX:Float;
@@ -73,8 +75,9 @@ class BoardBody extends Body {
 
     public function new():Void {
 
-        super();
-        interactionSignal.add(receiveInteraction);
+        body = new Body();
+        body.interactionSignal.add(receiveInteraction);
+        body.updateSignal.add(update);
 
         dragging = false;
         dragStartTransform = new Matrix3D();
@@ -83,6 +86,7 @@ class BoardBody extends Body {
         plainTransform = new Matrix3D();
         
         boardScale = 1;
+        body.glyphScale = 0.025;
         nodeViews = [];
         nodeTweens = [];
         wavePools = [];
@@ -103,7 +107,7 @@ class BoardBody extends Body {
 
         this.numPlayers = numPlayers;
         numNodes = nodePositions.length;
-        growTo(numNodes * GLYPHS_PER_NODE);
+        body.growTo(numNodes * GLYPHS_PER_NODE);
 
         for (ike in 0...numPlayers) {
             if (wavePools[ike] == null) {
@@ -120,9 +124,9 @@ class BoardBody extends Body {
         for (ike in 0...numNodes) {
             var view:NodeView = nodeViews[ike];
             if (view == null) nodeViews[ike] = view = makeView();
-            view.bottomGlyph = glyphs[ike * GLYPHS_PER_NODE + 0];
-            view.topGlyph = glyphs[ike * GLYPHS_PER_NODE + 1];
-            view.uiGlyph = glyphs[ike * GLYPHS_PER_NODE + 2];
+            view.bottomGlyph = body.getGlyphByID(ike * GLYPHS_PER_NODE + 0);
+            view.topGlyph = body.getGlyphByID(ike * GLYPHS_PER_NODE + 1);
+            view.uiGlyph = body.getGlyphByID(ike * GLYPHS_PER_NODE + 2);
 
             var pos:XYZ = nodePositions[ike];
             view.pos = pos;
@@ -154,13 +158,14 @@ class BoardBody extends Body {
         }
 
         boardScale = BOARD_MAGNIFICATION / (maxX - minX);
+        body.glyphScale = 0.025 * boardScale;
         
         homeTransform.identity();
         homeTransform.appendScale(boardScale, boardScale, boardScale);
         homeTransform.appendTranslation(0, 0, 0.5);
         
-        transform = rawTransform.clone();
-        transform.append(homeTransform);
+        body.transform.copyFrom(rawTransform);
+        body.transform.append(homeTransform);
     }
 
     public function handleUIUpdate():Void {
@@ -312,12 +317,7 @@ class BoardBody extends Body {
         proceedSignal = signal;
     }
 
-    override public function resize(stageWidth:Int, stageHeight:Int):Void {
-        super.resize(stageWidth, stageHeight);
-        glyphScale = camera.rectScale * 0.05 * boardScale;
-    }
-
-    override public function update(delta:Float):Void {
+    function update(delta:Float):Void {
         
         // update animations
         if (numActiveTweens > 0) {
@@ -363,11 +363,9 @@ class BoardBody extends Body {
 
         if (!dragging) {
             rawTransform.interpolateTo(plainTransform, 0.1);
-            transform.copyFrom(rawTransform);
-            transform.append(homeTransform);
+            body.transform.copyFrom(rawTransform);
+            body.transform.append(homeTransform);
         }
-
-        super.update(delta);
     }
 
     function receiveInteraction(id:Int, interaction:Interaction):Void {
@@ -408,8 +406,8 @@ class BoardBody extends Body {
 
         rawTransform.appendRotation(x * dirX * 180, Vector3D.Y_AXIS);
         rawTransform.appendRotation(y * dirY * 180, Vector3D.X_AXIS);
-        transform.copyFrom(rawTransform);
-        transform.append(homeTransform);
+        body.transform.copyFrom(rawTransform);
+        body.transform.append(homeTransform);
     }
 
     inline function stopDrag():Void {
@@ -463,11 +461,11 @@ class BoardBody extends Body {
                     top.color = ColorPalette.WALL_COLOR;
                     top.pos.z += WALL_TOP_OFFSET;
                     top.thickness = 0.4;
-                    top.stretch = glyphTexture.font.glyphRatio;
+                    top.stretch = body.glyphTexture.font.glyphRatio;
                     bottom.size = 1;
                     bottom.char = top.char;
                     bottom.color = ColorPalette.BOARD_COLOR;
-                    bottom.stretch = glyphTexture.font.glyphRatio;
+                    bottom.stretch = body.glyphTexture.font.glyphRatio;
                 }
             case Empty:
                 bottom.color = ColorPalette.BOARD_COLOR;

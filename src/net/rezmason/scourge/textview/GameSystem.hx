@@ -9,7 +9,7 @@ import net.rezmason.scourge.controller.Referee;
 import net.rezmason.scourge.controller.ReplaySmarts;
 import net.rezmason.scourge.controller.StateChangeSequencer;
 import net.rezmason.scourge.model.ScourgeConfig;
-import net.rezmason.scourge.textview.board.BoardBody;
+import net.rezmason.scourge.textview.board.BoardSystem;
 import net.rezmason.scourge.textview.console.ConsoleUIMediator;
 import net.rezmason.utils.Zig;
 
@@ -17,27 +17,27 @@ class GameSystem {
 
     public var referee(default, null):Referee;
     public var sequencer(default, null):StateChangeSequencer;
-    public var boardBody(default, null):BoardBody;
+    public var boardSystem(default, null):BoardSystem;
 
     var console:ConsoleUIMediator;
 
-    public function new(boardBody:BoardBody, console:ConsoleUIMediator):Void {
+    public function new(boardSystem:BoardSystem, console:ConsoleUIMediator):Void {
         referee = new Referee();
         sequencer = new StateChangeSequencer();
         
-        this.boardBody = boardBody;
+        this.boardSystem = boardSystem;
         this.console = console;
         
-        sequencer.sequenceStartSignal.add(boardBody.presentStart);
-        sequencer.sequenceUpdateSignal.add(boardBody.presentSequence);
-        boardBody.setProceedSignal(sequencer.proceedSignal);
+        sequencer.sequenceStartSignal.add(boardSystem.presentStart);
+        sequencer.sequenceUpdateSignal.add(boardSystem.presentSequence);
+        boardSystem.setProceedSignal(sequencer.proceedSignal);
     }
 
     public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, thinkPeriod:Int, animateMils:Int, isReplay:Bool, seed:UInt):Void {
 
         if (referee.gameBegun) referee.endGame();
 
-        boardBody.setAnimationSpeed(animateMils);
+        boardSystem.setAnimationSpeed(animateMils);
 
         var playerDefs:Array<PlayerDef> = [];
         var randGen:Void->Float = lgm(seed);

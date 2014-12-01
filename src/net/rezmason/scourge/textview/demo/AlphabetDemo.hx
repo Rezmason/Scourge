@@ -33,14 +33,14 @@ class AlphabetDemo {
         body.transform.appendScale(1, -1, 1);
         body.interactionSignal.add(receiveInteraction);
 
-        for (ike in 0...body.numGlyphs) {
+        for (glyph in body.eachGlyph()) {
 
-            var glyph:Glyph = body.getGlyphByID(ike);
-            var col:Int = ike % numCols;
-            var row:Int = Std.int(ike / numCols);
+            var id:Int = glyph.id;
+            var col:Int = id % numCols;
+            var row:Int = Std.int(id / numCols);
             var x:Float = ((col + 0.5) / numCols - 0.5);
             var y:Float = ((row + 0.5) / numRows    - 0.5);
-            var charCode:Int = Utf8.charCodeAt(CHARS, ike % CHARS.length);
+            var charCode:Int = Utf8.charCodeAt(CHARS, id % CHARS.length);
 
             glyph.set_xyz(x, y, 0);
             glyph.set_rgb(1, 1, 1);

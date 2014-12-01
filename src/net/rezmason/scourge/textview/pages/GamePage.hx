@@ -2,7 +2,7 @@ package net.rezmason.scourge.textview.pages;
 
 import flash.geom.Rectangle;
 
-import net.rezmason.scourge.textview.board.BoardBody;
+import net.rezmason.scourge.textview.board.BoardSystem;
 import net.rezmason.scourge.textview.commands.*;
 import net.rezmason.scourge.textview.console.*;
 import net.rezmason.scourge.textview.core.Body;
@@ -30,16 +30,18 @@ class GamePage extends NavPage {
 
         console = new ConsoleUIMediator();
         var interpreter = new Interpreter(console);
-        var boardBody:BoardBody  = new BoardBody();
+        var boardSystem:BoardSystem  = new BoardSystem();
         var uiBody:UIBody = new UIBody(console);
 
         var alphabetDemo:AlphabetDemo = new AlphabetDemo();
+        var glyphDemo:GlyphDemo = new GlyphDemo();
+        var eyeCandyDemo:EyeCandyDemo = new EyeCandyDemo();
 
         bodiesByName = new Map();
         bodiesByName['alphabet'] = alphabetDemo.body;
-        bodiesByName['sdf']      = new GlyphBody();
-        bodiesByName['test']     = new TestBody();
-        bodiesByName['board']    = boardBody;
+        bodiesByName['sdf']      = glyphDemo.body;
+        bodiesByName['test']     = eyeCandyDemo.body;
+        bodiesByName['board']    = boardSystem.body;
 
         for (key in bodiesByName.keys()) {
             bodiesByName[key].camera.rect = new Rectangle(0, 0, 0.6, 1);
@@ -48,7 +50,7 @@ class GamePage extends NavPage {
         uiBody.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
         uiBody.showScrollBar = true;
         sideScene.addBody(uiBody);
-        gameSystem = new GameSystem(boardBody, console); // Doesn't really belong in here
+        gameSystem = new GameSystem(boardSystem, console); // Doesn't really belong in here
 
         interpreter.addCommand(new RunTestsConsoleCommand());
         interpreter.addCommand(new SetFontConsoleCommand(uiBody));
