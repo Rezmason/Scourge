@@ -1,7 +1,6 @@
 Break down Body
 
-    Most things that extend Body should be their own classes, that use a Body
-        Separate pan behavior into its own class
+    Break down UIBody
     
     Rethink glyph transform
 

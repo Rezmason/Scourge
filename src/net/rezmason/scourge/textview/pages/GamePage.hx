@@ -48,7 +48,7 @@ class GamePage extends NavPage {
         }
 
         uiBody.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
-        uiBody.showScrollBar = true;
+        uiBody.hasScrollBar = true;
         sideScene.addBody(uiBody);
         gameSystem = new GameSystem(boardSystem, console); // Doesn't really belong in here
 
