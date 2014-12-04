@@ -6,15 +6,15 @@ import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
 import net.rezmason.scourge.textview.core.FontManager;
 import net.rezmason.scourge.textview.core.GlyphTexture;
-import net.rezmason.scourge.textview.ui.UIBody;
+import net.rezmason.scourge.textview.ui.UIElement;
 import net.rezmason.utils.santa.Present;
 
 class SetFontConsoleCommand extends ConsoleCommand {
 
-    var uiBody:UIBody;
+    var uiBody:UIElement;
     var fontManager:FontManager;
 
-    public function new(uiBody:UIBody):Void {
+    public function new(uiBody:UIElement):Void {
         super();
         name = 'setFont';
 

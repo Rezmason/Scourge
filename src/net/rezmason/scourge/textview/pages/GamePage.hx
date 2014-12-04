@@ -8,7 +8,7 @@ import net.rezmason.scourge.textview.console.*;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Scene;
 import net.rezmason.scourge.textview.demo.*;
-import net.rezmason.scourge.textview.ui.UIBody;
+import net.rezmason.scourge.textview.ui.UIElement;
 import net.rezmason.utils.Zig;
 
 class GamePage extends NavPage {
@@ -16,7 +16,7 @@ class GamePage extends NavPage {
     var gameSystem:GameSystem;
     var bodiesByName:Map<String, Body>;
     var currentBodyName:String;
-    var console:ConsoleUIMediator;
+    var consoleMed:ConsoleUIMediator;
     var mainScene:Scene;
     var sideScene:Scene;
 
@@ -28,10 +28,10 @@ class GamePage extends NavPage {
         scenes.push(mainScene);
         scenes.push(sideScene);
 
-        console = new ConsoleUIMediator();
-        var interpreter = new Interpreter(console);
+        consoleMed = new ConsoleUIMediator();
+        var interpreter = new Interpreter(consoleMed);
         var boardSystem:BoardSystem  = new BoardSystem();
-        var uiBody:UIBody = new UIBody(console);
+        var console:UIElement = new UIElement(consoleMed);
 
         var alphabetDemo:AlphabetDemo = new AlphabetDemo();
         var glyphDemo:GlyphDemo = new GlyphDemo();
@@ -47,13 +47,13 @@ class GamePage extends NavPage {
             bodiesByName[key].camera.rect = new Rectangle(0, 0, 0.6, 1);
         }
 
-        uiBody.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
-        uiBody.hasScrollBar = true;
-        sideScene.addBody(uiBody);
-        gameSystem = new GameSystem(boardSystem, console); // Doesn't really belong in here
+        console.body.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
+        console.hasScrollBar = true;
+        sideScene.addBody(console.body);
+        gameSystem = new GameSystem(boardSystem, consoleMed); // Doesn't really belong in here
 
         interpreter.addCommand(new RunTestsConsoleCommand());
-        interpreter.addCommand(new SetFontConsoleCommand(uiBody));
+        interpreter.addCommand(new SetFontConsoleCommand(console));
         interpreter.addCommand(new SetNameConsoleCommand(interpreter));
         interpreter.addCommand(new PrintConsoleCommand());
         interpreter.addCommand(new SimpleCommand('clear', clearConsoleCommand));
@@ -64,7 +64,7 @@ class GamePage extends NavPage {
     }
 
     function clearConsoleCommand(args, outputSignal):Void {
-        console.clearText();
+        consoleMed.clearText();
         outputSignal.dispatch(null, true);
     }
 

@@ -112,7 +112,8 @@ class Body {
         }
     }
 
-    public function resize(stageWidth:Int, stageHeight:Int):Void {
+    @:allow(net.rezmason.scourge.textview.core)
+    function resize(stageWidth:Int, stageHeight:Int):Void {
         this.stageWidth = stageWidth;
         this.stageHeight = stageHeight;
         camera.resize(stageWidth, stageHeight);
@@ -120,7 +121,8 @@ class Body {
         resizeSignal.dispatch(stageWidth, stageHeight);
     }
 
-    public function update(delta:Float):Void {
+    @:allow(net.rezmason.scourge.textview.core)
+    function update(delta:Float):Void {
         updateSignal.dispatch(delta);
         for (segment in segments) segment.update();
     }

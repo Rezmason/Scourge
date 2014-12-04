@@ -4,7 +4,7 @@ import flash.geom.Rectangle;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Scene;
 import net.rezmason.scourge.textview.ui.SplashDemo;
-import net.rezmason.scourge.textview.ui.UIBody;
+import net.rezmason.scourge.textview.ui.UIElement;
 import net.rezmason.scourge.textview.ui.UIMediator;
 
 class SplashPage extends NavPage {
@@ -19,10 +19,10 @@ class SplashPage extends NavPage {
     '¶{name:main, align:center}';
 
     var splashScene:Scene;
-    var uiScene:Scene;
+    var navScene:Scene;
     var splashDemo:SplashDemo;
-    var uiBody:UIBody;
-    var uiMed:UIMediator;
+    var nav:UIElement;
+    var navMed:UIMediator;
 
     public function new():Void {
         super();
@@ -33,15 +33,15 @@ class SplashPage extends NavPage {
         splashScene.addBody(splashDemo.body);
         scenes.push(splashScene);
 
-        uiMed = new UIMediator();
-        uiBody = new UIBody(uiMed);
+        navMed = new UIMediator();
+        nav = new UIElement(navMed);
         var uiRect:Rectangle = new Rectangle(0.0, 0.4, 1.0, 0.6);
         uiRect.inflate(-0.02, -0.02);
-        uiBody.camera.rect = uiRect;
-        uiBody.setFontSize(28);
-        uiScene = new Scene();
-        uiScene.addBody(uiBody);
-        scenes.push(uiScene);
+        nav.body.camera.rect = uiRect;
+        nav.setFontSize(28);
+        navScene = new Scene();
+        navScene.addBody(nav.body);
+        scenes.push(navScene);
 
         var buttons:Array<String> = [
             makeButton('BEGIN', playGame),
@@ -50,12 +50,12 @@ class SplashPage extends NavPage {
         ];
 
         var uiText:String = BUTTON_STYLE + buttons.join('  ');
-        uiMed.setText(uiText);
+        navMed.setText(uiText);
     }
 
     public function makeButton(text:String, cbk:Void->Void):String {
         var id:String = 'button_' + text;
-        uiMed.mouseSignal.add(function(str, type) if (str == id && type == CLICK) cbk());
+        navMed.mouseSignal.add(function(str, type) if (str == id && type == CLICK) cbk());
         return 'µ{name:splashButton, id:$id}$h$h$h$text$h$h$h§{}';
     }
 

@@ -1,7 +1,5 @@
 Break down Body
 
-    Break down UIBody
-    
     Rethink glyph transform
 
     Scene

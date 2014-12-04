@@ -11,11 +11,13 @@ import net.rezmason.scourge.textview.core.Interaction;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class UIBody extends Body {
+class UIElement {
 
     inline static var glideEase:Float = 0.6;
     inline static var NATIVE_DPI:Float = 96;
     inline static var DEFAULT_GLYPH_HEIGHT_IN_POINTS:Float = 18;
+
+    public var body(default, null):Body;
 
     var spaceCode:Int;
 
@@ -55,17 +57,16 @@ class UIBody extends Body {
     public var hasScrollBar(default, set):Bool;
     var scrollBar:UIScrollBar;
 
-    var sized:Bool;
-
     public function new(uiMediator:UIMediator):Void {
 
-        super();
-        interactionSignal.add(receiveInteraction);
-        sized = false;
+        body = new Body();
+        body.interactionSignal.add(receiveInteraction);
+        body.resizeSignal.add(resize);
+        body.updateSignal.add(update);
         scrollBar = null;
         hasScrollBar = false;
         
-        bodyPaint = id << 16;
+        bodyPaint = body.id << 16;
         spaceCode = ' '.charCodeAt(0);
 
         baseTransform = new Matrix3D();
@@ -73,7 +74,7 @@ class UIBody extends Body {
 
         glyphHeightInPoints = DEFAULT_GLYPH_HEIGHT_IN_POINTS;
         glyphHeightInPixels = glyphHeightInPoints * getScreenDPI() / NATIVE_DPI;
-        glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
+        glyphWidthInPixels = glyphHeightInPixels / body.glyphTexture.font.glyphRatio;
 
         currentScrollPos = Math.NaN;
         scrollY = 0;
@@ -84,7 +85,7 @@ class UIBody extends Body {
         numCols = 0;
         numTextCols = 0;
 
-        camera.scaleMode = EXACT_FIT;
+        body.camera.scaleMode = EXACT_FIT;
 
         this.uiMediator = uiMediator;
     }
@@ -104,19 +105,19 @@ class UIBody extends Body {
         var worked:Bool = false;
         if (tex != null) {
             worked = true;
-            glyphTexture = tex;
+            body.glyphTexture = tex;
             recalculateGeometry();
         }
         return worked;
     }
 
-    override public function update(delta:Float):Void {
+    function update(delta:Float):Void {
 
         if (!dragging && uiMediator.isDirty) {
             uiMediator.updateDirtyText(bodyPaint);
             if (Math.isNaN(currentScrollPos)) setScrollPos(uiMediator.bottomPos());
             glideTextToPos(uiMediator.bottomPos());
-            redrawHitSignal.dispatch();
+            body.redrawHitSignal.dispatch();
         }
 
         updateGlide(delta);
@@ -124,17 +125,11 @@ class UIBody extends Body {
         findAndPositionCaret();
         taperScrollEdges();
         if (hasScrollBar) scrollBar.updateFade(delta);
-
-        super.update(delta);
     }
 
-    override public function resize(stageWidth:Int, stageHeight:Int):Void {
-        sized = true;
-        var originalViewRect:Rectangle = camera.rect.clone();
-        super.resize(stageWidth, stageHeight);
-        viewPixelHeight = camera.rect.height * stageHeight;
-        viewPixelWidth  = camera.rect.width  * stageWidth;
-        camera.rect = originalViewRect;
+    function resize(stageWidth:Int, stageHeight:Int):Void {
+        viewPixelHeight = body.camera.rect.height * stageHeight;
+        viewPixelWidth  = body.camera.rect.width  * stageWidth;
         recalculateGeometry();
     }
 
@@ -170,8 +165,8 @@ class UIBody extends Body {
         caretGlyphGuide = null;
 
         if (caretGlyphID != -1) {
-            var leftGlyph:Glyph = glyphs[caretGlyphID - 1];
-            var rightGlyph:Glyph = glyphs[caretGlyphID];
+            var leftGlyph:Glyph = body.getGlyphByID(caretGlyphID - 1);
+            var rightGlyph:Glyph = body.getGlyphByID(caretGlyphID);
 
             if (leftGlyph != null || rightGlyph != null) {
                 if (leftGlyph == null) {
@@ -211,24 +206,25 @@ class UIBody extends Body {
     }
 
     function recalculateGeometry():Void {
-        if (stageWidth == 0 || stageHeight == 0) return;
+        if (viewPixelWidth == 0 || viewPixelHeight == 0) return;
 
-        glyphWidthInPixels = glyphHeightInPixels / glyphTexture.font.glyphRatio;
-        glyphWidth = glyphWidthInPixels / stageWidth;
-        glyphHeight = glyphHeightInPixels / stageHeight;
-        glyphScale = glyphWidth;
+        glyphWidthInPixels = glyphHeightInPixels / body.glyphTexture.font.glyphRatio;
+        glyphWidth = glyphWidthInPixels * body.camera.rect.width / viewPixelWidth;
+        glyphHeight = glyphHeightInPixels * body.camera.rect.height / viewPixelHeight;
+
+        body.glyphScale = glyphWidth;
 
         numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
         numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
         numTextCols = Std.int(Math.max(0, numCols + (hasScrollBar ? -1 : 0)));
 
-        growTo(numRows * numTextCols + 2 + 1);
+        body.growTo(numRows * numTextCols + 2 + 1);
 
-        for (ike in numRows * numTextCols...numGlyphs) glyphs[ike].reset();
+        for (ike in numRows * numTextCols...body.numGlyphs) body.getGlyphByID(ike).reset();
 
-        caretGlyph = glyphs[numGlyphs - 1];
+        caretGlyph = body.getGlyphByID(body.numGlyphs - 1);
         if (hasScrollBar) {
-            scrollBar.setGlyphs(glyphs[numRows * numTextCols], glyphs[numRows * numTextCols + 1]);
+            scrollBar.setGlyphs(body.getGlyphByID(numRows * numTextCols), body.getGlyphByID(numRows * numTextCols + 1));
         }
 
         lastRedrawPos = Math.NaN;
@@ -242,10 +238,10 @@ class UIBody extends Body {
     inline function reorderGlyphs():Void {
         var id:Int = 0;
         for (row in 0...numRows) {
-            var y:Float = (row + 0.5 - (numRows - 1) / 2) * glyphHeight / camera.rect.height;
+            var y:Float = (row + 0.5 - (numRows - 1) / 2) * glyphHeight / body.camera.rect.height;
             for (col in 0...numTextCols) {
-                var x:Float = (col + 0.5 - numCols / 2) * glyphWidth / camera.rect.width;
-                glyphs[id].set_xyz(x, y, 0);
+                var x:Float = (col + 0.5 - numCols / 2) * glyphWidth / body.camera.rect.width;
+                body.getGlyphByID(id).set_xyz(x, y, 0);
                 id++;
             }
         }
@@ -254,14 +250,14 @@ class UIBody extends Body {
     inline function setScrollPos(pos:Float):Void {
         currentScrollPos = pos;
         var scrollStartIndex:Int = Std.int(currentScrollPos);
-        caretGlyphID = uiMediator.stylePage(scrollStartIndex, glyphs, caretGlyph);
+        caretGlyphID = uiMediator.stylePage(scrollStartIndex, body, caretGlyph);
         findAndPositionCaret();
         taperScrollEdges();
         scrollY = (currentScrollPos - scrollStartIndex) / (numRows - 1);
         scrollBarX = ((numTextCols + 0.5) / numCols - 0.5);
-        transform.identity();
-        transform.append(baseTransform);
-        transform.appendTranslation(0, scrollY, 0);
+        body.transform.identity();
+        body.transform.append(baseTransform);
+        body.transform.appendTranslation(0, scrollY, 0);
         updateScrollBarPosition();
     }
 
@@ -278,11 +274,11 @@ class UIBody extends Body {
         var lastRow:Int = (numRows - 1) * numTextCols;
         var glyph:Glyph;
         for (col in 0...numTextCols) {
-            glyph = glyphs[col];
+            glyph = body.getGlyphByID(col);
             glyph.set_color(Colors.mult(glyph.get_color(), 1 - offset));
             if (glyph == caretGlyphGuide) caretGlyph.set_color(Colors.mult(caretGlyph.get_color(), 1 - offset));
 
-            glyph = glyphs[lastRow + col];
+            glyph = body.getGlyphByID(lastRow + col);
             glyph.set_color(Colors.mult(glyph.get_color(), offset));
             if (glyph == caretGlyphGuide) caretGlyph.set_color(Colors.mult(caretGlyph.get_color(), offset));
         }
@@ -299,7 +295,7 @@ class UIBody extends Body {
                 setScrollPos(glideGoal);
                 if (lastRedrawPos != glideGoal) {
                     lastRedrawPos = glideGoal;
-                    redrawHitSignal.dispatch();
+                    body.redrawHitSignal.dispatch();
                 }
             }
         }

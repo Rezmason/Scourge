@@ -4,7 +4,7 @@ import flash.geom.Rectangle;
 import openfl.Assets;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Scene;
-import net.rezmason.scourge.textview.ui.UIBody;
+import net.rezmason.scourge.textview.ui.UIElement;
 import net.rezmason.scourge.textview.ui.UIMediator;
 
 class AboutPage extends NavPage {
@@ -20,29 +20,29 @@ class AboutPage extends NavPage {
     '¶{name:paper, align:center}';
 
     var paperScene:Scene;
-    var paperBody:UIBody;
+    var paper:UIElement;
     var paperMed:UIMediator;
     var navScene:Scene;
-    var navBody:UIBody;
+    var nav:UIElement;
     var navMed:UIMediator;
 
     public function new():Void {
         super();
 
         paperMed = new UIMediator();
-        paperBody = new UIBody(paperMed);
-        paperBody.camera.rect = new Rectangle(0.1, 0, 0.8, 0.9);
-        paperBody.setFontSize(14);
+        paper = new UIElement(paperMed);
+        paper.body.camera.rect = new Rectangle(0.1, 0, 0.8, 0.9);
+        paper.setFontSize(14);
         paperScene = new Scene();
-        paperScene.addBody(paperBody);
+        paperScene.addBody(paper.body);
         scenes.push(paperScene);
 
         navMed = new UIMediator();
-        navBody = new UIBody(navMed);
-        navBody.camera.rect = new Rectangle(0, 0.9, 1, 0.1);
-        navBody.setFontSize(14);
+        nav = new UIElement(navMed);
+        nav.body.camera.rect = new Rectangle(0, 0.9, 1, 0.1);
+        nav.setFontSize(14);
         navScene = new Scene();
-        navScene.addBody(navBody);
+        navScene.addBody(nav.body);
         scenes.push(navScene);
 
         var buttons:Array<String> = [

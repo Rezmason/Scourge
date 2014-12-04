@@ -2,6 +2,7 @@ package net.rezmason.scourge.textview.ui;
 
 import haxe.Utf8;
 
+import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.MouseInteractionType;
@@ -49,7 +50,7 @@ class UIMediator {
         this.isDirty = true;
     }
 
-    public function stylePage(startIndex:Int, glyphs:Array<Glyph>, caretGlyph:Glyph):Int {
+    public function stylePage(startIndex:Int, body:Body, caretGlyph:Glyph):Int {
         var id:Int = 0;
         var pageSegment:Array<String> = page.slice(startIndex, startIndex + numRows);
         var spanIndex:Int = lineStyleIndices[startIndex];
@@ -75,7 +76,7 @@ class UIMediator {
                     case PARAGRAPH_STYLE_CODE:
                         // nada
                     case _:
-                        var glyph:Glyph = glyphs[id];
+                        var glyph:Glyph = body.getGlyphByID(id);
                         if (charCode == Strings.HARD_SPACE_CODE) charCode = Strings.SPACE_CODE;
                         glyph.set_char(charCode);
                         currentSpan.addGlyph(glyph);
