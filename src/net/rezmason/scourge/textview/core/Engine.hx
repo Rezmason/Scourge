@@ -111,8 +111,7 @@ class Engine {
     }
 
     function initRenderMethods():Void {
-        //prettyMethod = new PrettyMethod();
-        prettyMethod = new MouseMethod();
+        prettyMethod = new PrettyMethod();
         mouseMethod = new MouseMethod();
 
         prettyMethod.loadedSignal.add(onMethodLoaded);
