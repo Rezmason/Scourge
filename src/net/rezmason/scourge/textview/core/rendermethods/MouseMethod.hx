@@ -1,7 +1,5 @@
 package net.rezmason.scourge.textview.core.rendermethods;
 
-import flash.geom.Matrix3D;
-
 import openfl.Assets.getText;
 
 import net.rezmason.scourge.textview.core.BodySegment;
@@ -13,46 +11,28 @@ import net.rezmason.gl.VertexBuffer;
 
 class MouseMethod extends RenderMethod {
 
-    //inline static var FAT_FINGERS:Float = 2; // TODO: Fat finger support needs to wait till we can z-order buttons
-
     public function new():Void {
         super();
         backgroundColor = 0xFFFFFF;
-        //glyphMag = FAT_FINGERS;
     }
 
-    override public function activate():Void {
-        glSys.setProgram(program);
-    }
-
-    override public function deactivate():Void {
-    }
+    override public function activate():Void glSys.setProgram(program);
 
     override function composeShaders():Void {
         vertShader = getText('shaders/mousepicking.vert');
         fragShader = #if !desktop 'precision mediump float;' + #end getText('shaders/mousepicking.frag');
     }
 
-    override public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
-        super.setGlyphTexture(glyphTexture, glyphTransform);
-        program.setProgramConstantsFromMatrix('uGlyphMat', glyphMat);
-    }
-
-    override public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void {
-        program.setProgramConstantsFromMatrix('uCameraMat', cameraMat);
-        program.setProgramConstantsFromMatrix('uBodyMat', bodyMat);
+    override function setBody(body:Body):Void {
+        program.setProgramConstantsFromMatrix('uCameraMat', body.camera.transform); // uCameraMat contains the camera matrix
+        program.setProgramConstantsFromMatrix('uBodyMat', body.transform); // uBodyMat contains the body's matrix
+        program.setFourProgramConstants('uGlyphTfm', body.glyphTransform); // uGlyphTfm contains the glyph transform
+        program.setTextureAt('uSampler', body.glyphTexture.texture); // uSampler contains our texture
     }
 
     override public function setSegment(segment:BodySegment):Void {
-
-        var shapeBuffer:VertexBuffer = null;
-        var paintBuffer:VertexBuffer = null;
-
-        if (segment != null) {
-            shapeBuffer = segment.shapeBuffer;
-            paintBuffer = segment.paintBuffer;
-        }
-
+        var shapeBuffer:VertexBuffer = (segment == null) ? null : segment.shapeBuffer;
+        var paintBuffer:VertexBuffer = (segment == null) ? null : segment.paintBuffer;
         program.setVertexBufferAt('aPos',    shapeBuffer, 0, 3);
         program.setVertexBufferAt('aCorner', shapeBuffer, 3, 2);
         program.setVertexBufferAt('aPaint',  paintBuffer, 0, 3);

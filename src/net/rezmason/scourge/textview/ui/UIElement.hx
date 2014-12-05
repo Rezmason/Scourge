@@ -58,7 +58,7 @@ class UIElement {
     var scrollBar:UIScrollBar;
 
     public function new(uiMediator:UIMediator):Void {
-
+        this.uiMediator = uiMediator;
         body = new Body();
         body.interactionSignal.add(receiveInteraction);
         body.resizeSignal.add(resize);
@@ -86,8 +86,6 @@ class UIElement {
         numTextCols = 0;
 
         body.camera.scaleMode = EXACT_FIT;
-
-        this.uiMediator = uiMediator;
     }
 
     public function setFontSize(size:Float):Bool {
@@ -211,22 +209,21 @@ class UIElement {
         glyphWidthInPixels = glyphHeightInPixels / body.glyphTexture.font.glyphRatio;
         glyphWidth = glyphWidthInPixels * body.camera.rect.width / viewPixelWidth;
         glyphHeight = glyphHeightInPixels * body.camera.rect.height / viewPixelHeight;
-
+        
         body.glyphScale = glyphWidth;
-
+        
         numRows = Std.int(viewPixelHeight / glyphHeightInPixels) + 1;
         numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
         numTextCols = Std.int(Math.max(0, numCols + (hasScrollBar ? -1 : 0)));
-
+        
         body.growTo(numRows * numTextCols + 2 + 1);
-
         for (ike in numRows * numTextCols...body.numGlyphs) body.getGlyphByID(ike).reset();
 
         caretGlyph = body.getGlyphByID(body.numGlyphs - 1);
         if (hasScrollBar) {
             scrollBar.setGlyphs(body.getGlyphByID(numRows * numTextCols), body.getGlyphByID(numRows * numTextCols + 1));
         }
-
+        
         lastRedrawPos = Math.NaN;
         reorderGlyphs();
         updateScrollBarPosition();

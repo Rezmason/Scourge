@@ -1,7 +1,5 @@
 package net.rezmason.scourge.textview.core.rendermethods;
 
-import flash.geom.Matrix3D;
-
 import openfl.Assets.getText;
 
 import net.rezmason.scourge.textview.core.Almanac.*;
@@ -55,15 +53,11 @@ class PrettyMethod extends RenderMethod {
         #end
     }
 
-    override public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
-        super.setGlyphTexture(glyphTexture, glyphTransform);
-        program.setProgramConstantsFromMatrix('uGlyphMat', glyphMat); // uGlyphMat contains the character matrix
-        program.setTextureAt('uSampler', glyphTexture.texture); // uSampler contains our texture
-    }
-
-    override public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void {
-        program.setProgramConstantsFromMatrix('uCameraMat', cameraMat); // uCameraMat contains the camera matrix
-        program.setProgramConstantsFromMatrix('uBodyMat', bodyMat); // uBodyMat contains the body's matrix
+    override function setBody(body:Body):Void {
+        program.setProgramConstantsFromMatrix('uCameraMat', body.camera.transform); // uCameraMat contains the camera matrix
+        program.setProgramConstantsFromMatrix('uBodyMat', body.transform); // uBodyMat contains the body's matrix
+        program.setFourProgramConstants('uGlyphTfm', body.glyphTransform); // uGlyphTfm contains the glyph transform
+        program.setTextureAt('uSampler', body.glyphTexture.texture); // uSampler contains our texture
     }
 
     override public function setSegment(segment:BodySegment):Void {

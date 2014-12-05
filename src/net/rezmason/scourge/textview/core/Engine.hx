@@ -111,7 +111,8 @@ class Engine {
     }
 
     function initRenderMethods():Void {
-        prettyMethod = new PrettyMethod();
+        //prettyMethod = new PrettyMethod();
+        prettyMethod = new MouseMethod();
         mouseMethod = new MouseMethod();
 
         prettyMethod.loadedSignal.add(onMethodLoaded);
@@ -157,27 +158,11 @@ class Engine {
             if (method == null) {
                 trace('Null method.');
             } else {
-                method.activate();
-
-                glSys.start(outputBuffer);
-                glSys.clear(method.backgroundColor);
-
+                method.start(outputBuffer);
                 for (scene in scenes) {
-                    for (body in scene.bodies) {
-                        if (body.numGlyphs == 0) continue;
-                        method.setMatrices(body.camera.transform, body.transform);
-                        method.setGlyphTexture(body.glyphTexture, body.glyphTransform);
-
-                        for (segment in body.segments) {
-                            method.setSegment(segment);
-                            glSys.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
-                        }
-                    }
+                    for (body in scene.bodies) if (body.numGlyphs > 0) method.drawBody(body);
                 }
-
-                method.setSegment(null);
-                method.deactivate();
-                glSys.finish();
+                method.finish();
             }
         }
     }

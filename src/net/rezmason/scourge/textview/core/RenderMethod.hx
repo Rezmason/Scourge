@@ -7,11 +7,11 @@ import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
 import net.rezmason.gl.GLSystem;
+import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.Program;
 
 class RenderMethod {
 
-    inline static var GLYPH_MAG_LIMIT:Float = 0.7;
     static var unitVec:Vector3D = new Vector3D(1, 0, 0);
 
     public var program(default, null):Program;
@@ -19,16 +19,12 @@ class RenderMethod {
     public var backgroundColor(default, null):Int;
     public var loadedSignal(default, null):Zig<Void->Void>;
     var glSys:GLSystem;
-    var glyphMat:Matrix3D;
-    var glyphMag:Float;
     var vertShader:String;
     var fragShader:String;
 
     function new():Void {
         loadedSignal = new Zig();
-        glyphMag = 1;
         backgroundColor = 0x0;
-        glyphMat = new Matrix3D();
         composeShaders();
         glSys = new Present(GLSystem);
     }
@@ -41,20 +37,28 @@ class RenderMethod {
 
     function onProgramLoaded():Void loadedSignal.dispatch();
 
-    public function setMatrices(cameraMat:Matrix3D, bodyMat:Matrix3D):Void { }
-    public function activate():Void { }
-    public function deactivate():Void { }
+    public inline function start(outputBuffer:OutputBuffer):Void {
+        activate();
+        glSys.start(outputBuffer);
+        glSys.clear(backgroundColor);
+    }
 
-    public function setGlyphTexture(glyphTexture:GlyphTexture, glyphTransform:Matrix3D):Void {
-        glyphMat.identity();
-        glyphMat.append(glyphTransform);
-        glyphMat.appendScale(glyphMag, glyphMag, 1);
+    public inline function finish():Void {
+        setSegment(null);
+        deactivate();
+        glSys.finish();
+    }
 
-        /*
-        #if debug
-            if (glyphMat.transformVector(unitVec).length > GLYPH_MAG_LIMIT) throw 'You blew the glyph mag fuse!';
-        #end
-        */
+    function activate():Void {}
+    function deactivate():Void {}
+    function setBody(body:Body):Void { }
+
+    public inline function drawBody(body:Body):Void {
+        setBody(body);
+        for (segment in body.segments) {
+            setSegment(segment);
+            glSys.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+        }
     }
 
     public function setSegment(segment:BodySegment):Void { }
