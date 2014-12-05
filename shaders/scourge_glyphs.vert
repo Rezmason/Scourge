@@ -17,7 +17,7 @@ void main(void) {
     vec4 pos = uBodyMat * vec4(aPos, 1.0);
     pos.z += aDistort.z;
     pos = uCameraMat * pos;
-    pos.xy += uGlyphTfm.xy * aCorner * aDistort.y;
+    pos.xy += uGlyphTfm.xy * vec2(aCorner.x * aDistort.x, aCorner.y) * aDistort.y;
 
     vColor = aColor * clamp(2.0 - pos.z, 0.0, 1.0);
     vUV = aUV;
