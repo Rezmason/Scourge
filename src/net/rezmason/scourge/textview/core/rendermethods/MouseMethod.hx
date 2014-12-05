@@ -27,7 +27,6 @@ class MouseMethod extends RenderMethod {
         program.setProgramConstantsFromMatrix('uCameraMat', body.camera.transform); // uCameraMat contains the camera matrix
         program.setProgramConstantsFromMatrix('uBodyMat', body.transform); // uBodyMat contains the body's matrix
         program.setFourProgramConstants('uGlyphTfm', body.glyphTransform); // uGlyphTfm contains the glyph transform
-        program.setTextureAt('uSampler', body.glyphTexture.texture); // uSampler contains our texture
     }
 
     override public function setSegment(segment:BodySegment):Void {

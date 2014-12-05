@@ -132,7 +132,6 @@ class Body {
     public inline function eachGlyph():Iterator<Glyph> return glyphs.iterator();
 
     inline function set_glyphScale(val:Float):Float {
-        if (Math.isNaN(val)) val = 0;
         glyphScale = val;
         updateGlyphTransform();
         return glyphScale;
