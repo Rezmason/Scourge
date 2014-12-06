@@ -15,9 +15,9 @@ class Body {
     public var numGlyphs(default, null):Int;
     public var id(default, null):Int;
     public var transform(default, null):Matrix3D;
-    public var camera(default, null):Camera;
     public var glyphScale(default, set):Float;
     public var glyphTexture(default, set):GlyphTexture;
+    public var scene(default, null):Scene;
     
     public var redrawHitSignal(default, null):Zig<Void->Void>;
     public var updateSignal(default, null):Zig<Float->Void>;
@@ -55,7 +55,6 @@ class Body {
         glyphs = [];
 
         transform = new Matrix3D();
-        camera = new Camera();
         glyphTransform = [0, 0, 0, 0];
         glyphScale = 1;
     }
@@ -116,7 +115,6 @@ class Body {
     function resize(stageWidth:Int, stageHeight:Int):Void {
         this.stageWidth = stageWidth;
         this.stageHeight = stageHeight;
-        camera.resize(stageWidth, stageHeight);
         updateGlyphTransform();
         resizeSignal.dispatch(stageWidth, stageHeight);
     }
@@ -125,6 +123,11 @@ class Body {
     function update(delta:Float):Void {
         updateSignal.dispatch(delta);
         for (segment in segments) segment.update();
+    }
+
+    @:allow(net.rezmason.scourge.textview.core)
+    function setScene(scene:Scene):Void {
+        this.scene = scene;
     }
 
     public inline function getGlyphByID(id:Int):Glyph return glyphs[id];

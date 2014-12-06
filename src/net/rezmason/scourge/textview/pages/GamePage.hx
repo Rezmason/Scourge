@@ -18,16 +18,14 @@ class GamePage extends NavPage {
     var currentBodyName:String;
     var consoleMed:ConsoleUIMediator;
     var mainScene:Scene;
-    var sideScene:Scene;
 
     public function new():Void {
         super();
 
         mainScene = new Scene();
-        sideScene = new Scene();
+        mainScene.camera.rect = new Rectangle(0, 0, 0.6, 1);
         scenes.push(mainScene);
-        scenes.push(sideScene);
-
+        
         consoleMed = new ConsoleUIMediator();
         var interpreter = new Interpreter(consoleMed);
         var boardSystem:BoardSystem  = new BoardSystem();
@@ -43,13 +41,9 @@ class GamePage extends NavPage {
         bodiesByName['test']     = eyeCandyDemo.body;
         bodiesByName['board']    = boardSystem.body;
 
-        for (key in bodiesByName.keys()) {
-            bodiesByName[key].camera.rect = new Rectangle(0, 0, 0.6, 1);
-        }
-
-        console.body.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
         console.hasScrollBar = true;
-        sideScene.addBody(console.body);
+        console.scene.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
+        scenes.push(console.scene);
         gameSystem = new GameSystem(boardSystem, consoleMed); // Doesn't really belong in here
 
         interpreter.addCommand(new RunTestsConsoleCommand());

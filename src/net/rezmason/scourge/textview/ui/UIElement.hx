@@ -5,9 +5,11 @@ import flash.geom.Rectangle;
 import flash.system.Capabilities;
 
 import net.rezmason.scourge.textview.core.Body;
+import net.rezmason.scourge.textview.core.BodyScaleMode;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.Interaction;
+import net.rezmason.scourge.textview.core.Scene;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -18,6 +20,7 @@ class UIElement {
     inline static var DEFAULT_GLYPH_HEIGHT_IN_POINTS:Float = 18;
 
     public var body(default, null):Body;
+    public var scene(default, null):Scene;
 
     var spaceCode:Int;
 
@@ -59,7 +62,10 @@ class UIElement {
 
     public function new(uiMediator:UIMediator):Void {
         this.uiMediator = uiMediator;
+        scene = new Scene();
+        scene.camera.scaleMode = EXACT_FIT;
         body = new Body();
+        scene.addBody(body);
         body.interactionSignal.add(receiveInteraction);
         body.resizeSignal.add(resize);
         body.updateSignal.add(update);
@@ -84,8 +90,6 @@ class UIElement {
         numRows = 0;
         numCols = 0;
         numTextCols = 0;
-
-        body.camera.scaleMode = EXACT_FIT;
     }
 
     public function setFontSize(size:Float):Bool {
@@ -126,8 +130,8 @@ class UIElement {
     }
 
     function resize(stageWidth:Int, stageHeight:Int):Void {
-        viewPixelHeight = body.camera.rect.height * stageHeight;
-        viewPixelWidth  = body.camera.rect.width  * stageWidth;
+        viewPixelHeight = scene.camera.rect.height * stageHeight;
+        viewPixelWidth  = scene.camera.rect.width  * stageWidth;
         recalculateGeometry();
     }
 
@@ -207,8 +211,8 @@ class UIElement {
         if (viewPixelWidth == 0 || viewPixelHeight == 0) return;
 
         glyphWidthInPixels = glyphHeightInPixels / body.glyphTexture.font.glyphRatio;
-        glyphWidth = glyphWidthInPixels * body.camera.rect.width / viewPixelWidth;
-        glyphHeight = glyphHeightInPixels * body.camera.rect.height / viewPixelHeight;
+        glyphWidth = glyphWidthInPixels * scene.camera.rect.width / viewPixelWidth;
+        glyphHeight = glyphHeightInPixels * scene.camera.rect.height / viewPixelHeight;
         
         body.glyphScale = glyphWidth;
         
@@ -235,9 +239,9 @@ class UIElement {
     inline function reorderGlyphs():Void {
         var id:Int = 0;
         for (row in 0...numRows) {
-            var y:Float = (row + 0.5 - (numRows - 1) / 2) * glyphHeight / body.camera.rect.height;
+            var y:Float = (row + 0.5 - (numRows - 1) / 2) * glyphHeight / scene.camera.rect.height;
             for (col in 0...numTextCols) {
-                var x:Float = (col + 0.5 - numCols / 2) * glyphWidth / body.camera.rect.width;
+                var x:Float = (col + 0.5 - numCols / 2) * glyphWidth / scene.camera.rect.width;
                 body.getGlyphByID(id).set_xyz(x, y, 0);
                 id++;
             }

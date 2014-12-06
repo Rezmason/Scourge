@@ -3,7 +3,6 @@ package net.rezmason.scourge.textview.pages;
 import flash.geom.Rectangle;
 import openfl.Assets;
 import net.rezmason.scourge.textview.core.Interaction;
-import net.rezmason.scourge.textview.core.Scene;
 import net.rezmason.scourge.textview.ui.UIElement;
 import net.rezmason.scourge.textview.ui.UIMediator;
 
@@ -19,10 +18,8 @@ class AboutPage extends NavPage {
     '¶{name:nav, align:justify-center}' +
     '¶{name:paper, align:center}';
 
-    var paperScene:Scene;
     var paper:UIElement;
     var paperMed:UIMediator;
-    var navScene:Scene;
     var nav:UIElement;
     var navMed:UIMediator;
 
@@ -31,19 +28,17 @@ class AboutPage extends NavPage {
 
         paperMed = new UIMediator();
         paper = new UIElement(paperMed);
-        paper.body.camera.rect = new Rectangle(0.1, 0, 0.8, 0.9);
         paper.setFontSize(14);
-        paperScene = new Scene();
-        paperScene.addBody(paper.body);
-        scenes.push(paperScene);
+        paper.scene.camera.rect = new Rectangle(0.1, 0, 0.8, 0.9);
+        paper.scene.addBody(paper.body);
+        scenes.push(paper.scene);
 
         navMed = new UIMediator();
         nav = new UIElement(navMed);
-        nav.body.camera.rect = new Rectangle(0, 0.9, 1, 0.1);
         nav.setFontSize(14);
-        navScene = new Scene();
-        navScene.addBody(nav.body);
-        scenes.push(navScene);
+        nav.scene.camera.rect = new Rectangle(0, 0.9, 1, 0.1);
+        nav.scene.addBody(nav.body);
+        scenes.push(nav.scene);
 
         var buttons:Array<String> = [
             makeButton('PREV', prev),

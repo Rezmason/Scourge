@@ -221,7 +221,7 @@ class Engine {
 
     function updateMouseSystem():Void {
         var rectsByBodyID:Map<Int, Rectangle> = new Map();
-        for (scene in scenes) if (scene.focus != null) rectsByBodyID[scene.focus.id] = scene.focus.camera.rect;
+        for (scene in scenes) if (scene.focus != null) rectsByBodyID[scene.focus.id] = scene.camera.rect;
         mouseSystem.setRectRegions(rectsByBodyID);
         mouseSystem.invalidate();
     }
@@ -244,7 +244,7 @@ class Engine {
                 if (type == CLICK) keyboardSystem.focusBodyID = bodyID;
 
                 if (target != null) {
-                    var rect:Rectangle = target.camera.rect;
+                    var rect:Rectangle = target.scene.camera.rect;
                     var nX:Float = (oX / width  - rect.x) / rect.width;
                     var nY:Float = (oY / height - rect.y) / rect.height;
                     interaction = MOUSE(type, nX, nY);

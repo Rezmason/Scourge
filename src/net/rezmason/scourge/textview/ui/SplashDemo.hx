@@ -7,7 +7,6 @@ import openfl.Assets;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
-import net.rezmason.scourge.textview.core.BodyScaleMode;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.Interaction;
 
@@ -44,7 +43,6 @@ class SplashDemo {
     public function new():Void {
         body = new Body();
         body.updateSignal.add(update);
-        body.camera.scaleMode = WIDTH_FIT;
         time = 0;
         lines = Assets.getText('text/splash.txt').split('\n');
         lines.pop();

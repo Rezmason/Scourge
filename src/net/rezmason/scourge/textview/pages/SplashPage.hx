@@ -19,7 +19,6 @@ class SplashPage extends NavPage {
     '¶{name:main, align:center}';
 
     var splashScene:Scene;
-    var navScene:Scene;
     var splashDemo:SplashDemo;
     var nav:UIElement;
     var navMed:UIMediator;
@@ -28,8 +27,9 @@ class SplashPage extends NavPage {
         super();
 
         splashDemo = new SplashDemo();
-        splashDemo.body.camera.rect = new Rectangle(0.0, 0.0, 1.0, 0.4);
         splashScene = new Scene();
+        splashScene.camera.scaleMode = WIDTH_FIT;
+        splashScene.camera.rect = new Rectangle(0.0, 0.0, 1.0, 0.4);
         splashScene.addBody(splashDemo.body);
         scenes.push(splashScene);
 
@@ -37,11 +37,10 @@ class SplashPage extends NavPage {
         nav = new UIElement(navMed);
         var uiRect:Rectangle = new Rectangle(0.0, 0.4, 1.0, 0.6);
         uiRect.inflate(-0.02, -0.02);
-        nav.body.camera.rect = uiRect;
+        nav.scene.camera.rect = uiRect;
+        nav.scene.addBody(nav.body);
         nav.setFontSize(28);
-        navScene = new Scene();
-        navScene.addBody(nav.body);
-        scenes.push(navScene);
+        scenes.push(nav.scene);
 
         var buttons:Array<String> = [
             makeButton('BEGIN', playGame),

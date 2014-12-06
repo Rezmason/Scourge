@@ -1,7 +1,9 @@
 Break down Body
 
+    Separate UIElement from UIScene
+        UIScene is a Scene subclass with a UIElement in it
+
     Scene
-        Camera
         Engine iterates over scenes to render, grabs camera from there
         Engine resizes scenes, scenes resize cameras and trigger/call resize on bodies
 
