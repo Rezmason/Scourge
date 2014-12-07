@@ -64,10 +64,10 @@ class UIElement {
         this.uiMediator = uiMediator;
         scene = new Scene();
         scene.camera.scaleMode = EXACT_FIT;
+        scene.resizeSignal.add(resize);
         body = new Body();
         scene.addBody(body);
         body.interactionSignal.add(receiveInteraction);
-        body.resizeSignal.add(resize);
         body.updateSignal.add(update);
         scrollBar = null;
         hasScrollBar = false;
@@ -119,7 +119,7 @@ class UIElement {
             uiMediator.updateDirtyText(bodyPaint);
             if (Math.isNaN(currentScrollPos)) setScrollPos(uiMediator.bottomPos());
             glideTextToPos(uiMediator.bottomPos());
-            body.redrawHitSignal.dispatch();
+            scene.redrawHitSignal.dispatch();
         }
 
         updateGlide(delta);
@@ -296,7 +296,7 @@ class UIElement {
                 setScrollPos(glideGoal);
                 if (lastRedrawPos != glideGoal) {
                     lastRedrawPos = glideGoal;
-                    body.redrawHitSignal.dispatch();
+                    scene.redrawHitSignal.dispatch();
                 }
             }
         }

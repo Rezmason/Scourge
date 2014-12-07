@@ -19,11 +19,9 @@ class Body {
     public var glyphTexture(default, set):GlyphTexture;
     public var scene(default, null):Scene;
     
-    public var redrawHitSignal(default, null):Zig<Void->Void>;
-    public var updateSignal(default, null):Zig<Float->Void>;
-    public var resizeSignal(default, null):Zig<Void->Void>;
-    public var interactionSignal(default, null):Zig<Int->Interaction->Void>;
     public var fontChangedSignal(default, null):Zig<Void->Void>;
+    public var interactionSignal(default, null):Zig<Int->Interaction->Void>;
+    public var updateSignal(default, null):Zig<Float->Void>;
 
     @:allow(net.rezmason.scourge.textview.core) var segments(default, null):Array<BodySegment>;
     @:allow(net.rezmason.scourge.textview.core) var glyphTransform(default, null):Array<Float>;
@@ -33,11 +31,9 @@ class Body {
     var glyphs:Array<Glyph>;
 
     public function new():Void {
-        redrawHitSignal = new Zig();
-        updateSignal = new Zig();
-        resizeSignal = new Zig();
-        interactionSignal = new Zig();
         fontChangedSignal = new Zig();
+        interactionSignal = new Zig();
+        updateSignal = new Zig();
         id = ++_ids;
         glyphs = [];
         var fontManager:FontManager = new Present(FontManager);
@@ -112,12 +108,6 @@ class Body {
     }
 
     @:allow(net.rezmason.scourge.textview.core)
-    function resize():Void {
-        updateGlyphTransform();
-        resizeSignal.dispatch();
-    }
-
-    @:allow(net.rezmason.scourge.textview.core)
     function update(delta:Float):Void {
         updateSignal.dispatch(delta);
         for (segment in segments) segment.update();
@@ -125,7 +115,10 @@ class Body {
 
     @:allow(net.rezmason.scourge.textview.core)
     function setScene(scene:Scene):Void {
+        if (this.scene != null) this.scene.resizeSignal.remove(updateGlyphTransform);
         this.scene = scene;
+        updateGlyphTransform();
+        if (this.scene != null) this.scene.resizeSignal.add(updateGlyphTransform);
     }
 
     function updateGlyphTexture(glyphTexture:GlyphTexture):Void {

@@ -1,17 +1,14 @@
-Break down Body
-
-    Allow bodies to have parent-child relationships
-        Replace Scene::children with Scene::root
+Allow bodies to have parent-child relationships
+    Replace Scene::children with Scene::root
 
 Camera scale mode should drive glyph scaling
 
-Break down BoardBody
+Break down BoardSystem
 
 The Loupe
     Get it ON the board
-        "Scene graph" logic; two bodies share transform info, camera
     Get it to traverse the board
-        BoardBody needs to expose glyph position somehow
+        BoardSystem needs to expose glyph position somehow
     Then, get it to display the current piece
     Then, give it buttons
 
