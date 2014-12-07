@@ -66,8 +66,8 @@ class PolyformGeneratorTest {
         // PolyformGenerator should create all free polyominoes with no duplicates
 
         var expectedCounts:Array<Array<Int>> = [
-            [ 1, 1, 1, 2,  5, 12,  35, 107,  363, 1248, ], // https://oeis.org/A006724
-            [ 1, 1, 2, 6, 19, 63, 216, 756, 2684, 9638, ], // https://oeis.org/A000104
+            [ 1, 1, 1, 2,  5, 12,  35, 107,  363, 1248, ], // https://oeis.org/A000104
+            [ 1, 1, 2, 6, 19, 63, 216, 756, 2684, 9638, ], // https://oeis.org/A006724
         ];
 
         var polyominoes = PolyformGenerator.generate(4, true);
