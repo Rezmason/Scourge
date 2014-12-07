@@ -5,13 +5,14 @@ import net.rezmason.utils.Zig;
 
 class NavPage {
 
-    public var scenes(default, null):Array<Scene>;
     public var navToSignal(default, null):Zig<NavAddress->Void>;
-    public var updateViewSignal(default, null):Zig<Void->Void>;
+
+    var scenes:Array<Scene>;
 
     public function new():Void {
         scenes = [];
         navToSignal = new Zig();
-        updateViewSignal = new Zig();
     }
+
+    public inline function eachScene():Iterator<Scene> return scenes.iterator();
 }

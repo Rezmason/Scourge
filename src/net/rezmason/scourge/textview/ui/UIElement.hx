@@ -129,9 +129,9 @@ class UIElement {
         if (hasScrollBar) scrollBar.updateFade(delta);
     }
 
-    function resize(stageWidth:Int, stageHeight:Int):Void {
-        viewPixelHeight = scene.camera.rect.height * stageHeight;
-        viewPixelWidth  = scene.camera.rect.width  * stageWidth;
+    function resize():Void {
+        viewPixelHeight = scene.camera.rect.height * scene.stageHeight;
+        viewPixelWidth  = scene.camera.rect.width  * scene.stageWidth;
         recalculateGeometry();
     }
 

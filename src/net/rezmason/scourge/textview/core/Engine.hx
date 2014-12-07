@@ -95,10 +95,6 @@ class Engine {
         bodiesByID.remove(body.id);
     }
 
-    function updateSceneFocus(scene:Scene, body:Body):Void {
-
-    }
-
     function initInteractionSystems():Void {
         mouseSystem = new MouseSystem();
         mouseSystem.updateSignal.add(renderMouse);
@@ -170,7 +166,7 @@ class Engine {
         readyCheck();
         this.width = width;
         this.height = height;
-        for (body in bodiesByID) body.resize(width, height);
+        for (scene in scenes) scene.resize(width, height);
         mouseSystem.setSize(width, height);
         glSys.viewportOutputBuffer.resize(width, height);
     }

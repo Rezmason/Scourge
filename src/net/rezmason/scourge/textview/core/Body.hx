@@ -21,7 +21,7 @@ class Body {
     
     public var redrawHitSignal(default, null):Zig<Void->Void>;
     public var updateSignal(default, null):Zig<Float->Void>;
-    public var resizeSignal(default, null):Zig<Int->Int->Void>;
+    public var resizeSignal(default, null):Zig<Void->Void>;
     public var interactionSignal(default, null):Zig<Int->Interaction->Void>;
     public var fontChangedSignal(default, null):Zig<Void->Void>;
 
@@ -29,14 +29,10 @@ class Body {
     @:allow(net.rezmason.scourge.textview.core) var glyphTransform(default, null):Array<Float>;
     
     var trueNumGlyphs:Int;
-    var stageWidth:Int;
-    var stageHeight:Int;
 
     var glyphs:Array<Glyph>;
 
     public function new():Void {
-        stageWidth = 0;
-        stageHeight = 0;
         redrawHitSignal = new Zig();
         updateSignal = new Zig();
         resizeSignal = new Zig();
@@ -58,6 +54,10 @@ class Body {
         glyphTransform = [0, 0, 0, 0];
         glyphScale = 1;
     }
+
+    public inline function getGlyphByID(id:Int):Glyph return glyphs[id];
+
+    public inline function eachGlyph():Iterator<Glyph> return glyphs.iterator();
 
     public function growTo(numGlyphs:Int):Void {
         if (trueNumGlyphs < numGlyphs) {
@@ -112,11 +112,9 @@ class Body {
     }
 
     @:allow(net.rezmason.scourge.textview.core)
-    function resize(stageWidth:Int, stageHeight:Int):Void {
-        this.stageWidth = stageWidth;
-        this.stageHeight = stageHeight;
+    function resize():Void {
         updateGlyphTransform();
-        resizeSignal.dispatch(stageWidth, stageHeight);
+        resizeSignal.dispatch();
     }
 
     @:allow(net.rezmason.scourge.textview.core)
@@ -130,9 +128,13 @@ class Body {
         this.scene = scene;
     }
 
-    public inline function getGlyphByID(id:Int):Glyph return glyphs[id];
-
-    public inline function eachGlyph():Iterator<Glyph> return glyphs.iterator();
+    function updateGlyphTexture(glyphTexture:GlyphTexture):Void {
+        if (this.glyphTexture != glyphTexture) {
+            this.glyphTexture = glyphTexture;
+            updateGlyphTransform();
+            for (glyph in glyphs) glyph.set_font(glyphTexture.font);
+        }
+    }
 
     inline function set_glyphScale(val:Float):Float {
         glyphScale = val;
@@ -149,15 +151,9 @@ class Body {
     }
 
     inline function updateGlyphTransform():Void {
-        glyphTransform[0] = glyphScale;
-        glyphTransform[1] = glyphScale * glyphTexture.font.glyphRatio * stageWidth / stageHeight;
-    }
-
-    function updateGlyphTexture(glyphTexture:GlyphTexture):Void {
-        if (this.glyphTexture != glyphTexture) {
-            this.glyphTexture = glyphTexture;
-            updateGlyphTransform();
-            for (glyph in glyphs) glyph.set_font(glyphTexture.font);
+        if (glyphTexture != null && scene != null) {
+            glyphTransform[0] = glyphScale;
+            glyphTransform[1] = glyphScale * glyphTexture.font.glyphRatio * scene.stageWidth / scene.stageHeight;
         }
     }
 }

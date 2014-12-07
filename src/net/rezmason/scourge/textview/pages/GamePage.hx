@@ -81,6 +81,5 @@ class GamePage extends NavPage {
         currentBodyName = name;
         mainScene.addBody(bodiesByName[currentBodyName]);
         mainScene.focus = bodiesByName[currentBodyName];
-        updateViewSignal.dispatch();
     }
 }

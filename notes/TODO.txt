@@ -1,12 +1,5 @@
 Break down Body
 
-    Separate UIElement from UIScene
-        UIScene is a Scene subclass with a UIElement in it
-
-    Scene
-        Engine iterates over scenes to render, grabs camera from there
-        Engine resizes scenes, scenes resize cameras and trigger/call resize on bodies
-
     Allow bodies to have parent-child relationships
         Replace Scene::children with Scene::root
 
@@ -53,6 +46,9 @@ Wrap shaders in a soft fuzzy blanket, so they don't fucking piss themselves
 
     Flash test - the commented out example output in the metaball post shader should just plain work
     GLSL test - texture indices should no longer be necessary
+
+Separate UIElement from UIScene
+    UIScene is a Scene subclass with a UIElement in it, which it resizes to fit itself
 
 Add Metaballs to the game
 
