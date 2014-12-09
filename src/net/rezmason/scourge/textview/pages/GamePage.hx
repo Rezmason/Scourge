@@ -77,9 +77,9 @@ class GamePage extends NavPage {
     function hasBodyByName(name:String):Bool return bodiesByName[name] != null;
 
     function showBodyByName(name:String):Void {
-        if (currentBodyName != null) mainScene.removeBody(bodiesByName[currentBodyName]);
+        if (currentBodyName != null) mainScene.root.removeChild(bodiesByName[currentBodyName]);
         currentBodyName = name;
-        mainScene.addBody(bodiesByName[currentBodyName]);
+        mainScene.root.addChild(bodiesByName[currentBodyName]);
         mainScene.focus = bodiesByName[currentBodyName];
     }
 }

@@ -63,37 +63,27 @@ class Engine {
     public function set_framerate(f:Float):Float return framerate = (f >= 0 ? f : 0);
 
     public function addScene(scene:Scene):Void {
-        readyCheck();
+        #if debug readyCheck(); #end
         if (!scenes.has(scene)) {
             scenes.push(scene);
             scene.redrawHitSignal.add(updateMouseSystem);
-            scene.bodyAddedSignal.add(addBody);
-            scene.bodyRemovedSignal.add(removeBody);
-            for (body in scene.bodies) addBody(body);
+            scene.invalidatedSignal.add(invalidate);
             scene.resize(width, height);
+            invalidate();
         }
     }
 
     public function removeScene(scene:Scene):Void {
-        readyCheck();
+        #if debug readyCheck(); #end
         if (scenes.has(scene)) {
             scenes.remove(scene);
             scene.redrawHitSignal.remove(updateMouseSystem);
-            scene.bodyAddedSignal.remove(addBody);
-            scene.bodyRemovedSignal.remove(removeBody);
-            for (body in scene.bodies) removeBody(body);
+            scene.invalidatedSignal.remove(invalidate);
+            invalidate();
         }
     }
 
-    function addBody(body:Body):Void {
-        readyCheck();
-        bodiesByID[body.id] = body;
-    }
-
-    function removeBody(body:Body):Void {
-        readyCheck();
-        bodiesByID.remove(body.id);
-    }
+    function invalidate():Void bodiesByID = null;
 
     function initInteractionSystems():Void {
         mouseSystem = new MouseSystem();
@@ -163,7 +153,7 @@ class Engine {
     }
 
     public function setSize(width:Int, height:Int):Void {
-        readyCheck();
+        #if debug readyCheck(); #end
         this.width = width;
         this.height = height;
         for (scene in scenes) scene.resize(width, height);
@@ -172,7 +162,7 @@ class Engine {
     }
 
     public function activate():Void {
-        readyCheck();
+        #if debug readyCheck(); #end
         if (active) return;
         active = true;
 
@@ -185,7 +175,7 @@ class Engine {
     }
 
     public function deactivate():Void {
-        readyCheck();
+        #if debug readyCheck(); #end
         if (!active) return;
         active = false;
         updateTimer.stop();
@@ -204,18 +194,21 @@ class Engine {
     }
 
     public function setKeyboardFocus(body:Body):Void {
-        readyCheck();
+        #if debug readyCheck(); #end
+        fetchBodies();
         if (bodiesByID[body.id] == body) keyboardSystem.focusBodyID = body.id;
     }
 
     function onTimer():Void {
         var timeStamp:Float = Timer.stamp();
         var delta:Float = timeStamp - lastTimeStamp;
+        fetchBodies();
         for (body in bodiesByID) body.update(delta);
         lastTimeStamp = timeStamp;
     }
 
     function updateMouseSystem():Void {
+        fetchBodies();
         var rectsByBodyID:Map<Int, Rectangle> = new Map();
         for (scene in scenes) if (scene.focus != null) rectsByBodyID[scene.focus.id] = scene.camera.rect;
         mouseSystem.setRectRegions(rectsByBodyID);
@@ -232,7 +225,7 @@ class Engine {
     // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();
 
     function handleInteraction(bodyID:Null<Int>, glyphID:Null<Int>, interaction:Interaction):Void {
-
+        fetchBodies();
         var target:Body = bodiesByID[bodyID];
 
         switch (interaction) {
@@ -251,5 +244,12 @@ class Engine {
         if (target != null) target.interactionSignal.dispatch(glyphID, interaction);
     }
 
-    inline function readyCheck():Void if (!ready) throw "Engine hasn't initialized yet.";
+    inline function fetchBodies():Void {
+        if (bodiesByID == null) {
+            bodiesByID = new Map();
+            for (scene in scenes) for (body in scene.bodies) bodiesByID[body.id] = body;
+        }
+    }
+
+    #if debug inline function readyCheck():Void if (!ready) throw "Engine hasn't initialized yet."; #end
 }

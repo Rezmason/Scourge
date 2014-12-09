@@ -3,18 +3,20 @@ package net.rezmason.scourge.textview.core;
 import flash.geom.Matrix3D;
 import flash.geom.Rectangle;
 
+import net.rezmason.ds.SceneNode;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class Body {
+class Body extends SceneNode<Body> {
 
     static var _ids:Int = 0;
 
     public var numGlyphs(default, null):Int;
     public var id(default, null):Int;
     public var transform(default, null):Matrix3D;
+    public var concatenatedTransform(get, null):Matrix3D;
     public var glyphScale(default, set):Float;
     public var glyphTexture(default, set):GlyphTexture;
     public var scene(default, null):Scene;
@@ -27,10 +29,11 @@ class Body {
     @:allow(net.rezmason.scourge.textview.core) var glyphTransform(default, null):Array<Float>;
     
     var trueNumGlyphs:Int;
-
+    var concatMat:Matrix3D;
     var glyphs:Array<Glyph>;
 
     public function new():Void {
+        super();
         fontChangedSignal = new Zig();
         interactionSignal = new Zig();
         updateSignal = new Zig();
@@ -47,8 +50,28 @@ class Body {
         glyphs = [];
 
         transform = new Matrix3D();
+        concatMat = new Matrix3D();
         glyphTransform = [0, 0, 0, 0];
         glyphScale = 1;
+    }
+
+    override public function addChild(node:Body):Bool {
+        var success = super.addChild(node);
+        if (success) {
+            node.setScene(scene);
+            node.update(0);
+            if (scene != null) scene.invalidate();
+        }
+        return success;
+    }
+
+    override public function removeChild(node:Body):Bool {
+        var success = super.removeChild(node);
+        if (success) {
+            node.setScene(null);
+            if (scene != null) scene.invalidate();
+        }
+        return success;
     }
 
     public inline function getGlyphByID(id:Int):Glyph return glyphs[id];
@@ -110,15 +133,18 @@ class Body {
     @:allow(net.rezmason.scourge.textview.core)
     function update(delta:Float):Void {
         updateSignal.dispatch(delta);
-        for (segment in segments) segment.update();
+        if (scene != null) for (segment in segments) segment.update();
     }
 
     @:allow(net.rezmason.scourge.textview.core)
     function setScene(scene:Scene):Void {
+        var sceneWasNull:Bool = this.scene == null;
         if (this.scene != null) this.scene.resizeSignal.remove(updateGlyphTransform);
         this.scene = scene;
         updateGlyphTransform();
         if (this.scene != null) this.scene.resizeSignal.add(updateGlyphTransform);
+        if (sceneWasNull) for (segment in segments) segment.update();
+        for (child in children()) child.setScene(scene);
     }
 
     function updateGlyphTexture(glyphTexture:GlyphTexture):Void {
@@ -148,5 +174,11 @@ class Body {
             glyphTransform[0] = glyphScale;
             glyphTransform[1] = glyphScale * glyphTexture.font.glyphRatio * scene.stageWidth / scene.stageHeight;
         }
+    }
+
+    function get_concatenatedTransform():Matrix3D {
+        concatMat.copyFrom(transform);
+        if (parent != null) concatMat.append(parent.concatenatedTransform);
+        return concatMat;
     }
 }

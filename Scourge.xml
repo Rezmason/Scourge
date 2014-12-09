@@ -22,7 +22,7 @@
 	<haxedef name="glsl2agal" if="flash" />
 	<!-- <haxeflag name="-D" value="dump=pretty" /> -->
 	<haxedef name="haxeJSON" />
-	<!-- <haxedef name="advanced-telemetry" if="flash"/> -->
+	<haxedef name="advanced-telemetry" if="flash"/>
 	<!-- <haxedef name="dce" value="no" if="flash"/> -->
 	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
 	<!-- <compilerflag name="--macro" value="this.is.how.you.run.a.Compiler.macro()"/> -->

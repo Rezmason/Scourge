@@ -66,7 +66,7 @@ class UIElement {
         scene.camera.scaleMode = EXACT_FIT;
         scene.resizeSignal.add(resize);
         body = new Body();
-        scene.addBody(body);
+        scene.root.addChild(body);
         body.interactionSignal.add(receiveInteraction);
         body.updateSignal.add(update);
         scrollBar = null;

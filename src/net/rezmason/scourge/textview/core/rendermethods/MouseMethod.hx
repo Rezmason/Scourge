@@ -25,7 +25,7 @@ class MouseMethod extends RenderMethod {
 
     override function setBody(body:Body):Void {
         program.setProgramConstantsFromMatrix('uCameraMat', body.scene.camera.transform); // uCameraMat contains the camera matrix
-        program.setProgramConstantsFromMatrix('uBodyMat', body.transform); // uBodyMat contains the body's matrix
+        program.setProgramConstantsFromMatrix('uBodyMat', body.concatenatedTransform); // uBodyMat contains the body's matrix
         program.setFourProgramConstants('uGlyphTfm', body.glyphTransform); // uGlyphTfm contains the glyph transform
     }
 
