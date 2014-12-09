@@ -10,12 +10,10 @@ class UIScrollBar {
     public var thumbGlyph:Glyph;
     public var visible:Bool;
     public var fade:Float;
-    var bodyPaint:Int;
-
-    public function new(bodyPaint:Int):Void {
+    
+    public function new():Void {
         visible = false;
         fade = 0;
-        this.bodyPaint = bodyPaint;
     }
 
     public inline function setGlyphs(track:Glyph, thumb:Glyph):Void {
@@ -24,11 +22,9 @@ class UIScrollBar {
 
         trackGlyph.set_rgb(1, 1, 1);
         trackGlyph.set_i(0.2);
-        trackGlyph.set_paint(bodyPaint);
 
         thumbGlyph.set_rgb(1, 1, 1);
         thumbGlyph.set_i(1);
-        thumbGlyph.set_paint(bodyPaint);
     }
 
     public inline function updateFade(delta:Float):Void {

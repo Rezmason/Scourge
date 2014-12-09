@@ -57,7 +57,7 @@ class Span {
         }
     }
 
-    inline function paintGlyph(glyph:Glyph, val:Int):Void glyph.set_paint((glyph.get_paint() & 0xFF0000) | val);
+    inline function paintGlyph(glyph:Glyph, val:Int):Void glyph.set_paint(val);
 
     public inline function connect():Void style.connectSpan(this);
     public inline function removeAllGlyphs():Void glyphs = [];

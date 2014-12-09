@@ -1,4 +1,3 @@
-Mouse body paint: body's ID should be passed in
 Camera scale mode should drive glyph scaling
 
 Break down BoardSystem
@@ -18,6 +17,9 @@ Where does the loupe live?
             One for biting
             One for player stats
             One for DNA?
+
+We can support more Bodies by making IDs dynamic
+    Engine, render methods create them from display list
 
 Settings page
 Game config page

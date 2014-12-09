@@ -53,8 +53,6 @@ class UIElement {
     var numCols:Int;
     var numTextCols:Int;
 
-    var bodyPaint:Int;
-
     var uiMediator:UIMediator;
 
     public var hasScrollBar(default, set):Bool;
@@ -72,7 +70,6 @@ class UIElement {
         scrollBar = null;
         hasScrollBar = false;
         
-        bodyPaint = body.id << 16;
         spaceCode = ' '.charCodeAt(0);
 
         baseTransform = new Matrix3D();
@@ -116,7 +113,7 @@ class UIElement {
     function update(delta:Float):Void {
 
         if (!dragging && uiMediator.isDirty) {
-            uiMediator.updateDirtyText(bodyPaint);
+            uiMediator.updateDirtyText();
             if (Math.isNaN(currentScrollPos)) setScrollPos(uiMediator.bottomPos());
             glideTextToPos(uiMediator.bottomPos());
             scene.redrawHitSignal.dispatch();
@@ -314,7 +311,7 @@ class UIElement {
     inline function set_hasScrollBar(val:Bool):Bool {
         if (hasScrollBar != val) {
             hasScrollBar = val;
-            scrollBar = val ? new UIScrollBar(bodyPaint) : null;
+            scrollBar = val ? new UIScrollBar() : null;
             recalculateGeometry();
         }
         return val;

@@ -26,7 +26,7 @@ class MouseMethod extends RenderMethod {
     override function setBody(body:Body):Void {
         program.setProgramConstantsFromMatrix('uCameraMat', body.scene.camera.transform); // uCameraMat contains the camera matrix
         program.setProgramConstantsFromMatrix('uBodyMat', body.concatenatedTransform); // uBodyMat contains the body's matrix
-        program.setFourProgramConstants('uGlyphTfm', body.glyphTransform); // uGlyphTfm contains the glyph transform
+        program.setFourProgramConstants('uBodyParams', body.params); // uBodyParams contains the glyph transform and body paint
     }
 
     override public function setSegment(segment:BodySegment):Void {
@@ -34,7 +34,7 @@ class MouseMethod extends RenderMethod {
         var paintBuffer:VertexBuffer = (segment == null) ? null : segment.paintBuffer;
         program.setVertexBufferAt('aPos',    shapeBuffer, 0, 3);
         program.setVertexBufferAt('aCorner', shapeBuffer, 3, 2);
-        program.setVertexBufferAt('aPaint',  paintBuffer, 0, 3);
+        program.setVertexBufferAt('aPaint',  paintBuffer, 0, 2);
     }
 }
 

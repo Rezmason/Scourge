@@ -86,7 +86,7 @@ class SplashDemo {
                     glyph.set_color(color);
                     glyph.set_i(0);
                     glyph.set_char(charCode);
-                    glyph.set_paint(glyph.id | body.id << 16);
+                    glyph.set_paint(glyph.id);
 
                     z += 0.01;
                     color = Colors.mult(color, 0.2);

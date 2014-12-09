@@ -26,7 +26,7 @@ class Body extends SceneNode<Body> {
     public var updateSignal(default, null):Zig<Float->Void>;
 
     @:allow(net.rezmason.scourge.textview.core) var segments(default, null):Array<BodySegment>;
-    @:allow(net.rezmason.scourge.textview.core) var glyphTransform(default, null):Array<Float>;
+    @:allow(net.rezmason.scourge.textview.core) var params(default, null):Array<Float>;
     
     var trueNumGlyphs:Int;
     var concatMat:Matrix3D;
@@ -51,7 +51,8 @@ class Body extends SceneNode<Body> {
 
         transform = new Matrix3D();
         concatMat = new Matrix3D();
-        glyphTransform = [0, 0, 0, 0];
+        params = [0, 0, 0, 0];
+        params[2] = id / 0xFF;
         glyphScale = 1;
     }
 
@@ -124,10 +125,7 @@ class Body extends SceneNode<Body> {
         this.numGlyphs = numGlyphs;
 
         for (ike in numGlyphs...trueNumGlyphs) glyphs[ike].reset();
-        for (glyph in glyphs) {
-            glyph.set_paint(glyph.get_paint() & 0xFFFF | this.id << 16);
-            glyph.set_font(glyphTexture.font);
-        }
+        for (glyph in glyphs) glyph.set_font(glyphTexture.font);
     }
 
     @:allow(net.rezmason.scourge.textview.core)
@@ -171,8 +169,8 @@ class Body extends SceneNode<Body> {
 
     inline function updateGlyphTransform():Void {
         if (glyphTexture != null && scene != null) {
-            glyphTransform[0] = glyphScale;
-            glyphTransform[1] = glyphScale * glyphTexture.font.glyphRatio * scene.stageWidth / scene.stageHeight;
+            params[0] = glyphScale;
+            params[1] = glyphScale * glyphTexture.font.glyphRatio * scene.stageWidth / scene.stageHeight;
         }
     }
 

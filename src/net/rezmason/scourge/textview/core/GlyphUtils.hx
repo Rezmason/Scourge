@@ -159,16 +159,15 @@ class GlyphUtils {
     public inline static function get_paint(gl:Glyph) return gl.paintHex;
 
     public inline static function set_paint(gl:Glyph, val:Int) {
-        if (get_paint(gl) != val) {
+        #if debug if (val > 0xFFFF) throw 'Glyph cannot be painted color ${Colors.fromHex(val)}'; #end
+        if (gl.paintHex != val) {
 
-            var paintR = ((val >> 16) & 0xFF) / 0xFF;
-            var paintG = ((val >>  8) & 0xFF) / 0xFF;
-            var paintB = ((val >>  0) & 0xFF) / 0xFF;
+            var paintR = ((val >>  8) & 0xFF) / 0xFF;
+            var paintG = ((val >>  0) & 0xFF) / 0xFF;
             var glyphOffset:Int = gl.id * PAINT_FLOATS_PER_GLYPH;
 
             pop4(gl.paint, glyphOffset, PR_OFFSET, PAINT_FLOATS_PER_VERTEX, paintR);
             pop4(gl.paint, glyphOffset, PG_OFFSET, PAINT_FLOATS_PER_VERTEX, paintG);
-            pop4(gl.paint, glyphOffset, PB_OFFSET, PAINT_FLOATS_PER_VERTEX, paintB);
 
             gl.paintHex = val;
         }

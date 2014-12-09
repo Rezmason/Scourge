@@ -91,7 +91,7 @@ class UIMediator {
         return caretGlyphID;
     }
 
-    public function updateDirtyText(bodyPaint:Int, force:Null<Bool> = false):Void {
+    public function updateDirtyText(force:Null<Bool> = false):Void {
         isDirty = isDirty || force;
 
         if (isDirty) {

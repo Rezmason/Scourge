@@ -79,6 +79,38 @@ class BoardSystem {
         body.interactionSignal.add(receiveInteraction);
         body.updateSignal.add(update);
 
+        var base = body;
+        var colors = [
+            {r:1, g:0, b:0},
+            {r:1, g:1, b:0},
+            {r:0, g:1, b:0},
+            {r:0, g:1, b:1},
+            {r:0, g:0, b:1},
+            {r:1, g:0, b:1},
+        ];
+        for (ike in 0...6) {
+            var child = new Body();
+            child.glyphScale = 0.025;
+            child.growTo(8);
+            for (glyph in child.eachGlyph()) {
+                glyph.set_char('*'.charCodeAt(0));
+                glyph.set_color(colors[ike]);
+            }
+            var s = 0.015;
+            child.getGlyphByID(0).set_xyz(-s, -s, -s);
+            child.getGlyphByID(1).set_xyz( s, -s, -s);
+            child.getGlyphByID(2).set_xyz( s,  s, -s);
+            child.getGlyphByID(3).set_xyz(-s,  s, -s);
+            child.getGlyphByID(4).set_xyz(-s, -s,  s);
+            child.getGlyphByID(5).set_xyz( s, -s,  s);
+            child.getGlyphByID(6).set_xyz( s,  s,  s);
+            child.getGlyphByID(7).set_xyz(-s,  s,  s);
+            if (ike > 0) child.transform.appendTranslation(0.1, 0, 0);
+            child.updateSignal.add(function(t) child.transform.appendRotation(t * ike * 30, Vector3D.Z_AXIS));
+            base.addChild(child);
+            base = child;
+        }
+
         dragging = false;
         dragStartTransform = new Matrix3D();
         rawTransform = new Matrix3D();

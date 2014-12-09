@@ -79,7 +79,7 @@ class EyeCandyDemo {
             glyph.set_rgb(r, g, b);
             glyph.set_a(1);
             glyph.set_char(charCode);
-            glyph.set_paint(glyph.id | body.id << 16);
+            glyph.set_paint(glyph.id);
 
             _z -= dZ;
             theta += dTheta;

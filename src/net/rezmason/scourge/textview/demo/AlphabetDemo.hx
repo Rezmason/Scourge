@@ -46,7 +46,7 @@ class AlphabetDemo {
             glyph.set_rgb(1, 1, 1);
             glyph.set_i(0.1);
             glyph.set_char(charCode);
-            glyph.set_paint((glyph.id + 1) | body.id << 16); // necessary?
+            glyph.set_paint(glyph.id + 1);
         }
     }
 
