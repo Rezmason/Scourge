@@ -28,7 +28,7 @@ class SplashPage extends NavPage {
 
         splashDemo = new SplashDemo();
         splashScene = new Scene();
-        splashScene.camera.scaleMode = WIDTH_FIT;
+        splashScene.camera.mode = WIDTH_FIT;
         splashScene.camera.rect = new Rectangle(0.0, 0.0, 1.0, 0.4);
         splashScene.root.addChild(splashDemo.body);
         scenes.push(splashScene);

@@ -88,24 +88,16 @@ class BoardSystem {
             {r:0, g:0, b:1},
             {r:1, g:0, b:1},
         ];
+        var s:Float = 4;
         for (ike in 0...6) {
             var child = new Body();
             child.glyphScale = 0.025;
-            child.growTo(8);
-            for (glyph in child.eachGlyph()) {
-                glyph.set_char('*'.charCodeAt(0));
-                glyph.set_color(colors[ike]);
-            }
-            var s = 0.015;
-            child.getGlyphByID(0).set_xyz(-s, -s, -s);
-            child.getGlyphByID(1).set_xyz( s, -s, -s);
-            child.getGlyphByID(2).set_xyz( s,  s, -s);
-            child.getGlyphByID(3).set_xyz(-s,  s, -s);
-            child.getGlyphByID(4).set_xyz(-s, -s,  s);
-            child.getGlyphByID(5).set_xyz( s, -s,  s);
-            child.getGlyphByID(6).set_xyz( s,  s,  s);
-            child.getGlyphByID(7).set_xyz(-s,  s,  s);
-            if (ike > 0) child.transform.appendTranslation(0.1, 0, 0);
+            child.growTo(1);
+            child.getGlyphByID(0).set_char('*'.charCodeAt(0));
+            child.getGlyphByID(0).set_s(s);
+            child.getGlyphByID(0).set_color(colors[ike]);
+            if (ike > 0) child.transform.appendTranslation(s * 0.07, 0, 0);
+            s *= 0.7;
             child.updateSignal.add(function(t) child.transform.appendRotation(t * ike * 30, Vector3D.Z_AXIS));
             base.addChild(child);
             base = child;
