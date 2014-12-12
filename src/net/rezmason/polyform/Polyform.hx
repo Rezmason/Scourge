@@ -62,7 +62,7 @@ abstract Polyform(String) {
     }
 
     public inline function expand(rules:Map<String, String>) {
-        var expansions = new Map();
+        var expansions:Map<String, Polyform> = new Map();
         var len = this.length;
         for (pattern in rules.keys()) {
             var rep = rules[pattern];
