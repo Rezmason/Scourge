@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-enum CameraMode {
+enum CameraScaleMode {
     EXACT_FIT; // Distort the aspect ratio to fit the camera in the rectangle
     NO_BORDER; // Scale the camera uniformly to match the dimension of the largest side of the screen
     NO_SCALE; // Perform no scaling logic

@@ -136,12 +136,12 @@ class Body extends SceneNode<Body> {
 
     @:allow(net.rezmason.scourge.textview.core)
     function setScene(scene:Scene):Void {
-        var sceneWasNull:Bool = this.scene == null;
+        var lastScene:Scene = this.scene;
         if (this.scene != null) this.scene.resizeSignal.remove(updateGlyphTransform);
         this.scene = scene;
         updateGlyphTransform();
         if (this.scene != null) this.scene.resizeSignal.add(updateGlyphTransform);
-        if (sceneWasNull) for (segment in segments) segment.update();
+        if (lastScene == null) for (segment in segments) segment.update();
         for (child in children()) child.setScene(scene);
     }
 
@@ -169,8 +169,8 @@ class Body extends SceneNode<Body> {
 
     inline function updateGlyphTransform():Void {
         if (glyphTexture != null && scene != null) {
-            params[0] = glyphScale;
-            params[1] = glyphScale * glyphTexture.font.glyphRatio * scene.stageWidth / scene.stageHeight;
+            params[0] = glyphScale * scene.camera.glyphScale;
+            params[1] = glyphScale * scene.camera.glyphScale * scene.stageWidth / scene.stageHeight * glyphTexture.font.glyphRatio;
         }
     }
 

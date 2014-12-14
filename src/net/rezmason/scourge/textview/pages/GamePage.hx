@@ -23,6 +23,7 @@ class GamePage extends NavPage {
         super();
 
         mainScene = new Scene();
+        mainScene.camera.glyphScaleMode = SCALE_WITH_MIN;
         mainScene.camera.rect = new Rectangle(0, 0, 0.6, 1);
         scenes.push(mainScene);
         

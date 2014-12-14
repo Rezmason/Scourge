@@ -1,5 +1,3 @@
-Camera scale mode should drive glyph scaling
-
 Break down BoardSystem
 
 The Loupe

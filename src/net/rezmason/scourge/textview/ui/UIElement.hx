@@ -5,7 +5,7 @@ import flash.geom.Rectangle;
 import flash.system.Capabilities;
 
 import net.rezmason.scourge.textview.core.Body;
-import net.rezmason.scourge.textview.core.CameraMode;
+import net.rezmason.scourge.textview.core.CameraScaleMode;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.core.Interaction;
@@ -61,7 +61,7 @@ class UIElement {
     public function new(uiMediator:UIMediator):Void {
         this.uiMediator = uiMediator;
         scene = new Scene();
-        scene.camera.mode = EXACT_FIT;
+        scene.camera.scaleMode = EXACT_FIT;
         scene.resizeSignal.add(resize);
         body = new Body();
         scene.root.addChild(body);
