@@ -26,7 +26,7 @@ class Converter extends BasicWorker<GLSLInput, AGALOutput> {
     static var cModuleInitialized:Bool = false;
     static var assembler:AGALMiniAssembler;
 
-    override function receive(data:GLSLInput):Void send(convert(data));
+    override function process(data:GLSLInput):AGALOutput return convert(data);
 
     static function convert(input:GLSLInput):AGALOutput {
         var isFrag:Int = input.type == Context3DProgramType.FRAGMENT ? 1 : 0;
