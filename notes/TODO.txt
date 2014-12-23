@@ -1,4 +1,11 @@
 Break down BoardSystem
+    Better setting of multiple values on a glyph at once
+        createGlyph should accept params
+        macro setter!
+        GlyphUtils could have an interpolate method
+            Interpolate from what though?
+            Fake glyphs?
+    If necessary, node views' glyphs can have corresponding persistent from and to glyphs
 
 The Loupe
     Get it ON the board

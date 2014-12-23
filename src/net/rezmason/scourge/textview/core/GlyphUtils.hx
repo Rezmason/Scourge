@@ -56,6 +56,23 @@ class GlyphUtils {
         set_a(gl, a);
     }
 
+    public inline static function createGlyph():Glyph {
+        var gl = new Glyph();
+        gl.shape = new VertexArray(SHAPE_FLOATS_PER_GLYPH);
+        gl.color = new VertexArray(COLOR_FLOATS_PER_GLYPH);
+        gl.paint = new VertexArray(PAINT_FLOATS_PER_GLYPH);
+        return gl;
+    }
+
+    public inline static function copy(gl:Glyph):Glyph {
+        var copy = createGlyph();
+        init(copy);
+        for (ike in 0...SHAPE_FLOATS_PER_GLYPH) copy.shape[ike] = gl.shape[gl.id + ike];
+        for (ike in 0...COLOR_FLOATS_PER_GLYPH) copy.color[ike] = gl.color[gl.id + ike];
+        for (ike in 0...PAINT_FLOATS_PER_GLYPH) copy.paint[ike] = gl.paint[gl.id + ike];
+        return copy;
+    }
+
     // Shape
 
     public inline static function get_x(gl:Glyph) return gl.shape[gl.id * SHAPE_FLOATS_PER_GLYPH + X_OFFSET];
@@ -90,19 +107,6 @@ class GlyphUtils {
         set_h(gl, h);
         set_s(gl, s);
         set_p(gl, p);
-    }
-
-    public inline static function makeCorners(gl:Glyph):Void {
-        var glyphOffset:Int = gl.id * SHAPE_FLOATS_PER_GLYPH;
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX, -1);
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX,  1);
-
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, -1);
     }
 
     // Character
@@ -175,27 +179,28 @@ class GlyphUtils {
         return gl.paintHex;
     }
 
-    public inline static function transfer(gl:Glyph, shape:VertexArray, color:VertexArray, paint:VertexArray):Void {
-        gl.shape = shape;
-        gl.color = color;
-        gl.paint = paint;
+    public inline static function init(gl:Glyph):Void {
+        // corner H
+        var glyphOffset:Int = gl.id * SHAPE_FLOATS_PER_GLYPH;
+        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
+        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX, -1);
+        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
+        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX,  1);
+        // corner V
+        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
+        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX,  1);
+        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
+        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, -1);
 
-        makeCorners(gl);
-
-        gl.charCode = 0;
-        gl.paintHex = 0;
-
-        set_paint(gl, gl.paintHex);
-
-        pop4(gl.color, gl.id * COLOR_FLOATS_PER_GLYPH, U_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
-        pop4(gl.color, gl.id * COLOR_FLOATS_PER_GLYPH, V_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
+        set_paint(gl, 0);
+        reset(gl);
     }
 
     public inline static function reset(gl:Glyph):Void {
-        set_distort(gl, 1, 1, 0);
-        set_xyz(gl, 0, 0, 0);
-        set_rgb(gl, 1, 1, 1);
-        set_fx(gl, 0, 0.5, 0);
+        set_distort(gl, 1, 1, 0); // h, s, p
+        set_xyz(gl, 0, 0, 0); // x, y, z
+        set_rgb(gl, 1, 1, 1); // r, g, b
+        set_fx(gl, 0, 0.5, 0); // i, f, a
         // We don't reset the font.
         set_char(gl, -1);
     }

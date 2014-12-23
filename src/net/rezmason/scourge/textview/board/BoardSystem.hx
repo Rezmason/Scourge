@@ -39,14 +39,6 @@ class BoardSystem {
 
     public var body(default, null):Body;
 
-    var dragging:Bool;
-    var dragX:Float;
-    var dragY:Float;
-    var dragStartTransform:Matrix3D;
-    var rawTransform:Matrix3D;
-    var homeTransform:Matrix3D;
-    var plainTransform:Matrix3D;
-
     var maxAnimationTime:Float;
     var animationSpeed:Float;
     
@@ -76,39 +68,8 @@ class BoardSystem {
     public function new():Void {
 
         body = new Body();
-        body.interactionSignal.add(receiveInteraction);
         body.updateSignal.add(update);
 
-        var base = body;
-        var colors = [
-            {r:1, g:0, b:0},
-            {r:1, g:1, b:0},
-            {r:0, g:1, b:0},
-            {r:0, g:1, b:1},
-            {r:0, g:0, b:1},
-            {r:1, g:0, b:1},
-        ];
-        var s:Float = 4;
-        for (ike in 0...6) {
-            var child = new Body();
-            child.glyphScale = 0.025;
-            child.growTo(1);
-            child.getGlyphByID(0).set_char('*'.charCodeAt(0));
-            child.getGlyphByID(0).set_s(s);
-            child.getGlyphByID(0).set_color(colors[ike]);
-            if (ike > 0) child.transform.appendTranslation(s * 0.07, 0, 0);
-            s *= 0.7;
-            child.updateSignal.add(function(t) child.transform.appendRotation(t * ike * 30, Vector3D.Z_AXIS));
-            base.addChild(child);
-            base = child;
-        }
-
-        dragging = false;
-        dragStartTransform = new Matrix3D();
-        rawTransform = new Matrix3D();
-        homeTransform = new Matrix3D();
-        plainTransform = new Matrix3D();
-        
         boardScale = 1;
         body.glyphScale = 0.025;
         nodeViews = [];
@@ -184,12 +145,9 @@ class BoardSystem {
         boardScale = BOARD_MAGNIFICATION / (maxX - minX);
         body.glyphScale = 0.025 * boardScale;
         
-        homeTransform.identity();
-        homeTransform.appendScale(boardScale, boardScale, boardScale);
-        homeTransform.appendTranslation(0, 0, 0.5);
-        
-        body.transform.copyFrom(rawTransform);
-        body.transform.append(homeTransform);
+        body.transform.identity();
+        body.transform.appendScale(boardScale, boardScale, boardScale);
+        body.transform.appendTranslation(0, 0, 0.5);
     }
 
     public function handleUIUpdate():Void {
@@ -384,58 +342,6 @@ class BoardSystem {
                 view.topGlyph.set_s(view.topSize * (1 - h) + (view.topSize + 0.5) * h);
             }
         }
-
-        if (!dragging) {
-            rawTransform.interpolateTo(plainTransform, 0.1);
-            body.transform.copyFrom(rawTransform);
-            body.transform.append(homeTransform);
-        }
-    }
-
-    function receiveInteraction(id:Int, interaction:Interaction):Void {
-        switch (interaction) {
-            case MOUSE(type, x, y):
-                switch (type) {
-                    case MOUSE_DOWN: startDrag(x, y);
-                    case MOUSE_UP, DROP: stopDrag();
-                    case MOVE, ENTER, EXIT: if (dragging) updateDrag(x, y);
-                    case _:
-                }
-            case _:
-        }
-    }
-
-    inline function startDrag(x:Float, y:Float):Void {
-        dragging = true;
-        dragStartTransform.copyFrom(rawTransform);
-        dragX = x;
-        dragY = y;
-    }
-
-    inline static var MAG:Float = 10;
-
-    inline function updateDrag(x:Float, y:Float):Void {
-        rawTransform.copyFrom(dragStartTransform);
-
-        var dirX:Float = dragX > x ? 1 : -1;
-        var dirY:Float = dragY > y ? 1 : -1;
-
-        x = (dragX - x) * dirX;
-        y = (dragY - y) * dirY;
-
-        x = Math.sqrt(x * MAG) / MAG;
-        y = Math.sqrt(y * MAG) / MAG;
-
-        // TODO: -kx
-
-        rawTransform.appendRotation(x * dirX * 180, Vector3D.Y_AXIS);
-        rawTransform.appendRotation(y * dirY * 180, Vector3D.X_AXIS);
-        body.transform.copyFrom(rawTransform);
-        body.transform.append(homeTransform);
-    }
-
-    inline function stopDrag():Void {
-        dragging = false;
     }
 
     inline function makeView():NodeView {

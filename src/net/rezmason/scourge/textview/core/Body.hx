@@ -121,10 +121,7 @@ class Body extends SceneNode<Body> {
                 remainingGlyphs -= Almanac.BUFFER_CHUNK;
             }
         }
-
         this.numGlyphs = numGlyphs;
-
-        for (ike in numGlyphs...trueNumGlyphs) glyphs[ike].reset();
         for (glyph in glyphs) glyph.set_font(glyphTexture.font);
     }
 

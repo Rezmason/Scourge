@@ -17,9 +17,5 @@ class Glyph {
     var charCode:Int;
     var font:FlatFont;
 
-    function new(id:Int, shape:VertexArray, color:VertexArray, paint:VertexArray):Void {
-        this.id = id;
-        GlyphUtils.transfer(this, shape, color, paint);
-        GlyphUtils.reset(this);
-    }
+    function new(id:Int = 0):Void this.id = id;
 }

@@ -61,15 +61,8 @@ class PrettyMethod extends RenderMethod {
     }
 
     override public function setSegment(segment:BodySegment):Void {
-
-        var shapeBuffer:VertexBuffer = null;
-        var colorBuffer:VertexBuffer = null;
-
-        if (segment != null) {
-            shapeBuffer = segment.shapeBuffer;
-            colorBuffer = segment.colorBuffer;
-        }
-
+        var shapeBuffer:VertexBuffer = (segment == null) ? null : segment.shapeBuffer;
+        var colorBuffer:VertexBuffer = (segment == null) ? null : segment.colorBuffer;
         program.setVertexBufferAt('aPos',     shapeBuffer, 0, 3); // aPos contains x,y,z
         program.setVertexBufferAt('aCorner',  shapeBuffer, 3, 2); // aCorner contains h,v
         program.setVertexBufferAt('aDistort', shapeBuffer, 5, 3); // aScale contains h,s,p
