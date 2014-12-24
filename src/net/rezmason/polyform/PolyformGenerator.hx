@@ -38,7 +38,7 @@ class PolyformGenerator {
                 for (poly in lastMatches) for (expansion in poly.expand(stringRules)) matchMap[expansion] = expansion;
                 for (poly in matchMap) {
                     if (poly.winding() != 4) throw 'Invalid: $poly'; // This actually tests the rules, not the pieces.
-                    if (!hasCoincidentPerimeter(poly)) matches.push(poly);
+                    if (ike < 7 || !hasCoincidentPerimeter(poly)) matches.push(poly);
                 }
             }
             matches.sort(Polyform.sortFunction);

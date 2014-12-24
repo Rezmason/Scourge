@@ -110,15 +110,15 @@ class DropPieceRule extends Rule {
             var freePiece:FreePiece = cfg.pieces.getPieceById(pieceID);
 
             // For each allowed reflection,
-            var allowedReflectionIndex:Int = pieceReflection % freePiece.numReflections();
-            for (reflectionIndex in 0...freePiece.numReflections()) {
+            var allowedReflectionIndex:Int = pieceReflection % freePiece.numReflections;
+            for (reflectionIndex in 0...freePiece.numReflections) {
 
                 if (!cfg.allowFlipping && reflectionIndex != allowedReflectionIndex) continue;
                 
                 // For each allowed rotation,
-                var allowedRotationIndex:Int = pieceRotation % freePiece.numRotations();
+                var allowedRotationIndex:Int = pieceRotation % freePiece.numRotations;
 
-                for (rotationIndex in 0...freePiece.numRotations()) {
+                for (rotationIndex in 0...freePiece.numRotations) {
 
                     if (!cfg.allowRotating && rotationIndex != allowedRotationIndex) continue;
                     var piece:Piece = freePiece.getPiece(reflectionIndex, rotationIndex);
@@ -140,7 +140,7 @@ class DropPieceRule extends Rule {
                             var numAddedNodes:Int = 0;
                             var addedNodes:Array<Int> = [];
 
-                            for (coord in piece.cells()) {
+                            for (coord in piece.cells) {
                                 var nodeAtCoord:AspectSet = walkLocus(getNodeLocus(node), coord, homeCoord).value;
                                 addedNodes.push(getID(nodeAtCoord));
                                 numAddedNodes++;
@@ -214,7 +214,7 @@ class DropPieceRule extends Rule {
         if (move.targetNode != Aspect.NULL) {
             var freePiece:FreePiece = cfg.pieces.getPieceById(move.pieceID);
             var targetLocus:BoardLocus = getLocus(move.targetNode);
-            var coords:Array<IntCoord> = freePiece.getPiece(move.reflection, move.rotation).cells();
+            var coords:Array<IntCoord> = freePiece.getPiece(move.reflection, move.rotation).cells;
             var homeCoord:IntCoord = move.coord;
             var maxFreshness:Int = state.globals[maxFreshness_] + 1;
 
@@ -279,8 +279,8 @@ class DropPieceRule extends Rule {
     inline function walkLocus(locus:BoardLocus, fromCoord:IntCoord, toCoord:IntCoord):BoardLocus {
         var dn:Int = 0;
         var dw:Int = 0;
-        var de:Int = toCoord.x() - fromCoord.x();
-        var ds:Int = toCoord.y() - fromCoord.y();
+        var de:Int = toCoord.x - fromCoord.x;
+        var ds:Int = toCoord.y - fromCoord.y;
 
         if (de < 0) {
             dw = -de;

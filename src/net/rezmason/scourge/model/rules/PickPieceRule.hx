@@ -127,7 +127,7 @@ class PickPieceRule extends Rule {
             if (freq == 0 || freq == null) continue;
 
             var freePiece:FreePiece = cfg.pieces.getPieceById(pieceTableID);
-            var numRotations = freePiece.numRotations();
+            var numRotations = freePiece.numRotations;
 
             // A piece that can't be flipped or rotated has its multiple symmetries
             // added to the hat, and so it has more moves
@@ -140,7 +140,7 @@ class PickPieceRule extends Rule {
                     for (rotation in 0...numRotations) generateMove(pieceTableID, 0, rotation, freq * spinWeight);
                 }
             } else {
-                for (flip in 0...freePiece.numReflections()) {
+                for (flip in 0...freePiece.numReflections) {
                     if (cfg.allowRotating) {
                         generateMove(pieceTableID, flip, 0, freq);
                     } else {

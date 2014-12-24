@@ -42,14 +42,14 @@ class PolyformGeneratorTest {
             var freePieces:Array<FreePiece> = pieces.getAllPiecesOfSize(size);
 
             for (freePiece in freePieces) {
-                for (ike in 0...freePiece.numRotations()) {
+                for (ike in 0...freePiece.numRotations) {
                     var piece = freePiece.getPiece(0, ike);
-                    Assert.areEqual(size, piece.cells().length);
+                    Assert.areEqual(size, piece.cells.length);
                     str += '\n' + spitPiece(piece);
-                    if (freePiece.numReflections() > 1) {
+                    if (freePiece.numReflections > 1) {
                         var mirrorPiece = freePiece.getPiece(1, ike);
-                        Assert.areEqual(size, mirrorPiece.cells().length);
-                        Assert.areNotEqual(Std.string(piece.cells()), Std.string(mirrorPiece.cells()));
+                        Assert.areEqual(size, mirrorPiece.cells.length);
+                        Assert.areNotEqual(Std.string(piece.cells), Std.string(mirrorPiece.cells));
                         str += '\n' + spitPiece(mirrorPiece);
                     }
                     str += '\n ';
@@ -77,10 +77,10 @@ class PolyformGeneratorTest {
             var series = freePiecesBySize[size];
             var count = 0;
             for (freePiece in series) {
-                count += freePiece.numReflections() * freePiece.numRotations();
-                for (reflection in 0...freePiece.numReflections()) {
-                    for (rotation in 0...freePiece.numRotations()) {
-                        Assert.areEqual(freePiece.getPiece(reflection, rotation).cells().length, size);
+                count += freePiece.numReflections * freePiece.numRotations;
+                for (reflection in 0...freePiece.numReflections) {
+                    for (rotation in 0...freePiece.numRotations) {
+                        Assert.areEqual(freePiece.getPiece(reflection, rotation).cells.length, size);
                     }
                 }
             }
@@ -90,13 +90,13 @@ class PolyformGeneratorTest {
     }
 
     private function spitPiece(piece:Piece):String {
-        var max:Int = piece.cells().length + 2;
+        var max:Int = piece.cells.length + 2;
 
         var minX = max;
         var minY = max;
-        for (coord in piece.corners()) {
-            if (minX > coord.x()) minX = coord.x();
-            if (minY > coord.y()) minY = coord.y();
+        for (coord in piece.corners) {
+            if (minX > coord.x) minX = coord.x;
+            if (minY > coord.y) minY = coord.y;
         }
 
         var str:String = '';
@@ -104,18 +104,18 @@ class PolyformGeneratorTest {
             str += ' ';
         }
 
-        for (coord in piece.cells()) {
-            var index:Int = max * (coord.y() - minY) + coord.x() - minX;
+        for (coord in piece.cells) {
+            var index:Int = max * (coord.y - minY) + coord.x - minX;
             str = str.substr(0, index) + 'X' + str.substr(index + 1);
         }
 
-        for (coord in piece.edges()) {
-            var index:Int = max * (coord.y() - minY) + coord.x() - minX;
+        for (coord in piece.edges) {
+            var index:Int = max * (coord.y - minY) + coord.x - minX;
             str = str.substr(0, index) + 'o' + str.substr(index + 1);
         }
 
-        for (coord in piece.corners()) {
-            var index:Int = max * (coord.y() - minY) + coord.x() - minX;
+        for (coord in piece.corners) {
+            var index:Int = max * (coord.y - minY) + coord.x - minX;
             str = str.substr(0, index) + '+' + str.substr(index + 1);
         }
 
