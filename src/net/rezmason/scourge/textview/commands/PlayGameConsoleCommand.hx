@@ -2,10 +2,12 @@ package net.rezmason.scourge.textview.commands;
 
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
+import net.rezmason.scourge.textview.GameSystem;
 import net.rezmason.scourge.textview.console.ConsoleCommand;
 import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
+import net.rezmason.utils.santa.Present;
 using Lambda;
 
 class PlayGameConsoleCommand extends ConsoleCommand {
@@ -13,10 +15,10 @@ class PlayGameConsoleCommand extends ConsoleCommand {
     var showBody:Void->Void;
     var gameSystem:GameSystem;
 
-    public function new(showBody:Void->Void, gameSystem:GameSystem):Void {
+    public function new(showBody:Void->Void):Void {
         super();
         this.showBody = showBody;
-        this.gameSystem = gameSystem;
+        this.gameSystem = new Present(GameSystem);
         name = 'play';
 
         keys['playerPattern'] = PLAYER_PATTERN;

@@ -2,7 +2,7 @@ package net.rezmason.scourge.textview.pages;
 
 import flash.geom.Rectangle;
 
-import net.rezmason.scourge.textview.board.BoardSystem;
+import net.rezmason.scourge.textview.GameSystem;
 import net.rezmason.scourge.textview.commands.*;
 import net.rezmason.scourge.textview.console.*;
 import net.rezmason.scourge.textview.core.Body;
@@ -10,10 +10,10 @@ import net.rezmason.scourge.textview.core.Scene;
 import net.rezmason.scourge.textview.demo.*;
 import net.rezmason.scourge.textview.ui.UIElement;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.santa.Present;
 
 class GamePage extends NavPage {
 
-    var gameSystem:GameSystem;
     var bodiesByName:Map<String, Body>;
     var currentBodyName:String;
     var consoleMed:ConsoleUIMediator;
@@ -29,23 +29,22 @@ class GamePage extends NavPage {
         
         consoleMed = new ConsoleUIMediator();
         var interpreter = new Interpreter(consoleMed);
-        var boardSystem:BoardSystem  = new BoardSystem();
         var console:UIElement = new UIElement(consoleMed);
 
         var alphabetDemo:AlphabetDemo = new AlphabetDemo();
         var glyphDemo:GlyphDemo = new GlyphDemo();
         var eyeCandyDemo:EyeCandyDemo = new EyeCandyDemo();
+        var gameSystem:GameSystem = new Present(GameSystem);
 
         bodiesByName = new Map();
         bodiesByName['alphabet'] = alphabetDemo.body;
         bodiesByName['sdf']      = glyphDemo.body;
         bodiesByName['test']     = eyeCandyDemo.body;
-        bodiesByName['board']    = boardSystem.body;
+        bodiesByName['board']    = gameSystem.board;
 
         console.hasScrollBar = true;
         console.scene.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
         scenes.push(console.scene);
-        gameSystem = new GameSystem(boardSystem, consoleMed); // Doesn't really belong in here
 
         interpreter.addCommand(new RunTestsConsoleCommand());
         interpreter.addCommand(new SetFontConsoleCommand(console));
@@ -53,7 +52,7 @@ class GamePage extends NavPage {
         interpreter.addCommand(new PrintConsoleCommand());
         interpreter.addCommand(new SimpleCommand('clear', clearConsoleCommand));
         interpreter.addCommand(new SimpleCommand('show', showBodyCommand));
-        interpreter.addCommand(new PlayGameConsoleCommand(showBodyByName.bind('board'), gameSystem));
+        interpreter.addCommand(new PlayGameConsoleCommand(showBodyByName.bind('board')));
 
         showBodyByName('board');
     }

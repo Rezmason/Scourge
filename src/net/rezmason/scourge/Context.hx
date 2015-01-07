@@ -4,6 +4,7 @@ import flash.Lib;
 import flash.display.Stage;
 import flash.events.Event;
 
+import net.rezmason.scourge.textview.GameSystem;
 import net.rezmason.scourge.textview.NavSystem;
 import net.rezmason.scourge.textview.ScourgeNavPageAddresses;
 import net.rezmason.scourge.textview.core.Engine;
@@ -16,7 +17,6 @@ class Context {
 
     var stage:Stage;
     var engine:Engine;
-    var navSystem:NavSystem;
     var glSys:GLSystem;
     var glFlow:GLFlowControl;
 
@@ -35,17 +35,14 @@ class Context {
         Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));
 
         makeEngine();
+        makeGameSystem();
+        makeNavSystem();
     }
 
     function makeEngine():Void {
         engine = new Engine(glFlow);
-        engine.readySignal.add(onEngine);
+        engine.readySignal.add(addListeners);
         engine.init();
-    }
-
-    function onEngine():Void {
-        addListeners();
-        makeNavSystem();
     }
 
     function addListeners():Void {
@@ -58,8 +55,10 @@ class Context {
         onActivate();
     }
 
+    function makeGameSystem():Void Santa.mapToClass(GameSystem, Singleton(new GameSystem()));
+
     function makeNavSystem():Void {
-        navSystem = new NavSystem(engine);
+        var navSystem:NavSystem = new NavSystem(engine);
         navSystem.addPage(ScourgeNavPageAddresses.SPLASH, new SplashPage());
         navSystem.addPage(ScourgeNavPageAddresses.ABOUT, new AboutPage());
         navSystem.addPage(ScourgeNavPageAddresses.GAME, new GamePage());

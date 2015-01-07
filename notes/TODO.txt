@@ -1,4 +1,5 @@
 Break down BoardSystem
+    Entity system written all over it
     Better setting of multiple values on a glyph at once
         createGlyph should accept params
         macro setter!

@@ -10,23 +10,23 @@ import net.rezmason.scourge.controller.ReplaySmarts;
 import net.rezmason.scourge.controller.StateChangeSequencer;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.textview.board.BoardSystem;
-import net.rezmason.scourge.textview.console.ConsoleUIMediator;
+import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.utils.Zig;
 
 class GameSystem {
 
     public var referee(default, null):Referee;
     public var sequencer(default, null):StateChangeSequencer;
-    public var boardSystem(default, null):BoardSystem;
+    public var board(default, null):Body;
 
-    var console:ConsoleUIMediator;
+    var boardSystem:BoardSystem;
 
-    public function new(boardSystem:BoardSystem, console:ConsoleUIMediator):Void {
+    public function new():Void {
         referee = new Referee();
         sequencer = new StateChangeSequencer();
         
-        this.boardSystem = boardSystem;
-        this.console = console;
+        boardSystem = new BoardSystem();
+        board = boardSystem.body;
         
         sequencer.sequenceStartSignal.add(boardSystem.presentStart);
         sequencer.sequenceUpdateSignal.add(boardSystem.presentSequence);
