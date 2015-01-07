@@ -4,6 +4,7 @@ import haxe.ds.ObjectMap;
 
 @:allow(net.rezmason.ecce)
 class Entity {
+    var inUse:Bool = false;
     var bitfield:Bitfield = 0;
     var ecce:Ecce;
     var comps:ObjectMap<Dynamic, Component> = new ObjectMap();
@@ -11,13 +12,18 @@ class Entity {
     public inline function get(type:Class<Component>) return comps.get(type);
     
     public inline function add(type:Class<Component>) {
-        ecce.mutate(this, type, true); 
-        comps.set(type, Type.createInstance(type, []));
+        if (!comps.exists(type)) {
+            comps.set(type, ecce.dispenseComponent(type));
+            ecce.mutate(this, type, true);
+        }
     }
     
     public inline function remove(type:Class<Component>) {
-        ecce.mutate(this, type, false); 
-        comps.remove(type);
+        if (comps.exists(type)) {
+            ecce.collectComponent(type, comps.get(type));
+            comps.remove(type);
+            ecce.mutate(this, type, false);
+        }
     }
 
     public inline function copyFrom(src:Entity) {

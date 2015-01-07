@@ -5,22 +5,39 @@ import haxe.ds.ObjectMap;
 class Ecce {
 
     var maxBitfield:Int = 1;
-    var entities:Array<Entity> = [];
+    var entities:Map<Entity, Bool> = new Map();
+    var numEntities:Int = 0;
+    var entityPool:Array<Entity> = [];
     var typeBitfields:ObjectMap<Dynamic, Bitfield> = new ObjectMap();
     var queriesByBitfield:Map<Bitfield, Query> = new Map();
     var transitionsByBitfield:Map<Bitfield, Map<Bitfield, Array<Query>>> = new Map();
+    var componentPools:ObjectMap<Dynamic, Array<Component>> = new ObjectMap();
+    var componentBases:ObjectMap<Dynamic, Component> = new ObjectMap();
 
     public function new() query([]);
 
-    public function create(types:Array<Class<Component>> = null) {
-        var e = new Entity(this);
-        entities.push(e);
+    public function dispense(types:Array<Class<Component>> = null) {
+        var e = entityPool.pop();
+        if (e == null) e = new Entity(this);
+        e.inUse = true;
+        entities[e] = true;
+        numEntities++;
         if (types != null) for (type in types) e.add(type);
         return e;
     }
 
+    public function collect(e:Entity) {
+        if (e.inUse) {
+            e.inUse = false;
+            entities.remove(e);
+            numEntities--;
+            entityPool.push(e);
+            for (type in e.comps.keys()) e.remove(type);
+        }
+    }
+
     public function clone(e1:Entity) {
-        var e2 = create([for (type in e1.comps.keys()) type]);
+        var e2 = dispense([for (type in e1.comps.keys()) type]);
         e2.copyFrom(e1);
         return e2;
     }
@@ -30,7 +47,7 @@ class Ecce {
     public function query(types:Array<Class<Component>>) {
         var bitfield = getBitfieldForTypes(types);
         if (queriesByBitfield[bitfield] == null) {
-            if (entities.length > 0) throw 'New queries cannot be made after entities are created.';
+            if (numEntities > 0) throw 'New queries cannot be made while there are entities dispensed.';
             var query = new Query(bitfield);
             for (e in getByBitfield(bitfield)) query.add(e);
             queriesByBitfield[bitfield] = query;
@@ -58,9 +75,29 @@ class Ecce {
         e.bitfield = bitfield;
     }
 
+    @:allow(net.rezmason.ecce) function dispenseComponent(type:Class<Component>) {
+        initComponentPool(type);
+        var comp = componentPools.get(type).pop();
+        if (comp == null) comp = Type.createInstance(type, []);
+        comp.copyFrom(componentBases.get(type));
+        return comp;
+    }
+
+    @:allow(net.rezmason.ecce) function collectComponent(type:Class<Component>, comp:Component) {
+        initComponentPool(type);
+        componentPools.get(type).push(comp);
+    }
+
+    inline function initComponentPool(type:Class<Component>) {
+        if (!componentPools.exists(type)) {
+            componentPools.set(type, []);
+            componentBases.set(type, Type.createInstance(type, []));
+        }
+    }
+    
     inline function getByBitfield(bitfield:Bitfield) {
         var ret = [];
-        for (e in entities) if (e.bitfield & bitfield == bitfield) ret.push(e);
+        for (e in entities.keys()) if (e.bitfield & bitfield == bitfield) ret.push(e);
         return ret;
     }
     

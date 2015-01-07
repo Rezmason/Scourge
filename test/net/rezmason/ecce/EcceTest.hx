@@ -14,11 +14,11 @@ class EcceTest {
         var q3 = ecce.query([Thing2]);
         var q4 = ecce.query([Thing3]);
 
-        var e1 = ecce.create([Thing1]);
-        var e2 = ecce.create([Thing2]);
-        var e3 = ecce.create([Thing3]);
+        var e1 = ecce.dispense([Thing1]);
+        var e2 = ecce.dispense([Thing2]);
+        var e3 = ecce.dispense([Thing3]);
 
-        var e4 = ecce.create();
+        var e4 = ecce.dispense();
         e4.add(Thing1);
         e4.remove(Thing1);
         e4.add(Thing1);
@@ -28,12 +28,12 @@ class EcceTest {
         ecce.query([Thing3]);
         try {
             ecce.query([Thing2, Thing3]);
-            Assert.fail('Ecce should not allow new queries after entities are created');
+            Assert.fail('Ecce should not allow new queries after entities are dispensed');
         } catch (e:String) {}
         
-        var e5 = ecce.create([Thing1, Thing2]);
-        var e6 = ecce.create([Thing2, Thing3]);
-        var e7 = ecce.create([Thing3, Thing1]);
+        var e5 = ecce.dispense([Thing1, Thing2]);
+        var e6 = ecce.dispense([Thing2, Thing3]);
+        var e7 = ecce.dispense([Thing3, Thing1]);
 
         for (e in ecce.get([Thing2])) trace(e.get(Thing2));
 
