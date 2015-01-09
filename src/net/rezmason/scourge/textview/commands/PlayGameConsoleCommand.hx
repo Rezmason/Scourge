@@ -39,7 +39,7 @@ class PlayGameConsoleCommand extends ConsoleCommand {
 
         var isReplay:Bool = args.flags.has('replay');
 
-        if (isReplay && gameSystem.referee.lastGame == null) {
+        if (isReplay && !gameSystem.hasLastGame) {
             message = styleError('Referee has no last game to replay.');
             outputSignal.dispatch(message, true);
             return;
@@ -89,7 +89,8 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animateMils, isReplay, seed);
         showBody();
 
-        message = 'Starting $numPlayers-player game with seed $seed.';
+        if (isReplay) message = 'Replaying last game.';
+        else message = 'Starting $numPlayers-player game with seed $seed.';
         outputSignal.dispatch(message, true);
     }
 }

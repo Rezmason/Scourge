@@ -6,9 +6,14 @@ import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
 enum PlayerDef {
-    Bot(smarts:Smarts, period:Int);
+    Bot(braininess:Braininess, period:Int);
     Human;
     Remote;
+}
+
+enum Braininess {
+    Basic;
+    Replay(log:Array<GameEvent>);
 }
 
 typedef GameEvent = {

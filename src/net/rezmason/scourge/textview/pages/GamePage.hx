@@ -50,31 +50,27 @@ class GamePage extends NavPage {
         interpreter.addCommand(new SetFontConsoleCommand(console));
         interpreter.addCommand(new SetNameConsoleCommand(interpreter));
         interpreter.addCommand(new PrintConsoleCommand());
-        interpreter.addCommand(new SimpleCommand('clear', clearConsoleCommand));
-        interpreter.addCommand(new SimpleCommand('show', showBodyCommand));
         interpreter.addCommand(new PlayGameConsoleCommand(showBodyByName.bind('board')));
+        
+        interpreter.addCommand(new SimpleCommand('clear', function (args, outputSignal) {
+            consoleMed.clearText();
+            outputSignal.dispatch(null, true);
+        }));
+
+        interpreter.addCommand(new SimpleCommand('show', function (args, outputSignal) {
+            var bodyName:String = args.tail;
+            var message:String = null;
+            if (bodiesByName[bodyName] != null) {
+                showBodyByName(bodyName);
+                message = 'Showing $bodyName.';
+            } else {
+                message = ConsoleUtils.styleError('"$bodyName" not found.');
+            }
+            outputSignal.dispatch(message, true);
+        }));
 
         showBodyByName('board');
     }
-
-    function clearConsoleCommand(args, outputSignal):Void {
-        consoleMed.clearText();
-        outputSignal.dispatch(null, true);
-    }
-
-    function showBodyCommand(args, outputSignal):Void {
-        var bodyName:String = args.tail;
-        var message:String = null;
-        if (bodiesByName[bodyName] != null) {
-            showBodyByName(bodyName);
-            message = 'Showing $bodyName.';
-        } else {
-            message = ConsoleUtils.styleError('"$bodyName" not found.');
-        }
-        outputSignal.dispatch(message, true);
-    }
-
-    function hasBodyByName(name:String):Bool return bodiesByName[name] != null;
 
     function showBodyByName(name:String):Void {
         if (currentBodyName != null) mainScene.root.removeChild(bodiesByName[currentBodyName]);
