@@ -23,7 +23,7 @@ class ReplaySmarts extends Smarts {
         while (!found) {
             type = log.shift().type;
             switch (type) {
-                case PlayerAction(SubmitMove(turn, action, move)): found = true;
+                case SubmitMove(turn, action, move): found = true;
                 case _:
             }
         }
@@ -38,7 +38,7 @@ class ReplaySmarts extends Smarts {
             type = null;
         }
 
-        if (type == null) type = PlayerAction(SubmitMove(game.revision, actionIndicesByAction[QUIT_ACTION], 0));
+        if (type == null) type = SubmitMove(game.revision, actionIndicesByAction[QUIT_ACTION], 0);
         // trace(type);
         return type;
     }

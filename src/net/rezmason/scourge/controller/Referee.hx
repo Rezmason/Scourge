@@ -113,22 +113,18 @@ class Referee {
         event.timeReceived = UnixTime.now();
 
         switch (event.type) {
-            case PlayerAction(actionType):
-                switch (actionType) {
-                    case SubmitMove(turn, action, move):
-                        if (!gameBegun) throw 'Game has not begun!';
-                        if (playerIndex == game.currentPlayer && turn == game.revision) {
-                            if (busy) throw 'Players must not submit moves synchronously!';
-                            clearFloats();
-                            game.chooseMove(action, move);
-                            // trace(game.spitBoard());
-                            refereeCall(getFloatsAction(game.revision - 1));
-                            refereeCall(RelayMove(turn, action, move));
-                            if (game.winner >= 0) endGame(); // TEMPORARY
-                        }
-                    case _:
+            case SubmitMove(turn, action, move):
+                if (!gameBegun) throw 'Game has not begun!';
+                if (playerIndex == game.currentPlayer && turn == game.revision) {
+                    if (busy) throw 'Players must not submit moves synchronously!';
+                    clearFloats();
+                    game.chooseMove(action, move);
+                    // trace(game.spitBoard());
+                    refereeCall(getFloatsAction(game.revision - 1));
+                    refereeCall(RelayMove(turn, action, move));
+                    if (game.winner >= 0) endGame(); // TEMPORARY
                 }
-            case RefereeAction(_): 
+            case _:
         }
     }
 
@@ -142,8 +138,8 @@ class Referee {
         //trace(busy ? 'STILL BUSY' : 'FREE');
     }
 
-    private function refereeCall(action:RefereeActionType):Void {
-        broadcastAndLog({type:RefereeAction(action), timeIssued:UnixTime.now()});
+    private function refereeCall(action:GameEventType):Void {
+        broadcastAndLog({type:action, timeIssued:UnixTime.now()});
     }
 
     private inline static function copyLog(source:Array<GameEvent>):Array<GameEvent> {
@@ -161,7 +157,7 @@ class Referee {
         return float;
     }
 
-    private function getFloatsAction(rev:Int):RefereeActionType {
+    private function getFloatsAction(rev:Int):GameEventType {
         return RandomFloats(rev, SafeSerializer.run(floats));
     }
 

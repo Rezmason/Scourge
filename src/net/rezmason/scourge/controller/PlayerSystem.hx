@@ -42,38 +42,35 @@ class PlayerSystem implements IPlayer {
 
     private function processGameEventType(type:GameEventType):Void {
         switch (type) {
-            case RefereeAction(action):
-                switch (action) {
-                    case Init(configData, saveData): 
-                        if (!game.hasBegun) {
-                            init(configData, saveData);
-                            if (usesSignals) {
-                                isWaitingToProceed = true;
-                                gameBegunSignal.dispatch(game);
-                            } else {
-                                takeTurn();
-                            }
-                        }
-                    case RelayMove(turn, action, move):
-                        if (turn == game.revision) {
-                            if (usesSignals) moveStartSignal.dispatch(game.currentPlayer, action, move);
-                            isGameUpdating = true;
-                            if (game.hasBegun) updateGame(action, move);
-                            isGameUpdating = false;
-                            if (usesSignals) {
-                                isWaitingToProceed = true;
-                                moveStopSignal.dispatch();
-                            } else {
-                                takeTurn();
-                            }
-                        }
-                    case RandomFloats(turn, data): 
-                        if (turn == game.revision) floats = Unserializer.run(data);
-                    case End: 
-                        if (game.hasBegun) {
-                            if (usesSignals) gameEndedSignal.dispatch();
-                            end();
-                        }
+            case Init(configData, saveData): 
+                if (!game.hasBegun) {
+                    init(configData, saveData);
+                    if (usesSignals) {
+                        isWaitingToProceed = true;
+                        gameBegunSignal.dispatch(game);
+                    } else {
+                        takeTurn();
+                    }
+                }
+            case RelayMove(turn, action, move):
+                if (turn == game.revision) {
+                    if (usesSignals) moveStartSignal.dispatch(game.currentPlayer, action, move);
+                    isGameUpdating = true;
+                    if (game.hasBegun) updateGame(action, move);
+                    isGameUpdating = false;
+                    if (usesSignals) {
+                        isWaitingToProceed = true;
+                        moveStopSignal.dispatch();
+                    } else {
+                        takeTurn();
+                    }
+                }
+            case RandomFloats(turn, data): 
+                if (turn == game.revision) floats = Unserializer.run(data);
+            case End: 
+                if (game.hasBegun) {
+                    if (usesSignals) gameEndedSignal.dispatch();
+                    end();
                 }
             case _:
         }

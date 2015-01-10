@@ -25,7 +25,6 @@ class GameSystem {
 
         if (referee.gameBegun) referee.endGame();
 
-        var botType:BotType = Basic;
         var randGen:Void->Float = lgm(seed);
         var randBot:Void->Float = lgm(seed); // TODO: seed should only be given to *internal* bots
         var botSystem:BotSystem = null;
@@ -45,7 +44,6 @@ class GameSystem {
 
         if (isReplay) {
             config = referee.lastGameConfig;
-            botType = Replay(referee.lastGame.log);
             var floats:Array<Float> = referee.lastGame.floats.copy();
             randGen = function() return floats.shift();
         }
@@ -55,10 +53,7 @@ class GameSystem {
             switch (playerPattern[ike]) {
                 case 'h' if (hasHumans): throw 'Humans cannot play yet.';
                 default: 
-                    var smarts = switch (botType) {
-                        case Basic: new BasicSmarts();
-                        case Replay(log): new ReplaySmarts(log);
-                    }
+                    var smarts = isReplay ? new ReplaySmarts(referee.lastGame.log) : new BasicSmarts();
                     players.push(botSystem.createPlayer(ike, smarts, thinkPeriod));
             }
         }

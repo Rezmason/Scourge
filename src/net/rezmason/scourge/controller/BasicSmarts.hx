@@ -58,7 +58,7 @@ class BasicSmarts extends Smarts {
                 } else {
                     choice = findBestMoveIndex(dropActionIndex, prunedMoves.iterator(), getSizeDelta);
                 }
-                type = PlayerAction(SubmitMove(rev, dropActionIndex, choice));
+                type = SubmitMove(rev, dropActionIndex, choice);
             }
         }
 
@@ -66,7 +66,7 @@ class BasicSmarts extends Smarts {
             var swapMoves:Array<Move> = game.getMovesForAction(swapActionIndex);
             if (swapMoves.length > 0) {
                 choice = randIntRange(swapMoves.length);
-                type = PlayerAction(SubmitMove(rev, swapActionIndex, choice));
+                type = SubmitMove(rev, swapActionIndex, choice);
             }
         }
 
@@ -79,20 +79,20 @@ class BasicSmarts extends Smarts {
                 var maxBiteSizeIndex:Int = biteSizes.indexOf(maxBiteSize);
                 
                 choice = findBestMoveIndex(biteActionIndex, maxBiteSizeIndex...biteMoves.length, getSizeDelta);
-                type = PlayerAction(SubmitMove(rev, biteActionIndex, choice));
+                type = SubmitMove(rev, biteActionIndex, choice);
             }
         }
 
         if (type == null) {
             if (canSkip) {
-                type = PlayerAction(SubmitMove(rev, dropActionIndex, choice));
+                type = SubmitMove(rev, dropActionIndex, choice);
             }
         }
 
         if (type == null) {
             var quitMoves:Array<Move> = game.getMovesForAction(quitActionIndex);
             if (quitMoves.length > 0) {
-                type = PlayerAction(SubmitMove(rev, quitActionIndex, choice));
+                type = SubmitMove(rev, quitActionIndex, choice);
             }
         }
 

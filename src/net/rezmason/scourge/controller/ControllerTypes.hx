@@ -1,20 +1,6 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.ropes.RopesTypes.SavedState;
-import net.rezmason.scourge.model.Game;
-import net.rezmason.scourge.model.ScourgeConfig;
-import net.rezmason.utils.Zig;
-
-enum BotType {
-    Basic;
-    Replay(log:Array<GameEvent>);
-}
-
-typedef GameEvent = {
-    var type:GameEventType;
-    var timeIssued:Int;
-    @:optional var timeReceived:Int;
-}
 
 typedef SavedGame = {
     var state:SavedState;
@@ -23,34 +9,16 @@ typedef SavedGame = {
     var timeSaved:Int;
 }
 
+typedef GameEvent = {
+    var type:GameEventType;
+    var timeIssued:Int;
+    @:optional var timeReceived:Int;
+}
+
 enum GameEventType {
-    PlayerAction(type:PlayerActionType);
-    RefereeAction(type:RefereeActionType);
-}
-
-enum PlayerActionType {
     SubmitMove(turn:Int, action:Int, move:Int);
-}
-
-enum RefereeActionType {
     Init(config:String, ?savedState:String);
     RelayMove(turn:Int, action:Int, move:Int);
     RandomFloats(turn:Int, floats:String);
     End;
 }
-/*
-enum NodeState {
-    Wall;
-    Empty;
-    Cavity;
-    Body;
-    Head;
-}
-
-typedef NodeVO = {
-    var id:Int;
-    var occupier:Int;
-    var state:Null<NodeState>;
-    var freshness:Int;
-};
-*/
