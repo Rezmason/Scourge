@@ -13,38 +13,31 @@ using Lambda;
 class PlayerSystem implements IPlayer {
 
     public var index(default, null):Int;
+    public var gameBegunSignal(default, null):Zig<Game->Void> = new Zig();
+    public var gameEndedSignal(default, null):Zig<Void->Void> = new Zig();
+    public var moveStartSignal(default, null):Zig<Int->Int->Int->Void> = new Zig();
+    public var moveStopSignal(default, null):Zig<Void->Void> = new Zig();
+    public var moveStepSignal(default, null):Zig<String->Void> = new Zig();
 
     private var game:Game;
-    private var floats:Array<Float>;
+    private var floats:Array<Float> = [];
     private var config:ScourgeConfig;
-    private var mediator:IPlayerMediator;
-    private var mediatorMoveStarted:Bool;
+    private var isGameUpdating:Bool = false;
+    private var isWaitingToProceed:Bool = false;
+    private var usesSignals:Bool;
 
     @:allow(net.rezmason.scourge.controller.Referee)
     private var playSignal:Zig<GameEvent->Void>;
     
-    function new(cacheMoves:Bool):Void {
+    function new(usesSignals:Bool, cacheMoves:Bool):Void {
+        this.usesSignals = usesSignals;
         game = new Game(cacheMoves);
-        floats = [];
-        mediator = null;
-        mediatorMoveStarted = false;
     }
 
-    public function setMediator(med:IPlayerMediator):Void {
-        if (mediator != med) {
-            removeMediator();
-            mediator = med;
-            mediator.proceedSignal.add(proceed);
-            if (game.hasBegun) mediator.connect(game);
-        }
-    }
-
-    public function removeMediator():Void {
-        if (mediator != null) {
-            mediator.proceedSignal.remove(proceed);
-            mediator.disconnect();
-            mediator = null;
-        }
+    public function proceed():Void {
+        if (!isWaitingToProceed) throw 'Called PlayerSystem::proceed() out of sequence.';
+        isWaitingToProceed = false;
+        takeTurn();
     }
 
     private function processGameEventType(type:GameEventType):Void {
@@ -54,23 +47,31 @@ class PlayerSystem implements IPlayer {
                     case Init(configData, saveData): 
                         if (!game.hasBegun) {
                             init(configData, saveData);
-                            if (mediator != null) mediator.connect(game);
-                            else proceed();
+                            if (usesSignals) {
+                                isWaitingToProceed = true;
+                                gameBegunSignal.dispatch(game);
+                            } else {
+                                takeTurn();
+                            }
                         }
                     case RelayMove(turn, action, move):
                         if (turn == game.revision) {
-                            if (mediator != null) mediator.moveStarts(game.currentPlayer, action, move);
-                            mediatorMoveStarted = true;
+                            if (usesSignals) moveStartSignal.dispatch(game.currentPlayer, action, move);
+                            isGameUpdating = true;
                             if (game.hasBegun) updateGame(action, move);
-                            mediatorMoveStarted = false;
-                            if (mediator != null) mediator.moveStops();
-                            else proceed();
+                            isGameUpdating = false;
+                            if (usesSignals) {
+                                isWaitingToProceed = true;
+                                moveStopSignal.dispatch();
+                            } else {
+                                takeTurn();
+                            }
                         }
                     case RandomFloats(turn, data): 
                         if (turn == game.revision) floats = Unserializer.run(data);
                     case End: 
                         if (game.hasBegun) {
-                            if (mediator != null) mediator.disconnect();
+                            if (usesSignals) gameEndedSignal.dispatch();
                             end();
                         }
                 }
@@ -85,10 +86,10 @@ class PlayerSystem implements IPlayer {
     }
 
     private inline function onMoveStep(cause:String):Void {
-        if (mediatorMoveStarted && mediator != null) mediator.moveSteps(cause);
+        if (isGameUpdating && usesSignals) moveStepSignal.dispatch(cause);
     }
 
-    private function proceed():Void if (isMyTurn()) play();
+    private function takeTurn():Void if (isMyTurn()) play();
     private function end():Void game.end();
     private function updateGame(actionIndex:Int, move:Int):Void game.chooseMove(actionIndex, move);
     private function play():Void throw "Override this.";

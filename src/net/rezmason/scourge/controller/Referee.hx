@@ -12,13 +12,6 @@ import net.rezmason.utils.Zig;
 
 using Lambda;
 
-typedef RefereeParams = {
-    var players:Array<IPlayer>;
-    var randGen:Void->Float;
-    var gameConfig:ScourgeConfig;
-    @:optional var savedGame:SavedGame;
-}
-
 class Referee {
 
     var game:Game;
@@ -43,14 +36,13 @@ class Referee {
         floats = [];
     }
 
-    public function beginGame(params:RefereeParams):Void {
+    public function beginGame(players:Array<IPlayer>, randGen:Void->Float, gameConfig:ScourgeConfig, savedGame:SavedGame = null):Void {
 
-        if (params.players.length != params.gameConfig.numPlayers) {
-            throw 'Player config has ${params.players.length} players: ' +
-                'game config requires ${params.gameConfig.numPlayers}';
+        if (players.length != gameConfig.numPlayers) {
+            throw 'Player config has ${players.length} players: ' +
+                'game config requires ${gameConfig.numPlayers}';
         }
 
-        var savedGame:SavedGame = params.savedGame;
         var serializedSavedGame:String = null;
         var savedGameState:SavedState = null;
 
@@ -64,9 +56,9 @@ class Referee {
             savedGameState = savedGame.state;
         }
 
-        gameConfig = params.gameConfig;
-        randGen = params.randGen;
-        this.players = params.players;
+        this.gameConfig = gameConfig;
+        this.randGen = randGen;
+        this.players = players;
         playerListeners = [];
         for (ike in 0...numPlayers) {
             playerListeners[ike] = handlePlaySignal.bind(ike);
@@ -74,9 +66,9 @@ class Referee {
         }
         clearFloats();
 
-        game.begin(params.gameConfig, generateRandomFloat, null, savedGameState);
+        game.begin(gameConfig, generateRandomFloat, null, savedGameState);
         refereeCall(getFloatsAction(0));
-        refereeCall(Init(SafeSerializer.run(params.gameConfig), serializedSavedGame));
+        refereeCall(Init(SafeSerializer.run(gameConfig), serializedSavedGame));
     }
 
     public function endGame():Void {

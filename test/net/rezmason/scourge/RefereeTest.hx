@@ -46,7 +46,7 @@ class RefereeTest {
         players = [];
         for (ike in 0...4) players.push(new TestPlayer(ike, noop, random));
         var config:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
-        referee.beginGame({players:players, randGen:randGen, gameConfig:config});
+        referee.beginGame(players, randGen, config);
 
         var savedGame = referee.saveGame();
         var data:String = savedGame.state.data;
@@ -83,8 +83,7 @@ class RefereeTest {
 
         Assert.isFalse(referee.gameBegun);
         var config:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
-        var refereeParams = {players:players, randGen:randGen, gameConfig:config, savedGame:null};
-        referee.beginGame(refereeParams);
+        referee.beginGame(players, randGen, config);
         Assert.isTrue(referee.gameBegun);
 
         for (ike in 0...10)
@@ -103,7 +102,7 @@ class RefereeTest {
             }
         }
 
-        refereeParams.savedGame = referee.saveGame();
+        var savedGame = referee.saveGame();
         var board = referee.spitBoard();
 
         //trace(board);
@@ -116,7 +115,7 @@ class RefereeTest {
         referee.endGame();
         Assert.isFalse(referee.gameBegun);
 
-        referee.beginGame(refereeParams);
+        referee.beginGame(players, randGen, config, savedGame);
         Assert.isTrue(referee.gameBegun);
 
         Assert.areEqual(board, referee.spitBoard());

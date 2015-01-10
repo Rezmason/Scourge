@@ -5,13 +5,7 @@ import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
-enum PlayerDef {
-    Bot(braininess:Braininess, period:Int);
-    Human;
-    Remote;
-}
-
-enum Braininess {
+enum BotType {
     Basic;
     Replay(log:Array<GameEvent>);
 }
@@ -44,7 +38,7 @@ enum RefereeActionType {
     RandomFloats(turn:Int, floats:String);
     End;
 }
-
+/*
 enum NodeState {
     Wall;
     Empty;
@@ -59,4 +53,4 @@ typedef NodeVO = {
     var state:Null<NodeState>;
     var freshness:Int;
 };
-
+*/

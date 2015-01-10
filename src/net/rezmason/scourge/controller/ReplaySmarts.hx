@@ -16,8 +16,18 @@ class ReplaySmarts extends Smarts {
     }
 
     override public function choose():GameEventType {
-        // trace(moves[1].length);
-        var type:GameEventType = log.shift().type;
+        
+        var found:Bool = false;
+        var type:GameEventType = null;
+
+        while (!found) {
+            type = log.shift().type;
+            switch (type) {
+                case PlayerAction(SubmitMove(turn, action, move)): found = true;
+                case _:
+            }
+        }
+
         var params = Type.enumParameters(type);
         var actionIndex:Int = params[0];
         var moveIndex:Int = params[1];

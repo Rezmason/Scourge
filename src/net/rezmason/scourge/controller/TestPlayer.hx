@@ -14,7 +14,7 @@ class TestPlayer extends PlayerSystem {
     private var random:Void->Float;
 
     public function new(index:Int, proxy:TestProxy, random:Void->Float):Void {
-        super(false);
+        super(false, false);
         this.index = index;
         this.proxy = proxy;
         this.random = random;
