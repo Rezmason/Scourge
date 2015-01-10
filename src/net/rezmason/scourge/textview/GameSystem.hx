@@ -82,7 +82,14 @@ class GameSystem {
         referee.beginGame(players, randGen, config);
     }
 
-    function lgm(n:UInt):Void->Float return function() return (n = (n * 0x41A7) % 0x7FFFFFFF) / 0x7FFFFFFF;
+    function lgm(n:UInt):Void->Float {
+        var a:UInt = 0x41A7;
+        var div:UInt = 0x7FFFFFFF;
+        return function() {
+            n = (n * a) % div;
+            return n / div;
+        }
+    }
 
     function get_hasLastGame():Bool return referee.lastGame != null;
 }
