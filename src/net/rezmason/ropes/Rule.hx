@@ -60,12 +60,12 @@ using net.rezmason.utils.Pointers;
         _init(config);
     }
 
-    @:final public function prime(primer:RulePrimer):Void {
-        this.state = primer.state;
-        this.plan = primer.plan;
-        this.onSignal = primer.onSignal;
-        this.history = primer.history;
-        this.historyState = primer.historyState;
+    @:final public function prime(state, plan, history, historyState, ?onSignal):Void {
+        this.state = state;
+        this.plan = plan;
+        this.history = history;
+        this.historyState = historyState;
+        this.onSignal = onSignal;
 
         ident_ = Ptr.intToPointer(0, state.key);
 

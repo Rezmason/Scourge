@@ -82,16 +82,7 @@ class StateHistorianTest {
 
         var rules:Array<Rule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];
         var plan:StatePlan = new StatePlanner().planState(state, rules);
-
-        var primer:RulePrimer = {
-            state:state, 
-            plan:plan, 
-            history:history, 
-            historyState:historyState
-        };
-
-        for (rule in rules) rule.prime(primer);
-
+        for (rule in rules) rule.prime(state, plan, history, historyState);
         var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
 
 

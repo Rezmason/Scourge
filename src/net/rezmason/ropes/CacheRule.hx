@@ -30,16 +30,7 @@ class CacheRule extends Rule {
         nodeAspectRequirements.absorb(rule.nodeAspectRequirements);
     }
 
-    override public function _prime():Void {
-        var primer:RulePrimer = {
-            state:state,
-            plan:plan,
-            onSignal:onSignal,
-            history:history,
-            historyState:historyState,
-        };
-        rule.prime(primer);
-    }
+    override public function _prime():Void rule.prime(state, plan, history, historyState, onSignal);
 
     override private function _update():Void {
         var rev:Int = cfg.revGetter();

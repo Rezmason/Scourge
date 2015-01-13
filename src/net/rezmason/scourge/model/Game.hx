@@ -3,6 +3,7 @@ package net.rezmason.scourge.model;
 import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.RuleFactory;
 import net.rezmason.ropes.State;
+import net.rezmason.ropes.StatePlan;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.RopesTypes;
@@ -10,7 +11,6 @@ import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
 import net.rezmason.utils.Zig;
 
-using net.rezmason.ropes.StatePlan;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;
@@ -44,8 +44,9 @@ class Game {
 
     public function begin(config:ScourgeConfig, randomFunction:Void->Float, alertFunction:String->Void, savedState:SavedState = null):Int {
 
-        if (hasBegun)
+        if (hasBegun) {
             throw 'The game has already begun; it cannot begin again until you end it.';
+        }
 
         // Build the game from the config
 
@@ -74,17 +75,9 @@ class Game {
 
         plan = planner.planState(state, builderRules.concat(basicRules));
 
-        // Prime the rules
-        var primer:RulePrimer = {
-            state:state,
-            plan:plan,
-            history:historian.history,
-            historyState:historian.historyState,
-            onSignal:alertFunction,
-        };
-
-        for (rule in builderRules) rule.prime(primer);
-        for (rule in basicRules) rule.prime(primer);
+        for (rule in builderRules.concat(basicRules)) {
+            rule.prime(state, plan, historian.history, historian.historyState, alertFunction);
+        }
 
         // Grab some aspect pointers so we can quickly evaluate the state
 

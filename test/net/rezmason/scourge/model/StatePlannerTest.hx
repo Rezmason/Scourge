@@ -52,15 +52,7 @@ class StatePlannerTest {
         var rules:Array<Rule> = [null, buildStateRule, testRule];
         var state:State = new State(key);
         var plan:StatePlan = planner.planState(state, rules);
-
-        var primer:RulePrimer = {
-            state:state, 
-            plan:plan, 
-            history:history, 
-            historyState:historyState
-        };
-
-        for (rule in rules) if (rule != null) rule.prime(primer);
+        for (rule in rules) if (rule != null) rule.prime(state,  plan,  history,  historyState);
 
         // Make sure there's the right aspects on the state
 

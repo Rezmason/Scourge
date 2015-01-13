@@ -302,19 +302,12 @@ class ScourgeConfigFactoryTest
         while (builderRules.remove(null)) {}
 
         // Plan the state
-
         plan = new StatePlanner().planState(state, builderRules.concat(basicRules));
 
         // Prime the rules
-        var primer:RulePrimer = {
-            state:state,
-            plan:plan,
-            history:history,
-            historyState:historyState
-        };
-
-        for (rule in builderRules) rule.prime(primer);
-        for (rule in basicRules) rule.prime(primer);
+        for (rule in builderRules.concat(basicRules)) {
+            rule.prime(state, plan, history, historyState);
+        }
 
         startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
         biteAction = combinedRules.get('biteAction');

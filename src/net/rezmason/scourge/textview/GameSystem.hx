@@ -10,6 +10,7 @@ import net.rezmason.scourge.controller.RandomSmarts;
 import net.rezmason.scourge.controller.Referee;
 import net.rezmason.scourge.controller.ReplaySmarts;
 import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.textview.board.BoardSequenceSystem;
 import net.rezmason.scourge.textview.core.Body;
 
 class GameSystem {
@@ -28,18 +29,18 @@ class GameSystem {
         var randGen:Void->Float = lgm(seed);
         var randBot:Void->Float = lgm(seed); // TODO: seed should only be given to *internal* bots
         var botSystem:BotSystem = null;
-        var watchedSystem:PlayerSystem = null;
+        var watchedPlayer:PlayerSystem = null;
         var hasHumans:Bool = !isReplay && playerPattern.indexOf('h') != -1;
         var hasBots:Bool   =  isReplay || playerPattern.indexOf('b') != -1;
 
         if (hasHumans) {
             // TODO: create HumanSystem
-            // TODO: watchedSystem = humanSystem
+            // TODO: watchedPlayer = humanSystem
         }
 
         if (hasBots) {
-            botSystem = new BotSystem(!hasHumans, randBot); // TODO: recycle bot system
-            if (watchedSystem == null) watchedSystem = botSystem;
+            botSystem = new BotSystem(!hasHumans, randBot); // TODO: recycle
+            if (watchedPlayer == null) watchedPlayer = botSystem;
         }
 
         if (isReplay) {
@@ -58,22 +59,9 @@ class GameSystem {
             }
         }
 
-        // TODO: connect to watched system's signals here
-        var g = null;
-        watchedSystem.gameBegunSignal.add(function(_) { g = _; trace('GAME START'); watchedSystem.proceed(); });
-        watchedSystem.moveStartSignal.add(function(_, _, _) { trace('READ START'); });
-        watchedSystem.moveStepSignal.add(function(_) { trace(_); });
-        watchedSystem.moveStopSignal.add(function() { trace('READ STOP'); watchedSystem.proceed(); });
-        watchedSystem.gameEndedSignal.add(function() {
-            trace('GAME END'); 
-            g = null;
-            watchedSystem.gameBegunSignal.removeAll();
-            watchedSystem.gameEndedSignal.removeAll();
-            watchedSystem.moveStartSignal.removeAll();
-            watchedSystem.moveStepSignal.removeAll();
-            watchedSystem.moveStopSignal.removeAll();
-        });
-
+        var boardSequenceSystem = new BoardSequenceSystem(ecce); // TODO: recycle
+        boardSequenceSystem.connect(watchedPlayer);
+        
         referee.beginGame(players, randGen, config);
     }
 

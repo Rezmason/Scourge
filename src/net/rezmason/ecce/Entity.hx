@@ -9,7 +9,7 @@ class Entity {
     var ecce:Ecce;
     var comps:ObjectMap<Dynamic, Component> = new ObjectMap();
     inline function new(ecce) this.ecce = ecce;
-    public inline function get(type:Class<Component>) return comps.get(type);
+    public inline function get<T:(Component)>(type:Class<T>):T return cast comps.get(type);
     
     public inline function add(type:Class<Component>) {
         if (!comps.exists(type)) {
