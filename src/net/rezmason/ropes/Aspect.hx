@@ -15,7 +15,7 @@ import net.rezmason.ropes.RopesTypes;
 
         var classType = Context.getLocalClass().get();
 
-        var msg:String = 'Building ${classType.name}  ';
+        var msg:String = 'Aspect processing ${classType.name}  ';
 
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
