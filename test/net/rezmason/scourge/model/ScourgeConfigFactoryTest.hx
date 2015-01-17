@@ -9,7 +9,6 @@ import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlanner;
-import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.RuleFactory;
 import net.rezmason.ropes.Aspect;
 import net.rezmason.scourge.model.ScourgeConfig;

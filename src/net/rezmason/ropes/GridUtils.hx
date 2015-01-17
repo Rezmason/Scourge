@@ -2,6 +2,7 @@ package net.rezmason.ropes;
 
 import haxe.Serializer;
 import haxe.Unserializer;
+import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.ds.ShitList;
 
@@ -141,14 +142,14 @@ class GridUtils {
     }
 
     // Shortcuts
-    public inline static function nw<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.nw]; }
-    public inline static function  n<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.n ]; }
-    public inline static function ne<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.ne]; }
-    public inline static function  e<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.e ]; }
-    public inline static function se<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.se]; }
-    public inline static function  s<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.s ]; }
-    public inline static function sw<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.sw]; }
-    public inline static function  w<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[Gr.w ]; }
+    public inline static function nw<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[NW]; }
+    public inline static function  n<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[N ]; }
+    public inline static function ne<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[NE]; }
+    public inline static function  e<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[E ]; }
+    public inline static function se<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[SE]; }
+    public inline static function  s<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[S ]; }
+    public inline static function sw<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[SW]; }
+    public inline static function  w<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[W ]; }
 }
 
 class GridWalker<T> {

@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
@@ -12,7 +12,7 @@ using Lambda;
 using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.Pointers;
 
-class KillHeadlessBodyRule extends Rule {
+class KillHeadlessBodyRule extends RopesRule<Void> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
@@ -22,8 +22,6 @@ class KillHeadlessBodyRule extends Rule {
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
-
-    override public function _init(cfg:Dynamic):Void { moves.push({id:0}); }
 
     override private function _chooseMove(choice:Int):Void {
 

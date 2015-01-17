@@ -2,7 +2,7 @@ package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
 import VisualAssert;
-
+import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;
 
 using net.rezmason.ropes.GridUtils;
@@ -32,22 +32,22 @@ class GridUtilsTest {
         var node:GridLocus<Int> = makeNode();
         var first:GridLocus<Int> = node;
         Assert.areEqual(0, node.value);
-        for (i in 1...10) node = node.attach(makeNode(), Gr.e);
+        for (i in 1...10) node = node.attach(makeNode(), E);
         var last:GridLocus<Int> = node;
-        Assert.areEqual(10 - 1, node.run(Gr.e).value);
-        Assert.areEqual(last, first.run(Gr.e));
-        Assert.areEqual(first, last.run(Gr.w));
+        Assert.areEqual(10 - 1, node.run(E).value);
+        Assert.areEqual(last, first.run(E));
+        Assert.areEqual(first, last.run(W));
 
         nodeItr = 10;
-        for (n in node.walk(Gr.w)) Assert.areEqual(n.value, --nodeItr);
+        for (n in node.walk(W)) Assert.areEqual(n.value, --nodeItr);
 
         var ike:Int = 0;
 
-        for (n in last.walk(Gr.w)) ike++;
+        for (n in last.walk(W)) ike++;
         Assert.areEqual(10, ike);
 
         ike = 0;
-        for (n in first.walk(Gr.e)) ike++;
+        for (n in first.walk(E)) ike++;
         Assert.areEqual(10, ike);
 
         Assert.areEqual(10, first.getGraphSequence().length);

@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
@@ -18,7 +18,7 @@ typedef DecayConfig = {
     var orthoOnly:Bool;
 }
 
-class DecayRule extends Rule {
+class DecayRule extends RopesRule<DecayConfig> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
@@ -29,13 +29,6 @@ class DecayRule extends Rule {
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
-
-    private var cfg:DecayConfig;
-
-    override public function _init(cfg:Dynamic):Void {
-        this.cfg = cfg;
-        moves.push({id:0});
-    }
 
     override private function _chooseMove(choice:Int):Void {
 
@@ -52,7 +45,7 @@ class DecayRule extends Rule {
         }
 
         // Use the heads as starting points for a flood fill of connected living cells
-        var livingBodyNeighbors:Array<BoardLocus> = heads.expandGraph(cfg.orthoOnly, isLivingBodyNeighbor);
+        var livingBodyNeighbors:Array<BoardLocus> = heads.expandGraph(config.orthoOnly, isLivingBodyNeighbor);
 
         // Remove cells from player bodies
         for (player in eachPlayer()) {
@@ -76,7 +69,7 @@ class DecayRule extends Rule {
         }
 
         state.globals[maxFreshness_] = maxFreshness;
-        signalEvent();
+        onSignal();
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {

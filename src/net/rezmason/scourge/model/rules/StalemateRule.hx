@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
@@ -12,20 +12,13 @@ typedef SkipsExhaustedConfig = {
     var maxSkips:Int;
 }
 
-class StalemateRule extends Rule {
+class StalemateRule extends RopesRule<SkipsExhaustedConfig> {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @player(PlyAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
     @global(WinAspect.WINNER) var winner_;
 
-    private var cfg:SkipsExhaustedConfig;
-
     // This rule discovers whether there is only one remaining player, and makes that player the winner
-    override public function _init(cfg:Dynamic):Void {
-        this.cfg = cfg;
-        moves.push({id:0});
-    }
-
     override private function _chooseMove(choice:Int):Void {
 
         var stalemate:Bool = true;
@@ -34,7 +27,7 @@ class StalemateRule extends Rule {
             stalemate = false;
         } else {
             for (player in eachPlayer()) {
-                if (player[numConsecutiveSkips_] < cfg.maxSkips) {
+                if (player[numConsecutiveSkips_] < config.maxSkips) {
                     stalemate = false;
                     break;
                 }
@@ -54,7 +47,7 @@ class StalemateRule extends Rule {
             }
 
             state.globals[winner_] = largestPlayers.pop();
-            signalEvent();
+            onSignal();
         }
     }
 }

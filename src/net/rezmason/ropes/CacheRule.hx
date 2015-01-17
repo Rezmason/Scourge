@@ -11,19 +11,15 @@ typedef CacheConfig = {
     var revGetter:Void->Int;
 };
 
-class CacheRule extends Rule {
+class CacheRule extends RopesRule<CacheConfig> {
 
     private var rule:Rule;
-    private var cfg:CacheConfig;
-    private var moveCache:Array<Array<Move>>;
-    private var quantumMoveCache:Array<Array<Move>>;
+    private var moveCache:Array<Array<Move>> = [];
+    private var quantumMoveCache:Array<Array<Move>> = [];
 
-    override public function _init(cfg:Dynamic):Void {
-        this.cfg = cfg;
-        rule = this.cfg.rule;
-        this.cfg.invalidateSignal.add(invalidate);
-        moveCache = [];
-        quantumMoveCache = [];
+    override public function _init():Void {
+        rule = config.rule;
+        config.invalidateSignal.add(invalidate);
 
         globalAspectRequirements.absorb(rule.globalAspectRequirements);
         playerAspectRequirements.absorb(rule.playerAspectRequirements);
@@ -33,7 +29,7 @@ class CacheRule extends Rule {
     override public function _prime():Void rule.prime(state, plan, history, historyState, onSignal);
 
     override private function _update():Void {
-        var rev:Int = cfg.revGetter();
+        var rev:Int = config.revGetter();
         if (moveCache[rev] != null) {
             #if ROPES_VERBOSE trace('Cached: $rule $rev'); #end
             rule.moves = moves = moveCache[rev];

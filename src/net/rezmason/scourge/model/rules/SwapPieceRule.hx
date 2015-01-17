@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
@@ -15,18 +15,14 @@ typedef SwapPieceConfig = {
     var startingSwaps:Int;
 }
 
-class SwapPieceRule extends Rule {
+class SwapPieceRule extends RopesRule<SwapPieceConfig> {
 
     @player(SwapAspect.NUM_SWAPS) var numSwaps_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
     @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
 
-    var cfg:SwapPieceConfig;
-
-    override public function _init(cfg:Dynamic):Void { this.cfg = cfg; }
-
     override private function _prime():Void {
-        for (player in eachPlayer()) player[numSwaps_] = cfg.startingSwaps;
+        for (player in eachPlayer()) player[numSwaps_] = config.startingSwaps;
     }
 
     // This rule basically zaps the current player's piece and takes away a swap.
@@ -42,7 +38,7 @@ class SwapPieceRule extends Rule {
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
         getPlayer(currentPlayer)[numSwaps_] = numSwaps - 1;
         state.globals[pieceTableID_] = Aspect.NULL;
-        signalEvent();
+        onSignal();
     }
 }
 

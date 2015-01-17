@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
@@ -23,7 +23,7 @@ typedef EatCellsConfig = {
     public var orthoOnly:Bool;
 }
 
-class EatCellsRule extends Rule {
+class EatCellsRule extends RopesRule<EatCellsConfig> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
@@ -34,13 +34,6 @@ class EatCellsRule extends Rule {
     @player(BodyAspect.HEAD) var head_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
-
-    private var cfg:EatCellsConfig;
-
-    override public function _init(cfg:Dynamic):Void {
-        this.cfg = cfg;
-        moves.push({id:0});
-    }
 
     override private function _chooseMove(choice:Int):Void {
 
@@ -72,7 +65,7 @@ class EatCellsRule extends Rule {
         if (node != null) newNodesByID[getID(node)] = null;
         while (node != null) {
             // search in all directions
-            for (direction in directionsFor(cfg.orthoOnly)) {
+            for (direction in directionsFor(config.orthoOnly)) {
                 var pendingNodes:Array<AspectSet> = [];
                 var locus:BoardLocus = getNodeLocus(node);
                 for (scout in locus.walk(direction)) {
@@ -83,8 +76,8 @@ class EatCellsRule extends Rule {
                             // Add nodes to the eaten region
                             for (pendingNode in pendingNodes) {
                                 var playerID:Int = headIndices.indexOf(getID(pendingNode));
-                                if (playerID != -1 && cfg.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
-                                else if (cfg.recursive && newNodesByID[getID(pendingNode)] == null) newNodes.add(pendingNode); // recursive eating
+                                if (playerID != -1 && config.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
+                                else if (config.recursive && newNodesByID[getID(pendingNode)] == null) newNodes.add(pendingNode); // recursive eating
 
                                 eatenNodes[getID(pendingNode)] = pendingNode;
                             }
@@ -92,7 +85,7 @@ class EatCellsRule extends Rule {
                             break;
                         } else if (headIndices[scoutOccupier] == getID(scout.value)) {
                             // Only eat heads if the config specifies this
-                            if (cfg.eatHeads) pendingNodes.push(scout.value);
+                            if (config.eatHeads) pendingNodes.push(scout.value);
                             //else break;
                         } else {
                             pendingNodes.push(scout.value);
@@ -150,7 +143,7 @@ class EatCellsRule extends Rule {
             }
         }
         getPlayer(currentPlayer)[bodyFirst_] = getID(bodyNode);
-        signalEvent();
+        onSignal();
     }
 
     function getBody(playerID:Int):Array<AspectSet> {

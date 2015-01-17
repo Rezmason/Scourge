@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.ReplenishableAspect;
 
 using Lambda;
@@ -24,7 +24,7 @@ typedef ReplenishConfig = {
     var nodeProperties:Array<ReplenishableConfig>;
 }
 
-class ReplenishRule extends Rule {
+class ReplenishRule extends RopesRule<ReplenishConfig> {
 
     // state, extra for each replenishable
     @extra(ReplenishableAspect.REP_NEXT) var repNext_;
@@ -37,16 +37,10 @@ class ReplenishRule extends Rule {
     @global(ReplenishableAspect.PLAYER_REP_FIRST) var playerRepFirst_;
     @global(ReplenishableAspect.NODE_REP_FIRST) var nodeRepFirst_;
 
-    var cfg:ReplenishConfig;
-
-    override public function _init(cfg:Dynamic):Void {
-        this.cfg = cfg;
-
-        for (rProp in this.cfg.globalProperties ) addGlobalAspectRequirement (rProp.prop);
-        for (rProp in this.cfg.playerProperties) addPlayerAspectRequirement(rProp.prop);
-        for (rProp in this.cfg.nodeProperties  ) addNodeAspectRequirement  (rProp.prop);
-
-        moves.push({id:0});
+    override public function _init():Void {
+        for (rProp in config.globalProperties ) addGlobalAspectRequirement(rProp.prop);
+        for (rProp in config.playerProperties ) addPlayerAspectRequirement(rProp.prop);
+        for (rProp in config.nodeProperties   ) addNodeAspectRequirement  (rProp.prop);
     }
 
     override private function _prime():Void {
@@ -58,19 +52,19 @@ class ReplenishRule extends Rule {
         var nodeReps:Array<AspectSet> = [];
 
         // Create the replenishables
-        for (repCfg in cfg.globalProperties) {
+        for (repCfg in config.globalProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.globalAspectLookup);
             repCfg.replenishableID = replenishable[ident_];
             stateReps.push(replenishable);
         }
 
-        for (repCfg in cfg.playerProperties) {
+        for (repCfg in config.playerProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.playerAspectLookup);
             repCfg.replenishableID = replenishable[ident_];
             playerReps.push(replenishable);
         }
 
-        for (repCfg in cfg.nodeProperties) {
+        for (repCfg in config.nodeProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.nodeAspectLookup);
             repCfg.replenishableID = replenishable[ident_];
             nodeReps.push(replenishable);
@@ -101,10 +95,10 @@ class ReplenishRule extends Rule {
     }
 
     override private function _chooseMove(choice:Int):Void {
-        updateReps(cfg.globalProperties, [state.globals]);
-        updateReps(cfg.playerProperties, state.players);
-        updateReps(cfg.nodeProperties, state.nodes);
-        signalEvent();
+        updateReps(config.globalProperties, [state.globals]);
+        updateReps(config.playerProperties, state.players);
+        updateReps(config.nodeProperties, state.nodes);
+        onSignal();
     }
 
     private function makeReplenishable(repCfg:ReplenishableConfig, lookup:AspectLookup):AspectSet {

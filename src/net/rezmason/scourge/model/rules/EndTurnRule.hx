@@ -1,16 +1,14 @@
 package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
 
-class EndTurnRule extends Rule {
+class EndTurnRule extends RopesRule<Void> {
 
     @player(BodyAspect.HEAD) var head_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
-
-    override public function _init(cfg:Dynamic):Void { moves.push({id:0}); }
 
     override private function _chooseMove(choice:Int):Void {
 
@@ -27,7 +25,7 @@ class EndTurnRule extends Rule {
         }
 
         state.globals[currentPlayer_] = playerID;
-        signalEvent();
+        onSignal();
     }
 }
 

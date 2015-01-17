@@ -1,9 +1,10 @@
 package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
@@ -41,7 +42,7 @@ typedef DropPieceMove = {>Move,
     var duplicate:Bool;
 }
 
-class DropPieceRule extends Rule {
+class DropPieceRule extends RopesRule<DropPieceConfig> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
@@ -56,30 +57,9 @@ class DropPieceRule extends Rule {
     @global(PieceAspect.PIECE_ROTATION) var pieceRotation_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
-    private var cfg:DropPieceConfig;
-    private var nowhereMove:DropPieceMove;
-    private var movePool:Array<DropPieceMove>;
-    private var allMoves:Array<DropPieceMove>;
-
-    override public function _init(cfg:Dynamic):Void {
-        this.cfg = cfg;
-        movePool = [];
-        allMoves = [];
-
-        if (this.cfg.allowNowhere) {
-            nowhereMove = {
-                targetNode:Aspect.NULL,
-                coord:null,
-                pieceID:Aspect.NULL,
-                rotation:0,
-                reflection:0,
-                id:0,
-                duplicate:false,
-                numAddedNodes:0,
-                addedNodes:[],
-            };
-        }
-    }
+    private var nowhereMove:DropPieceMove = makeMove();
+    private var movePool:Array<DropPieceMove> = [];
+    private var allMoves:Array<DropPieceMove> = [];
 
     override private function _update():Void {
 
@@ -87,12 +67,10 @@ class DropPieceRule extends Rule {
 
         // This allows the place-piece function to behave like a skip function
         // Setting this to false also forces players to forfeit if they can't place a piece
-        if (cfg.allowNowhere) {
-            dropMoves.push(cast nowhereMove);
-        }
+        if (config.allowNowhere) dropMoves.push(cast nowhereMove);
 
         var pieceIDs:Array<Int> = [];
-        if (cfg.allowPiecePick) for (pieceID in cfg.pieceTableIDs) pieceIDs.push(pieceID);
+        if (config.allowPiecePick) for (pieceID in config.pieceTableIDs) pieceIDs.push(pieceID);
         else if (state.globals[pieceTableID_] != Aspect.NULL) pieceIDs.push(state.globals[pieceTableID_]);
 
         // get current player head
@@ -107,20 +85,20 @@ class DropPieceRule extends Rule {
 
         for (pieceID in pieceIDs) {
 
-            var freePiece:FreePiece = cfg.pieces.getPieceById(pieceID);
+            var freePiece:FreePiece = config.pieces.getPieceById(pieceID);
 
             // For each allowed reflection,
             var allowedReflectionIndex:Int = pieceReflection % freePiece.numReflections;
             for (reflectionIndex in 0...freePiece.numReflections) {
 
-                if (!cfg.allowFlipping && reflectionIndex != allowedReflectionIndex) continue;
+                if (!config.allowFlipping && reflectionIndex != allowedReflectionIndex) continue;
                 
                 // For each allowed rotation,
                 var allowedRotationIndex:Int = pieceRotation % freePiece.numRotations;
 
                 for (rotationIndex in 0...freePiece.numRotations) {
 
-                    if (!cfg.allowRotating && rotationIndex != allowedRotationIndex) continue;
+                    if (!config.allowRotating && rotationIndex != allowedRotationIndex) continue;
                     var piece:Piece = freePiece.getPiece(reflectionIndex, rotationIndex);
 
                     // For each edge node,
@@ -128,7 +106,7 @@ class DropPieceRule extends Rule {
 
                         // Generate the piece's footprint
 
-                        var footprint = piece.footprint(cfg.overlapSelf, !cfg.diagOnly, !cfg.orthoOnly);
+                        var footprint = piece.footprint(config.overlapSelf, !config.diagOnly, !config.orthoOnly);
 
                         // Using each footprint coord as a home coord (aka the point of connection),
                         for (homeCoord in footprint) {
@@ -147,7 +125,7 @@ class DropPieceRule extends Rule {
                                 var occupier:Int = nodeAtCoord[occupier_];
                                 var isFilled:Int = nodeAtCoord[isFilled_];
 
-                                if (isFilled == Aspect.TRUE && !(cfg.overlapSelf && occupier == currentPlayer)) {
+                                if (isFilled == Aspect.TRUE && !(config.overlapSelf && occupier == currentPlayer)) {
                                     valid = false;
                                     break;
                                 }
@@ -188,20 +166,24 @@ class DropPieceRule extends Rule {
     inline function getMove():DropPieceMove {
         var move:DropPieceMove = movePool.pop();
         if (move == null) {
-            move = {
-                id:-1,
-                targetNode:Aspect.NULL,
-                pieceID:-1,
-                reflection:-1,
-                rotation:-1,
-                numAddedNodes:0,
-                addedNodes:null,
-                coord:null,
-                duplicate:false,
-            };
+            move = makeMove();
             allMoves.push(move);
         }
         return move;
+    }
+
+    inline static function makeMove():DropPieceMove {
+        return {
+            id:-1,
+            targetNode:Aspect.NULL,
+            pieceID:-1,
+            reflection:-1,
+            rotation:-1,
+            numAddedNodes:0,
+            addedNodes:null,
+            coord:null,
+            duplicate:false,
+        };
     }
 
     override private function _chooseMove(choice:Int):Void {
@@ -212,7 +194,7 @@ class DropPieceRule extends Rule {
         var player:AspectSet = getPlayer(currentPlayer);
 
         if (move.targetNode != Aspect.NULL) {
-            var freePiece:FreePiece = cfg.pieces.getPieceById(move.pieceID);
+            var freePiece:FreePiece = config.pieces.getPieceById(move.pieceID);
             var targetLocus:BoardLocus = getLocus(move.targetNode);
             var coords:Array<IntCoord> = freePiece.getPiece(move.reflection, move.rotation).cells;
             var homeCoord:IntCoord = move.coord;
@@ -231,7 +213,7 @@ class DropPieceRule extends Rule {
         }
 
         state.globals[pieceTableID_] = Aspect.NULL;
-        signalEvent();
+        onSignal();
     }
 
     override private function _collectMoves():Void movePool = allMoves.copy();
@@ -239,7 +221,7 @@ class DropPieceRule extends Rule {
     inline function hasFreeEdge(node:AspectSet):Bool {
         var exists:Bool = false;
 
-        for (neighbor in neighborsFor(getNodeLocus(node), cfg.orthoOnly)) {
+        for (neighbor in neighborsFor(getNodeLocus(node), config.orthoOnly)) {
             if (neighbor.value[isFilled_] == Aspect.FALSE) {
                 exists = true;
                 break;
@@ -292,7 +274,7 @@ class DropPieceRule extends Rule {
             ds = 0;
         }
 
-        return locus.run(Gr.n, dn).run(Gr.s, ds).run(Gr.e, de).run(Gr.w, dw);
+        return locus.run(N, dn).run(S, ds).run(E, de).run(W, dw);
     }
 
     inline function neighborsFor(locus:BoardLocus, ortho:Bool):Array<BoardLocus> {

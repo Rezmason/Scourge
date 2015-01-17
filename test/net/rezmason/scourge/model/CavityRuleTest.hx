@@ -5,11 +5,13 @@ import VisualAssert;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;
+import net.rezmason.ropes.GridDirection.*;
+import net.rezmason.ropes.GridLocus;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.rules.CavityRule;
 
-using net.rezmason.ropes.GridLocus;
+
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.StatePlan;
@@ -80,7 +82,7 @@ class CavityRuleTest extends ScourgeRuleTest
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var head:BoardLocus = state.loci[state.players[0][head_]];
-        var bump:BoardLocus = head.run(Gr.s, 5);
+        var bump:BoardLocus = head.run(S, 5);
 
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);

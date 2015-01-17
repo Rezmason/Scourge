@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
@@ -12,7 +12,7 @@ using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.Pointers;
 
-class CavityRule extends Rule {
+class CavityRule extends RopesRule<Void> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.CAVITY_NEXT) var cavityNext_;
@@ -26,26 +26,17 @@ class CavityRule extends Rule {
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
-    var allEdges:Array<Int>;
-    var groupFirstEdges:Array<Int>;
-    var groupAngles:Array<Int>;
-    var cavityNodes:Array<AspectSet>;
-
-    override public function _init(cfg:Dynamic):Void {
-        moves.push({id:0});
-
-        allEdges = [];
-        groupFirstEdges = [];
-        groupAngles = [];
-        cavityNodes = [];
-    }
+    var allEdges:Array<Int> = [];
+    var groupFirstEdges:Array<Int> = [];
+    var groupAngles:Array<Int> = [];
+    var cavityNodes:Array<AspectSet> = [];
 
     override private function _chooseMove(choice:Int):Void {
         var maxFreshness:Int = state.globals[maxFreshness_] + 1;
         for (player in eachPlayer()) eraseCavities(player, maxFreshness);
         for (player in eachPlayer()) makeCavities(player, maxFreshness);
         state.globals[maxFreshness_] = maxFreshness;
-        signalEvent();
+        onSignal();
     }
 
     private function eraseCavities(player:AspectSet, maxFreshness):Void {

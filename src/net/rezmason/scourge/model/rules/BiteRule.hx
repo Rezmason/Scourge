@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
@@ -34,7 +34,7 @@ typedef BiteMove = {>Move,
     var duplicate:Bool;
 }
 
-class BiteRule extends Rule {
+class BiteRule extends RopesRule<BiteConfig> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
@@ -48,18 +48,11 @@ class BiteRule extends Rule {
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
-    private var cfg:BiteConfig;
-    private var movePool:Array<BiteMove>;
-    private var allMoves:Array<BiteMove>;
-
-    override public function _init(cfg:Dynamic):Void {
-        this.cfg = cfg;
-        movePool = [];
-        allMoves = [];
-    }
+    private var movePool:Array<BiteMove> = [];
+    private var allMoves:Array<BiteMove> = [];
 
     override private function _prime():Void {
-        for (player in eachPlayer()) player[numBites_] = cfg.startingBites;
+        for (player in eachPlayer()) player[numBites_] = config.startingBites;
     }
 
     override private function _update():Void {
@@ -88,7 +81,7 @@ class BiteRule extends Rule {
                 for (neighbor in neighborsFor(locus)) {
                     if (isValidEnemy(headIDs, currentPlayer, neighbor.value)) {
                         var move:BiteMove = getMove(getID(node), [getID(neighbor.value)]);
-                        if (!cfg.omnidirectional && cfg.baseReachOnThickness) {
+                        if (!config.omnidirectional && config.baseReachOnThickness) {
                             // The baseReachOnThickness config param uses this data to determine how far to extend a bite
                             var backwards:Int = (locus.neighbors.indexOf(neighbor) + 4) % 8;
                             var depth:Int = 0;
@@ -108,9 +101,9 @@ class BiteRule extends Rule {
             // Extend the existing valid bites
 
             var reachItr:Int = 1;
-            var growthPercent:Float = Math.min(1, totalArea / cfg.maxSizeReference); // The "size calculation" for players
-            var reach:Int = Std.int(cfg.minReach + growthPercent * (cfg.maxReach - cfg.minReach));
-            if (cfg.baseReachOnThickness) reach = cfg.maxReach;
+            var growthPercent:Float = Math.min(1, totalArea / config.maxSizeReference); // The "size calculation" for players
+            var reach:Int = Std.int(config.minReach + growthPercent * (config.maxReach - config.minReach));
+            if (config.baseReachOnThickness) reach = config.maxReach;
 
             // We find moves by taking existing moves and extending them until there's nothing left to extend
             while (reachItr < reach && newMoves.length > 0) {
@@ -118,7 +111,7 @@ class BiteRule extends Rule {
                 newMoves = [];
 
                 for (move in oldMoves) {
-                    if (cfg.omnidirectional) {
+                    if (config.omnidirectional) {
                         // Omnidirectional moves are squiggly
                         for (bitNodeID in move.bitNodes) {
                             var bitLocus:BoardLocus = getLocus(bitNodeID);
@@ -128,7 +121,7 @@ class BiteRule extends Rule {
                                 }
                             }
                         }
-                    } else if (!cfg.baseReachOnThickness || move.bitNodes.length < move.thickness) {
+                    } else if (!config.baseReachOnThickness || move.bitNodes.length < move.thickness) {
                         // Straight moves are a little easier to generate
                         var firstBitLocus:BoardLocus = getLocus(move.bitNodes[0]);
                         var lastBitLocus:BoardLocus = getLocus(move.bitNodes[move.bitNodes.length - 1]);
@@ -201,7 +194,7 @@ class BiteRule extends Rule {
             getPlayer(currentPlayer)[numBites_] = numBites;
         }
 
-        signalEvent();
+        onSignal();
     }
 
     override private function _collectMoves():Void movePool = allMoves.copy();
@@ -233,8 +226,8 @@ class BiteRule extends Rule {
         var val:Bool = true;
         if (node[occupier_] == allegiance) val = false; // Can't be the current player
         else if (node[occupier_] == Aspect.NULL) val = false; // Can't be the current player
-        else if (!cfg.biteThroughCavities && node[isFilled_] == Aspect.FALSE) val = false; // Must be filled, or must allow biting through a cavity
-        else if (!cfg.biteHeads && headIDs.has(getID(node))) val = false;
+        else if (!config.biteThroughCavities && node[isFilled_] == Aspect.FALSE) val = false; // Must be filled, or must allow biting through a cavity
+        else if (!config.biteHeads && headIDs.has(getID(node))) val = false;
 
         return val;
     }
@@ -281,6 +274,6 @@ class BiteRule extends Rule {
     }
 
     inline function neighborsFor(node:BoardLocus):Array<BoardLocus> {
-        return cfg.orthoOnly ? node.orthoNeighbors() : node.neighbors;
+        return config.orthoOnly ? node.orthoNeighbors() : node.neighbors;
     }
 }

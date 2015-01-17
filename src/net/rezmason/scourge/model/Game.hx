@@ -1,6 +1,5 @@
 package net.rezmason.scourge.model;
 
-import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.RuleFactory;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlan;
@@ -76,7 +75,8 @@ class Game {
         plan = planner.planState(state, builderRules.concat(basicRules));
 
         for (rule in builderRules.concat(basicRules)) {
-            rule.prime(state, plan, historian.history, historian.historyState, alertFunction);
+            var alertFn = alertFunction == null ? null : alertFunction.bind(rule.myName());
+            rule.prime(state, plan, historian.history, historian.historyState, alertFn);
         }
 
         // Grab some aspect pointers so we can quickly evaluate the state

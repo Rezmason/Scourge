@@ -4,7 +4,6 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlan;
 import net.rezmason.ropes.StatePlanner;

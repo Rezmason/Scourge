@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.rules;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Rule;
+import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
@@ -26,11 +26,9 @@ typedef PickPieceMove = {>Move,
     var reflection:Int;
 }
 
-class PickPieceRule extends Rule {
+class PickPieceRule extends RopesRule<PickPieceConfig> {
 
     static var stateReqs:AspectRequirements;
-
-    private var cfg:PickPieceConfig;
 
     private var allMoves:Array<PickPieceMove>;
     private var pickMove:Move;
@@ -55,14 +53,10 @@ class PickPieceRule extends Rule {
     @global(PieceAspect.PIECE_HAT_PLAYER) var pieceHatPlayer_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
-    override public function _init(cfg:Dynamic):Void {
-        this.cfg = cfg;
-        if (this.cfg.hatSize > this.cfg.pieceTableIDs.length) this.cfg.hatSize = this.cfg.pieceTableIDs.length;
-    }
-
     // All this for an overglorified random piece picker!
 
     override private function _prime():Void {
+        if (config.hatSize > config.pieceTableIDs.length) config.hatSize = config.pieceTableIDs.length;
         buildPieceMoves();
         buildHat();
     }
@@ -93,7 +87,7 @@ class PickPieceRule extends Rule {
         if (remakeHat()) buildHat();
         move = pickMoveFromHat();
         setPiece(move.pieceTableID, move.reflection, move.rotation);
-        signalEvent();
+        onSignal();
     }
 
     override private function _chooseQuantumMove(choice:Int):Void {
@@ -115,7 +109,7 @@ class PickPieceRule extends Rule {
         // We create the table of piece frequencies from the config
 
         var pieceFrequencies:Array<Null<Int>> = [];
-        for (pieceTableID in cfg.pieceTableIDs) {
+        for (pieceTableID in config.pieceTableIDs) {
             if (pieceFrequencies[pieceTableID] == null) pieceFrequencies[pieceTableID] = 0;
             pieceFrequencies[pieceTableID]++;
         }
@@ -126,14 +120,14 @@ class PickPieceRule extends Rule {
             var freq:Null<Int> = pieceFrequencies[pieceTableID];
             if (freq == 0 || freq == null) continue;
 
-            var freePiece:FreePiece = cfg.pieces.getPieceById(pieceTableID);
+            var freePiece:FreePiece = config.pieces.getPieceById(pieceTableID);
             var numRotations = freePiece.numRotations;
 
             // A piece that can't be flipped or rotated has its multiple symmetries
             // added to the hat, and so it has more moves
 
-            if (cfg.allowFlipping) {
-                if (cfg.allowRotating) {
+            if (config.allowFlipping) {
+                if (config.allowRotating) {
                     generateMove(pieceTableID, 0, 0, freq);
                 } else {
                     var spinWeight:Int = Std.int(numRotations / 4);
@@ -141,7 +135,7 @@ class PickPieceRule extends Rule {
                 }
             } else {
                 for (flip in 0...freePiece.numReflections) {
-                    if (cfg.allowRotating) {
+                    if (config.allowRotating) {
                         generateMove(pieceTableID, flip, 0, freq);
                     } else {
                         var spinWeight:Int = Std.int(numRotations / 4);
@@ -203,7 +197,7 @@ class PickPieceRule extends Rule {
 
         var pickedPiece:AspectSet = null;
         if (move == null) {
-            var pick:Float = cfg.randomFunction() * maxWeight;
+            var pick:Float = config.randomFunction() * maxWeight;
             pickedPiece = hatPieces[binarySearch(pick, weights)];
             move = allMoves[pickedPiece[pieceMoveID_]];
         } else {
@@ -254,6 +248,6 @@ class PickPieceRule extends Rule {
     // We fill the hat up again if it's empty
     private function remakeHat():Bool {
         return state.globals[pieceHatPlayer_] != state.globals[currentPlayer_] ||
-                state.globals[piecesPicked_] == cfg.hatSize;
+                state.globals[piecesPicked_] == config.hatSize;
     }
 }

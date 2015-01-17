@@ -1,41 +1,34 @@
 package net.rezmason.ropes;
 
-#if macro
-import haxe.macro.Context;
-import haxe.macro.Expr;
-#end
-
 import net.rezmason.ropes.RopesTypes;
 
-#if !macro @:autoBuild(net.rezmason.ropes.Rule.build()) #end class Rule extends Reckoner {
+class RopesRule<Config> extends Reckoner {
 
     var historyState:State;
     var history:StateHistory;
+    var config:Config;
 
-    public var moves(default, null):Array<Move>;
-    public var quantumMoves(default, null):Array<Move>;
+    public var moves(default, null):Array<Move> = [{id:0}];
+    public var quantumMoves(default, null):Array<Move> = [];
     
     private function _prime():Void {}
-    private function _init(config:Dynamic):Void {}
+    private function _init():Void {}
     private function _update():Void {}
     private function _chooseMove(choice:Int):Void {}
     private function _collectMoves():Void {}
     private function _chooseQuantumMove(choice:Int):Void {}
 
-    private function signalEvent():Void {}
-
-    var onSignal:String->Void;
+    var onSignal:Void->Void = function() {};
 
     @:final public function init(config:Dynamic):Void {
-        moves = [];
-        quantumMoves = [];
-        _init(config);
+        this.config = config;
+        _init();
     }
 
     @:final public function prime(state, plan, history, historyState, ?onSignal):Void {
         this.history = history;
         this.historyState = historyState;
-        this.onSignal = onSignal;
+        if (onSignal != null) this.onSignal = onSignal;
 
         primePointers(state, plan);
 
@@ -74,7 +67,7 @@ import net.rezmason.ropes.RopesTypes;
         _chooseQuantumMove(choice);
     }
 
-    @:final inline function myName():String {
+    @:final public inline function myName():String {
         var name:String = Type.getClassName(Type.getClass(this));
         name = name.substr(name.lastIndexOf('.') + 1);
         return name;
@@ -122,44 +115,4 @@ import net.rezmason.ropes.RopesTypes;
         historyState.extras.push(extraAspectTemplate.map(history.alloc));
         return extra;
     }
-
-    #if macro
-    private static var restrictedFields:Map<String, Bool> = [
-        'prime' => true,
-        'update' => true,
-        'chooseMove' => true,
-        'chooseQuantumMove' => true,
-        'signalEvent' => true,
-    ];
-    #end
-
-    macro public static function build():Array<Field> {
-        var className:String = Context.getLocalClass().get().name;
-        var msg:String = 'Rule processing $className  ';
-        var pos:Position = Context.currentPos();
-        var fields:Array<Field> = Context.getBuildFields();
-        for (field in fields) {
-            if (restrictedFields.exists(field.name)) {
-                throw new Error('Rules cannot manually override the function ${field.name}', field.pos);
-            }
-        }
-
-        msg += '\n';
-
-        var signalEventBody:Expr = macro if (onSignal != null) onSignal($v{className});
-        fields.push(overrider('signalEvent', [signalEventBody], pos));
-
-        #if ROPES_MACRO_VERBOSE
-            Sys.print(msg);
-        #end
-
-        return fields;
-    }
-
-    #if macro
-    private inline static function overrider(name:String, expressions:Array<Expr>, pos:Position):Field {
-        var func:Function = {params:[], args:[], ret:null, expr:macro $b{expressions}};
-        return { name:name, access:[APrivate, AOverride], kind:FFun(func), pos:pos };
-    }
-    #end
 }

@@ -2,6 +2,7 @@ package net.rezmason.scourge.model;
 
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.RopesTypes;
+import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlan;
@@ -16,7 +17,7 @@ class BoardUtils {
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
     public inline static function grabXY(state:State, east:Int, south:Int):BoardLocus {
-        return state.loci[0].run(Gr.nw).run(Gr.w).run(Gr.n).run(Gr.s, south).run(Gr.e, east);
+        return state.loci[0].run(NW).run(W).run(N).run(S, south).run(E, east);
     }
 
     public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, evaluator:AspectSet->String = null):String {
@@ -24,14 +25,14 @@ class BoardUtils {
 
         var str:String = '';
 
-        var grid:BoardLocus = state.loci[0].run(Gr.nw).run(Gr.w).run(Gr.n);
+        var grid:BoardLocus = state.loci[0].run(NW).run(W).run(N);
 
         var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
 
-        for (row in grid.walk(Gr.s)) {
+        for (row in grid.walk(S)) {
             str += '\n';
-            for (column in row.walk(Gr.e)) {
+            for (column in row.walk(E)) {
                 var char:String = null;
                 if (evaluator != null) char = evaluator(column.value);
                 if (char == null) {

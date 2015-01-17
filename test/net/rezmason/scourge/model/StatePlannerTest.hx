@@ -6,7 +6,6 @@ import VisualAssert;
 import net.rezmason.ropes.Aspect;
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.scourge.model.aspects.TestAspect;

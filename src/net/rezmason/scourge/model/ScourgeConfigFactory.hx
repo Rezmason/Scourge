@@ -1,7 +1,6 @@
 package net.rezmason.scourge.model;
 
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Rule;
 import net.rezmason.ropes.State;
 import net.rezmason.utils.Siphon;
 import net.rezmason.scourge.model.aspects.BiteAspect;

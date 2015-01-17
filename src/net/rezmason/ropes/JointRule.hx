@@ -1,23 +1,21 @@
 package net.rezmason.ropes;
 
-class JointRule extends Rule {
+import net.rezmason.ropes.RopesTypes;
 
-    var rules:Array<Rule>;
-
-    override public function _init(cfg:Dynamic):Void { rules = cast cfg; }
+class JointRule extends RopesRule<Array<Rule>> {
 
     override private function _update():Void {
-        rules[0].update();
-        moves = rules[0].moves;
-        quantumMoves = rules[0].quantumMoves;
+        config[0].update();
+        moves = config[0].moves;
+        quantumMoves = config[0].quantumMoves;
     }
 
     override private function _chooseMove(choice:Int):Void {
         #if ROPES_VERBOSE trace('{'); #end
 
-        rules[0].chooseMove(choice);
-        for (ike in 1...rules.length) {
-            var rule:Rule = rules[ike];
+        config[0].chooseMove(choice);
+        for (ike in 1...config.length) {
+            var rule:Rule = config[ike];
             rule.update();
             rule.chooseMove();
         }
@@ -25,14 +23,14 @@ class JointRule extends Rule {
         #if ROPES_VERBOSE trace('}'); #end
     }
 
-    override private function _collectMoves():Void rules[0].collectMoves();
+    override private function _collectMoves():Void config[0].collectMoves();
 
     override private function _chooseQuantumMove(choice:Int):Void {
         #if ROPES_VERBOSE trace('{'); #end
 
-        rules[0].chooseQuantumMove(choice);
-        for (ike in 1...rules.length) {
-            var rule:Rule = rules[ike];
+        config[0].chooseQuantumMove(choice);
+        for (ike in 1...config.length) {
+            var rule:Rule = config[ike];
             rule.update();
             rule.chooseMove();
         }
