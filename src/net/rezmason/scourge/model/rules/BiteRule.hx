@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
@@ -162,13 +162,13 @@ class BiteRule extends RopesRule<BiteConfig> {
 
         var move:BiteMove = cast moves[choice];
 
-        if (move.targetNode != Aspect.NULL) {
+        if (move.targetNode != NULL) {
 
             // Grab data from the move
 
             var currentPlayer:Int = state.globals[currentPlayer_];
 
-            var maxFreshness:Int = state.globals[maxFreshness_] + 1;
+            var maxFreshness:Int = state.globals[maxFreshness_];
             var numBites:Int = getPlayer(currentPlayer)[numBites_] - 1;
 
             // Find the cells removed from each player
@@ -194,7 +194,7 @@ class BiteRule extends RopesRule<BiteConfig> {
             getPlayer(currentPlayer)[numBites_] = numBites;
         }
 
-        onSignal();
+        signalChange();
     }
 
     override private function _collectMoves():Void movePool = allMoves.copy();
@@ -225,8 +225,8 @@ class BiteRule extends RopesRule<BiteConfig> {
     inline function isValidEnemy(headIDs:Array<Int>, allegiance:Int, node:AspectSet):Bool {
         var val:Bool = true;
         if (node[occupier_] == allegiance) val = false; // Can't be the current player
-        else if (node[occupier_] == Aspect.NULL) val = false; // Can't be the current player
-        else if (!config.biteThroughCavities && node[isFilled_] == Aspect.FALSE) val = false; // Must be filled, or must allow biting through a cavity
+        else if (node[occupier_] == NULL) val = false; // Can't be the current player
+        else if (!config.biteThroughCavities && node[isFilled_] == FALSE) val = false; // Must be filled, or must allow biting through a cavity
         else if (!config.biteHeads && headIDs.has(getID(node))) val = false;
 
         return val;
@@ -261,13 +261,13 @@ class BiteRule extends RopesRule<BiteConfig> {
     }
 
     inline function killCell(node:AspectSet, freshness:Int, firstIndex:Int):Int {
-        if (node[isFilled_] == Aspect.TRUE) {
+        if (node[isFilled_] == TRUE) {
             var nextNode:AspectSet = node.removeSet(state.nodes, bodyNext_, bodyPrev_);
-            if (firstIndex == getID(node)) firstIndex = nextNode == null ? Aspect.NULL : getID(nextNode);
-            node[isFilled_] = Aspect.FALSE;
+            if (firstIndex == getID(node)) firstIndex = nextNode == null ? NULL : getID(nextNode);
+            node[isFilled_] = FALSE;
         }
 
-        node[occupier_] = Aspect.NULL;
+        node[occupier_] = NULL;
         node[freshness_] = freshness;
 
         return firstIndex;

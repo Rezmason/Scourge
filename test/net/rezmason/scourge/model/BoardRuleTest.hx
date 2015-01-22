@@ -54,7 +54,7 @@ class BoardRuleTest extends ScourgeRuleTest {
         VisualAssert.assert('Should appear to be four integers, equally spaced and equally distant from the edges of a box', state.spitBoard(plan));
         Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, state.spitBoard(plan, false));
 
-        var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
+        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
         var currentPlayer:Int = state.globals[currentPlayer_];
 
         var playerHead:BoardLocus = state.loci[state.players[currentPlayer][head_]];

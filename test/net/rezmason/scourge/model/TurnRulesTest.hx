@@ -48,7 +48,7 @@ class TurnRulesTest extends ScourgeRuleTest
         endTurnRule.init(null);
         makeState([endTurnRule], 4, TestBoards.emptySquareFourPlayerSkirmish);
 
-        var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
+        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
 
         var expectedCurrentPlayer:Int = 0;
         var currentPlayer:Int = state.globals[currentPlayer_];
@@ -84,7 +84,7 @@ class TurnRulesTest extends ScourgeRuleTest
         makeState([forfeitRule], 4, TestBoards.oaf);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
+        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
 
@@ -124,7 +124,7 @@ class TurnRulesTest extends ScourgeRuleTest
         // Change occupier of current player\'s head
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
+        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
@@ -158,7 +158,7 @@ class TurnRulesTest extends ScourgeRuleTest
         stalemateRule.init({maxSkips:5});
         makeState([stalemateRule], 4);
 
-        var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         var numConsecutiveSkips_:AspectPtr = plan.onPlayer(PlyAspect.NUM_CONSECUTIVE_SKIPS);
 
@@ -194,7 +194,7 @@ class TurnRulesTest extends ScourgeRuleTest
         oneLivingPlayerRule.init(null);
         makeState([oneLivingPlayerRule], 4);
 
-        var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
         // kill the first, third and fourth players

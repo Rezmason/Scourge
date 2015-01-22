@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.RopesTypes;
@@ -71,7 +71,7 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
 
         var pieceIDs:Array<Int> = [];
         if (config.allowPiecePick) for (pieceID in config.pieceTableIDs) pieceIDs.push(pieceID);
-        else if (state.globals[pieceTableID_] != Aspect.NULL) pieceIDs.push(state.globals[pieceTableID_]);
+        else if (state.globals[pieceTableID_] != NULL) pieceIDs.push(state.globals[pieceTableID_]);
 
         // get current player head
         var currentPlayer:Int = state.globals[currentPlayer_];
@@ -125,7 +125,7 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
                                 var occupier:Int = nodeAtCoord[occupier_];
                                 var isFilled:Int = nodeAtCoord[isFilled_];
 
-                                if (isFilled == Aspect.TRUE && !(config.overlapSelf && occupier == currentPlayer)) {
+                                if (isFilled == TRUE && !(config.overlapSelf && occupier == currentPlayer)) {
                                     valid = false;
                                     break;
                                 }
@@ -175,7 +175,7 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
     inline static function makeMove():DropPieceMove {
         return {
             id:-1,
-            targetNode:Aspect.NULL,
+            targetNode:NULL,
             pieceID:-1,
             reflection:-1,
             rotation:-1,
@@ -193,27 +193,27 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
         var currentPlayer:Int = state.globals[currentPlayer_];
         var player:AspectSet = getPlayer(currentPlayer);
 
-        if (move.targetNode != Aspect.NULL) {
+        if (move.targetNode != NULL) {
             var freePiece:FreePiece = config.pieces.getPieceById(move.pieceID);
             var targetLocus:BoardLocus = getLocus(move.targetNode);
             var coords:Array<IntCoord> = freePiece.getPiece(move.reflection, move.rotation).cells;
             var homeCoord:IntCoord = move.coord;
-            var maxFreshness:Int = state.globals[maxFreshness_] + 1;
+            var maxFreshness:Int = state.globals[maxFreshness_];
 
             var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
 
             for (coord in coords) bodyNode = fillAndOccupyCell(walkLocus(targetLocus, coord, homeCoord).value, currentPlayer, maxFreshness, bodyNode);
             player[bodyFirst_] = getID(bodyNode);
 
-            state.globals[maxFreshness_] = maxFreshness;
+            state.globals[maxFreshness_] = maxFreshness + 1;
 
             player[numConsecutiveSkips_] = 0;
         } else {
             player[numConsecutiveSkips_] = player[numConsecutiveSkips_] + 1;
         }
 
-        state.globals[pieceTableID_] = Aspect.NULL;
-        onSignal();
+        state.globals[pieceTableID_] = NULL;
+        signalChange();
     }
 
     override private function _collectMoves():Void movePool = allMoves.copy();
@@ -222,7 +222,7 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
         var exists:Bool = false;
 
         for (neighbor in neighborsFor(getNodeLocus(node), config.orthoOnly)) {
-            if (neighbor.value[isFilled_] == Aspect.FALSE) {
+            if (neighbor.value[isFilled_] == FALSE) {
                 exists = true;
                 break;
             }
@@ -251,9 +251,9 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
     }
 
     inline function fillAndOccupyCell(me:AspectSet, currentPlayer:Int, maxFreshness, bodyNode:AspectSet):AspectSet {
-        if (me[occupier_] != currentPlayer || me[isFilled_] == Aspect.FALSE) me[freshness_] = maxFreshness;
+        if (me[occupier_] != currentPlayer || me[isFilled_] == FALSE) me[freshness_] = maxFreshness;
         me[occupier_] = currentPlayer;
-        me[isFilled_] = Aspect.TRUE;
+        me[isFilled_] = TRUE;
         return bodyNode.addSet(me, state.nodes, ident_, bodyNext_, bodyPrev_);
     }
 

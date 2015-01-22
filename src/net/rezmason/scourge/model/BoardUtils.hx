@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;
@@ -40,10 +40,10 @@ class BoardUtils {
                     var isFilled:Null<Int> = column.value[isFilled_];
 
                     if (occupier == null) char = 'n';
-                    else if (occupier != Aspect.NULL && isFilled == Aspect.FALSE) char = String.fromCharCode(ALPHABET() + occupier);
-                    else if (occupier != Aspect.NULL) char = '' + occupier;
-                    else if (isFilled == Aspect.TRUE) char = 'X';
-                    else if (isFilled == Aspect.FALSE && occupier == Aspect.NULL) char = ' ';
+                    else if (occupier != NULL && isFilled == FALSE) char = String.fromCharCode(ALPHABET() + occupier);
+                    else if (occupier != NULL) char = '' + occupier;
+                    else if (isFilled == TRUE) char = 'X';
+                    else if (isFilled == FALSE && occupier == NULL) char = ' ';
                 }
 
                 str += char;

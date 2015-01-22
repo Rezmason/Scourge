@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
@@ -32,14 +32,14 @@ class DecayRule extends RopesRule<DecayConfig> {
 
     override private function _chooseMove(choice:Int):Void {
 
-        var maxFreshness:Int = state.globals[maxFreshness_] + 1;
+        var maxFreshness:Int = state.globals[maxFreshness_];
 
         // Grab all the player heads
 
         var heads:Array<BoardLocus> = [];
         for (player in eachPlayer()) {
             var headIndex:Int = player[head_];
-            if (headIndex != Aspect.NULL && getNode(headIndex)[occupier_] == getID(player)) {
+            if (headIndex != NULL && getNode(headIndex)[occupier_] == getID(player)) {
                 heads.push(getLocus(headIndex));
             }
         }
@@ -47,17 +47,18 @@ class DecayRule extends RopesRule<DecayConfig> {
         // Use the heads as starting points for a flood fill of connected living cells
         var livingBodyNeighbors:Array<BoardLocus> = heads.expandGraph(config.orthoOnly, isLivingBodyNeighbor);
 
+        var cellDied = false;
         // Remove cells from player bodies
         for (player in eachPlayer()) {
 
             var totalArea:Int = 0;
 
             var bodyFirst:Int = player[bodyFirst_];
-            if (bodyFirst != Aspect.NULL) {
+            if (bodyFirst != NULL) {
                 for (node in getNode(bodyFirst).iterate(state.nodes, bodyNext_)) {
                     if (livingBodyNeighbors[getID(node)] == null) {
                         bodyFirst = killCell(node, maxFreshness, bodyFirst);
-                        maxFreshness++;
+                        cellDied = true;
                     } else {
                         totalArea++;
                     }
@@ -68,23 +69,23 @@ class DecayRule extends RopesRule<DecayConfig> {
             player[totalArea_] = totalArea;
         }
 
-        state.globals[maxFreshness_] = maxFreshness;
-        onSignal();
+        state.globals[maxFreshness_] = maxFreshness + (cellDied ? 1 : 0);
+        signalChange();
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
-        if (me[isFilled_] == Aspect.FALSE) return false;
+        if (me[isFilled_] == FALSE) return false;
         return me[occupier_] == you[occupier_];
     }
 
     function killCell(node:AspectSet, freshness:Int, firstIndex:Int):Int {
-        node[isFilled_] = Aspect.FALSE;
-        node[occupier_] = Aspect.NULL;
+        node[isFilled_] = FALSE;
+        node[occupier_] = NULL;
         node[freshness_] = freshness;
 
         var nextNode:AspectSet = node.removeSet(state.nodes, bodyNext_, bodyPrev_);
         if (firstIndex == getID(node)) {
-            firstIndex = (nextNode == null) ? Aspect.NULL : getID(nextNode);
+            firstIndex = (nextNode == null) ? NULL : getID(nextNode);
         }
         return firstIndex;
     }

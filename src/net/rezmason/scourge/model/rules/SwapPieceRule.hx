@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesRule;
 
 import net.rezmason.scourge.model.aspects.PieceAspect;
@@ -30,15 +30,15 @@ class SwapPieceRule extends RopesRule<SwapPieceConfig> {
         moves = [];
         var currentPlayer:Int = state.globals[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
-        if (numSwaps > 0 && state.globals[pieceTableID_] != Aspect.NULL) moves.push({id:0});
+        if (numSwaps > 0 && state.globals[pieceTableID_] != NULL) moves.push({id:0});
     }
 
     override private function _chooseMove(choice:Int):Void {
                 var currentPlayer:Int = state.globals[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
         getPlayer(currentPlayer)[numSwaps_] = numSwaps - 1;
-        state.globals[pieceTableID_] = Aspect.NULL;
-        onSignal();
+        state.globals[pieceTableID_] = NULL;
+        signalChange();
     }
 }
 

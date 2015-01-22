@@ -1,4 +1,7 @@
-Board entity system
+Entity system
+    A "Sequencer" Reckoner finds and sequences changes and their causes
+        The Sequencer maps causes to Presenters, and passes them entities that changed, to which they attach animations
+        
 
 The Loupe
     Get it ON the board

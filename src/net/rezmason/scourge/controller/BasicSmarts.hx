@@ -11,7 +11,7 @@ import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.rules.DropPieceRule.DropPieceMove;
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 
 using net.rezmason.ropes.GridUtils;
 
@@ -23,9 +23,10 @@ class BasicSmarts extends Smarts {
     private var quitActionIndex:Int;
     private var otherActionIndices:Array<Int>;
     private var canSkip:Bool;
-    private var totalArea_:AspectPtr;
-    private var occupier_:AspectPtr;
-    private var isFilled_:AspectPtr;
+
+    @player(BodyAspect.TOTAL_AREA) var totalArea_;
+    @node(OwnershipAspect.IS_FILLED) var isFilled_;
+    @node(OwnershipAspect.OCCUPIER) var occupier_;
     
     override public function init(game:Game, config:ScourgeConfig, id:Int, random:Void->Float):Void {
         super.init(game, config, id, random);
@@ -35,7 +36,6 @@ class BasicSmarts extends Smarts {
         quitActionIndex = game.actionIDs.indexOf(QUIT_ACTION);
         canSkip = config.allowNowhereDrop;
 
-        totalArea_ = game.plan.onPlayer(BodyAspect.TOTAL_AREA);
         occupier_ = game.plan.onNode(OwnershipAspect.OCCUPIER);
         isFilled_ = game.plan.onNode(OwnershipAspect.IS_FILLED);
     }
@@ -112,7 +112,7 @@ class BasicSmarts extends Smarts {
         if (dropMove.addedNodes.length == 0) return false;
         for (nodeID in dropMove.addedNodes) {
             for (neighborLocus in game.state.loci[nodeID].orthoNeighbors()) {
-                if (neighborLocus.value[isFilled_] == Aspect.TRUE && neighborLocus.value[occupier_] == Aspect.NULL) {
+                if (neighborLocus.value[isFilled_] == TRUE && neighborLocus.value[occupier_] == NULL) {
                     return true;
                 }
             }

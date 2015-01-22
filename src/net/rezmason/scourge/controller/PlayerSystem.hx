@@ -15,7 +15,7 @@ class PlayerSystem implements IPlayer {
     public var index(default, null):Int;
     public var gameBegunSignal(default, null):Zig<Game->Void> = new Zig();
     public var gameEndedSignal(default, null):Zig<Void->Void> = new Zig();
-    public var moveStartSignal(default, null):Zig<Int->Int->Int->Void> = new Zig();
+    public var moveStartSignal(default, null):Zig<Int->String->Int->Void> = new Zig();
     public var moveStopSignal(default, null):Zig<Void->Void> = new Zig();
     public var moveStepSignal(default, null):Zig<String->Void> = new Zig();
 
@@ -54,7 +54,7 @@ class PlayerSystem implements IPlayer {
                 }
             case RelayMove(turn, action, move):
                 if (turn == game.revision) {
-                    if (usesSignals) moveStartSignal.dispatch(game.currentPlayer, action, move);
+                    if (usesSignals) moveStartSignal.dispatch(game.currentPlayer, game.actionIDs[action], move);
                     isGameUpdating = true;
                     if (game.hasBegun) updateGame(action, move);
                     isGameUpdating = false;

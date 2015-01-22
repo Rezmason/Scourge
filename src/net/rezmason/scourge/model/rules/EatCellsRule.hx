@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
@@ -40,7 +40,7 @@ class EatCellsRule extends RopesRule<EatCellsConfig> {
         var currentPlayer:Int = state.globals[currentPlayer_];
         var head:Int = getPlayer(currentPlayer)[head_];
         var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
-        var maxFreshness:Int = state.globals[maxFreshness_] + 1;
+        var maxFreshness:Int = state.globals[maxFreshness_];
 
         // List all the players' heads
 
@@ -101,13 +101,15 @@ class EatCellsRule extends RopesRule<EatCellsConfig> {
 
         // Update cells in the eaten region
         for (group in eatenNodeGroups) {
+            var nodesEaten = false;
             for (node in group) {
                 if (node != null && node[occupier_] != currentPlayer) {
                     node[occupier_] = currentPlayer;
                     node[freshness_] = maxFreshness;
+                    nodesEaten = true;
                 }
             }
-            maxFreshness++;
+            if (nodesEaten) maxFreshness++;
         }
 
         state.globals[maxFreshness_] = maxFreshness;
@@ -118,32 +120,32 @@ class EatCellsRule extends RopesRule<EatCellsConfig> {
             if (playerID == currentPlayer) continue;
 
             var bodyFirst:Int = player[bodyFirst_];
-            if (bodyFirst != Aspect.NULL) {
+            if (bodyFirst != NULL) {
                 var body:Array<AspectSet> = getNode(bodyFirst).listToArray(state.nodes, bodyNext_);
                 var revisedBody:Array<AspectSet> = [];
                 for (node in body) {
-                    if (node[isFilled_] == Aspect.TRUE && node[occupier_] == playerID) revisedBody.push(node);
+                    if (node[isFilled_] == TRUE && node[occupier_] == playerID) revisedBody.push(node);
                 }
                 revisedBody.chainByAspect(ident_, bodyNext_, bodyPrev_);
                 if (revisedBody.length > 0) player[bodyFirst_] = getID(revisedBody[0]);
-                else player[bodyFirst_] = Aspect.NULL;
+                else player[bodyFirst_] = NULL;
             }
 
             var head:Int = player[head_];
-            if (head != Aspect.NULL) {
+            if (head != NULL) {
                 var headNode:AspectSet = getNode(head);
-                if (headNode[occupier_] != playerID) player[head_] = Aspect.NULL;
+                if (headNode[occupier_] != playerID) player[head_] = NULL;
             }
         }
 
         // Add the filled eaten nodes to the current player body
         for (node in eatenNodes) {
-            if (node != null && node[isFilled_] == Aspect.TRUE) {
+            if (node != null && node[isFilled_] == TRUE) {
                 bodyNode = bodyNode.addSet(node, state.nodes, ident_, bodyNext_, bodyPrev_);
             }
         }
         getPlayer(currentPlayer)[bodyFirst_] = getID(bodyNode);
-        onSignal();
+        signalChange();
     }
 
     function getBody(playerID:Int):Array<AspectSet> {
@@ -152,12 +154,12 @@ class EatCellsRule extends RopesRule<EatCellsConfig> {
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
-        if (me[isFilled_] == Aspect.FALSE) return false;
+        if (me[isFilled_] == FALSE) return false;
         return me[occupier_] == you[occupier_];
     }
 
     function isFresh(node:AspectSet):Bool {
-        return node[freshness_] > 0;
+        return node[freshness_] != NULL;
     }
 
     function directionsFor(ortho:Bool):Iterator<Int> {

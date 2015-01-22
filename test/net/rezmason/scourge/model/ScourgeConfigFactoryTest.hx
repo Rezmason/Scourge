@@ -120,8 +120,8 @@ class ScourgeConfigFactoryTest
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
-        var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
-        var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
+        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
+        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
 
         Assert.areEqual(36, state.players[0][totalArea_]);
         Assert.areEqual(Aspect.NULL, state.players[1][head_]);
@@ -141,9 +141,9 @@ class ScourgeConfigFactoryTest
 
         VisualAssert.assert('two player grab', state.spitBoard(plan));
 
-        var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
-        var currentPlayer_:AspectPtr = plan.onState(PlyAspect.CURRENT_PLAYER);
+        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
 
         startAction.update();
         startAction.chooseMove();
@@ -192,7 +192,7 @@ class ScourgeConfigFactoryTest
         startAction.chooseMove();
 
         var numSwaps_:AspectPtr = plan.onPlayer(SwapAspect.NUM_SWAPS);
-        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
+        var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
         Assert.areEqual(config.startingSwaps, state.players[0][numSwaps_]);
 
@@ -227,7 +227,7 @@ class ScourgeConfigFactoryTest
         quitAction.update();
         quitAction.chooseMove(); // player 1 ragequits
 
-        var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
 
         Assert.areEqual(1, state.globals[winner_]);
     }
@@ -278,7 +278,7 @@ class ScourgeConfigFactoryTest
         
         VisualAssert.assert('player zero dropped another ---, ate player one\'s head and body; another cavity', state.spitBoard(plan));
 
-        var winner_:AspectPtr = plan.onState(WinAspect.WINNER);
+        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
         Assert.areEqual(0, state.globals[winner_]);
     }
 

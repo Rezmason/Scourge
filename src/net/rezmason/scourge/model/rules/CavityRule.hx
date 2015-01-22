@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
@@ -32,24 +32,25 @@ class CavityRule extends RopesRule<Void> {
     var cavityNodes:Array<AspectSet> = [];
 
     override private function _chooseMove(choice:Int):Void {
-        var maxFreshness:Int = state.globals[maxFreshness_] + 1;
-        for (player in eachPlayer()) eraseCavities(player, maxFreshness);
-        for (player in eachPlayer()) makeCavities(player, maxFreshness);
-        state.globals[maxFreshness_] = maxFreshness;
-        onSignal();
+        var maxFreshness:Int = state.globals[maxFreshness_];
+        var boardChanged = false;
+        for (player in eachPlayer()) boardChanged = eraseCavities(player, maxFreshness) || boardChanged;
+        for (player in eachPlayer()) boardChanged =  makeCavities(player, maxFreshness) || boardChanged;
+        if (boardChanged) state.globals[maxFreshness_] = maxFreshness + 1;
+        signalChange();
     }
 
-    private function eraseCavities(player:AspectSet, maxFreshness):Void {
+    private function eraseCavities(player:AspectSet, maxFreshness):Bool {
         var cavityFirst:Int = player[cavityFirst_];
-        var oldCavityNodes:Array<AspectSet> = [];
-        if (cavityFirst != Aspect.NULL) {
-            oldCavityNodes = getNode(cavityFirst).listToAssocArray(state.nodes, cavityNext_, ident_);
+        if (cavityFirst != NULL) {
+            var oldCavityNodes = getNode(cavityFirst).listToAssocArray(state.nodes, cavityNext_, ident_);
             for (node in oldCavityNodes) if (node != null) clearCavityCell(node, maxFreshness);
-            player[cavityFirst_] = Aspect.NULL;
+            player[cavityFirst_] = NULL;
         }
+        return cavityFirst != NULL;
     }
 
-    private function makeCavities(player:AspectSet, maxFreshness:Int):Void {
+    private function makeCavities(player:AspectSet, maxFreshness:Int):Bool {
 
         var edgeGroupIDs:Array<Null<Int>> = [];
         var numEdges:Int = 0;
@@ -71,7 +72,7 @@ class CavityRule extends RopesRule<Void> {
                 // For each empty ortho neighbor,
                 for (direction in GridUtils.orthoDirections()) {
                     var neighbor = edgeLocus.neighbors[direction];
-                    if (neighbor.value[isFilled_] == Aspect.FALSE || neighbor.value[occupier_] != occupier) {
+                    if (neighbor.value[isFilled_] == FALSE || neighbor.value[occupier_] != occupier) {
                         // make an edge that's in-no-group
                         currentEdge = makeEdge(getID(edgeNode), direction);
                         edgeGroupIDs[currentEdge] = -1;
@@ -170,13 +171,15 @@ class CavityRule extends RopesRule<Void> {
             var totalArea:Int = player[totalArea_] + cavityNodes.length;
             player[totalArea_] = totalArea;
         }
+
+        return numCavityNodes > 0;
     }
 
     inline function hasDifferentNeighbor(allegiance:Int, node:AspectSet):Bool {
         var exists:Bool = false;
 
         for (neighbor in getNodeLocus(node).orthoNeighbors()) {
-            if (neighbor == null || neighbor.value[isFilled_] == Aspect.FALSE || neighbor.value[occupier_] != allegiance) {
+            if (neighbor == null || neighbor.value[isFilled_] == FALSE || neighbor.value[occupier_] != allegiance) {
                 exists = true;
                 break;
             }
@@ -189,16 +192,16 @@ class CavityRule extends RopesRule<Void> {
     inline function getEdgeID(edge:Int):Int return edge >> 3;
     inline function getEdgeDirection(edge:Int):Int return edge & 7;
 
-    inline function isEmpty(me:AspectSet, you:AspectSet):Bool return me[isFilled_] == Aspect.FALSE;
+    inline function isEmpty(me:AspectSet, you:AspectSet):Bool return me[isFilled_] == FALSE;
 
     inline function createCavity(occupier:Int, maxFreshness:Int, node:AspectSet):Void {
-        node[isFilled_] = Aspect.FALSE;
+        node[isFilled_] = FALSE;
         node[occupier_] = occupier;
         node[freshness_] = maxFreshness;
     }
 
     inline function clearCavityCell(node:AspectSet, maxFreshness:Int):Void {
-        if (node[isFilled_] == Aspect.FALSE) node[occupier_] = Aspect.NULL;
+        if (node[isFilled_] == FALSE) node[occupier_] = NULL;
         node[freshness_] = maxFreshness;
         node.removeSet(state.nodes, cavityNext_, cavityPrev_);
     }

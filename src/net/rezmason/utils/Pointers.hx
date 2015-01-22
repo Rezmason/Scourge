@@ -19,7 +19,7 @@ abstract PtrSet<T>(Array<T>) {
     public inline function new(a:Array<T> = null) this = (a == null) ? [] : a.copy();
     public inline function wipe():Void this.splice(0, this.length);
     public inline function copy():PtrSet<T> return new PtrSet(this);
-    public inline function copyTo(dest:PtrSet<T>, offset:Int):Void {
+    public inline function copyTo(dest:PtrSet<T>, offset:Int = 0):Void {
         for (ike in 0...this.length) dest.write(ike + offset, this[ike]);
     }
     public inline function map<U>(mapFunc:T->U):PtrSet<U> return new PtrSet(this.map(mapFunc));

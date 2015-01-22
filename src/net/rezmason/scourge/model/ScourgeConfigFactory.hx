@@ -2,13 +2,15 @@ package net.rezmason.scourge.model;
 
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.State;
-import net.rezmason.utils.Siphon;
+import net.rezmason.scourge.controller.Presenter;
+import net.rezmason.scourge.model.Pieces;
+import net.rezmason.scourge.model.ScourgeAction.*;
+import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.aspects.BiteAspect;
 import net.rezmason.scourge.model.aspects.SwapAspect;
 import net.rezmason.scourge.model.rules.*;
-import net.rezmason.scourge.model.Pieces;
 import net.rezmason.scourge.tools.Resource;
-import net.rezmason.scourge.model.ScourgeAction.*;
+import net.rezmason.utils.Siphon;
 
 typedef ReplenishableConfig = { prop:AspectProperty, amount:Int, period:Int, maxAmount:Int, }
 
@@ -35,7 +37,13 @@ class ScourgeConfigFactory {
     static var BITE:String               = Type.getClassName(BiteRule);
     static var SWAP_PIECE:String         = Type.getClassName(SwapPieceRule);
 
-    public static var ruleDefs:Map<String, Class<Rule>> = cast Siphon.getDefs('net.rezmason.scourge.model.rules', 'src', false, 'Rule');
+    public static var ruleDefs(default, null):Map<String, Class<Rule>> = cast Siphon.getDefs(
+        'net.rezmason.scourge.model.rules', 'src', false, 'Rule'
+    );
+
+    public static var presenterDefs(default, null):Map<String, Class<Presenter>> = cast Siphon.getDefs(
+        'net.rezmason.scourge.controller.presenters', 'src', false, 'Presenter'
+    );
 
     public inline static function makeDefaultActionList():Array<String> return [DROP_ACTION, QUIT_ACTION];
     public inline static function makeStartAction():String return START_ACTION;

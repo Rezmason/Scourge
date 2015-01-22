@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.ReplenishableAspect;
@@ -76,21 +76,21 @@ class ReplenishRule extends RopesRule<ReplenishConfig> {
             stateReps.chainByAspect(ident_, repNext_, repPrev_);
             state.globals[stateRepFirst_] = stateReps[0][ident_];
         } else {
-            state.globals[stateRepFirst_] = Aspect.NULL;
+            state.globals[stateRepFirst_] = NULL;
         }
 
         if (playerReps.length > 0) {
             playerReps.chainByAspect(ident_, repNext_, repPrev_);
             state.globals[playerRepFirst_] = playerReps[0][ident_];
         } else {
-            state.globals[playerRepFirst_] = Aspect.NULL;
+            state.globals[playerRepFirst_] = NULL;
         }
 
         if (nodeReps.length > 0) {
             nodeReps.chainByAspect(ident_, repNext_, repPrev_);
             state.globals[nodeRepFirst_] = nodeReps[0][ident_];
         } else {
-            state.globals[nodeRepFirst_] = Aspect.NULL;
+            state.globals[nodeRepFirst_] = NULL;
         }
     }
 
@@ -98,7 +98,7 @@ class ReplenishRule extends RopesRule<ReplenishConfig> {
         updateReps(config.globalProperties, [state.globals]);
         updateReps(config.playerProperties, state.players);
         updateReps(config.nodeProperties, state.nodes);
-        onSignal();
+        signalChange();
     }
 
     private function makeReplenishable(repCfg:ReplenishableConfig, lookup:AspectLookup):AspectSet {

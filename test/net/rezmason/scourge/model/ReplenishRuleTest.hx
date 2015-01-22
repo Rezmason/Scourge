@@ -60,9 +60,9 @@ class ReplenishRuleTest extends ScourgeRuleTest
 
         makeState([replenishRule], 1, TestBoards.emptyPetri);
 
-        var stateValue1_:AspectPtr = plan.onState(TestAspect.VALUE_1);
-        var stateValue2_:AspectPtr = plan.onState(TestAspect.VALUE_2);
-        var stateValue3_:AspectPtr = plan.onState(TestAspect.VALUE_3);
+        var stateValue1_:AspectPtr = plan.onGlobal(TestAspect.VALUE_1);
+        var stateValue2_:AspectPtr = plan.onGlobal(TestAspect.VALUE_2);
+        var stateValue3_:AspectPtr = plan.onGlobal(TestAspect.VALUE_3);
 
         var playerValue1_:AspectPtr = plan.onPlayer(TestAspect.VALUE_1);
         var playerValue2_:AspectPtr = plan.onPlayer(TestAspect.VALUE_2);

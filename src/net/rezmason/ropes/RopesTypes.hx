@@ -1,6 +1,6 @@
 package net.rezmason.ropes;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 
 using net.rezmason.utils.History;
 using net.rezmason.utils.Pointers;

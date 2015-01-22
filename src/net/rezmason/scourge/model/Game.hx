@@ -47,6 +47,8 @@ class Game {
             throw 'The game has already begun; it cannot begin again until you end it.';
         }
 
+        var ruleAlertFunction = makeRuleAlertFunction(alertFunction);
+
         // Build the game from the config
 
         var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction);
@@ -75,14 +77,13 @@ class Game {
         plan = planner.planState(state, builderRules.concat(basicRules));
 
         for (rule in builderRules.concat(basicRules)) {
-            var alertFn = alertFunction == null ? null : alertFunction.bind(rule.myName());
-            rule.prime(state, plan, historian.history, historian.historyState, alertFn);
+            rule.prime(state, plan, historian.history, historian.historyState, ruleAlertFunction);
         }
 
         // Grab some aspect pointers so we can quickly evaluate the state
 
-        winner_ = plan.onState(WinAspect.WINNER);
-        currentPlayer_ = plan.onState(PlyAspect.CURRENT_PLAYER);
+        winner_ = plan.onGlobal(WinAspect.WINNER);
+        currentPlayer_ = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
 
         // Find the player actions
 
@@ -211,6 +212,8 @@ class Game {
         for (action in actions) action.collectMoves();
         historian.key.unlock();
     }
+
+    private function makeRuleAlertFunction(fn) return (fn == null) ? null : function(rule:Rule) fn(rule.myName());
 
     private function get_actionIDs():Array<String> { return actionIDs.copy(); }
 

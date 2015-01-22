@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
@@ -18,7 +18,7 @@ class OneLivingPlayerRule extends RopesRule<Void> {
         var playersWithHeads:Array<Int> = [];
         for (player in eachPlayer()) {
             var headIndex:Int = player[head_];
-            if (headIndex != Aspect.NULL) playersWithHeads.push(getID(player));
+            if (headIndex != NULL) playersWithHeads.push(getID(player));
         }
 
         if (playersWithHeads.length == 1) state.globals[winner_] = playersWithHeads.pop();

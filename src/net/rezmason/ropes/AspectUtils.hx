@@ -1,5 +1,6 @@
 package net.rezmason.ropes;
 
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 
 using Lambda;
@@ -32,20 +33,20 @@ class AspectUtils {
 
         var wasConnected:Bool = false;
 
-        if (nextSetID != Aspect.NULL) {
+        if (nextSetID != NULL) {
             wasConnected = true;
             nextSet = list[nextSetID];
             list[nextSetID][prev] = prevSetID;
         }
 
-        if (prevSetID != Aspect.NULL) {
+        if (prevSetID != NULL) {
             wasConnected = true;
             list[prevSetID][next] = nextSetID;
         }
 
         if (wasConnected) {
-            me[next] = Aspect.NULL;
-            me[prev] = Aspect.NULL;
+            me[next] = NULL;
+            me[prev] = NULL;
         }
 
         return nextSet;
@@ -60,7 +61,7 @@ class AspectUtils {
         me[next] = you[id];
         me[prev] = prevSetID;
         you[prev] = myID;
-        if (prevSetID != Aspect.NULL) {
+        if (prevSetID != NULL) {
             var prevSet:AspectSet = list[prevSetID];
             prevSet[next] = myID;
         }
@@ -84,9 +85,9 @@ class AspectUtils {
                 me = nextSet;
             }
 
-            me[next] = Aspect.NULL;
+            me[next] = NULL;
             me = list[0];
-            me[prev] = Aspect.NULL;
+            me[prev] = NULL;
         }
     }
 }
@@ -110,7 +111,7 @@ class AspectSetIterator {
     public function next():AspectSet {
         var lastSet:AspectSet = me;
         var meIndex:Int = me[aspectPointer];
-        if (meIndex == Aspect.NULL) me = null;
+        if (meIndex == NULL) me = null;
         else me = list[meIndex];
         return lastSet;
     }

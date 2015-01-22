@@ -14,7 +14,7 @@ class StatePlan {
 
     public function new():Void {}
 
-    public inline function onState(prop:AspectProperty) return globalAspectLookup[prop.id];
+    public inline function onGlobal(prop:AspectProperty) return globalAspectLookup[prop.id];
     public inline function onPlayer(prop:AspectProperty) return playerAspectLookup[prop.id];
     public inline function onNode(prop:AspectProperty) return nodeAspectLookup[prop.id];
 }

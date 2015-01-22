@@ -359,7 +359,7 @@ class PieceRulesTest extends ScourgeRuleTest
         pickPieceRule.init(pickPieceCfg);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
+        var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
         pickPieceRule.update();
 
@@ -390,7 +390,7 @@ class PieceRulesTest extends ScourgeRuleTest
         pickPieceRule.init(pickPieceCfg);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
+        var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
         pickPieceRule.update();
 
@@ -415,7 +415,7 @@ class PieceRulesTest extends ScourgeRuleTest
         pickPieceRule.init(pickPieceCfg);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
+        var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
         pickPieceRule.update();
 
@@ -515,7 +515,7 @@ class PieceRulesTest extends ScourgeRuleTest
         swapPieceRule.init(swapPieceCfg);
         makeState([swapPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.onState(PieceAspect.PIECE_TABLE_ID);
+        var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
         state.globals[pieceTableID_] =  0;
 

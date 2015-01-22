@@ -18,17 +18,17 @@ class RopesRule<Config> extends Reckoner {
     private function _collectMoves():Void {}
     private function _chooseQuantumMove(choice:Int):Void {}
 
-    var onSignal:Void->Void = function() {};
+    var changeSignal:Rule->Void;
 
     @:final public function init(config:Dynamic):Void {
         this.config = config;
         _init();
     }
 
-    @:final public function prime(state, plan, history, historyState, ?onSignal):Void {
+    @:final public function prime(state, plan, history, historyState, ?changeSignal:Rule->Void):Void {
         this.history = history;
         this.historyState = historyState;
-        if (onSignal != null) this.onSignal = onSignal;
+        this.changeSignal = changeSignal;
 
         primePointers(state, plan);
 
@@ -66,6 +66,8 @@ class RopesRule<Config> extends Reckoner {
         #if ROPES_VERBOSE trace('${myName()}choosing quantum move $choice'); #end
         _chooseQuantumMove(choice);
     }
+
+    @:final inline function signalChange() if (changeSignal != null) changeSignal(this);
 
     @:final public inline function myName():String {
         var name:String = Type.getClassName(Type.getClass(this));

@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
@@ -19,13 +19,13 @@ class EndTurnRule extends RopesRule<Void> {
         // Find the next living player
         var startPlayerIndex:Int = (currentPlayer + 1) % numPlayers();
         var playerID:Int = startPlayerIndex;
-        while (getPlayer(playerID)[head_] == Aspect.NULL) {
+        while (getPlayer(playerID)[head_] == NULL) {
             playerID = (playerID + 1) % numPlayers();
             if (playerID == startPlayerIndex) throw 'No players have heads!';
         }
 
         state.globals[currentPlayer_] = playerID;
-        onSignal();
+        signalChange();
     }
 }
 

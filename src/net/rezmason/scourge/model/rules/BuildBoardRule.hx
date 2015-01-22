@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;
@@ -138,10 +138,10 @@ class BuildBoardRule extends RopesRule<BuildBoardConfig> {
     }
 
     inline function obstructGraphRim(grid:BoardLocus):Void {
-        for (locus in grid.walk(E)) locus.value[isFilled_] = Aspect.TRUE;
-        for (locus in grid.walk(S)) locus.value[isFilled_] = Aspect.TRUE;
-        for (locus in grid.run(S).walk(E)) locus.value[isFilled_] = Aspect.TRUE;
-        for (locus in grid.run(E).walk(S)) locus.value[isFilled_] = Aspect.TRUE;
+        for (locus in grid.walk(E)) locus.value[isFilled_] = TRUE;
+        for (locus in grid.walk(S)) locus.value[isFilled_] = TRUE;
+        for (locus in grid.run(S).walk(E)) locus.value[isFilled_] = TRUE;
+        for (locus in grid.run(E).walk(S)) locus.value[isFilled_] = TRUE;
     }
 
     inline function populateGraphHeads(grid:BoardLocus, headCoords:Array<XY>, plantHeads:Bool):Void {
@@ -151,10 +151,10 @@ class BuildBoardRule extends RopesRule<BuildBoardConfig> {
             var coord:XY = headCoords[ike];
             var head:BoardLocus = grid.run(E, Std.int(coord.x)).run(S, Std.int(coord.y));
             if (plantHeads) {
-                head.value[isFilled_] = Aspect.TRUE;
+                head.value[isFilled_] = TRUE;
                 head.value[occupier_] = ike;
                 getPlayer(ike)[head_] = getID(head.value);
-            } else if (head.value[isFilled_] == Aspect.TRUE && head.value[occupier_] == ike) {
+            } else if (head.value[isFilled_] == TRUE && head.value[occupier_] == ike) {
                 getPlayer(ike)[head_] = getID(head.value);
             }
         }
@@ -191,11 +191,11 @@ class BuildBoardRule extends RopesRule<BuildBoardConfig> {
         for (row in grid.walk(S)) {
             var x:Int = 0;
             for (column in row.walk(E)) {
-                if (column.value[isFilled_] == Aspect.FALSE) {
+                if (column.value[isFilled_] == FALSE) {
                     var char:String = initGrid.charAt(y * initGridWidth + x + 1);
                     if (char != ' ') {
-                        column.value[isFilled_] = Aspect.TRUE;
-                        if (!NUMERIC_CHAR.match(char)) column.value[occupier_] = Aspect.NULL;
+                        column.value[isFilled_] = TRUE;
+                        if (!NUMERIC_CHAR.match(char)) column.value[occupier_] = NULL;
                         else column.value[occupier_] = Std.parseInt(char);
                     }
                 }
@@ -211,9 +211,9 @@ class BuildBoardRule extends RopesRule<BuildBoardConfig> {
         for (player in eachPlayer()) bodies.push([]);
 
         for (locus in eachLocus()) {
-            if (locus.value[isFilled_] != Aspect.FALSE) {
+            if (locus.value[isFilled_] != FALSE) {
                 var occupier:Int = locus.value[occupier_];
-                if (occupier != Aspect.NULL) {
+                if (occupier != NULL) {
                     if (bodies[occupier] == null) throw 'A node is owned by a player that doesn\'t exist: $occupier';
                     else bodies[occupier].push(locus.value);
                 }

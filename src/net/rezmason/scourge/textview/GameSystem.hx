@@ -9,8 +9,8 @@ import net.rezmason.scourge.controller.PlayerSystem;
 import net.rezmason.scourge.controller.RandomSmarts;
 import net.rezmason.scourge.controller.Referee;
 import net.rezmason.scourge.controller.ReplaySmarts;
+import net.rezmason.scourge.controller.Sequencer;
 import net.rezmason.scourge.model.ScourgeConfig;
-import net.rezmason.scourge.textview.board.BoardSequenceSystem;
 import net.rezmason.scourge.textview.core.Body;
 
 class GameSystem {
@@ -59,8 +59,9 @@ class GameSystem {
             }
         }
 
-        var boardSequenceSystem = new BoardSequenceSystem(ecce); // TODO: recycle
-        boardSequenceSystem.connect(watchedPlayer);
+        // TODO: recycle
+        var sequencer = new Sequencer(ecce);
+        sequencer.connect(watchedPlayer);
         
         referee.beginGame(players, randGen, config);
     }

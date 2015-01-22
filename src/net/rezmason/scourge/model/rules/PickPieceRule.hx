@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.PieceTypes;
@@ -66,7 +66,7 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
             // The hat's been refilled; all piece moves are available as quantum moves
             moves = [pickMove];
             quantumMoves = cast allMoves.copy();
-        } else if (state.globals[pieceTableID_] == Aspect.NULL) {
+        } else if (state.globals[pieceTableID_] == NULL) {
             moves = [pickMove];
 
             // Iterate over the hat's contents and include the corresopnding quantum moves
@@ -87,7 +87,7 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
         if (remakeHat()) buildHat();
         move = pickMoveFromHat();
         setPiece(move.pieceTableID, move.reflection, move.rotation);
-        onSignal();
+        signalChange();
     }
 
     override private function _chooseQuantumMove(choice:Int):Void {
@@ -211,7 +211,7 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
 
         if (pickedPiece == firstHatPiece) {
             firstHatPiece = nextPiece;
-            if (firstHatPiece == null) state.globals[pieceHatFirst_] = Aspect.NULL;
+            if (firstHatPiece == null) state.globals[pieceHatFirst_] = NULL;
             else state.globals[pieceHatFirst_] = firstHatPiece[ident_];
         }
 

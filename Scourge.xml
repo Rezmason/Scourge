@@ -6,7 +6,8 @@
 	<window width="0" height="0" fps="30" orientation="portrait" background="#000000" resizable="true" unless="mac"/>
 	<window width="1152" height="720" fps="30" orientation="portrait" background="#000000" resizable="true" borderless="true" if="mac" />
 	<!-- <window width="720" height="720" fps="30" orientation="portrait" background="#000000" resizable="false" if="mac" /> -->
-	<set name="BUILD_DIR" value="Export/Scourge" />
+	<set name="BUILD_DIR" value="Export/Scourge/release" unless="debug" />
+	<set name="BUILD_DIR" value="Export/Scourge/debug" if="debug" />
 	<classpath name="src" />
 	<classpath name="thirdparty/kawanet_ktween/src" />
 	<haxelib name="munit" />

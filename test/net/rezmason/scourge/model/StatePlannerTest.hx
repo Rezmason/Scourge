@@ -55,7 +55,7 @@ class StatePlannerTest {
 
         // Make sure there's the right aspects on the state
 
-        var stateTestValue_:AspectPtr = plan.onState(TestAspect.VALUE_1);
+        var stateTestValue_:AspectPtr = plan.onGlobal(TestAspect.VALUE_1);
         Assert.isNotNull(state.globals[stateTestValue_]);
 
         // Make sure there's the right aspects on each player

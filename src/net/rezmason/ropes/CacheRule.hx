@@ -26,7 +26,7 @@ class CacheRule extends RopesRule<CacheConfig> {
         nodeAspectRequirements.absorb(rule.nodeAspectRequirements);
     }
 
-    override public function _prime():Void rule.prime(state, plan, history, historyState, onSignal);
+    override public function _prime():Void rule.prime(state, plan, history, historyState, changeSignal);
 
     override private function _update():Void {
         var rev:Int = config.revGetter();

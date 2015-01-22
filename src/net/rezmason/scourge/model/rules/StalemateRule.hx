@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.rules;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
@@ -23,7 +23,7 @@ class StalemateRule extends RopesRule<SkipsExhaustedConfig> {
 
         var stalemate:Bool = true;
 
-        if (state.globals[winner_] != Aspect.NULL) {
+        if (state.globals[winner_] != NULL) {
             stalemate = false;
         } else {
             for (player in eachPlayer()) {
@@ -47,7 +47,7 @@ class StalemateRule extends RopesRule<SkipsExhaustedConfig> {
             }
 
             state.globals[winner_] = largestPlayers.pop();
-            onSignal();
+            signalChange();
         }
     }
 }
