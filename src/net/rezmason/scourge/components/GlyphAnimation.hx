@@ -1,6 +1,7 @@
 package net.rezmason.scourge.components;
 
 import net.rezmason.ecce.Component;
+import net.rezmason.ecce.Entity;
 
 class GlyphAnimation extends Component {
 
@@ -8,9 +9,7 @@ class GlyphAnimation extends Component {
     public var duration:Float;
     public var overlap:Float;
     public var startTime:Float;
-    // public var ident:Int;
-    // public var values:AspectSet;
-    // public var lastValues:AspectSet;
+    public var subject:Entity;
 
     /*
     override function copyFrom(other:Component) {

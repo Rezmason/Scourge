@@ -40,7 +40,9 @@ class Siphon {
             exprs.push(keyValueExpr);
         }
         
-        return macro [$a{exprs}];
+        if (exprs.length == 0) return macro cast new haxe.ds.StringMap();
+
+        return macro cast [$a{exprs}];
     }
 
     #if macro

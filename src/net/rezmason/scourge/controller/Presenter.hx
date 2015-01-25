@@ -19,10 +19,17 @@ class Presenter extends Reckoner {
     // @node(FreshnessAspect.FRESHNESS) var freshness_;
     // @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
-    public function new(ecce:Ecce) {
-        super();
+    @:final public function init(game:Game, ecce:Ecce) {
+        primePointers(game.state, game.plan);
         this.ecce = ecce;
-        
     }
 
+    public function presentBoardChange(cause:String, index:Int, entity:Entity):Void {
+        var anim:GlyphAnimation = ecce.dispense([GlyphAnimation]).get(GlyphAnimation);
+        anim.subject = entity;
+
+        anim.duration = 1;
+        anim.overlap = 0.5;
+        anim.index = index;
+    }
 }

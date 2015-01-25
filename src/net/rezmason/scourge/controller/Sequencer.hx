@@ -20,12 +20,12 @@ class Sequencer extends Reckoner {
     var player:PlayerSystem = null;
     var boardEntities:Map<Int, Entity>;
     var qBoardSpaces:Query;
-    var qAnimatingBoardSpaces:Query;
+    var qAnimations:Query;
     var lastMaxFreshness:Int;
-    public var gameStartSignal(default, null):Zig<Void->Void> = new Zig();
+    public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
     public var gameChangeSignal(default, null):Zig<String->Void> = new Zig();
     public var boardChangeSignal(default, null):Zig<String->Int->Entity->Void> = new Zig();
-    
+
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
@@ -33,7 +33,7 @@ class Sequencer extends Reckoner {
         super();
         this.ecce = ecce;
         qBoardSpaces = ecce.query([BoardSpace]);
-        qAnimatingBoardSpaces = ecce.query([BoardSpace, GlyphAnimation]);
+        qAnimations = ecce.query([GlyphAnimation]);
         boardEntities = new Map();
     }
 
@@ -60,10 +60,10 @@ class Sequencer extends Reckoner {
 
     public function proceed():Void player.proceed();
 
-    function onGameBegun(game) { 
+    function onGameBegun(game) {
         this.game = game;
         primePointers(game.state, game.plan);
-        
+
         for (node in state.nodes) {
             var e = ecce.dispense([BoardSpace]);
             var boardSpace = e.get(BoardSpace);
@@ -71,7 +71,7 @@ class Sequencer extends Reckoner {
             boardSpace.values = node;
             boardSpace.lastValues = node.copy();
         }
-        gameStartSignal.dispatch();
+        gameStartSignal.dispatch(game, ecce);
         player.proceed();
     }
 
@@ -101,7 +101,7 @@ class Sequencer extends Reckoner {
 
     function onMoveStop() {
         var animations:Array<Array<GlyphAnimation>> = [];
-        for (e in qAnimatingBoardSpaces) {
+        for (e in qAnimations) {
             var glyphAnimation = e.get(GlyphAnimation);
             if (animations[glyphAnimation.index] == null) animations[glyphAnimation.index] = [glyphAnimation];
             else animations[glyphAnimation.index].push(glyphAnimation);
@@ -118,7 +118,14 @@ class Sequencer extends Reckoner {
             startTime = lastAnim.startTime + lastAnim.duration * (1 - lastAnim.overlap);
         }
 
-        proceed(); // FOR NOW
+        // FOR NOW:
+        var count = 0;
+        for (e in qAnimations) {
+            ecce.collect(e);
+            count++;
+        }
+        
+        proceed();
     }
 
 }
