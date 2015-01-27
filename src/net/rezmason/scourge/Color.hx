@@ -1,7 +1,15 @@
 package net.rezmason.scourge;
 
-typedef Color = {
-    var r(default, null):Float;
-    var g(default, null):Float;
-    var b(default, null):Float;
+@:forward(r, g, b)
+abstract Color({r:Float, g:Float, b:Float}) {
+    public function new(r:Float, g:Float, b:Float) this = {r:r, g:g, b:b};
+
+    @:op(A * B) public inline function multFloat(rhs:Float):Color return new Color(this.r * rhs, this.g * rhs, this.b * rhs);
+    @:op(A / B) public inline function  divFloat(rhs:Float):Color return new Color(this.r / rhs, this.g / rhs, this.b / rhs);
+    @:op(A + B) public inline function  addFloat(rhs:Float):Color return new Color(this.r + rhs, this.g + rhs, this.b + rhs);
+    @:op(A - B) public inline function  subFloat(rhs:Float):Color return new Color(this.r - rhs, this.g - rhs, this.b - rhs);
+
+    public inline static function fromHex(rgb:Int):Color {
+        return new Color((rgb >> 16 & 0xFF) / 0xFF, (rgb >> 8  & 0xFF) / 0xFF, (rgb >> 0  & 0xFF) / 0xFF);
+    }
 }

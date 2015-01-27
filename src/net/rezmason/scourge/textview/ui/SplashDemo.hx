@@ -26,14 +26,15 @@ class SplashDemo {
     */
 
     static var SPLASH_COLORS = [
-        'S' => {r:1.00, g:0.00, b:0.56},
-        'C' => {r:1.00, g:0.78, b:0.00},
-        'O' => {r:0.18, g:1.00, b:0.00},
-        'U' => {r:0.00, g:0.75, b:1.00},
-        'R' => {r:1.00, g:0.37, b:0.00},
-        'G' => {r:0.75, g:0.00, b:1.00},
-        'E' => {r:0.18, g:0.18, b:1.00},
+        'S' => new Color(1.00, 0.00, 0.56),
+        'C' => new Color(1.00, 0.78, 0.00),
+        'O' => new Color(0.18, 1.00, 0.00),
+        'U' => new Color(0.00, 0.75, 1.00),
+        'R' => new Color(1.00, 0.37, 0.00),
+        'G' => new Color(0.75, 0.00, 1.00),
+        'E' => new Color(0.18, 0.18, 1.00),
     ];
+    static var WHITE = new Color(1, 1, 1);
 
     public var body(default, null):Body;
     var glyphTowers:Array<Array<Glyph>>;
@@ -71,7 +72,7 @@ class SplashDemo {
                 var charCode:Int = lines[row].charCodeAt(col);
 
                 var color:Color = SPLASH_COLORS[lines[row].charAt(col)];
-                if (color == null) color = {r:1, g:1, b:1};
+                if (color == null) color = WHITE;
 
                 var s:Float = 1;
 
@@ -89,7 +90,7 @@ class SplashDemo {
                     glyph.set_paint(glyph.id);
 
                     z += 0.01;
-                    color = Colors.mult(color, 0.2);
+                    color = color * 0.2;
 
                     glyphID++;
                 }

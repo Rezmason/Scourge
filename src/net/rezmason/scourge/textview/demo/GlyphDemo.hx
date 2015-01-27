@@ -14,7 +14,7 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class GlyphDemo {
 
-    static var COLORS:Array<Color> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Colors.fromHex);
+    static var COLORS:Array<Color> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Color.fromHex);
     inline static var TWEEN_LENGTH:Float = 0.25;
     inline static var WAIT_LENGTH:Float = 0.5;
     inline static var FADE_AMT:Float = 0;
@@ -70,7 +70,7 @@ class GlyphDemo {
         var val:Float = tweens[currentPhase](percent);
         val = tweenData[currentPhase][0] * (1 - val) + tweenData[currentPhase][1] * val;
         glyph.set_f(val * 0.5);
-        glyph.set_color(Colors.mult(COLORS[currentColor], val * (1 + FADE_AMT) - FADE_AMT));
+        glyph.set_color(COLORS[currentColor] * (val * (1 + FADE_AMT) - FADE_AMT));
     }
 
     function receiveInteraction(id:Int, interaction:Interaction):Void {

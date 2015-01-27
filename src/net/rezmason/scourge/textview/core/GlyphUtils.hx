@@ -36,13 +36,7 @@ class GlyphUtils {
         set_b(gl, b);
     }
 
-    public inline static function get_color(gl:Glyph):Color {
-        return {
-            r: get_r(gl),
-            g: get_g(gl),
-            b: get_b(gl),
-        };
-    }
+    public inline static function get_color(gl:Glyph):Color return new Color(get_r(gl), get_g(gl), get_b(gl));
 
     public inline static function set_color(gl:Glyph, color:Color) {
         set_r(gl, color.r);

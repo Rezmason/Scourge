@@ -273,12 +273,12 @@ class UIElement {
         var glyph:Glyph;
         for (col in 0...numTextCols) {
             glyph = body.getGlyphByID(col);
-            glyph.set_color(Colors.mult(glyph.get_color(), 1 - offset));
-            if (glyph == caretGlyphGuide) caretGlyph.set_color(Colors.mult(caretGlyph.get_color(), 1 - offset));
+            glyph.set_color(glyph.get_color() * (1 - offset));
+            if (glyph == caretGlyphGuide) caretGlyph.set_color(caretGlyph.get_color() * (1 - offset));
 
             glyph = body.getGlyphByID(lastRow + col);
-            glyph.set_color(Colors.mult(glyph.get_color(), offset));
-            if (glyph == caretGlyphGuide) caretGlyph.set_color(Colors.mult(caretGlyph.get_color(), offset));
+            glyph.set_color(glyph.get_color() * offset);
+            if (glyph == caretGlyphGuide) caretGlyph.set_color(caretGlyph.get_color() * offset);
         }
     }
 
