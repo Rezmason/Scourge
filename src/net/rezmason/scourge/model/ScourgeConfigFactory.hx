@@ -41,10 +41,6 @@ class ScourgeConfigFactory {
         'net.rezmason.scourge.model.rules', 'src', false, 'Rule'
     );
 
-    public static var presenterDefs(default, null):Map<String, Class<Presenter>> = cast Siphon.getDefs(
-        'net.rezmason.scourge.controller.presenters', 'src', false, 'Presenter'
-    );
-
     public inline static function makeDefaultActionList():Array<String> return [DROP_ACTION, QUIT_ACTION];
     public inline static function makeStartAction():String return START_ACTION;
     public static function makeBuilderRuleList():Array<String> return [BUILD_GLOBALS, BUILD_PLAYERS, BUILD_BOARD];

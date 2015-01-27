@@ -1,6 +1,5 @@
 package net.rezmason.scourge.controller;
 
-import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.utils.Zig;
 
 @:allow(net.rezmason.scourge.controller.BotSystem)

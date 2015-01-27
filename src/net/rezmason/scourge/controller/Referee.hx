@@ -3,7 +3,6 @@ package net.rezmason.scourge.controller;
 import haxe.Timer;
 
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.SafeSerializer;
@@ -67,15 +66,15 @@ class Referee {
         clearFloats();
 
         game.begin(gameConfig, generateRandomFloat, null, savedGameState);
-        refereeCall(getFloatsAction(0));
-        refereeCall(Init(SafeSerializer.run(gameConfig), serializedSavedGame));
+        broadcastAndLog(getFloatsAction(0));
+        broadcastAndLog(Init(SafeSerializer.run(gameConfig), serializedSavedGame));
     }
 
     public function endGame():Void {
         lastGame = saveGame();
         lastGameConfig = gameConfig;
         game.end();
-        refereeCall(End);
+        broadcastAndLog(End);
         for (ike in 0...numPlayers) players[ike].playSignal.remove(playerListeners[ike]);
         playerListeners = null;
         players = null;
@@ -109,10 +108,7 @@ class Referee {
     }
 
     private function handlePlaySignal(playerIndex:Int, event:GameEvent):Void {
-
-        event.timeReceived = UnixTime.now();
-
-        switch (event.type) {
+        switch (event) {
             case SubmitMove(turn, action, move):
                 if (!gameBegun) throw 'Game has not begun!';
                 if (playerIndex == game.currentPlayer && turn == game.revision) {
@@ -120,8 +116,8 @@ class Referee {
                     clearFloats();
                     game.chooseMove(action, move);
                     // trace(game.spitBoard());
-                    refereeCall(getFloatsAction(game.revision - 1));
-                    refereeCall(RelayMove(turn, action, move));
+                    broadcastAndLog(getFloatsAction(game.revision - 1));
+                    broadcastAndLog(RelayMove(turn, action, move));
                     if (game.winner >= 0) endGame(); // TEMPORARY
                 }
             case _:
@@ -129,17 +125,14 @@ class Referee {
     }
 
     private function broadcastAndLog(event:GameEvent):Void {
+        log.push(Time(UnixTime.now()));
         log.push(event);
         var wasBusy:Bool = busy;
         //trace('BUSY: BROADCAST');
         busy = true;
-        for (player in players) player.playSignal.dispatch(Reflect.copy(event));
+        for (player in players) player.playSignal.dispatch(event);
         busy = wasBusy;
         //trace(busy ? 'STILL BUSY' : 'FREE');
-    }
-
-    private function refereeCall(action:GameEventType):Void {
-        broadcastAndLog({type:action, timeIssued:UnixTime.now()});
     }
 
     private inline static function copyLog(source:Array<GameEvent>):Array<GameEvent> {
@@ -157,7 +150,7 @@ class Referee {
         return float;
     }
 
-    private function getFloatsAction(rev:Int):GameEventType {
+    private function getFloatsAction(rev:Int):GameEvent {
         return RandomFloats(rev, SafeSerializer.run(floats));
     }
 

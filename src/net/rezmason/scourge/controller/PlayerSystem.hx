@@ -2,10 +2,8 @@ package net.rezmason.scourge.controller;
 
 import haxe.Unserializer;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
-import net.rezmason.utils.UnixTime;
 import net.rezmason.utils.Zig;
 
 using Lambda;
@@ -40,7 +38,7 @@ class PlayerSystem implements IPlayer {
         takeTurn();
     }
 
-    private function processGameEventType(type:GameEventType):Void {
+    private function processGameEvent(type:GameEvent):Void {
         switch (type) {
             case Init(configData, saveData): 
                 if (!game.hasBegun) {
@@ -91,7 +89,6 @@ class PlayerSystem implements IPlayer {
     private function updateGame(actionIndex:Int, move:Int):Void game.chooseMove(actionIndex, move);
     private function play():Void throw "Override this.";
     private function retrieveRandomFloat():Float return floats.shift();
-    private function makeGameEvent(type:GameEventType):GameEvent return {type:type, timeIssued:UnixTime.now()};
 
     private function isMyTurn():Bool {
         throw "Override this.";

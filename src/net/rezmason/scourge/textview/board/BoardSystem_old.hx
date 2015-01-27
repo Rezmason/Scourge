@@ -9,7 +9,6 @@ import net.rezmason.scourge.waves.WavePool;
 import net.rezmason.scourge.waves.Ripple;
 import net.rezmason.scourge.waves.WaveFunctions;
 
-import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.textview.board.BoardEffects;
 import net.rezmason.scourge.textview.board.BoardTypes;
 import net.rezmason.scourge.textview.core.Body;

@@ -1,7 +1,6 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.ropes.RopesTypes.Move;
-import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeAction.*;
 import net.rezmason.scourge.model.ScourgeConfig;
@@ -26,8 +25,8 @@ class RandomSmarts extends Smarts {
         canSkip = config.allowNowhereDrop;
     }
 
-    override public function choose():GameEventType {
-        var type:GameEventType = null;
+    override public function choose():GameEvent {
+        var type:GameEvent = null;
         var rev:Int = game.revision;
 
         var dropMoves:Array<Move> = game.getMovesForAction(dropActionIndex);

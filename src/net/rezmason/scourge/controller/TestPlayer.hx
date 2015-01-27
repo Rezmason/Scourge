@@ -1,6 +1,5 @@
 package net.rezmason.scourge.controller;
 
-import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.Zig;
@@ -21,7 +20,7 @@ class TestPlayer extends PlayerSystem {
         smarts = new RandomSmarts();
         
         playSignal = new Zig();
-        playSignal.add(function(event:GameEvent):Void processGameEventType(event.type));
+        playSignal.add(processGameEvent);
     }
 
     override private function init(configData:String, saveData:String):Void {
@@ -32,5 +31,5 @@ class TestPlayer extends PlayerSystem {
     override private function end():Void proxy(game, game.end);
     override private function play():Void proxy(game, choose);
     override private function isMyTurn():Bool return game.hasBegun && game.winner < 0 && game.currentPlayer == index;
-    private function choose():Void playSignal.dispatch(makeGameEvent(smarts.choose()));
+    private function choose():Void playSignal.dispatch(smarts.choose());
 }

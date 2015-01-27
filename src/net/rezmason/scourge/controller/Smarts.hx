@@ -1,7 +1,6 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.ropes.Reckoner;
-import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 
@@ -23,7 +22,7 @@ class Smarts extends Reckoner {
         this.random = random;
     }
 
-    public function choose():GameEventType {
+    public function choose():GameEvent {
         throw "Override this.";
         return null;
     }

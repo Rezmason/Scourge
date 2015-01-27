@@ -3,7 +3,6 @@ package net.rezmason.scourge.textview;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.scourge.controller.BasicSmarts;
 import net.rezmason.scourge.controller.BotSystem;
-import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.controller.IPlayer;
 import net.rezmason.scourge.controller.PlayerSystem;
 import net.rezmason.scourge.controller.RandomSmarts;

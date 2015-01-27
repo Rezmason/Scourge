@@ -1,7 +1,6 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.ropes.RopesTypes.Move;
-import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeAction.QUIT_ACTION;
 
@@ -15,31 +14,31 @@ class ReplaySmarts extends Smarts {
         this.log = log;
     }
 
-    override public function choose():GameEventType {
+    override public function choose():GameEvent {
         
         var found:Bool = false;
-        var type:GameEventType = null;
+        var event:GameEvent = null;
 
         while (!found) {
-            type = log.shift().type;
-            switch (type) {
-                case SubmitMove(turn, action, move): found = true;
+            event = log.shift();
+            switch (event) {
+                case SubmitMove(_, _, _): found = true;
                 case _:
             }
         }
 
-        var params = Type.enumParameters(type);
+        var params = Type.enumParameters(event);
         var actionIndex:Int = params[0];
         var moveIndex:Int = params[1];
         var moves:Array<Move> = game.getMovesForAction(actionIndex);
         
         if (moves.length < moveIndex + 1) {
-            // trace('Move failure: $type < ${moves.length}');
-            type = null;
+            // trace('Move failure: $event < ${moves.length}');
+            event = null;
         }
 
-        if (type == null) type = SubmitMove(game.revision, actionIndicesByAction[QUIT_ACTION], 0);
-        // trace(type);
-        return type;
+        if (event == null) event = SubmitMove(game.revision, actionIndicesByAction[QUIT_ACTION], 0);
+        // trace(event);
+        return event;
     }
 }

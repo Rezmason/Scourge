@@ -1,7 +1,6 @@
 package net.rezmason.scourge.controller;
 
 import haxe.Timer;
-import net.rezmason.scourge.controller.ControllerTypes;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
@@ -28,7 +27,7 @@ class BotSystem extends PlayerSystem {
     }
 
     private function onBotSignal(senderIndex:Int, event:GameEvent):Void {
-        if (!game.hasBegun || senderIndex == game.currentPlayer) processGameEventType(event.type);
+        if (!game.hasBegun || senderIndex == game.currentPlayer) processGameEvent(event);
     }
 
     override private function init(configData:String, saveData:String):Void {
@@ -42,9 +41,9 @@ class BotSystem extends PlayerSystem {
     private function choose():Void {
         var player:BotPlayer = currentPlayer();
         var playerSmarts:Smarts = player.smarts;
-        var eventType:GameEventType = playerSmarts.choose();
-        // trace('${game.currentPlayer} $eventType');
-        player.playSignal.dispatch(makeGameEvent(eventType));
+        var event:GameEvent = playerSmarts.choose();
+        // trace('${game.currentPlayer} $event');
+        player.playSignal.dispatch(event);
     }
 
     private function beat(cbk:Void->Void):Void {
