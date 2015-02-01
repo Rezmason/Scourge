@@ -27,7 +27,7 @@ class KillHeadlessBodyRule extends RopesRule<Void> {
 
         // trace(state.spitBoard(plan));
 
-        var maxFreshness:Int = state.globals[maxFreshness_];
+        var maxFreshness:Int = state.global[maxFreshness_];
 
         // Check each player to see if they still have head nodes
 
@@ -53,7 +53,7 @@ class KillHeadlessBodyRule extends RopesRule<Void> {
 
         }
 
-        state.globals[maxFreshness_] = maxFreshness;
+        state.global[maxFreshness_] = maxFreshness;
 
         // trace(state.spitBoard(plan));
         // trace('---');

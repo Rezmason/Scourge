@@ -14,7 +14,7 @@ class EndTurnRule extends RopesRule<Void> {
 
         // Get current player
 
-        var currentPlayer:Int = state.globals[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
 
         // Find the next living player
         var startPlayerIndex:Int = (currentPlayer + 1) % numPlayers();
@@ -24,7 +24,7 @@ class EndTurnRule extends RopesRule<Void> {
             if (playerID == startPlayerIndex) throw 'No players have heads!';
         }
 
-        state.globals[currentPlayer_] = playerID;
+        state.global[currentPlayer_] = playerID;
         signalChange();
     }
 }

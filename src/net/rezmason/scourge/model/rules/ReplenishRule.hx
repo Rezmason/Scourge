@@ -74,28 +74,28 @@ class ReplenishRule extends RopesRule<ReplenishConfig> {
 
         if (stateReps.length > 0) {
             stateReps.chainByAspect(ident_, repNext_, repPrev_);
-            state.globals[stateRepFirst_] = stateReps[0][ident_];
+            state.global[stateRepFirst_] = stateReps[0][ident_];
         } else {
-            state.globals[stateRepFirst_] = NULL;
+            state.global[stateRepFirst_] = NULL;
         }
 
         if (playerReps.length > 0) {
             playerReps.chainByAspect(ident_, repNext_, repPrev_);
-            state.globals[playerRepFirst_] = playerReps[0][ident_];
+            state.global[playerRepFirst_] = playerReps[0][ident_];
         } else {
-            state.globals[playerRepFirst_] = NULL;
+            state.global[playerRepFirst_] = NULL;
         }
 
         if (nodeReps.length > 0) {
             nodeReps.chainByAspect(ident_, repNext_, repPrev_);
-            state.globals[nodeRepFirst_] = nodeReps[0][ident_];
+            state.global[nodeRepFirst_] = nodeReps[0][ident_];
         } else {
-            state.globals[nodeRepFirst_] = NULL;
+            state.global[nodeRepFirst_] = NULL;
         }
     }
 
     override private function _chooseMove(choice:Int):Void {
-        updateReps(config.globalProperties, [state.globals]);
+        updateReps(config.globalProperties, [state.global]);
         updateReps(config.playerProperties, state.players);
         updateReps(config.nodeProperties, state.nodes);
         signalChange();

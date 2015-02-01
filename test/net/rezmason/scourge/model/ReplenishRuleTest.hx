@@ -82,9 +82,9 @@ class ReplenishRuleTest extends ScourgeRuleTest
             var index2:Int = Std.int(Math.min(expectedValues2.length - 1, ike));
             var index3:Int = Std.int(Math.min(expectedValues3.length - 1, ike));
 
-            Assert.areEqual(expectedValues1[index1], state.globals[stateValue1_]);
-            Assert.areEqual(expectedValues2[index2], state.globals[stateValue2_]);
-            Assert.areEqual(expectedValues3[index3], state.globals[stateValue3_]);
+            Assert.areEqual(expectedValues1[index1], state.global[stateValue1_]);
+            Assert.areEqual(expectedValues2[index2], state.global[stateValue2_]);
+            Assert.areEqual(expectedValues3[index3], state.global[stateValue3_]);
 
             for (player in state.players) {
                 Assert.areEqual(expectedValues1[index1], player[playerValue1_]);

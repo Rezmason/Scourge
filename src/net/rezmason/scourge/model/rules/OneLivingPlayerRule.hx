@@ -21,7 +21,7 @@ class OneLivingPlayerRule extends RopesRule<Void> {
             if (headIndex != NULL) playersWithHeads.push(getID(player));
         }
 
-        if (playersWithHeads.length == 1) state.globals[winner_] = playersWithHeads.pop();
+        if (playersWithHeads.length == 1) state.global[winner_] = playersWithHeads.pop();
     }
 }
 

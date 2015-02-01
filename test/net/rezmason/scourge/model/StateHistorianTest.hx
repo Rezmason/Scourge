@@ -10,7 +10,7 @@ import net.rezmason.ropes.StatePlanner;
 import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
 import net.rezmason.scourge.model.rules.BuildPlayersRule;
-import net.rezmason.scourge.model.rules.BuildGlobalsRule;
+import net.rezmason.scourge.model.rules.BuildGlobalRule;
 import net.rezmason.scourge.model.rules.EatCellsRule;
 import net.rezmason.scourge.model.rules.PickPieceRule;
 import net.rezmason.scourge.tools.Resource;
@@ -67,7 +67,7 @@ class StateHistorianTest {
             pieces:new Pieces(Resource.getString('tables/pieces.json.txt'))
         }
 
-        var buildStateRule:BuildGlobalsRule = new BuildGlobalsRule();
+        var buildStateRule:BuildGlobalRule = new BuildGlobalRule();
         var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule();
         var buildBoardRule:BuildBoardRule = new BuildBoardRule();
         var eatRule:EatCellsRule = new EatCellsRule();

@@ -32,11 +32,11 @@ class CavityRule extends RopesRule<Void> {
     var cavityNodes:Array<AspectSet> = [];
 
     override private function _chooseMove(choice:Int):Void {
-        var maxFreshness:Int = state.globals[maxFreshness_];
+        var maxFreshness:Int = state.global[maxFreshness_];
         var boardChanged = false;
         for (player in eachPlayer()) boardChanged = eraseCavities(player, maxFreshness) || boardChanged;
         for (player in eachPlayer()) boardChanged =  makeCavities(player, maxFreshness) || boardChanged;
-        if (boardChanged) state.globals[maxFreshness_] = maxFreshness + 1;
+        if (boardChanged) state.global[maxFreshness_] = maxFreshness + 1;
         signalChange();
     }
 

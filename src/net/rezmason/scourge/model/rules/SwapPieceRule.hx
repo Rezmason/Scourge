@@ -28,16 +28,16 @@ class SwapPieceRule extends RopesRule<SwapPieceConfig> {
     // This rule basically zaps the current player's piece and takes away a swap.
     override private function _update():Void {
         moves = [];
-        var currentPlayer:Int = state.globals[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
-        if (numSwaps > 0 && state.globals[pieceTableID_] != NULL) moves.push({id:0});
+        if (numSwaps > 0 && state.global[pieceTableID_] != NULL) moves.push({id:0});
     }
 
     override private function _chooseMove(choice:Int):Void {
-                var currentPlayer:Int = state.globals[currentPlayer_];
+                var currentPlayer:Int = state.global[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
         getPlayer(currentPlayer)[numSwaps_] = numSwaps - 1;
-        state.globals[pieceTableID_] = NULL;
+        state.global[pieceTableID_] = NULL;
         signalChange();
     }
 }

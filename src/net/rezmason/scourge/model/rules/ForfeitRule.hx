@@ -11,7 +11,7 @@ class ForfeitRule extends RopesRule<Void> {
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     override private function _chooseMove(choice:Int):Void {
-        getPlayer(state.globals[currentPlayer_])[head_] = NULL;
+        getPlayer(state.global[currentPlayer_])[head_] = NULL;
         signalChange();
     }
 }

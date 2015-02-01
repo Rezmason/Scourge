@@ -10,7 +10,7 @@ import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.scourge.model.aspects.TestAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.rules.BuildGlobalsRule;
+import net.rezmason.scourge.model.rules.BuildGlobalRule;
 import net.rezmason.scourge.model.rules.TestRule;
 
 using net.rezmason.ropes.GridUtils;
@@ -44,7 +44,7 @@ class StatePlannerTest {
 
         // make state config and generate state
         var planner:StatePlanner = new StatePlanner();
-        var buildStateRule:BuildGlobalsRule = new BuildGlobalsRule();
+        var buildStateRule:BuildGlobalRule = new BuildGlobalRule();
         var testRule:TestRule = new TestRule();
         buildStateRule.init({firstPlayer:0});
         testRule.init(null);
@@ -56,7 +56,7 @@ class StatePlannerTest {
         // Make sure there's the right aspects on the state
 
         var stateTestValue_:AspectPtr = plan.onGlobal(TestAspect.VALUE_1);
-        Assert.isNotNull(state.globals[stateTestValue_]);
+        Assert.isNotNull(state.global[stateTestValue_]);
 
         // Make sure there's the right aspects on each player
         var playerTestValue_:AspectPtr = plan.onPlayer(TestAspect.VALUE_1);

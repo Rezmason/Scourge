@@ -19,8 +19,8 @@ class TestPieceRule extends RopesRule<TestPieceConfig> {
     @global(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
 
     override public function _prime():Void {
-        state.globals[pieceTableID_] = config.pieceTableID;
-        state.globals[pieceReflection_] = config.reflection;
-        state.globals[pieceRotation_] = config.rotation;
+        state.global[pieceTableID_] = config.pieceTableID;
+        state.global[pieceReflection_] = config.reflection;
+        state.global[pieceRotation_] = config.rotation;
     }
 }

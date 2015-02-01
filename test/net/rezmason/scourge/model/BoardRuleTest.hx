@@ -55,7 +55,7 @@ class BoardRuleTest extends ScourgeRuleTest {
         Assert.areEqual(TestBoards.emptySquareFourPlayerSkirmish, state.spitBoard(plan, false));
 
         var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
-        var currentPlayer:Int = state.globals[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
 
         var playerHead:BoardLocus = state.loci[state.players[currentPlayer][head_]];
 

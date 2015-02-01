@@ -60,7 +60,7 @@ class BiteRule extends RopesRule<BiteConfig> {
         var biteMoves:Array<BiteMove> = [];
 
         // get current player head
-        var currentPlayer:Int = state.globals[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
 
         var headIDs:Array<Int> = [];
         for (player in eachPlayer()) headIDs.push(player[head_]);
@@ -166,9 +166,9 @@ class BiteRule extends RopesRule<BiteConfig> {
 
             // Grab data from the move
 
-            var currentPlayer:Int = state.globals[currentPlayer_];
+            var currentPlayer:Int = state.global[currentPlayer_];
 
-            var maxFreshness:Int = state.globals[maxFreshness_];
+            var maxFreshness:Int = state.global[maxFreshness_];
             var numBites:Int = getPlayer(currentPlayer)[numBites_] - 1;
 
             // Find the cells removed from each player
@@ -190,7 +190,7 @@ class BiteRule extends RopesRule<BiteConfig> {
                 player[bodyFirst_] = bodyFirst;
             }
 
-            state.globals[maxFreshness_] = maxFreshness;
+            state.global[maxFreshness_] = maxFreshness;
             getPlayer(currentPlayer)[numBites_] = numBites;
         }
 

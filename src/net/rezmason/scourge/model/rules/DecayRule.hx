@@ -32,7 +32,7 @@ class DecayRule extends RopesRule<DecayConfig> {
 
     override private function _chooseMove(choice:Int):Void {
 
-        var maxFreshness:Int = state.globals[maxFreshness_];
+        var maxFreshness:Int = state.global[maxFreshness_];
 
         // Grab all the player heads
 
@@ -69,7 +69,7 @@ class DecayRule extends RopesRule<DecayConfig> {
             player[totalArea_] = totalArea;
         }
 
-        state.globals[maxFreshness_] = maxFreshness + (cellDied ? 1 : 0);
+        state.global[maxFreshness_] = maxFreshness + (cellDied ? 1 : 0);
         signalChange();
     }
 

@@ -197,9 +197,9 @@ class Game {
 
     private function get_revision():Int { return historian.history.revision; }
 
-    private function get_currentPlayer():Int { return historian.state.globals[currentPlayer_]; }
+    private function get_currentPlayer():Int { return historian.state.global[currentPlayer_]; }
 
-    private function get_winner():Int { return historian.state.globals[winner_]; }
+    private function get_winner():Int { return historian.state.global[winner_]; }
 
     private function get_state():State { return historian.state; }
 

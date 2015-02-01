@@ -9,7 +9,7 @@ import net.rezmason.ropes.StatePlan;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.scourge.model.rules.BuildBoardRule;
-import net.rezmason.scourge.model.rules.BuildGlobalsRule;
+import net.rezmason.scourge.model.rules.BuildGlobalRule;
 import net.rezmason.scourge.model.rules.BuildPlayersRule;
 
 using net.rezmason.ropes.AspectUtils;
@@ -58,7 +58,7 @@ class ScourgeRuleTest
         if (rules == null) rules = [];
 
         // make state config and generate state
-        var buildStateRule:BuildGlobalsRule = new BuildGlobalsRule();
+        var buildStateRule:BuildGlobalRule = new BuildGlobalRule();
         buildStateRule.init({firstPlayer:0});
 
         // make player config and generate players

@@ -51,7 +51,7 @@ class TurnRulesTest extends ScourgeRuleTest
         var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
 
         var expectedCurrentPlayer:Int = 0;
-        var currentPlayer:Int = state.globals[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
 
         Assert.areEqual(expectedCurrentPlayer, currentPlayer);
 
@@ -69,7 +69,7 @@ class TurnRulesTest extends ScourgeRuleTest
         while (expectedCurrentPlayer < 10) {
             expectedCurrentPlayer++;
             endTurnRule.chooseMove();
-            currentPlayer = state.globals[currentPlayer_];
+            currentPlayer = state.global[currentPlayer_];
             Assert.areEqual(expectedCurrentPlayer % 3, currentPlayer);
         }
     }
@@ -88,7 +88,7 @@ class TurnRulesTest extends ScourgeRuleTest
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
 
-        var currentPlayer:Int = state.globals[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
         var playerHead:AspectSet = state.nodes[head];
 
@@ -129,7 +129,7 @@ class TurnRulesTest extends ScourgeRuleTest
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
 
-        var currentPlayer:Int = state.globals[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
         var playerHead:AspectSet = state.nodes[head];
 
@@ -171,7 +171,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         stalemateRule.update();
         stalemateRule.chooseMove();
-        Assert.areEqual(Aspect.NULL, state.globals[winner_]);
+        Assert.areEqual(Aspect.NULL, state.global[winner_]);
 
         // Have each player skip one more time, then check for a winner
 
@@ -183,7 +183,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         stalemateRule.update();
         stalemateRule.chooseMove();
-        Assert.areEqual(3, state.globals[winner_]);
+        Assert.areEqual(3, state.global[winner_]);
     }
 
     @Test
@@ -209,6 +209,6 @@ class TurnRulesTest extends ScourgeRuleTest
 
         oneLivingPlayerRule.update();
         oneLivingPlayerRule.chooseMove();
-        Assert.areEqual(1, state.globals[winner_]);
+        Assert.areEqual(1, state.global[winner_]);
     }
 }

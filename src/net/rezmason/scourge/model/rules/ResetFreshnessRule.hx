@@ -11,7 +11,7 @@ class ResetFreshnessRule extends RopesRule<Void> {
     
     override private function _chooseMove(choice:Int):Void {
         for (node in eachNode()) node[freshness_] = NULL;
-        state.globals[maxFreshness_] = 0;
+        state.global[maxFreshness_] = 0;
         signalChange();
     }
 }

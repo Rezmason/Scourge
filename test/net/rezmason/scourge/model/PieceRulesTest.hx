@@ -367,8 +367,8 @@ class PieceRulesTest extends ScourgeRuleTest
             Assert.areEqual(1, pickPieceRule.moves.length);
             Assert.areEqual(pieceTableIDs.length - (ike % hatSize), pickPieceRule.quantumMoves.length);
             pickPieceRule.chooseMove();
-            Assert.areEqual(pieceTableIDs[ike % hatSize], state.globals[pieceTableID_]);
-            state.globals[pieceTableID_] =  Aspect.NULL;
+            Assert.areEqual(pieceTableIDs[ike % hatSize], state.global[pieceTableID_]);
+            state.global[pieceTableID_] =  Aspect.NULL;
             pickPieceRule.update();
         }
     }
@@ -517,7 +517,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
-        state.globals[pieceTableID_] =  0;
+        state.global[pieceTableID_] =  0;
 
         swapPieceRule.update();
 
@@ -526,7 +526,7 @@ class PieceRulesTest extends ScourgeRuleTest
             swapPieceRule.chooseMove();
             swapPieceRule.update();
             Assert.areEqual(0, swapPieceRule.moves.length);
-            state.globals[pieceTableID_] =  0;
+            state.global[pieceTableID_] =  0;
             swapPieceRule.update();
         }
 

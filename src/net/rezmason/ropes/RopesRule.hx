@@ -75,46 +75,32 @@ class RopesRule<Config> extends Reckoner {
         return name;
     }
 
-    @:final inline function addGlobals():AspectSet {
-        var globals:AspectSet = plan.globalAspectTemplate.copy();
-        globals[ident_] = 0;
-        state.globals = globals;
-        plan.globalAspectTemplate[ident_] = 0;
-        historyState.globals = plan.globalAspectTemplate.map(history.alloc);
-        return globals;
+    @:final inline function addGlobal():AspectSet {
+        return addAspectSet(plan.globalAspectTemplate, state.globals, historyState.globals, 0);
     }
 
     @:final inline function addPlayer():AspectSet {
-        var player:AspectSet = plan.playerAspectTemplate.copy();
-        var playerID:Int = numPlayers();
-        player[ident_] = playerID;
-        state.players.push(player);
-        plan.playerAspectTemplate[ident_] = playerID;
-        historyState.players.push(plan.playerAspectTemplate.map(history.alloc));
-        return player;
+        return addAspectSet(plan.playerAspectTemplate, state.players, historyState.players, numPlayers());
     }
 
     @:final inline function addNode():AspectSet {
-        var node:AspectSet = plan.nodeAspectTemplate.copy();
-        var nodeID:Int = numNodes();
-        node[ident_] = nodeID;
-        state.nodes.push(node);
-        plan.nodeAspectTemplate[ident_] = nodeID;
-        historyState.nodes.push(plan.nodeAspectTemplate.map(history.alloc));
-
-        var locus:BoardLocus = new BoardLocus(nodeID, node);
+        var node = addAspectSet(plan.nodeAspectTemplate, state.nodes, historyState.nodes, numNodes());
+        var locus:BoardLocus = new BoardLocus(node[ident_], node);
         state.loci.push(locus);
-        
         return node;
     }
 
     @:final inline function addExtra():AspectSet {
-        var extra:AspectSet = extraAspectTemplate.copy();
-        var extraID:Int = numExtras();
-        extra[ident_] = extraID;
-        state.extras.push(extra);
-        extraAspectTemplate[ident_] = extraID;
-        historyState.extras.push(extraAspectTemplate.map(history.alloc));
-        return extra;
+        return addAspectSet(extraAspectTemplate, state.extras, historyState.extras, numExtras());
+    }
+
+    @:final inline function addAspectSet(template:AspectSet, list, histList, id):AspectSet {
+        var aspectSet:AspectSet = template.copy();
+        aspectSet[ident_] = id;
+        list.push(aspectSet);
+        template[ident_] = id;
+        histList.push(template.map(history.alloc));
+        state.resolve();
+        return aspectSet;
     }
 }

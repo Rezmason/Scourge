@@ -71,17 +71,17 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
 
         var pieceIDs:Array<Int> = [];
         if (config.allowPiecePick) for (pieceID in config.pieceTableIDs) pieceIDs.push(pieceID);
-        else if (state.globals[pieceTableID_] != NULL) pieceIDs.push(state.globals[pieceTableID_]);
+        else if (state.global[pieceTableID_] != NULL) pieceIDs.push(state.global[pieceTableID_]);
 
         // get current player head
-        var currentPlayer:Int = state.globals[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
         var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
 
         // Find edge nodes of current player
         var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_).filter(hasFreeEdge);
 
-        var pieceReflection:Int = state.globals[pieceReflection_];
-        var pieceRotation:Int = state.globals[pieceRotation_];
+        var pieceReflection:Int = state.global[pieceReflection_];
+        var pieceRotation:Int = state.global[pieceRotation_];
 
         for (pieceID in pieceIDs) {
 
@@ -190,7 +190,7 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
 
         var move:DropPieceMove = cast moves[choice];
 
-        var currentPlayer:Int = state.globals[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
         var player:AspectSet = getPlayer(currentPlayer);
 
         if (move.targetNode != NULL) {
@@ -198,21 +198,21 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
             var targetLocus:BoardLocus = getLocus(move.targetNode);
             var coords:Array<IntCoord> = freePiece.getPiece(move.reflection, move.rotation).cells;
             var homeCoord:IntCoord = move.coord;
-            var maxFreshness:Int = state.globals[maxFreshness_];
+            var maxFreshness:Int = state.global[maxFreshness_];
 
             var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
 
             for (coord in coords) bodyNode = fillAndOccupyCell(walkLocus(targetLocus, coord, homeCoord).value, currentPlayer, maxFreshness, bodyNode);
             player[bodyFirst_] = getID(bodyNode);
 
-            state.globals[maxFreshness_] = maxFreshness + 1;
+            state.global[maxFreshness_] = maxFreshness + 1;
 
             player[numConsecutiveSkips_] = 0;
         } else {
             player[numConsecutiveSkips_] = player[numConsecutiveSkips_] + 1;
         }
 
-        state.globals[pieceTableID_] = NULL;
+        state.global[pieceTableID_] = NULL;
         signalChange();
     }
 

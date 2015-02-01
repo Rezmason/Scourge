@@ -23,7 +23,7 @@ class StalemateRule extends RopesRule<SkipsExhaustedConfig> {
 
         var stalemate:Bool = true;
 
-        if (state.globals[winner_] != NULL) {
+        if (state.global[winner_] != NULL) {
             stalemate = false;
         } else {
             for (player in eachPlayer()) {
@@ -46,7 +46,7 @@ class StalemateRule extends RopesRule<SkipsExhaustedConfig> {
                 else if (totalArea == largestArea) largestPlayers.push(playerID);
             }
 
-            state.globals[winner_] = largestPlayers.pop();
+            state.global[winner_] = largestPlayers.pop();
             signalChange();
         }
     }

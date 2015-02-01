@@ -85,7 +85,7 @@ class Sequencer extends Reckoner {
     }
 
     function onMoveStep(cause:String) {
-        var maxFreshness:Int = state.globals[maxFreshness_];
+        var maxFreshness:Int = state.global[maxFreshness_];
         if (maxFreshness > lastMaxFreshness) {
             for (e in qBoardSpaces) {
                 var freshness:Int = e.get(BoardSpace).values[freshness_];

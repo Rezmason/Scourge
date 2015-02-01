@@ -125,8 +125,8 @@ class ScourgeConfigFactoryTest
 
         Assert.areEqual(36, state.players[0][totalArea_]);
         Assert.areEqual(Aspect.NULL, state.players[1][head_]);
-        Assert.areEqual(0, state.globals[winner_]);
-        Assert.areEqual(0, state.globals[currentPlayer_]);
+        Assert.areEqual(0, state.global[winner_]);
+        Assert.areEqual(0, state.global[currentPlayer_]);
     }
 
     @Test
@@ -202,9 +202,9 @@ class ScourgeConfigFactoryTest
             swapAction.update();
             swapAction.chooseMove();
 
-            var piece:Int = state.globals[pieceTableID_];
+            var piece:Int = state.global[pieceTableID_];
 
-            Assert.areEqual(config.pieceTableIDs[(ike + 1) % config.pieceHatSize], state.globals[pieceTableID_]);
+            Assert.areEqual(config.pieceTableIDs[(ike + 1) % config.pieceHatSize], state.global[pieceTableID_]);
 
             var index:Int = ike % config.pieceHatSize;
             if (pickedPieces[index] == null) pickedPieces[index] = piece;
@@ -229,7 +229,7 @@ class ScourgeConfigFactoryTest
 
         var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
 
-        Assert.areEqual(1, state.globals[winner_]);
+        Assert.areEqual(1, state.global[winner_]);
     }
 
     @Test
@@ -279,7 +279,7 @@ class ScourgeConfigFactoryTest
         VisualAssert.assert('player zero dropped another ---, ate player one\'s head and body; another cavity', state.spitBoard(plan));
 
         var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
-        Assert.areEqual(0, state.globals[winner_]);
+        Assert.areEqual(0, state.global[winner_]);
     }
 
     private function makeState():Void {

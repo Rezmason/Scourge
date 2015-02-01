@@ -7,7 +7,8 @@ using net.rezmason.utils.Pointers;
 
 class State {
 
-    public var globals:AspectSet;
+    public var global(default, null):AspectSet;
+    public var globals(default, null):Array<AspectSet>;
     public var players(default, null):Array<AspectSet>;
     public var nodes(default, null):Array<AspectSet>;
     public var loci(default, null):Array<GridLocus<AspectSet>>; // aka BoardLocus
@@ -15,10 +16,8 @@ class State {
     public var key(default, set):PtrKey;
 
     public function new(key:PtrKey):Void {
-
         this.key = key;
-
-        globals = null;
+        globals = [];
         players = [];
         nodes   = [];
         loci    = [];
@@ -26,13 +25,11 @@ class State {
     }
 
     public function wipe():Void {
-        if (globals != null) {
-            globals.wipe();
-            globals = null;
-        }
+        global = null;
+        globals.splice(0, globals.length);
         players.splice(0, players.length);
         nodes.splice  (0, nodes.length);
-        loci.splice  (0, loci.length);
+        loci.splice   (0, loci.length);
         extras.splice (0, extras.length);
     }
 
@@ -49,10 +46,15 @@ class State {
         loci    = s.unserializeGrid();
         nodes = [for (locus in loci) locus.value];
         extras  = s.unserialize();
+        resolve();
     }
 
     public function set_key(val:PtrKey):PtrKey {
         if (key == null) key = val;
         return val;
+    }
+
+    public function resolve() {
+        global = globals[0];
     }
 }

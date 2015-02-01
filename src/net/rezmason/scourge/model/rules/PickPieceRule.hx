@@ -66,13 +66,13 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
             // The hat's been refilled; all piece moves are available as quantum moves
             moves = [pickMove];
             quantumMoves = cast allMoves.copy();
-        } else if (state.globals[pieceTableID_] == NULL) {
+        } else if (state.global[pieceTableID_] == NULL) {
             moves = [pickMove];
 
             // Iterate over the hat's contents and include the corresopnding quantum moves
 
             var quantumPieceMoves:Array<PickPieceMove> = [];
-            var firstHatPiece:AspectSet = getExtra(state.globals[pieceHatFirst_]);
+            var firstHatPiece:AspectSet = getExtra(state.global[pieceHatFirst_]);
             var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
             for (piece in hatPieces) quantumPieceMoves.push(allMoves[piece[pieceMoveID_]]);
             quantumMoves = cast quantumPieceMoves;
@@ -155,7 +155,7 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
         }
 
         allPieces.chainByAspect(ident_, pieceNext_, piecePrev_);
-        state.globals[pieceFirst_] = allPieces[0][ident_];
+        state.global[pieceFirst_] = allPieces[0][ident_];
     }
 
     private function generateMove(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):PickPieceMove {
@@ -173,14 +173,14 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
     }
 
     private function setPiece(pieceTableID:Int, reflection:Int, rotation:Int):Void {
-        state.globals[pieceTableID_] = pieceTableID;
-        state.globals[pieceReflection_] = reflection;
-        state.globals[pieceRotation_] = rotation;
+        state.global[pieceTableID_] = pieceTableID;
+        state.global[pieceReflection_] = reflection;
+        state.global[pieceRotation_] = rotation;
     }
 
     private function pickMoveFromHat(move:PickPieceMove = null):PickPieceMove {
 
-        var firstHatPiece:AspectSet = getExtra(state.globals[pieceHatFirst_]);
+        var firstHatPiece:AspectSet = getExtra(state.global[pieceHatFirst_]);
         var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
 
         // Because pieces are differently weighted, we need to use a binary search algo
@@ -205,26 +205,26 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
         }
 
 
-        state.globals[piecesPicked_] = state.globals[piecesPicked_] + 1;
+        state.global[piecesPicked_] = state.global[piecesPicked_] + 1;
 
         var nextPiece:AspectSet = pickedPiece.removeSet(state.extras, pieceHatNext_, pieceHatPrev_);
 
         if (pickedPiece == firstHatPiece) {
             firstHatPiece = nextPiece;
-            if (firstHatPiece == null) state.globals[pieceHatFirst_] = NULL;
-            else state.globals[pieceHatFirst_] = firstHatPiece[ident_];
+            if (firstHatPiece == null) state.global[pieceHatFirst_] = NULL;
+            else state.global[pieceHatFirst_] = firstHatPiece[ident_];
         }
 
         return move;
     }
 
     private function buildHat():Void {
-        var firstPiece:AspectSet = getExtra(state.globals[pieceFirst_]);
+        var firstPiece:AspectSet = getExtra(state.global[pieceFirst_]);
         var allPieces:Array<AspectSet> = firstPiece.listToArray(state.extras, pieceNext_);
         allPieces.chainByAspect(ident_, pieceHatNext_, pieceHatPrev_);
-        state.globals[pieceHatFirst_] = firstPiece[ident_];
-        state.globals[piecesPicked_] = 0;
-        state.globals[pieceHatPlayer_] = state.globals[currentPlayer_];
+        state.global[pieceHatFirst_] = firstPiece[ident_];
+        state.global[piecesPicked_] = 0;
+        state.global[pieceHatPlayer_] = state.global[currentPlayer_];
     }
 
     private function binarySearch(val:Float, list:Array<Float>):Int {
@@ -247,7 +247,7 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
 
     // We fill the hat up again if it's empty
     private function remakeHat():Bool {
-        return state.globals[pieceHatPlayer_] != state.globals[currentPlayer_] ||
-                state.globals[piecesPicked_] == config.hatSize;
+        return state.global[pieceHatPlayer_] != state.global[currentPlayer_] ||
+                state.global[piecesPicked_] == config.hatSize;
     }
 }

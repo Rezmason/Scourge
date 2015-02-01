@@ -37,10 +37,10 @@ class EatCellsRule extends RopesRule<EatCellsConfig> {
 
     override private function _chooseMove(choice:Int):Void {
 
-        var currentPlayer:Int = state.globals[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = getPlayer(currentPlayer)[head_];
         var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
-        var maxFreshness:Int = state.globals[maxFreshness_];
+        var maxFreshness:Int = state.global[maxFreshness_];
 
         // List all the players' heads
 
@@ -112,7 +112,7 @@ class EatCellsRule extends RopesRule<EatCellsConfig> {
             if (nodesEaten) maxFreshness++;
         }
 
-        state.globals[maxFreshness_] = maxFreshness;
+        state.global[maxFreshness_] = maxFreshness;
 
         // Clean up the bodyFirst and head pointers for opponent players
         for (player in eachPlayer()) {

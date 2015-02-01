@@ -21,7 +21,7 @@ class ScourgeConfigFactory {
 
     static var BUILD_BOARD:String        = Type.getClassName(BuildBoardRule);
     static var BUILD_PLAYERS:String      = Type.getClassName(BuildPlayersRule);
-    static var BUILD_GLOBALS:String      = Type.getClassName(BuildGlobalsRule);
+    static var BUILD_GLOBAL:String      = Type.getClassName(BuildGlobalRule);
     static var CAVITY:String             = Type.getClassName(CavityRule);
     static var DECAY:String              = Type.getClassName(DecayRule);
     static var DROP_PIECE:String         = Type.getClassName(DropPieceRule);
@@ -43,7 +43,7 @@ class ScourgeConfigFactory {
 
     public inline static function makeDefaultActionList():Array<String> return [DROP_ACTION, QUIT_ACTION];
     public inline static function makeStartAction():String return START_ACTION;
-    public static function makeBuilderRuleList():Array<String> return [BUILD_GLOBALS, BUILD_PLAYERS, BUILD_BOARD];
+    public static function makeBuilderRuleList():Array<String> return [BUILD_GLOBAL, BUILD_PLAYERS, BUILD_BOARD];
     public static function makeActionList(config:ScourgeConfig):Array<String> {
 
         var actionList:Array<String> = [QUIT_ACTION, DROP_ACTION/*, PICK_ACTION*/];
@@ -102,7 +102,7 @@ class ScourgeConfigFactory {
 
     public static function makeRuleConfig(config:ScourgeConfig, rand:Void->Float):Map<String, Dynamic> {
         var ruleConfig:Map<String, Dynamic> = [
-            BUILD_GLOBALS => makeBuildStateConfig(config),
+            BUILD_GLOBAL => makeBuildGlobalConfig(config),
             BUILD_PLAYERS => makeBuildPlayersConfig(config),
             BUILD_BOARD => makeBuildBoardConfig(config),
             EAT_CELLS => makeEatCellsConfig(config),
@@ -150,7 +150,7 @@ class ScourgeConfigFactory {
         return combinedRuleConfig;
     }
 
-    inline static function makeBuildStateConfig(config:ScourgeConfig) {
+    inline static function makeBuildGlobalConfig(config:ScourgeConfig) {
         return {
             firstPlayer:config.firstPlayer,
         };
