@@ -86,17 +86,6 @@ class Referee {
         return {state:game.save(), log:savedLog, floats:savedFloats, timeSaved:UnixTime.now()};
     }
 
-    public function spitBoard():String return game.spitBoard();
-
-    public function spitMoves():String return game.spitMoves();
-
-    public function spitPlan():String {
-        return
-        'global:\n${spitAspectLookup(game.plan.globalAspectLookup)}' +
-        'player:\n${spitAspectLookup(game.plan.playerAspectLookup)}' +
-        'node:\n${spitAspectLookup(game.plan.nodeAspectLookup)}';
-    }
-
     function spitAspectLookup(lkp:AspectLookup):String {
         var str:String = '';
         var arr:Array<String> = [];
@@ -115,7 +104,6 @@ class Referee {
                     if (busy) throw 'Players must not submit moves synchronously!';
                     clearFloats();
                     game.chooseMove(action, move);
-                    // trace(game.spitBoard());
                     broadcastAndLog(getFloatsAction(game.revision - 1));
                     broadcastAndLog(RelayMove(turn, action, move));
                     if (game.winner >= 0) endGame(); // TEMPORARY
@@ -128,11 +116,9 @@ class Referee {
         log.push(Time(UnixTime.now()));
         log.push(event);
         var wasBusy:Bool = busy;
-        //trace('BUSY: BROADCAST');
         busy = true;
         for (player in players) player.playSignal.dispatch(event);
         busy = wasBusy;
-        //trace(busy ? 'STILL BUSY' : 'FREE');
     }
 
     private inline static function copyLog(source:Array<GameEvent>):Array<GameEvent> {

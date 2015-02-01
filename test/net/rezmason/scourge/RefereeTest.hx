@@ -2,7 +2,6 @@ package net.rezmason.scourge;
 
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
-import massive.munit.util.Timer;
 
 import net.rezmason.scourge.tools.Resource;
 
@@ -71,7 +70,10 @@ class RefereeTest {
 
         var deferredCalls = [];
 
+        var watchedGame:Game = null;
+
         function defer(game:Game, func:Void->Void) {
+            if (watchedGame == null) watchedGame = game;
             deferredCalls.push(func);
         }
 
@@ -89,27 +91,11 @@ class RefereeTest {
         {
             var oldDeferredCalls = deferredCalls;
             deferredCalls = [];
-            var then = Timer.stamp();
-            //trace('$ike ${oldDeferredCalls.length} ${Std.int(then * 1000)}');
-
-            for (call in oldDeferredCalls) {
-                call();
-
-                var now = Timer.stamp();
-                //trace(Std.int((now - then) * 1000));
-                then = now;
-            }
+            for (call in oldDeferredCalls) call();
         }
 
         var savedGame = referee.saveGame();
-        var board = referee.spitBoard();
-
-        //trace(board);
-
-        var moves:String = referee.spitMoves();
-        // trace(moves);
-
-        // trace(referee.spitPlan());
+        var board = watchedGame.state.spitBoard(watchedGame.plan);
 
         referee.endGame();
         Assert.isFalse(referee.gameBegun);
@@ -117,7 +103,7 @@ class RefereeTest {
         referee.beginGame(players, randGen, config, savedGame);
         Assert.isTrue(referee.gameBegun);
 
-        Assert.areEqual(board, referee.spitBoard());
+        Assert.areEqual(board, watchedGame.state.spitBoard(watchedGame.plan));
 
         referee.endGame();
         Assert.isFalse(referee.gameBegun);
