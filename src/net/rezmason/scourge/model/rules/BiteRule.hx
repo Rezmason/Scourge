@@ -52,7 +52,7 @@ class BiteRule extends RopesRule<BiteConfig> {
     private var allMoves:Array<BiteMove> = [];
 
     override private function _prime():Void {
-        for (player in eachPlayer()) player[numBites_] = config.startingBites;
+        for (player in eachPlayer()) player[numBites_] = params.startingBites;
     }
 
     override private function _update():Void {
@@ -81,8 +81,8 @@ class BiteRule extends RopesRule<BiteConfig> {
                 for (neighbor in neighborsFor(locus)) {
                     if (isValidEnemy(headIDs, currentPlayer, neighbor.value)) {
                         var move:BiteMove = getMove(getID(node), [getID(neighbor.value)]);
-                        if (!config.omnidirectional && config.baseReachOnThickness) {
-                            // The baseReachOnThickness config param uses this data to determine how far to extend a bite
+                        if (!params.omnidirectional && params.baseReachOnThickness) {
+                            // The baseReachOnThickness params param uses this data to determine how far to extend a bite
                             var backwards:Int = (locus.neighbors.indexOf(neighbor) + 4) % 8;
                             var depth:Int = 0;
                             for (innerNode in locus.walk(backwards)) {
@@ -101,9 +101,9 @@ class BiteRule extends RopesRule<BiteConfig> {
             // Extend the existing valid bites
 
             var reachItr:Int = 1;
-            var growthPercent:Float = Math.min(1, totalArea / config.maxSizeReference); // The "size calculation" for players
-            var reach:Int = Std.int(config.minReach + growthPercent * (config.maxReach - config.minReach));
-            if (config.baseReachOnThickness) reach = config.maxReach;
+            var growthPercent:Float = Math.min(1, totalArea / params.maxSizeReference); // The "size calculation" for players
+            var reach:Int = Std.int(params.minReach + growthPercent * (params.maxReach - params.minReach));
+            if (params.baseReachOnThickness) reach = params.maxReach;
 
             // We find moves by taking existing moves and extending them until there's nothing left to extend
             while (reachItr < reach && newMoves.length > 0) {
@@ -111,7 +111,7 @@ class BiteRule extends RopesRule<BiteConfig> {
                 newMoves = [];
 
                 for (move in oldMoves) {
-                    if (config.omnidirectional) {
+                    if (params.omnidirectional) {
                         // Omnidirectional moves are squiggly
                         for (bitNodeID in move.bitNodes) {
                             var bitLocus:BoardLocus = getLocus(bitNodeID);
@@ -121,7 +121,7 @@ class BiteRule extends RopesRule<BiteConfig> {
                                 }
                             }
                         }
-                    } else if (!config.baseReachOnThickness || move.bitNodes.length < move.thickness) {
+                    } else if (!params.baseReachOnThickness || move.bitNodes.length < move.thickness) {
                         // Straight moves are a little easier to generate
                         var firstBitLocus:BoardLocus = getLocus(move.bitNodes[0]);
                         var lastBitLocus:BoardLocus = getLocus(move.bitNodes[move.bitNodes.length - 1]);
@@ -221,13 +221,13 @@ class BiteRule extends RopesRule<BiteConfig> {
         return isNotNull;
     }
 
-    // Depending on the config, enemy nodes of different kinds can be bitten
+    // Depending on the params, enemy nodes of different kinds can be bitten
     inline function isValidEnemy(headIDs:Array<Int>, allegiance:Int, node:AspectSet):Bool {
         var val:Bool = true;
         if (node[occupier_] == allegiance) val = false; // Can't be the current player
         else if (node[occupier_] == NULL) val = false; // Can't be the current player
-        else if (!config.biteThroughCavities && node[isFilled_] == FALSE) val = false; // Must be filled, or must allow biting through a cavity
-        else if (!config.biteHeads && headIDs.has(getID(node))) val = false;
+        else if (!params.biteThroughCavities && node[isFilled_] == FALSE) val = false; // Must be filled, or must allow biting through a cavity
+        else if (!params.biteHeads && headIDs.has(getID(node))) val = false;
 
         return val;
     }
@@ -274,6 +274,6 @@ class BiteRule extends RopesRule<BiteConfig> {
     }
 
     inline function neighborsFor(node:BoardLocus):Array<BoardLocus> {
-        return config.orthoOnly ? node.orthoNeighbors() : node.neighbors;
+        return params.orthoOnly ? node.orthoNeighbors() : node.neighbors;
     }
 }

@@ -56,7 +56,7 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
     // All this for an overglorified random piece picker!
 
     override private function _prime():Void {
-        if (config.hatSize > config.pieceTableIDs.length) config.hatSize = config.pieceTableIDs.length;
+        if (params.hatSize > params.pieceTableIDs.length) params.hatSize = params.pieceTableIDs.length;
         buildPieceMoves();
         buildHat();
     }
@@ -106,10 +106,10 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
         allMoves = [];
         pickMove = {id:0};
 
-        // We create the table of piece frequencies from the config
+        // We create the table of piece frequencies from the params
 
         var pieceFrequencies:Array<Null<Int>> = [];
-        for (pieceTableID in config.pieceTableIDs) {
+        for (pieceTableID in params.pieceTableIDs) {
             if (pieceFrequencies[pieceTableID] == null) pieceFrequencies[pieceTableID] = 0;
             pieceFrequencies[pieceTableID]++;
         }
@@ -120,14 +120,14 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
             var freq:Null<Int> = pieceFrequencies[pieceTableID];
             if (freq == 0 || freq == null) continue;
 
-            var freePiece:FreePiece = config.pieces.getPieceById(pieceTableID);
+            var freePiece:FreePiece = params.pieces.getPieceById(pieceTableID);
             var numRotations = freePiece.numRotations;
 
             // A piece that can't be flipped or rotated has its multiple symmetries
             // added to the hat, and so it has more moves
 
-            if (config.allowFlipping) {
-                if (config.allowRotating) {
+            if (params.allowFlipping) {
+                if (params.allowRotating) {
                     generateMove(pieceTableID, 0, 0, freq);
                 } else {
                     var spinWeight:Int = Std.int(numRotations / 4);
@@ -135,7 +135,7 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
                 }
             } else {
                 for (flip in 0...freePiece.numReflections) {
-                    if (config.allowRotating) {
+                    if (params.allowRotating) {
                         generateMove(pieceTableID, flip, 0, freq);
                     } else {
                         var spinWeight:Int = Std.int(numRotations / 4);
@@ -197,7 +197,7 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
 
         var pickedPiece:AspectSet = null;
         if (move == null) {
-            var pick:Float = config.randomFunction() * maxWeight;
+            var pick:Float = params.randomFunction() * maxWeight;
             pickedPiece = hatPieces[binarySearch(pick, weights)];
             move = allMoves[pickedPiece[pieceMoveID_]];
         } else {
@@ -248,6 +248,6 @@ class PickPieceRule extends RopesRule<PickPieceConfig> {
     // We fill the hat up again if it's empty
     private function remakeHat():Bool {
         return state.global[pieceHatPlayer_] != state.global[currentPlayer_] ||
-                state.global[piecesPicked_] == config.hatSize;
+                state.global[piecesPicked_] == params.hatSize;
     }
 }

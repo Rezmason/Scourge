@@ -86,10 +86,10 @@ class BuildBoardRule extends RopesRule<BuildBoardConfig> {
         }
 
         var grid:BoardLocus = makeSquareGraph(boardWidth);
-        var hasInitGrid:Bool = config.initGrid != null && config.initGrid.length > 0;
+        var hasInitGrid:Bool = params.initGrid != null && params.initGrid.length > 0;
         obstructGraphRim(grid);
-        if (config.circular) encircleGraph(grid, boardWidth * 0.5 - RIM);
-        if (hasInitGrid) initGraph(grid, config.initGrid, boardWidth);
+        if (params.circular) encircleGraph(grid, boardWidth * 0.5 - RIM);
+        if (hasInitGrid) initGraph(grid, params.initGrid, boardWidth);
         populateGraphHeads(grid, headCoords, !hasInitGrid);
         populateGraphBodies();
     }

@@ -68,10 +68,10 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
 
         // This allows the place-piece function to behave like a skip function
         // Setting this to false also forces players to forfeit if they can't place a piece
-        if (config.allowNowhere) dropMoves.push(cast nowhereMove);
+        if (params.allowNowhere) dropMoves.push(cast nowhereMove);
 
         var pieceIDs:Array<Int> = [];
-        if (config.allowPiecePick) for (pieceID in config.pieceTableIDs) pieceIDs.push(pieceID);
+        if (params.allowPiecePick) for (pieceID in params.pieceTableIDs) pieceIDs.push(pieceID);
         else if (state.global[pieceTableID_] != NULL) pieceIDs.push(state.global[pieceTableID_]);
 
         // get current player head
@@ -86,20 +86,20 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
 
         for (pieceID in pieceIDs) {
 
-            var freePiece:FreePiece = config.pieces.getPieceById(pieceID);
+            var freePiece:FreePiece = params.pieces.getPieceById(pieceID);
 
             // For each allowed reflection,
             var allowedReflectionIndex:Int = pieceReflection % freePiece.numReflections;
             for (reflectionIndex in 0...freePiece.numReflections) {
 
-                if (!config.allowFlipping && reflectionIndex != allowedReflectionIndex) continue;
+                if (!params.allowFlipping && reflectionIndex != allowedReflectionIndex) continue;
                 
                 // For each allowed rotation,
                 var allowedRotationIndex:Int = pieceRotation % freePiece.numRotations;
 
                 for (rotationIndex in 0...freePiece.numRotations) {
 
-                    if (!config.allowRotating && rotationIndex != allowedRotationIndex) continue;
+                    if (!params.allowRotating && rotationIndex != allowedRotationIndex) continue;
                     var piece:Piece = freePiece.getPiece(reflectionIndex, rotationIndex);
 
                     // For each edge node,
@@ -107,7 +107,7 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
 
                         // Generate the piece's footprint
 
-                        var footprint = piece.footprint(config.overlapSelf, !config.diagOnly, !config.orthoOnly);
+                        var footprint = piece.footprint(params.overlapSelf, !params.diagOnly, !params.orthoOnly);
 
                         // Using each footprint coord as a home coord (aka the point of connection),
                         for (homeCoord in footprint) {
@@ -126,7 +126,7 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
                                 var occupier:Int = nodeAtCoord[occupier_];
                                 var isFilled:Int = nodeAtCoord[isFilled_];
 
-                                if (isFilled == TRUE && !(config.overlapSelf && occupier == currentPlayer)) {
+                                if (isFilled == TRUE && !(params.overlapSelf && occupier == currentPlayer)) {
                                     valid = false;
                                     break;
                                 }
@@ -195,7 +195,7 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
         var player:AspectSet = getPlayer(currentPlayer);
 
         if (move.targetNode != NULL) {
-            var freePiece:FreePiece = config.pieces.getPieceById(move.pieceID);
+            var freePiece:FreePiece = params.pieces.getPieceById(move.pieceID);
             var targetLocus:BoardLocus = getLocus(move.targetNode);
             var coords:Array<IntCoord> = freePiece.getPiece(move.reflection, move.rotation).cells;
             var homeCoord:IntCoord = move.coord;
@@ -222,7 +222,7 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
     inline function hasFreeEdge(node:AspectSet):Bool {
         var exists:Bool = false;
 
-        for (neighbor in neighborsFor(getNodeLocus(node), config.orthoOnly)) {
+        for (neighbor in neighborsFor(getNodeLocus(node), params.orthoOnly)) {
             if (neighbor.value[isFilled_] == FALSE) {
                 exists = true;
                 break;

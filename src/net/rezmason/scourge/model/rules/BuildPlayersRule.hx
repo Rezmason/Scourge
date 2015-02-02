@@ -6,7 +6,7 @@ typedef BuildPlayersConfig = { public var numPlayers:Int; }
 
 class BuildPlayersRule extends RopesRule<BuildPlayersConfig> {
     override private function _prime():Void {
-        if (config.numPlayers < 1) throw 'Invalid number of players in player config.';
-        for (ike in 0...config.numPlayers) addPlayer();
+        if (params.numPlayers < 1) throw 'Invalid number of players in player params.';
+        for (ike in 0...params.numPlayers) addPlayer();
     }
 }

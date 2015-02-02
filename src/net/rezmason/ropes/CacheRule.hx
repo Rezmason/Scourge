@@ -18,8 +18,8 @@ class CacheRule extends RopesRule<CacheConfig> {
     private var quantumMoveCache:Array<Array<Move>> = [];
 
     override public function _init():Void {
-        rule = config.rule;
-        config.invalidateSignal.add(invalidate);
+        rule = params.rule;
+        params.invalidateSignal.add(invalidate);
 
         globalAspectRequirements.absorb(rule.globalAspectRequirements);
         playerAspectRequirements.absorb(rule.playerAspectRequirements);
@@ -29,7 +29,7 @@ class CacheRule extends RopesRule<CacheConfig> {
     override public function _prime():Void rule.prime(state, plan, history, historyState, changeSignal);
 
     override private function _update():Void {
-        var rev:Int = config.revGetter();
+        var rev:Int = params.revGetter();
         if (moveCache[rev] != null) {
             #if ROPES_VERBOSE trace('Cached: $rule $rev'); #end
             rule.moves = moves = moveCache[rev];

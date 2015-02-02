@@ -11,6 +11,6 @@ class BuildGlobalRule extends RopesRule<BuildGlobalConfig> {
 
     override private function _prime():Void {
         addGlobal();
-        state.global[currentPlayer_] = config.firstPlayer;
+        state.global[currentPlayer_] = params.firstPlayer;
     }
 }

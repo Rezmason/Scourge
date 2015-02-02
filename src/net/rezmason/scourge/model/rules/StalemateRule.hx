@@ -28,7 +28,7 @@ class StalemateRule extends RopesRule<SkipsExhaustedConfig> {
             stalemate = false;
         } else {
             for (player in eachPlayer()) {
-                if (player[numConsecutiveSkips_] < config.maxSkips) {
+                if (player[numConsecutiveSkips_] < params.maxSkips) {
                     stalemate = false;
                     break;
                 }

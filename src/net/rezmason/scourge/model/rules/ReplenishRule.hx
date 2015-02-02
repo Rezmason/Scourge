@@ -38,9 +38,9 @@ class ReplenishRule extends RopesRule<ReplenishConfig> {
     @global(ReplenishableAspect.NODE_REP_FIRST) var nodeRepFirst_;
 
     override public function _init():Void {
-        for (rProp in config.globalProperties ) addGlobalAspectRequirement(rProp.prop);
-        for (rProp in config.playerProperties ) addPlayerAspectRequirement(rProp.prop);
-        for (rProp in config.nodeProperties   ) addNodeAspectRequirement  (rProp.prop);
+        for (rProp in params.globalProperties ) addGlobalAspectRequirement(rProp.prop);
+        for (rProp in params.playerProperties ) addPlayerAspectRequirement(rProp.prop);
+        for (rProp in params.nodeProperties   ) addNodeAspectRequirement  (rProp.prop);
     }
 
     override private function _prime():Void {
@@ -52,19 +52,19 @@ class ReplenishRule extends RopesRule<ReplenishConfig> {
         var nodeReps:Array<AspectSet> = [];
 
         // Create the replenishables
-        for (repCfg in config.globalProperties) {
+        for (repCfg in params.globalProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.globalAspectLookup);
             repCfg.replenishableID = replenishable[ident_];
             stateReps.push(replenishable);
         }
 
-        for (repCfg in config.playerProperties) {
+        for (repCfg in params.playerProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.playerAspectLookup);
             repCfg.replenishableID = replenishable[ident_];
             playerReps.push(replenishable);
         }
 
-        for (repCfg in config.nodeProperties) {
+        for (repCfg in params.nodeProperties) {
             var replenishable:AspectSet = makeReplenishable(repCfg, plan.nodeAspectLookup);
             repCfg.replenishableID = replenishable[ident_];
             nodeReps.push(replenishable);
@@ -95,9 +95,9 @@ class ReplenishRule extends RopesRule<ReplenishConfig> {
     }
 
     override private function _chooseMove(choice:Int):Void {
-        updateReps(config.globalProperties, [state.global]);
-        updateReps(config.playerProperties, state.players);
-        updateReps(config.nodeProperties, state.nodes);
+        updateReps(params.globalProperties, [state.global]);
+        updateReps(params.playerProperties, state.players);
+        updateReps(params.nodeProperties, state.nodes);
         signalChange();
     }
 

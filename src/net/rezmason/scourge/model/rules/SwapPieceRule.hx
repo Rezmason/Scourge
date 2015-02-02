@@ -22,7 +22,7 @@ class SwapPieceRule extends RopesRule<SwapPieceConfig> {
     @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
 
     override private function _prime():Void {
-        for (player in eachPlayer()) player[numSwaps_] = config.startingSwaps;
+        for (player in eachPlayer()) player[numSwaps_] = params.startingSwaps;
     }
 
     // This rule basically zaps the current player's piece and takes away a swap.

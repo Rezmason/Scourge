@@ -65,7 +65,7 @@ class EatCellsRule extends RopesRule<EatCellsConfig> {
         if (node != null) newNodesByID[getID(node)] = null;
         while (node != null) {
             // search in all directions
-            for (direction in directionsFor(config.orthoOnly)) {
+            for (direction in directionsFor(params.orthoOnly)) {
                 var pendingNodes:Array<AspectSet> = [];
                 var locus:BoardLocus = getNodeLocus(node);
                 for (scout in locus.walk(direction)) {
@@ -76,16 +76,16 @@ class EatCellsRule extends RopesRule<EatCellsConfig> {
                             // Add nodes to the eaten region
                             for (pendingNode in pendingNodes) {
                                 var playerID:Int = headIndices.indexOf(getID(pendingNode));
-                                if (playerID != -1 && config.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
-                                else if (config.recursive && newNodesByID[getID(pendingNode)] == null) newNodes.add(pendingNode); // recursive eating
+                                if (playerID != -1 && params.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
+                                else if (params.recursive && newNodesByID[getID(pendingNode)] == null) newNodes.add(pendingNode); // recursive eating
 
                                 eatenNodes[getID(pendingNode)] = pendingNode;
                             }
                             eatenNodeGroups.push(pendingNodes);
                             break;
                         } else if (headIndices[scoutOccupier] == getID(scout.value)) {
-                            // Only eat heads if the config specifies this
-                            if (config.eatHeads) pendingNodes.push(scout.value);
+                            // Only eat heads if the params specifies this
+                            if (params.eatHeads) pendingNodes.push(scout.value);
                             //else break;
                         } else {
                             pendingNodes.push(scout.value);

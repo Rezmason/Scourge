@@ -2,11 +2,11 @@ package net.rezmason.ropes;
 
 import net.rezmason.ropes.RopesTypes;
 
-class RopesRule<Config> extends Reckoner {
+class RopesRule<Params> extends Reckoner {
 
     var historyState:State;
     var history:StateHistory;
-    var config:Config;
+    var params:Params;
 
     public var moves(default, null):Array<Move> = [{id:0}];
     public var quantumMoves(default, null):Array<Move> = [];
@@ -20,8 +20,8 @@ class RopesRule<Config> extends Reckoner {
 
     var changeSignal:Rule->Void;
 
-    @:final public function init(config:Dynamic):Void {
-        this.config = config;
+    @:final public function init(params:Dynamic):Void {
+        this.params = params;
         _init();
     }
 
