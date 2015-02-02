@@ -8,6 +8,7 @@ import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
+import net.rezmason.scourge.model.aspects.SkipAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
 import net.rezmason.scourge.model.rules.EndTurnRule;
 import net.rezmason.scourge.model.rules.ForfeitRule;
@@ -160,7 +161,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
-        var numConsecutiveSkips_:AspectPtr = plan.onPlayer(PlyAspect.NUM_CONSECUTIVE_SKIPS);
+        var numConsecutiveSkips_:AspectPtr = plan.onPlayer(SkipAspect.NUM_CONSECUTIVE_SKIPS);
 
         // Have each player skip four times, then check for a winner
         for (ike in 0...state.players.length) {

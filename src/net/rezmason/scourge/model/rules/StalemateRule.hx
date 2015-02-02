@@ -4,6 +4,7 @@ import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.aspects.BodyAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
+import net.rezmason.scourge.model.aspects.SkipAspect;
 import net.rezmason.scourge.model.aspects.WinAspect;
 
 using net.rezmason.utils.Pointers;
@@ -15,7 +16,7 @@ typedef SkipsExhaustedConfig = {
 class StalemateRule extends RopesRule<SkipsExhaustedConfig> {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @player(PlyAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
+    @player(SkipAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
     @global(WinAspect.WINNER) var winner_;
 
     // This rule discovers whether there is only one remaining player, and makes that player the winner

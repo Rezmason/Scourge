@@ -9,7 +9,6 @@ import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlanner;
-import net.rezmason.ropes.RuleFactory;
 import net.rezmason.ropes.Aspect;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
@@ -284,10 +283,10 @@ class ScourgeConfigFactoryTest
 
     private function makeState():Void {
         var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction);
-        var basicRulesByName:Map<String, Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
+        var basicRulesByName:Map<String, Rule> = ScourgeConfigFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
         var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
         
-        combinedRules = RuleFactory.combineRules(combinedConfig, basicRulesByName);
+        combinedRules = ScourgeConfigFactory.combineRules(combinedConfig, basicRulesByName);
         
         var builderRuleKeys:Array<String> = ScourgeConfigFactory.makeBuilderRuleList();
         var basicRules:Array<Rule> = [];

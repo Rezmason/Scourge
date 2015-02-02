@@ -11,6 +11,7 @@ import net.rezmason.scourge.model.aspects.FreshnessAspect;
 import net.rezmason.scourge.model.aspects.OwnershipAspect;
 import net.rezmason.scourge.model.aspects.PieceAspect;
 import net.rezmason.scourge.model.aspects.PlyAspect;
+import net.rezmason.scourge.model.aspects.SkipAspect;
 
 using Lambda;
 using net.rezmason.ropes.GridUtils;
@@ -50,7 +51,7 @@ class DropPieceRule extends RopesRule<DropPieceConfig> {
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
-    @player(PlyAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
+    @player(SkipAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
     @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_;

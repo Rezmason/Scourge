@@ -1,6 +1,5 @@
 package net.rezmason.scourge.model;
 
-import net.rezmason.ropes.RuleFactory;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlan;
 import net.rezmason.ropes.StatePlanner;
@@ -51,16 +50,16 @@ class Game {
         // Build the game from the config
 
         var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction);
-        var basicRulesByName:Map<String, Rule> = RuleFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
+        var basicRulesByName:Map<String, Rule> = ScourgeConfigFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
 
         if (cacheMoves) {
             for (key in basicRulesByName.keys().a2z()) {
-                basicRulesByName[key] = RuleFactory.makeCacheRule(basicRulesByName[key], invalidateSignal, get_revision);
+                basicRulesByName[key] = ScourgeConfigFactory.makeCacheRule(basicRulesByName[key], invalidateSignal, get_revision);
             }
         }
 
         var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
-        var combinedRules:Map<String, Rule> = RuleFactory.combineRules(combinedConfig, basicRulesByName);
+        var combinedRules:Map<String, Rule> = ScourgeConfigFactory.combineRules(combinedConfig, basicRulesByName);
         var builderRuleKeys:Array<String> = ScourgeConfigFactory.makeBuilderRuleList();
         var basicRules:Array<Rule> = [];
         var builderRules:Array<Rule> = [];
