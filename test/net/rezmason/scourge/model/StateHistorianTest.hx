@@ -7,12 +7,12 @@ import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlanner;
-import net.rezmason.scourge.model.aspects.FreshnessAspect;
-import net.rezmason.scourge.model.rules.BuildBoardRule;
-import net.rezmason.scourge.model.rules.BuildPlayersRule;
-import net.rezmason.scourge.model.rules.BuildGlobalRule;
-import net.rezmason.scourge.model.rules.EatCellsRule;
-import net.rezmason.scourge.model.rules.PickPieceRule;
+import net.rezmason.scourge.model.meta.FreshnessAspect;
+import net.rezmason.scourge.model.body.EatCellsRule;
+import net.rezmason.scourge.model.build.BuildBoardRule;
+import net.rezmason.scourge.model.build.BuildPlayersRule;
+import net.rezmason.scourge.model.build.BuildGlobalRule;
+import net.rezmason.scourge.model.piece.PickPieceRule;
 import net.rezmason.scourge.tools.Resource;
 
 using net.rezmason.utils.Pointers;

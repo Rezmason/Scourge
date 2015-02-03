@@ -8,9 +8,9 @@ import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlan;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.ropes.StateHistorian;
-import net.rezmason.scourge.model.rules.BuildBoardRule;
-import net.rezmason.scourge.model.rules.BuildGlobalRule;
-import net.rezmason.scourge.model.rules.BuildPlayersRule;
+import net.rezmason.scourge.model.build.BuildBoardRule;
+import net.rezmason.scourge.model.build.BuildGlobalRule;
+import net.rezmason.scourge.model.build.BuildPlayersRule;
 
 using net.rezmason.ropes.AspectUtils;
 using net.rezmason.ropes.GridUtils;

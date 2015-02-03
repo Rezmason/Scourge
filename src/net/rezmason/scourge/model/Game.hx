@@ -5,8 +5,8 @@ import net.rezmason.ropes.StatePlan;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.scourge.model.aspects.PlyAspect;
-import net.rezmason.scourge.model.aspects.WinAspect;
+import net.rezmason.scourge.model.meta.PlyAspect;
+import net.rezmason.scourge.model.meta.WinAspect;
 import net.rezmason.utils.Zig;
 
 using net.rezmason.utils.Alphabetizer;

@@ -6,7 +6,7 @@ import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlan;
-import net.rezmason.scourge.model.aspects.OwnershipAspect;
+import net.rezmason.scourge.model.body.OwnershipAspect;
 
 using net.rezmason.ropes.GridUtils;
 

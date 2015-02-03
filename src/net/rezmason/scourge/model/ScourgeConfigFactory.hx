@@ -5,9 +5,13 @@ import net.rezmason.ropes.CacheRule;
 import net.rezmason.ropes.JointRule;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.ScourgeAction.*;
-import net.rezmason.scourge.model.aspects.BiteAspect;
-import net.rezmason.scourge.model.aspects.SwapAspect;
-import net.rezmason.scourge.model.rules.*;
+
+import net.rezmason.scourge.model.bite.*;
+import net.rezmason.scourge.model.body.*;
+import net.rezmason.scourge.model.build.*;
+import net.rezmason.scourge.model.meta.*;
+import net.rezmason.scourge.model.piece.*;
+
 import net.rezmason.scourge.tools.Resource;
 import net.rezmason.utils.Siphon;
 import net.rezmason.utils.StringSort;
@@ -43,7 +47,7 @@ class ScourgeConfigFactory {
     static var SWAP_PIECE:String         = Type.getClassName(SwapPieceRule);
 
     public static var ruleDefs(default, null):Map<String, Class<Rule>> = cast Siphon.getDefs(
-        'net.rezmason.scourge.model.rules', 'src', false, 'Rule'
+        'net.rezmason.scourge.model', 'src', true, 'Rule$$'
     );
 
     public inline static function makeDefaultActionList():Array<String> return [DROP_ACTION, QUIT_ACTION];

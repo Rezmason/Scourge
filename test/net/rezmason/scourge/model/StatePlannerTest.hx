@@ -8,10 +8,10 @@ import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StatePlanner;
-import net.rezmason.scourge.model.aspects.TestAspect;
-import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.rules.BuildGlobalRule;
-import net.rezmason.scourge.model.rules.TestRule;
+import net.rezmason.scourge.model.test.TestAspect;
+import net.rezmason.scourge.model.body.OwnershipAspect;
+import net.rezmason.scourge.model.build.BuildGlobalRule;
+import net.rezmason.scourge.model.test.TestRule;
 
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.ropes.StatePlan;

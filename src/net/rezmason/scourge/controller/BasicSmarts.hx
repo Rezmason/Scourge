@@ -6,10 +6,10 @@ import net.rezmason.scourge.model.ScourgeAction.*;
 import net.rezmason.scourge.model.ScourgeConfig;
 
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.scourge.model.aspects.BodyAspect;
-import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.aspects.OwnershipAspect;
-import net.rezmason.scourge.model.rules.DropPieceRule.DropPieceMove;
+import net.rezmason.scourge.model.body.BodyAspect;
+import net.rezmason.scourge.model.body.OwnershipAspect;
+import net.rezmason.scourge.model.body.OwnershipAspect;
+import net.rezmason.scourge.model.piece.DropPieceRule.DropPieceMove;
 import net.rezmason.ropes.Aspect.*;
 
 using net.rezmason.ropes.GridUtils;

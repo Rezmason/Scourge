@@ -25,8 +25,9 @@ class Siphon {
         var dirs:Array<String> = recursive ? getSubdirectories(path) : [path];
         var packagedClassNames:Array<String> = [];
         for (dir in dirs) {
-            for (file in FileSystem.readDirectory(dir).filter(classEReg.match).filter(~/\.hx$/.match)) {
+            for (file in FileSystem.readDirectory(dir).filter(~/\.hx$/.match)) {
                 var className:String = file.substr(0, file.length - '.hx'.length);
+                if (!classEReg.match(className)) continue;
                 var classPackage:String = ~/\//g.replace(dir, '.');
                 classPackage = classPackage.substr(base.length + 1);
                 if (classPackage.length > 0) classPackage += '.';
@@ -51,8 +52,8 @@ class Siphon {
             var itr:Int = 0;
             while (itr < dirPaths.length) {
                 for (path in FileSystem.readDirectory(dirPaths[itr])) {
-                    var fullPath:String = '${dirPaths[itr]}$path';
-                    if (FileSystem.isDirectory(fullPath)) dirPaths.push('$fullPath/');
+                    var fullPath:String = '${dirPaths[itr]}/$path';
+                    if (FileSystem.isDirectory(fullPath)) dirPaths.push('$fullPath');
                 }
                 itr++;
             }
