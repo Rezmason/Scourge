@@ -9,7 +9,7 @@ import net.rezmason.scourge.model.meta.PlyAspect;
 using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.Pointers;
 
-typedef PickPieceConfig = {
+typedef PickPieceParams = {
     public var pieceTableIDs:Array<Int>; // The list of pieces available at any point in the game
     public var allowFlipping:Bool; // If false, the reflection is left to chance
     public var allowRotating:Bool; // If false, the rotation is left to chance
@@ -25,7 +25,7 @@ typedef PickPieceMove = {>Move,
     var reflection:Int;
 }
 
-class PickPieceRule extends RopesRule<PickPieceConfig> {
+class PickPieceRule extends RopesRule<PickPieceParams> {
 
     static var stateReqs:AspectRequirements;
 

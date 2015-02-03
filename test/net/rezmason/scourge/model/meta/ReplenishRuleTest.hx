@@ -31,32 +31,32 @@ class ReplenishRuleTest extends ScourgeRuleTest
 
     @Test
     public function replenishTest():Void {
-        var cfg:ReplenishConfig = {
+        var params:ReplenishParams = {
             globalProperties:null,
             playerProperties:null,
             nodeProperties:null,
         };
 
-        cfg.globalProperties = [
+        params.globalProperties = [
             { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
             { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
             { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
-        cfg.playerProperties = [
+        params.playerProperties = [
             { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
             { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
             { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
-        cfg.nodeProperties = [
+        params.nodeProperties = [
             { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
             { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
             { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
         var replenishRule:ReplenishRule = new ReplenishRule();
-        replenishRule.init(cfg);
+        replenishRule.init(params);
 
         makeState([replenishRule], 1, TestBoards.emptyPetri);
 

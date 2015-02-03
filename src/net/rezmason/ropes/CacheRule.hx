@@ -5,13 +5,13 @@ import net.rezmason.ropes.RopesTypes;
 
 using net.rezmason.utils.MapUtils;
 
-typedef CacheConfig = {
+typedef CacheParams = {
     var rule:Rule;
     var invalidateSignal:Zig<Int->Void>;
     var revGetter:Void->Int;
 };
 
-class CacheRule extends RopesRule<CacheConfig> {
+class CacheRule extends RopesRule<CacheParams> {
 
     private var rule:Rule;
     private var moveCache:Array<Array<Move>> = [];

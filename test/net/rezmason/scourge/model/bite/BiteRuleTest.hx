@@ -39,7 +39,7 @@ class BiteRuleTest extends ScourgeRuleTest
     @Test
     public function straightBite1():Void {
 
-        var biteConfig:BiteConfig = {
+        var biteParams:BiteParams = {
             startingBites:100,
             minReach:1,
             maxReach:1,
@@ -51,7 +51,7 @@ class BiteRuleTest extends ScourgeRuleTest
             orthoOnly:true,
         };
         var biteRule:BiteRule = new BiteRule();
-        biteRule.init(biteConfig);
+        biteRule.init(biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
@@ -77,7 +77,7 @@ class BiteRuleTest extends ScourgeRuleTest
     @Test
     public function straightBite3():Void {
 
-        var biteConfig:BiteConfig = {
+        var biteParams:BiteParams = {
             startingBites:100,
             minReach:1,
             maxReach:3,
@@ -89,7 +89,7 @@ class BiteRuleTest extends ScourgeRuleTest
             orthoOnly:true,
         };
         var biteRule:BiteRule = new BiteRule();
-        biteRule.init(biteConfig);
+        biteRule.init(biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
@@ -104,7 +104,7 @@ class BiteRuleTest extends ScourgeRuleTest
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
         for (move in moves) {
-            if (move.bitNodes.length == biteConfig.maxReach) {
+            if (move.bitNodes.length == biteParams.maxReach) {
                 biteRule.chooseMove(move.id);
                 break;
             }
@@ -113,7 +113,7 @@ class BiteRuleTest extends ScourgeRuleTest
         VisualAssert.assert('two player bite, three-unit bite down from top', state.spitBoard(plan));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
-        Assert.areEqual(20 - biteConfig.maxReach, numCells); // 19 cells for player 1
+        Assert.areEqual(20 - biteParams.maxReach, numCells); // 19 cells for player 1
 
         testEnemyBody(numCells);
     }
@@ -121,7 +121,7 @@ class BiteRuleTest extends ScourgeRuleTest
     @Test
     public function diagonalStraightBite3():Void {
 
-        var biteConfig:BiteConfig = {
+        var biteParams:BiteParams = {
             startingBites:100,
             minReach:1,
             maxReach:3,
@@ -133,7 +133,7 @@ class BiteRuleTest extends ScourgeRuleTest
             orthoOnly:false,
         };
         var biteRule:BiteRule = new BiteRule();
-        biteRule.init(biteConfig);
+        biteRule.init(biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
@@ -150,7 +150,7 @@ class BiteRuleTest extends ScourgeRuleTest
         stateHistorian.write();
 
         for (move in moves) {
-            if (move.bitNodes.length == biteConfig.maxReach) {
+            if (move.bitNodes.length == biteParams.maxReach) {
                 biteRule.chooseMove(move.id);
                 break;
             }
@@ -159,7 +159,7 @@ class BiteRuleTest extends ScourgeRuleTest
         VisualAssert.assert('two player bite, three-unit bite down-diagonal from top', state.spitBoard(plan));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
-        Assert.areEqual(20 - biteConfig.maxReach, numCells); // 19 cells for player 1
+        Assert.areEqual(20 - biteParams.maxReach, numCells); // 19 cells for player 1
 
         testEnemyBody(numCells);
     }
@@ -167,7 +167,7 @@ class BiteRuleTest extends ScourgeRuleTest
     @Test
     public function omnidirectionalBite2():Void {
 
-        var biteConfig:BiteConfig = {
+        var biteParams:BiteParams = {
             startingBites:100,
             minReach:1,
             maxReach:2,
@@ -179,7 +179,7 @@ class BiteRuleTest extends ScourgeRuleTest
             orthoOnly:true,
         };
         var biteRule:BiteRule = new BiteRule();
-        biteRule.init(biteConfig);
+        biteRule.init(biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
@@ -194,7 +194,7 @@ class BiteRuleTest extends ScourgeRuleTest
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
         for (move in moves) {
-            if (move.bitNodes.length == biteConfig.maxReach) {
+            if (move.bitNodes.length == biteParams.maxReach) {
                 biteRule.chooseMove(move.id);
                 break;
             }
@@ -203,7 +203,7 @@ class BiteRuleTest extends ScourgeRuleTest
         VisualAssert.assert('two player bite, two-unit byte along top going east', state.spitBoard(plan));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
-        Assert.areEqual(20 - biteConfig.maxReach, numCells); // 19 cells for player 1
+        Assert.areEqual(20 - biteParams.maxReach, numCells); // 19 cells for player 1
 
         testEnemyBody(numCells);
     }
@@ -211,7 +211,7 @@ class BiteRuleTest extends ScourgeRuleTest
     @Test
     public function straightBiteThroughHeads():Void {
 
-        var biteConfig:BiteConfig = {
+        var biteParams:BiteParams = {
             startingBites:100,
             minReach:1,
             maxReach:1,
@@ -223,7 +223,7 @@ class BiteRuleTest extends ScourgeRuleTest
             orthoOnly:true,
         };
         var biteRule:BiteRule = new BiteRule();
-        biteRule.init(biteConfig);
+        biteRule.init(biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
@@ -258,7 +258,7 @@ class BiteRuleTest extends ScourgeRuleTest
     @Test
     public function straightBiteBasedOnThickness():Void {
 
-        var biteConfig:BiteConfig = {
+        var biteParams:BiteParams = {
             startingBites:100,
             minReach:1,
             maxReach:20,
@@ -271,7 +271,7 @@ class BiteRuleTest extends ScourgeRuleTest
         };
 
         var biteRule:BiteRule = new BiteRule();
-        biteRule.init(biteConfig);
+        biteRule.init(biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
@@ -305,7 +305,7 @@ class BiteRuleTest extends ScourgeRuleTest
     @Test
     public function cavityBite():Void {
 
-        var biteConfig:BiteConfig = {
+        var biteParams:BiteParams = {
             startingBites:100,
             minReach:1,
             maxReach:2,
@@ -317,7 +317,7 @@ class BiteRuleTest extends ScourgeRuleTest
             orthoOnly:true,
         };
         var biteRule:BiteRule = new BiteRule();
-        biteRule.init(biteConfig);
+        biteRule.init(biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);

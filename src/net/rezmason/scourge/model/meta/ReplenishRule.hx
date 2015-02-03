@@ -9,7 +9,7 @@ using net.rezmason.ropes.AspectUtils;
 
 using net.rezmason.utils.Pointers;
 
-typedef ReplenishableConfig = {
+typedef ReplenishableParams = {
     var prop:AspectProperty;
     var amount:Int;
     var period:Int;
@@ -17,13 +17,13 @@ typedef ReplenishableConfig = {
     @:optional var replenishableID:Int;
 }
 
-typedef ReplenishConfig = {
-    var globalProperties:Array<ReplenishableConfig>;
-    var playerProperties:Array<ReplenishableConfig>;
-    var nodeProperties:Array<ReplenishableConfig>;
+typedef ReplenishParams = {
+    var globalProperties:Array<ReplenishableParams>;
+    var playerProperties:Array<ReplenishableParams>;
+    var nodeProperties:Array<ReplenishableParams>;
 }
 
-class ReplenishRule extends RopesRule<ReplenishConfig> {
+class ReplenishRule extends RopesRule<ReplenishParams> {
 
     // state, extra for each replenishable
     @extra(ReplenishableAspect.REP_NEXT) var repNext_;
@@ -100,7 +100,7 @@ class ReplenishRule extends RopesRule<ReplenishConfig> {
         signalChange();
     }
 
-    private function makeReplenishable(repCfg:ReplenishableConfig, lookup:AspectLookup):AspectSet {
+    private function makeReplenishable(repCfg:ReplenishableParams, lookup:AspectLookup):AspectSet {
 
         // A replenishable is really just an accumulator that performs an action
         // on a value stored in a particular aspect set, at a specific index
@@ -111,7 +111,7 @@ class ReplenishRule extends RopesRule<ReplenishConfig> {
         return rep;
     }
 
-    private function updateReps(repCfgs:Array<ReplenishableConfig>, aspectSets:Array<AspectSet>):Void {
+    private function updateReps(repCfgs:Array<ReplenishableParams>, aspectSets:Array<AspectSet>):Void {
         // Each replenishable gets its iterator incremented
         for (repCfg in repCfgs) {
             var replenishable:AspectSet = getExtra(repCfg.replenishableID);

@@ -6,13 +6,13 @@ import net.rezmason.scourge.model.piece.PieceAspect;
 
 using net.rezmason.utils.Pointers;
 
-typedef TestPieceConfig = {
+typedef TestPieceParams = {
     var pieceTableID:Int;
     var reflection:Int;
     var rotation:Int;
 }
 
-class TestPieceRule extends RopesRule<TestPieceConfig> {
+class TestPieceRule extends RopesRule<TestPieceParams> {
 
     @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
     @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;

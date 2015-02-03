@@ -6,11 +6,11 @@ import net.rezmason.scourge.model.body.BodyAspect;
 
 using net.rezmason.utils.Pointers;
 
-typedef SkipsExhaustedConfig = {
+typedef SkipsExhaustedParams = {
     var maxSkips:Int;
 }
 
-class StalemateRule extends RopesRule<SkipsExhaustedConfig> {
+class StalemateRule extends RopesRule<SkipsExhaustedParams> {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @player(SkipAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;

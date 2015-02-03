@@ -14,7 +14,7 @@ using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
-typedef BiteConfig = {
+typedef BiteParams = {
     var minReach:Int;
     var maxReach:Int;
     var maxSizeReference:Int;
@@ -33,7 +33,7 @@ typedef BiteMove = {>Move,
     var duplicate:Bool;
 }
 
-class BiteRule extends RopesRule<BiteConfig> {
+class BiteRule extends RopesRule<BiteParams> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;

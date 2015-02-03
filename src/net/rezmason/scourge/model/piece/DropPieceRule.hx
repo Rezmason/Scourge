@@ -18,7 +18,7 @@ using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
-typedef DropPieceConfig = {
+typedef DropPieceParams = {
     public var overlapSelf:Bool;
     public var pieceTableIDs:Array<Int>;
     public var allowFlipping:Bool;
@@ -42,7 +42,7 @@ typedef DropPieceMove = {>Move,
     var duplicate:Bool;
 }
 
-class DropPieceRule extends RopesRule<DropPieceConfig> {
+class DropPieceRule extends RopesRule<DropPieceParams> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;

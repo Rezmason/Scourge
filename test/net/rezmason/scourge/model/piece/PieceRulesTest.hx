@@ -53,7 +53,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrtho():Void {
 
-        var testPieceCfg:TestPieceConfig = {
+        var testPieceCfg:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
@@ -61,7 +61,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {
+        var dropParams:DropPieceParams = {
             overlapSelf:false,
             allowFlipping:true,
             allowRotating:true,
@@ -74,7 +74,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule();
-        dropRule.init(dropConfig);
+        dropRule.init(dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -105,7 +105,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoNoSpace():Void {
 
-        var testPieceCfg:TestPieceConfig = {
+        var testPieceCfg:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 4), // 'I block'
             reflection:0,
             rotation:0,
@@ -114,7 +114,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {
+        var dropParams:DropPieceParams = {
             overlapSelf:false,
             allowFlipping:true,
             allowRotating:true,
@@ -127,7 +127,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule();
-        dropRule.init(dropConfig);
+        dropRule.init(dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.frozenPetri);
 
         dropRule.update();
@@ -144,7 +144,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoNoFlipping():Void {
 
-        var testPieceCfg:TestPieceConfig = {
+        var testPieceCfg:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
@@ -152,7 +152,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {
+        var dropParams:DropPieceParams = {
             overlapSelf:false,
             allowFlipping:false,
             allowRotating:true,
@@ -165,7 +165,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule();
-        dropRule.init(dropConfig);
+        dropRule.init(dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -185,7 +185,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoNoSpinning():Void {
 
-        var testPieceCfg:TestPieceConfig = {
+        var testPieceCfg:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
@@ -193,7 +193,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {
+        var dropParams:DropPieceParams = {
             overlapSelf:false,
             allowFlipping:true,
             allowRotating:false,
@@ -206,7 +206,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule();
-        dropRule.init(dropConfig);
+        dropRule.init(dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -226,7 +226,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoNoSpinningOrFlipping():Void {
 
-        var testPieceCfg:TestPieceConfig = {
+        var testPieceCfg:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
@@ -234,7 +234,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {
+        var dropParams:DropPieceParams = {
             overlapSelf:false,
             allowFlipping:false,
             allowRotating:false,
@@ -247,7 +247,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule();
-        dropRule.init(dropConfig);
+        dropRule.init(dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -267,7 +267,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoSelf():Void {
 
-        var testPieceCfg:TestPieceConfig = {
+        var testPieceCfg:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
@@ -275,7 +275,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {
+        var dropParams:DropPieceParams = {
             overlapSelf:true,
             allowFlipping:false,
             allowRotating:false,
@@ -288,7 +288,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule();
-        dropRule.init(dropConfig);
+        dropRule.init(dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -308,7 +308,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoAllowNowhere():Void {
 
-        var dropConfig:DropPieceConfig = {
+        var dropParams:DropPieceParams = {
             overlapSelf:false,
             allowFlipping:false,
             allowRotating:false,
@@ -321,7 +321,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule();
-        dropRule.init(dropConfig);
+        dropRule.init(dropParams);
         makeState([dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -347,7 +347,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceCfg:PickPieceConfig = {
+        var pickPieceCfg:PickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:true,
@@ -378,7 +378,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceCfg:PickPieceConfig = {
+        var pickPieceCfg:PickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:false,
             allowRotating:true,
@@ -403,7 +403,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceCfg:PickPieceConfig = {
+        var pickPieceCfg:PickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:false,
@@ -426,7 +426,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceDiag():Void {
 
-        var testPieceCfg:TestPieceConfig = {
+        var testPieceCfg:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
@@ -434,7 +434,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {
+        var dropParams:DropPieceParams = {
             overlapSelf:false,
             allowFlipping:true,
             allowRotating:true,
@@ -447,7 +447,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule();
-        dropRule.init(dropConfig);
+        dropRule.init(dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -467,7 +467,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoDiag():Void {
 
-        var testPieceCfg:TestPieceConfig = {
+        var testPieceCfg:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
@@ -476,7 +476,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceCfg);
 
-        var dropConfig:DropPieceConfig = {
+        var dropParams:DropPieceParams = {
             overlapSelf:false,
             allowFlipping:false,
             allowRotating:false,
@@ -489,7 +489,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowPiecePick:false,
         };
         var dropRule:DropPieceRule = new DropPieceRule();
-        dropRule.init(dropConfig);
+        dropRule.init(dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.flowerPetri);
 
         dropRule.update();
@@ -508,7 +508,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
     @Test
     public function swapPieceTest():Void {
-        var swapPieceCfg:SwapPieceConfig = {
+        var swapPieceCfg:SwapPieceParams = {
             startingSwaps:5,
         };
         var swapPieceRule:SwapPieceRule = new SwapPieceRule();

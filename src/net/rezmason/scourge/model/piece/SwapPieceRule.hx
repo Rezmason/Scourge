@@ -10,11 +10,11 @@ using Lambda;
 
 using net.rezmason.utils.Pointers;
 
-typedef SwapPieceConfig = {
+typedef SwapPieceParams = {
     var startingSwaps:Int;
 }
 
-class SwapPieceRule extends RopesRule<SwapPieceConfig> {
+class SwapPieceRule extends RopesRule<SwapPieceParams> {
 
     @player(SwapAspect.NUM_SWAPS) var numSwaps_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
