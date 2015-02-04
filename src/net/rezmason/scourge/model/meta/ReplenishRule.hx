@@ -37,21 +37,21 @@ class ReplenishRule extends RopesRule<ReplenishParams> {
         var nodeReps:Array<AspectSet> = [];
 
         // Create the replenishables
-        for (repCfg in params.globalProperties) {
-            var replenishable:AspectSet = makeReplenishable(repCfg, plan.globalAspectLookup);
-            repCfg.replenishableID = replenishable[ident_];
+        for (repProp in params.globalProperties) {
+            var replenishable:AspectSet = makeReplenishable(repProp, plan.globalAspectLookup);
+            repProp.replenishableID = replenishable[ident_];
             stateReps.push(replenishable);
         }
 
-        for (repCfg in params.playerProperties) {
-            var replenishable:AspectSet = makeReplenishable(repCfg, plan.playerAspectLookup);
-            repCfg.replenishableID = replenishable[ident_];
+        for (repProp in params.playerProperties) {
+            var replenishable:AspectSet = makeReplenishable(repProp, plan.playerAspectLookup);
+            repProp.replenishableID = replenishable[ident_];
             playerReps.push(replenishable);
         }
 
-        for (repCfg in params.nodeProperties) {
-            var replenishable:AspectSet = makeReplenishable(repCfg, plan.nodeAspectLookup);
-            repCfg.replenishableID = replenishable[ident_];
+        for (repProp in params.nodeProperties) {
+            var replenishable:AspectSet = makeReplenishable(repProp, plan.nodeAspectLookup);
+            repProp.replenishableID = replenishable[ident_];
             nodeReps.push(replenishable);
         }
 
@@ -86,31 +86,31 @@ class ReplenishRule extends RopesRule<ReplenishParams> {
         signalChange();
     }
 
-    private function makeReplenishable(repCfg:ReplenishableProperty, lookup:AspectLookup):AspectSet {
+    private function makeReplenishable(repProp:ReplenishableProperty, lookup:AspectLookup):AspectSet {
 
         // A replenishable is really just an accumulator that performs an action
         // on a value stored in a particular aspect set, at a specific index
 
         // We represent replenishables as extras
         var rep:AspectSet = addExtra();
-        rep[repPropLookup_] = lookup[repCfg.prop.id].toInt();
+        rep[repPropLookup_] = lookup[repProp.prop.id].toInt();
         return rep;
     }
 
-    private function updateReps(repCfgs:Array<ReplenishableProperty>, aspectSets:Array<AspectSet>):Void {
+    private function updateReps(repProps:Array<ReplenishableProperty>, aspectSets:Array<AspectSet>):Void {
         // Each replenishable gets its iterator incremented
-        for (repCfg in repCfgs) {
-            var replenishable:AspectSet = getExtra(repCfg.replenishableID);
+        for (repProp in repProps) {
+            var replenishable:AspectSet = getExtra(repProp.replenishableID);
             var step:Int = replenishable[repStep_];
             step++;
-            if (step == repCfg.period) {
+            if (step == repProp.period) {
                 // Time for action! Resolve the pointer and update values at that location
                 step = 0;
                 var ptr:AspectPtr = AspectPtr.intToPointer(replenishable[repPropLookup_], state.key);
                 for (aspectSet in aspectSets) {
                     var value:Int = aspectSet[ptr];
-                    value += repCfg.amount;
-                    if (value > repCfg.maxAmount) value = repCfg.maxAmount;
+                    value += repProp.amount;
+                    if (value > repProp.maxAmount) value = repProp.maxAmount;
                     aspectSet[ptr] = value;
                 }
             }

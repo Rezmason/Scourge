@@ -53,13 +53,13 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrtho():Void {
 
-        var testPieceCfg:TestPieceParams = {
+        var testPieceParams:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
         var testPieceRule:TestPieceRule = new TestPieceRule();
-        testPieceRule.init(testPieceCfg);
+        testPieceRule.init(testPieceParams);
 
         var dropParams:DropPieceParams = {
             overlapSelf:false,
@@ -105,14 +105,14 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoNoSpace():Void {
 
-        var testPieceCfg:TestPieceParams = {
+        var testPieceParams:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 4), // 'I block'
             reflection:0,
             rotation:0,
         };
 
         var testPieceRule:TestPieceRule = new TestPieceRule();
-        testPieceRule.init(testPieceCfg);
+        testPieceRule.init(testPieceParams);
 
         var dropParams:DropPieceParams = {
             overlapSelf:false,
@@ -144,13 +144,13 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoNoFlipping():Void {
 
-        var testPieceCfg:TestPieceParams = {
+        var testPieceParams:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
         var testPieceRule:TestPieceRule = new TestPieceRule();
-        testPieceRule.init(testPieceCfg);
+        testPieceRule.init(testPieceParams);
 
         var dropParams:DropPieceParams = {
             overlapSelf:false,
@@ -185,13 +185,13 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoNoSpinning():Void {
 
-        var testPieceCfg:TestPieceParams = {
+        var testPieceParams:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
         var testPieceRule:TestPieceRule = new TestPieceRule();
-        testPieceRule.init(testPieceCfg);
+        testPieceRule.init(testPieceParams);
 
         var dropParams:DropPieceParams = {
             overlapSelf:false,
@@ -226,13 +226,13 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoNoSpinningOrFlipping():Void {
 
-        var testPieceCfg:TestPieceParams = {
+        var testPieceParams:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
         var testPieceRule:TestPieceRule = new TestPieceRule();
-        testPieceRule.init(testPieceCfg);
+        testPieceRule.init(testPieceParams);
 
         var dropParams:DropPieceParams = {
             overlapSelf:false,
@@ -267,13 +267,13 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoSelf():Void {
 
-        var testPieceCfg:TestPieceParams = {
+        var testPieceParams:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
         var testPieceRule:TestPieceRule = new TestPieceRule();
-        testPieceRule.init(testPieceCfg);
+        testPieceRule.init(testPieceParams);
 
         var dropParams:DropPieceParams = {
             overlapSelf:true,
@@ -347,7 +347,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceCfg:PickPieceParams = {
+        var pickPieceParams:PickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:true,
@@ -356,7 +356,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieces:pieces,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule();
-        pickPieceRule.init(pickPieceCfg);
+        pickPieceRule.init(pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -378,7 +378,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceCfg:PickPieceParams = {
+        var pickPieceParams:PickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:false,
             allowRotating:true,
@@ -387,7 +387,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieces:pieces,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule();
-        pickPieceRule.init(pickPieceCfg);
+        pickPieceRule.init(pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -403,7 +403,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceCfg:PickPieceParams = {
+        var pickPieceParams:PickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:false,
@@ -412,7 +412,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieces:pieces,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule();
-        pickPieceRule.init(pickPieceCfg);
+        pickPieceRule.init(pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -426,13 +426,13 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceDiag():Void {
 
-        var testPieceCfg:TestPieceParams = {
+        var testPieceParams:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
         var testPieceRule:TestPieceRule = new TestPieceRule();
-        testPieceRule.init(testPieceCfg);
+        testPieceRule.init(testPieceParams);
 
         var dropParams:DropPieceParams = {
             overlapSelf:false,
@@ -467,14 +467,14 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoDiag():Void {
 
-        var testPieceCfg:TestPieceParams = {
+        var testPieceParams:TestPieceParams = {
             pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
 
         var testPieceRule:TestPieceRule = new TestPieceRule();
-        testPieceRule.init(testPieceCfg);
+        testPieceRule.init(testPieceParams);
 
         var dropParams:DropPieceParams = {
             overlapSelf:false,
@@ -508,11 +508,11 @@ class PieceRulesTest extends ScourgeRuleTest
 
     @Test
     public function swapPieceTest():Void {
-        var swapPieceCfg:SwapPieceParams = {
+        var swapPieceParams:SwapPieceParams = {
             startingSwaps:5,
         };
         var swapPieceRule:SwapPieceRule = new SwapPieceRule();
-        swapPieceRule.init(swapPieceCfg);
+        swapPieceRule.init(swapPieceParams);
         makeState([swapPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -521,7 +521,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         swapPieceRule.update();
 
-        for (ike in 0...swapPieceCfg.startingSwaps) {
+        for (ike in 0...swapPieceParams.startingSwaps) {
             Assert.areEqual(1, swapPieceRule.moves.length);
             swapPieceRule.chooseMove();
             swapPieceRule.update();
