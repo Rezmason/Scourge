@@ -10,7 +10,7 @@ import net.rezmason.ropes.State;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.ropes.Aspect;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.model.ScourgeParams;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
@@ -34,7 +34,7 @@ class ScourgeConfigFactoryTest
     var state:State;
     var historyState:State;
     var plan:StatePlan;
-    var config:ScourgeConfig;
+    var config:ScourgeParams;
     var combinedRules:StringMap<Rule>;
 
     var startAction:Rule;

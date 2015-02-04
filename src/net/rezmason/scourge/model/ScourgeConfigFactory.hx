@@ -47,13 +47,13 @@ class ScourgeConfigFactory {
     static var SWAP_PIECE:String         = Type.getClassName(SwapPieceRule);
 
     public static var ruleDefs(default, null):Map<String, Class<Rule>> = cast Siphon.getDefs(
-        'net.rezmason.scourge.model', 'src', true, 'Rule$$'
+        'net.rezmason.scourge.model', 'src', true, "Rule$"
     );
 
     public inline static function makeDefaultActionList():Array<String> return [DROP_ACTION, QUIT_ACTION];
     public inline static function makeStartAction():String return START_ACTION;
     public static function makeBuilderRuleList():Array<String> return [BUILD_GLOBAL, BUILD_PLAYERS, BUILD_BOARD];
-    public static function makeActionList(config:ScourgeConfig):Array<String> {
+    public static function makeActionList(config:ScourgeParams):Array<String> {
 
         var actionList:Array<String> = [QUIT_ACTION, DROP_ACTION/*, PICK_ACTION*/];
 
@@ -63,7 +63,7 @@ class ScourgeConfigFactory {
         return actionList;
     }
 
-    public static function makeDefaultConfig():ScourgeConfig {
+    public static function makeDefaultConfig():ScourgeParams {
 
         var pieces:Pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
 
@@ -109,7 +109,7 @@ class ScourgeConfigFactory {
         };
     }
 
-    public static function makeRuleConfig(config:ScourgeConfig, rand:Void->Float):Map<String, Dynamic> {
+    public static function makeRuleConfig(config:ScourgeParams, rand:Void->Float):Map<String, Dynamic> {
         var ruleConfig:Map<String, Dynamic> = [
             BUILD_GLOBAL => makeBuildGlobalConfig(config),
             BUILD_PLAYERS => makeBuildPlayersConfig(config),
@@ -135,7 +135,7 @@ class ScourgeConfigFactory {
         return ruleConfig;
     }
 
-    public static function makeCombinedRuleCfg(config:ScourgeConfig):Map<String, Array<String>> {
+    public static function makeCombinedRuleCfg(config:ScourgeParams):Map<String, Array<String>> {
 
         var combinedRuleConfig:Map<String, Array<String>> = [
             CLEAN_UP => [DECAY, KILL_HEADLESS_BODY, ONE_LIVING_PLAYER, RESET_FRESHNESS],
@@ -159,26 +159,26 @@ class ScourgeConfigFactory {
         return combinedRuleConfig;
     }
 
-    inline static function makeBuildGlobalConfig(config:ScourgeConfig) {
+    inline static function makeBuildGlobalConfig(config:ScourgeParams) {
         return {
             firstPlayer:config.firstPlayer,
         };
     }
 
-    inline static function makeBuildPlayersConfig(config:ScourgeConfig) {
+    inline static function makeBuildPlayersConfig(config:ScourgeParams) {
         return {
             numPlayers:config.numPlayers,
         };
     }
 
-    inline static function makeBuildBoardConfig(config:ScourgeConfig) {
+    inline static function makeBuildBoardConfig(config:ScourgeParams) {
         return {
             circular:config.circular,
             initGrid:config.initGrid,
         };
     }
 
-    inline static function makeEatCellsConfig(config:ScourgeConfig) {
+    inline static function makeEatCellsConfig(config:ScourgeParams) {
         return {
             recursive:config.eatRecursive,
             eatHeads:config.eatHeads,
@@ -187,13 +187,13 @@ class ScourgeConfigFactory {
         };
     }
 
-    inline static function makeDecayConfig(config:ScourgeConfig) {
+    inline static function makeDecayConfig(config:ScourgeParams) {
         return {
             orthoOnly:config.orthoDecayOnly,
         };
     }
 
-    inline static function makePickPieceConfig(config:ScourgeConfig, randomFunction:Void->Float) {
+    inline static function makePickPieceConfig(config:ScourgeParams, randomFunction:Void->Float) {
         return {
             pieceTableIDs:config.pieceTableIDs,
             allowFlipping:config.allowFlipping,
@@ -204,7 +204,7 @@ class ScourgeConfigFactory {
         };
     }
 
-    inline static function makeDropPieceConfig(config:ScourgeConfig) {
+    inline static function makeDropPieceConfig(config:ScourgeParams) {
         return {
             overlapSelf:config.overlapSelf,
             pieceTableIDs:config.pieceTableIDs,
@@ -219,7 +219,7 @@ class ScourgeConfigFactory {
         };
     }
 
-    inline static function makeBiteConfig(config:ScourgeConfig) {
+    inline static function makeBiteConfig(config:ScourgeParams) {
         return {
             minReach:config.minBiteReach,
             maxReach:config.maxBiteReach,
@@ -233,19 +233,19 @@ class ScourgeConfigFactory {
         };
     }
 
-    inline static function makeSwapConfig(config:ScourgeConfig) {
+    inline static function makeSwapConfig(config:ScourgeParams) {
         return {
             startingSwaps:config.startingSwaps,
         };
     }
 
-    inline static function makeSkipsExhaustedConfig(config:ScourgeConfig) {
+    inline static function makeSkipsExhaustedConfig(config:ScourgeParams) {
         return {
             maxSkips:config.maxSkips,
         };
     }
 
-    inline static function makeReplenishConfig(config:ScourgeConfig) {
+    inline static function makeReplenishConfig(config:ScourgeParams) {
         var stateReplenishProperties:Array<ReplenishableConfig> = [];
 
         if (config.maxSwaps > 0) stateReplenishProperties.push({

@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.commands;
 
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.model.ScourgeParams;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.textview.GameSystem;
 import net.rezmason.scourge.textview.console.ConsoleCommand;
@@ -70,7 +70,7 @@ class PlayGameConsoleCommand extends ConsoleCommand {
 
         var circular:Bool = args.flags.has('circular');
 
-        var cfg:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
+        var cfg:ScourgeParams = ScourgeConfigFactory.makeDefaultConfig();
 
         var pieceTableIDs:Array<Int> = [];
         for (ike in 0...4) pieceTableIDs = pieceTableIDs.concat(cfg.pieces.getAllPieceIDsOfSize(ike + 1));

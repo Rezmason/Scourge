@@ -3,7 +3,7 @@ package net.rezmason.scourge.controller;
 import net.rezmason.ropes.RopesTypes.Move;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeAction.*;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.model.ScourgeParams;
 
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.body.BodyAspect;
@@ -27,7 +27,7 @@ class BasicSmarts extends Smarts {
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     
-    override public function init(game:Game, config:ScourgeConfig, id:Int, random:Void->Float):Void {
+    override public function init(game:Game, config:ScourgeParams, id:Int, random:Void->Float):Void {
         super.init(game, config, id, random);
         dropActionIndex = game.actionIDs.indexOf(DROP_ACTION);
         swapActionIndex = game.actionIDs.indexOf(SWAP_ACTION);

@@ -3,7 +3,7 @@ package net.rezmason.scourge.controller;
 import haxe.Unserializer;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.Game;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.model.ScourgeParams;
 import net.rezmason.utils.Zig;
 
 using Lambda;
@@ -19,7 +19,7 @@ class PlayerSystem implements IPlayer {
 
     private var game:Game;
     private var floats:Array<Float> = [];
-    private var config:ScourgeConfig;
+    private var config:ScourgeParams;
     private var isGameUpdating:Bool = false;
     private var isWaitingToProceed:Bool = false;
     private var usesSignals:Bool;

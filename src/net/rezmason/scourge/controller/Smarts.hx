@@ -2,17 +2,17 @@ package net.rezmason.scourge.controller;
 
 import net.rezmason.ropes.Reckoner;
 import net.rezmason.scourge.model.Game;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.model.ScourgeParams;
 
 class Smarts extends Reckoner {
 
     private var actionIndicesByAction:Map<String, Int>;
     private var game:Game;
-    private var config:ScourgeConfig;
+    private var config:ScourgeParams;
     private var id:Int;
     private var random:Void->Float;
 
-    public function init(game:Game, config:ScourgeConfig, id:Int, random:Void->Float):Void {
+    public function init(game:Game, config:ScourgeParams, id:Int, random:Void->Float):Void {
         actionIndicesByAction = new Map();
         for (ike in 0...game.actionIDs.length) actionIndicesByAction[game.actionIDs[ike]] = ike;
         this.game = game;

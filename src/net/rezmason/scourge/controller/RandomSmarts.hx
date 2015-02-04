@@ -3,7 +3,7 @@ package net.rezmason.scourge.controller;
 import net.rezmason.ropes.RopesTypes.Move;
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeAction.*;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.model.ScourgeParams;
 
 using Lambda;
 
@@ -16,7 +16,7 @@ class RandomSmarts extends Smarts {
     private var otherActionIndices:Array<Int>;
     private var canSkip:Bool;
     
-    override public function init(game:Game, config:ScourgeConfig, id:Int, random:Void->Float):Void {
+    override public function init(game:Game, config:ScourgeParams, id:Int, random:Void->Float):Void {
         super.init(game, config, id, random);
         dropActionIndex = game.actionIDs.indexOf(DROP_ACTION);
         swapActionIndex = game.actionIDs.indexOf(SWAP_ACTION);

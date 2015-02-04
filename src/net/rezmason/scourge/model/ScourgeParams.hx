@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model;
 
-typedef ScourgeConfig = {
+typedef ScourgeParams = {
     var allowAllPieces:Bool;
     var allowFlipping:Bool;
     var allowNowhereDrop:Bool;

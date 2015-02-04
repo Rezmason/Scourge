@@ -6,7 +6,7 @@ import massive.munit.async.AsyncFactory;
 import net.rezmason.scourge.tools.Resource;
 
 import net.rezmason.scourge.model.Game;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.model.ScourgeParams;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
 
 import net.rezmason.scourge.controller.IPlayer;
@@ -43,7 +43,7 @@ class RefereeTest {
 
         players = [];
         for (ike in 0...4) players.push(new TestPlayer(ike, noop, random));
-        var config:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
+        var config:ScourgeParams = ScourgeConfigFactory.makeDefaultConfig();
         referee.beginGame(players, randGen, config);
 
         var savedGame = referee.saveGame();
@@ -83,7 +83,7 @@ class RefereeTest {
         for (ike in 0...4) players.push(new TestPlayer(ike, defer, random));
 
         Assert.isFalse(referee.gameBegun);
-        var config:ScourgeConfig = ScourgeConfigFactory.makeDefaultConfig();
+        var config:ScourgeParams = ScourgeConfigFactory.makeDefaultConfig();
         referee.beginGame(players, randGen, config);
         Assert.isTrue(referee.gameBegun);
 
