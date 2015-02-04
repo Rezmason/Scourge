@@ -12,10 +12,6 @@ using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
-typedef DecayParams = {
-    var orthoOnly:Bool;
-}
-
 class DecayRule extends RopesRule<DecayParams> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;

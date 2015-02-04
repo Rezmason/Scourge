@@ -14,18 +14,6 @@ using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
-typedef BiteParams = {
-    var minReach:Int;
-    var maxReach:Int;
-    var maxSizeReference:Int;
-    var baseReachOnThickness:Bool;
-    var omnidirectional:Bool;
-    var biteThroughCavities:Bool;
-    var biteHeads:Bool;
-    var orthoOnly:Bool;
-    var startingBites:Int;
-}
-
 typedef BiteMove = {>Move,
     var targetNode:Int;
     var bitNodes:Array<Int>;

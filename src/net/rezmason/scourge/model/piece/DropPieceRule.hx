@@ -18,19 +18,6 @@ using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
-typedef DropPieceParams = {
-    public var overlapSelf:Bool;
-    public var pieceTableIDs:Array<Int>;
-    public var allowFlipping:Bool;
-    public var allowRotating:Bool;
-    public var growGraph:Bool;
-    public var allowNowhere:Bool;
-    public var allowPiecePick:Bool; // if true, nothing in the game itself is left to chance
-    public var orthoOnly:Bool;
-    public var diagOnly:Bool;
-    public var pieces:Pieces;
-}
-
 typedef DropPieceMove = {>Move,
     var targetNode:Int;
     var numAddedNodes:Int;

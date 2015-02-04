@@ -3,8 +3,6 @@ package net.rezmason.scourge.model.build;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.meta.PlyAspect;
 
-typedef BuildGlobalParams = { public var firstPlayer:Int; }
-
 class BuildGlobalRule extends RopesRule<BuildGlobalParams> {
 
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;

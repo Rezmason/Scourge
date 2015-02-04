@@ -15,11 +15,6 @@ using net.rezmason.utils.Pointers;
 
 typedef XY = {x:Float, y:Float};
 
-typedef BuildBoardParams = {
-    public var circular:Bool;
-    public var initGrid:String;
-}
-
 class BuildBoardRule extends RopesRule<BuildBoardParams> {
 
     // Creates boards for "skirmish games"

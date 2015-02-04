@@ -14,13 +14,6 @@ using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
-typedef EatCellsParams = {
-    public var recursive:Bool;
-    public var eatHeads:Bool;
-    public var takeBodiesFromHeads:Bool;
-    public var orthoOnly:Bool;
-}
-
 class EatCellsRule extends RopesRule<EatCellsParams> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
