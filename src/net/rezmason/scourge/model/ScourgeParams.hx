@@ -19,7 +19,7 @@ typedef ScourgeParams = {
     var orthoDecayOnly:Bool;
     var orthoDropOnly:Bool;
     var orthoEatOnly:Bool;
-    var overlapSelf:Bool;
+    var dropOverlapsSelf:Bool;
     var takeBodiesFromHeads:Bool;
     var firstPlayer:Int;
     var maxBiteReach:Int;

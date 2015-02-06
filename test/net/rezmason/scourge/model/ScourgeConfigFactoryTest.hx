@@ -282,7 +282,7 @@ class ScourgeConfigFactoryTest
     }
 
     private function makeState():Void {
-        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction);
+        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config);
         var basicRulesByName:Map<String, Rule> = ScourgeConfigFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
         var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
         var random:Void->Float = function() return 0;
@@ -313,7 +313,5 @@ class ScourgeConfigFactoryTest
         quitAction = combinedRules.get('quitAction');
         dropAction = combinedRules.get('dropAction');
     }
-
-    private function randomFunction():Float { return 0; }
 
 }

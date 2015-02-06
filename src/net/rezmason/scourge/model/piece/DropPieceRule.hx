@@ -3,9 +3,10 @@ package net.rezmason.scourge.model.piece;
 import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;
-import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.PieceTypes;
+import net.rezmason.scourge.model.TempParams;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
@@ -29,7 +30,7 @@ typedef DropPieceMove = {>Move,
     var duplicate:Bool;
 }
 
-class DropPieceRule extends RopesRule<DropPieceParams> {
+class DropPieceRule extends RopesRule<FullDropPieceParams> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
@@ -54,7 +55,7 @@ class DropPieceRule extends RopesRule<DropPieceParams> {
 
         // This allows the place-piece function to behave like a skip function
         // Setting this to false also forces players to forfeit if they can't place a piece
-        if (params.allowNowhere) dropMoves.push(cast nowhereMove);
+        if (params.allowSkipping) dropMoves.push(cast nowhereMove);
 
         var pieceIDs:Array<Int> = [];
         if (params.allowPiecePick) for (pieceID in params.pieceTableIDs) pieceIDs.push(pieceID);
@@ -93,7 +94,7 @@ class DropPieceRule extends RopesRule<DropPieceParams> {
 
                         // Generate the piece's footprint
 
-                        var footprint = piece.footprint(params.overlapSelf, !params.diagOnly, !params.orthoOnly);
+                        var footprint = piece.footprint(params.dropOverlapsSelf, !params.dropDiagOnly, !params.dropOrthoOnly);
 
                         // Using each footprint coord as a home coord (aka the point of connection),
                         for (homeCoord in footprint) {
@@ -112,7 +113,7 @@ class DropPieceRule extends RopesRule<DropPieceParams> {
                                 var occupier:Int = nodeAtCoord[occupier_];
                                 var isFilled:Int = nodeAtCoord[isFilled_];
 
-                                if (isFilled == TRUE && !(params.overlapSelf && occupier == currentPlayer)) {
+                                if (isFilled == TRUE && !(params.dropOverlapsSelf && occupier == currentPlayer)) {
                                     valid = false;
                                     break;
                                 }
@@ -208,7 +209,7 @@ class DropPieceRule extends RopesRule<DropPieceParams> {
     inline function hasFreeEdge(node:AspectSet):Bool {
         var exists:Bool = false;
 
-        for (neighbor in neighborsFor(getNodeLocus(node), params.orthoOnly)) {
+        for (neighbor in neighborsFor(getNodeLocus(node), params.dropOrthoOnly)) {
             if (neighbor.value[isFilled_] == FALSE) {
                 exists = true;
                 break;

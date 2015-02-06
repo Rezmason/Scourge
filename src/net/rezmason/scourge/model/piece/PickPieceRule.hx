@@ -1,9 +1,10 @@
 package net.rezmason.scourge.model.piece;
 
 import net.rezmason.ropes.Aspect.*;
-import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.PieceTypes;
+import net.rezmason.scourge.model.TempParams;
 import net.rezmason.scourge.model.meta.PlyAspect;
 
 using net.rezmason.ropes.AspectUtils;
@@ -16,7 +17,7 @@ typedef PickPieceMove = {>Move,
     var reflection:Int;
 }
 
-class PickPieceRule extends RopesRule<PickPieceParams> {
+class PickPieceRule extends RopesRule<FullPickPieceParams> {
 
     static var stateReqs:AspectRequirements;
 

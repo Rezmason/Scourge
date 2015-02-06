@@ -49,7 +49,7 @@ class Game {
 
         // Build the game from the config
 
-        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction);
+        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config);
         var basicRulesByName:Map<String, Rule> = ScourgeConfigFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
 
         if (cacheMoves) {

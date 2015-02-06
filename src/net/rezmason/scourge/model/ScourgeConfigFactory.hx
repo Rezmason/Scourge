@@ -90,7 +90,7 @@ class ScourgeConfigFactory {
             orthoDecayOnly:true,
             orthoDropOnly:true,
             orthoEatOnly:false,
-            overlapSelf:false,
+            dropOverlapsSelf:false,
             takeBodiesFromHeads:true,
             firstPlayer:0,
             maxBiteReach:3,
@@ -113,7 +113,7 @@ class ScourgeConfigFactory {
         };
     }
 
-    public static function makeRuleConfig(config:ScourgeParams, rand:Void->Float):Map<String, Dynamic> {
+    public static function makeRuleConfig(config:ScourgeParams):Map<String, Dynamic> {
         var ruleConfig:Map<String, Dynamic> = [
             BUILD_GLOBAL => makeBuildGlobalConfig(config),
             BUILD_PLAYERS => makeBuildPlayersConfig(config),
@@ -130,7 +130,7 @@ class ScourgeConfigFactory {
             ONE_LIVING_PLAYER => null,
         ];
 
-        if (!config.allowAllPieces) ruleConfig.set(PICK_PIECE, makePickPieceConfig(config, rand));
+        if (!config.allowAllPieces) ruleConfig.set(PICK_PIECE, makePickPieceConfig(config));
         if (config.includeCavities) ruleConfig.set(CAVITY, null);
         if (!config.allowAllPieces && config.maxSwaps > 0) ruleConfig.set(SWAP_PIECE, makeSwapConfig(config));
         if (config.maxBites > 0) ruleConfig.set(BITE, makeBiteConfig(config));
@@ -197,28 +197,27 @@ class ScourgeConfigFactory {
         };
     }
 
-    inline static function makePickPieceConfig(config:ScourgeParams, randomFunction:Void->Float) {
+    inline static function makePickPieceConfig(config:ScourgeParams) {
         return {
             pieceTableIDs:config.pieceTableIDs,
             allowFlipping:config.allowFlipping,
             allowRotating:config.allowRotating,
             hatSize:config.pieceHatSize,
-            randomFunction:randomFunction,
             pieces:config.pieces,
         };
     }
 
     inline static function makeDropPieceConfig(config:ScourgeParams) {
         return {
-            overlapSelf:config.overlapSelf,
+            dropOverlapsSelf:config.dropOverlapsSelf,
             pieceTableIDs:config.pieceTableIDs,
             allowFlipping:config.allowFlipping,
             allowRotating:config.allowRotating,
-            growGraph:config.growGraphWithDrop,
-            allowNowhere:config.allowNowhereDrop,
+            dropGrowsGraph:config.growGraphWithDrop,
+            allowSkipping:config.allowNowhereDrop,
             allowPiecePick:config.allowAllPieces,
-            orthoOnly:config.orthoDropOnly,
-            diagOnly:config.diagDropOnly,
+            dropOrthoOnly:config.orthoDropOnly,
+            dropDiagOnly:config.diagDropOnly,
             pieces:config.pieces,
         };
     }
@@ -250,16 +249,16 @@ class ScourgeConfigFactory {
     }
 
     inline static function makeReplenishConfig(config:ScourgeParams) {
-        var stateReplenishProperties:Array<ReplenishableConfig> = [];
+        var globalProperties:Array<ReplenishableConfig> = [];
 
-        if (config.maxSwaps > 0) stateReplenishProperties.push({
+        if (config.maxSwaps > 0) globalProperties.push({
             prop:SwapAspect.NUM_SWAPS,
             amount:config.swapBoost,
             period:config.swapPeriod,
             maxAmount:config.maxSwaps,
         });
 
-        if (config.maxBites > 0) stateReplenishProperties.push({
+        if (config.maxBites > 0) globalProperties.push({
             prop:BiteAspect.NUM_BITES,
             amount:config.biteBoost,
             period:config.bitePeriod,
@@ -267,7 +266,7 @@ class ScourgeConfigFactory {
         });
 
         return {
-            globalProperties:stateReplenishProperties,
+            globalProperties:globalProperties,
             playerProperties:[],
             nodeProperties:[],
         };

@@ -13,6 +13,7 @@ import net.rezmason.scourge.model.piece.PickPieceRule;
 import net.rezmason.scourge.model.piece.SwapPieceRule;
 import net.rezmason.scourge.model.test.TestPieceRule;
 import net.rezmason.scourge.tools.Resource;
+import net.rezmason.scourge.model.TempParams;
 
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.StatePlan;
@@ -61,14 +62,14 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceParams);
 
-        var dropParams:DropPieceParams = {
-            overlapSelf:false,
+        var dropParams:FullDropPieceParams = {
+            dropOverlapsSelf:false,
             allowFlipping:true,
             allowRotating:true,
-            growGraph:false,
-            allowNowhere:false,
-            orthoOnly:true,
-            diagOnly:false,
+            dropGrowsGraph:false,
+            allowSkipping:false,
+            dropOrthoOnly:true,
+            dropDiagOnly:false,
             pieces:pieces,
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
@@ -114,14 +115,14 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceParams);
 
-        var dropParams:DropPieceParams = {
-            overlapSelf:false,
+        var dropParams:FullDropPieceParams = {
+            dropOverlapsSelf:false,
             allowFlipping:true,
             allowRotating:true,
-            growGraph:false,
-            allowNowhere:false,
-            orthoOnly:true,
-            diagOnly:false,
+            dropGrowsGraph:false,
+            allowSkipping:false,
+            dropOrthoOnly:true,
+            dropDiagOnly:false,
             pieces:pieces,
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
@@ -152,14 +153,14 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceParams);
 
-        var dropParams:DropPieceParams = {
-            overlapSelf:false,
+        var dropParams:FullDropPieceParams = {
+            dropOverlapsSelf:false,
             allowFlipping:false,
             allowRotating:true,
-            growGraph:false,
-            allowNowhere:false,
-            orthoOnly:true,
-            diagOnly:false,
+            dropGrowsGraph:false,
+            allowSkipping:false,
+            dropOrthoOnly:true,
+            dropDiagOnly:false,
             pieces:pieces,
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
@@ -193,14 +194,14 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceParams);
 
-        var dropParams:DropPieceParams = {
-            overlapSelf:false,
+        var dropParams:FullDropPieceParams = {
+            dropOverlapsSelf:false,
             allowFlipping:true,
             allowRotating:false,
-            growGraph:false,
-            allowNowhere:false,
-            orthoOnly:true,
-            diagOnly:false,
+            dropGrowsGraph:false,
+            allowSkipping:false,
+            dropOrthoOnly:true,
+            dropDiagOnly:false,
             pieces:pieces,
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
@@ -234,14 +235,14 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceParams);
 
-        var dropParams:DropPieceParams = {
-            overlapSelf:false,
+        var dropParams:FullDropPieceParams = {
+            dropOverlapsSelf:false,
             allowFlipping:false,
             allowRotating:false,
-            growGraph:false,
-            allowNowhere:false,
-            orthoOnly:true,
-            diagOnly:false,
+            dropGrowsGraph:false,
+            allowSkipping:false,
+            dropOrthoOnly:true,
+            dropDiagOnly:false,
             pieces:pieces,
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
@@ -275,14 +276,14 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceParams);
 
-        var dropParams:DropPieceParams = {
-            overlapSelf:true,
+        var dropParams:FullDropPieceParams = {
+            dropOverlapsSelf:true,
             allowFlipping:false,
             allowRotating:false,
-            growGraph:false,
-            allowNowhere:false,
-            orthoOnly:true,
-            diagOnly:false,
+            dropGrowsGraph:false,
+            allowSkipping:false,
+            dropOrthoOnly:true,
+            dropDiagOnly:false,
             pieces:pieces,
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
@@ -308,14 +309,14 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoAllowNowhere():Void {
 
-        var dropParams:DropPieceParams = {
-            overlapSelf:false,
+        var dropParams:FullDropPieceParams = {
+            dropOverlapsSelf:false,
             allowFlipping:false,
             allowRotating:false,
-            growGraph:false,
-            allowNowhere:true,
-            orthoOnly:true,
-            diagOnly:false,
+            dropGrowsGraph:false,
+            allowSkipping:true,
+            dropOrthoOnly:true,
+            dropDiagOnly:false,
             pieces:pieces,
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
@@ -347,7 +348,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceParams:PickPieceParams = {
+        var pickPieceParams:FullPickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:true,
@@ -377,7 +378,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceParams:PickPieceParams = {
+        var pickPieceParams:FullPickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:false,
             allowRotating:true,
@@ -401,7 +402,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceParams:PickPieceParams = {
+        var pickPieceParams:FullPickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:false,
@@ -431,14 +432,14 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceParams);
 
-        var dropParams:DropPieceParams = {
-            overlapSelf:false,
+        var dropParams:FullDropPieceParams = {
+            dropOverlapsSelf:false,
             allowFlipping:true,
             allowRotating:true,
-            growGraph:false,
-            allowNowhere:false,
-            orthoOnly:false,
-            diagOnly:true,
+            dropGrowsGraph:false,
+            allowSkipping:false,
+            dropOrthoOnly:false,
+            dropDiagOnly:true,
             pieces:pieces,
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
@@ -473,14 +474,14 @@ class PieceRulesTest extends ScourgeRuleTest
         var testPieceRule:TestPieceRule = new TestPieceRule();
         testPieceRule.init(testPieceParams);
 
-        var dropParams:DropPieceParams = {
-            overlapSelf:false,
+        var dropParams:FullDropPieceParams = {
+            dropOverlapsSelf:false,
             allowFlipping:false,
             allowRotating:false,
-            growGraph:false,
-            allowNowhere:false,
-            orthoOnly:false,
-            diagOnly:false,
+            dropGrowsGraph:false,
+            allowSkipping:false,
+            dropOrthoOnly:false,
+            dropDiagOnly:false,
             pieces:pieces,
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
