@@ -35,7 +35,7 @@ class DecayRuleTest extends ScourgeRuleTest
     public function decayScourgeRuleTest():Void {
 
         var params:DecayParams = {
-            orthoOnly:true,
+            decayOrthogonallyOnly:true,
         };
         var decayRule:DecayRule = new DecayRule();
         decayRule.init(params);
@@ -70,7 +70,7 @@ class DecayRuleTest extends ScourgeRuleTest
     public function decayDiagScourgeRuleTest():Void {
 
         var params:DecayParams = {
-            orthoOnly:false,
+            decayOrthogonallyOnly:false,
         };
         var decayRule:DecayRule = new DecayRule();
         decayRule.init(params);

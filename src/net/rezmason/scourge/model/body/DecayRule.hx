@@ -39,7 +39,7 @@ class DecayRule extends RopesRule<DecayParams> {
         }
 
         // Use the heads as starting points for a flood fill of connected living cells
-        var livingBodyNeighbors:Array<BoardLocus> = heads.expandGraph(params.orthoOnly, isLivingBodyNeighbor);
+        var livingBodyNeighbors:Array<BoardLocus> = heads.expandGraph(params.decayOrthogonallyOnly, isLivingBodyNeighbor);
 
         var cellDied = false;
         // Remove cells from player bodies

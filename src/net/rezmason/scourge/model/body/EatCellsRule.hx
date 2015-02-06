@@ -56,7 +56,7 @@ class EatCellsRule extends RopesRule<EatCellsParams> {
         if (node != null) newNodesByID[getID(node)] = null;
         while (node != null) {
             // search in all directions
-            for (direction in directionsFor(params.orthoOnly)) {
+            for (direction in directionsFor(params.eatOrthogonallyOnly)) {
                 var pendingNodes:Array<AspectSet> = [];
                 var locus:BoardLocus = getNodeLocus(node);
                 for (scout in locus.walk(direction)) {
@@ -67,8 +67,8 @@ class EatCellsRule extends RopesRule<EatCellsParams> {
                             // Add nodes to the eaten region
                             for (pendingNode in pendingNodes) {
                                 var playerID:Int = headIndices.indexOf(getID(pendingNode));
-                                if (playerID != -1 && params.takeBodiesFromHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
-                                else if (params.recursive && newNodesByID[getID(pendingNode)] == null) newNodes.add(pendingNode); // recursive eating
+                                if (playerID != -1 && params.takeBodiesFromEatenHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
+                                else if (params.eatRecursively && newNodesByID[getID(pendingNode)] == null) newNodes.add(pendingNode); // recursive eating
 
                                 eatenNodes[getID(pendingNode)] = pendingNode;
                             }

@@ -50,6 +50,10 @@ class ScourgeConfigFactory {
         'net.rezmason.scourge.model', 'src', true, "Rule$"
     );
 
+    public static var configDefs(default, null):Map<String, Class<Config<Dynamic>>> = cast Siphon.getDefs(
+        'net.rezmason.scourge.model', 'src', true, "Config$"
+    );
+
     public inline static function makeDefaultActionList():Array<String> return [DROP_ACTION, QUIT_ACTION];
     public inline static function makeStartAction():String return START_ACTION;
     public static function makeBuilderRuleList():Array<String> return [BUILD_GLOBAL, BUILD_PLAYERS, BUILD_BOARD];
@@ -180,16 +184,16 @@ class ScourgeConfigFactory {
 
     inline static function makeEatCellsConfig(config:ScourgeParams) {
         return {
-            recursive:config.eatRecursive,
+            eatRecursively:config.eatRecursive,
             eatHeads:config.eatHeads,
-            takeBodiesFromHeads:config.takeBodiesFromHeads,
-            orthoOnly:config.orthoEatOnly,
+            takeBodiesFromEatenHeads:config.takeBodiesFromHeads,
+            eatOrthogonallyOnly:config.orthoEatOnly,
         };
     }
 
     inline static function makeDecayConfig(config:ScourgeParams) {
         return {
-            orthoOnly:config.orthoDecayOnly,
+            decayOrthogonallyOnly:config.orthoDecayOnly,
         };
     }
 

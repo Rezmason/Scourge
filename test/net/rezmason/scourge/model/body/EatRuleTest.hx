@@ -35,7 +35,12 @@ class EatRuleTest extends ScourgeRuleTest
 
     @Test
     public function eatScourgeRuleTest():Void {
-        var eatParams:EatCellsParams = {recursive:false, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:false};
+        var eatParams:EatCellsParams = {
+            eatRecursively:false, 
+            eatHeads:false, 
+            takeBodiesFromEatenHeads:false, 
+            eatOrthogonallyOnly:false
+        };
         var eatRule:EatCellsRule = new EatCellsRule();
         eatRule.init(eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
@@ -75,7 +80,12 @@ class EatRuleTest extends ScourgeRuleTest
 
     @Test
     public function eatRecursivelyScourgeRuleTest():Void {
-        var eatParams:EatCellsParams = {recursive:true, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:false};
+        var eatParams:EatCellsParams = {
+            eatRecursively:true, 
+            eatHeads:false, 
+            takeBodiesFromEatenHeads:false, 
+            eatOrthogonallyOnly:false
+        };
         var eatRule:EatCellsRule = new EatCellsRule();
         eatRule.init(eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
@@ -112,7 +122,12 @@ class EatRuleTest extends ScourgeRuleTest
 
     @Test
     public function eatHeadAndBodyScourgeRuleTest():Void {
-        var eatParams:EatCellsParams = {recursive:false, eatHeads:true, takeBodiesFromHeads:true, orthoOnly:false};
+        var eatParams:EatCellsParams = {
+            eatRecursively:false, 
+            eatHeads:true, 
+            takeBodiesFromEatenHeads:true, 
+            eatOrthogonallyOnly:false
+        };
         var eatRule:EatCellsRule = new EatCellsRule();
         eatRule.init(eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
@@ -145,7 +160,12 @@ class EatRuleTest extends ScourgeRuleTest
 
     @Test
     public function eatHeadKillBodyTest():Void {
-        var eatParams:EatCellsParams = {recursive:false, eatHeads:true, takeBodiesFromHeads:false, orthoOnly:false};
+        var eatParams:EatCellsParams = {
+            eatRecursively:false, 
+            eatHeads:true, 
+            takeBodiesFromEatenHeads:false, 
+            eatOrthogonallyOnly:false
+        };
         var eatRule:EatCellsRule = new EatCellsRule();
         eatRule.init(eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
@@ -176,7 +196,12 @@ class EatRuleTest extends ScourgeRuleTest
 
     @Test
     public function eatOrthoScourgeRuleTest():Void {
-        var eatParams:EatCellsParams = {recursive:true, eatHeads:false, takeBodiesFromHeads:false, orthoOnly:true};
+        var eatParams:EatCellsParams = {
+            eatRecursively:true, 
+            eatHeads:false, 
+            takeBodiesFromEatenHeads:false, 
+            eatOrthogonallyOnly:true
+        };
         var eatRule:EatCellsRule = new EatCellsRule();
         eatRule.init(eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerN);
