@@ -352,7 +352,6 @@ class PieceRulesTest extends ScourgeRuleTest
             allowFlipping:true,
             allowRotating:true,
             hatSize:hatSize,
-            randomFunction:function() return 0,
             pieces:pieces,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule();
@@ -383,7 +382,6 @@ class PieceRulesTest extends ScourgeRuleTest
             allowFlipping:false,
             allowRotating:true,
             hatSize:hatSize,
-            randomFunction:function() return 0,
             pieces:pieces,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule();
@@ -408,7 +406,6 @@ class PieceRulesTest extends ScourgeRuleTest
             allowFlipping:true,
             allowRotating:false,
             hatSize:hatSize,
-            randomFunction:function() return 0,
             pieces:pieces,
         };
         var pickPieceRule:PickPieceRule = new PickPieceRule();

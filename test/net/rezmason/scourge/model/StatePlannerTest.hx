@@ -41,7 +41,7 @@ class StatePlannerTest {
 
         var history:StateHistory = new StateHistory();
         var historyState:State = new State(key);
-
+        var random:Void->Float = function() return 0;
         // make state config and generate state
         var planner:StatePlanner = new StatePlanner();
         var buildStateRule:BuildGlobalRule = new BuildGlobalRule();
@@ -51,7 +51,7 @@ class StatePlannerTest {
         var rules:Array<Rule> = [null, buildStateRule, testRule];
         var state:State = new State(key);
         var plan:StatePlan = planner.planState(state, rules);
-        for (rule in rules) if (rule != null) rule.prime(state,  plan,  history,  historyState);
+        for (rule in rules) if (rule != null) rule.prime(state,  plan,  history,  historyState, random);
 
         // Make sure there's the right aspects on the state
 

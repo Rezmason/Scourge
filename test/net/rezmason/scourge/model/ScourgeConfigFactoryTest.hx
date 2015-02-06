@@ -285,7 +285,7 @@ class ScourgeConfigFactoryTest
         var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config, randomFunction);
         var basicRulesByName:Map<String, Rule> = ScourgeConfigFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
         var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
-        
+        var random:Void->Float = function() return 0;
         combinedRules = ScourgeConfigFactory.combineRules(combinedConfig, basicRulesByName);
         
         var builderRuleKeys:Array<String> = ScourgeConfigFactory.makeBuilderRuleList();
@@ -304,7 +304,7 @@ class ScourgeConfigFactoryTest
 
         // Prime the rules
         for (rule in builderRules.concat(basicRules)) {
-            rule.prime(state, plan, history, historyState);
+            rule.prime(state, plan, history, historyState, random);
         }
 
         startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());

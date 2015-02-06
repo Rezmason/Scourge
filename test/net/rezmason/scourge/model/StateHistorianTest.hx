@@ -45,6 +45,7 @@ class StateHistorianTest {
         var history:StateHistory = historian.history;
         var historyState:State = historian.historyState;
         var state:State = historian.state;
+        var random:Void->Float = function() return 0;
 
         var config = {
             firstPlayer:0,
@@ -79,7 +80,7 @@ class StateHistorianTest {
 
         var rules:Array<Rule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];
         var plan:StatePlan = new StatePlanner().planState(state, rules);
-        for (rule in rules) rule.prime(state, plan, history, historyState);
+        for (rule in rules) rule.prime(state, plan, history, historyState, random);
         var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
 
 

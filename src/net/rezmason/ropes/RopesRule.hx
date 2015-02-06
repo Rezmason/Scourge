@@ -18,6 +18,7 @@ class RopesRule<Params> extends Reckoner {
     private function _collectMoves():Void {}
     private function _chooseQuantumMove(choice:Int):Void {}
 
+    var random:Void->Float;
     var changeSignal:Rule->Void;
 
     @:final public function init(params:Dynamic):Void {
@@ -25,10 +26,11 @@ class RopesRule<Params> extends Reckoner {
         _init();
     }
 
-    @:final public function prime(state, plan, history, historyState, ?changeSignal:Rule->Void):Void {
+    @:final public function prime(state, plan, history, historyState, random:Void->Float, changeSignal:Rule->Void = null):Void {
         this.history = history;
         this.historyState = historyState;
         this.changeSignal = changeSignal;
+        this.random = random;
 
         primePointers(state, plan);
 

@@ -187,7 +187,7 @@ class PickPieceRule extends RopesRule<PickPieceParams> {
 
         var pickedPiece:AspectSet = null;
         if (move == null) {
-            var pick:Float = params.randomFunction() * maxWeight;
+            var pick:Float = random() * maxWeight;
             pickedPiece = hatPieces[binarySearch(pick, weights)];
             move = allMoves[pickedPiece[pieceMoveID_]];
         } else {

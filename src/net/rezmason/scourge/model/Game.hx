@@ -75,7 +75,7 @@ class Game {
         plan = planner.planState(state, builderRules.concat(basicRules));
 
         for (rule in builderRules.concat(basicRules)) {
-            rule.prime(state, plan, historian.history, historian.historyState, ruleAlertFunction);
+            rule.prime(state, plan, historian.history, historian.historyState, randomFunction, ruleAlertFunction);
         }
 
         // Grab some aspect pointers so we can quickly evaluate the state
