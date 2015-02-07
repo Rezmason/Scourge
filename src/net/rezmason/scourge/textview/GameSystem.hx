@@ -9,7 +9,7 @@ import net.rezmason.scourge.controller.RandomSmarts;
 import net.rezmason.scourge.controller.Referee;
 import net.rezmason.scourge.controller.ReplaySmarts;
 import net.rezmason.scourge.controller.Sequencer;
-import net.rezmason.scourge.model.ScourgeParams;
+import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.textview.core.Body;
 
 class GameSystem {
@@ -21,7 +21,7 @@ class GameSystem {
 
     public function new():Void {}
 
-    public function beginGame(config:ScourgeParams, playerPattern:Array<String>, thinkPeriod:Int, animateMils:Int, isReplay:Bool, seed:UInt):Void {
+    public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, thinkPeriod:Int, animateMils:Int, isReplay:Bool, seed:UInt):Void {
 
         if (referee.gameBegun) referee.endGame();
 

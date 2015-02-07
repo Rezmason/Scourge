@@ -39,7 +39,7 @@ class Game {
         invalidateSignal = new Zig();
     }
 
-    public function begin(config:ScourgeParams, randomFunction:Void->Float, alertFunction:String->Void, savedState:SavedState = null):Int {
+    public function begin(config:ScourgeConfig, randomFunction:Void->Float, alertFunction:String->Void, savedState:SavedState = null):Int {
 
         if (hasBegun) {
             throw 'The game has already begun; it cannot begin again until you end it.';

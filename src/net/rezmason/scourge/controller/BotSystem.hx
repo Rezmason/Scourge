@@ -1,7 +1,7 @@
 package net.rezmason.scourge.controller;
 
 import haxe.Timer;
-import net.rezmason.scourge.model.ScourgeParams;
+import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
 class BotSystem extends PlayerSystem {

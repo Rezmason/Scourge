@@ -4,7 +4,7 @@ import haxe.Timer;
 
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.Game;
-import net.rezmason.scourge.model.ScourgeParams;
+import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.SafeSerializer;
 import net.rezmason.utils.UnixTime;
 import net.rezmason.utils.Zig;
@@ -14,7 +14,7 @@ using Lambda;
 class Referee {
 
     var game:Game;
-    var gameConfig:ScourgeParams;
+    var gameConfig:ScourgeConfig;
     var players:Array<IPlayer>;
     var playerListeners:Array<GameEvent->Void>;
     var gameTimer:Timer;
@@ -25,7 +25,7 @@ class Referee {
     var busy:Bool;
 
     public var lastGame(default, null):SavedGame;
-    public var lastGameConfig(default, null):ScourgeParams;
+    public var lastGameConfig(default, null):ScourgeConfig;
     public var gameBegun(get, never):Bool;
     public var numPlayers(get, never):Int;
 
@@ -35,11 +35,11 @@ class Referee {
         floats = [];
     }
 
-    public function beginGame(players:Array<IPlayer>, randGen:Void->Float, gameConfig:ScourgeParams, savedGame:SavedGame = null):Void {
+    public function beginGame(players:Array<IPlayer>, randGen:Void->Float, gameConfig:ScourgeConfig, savedGame:SavedGame = null):Void {
 
-        if (players.length != gameConfig.numPlayers) {
+        if (players.length != gameConfig.buildParams.numPlayers) {
             throw 'Player config has ${players.length} players: ' +
-                'game config requires ${gameConfig.numPlayers}';
+                'game config requires ${gameConfig.buildParams.numPlayers}';
         }
 
         var serializedSavedGame:String = null;

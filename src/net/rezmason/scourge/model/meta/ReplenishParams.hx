@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.meta;
 
 typedef ReplenishParams = {
-    var globalProperties:Array<ReplenishableProperty>;
-    var playerProperties:Array<ReplenishableProperty>;
-    var nodeProperties:Array<ReplenishableProperty>;
+    var globalProperties:Map<String, ReplenishableProperty>;
+    var playerProperties:Map<String, ReplenishableProperty>;
+    var nodeProperties:Map<String, ReplenishableProperty>;
 }

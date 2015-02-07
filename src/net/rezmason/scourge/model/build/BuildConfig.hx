@@ -21,7 +21,7 @@ class BuildConfig extends Config<BuildParams> {
         return {
             firstPlayer:0,
 
-            numPlayers:2,
+            numPlayers:4,
 
             circular:false,
             initGrid:initGrid,

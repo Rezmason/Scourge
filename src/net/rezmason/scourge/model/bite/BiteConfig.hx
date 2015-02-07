@@ -21,6 +21,8 @@ class BiteConfig extends Config<BiteParams> {
             biteHeads: true,
             orthoOnly: true,
             startingBites: 5,
+
+            allowBiting:true,
         };
     }
 }

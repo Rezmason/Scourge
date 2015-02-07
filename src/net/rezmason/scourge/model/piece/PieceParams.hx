@@ -5,4 +5,7 @@ typedef PieceParams = {
     > DropPieceParams,
     > PickPieceParams,
     > SwapPieceParams,
+
+    ?allowAllPieces:Bool,
+    ?allowSwapping:Bool,
 }

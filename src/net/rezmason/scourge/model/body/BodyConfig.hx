@@ -17,6 +17,8 @@ class BodyConfig extends Config<BodyParams> {
             takeBodiesFromEatenHeads:true,
             eatOrthogonallyOnly:false,
             decayOrthogonallyOnly:true,
+
+            includeCavities:true,
         };
     }
 }

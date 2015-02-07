@@ -1,13 +1,16 @@
 package net.rezmason.scourge.textview.commands;
 
-import net.rezmason.scourge.model.ScourgeParams;
+import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
+import net.rezmason.scourge.model.bite.BiteAspect;
+import net.rezmason.scourge.model.piece.SwapAspect;
 import net.rezmason.scourge.textview.GameSystem;
 import net.rezmason.scourge.textview.console.ConsoleCommand;
 import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
 import net.rezmason.utils.santa.Present;
+
 using Lambda;
 
 class PlayGameConsoleCommand extends ConsoleCommand {
@@ -70,21 +73,22 @@ class PlayGameConsoleCommand extends ConsoleCommand {
 
         var circular:Bool = args.flags.has('circular');
 
-        var cfg:ScourgeParams = ScourgeConfigFactory.makeDefaultConfig();
+        var cfg:ScourgeConfig = new ScourgeConfig();
 
         var pieceTableIDs:Array<Int> = [];
-        for (ike in 0...4) pieceTableIDs = pieceTableIDs.concat(cfg.pieces.getAllPieceIDsOfSize(ike + 1));
+        var pieces = cfg.pieceParams.pieces;
+        for (ike in 0...4) pieceTableIDs = pieceTableIDs.concat(pieces.getAllPieceIDsOfSize(ike + 1));
 
-        cfg.pieceTableIDs = pieceTableIDs;
-        cfg.allowRotating = true;
-        cfg.circular = circular;
-        cfg.allowNowhereDrop = false;
-        cfg.numPlayers = numPlayers;
-        cfg.includeCavities = true;
+        cfg.pieceParams.pieceTableIDs = pieceTableIDs;
+        cfg.pieceParams.allowRotating = true;
+        cfg.buildParams.circular = circular;
+        cfg.pieceParams.allowSkipping = false;
+        cfg.buildParams.numPlayers = numPlayers;
+        cfg.bodyParams.includeCavities = true;
 
-        cfg.maxSwaps = 5;
-        cfg.maxBites = 5;
-        cfg.maxSkips = 0;
+        cfg.metaParams.globalProperties[SwapAspect.NUM_SWAPS.id].maxAmount = 5;
+        cfg.metaParams.globalProperties[BiteAspect.NUM_BITES.id].maxAmount = 5;
+        cfg.pieceParams.allowSkipping = false;
 
         gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animateMils, isReplay, seed);
         showBody();

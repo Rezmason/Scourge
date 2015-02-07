@@ -1,5 +1,8 @@
 package net.rezmason.scourge.model;
 
+import net.rezmason.scourge.model.bite.BiteAspect.*;
+import net.rezmason.scourge.model.piece.SwapAspect.*;
+
 import net.rezmason.scourge.model.bite.*;
 import net.rezmason.scourge.model.body.*;
 import net.rezmason.scourge.model.build.*;
@@ -22,6 +25,9 @@ class ScourgeConfig extends GameConfig {
             MetaConfig,
             PieceConfig,
         ]);
+
+        metaParams.globalProperties[NUM_SWAPS.id] = { prop:NUM_SWAPS, amount:1, period:4, maxAmount:10 };
+        metaParams.globalProperties[NUM_BITES.id] = { prop:NUM_BITES, amount:1, period:3, maxAmount:10 };
     }
 
     inline function get_biteParams():BiteParams return params['bite'];

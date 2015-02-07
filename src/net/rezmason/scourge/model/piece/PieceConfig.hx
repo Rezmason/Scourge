@@ -29,13 +29,16 @@ class PieceConfig extends Config<PieceParams> {
             hatSize:5,
 
             dropOverlapsSelf:false,
-            dropOrthoOnly:false,
+            dropOrthoOnly:true,
             dropGrowsGraph:false,
             dropDiagOnly:false,
             allowPiecePick:false,
-            allowSkipping:false,
+            allowSkipping:true,
 
             startingSwaps:5,
+
+            allowAllPieces:false,
+            allowSwapping:true,
         };
     }
 }

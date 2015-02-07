@@ -10,7 +10,7 @@ import net.rezmason.ropes.State;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.ropes.Aspect;
-import net.rezmason.scourge.model.ScourgeParams;
+import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
@@ -34,7 +34,7 @@ class ScourgeConfigFactoryTest
     var state:State;
     var historyState:State;
     var plan:StatePlan;
-    var config:ScourgeParams;
+    var config:ScourgeConfig;
     var combinedRules:StringMap<Rule>;
 
     var startAction:Rule;
@@ -49,7 +49,7 @@ class ScourgeConfigFactoryTest
 
     @BeforeClass
     public function beforeClass():Void {
-        config = ScourgeConfigFactory.makeDefaultConfig();
+        config = new ScourgeConfig();
         stateHistorian = new StateHistorian();
 
         history = stateHistorian.history;
@@ -72,7 +72,7 @@ class ScourgeConfigFactoryTest
 
     @Before
     public function setup():Void {
-        config = ScourgeConfigFactory.makeDefaultConfig();
+        config = new ScourgeConfig();
         stateHistorian.reset();
 
         combinedRules = null;
@@ -93,8 +93,8 @@ class ScourgeConfigFactoryTest
     public function startActionTest():Void {
         // decay, cavity, killHeadlessPlayer, oneLivingPlayer, pickPiece
 
-        config.numPlayers = 2;
-        config.initGrid = TestBoards.twoPlayerBullshit;
+        config.buildParams.numPlayers = 2;
+        config.buildParams.initGrid = TestBoards.twoPlayerBullshit;
         makeState();
 
         VisualAssert.assert('floating zero square, stringy player one with no head', state.spitBoard(plan));
@@ -133,9 +133,9 @@ class ScourgeConfigFactoryTest
 
         // bite, decay, cavity, killHeadlessPlayer, oneLivingPlayer
 
-        config.numPlayers = 2;
-        config.startingBites = 5;
-        config.initGrid = TestBoards.twoPlayerGrab;
+        config.buildParams.numPlayers = 2;
+        config.biteParams.startingBites = 5;
+        config.buildParams.initGrid = TestBoards.twoPlayerGrab;
         makeState();
 
         VisualAssert.assert('two player grab', state.spitBoard(plan));
@@ -182,9 +182,9 @@ class ScourgeConfigFactoryTest
 
         // swapPiece, pickPiece
 
-        config.pieceHatSize = 3;
-        config.startingSwaps = 6;
-        config.allowFlipping = true;
+        config.pieceParams.hatSize = 3;
+        config.pieceParams.startingSwaps = 6;
+        config.pieceParams.allowFlipping = true;
 
         makeState();
         startAction.update();
@@ -193,19 +193,19 @@ class ScourgeConfigFactoryTest
         var numSwaps_:AspectPtr = plan.onPlayer(SwapAspect.NUM_SWAPS);
         var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
-        Assert.areEqual(config.startingSwaps, state.players[0][numSwaps_]);
+        Assert.areEqual(config.pieceParams.startingSwaps, state.players[0][numSwaps_]);
 
         var pickedPieces:Array<Null<Int>> = [];
 
-        for (ike in 0...config.startingSwaps) {
+        for (ike in 0...config.pieceParams.startingSwaps) {
             swapAction.update();
             swapAction.chooseMove();
 
             var piece:Int = state.global[pieceTableID_];
 
-            Assert.areEqual(config.pieceTableIDs[(ike + 1) % config.pieceHatSize], state.global[pieceTableID_]);
+            Assert.areEqual(config.pieceParams.pieceTableIDs[(ike + 1) % config.pieceParams.hatSize], state.global[pieceTableID_]);
 
-            var index:Int = ike % config.pieceHatSize;
+            var index:Int = ike % config.pieceParams.hatSize;
             if (pickedPieces[index] == null) pickedPieces[index] = piece;
             else Assert.areEqual(pickedPieces[index], piece);
         }
@@ -218,7 +218,7 @@ class ScourgeConfigFactoryTest
 
         // forfeit, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece
 
-        config.numPlayers = 2;
+        config.buildParams.numPlayers = 2;
         makeState();
         startAction.update();
         startAction.chooseMove();
@@ -251,9 +251,9 @@ class ScourgeConfigFactoryTest
 
         // dropPiece, eatCells, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
-        config.numPlayers = 2;
-        config.pieceTableIDs = [pieces.getPieceIdBySizeAndIndex(3, 1)]; // '--- block'
-        config.initGrid = TestBoards.twoPlayerGrab;
+        config.buildParams.numPlayers = 2;
+        config.pieceParams.pieceTableIDs = [pieces.getPieceIdBySizeAndIndex(3, 1)]; // '--- block'
+        config.buildParams.initGrid = TestBoards.twoPlayerGrab;
         makeState();
         startAction.update();
         startAction.chooseMove();

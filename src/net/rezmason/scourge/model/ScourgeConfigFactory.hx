@@ -12,7 +12,6 @@ import net.rezmason.scourge.model.build.*;
 import net.rezmason.scourge.model.meta.*;
 import net.rezmason.scourge.model.piece.*;
 
-import net.rezmason.scourge.tools.Resource;
 import net.rezmason.utils.Siphon;
 import net.rezmason.utils.StringSort;
 import net.rezmason.utils.Zig;
@@ -30,7 +29,7 @@ class ScourgeConfigFactory {
 
     static var BUILD_BOARD:String        = Type.getClassName(BuildBoardRule);
     static var BUILD_PLAYERS:String      = Type.getClassName(BuildPlayersRule);
-    static var BUILD_GLOBAL:String      = Type.getClassName(BuildGlobalRule);
+    static var BUILD_GLOBAL:String       = Type.getClassName(BuildGlobalRule);
     static var CAVITY:String             = Type.getClassName(CavityRule);
     static var DECAY:String              = Type.getClassName(DecayRule);
     static var DROP_PIECE:String         = Type.getClassName(DropPieceRule);
@@ -50,78 +49,28 @@ class ScourgeConfigFactory {
         'net.rezmason.scourge.model', 'src', true, "Rule$"
     );
 
-    public static var configDefs(default, null):Map<String, Class<Config<Dynamic>>> = cast Siphon.getDefs(
-        'net.rezmason.scourge.model', 'src', true, "Config$"
-    );
-
     public inline static function makeDefaultActionList():Array<String> return [DROP_ACTION, QUIT_ACTION];
     public inline static function makeStartAction():String return START_ACTION;
     public static function makeBuilderRuleList():Array<String> return [BUILD_GLOBAL, BUILD_PLAYERS, BUILD_BOARD];
-    public static function makeActionList(config:ScourgeParams):Array<String> {
+    public static function makeActionList(config:ScourgeConfig):Array<String> {
 
         var actionList:Array<String> = [QUIT_ACTION, DROP_ACTION/*, PICK_ACTION*/];
 
-        if (config.maxSwaps > 0) actionList.push(SWAP_ACTION);
-        if (config.maxBites > 0) actionList.push(BITE_ACTION);
+        if (config.pieceParams.allowSwapping) actionList.push(SWAP_ACTION);
+        if (config.biteParams.allowBiting) actionList.push(BITE_ACTION);
 
         return actionList;
     }
 
-    public static function makeDefaultConfig():ScourgeParams {
-
-        var pieces:Pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
-
-        return {
-            allowAllPieces:false,
-            allowFlipping:false,
-            allowNowhereDrop:true,
-            allowRotating:true,
-            baseBiteReachOnThickness:false,
-            biteHeads:true,
-            biteThroughCavities:false,
-            circular:false,
-            diagDropOnly:false,
-            eatHeads:true,
-            eatRecursive:true,
-            growGraphWithDrop:false,
-            includeCavities:true,
-            omnidirectionalBite:false,
-            orthoBiteOnly:true,
-            orthoDecayOnly:true,
-            orthoDropOnly:true,
-            orthoEatOnly:false,
-            dropOverlapsSelf:false,
-            takeBodiesFromHeads:true,
-            firstPlayer:0,
-            maxBiteReach:3,
-            maxSizeReference:Std.int(400 * 0.7),
-            minBiteReach:1,
-            numPlayers:4,
-            pieceHatSize:5,
-            startingSwaps:5,
-            startingBites:5,
-            swapBoost:1,
-            swapPeriod:4,
-            maxSwaps:10,
-            biteBoost:1,
-            bitePeriod:3,
-            maxBites:10,
-            maxSkips:3,
-            initGrid:null,
-            pieces:pieces,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
-        };
-    }
-
-    public static function makeRuleConfig(config:ScourgeParams):Map<String, Dynamic> {
+    public static function makeRuleConfig(config:ScourgeConfig):Map<String, Dynamic> {
         var ruleConfig:Map<String, Dynamic> = [
-            BUILD_GLOBAL => makeBuildGlobalConfig(config),
-            BUILD_PLAYERS => makeBuildPlayersConfig(config),
-            BUILD_BOARD => makeBuildBoardConfig(config),
-            EAT_CELLS => makeEatCellsConfig(config),
-            DECAY => makeDecayConfig(config),
-            DROP_PIECE => makeDropPieceConfig(config),
-            REPLENISH => makeReplenishConfig(config),
+            BUILD_GLOBAL => config.buildParams,
+            BUILD_PLAYERS => config.buildParams,
+            BUILD_BOARD => config.buildParams,
+            EAT_CELLS => config.bodyParams,
+            DECAY => config.bodyParams,
+            DROP_PIECE => config.pieceParams,
+            REPLENISH => config.metaParams,
 
             END_TURN => null,
             RESET_FRESHNESS => null,
@@ -130,16 +79,16 @@ class ScourgeConfigFactory {
             ONE_LIVING_PLAYER => null,
         ];
 
-        if (!config.allowAllPieces) ruleConfig.set(PICK_PIECE, makePickPieceConfig(config));
-        if (config.includeCavities) ruleConfig.set(CAVITY, null);
-        if (!config.allowAllPieces && config.maxSwaps > 0) ruleConfig.set(SWAP_PIECE, makeSwapConfig(config));
-        if (config.maxBites > 0) ruleConfig.set(BITE, makeBiteConfig(config));
-        if (config.maxSkips > 0) ruleConfig.set(STALEMATE, makeSkipsExhaustedConfig(config));
+        if (!config.pieceParams.allowAllPieces) ruleConfig.set(PICK_PIECE, config.pieceParams);
+        if (config.bodyParams.includeCavities) ruleConfig.set(CAVITY, null);
+        if (!config.pieceParams.allowAllPieces && config.pieceParams.allowSwapping) ruleConfig.set(SWAP_PIECE, config.pieceParams);
+        if (config.biteParams.allowBiting) ruleConfig.set(BITE, config.biteParams);
+        if (config.metaParams.maxSkips > 0) ruleConfig.set(STALEMATE, config.metaParams);
 
         return ruleConfig;
     }
 
-    public static function makeCombinedRuleCfg(config:ScourgeParams):Map<String, Array<String>> {
+    public static function makeCombinedRuleCfg(config:ScourgeConfig):Map<String, Array<String>> {
 
         var combinedRuleConfig:Map<String, Array<String>> = [
             CLEAN_UP => [DECAY, KILL_HEADLESS_BODY, ONE_LIVING_PLAYER, RESET_FRESHNESS],
@@ -150,12 +99,12 @@ class ScourgeConfigFactory {
             DROP_ACTION  => [DROP_PIECE, EAT_CELLS, CLEAN_UP, WRAP_UP],
         ];
 
-        if (config.includeCavities) combinedRuleConfig[CLEAN_UP].insert(1, CAVITY);
-        if (!config.allowAllPieces && config.maxSwaps > 0) combinedRuleConfig[SWAP_ACTION] = [SWAP_PIECE, PICK_PIECE];
-        if (config.maxBites > 0) combinedRuleConfig[BITE_ACTION] = [BITE, CLEAN_UP];
-        if (config.maxSkips > 0) combinedRuleConfig[DROP_ACTION].push(STALEMATE);
+        if (config.bodyParams.includeCavities) combinedRuleConfig[CLEAN_UP].insert(1, CAVITY);
+        if (!config.pieceParams.allowAllPieces && config.pieceParams.allowSwapping) combinedRuleConfig[SWAP_ACTION] = [SWAP_PIECE, PICK_PIECE];
+        if (config.biteParams.allowBiting) combinedRuleConfig[BITE_ACTION] = [BITE, CLEAN_UP];
+        if (config.metaParams.maxSkips > 0) combinedRuleConfig[DROP_ACTION].push(STALEMATE);
 
-        if (!config.allowAllPieces) {
+        if (!config.pieceParams.allowAllPieces) {
             combinedRuleConfig[START_ACTION].push(PICK_PIECE);
             combinedRuleConfig[WRAP_UP].push(PICK_PIECE);
         }
@@ -163,114 +112,7 @@ class ScourgeConfigFactory {
         return combinedRuleConfig;
     }
 
-    inline static function makeBuildGlobalConfig(config:ScourgeParams) {
-        return {
-            firstPlayer:config.firstPlayer,
-        };
-    }
-
-    inline static function makeBuildPlayersConfig(config:ScourgeParams) {
-        return {
-            numPlayers:config.numPlayers,
-        };
-    }
-
-    inline static function makeBuildBoardConfig(config:ScourgeParams) {
-        return {
-            circular:config.circular,
-            initGrid:config.initGrid,
-        };
-    }
-
-    inline static function makeEatCellsConfig(config:ScourgeParams) {
-        return {
-            eatRecursively:config.eatRecursive,
-            eatHeads:config.eatHeads,
-            takeBodiesFromEatenHeads:config.takeBodiesFromHeads,
-            eatOrthogonallyOnly:config.orthoEatOnly,
-        };
-    }
-
-    inline static function makeDecayConfig(config:ScourgeParams) {
-        return {
-            decayOrthogonallyOnly:config.orthoDecayOnly,
-        };
-    }
-
-    inline static function makePickPieceConfig(config:ScourgeParams) {
-        return {
-            pieceTableIDs:config.pieceTableIDs,
-            allowFlipping:config.allowFlipping,
-            allowRotating:config.allowRotating,
-            hatSize:config.pieceHatSize,
-            pieces:config.pieces,
-        };
-    }
-
-    inline static function makeDropPieceConfig(config:ScourgeParams) {
-        return {
-            dropOverlapsSelf:config.dropOverlapsSelf,
-            pieceTableIDs:config.pieceTableIDs,
-            allowFlipping:config.allowFlipping,
-            allowRotating:config.allowRotating,
-            dropGrowsGraph:config.growGraphWithDrop,
-            allowSkipping:config.allowNowhereDrop,
-            allowPiecePick:config.allowAllPieces,
-            dropOrthoOnly:config.orthoDropOnly,
-            dropDiagOnly:config.diagDropOnly,
-            pieces:config.pieces,
-        };
-    }
-
-    inline static function makeBiteConfig(config:ScourgeParams) {
-        return {
-            minReach:config.minBiteReach,
-            maxReach:config.maxBiteReach,
-            maxSizeReference:config.maxSizeReference,
-            baseReachOnThickness:config.baseBiteReachOnThickness,
-            omnidirectional:config.omnidirectionalBite,
-            biteThroughCavities:config.biteThroughCavities,
-            biteHeads:config.biteHeads,
-            orthoOnly:config.orthoBiteOnly,
-            startingBites:config.startingBites,
-        };
-    }
-
-    inline static function makeSwapConfig(config:ScourgeParams) {
-        return {
-            startingSwaps:config.startingSwaps,
-        };
-    }
-
-    inline static function makeSkipsExhaustedConfig(config:ScourgeParams) {
-        return {
-            maxSkips:config.maxSkips,
-        };
-    }
-
-    inline static function makeReplenishConfig(config:ScourgeParams) {
-        var globalProperties:Array<ReplenishableConfig> = [];
-
-        if (config.maxSwaps > 0) globalProperties.push({
-            prop:SwapAspect.NUM_SWAPS,
-            amount:config.swapBoost,
-            period:config.swapPeriod,
-            maxAmount:config.maxSwaps,
-        });
-
-        if (config.maxBites > 0) globalProperties.push({
-            prop:BiteAspect.NUM_BITES,
-            amount:config.biteBoost,
-            period:config.bitePeriod,
-            maxAmount:config.maxBites,
-        });
-
-        return {
-            globalProperties:globalProperties,
-            playerProperties:[],
-            nodeProperties:[],
-        };
-    }
+    // copied from rule factory
 
     public static function makeBasicRules(ruleDefs:Map<String, Class<Rule>>, cfg:Map<String, Dynamic>):Map<String, Rule> {
         var rules:Map<String, Rule> = new Map();

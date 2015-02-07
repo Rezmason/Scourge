@@ -38,21 +38,21 @@ class ReplenishRuleTest extends ScourgeRuleTest
         };
 
         params.globalProperties = [
-            { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
-            { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
-            { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
+            TestAspect.VALUE_1.id => { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
+            TestAspect.VALUE_2.id => { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
+            TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
         params.playerProperties = [
-            { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
-            { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
-            { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
+            TestAspect.VALUE_1.id => { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
+            TestAspect.VALUE_2.id => { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
+            TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
         params.nodeProperties = [
-            { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
-            { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
-            { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
+            TestAspect.VALUE_1.id => { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
+            TestAspect.VALUE_2.id => { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
+            TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
         var replenishRule:ReplenishRule = new ReplenishRule();
