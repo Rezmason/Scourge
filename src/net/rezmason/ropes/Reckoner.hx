@@ -100,7 +100,7 @@ using net.rezmason.utils.Pointers;
             }
 
             for (metaTag in field.meta) {
-                if (lkpSources.isNotNull(metaTag.name)) {
+                if (lkpSources[metaTag.name] != null) {
                     var kind:String = metaTag.name;
                     var name:String = field.name;
                     var aspect:Expr = metaTag.params[0];

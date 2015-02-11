@@ -108,7 +108,7 @@ class BasicSmarts extends Smarts {
 
     function dropMoveHugsEdges(move:Move):Bool {
         var dropMove:DropPieceMove = cast move;
-        if (dropMove.addedNodes.length == 0) return false;
+        if (dropMove.addedNodes == null || dropMove.addedNodes.length == 0) return false;
         for (nodeID in dropMove.addedNodes) {
             for (neighborLocus in game.state.loci[nodeID].orthoNeighbors()) {
                 if (neighborLocus.value[isFilled_] == TRUE && neighborLocus.value[occupier_] == NULL) {

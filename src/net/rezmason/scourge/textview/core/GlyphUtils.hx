@@ -157,7 +157,7 @@ class GlyphUtils {
     public inline static function get_paint(gl:Glyph) return gl.paintHex;
 
     public inline static function set_paint(gl:Glyph, val:Int) {
-        #if debug if (val > 0xFFFF) throw 'Glyph cannot be painted color ${Colors.fromHex(val)}'; #end
+        #if debug if (val > 0xFFFF) throw 'Glyph cannot be painted color ${Color.fromHex(val)}'; #end
         if (gl.paintHex != val) {
 
             var paintR = ((val >>  8) & 0xFF) / 0xFF;

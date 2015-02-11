@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.build;
 
-class BuildConfig extends Config<BuildParams> {
+class BuildConfig<RP, MP> extends Config<BuildParams, RP, MP> {
 
     var initGrid:String;
 
@@ -9,12 +9,12 @@ class BuildConfig extends Config<BuildParams> {
         initGrid = null;
     }
 
-    override public function id():String {
-        return 'build';
-    }
-
-    public override function ruleComposition():RuleComposition {
-        return null;
+    override public function composition():Map<String, RuleComposition<BuildParams, RP, MP>> {
+        return [
+            'buildGlobal'   => {def:BuildGlobalRule,    type:Builder, presenter:null},
+            'buildPlayers'  => {def:BuildPlayersRule,   type:Builder, presenter:null},
+            'buildBoard'    => {def:BuildBoardRule,     type:Builder, presenter:null},
+        ];
     }
 
     override public function defaultParams():Null<BuildParams> {

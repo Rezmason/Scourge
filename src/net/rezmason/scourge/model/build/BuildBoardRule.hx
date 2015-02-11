@@ -7,6 +7,7 @@ import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
+import net.rezmason.scourge.model.TempParams;
 
 using Lambda;
 using net.rezmason.ropes.AspectUtils;
@@ -15,7 +16,7 @@ using net.rezmason.utils.Pointers;
 
 typedef XY = {x:Float, y:Float};
 
-class BuildBoardRule extends RopesRule<BuildBoardParams> {
+class BuildBoardRule extends RopesRule<FullBuildBoardParams> {
 
     // Creates boards for "skirmish games"
 
@@ -39,7 +40,7 @@ class BuildBoardRule extends RopesRule<BuildBoardParams> {
         // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
         // Player 1's head is at a 45 degree angle
 
-        var numPlayers:Int = numPlayers();
+        var numPlayers:Int = params.numPlayers;
         var headAngle:Float = 2 / numPlayers;
         var boardRadius:Float = (numPlayers == 1) ? 0 : PLAYER_DIST / (2 * Math.sin(Math.PI * headAngle * 0.5));
 

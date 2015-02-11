@@ -21,7 +21,7 @@ class RopesRule<Params> extends Reckoner {
     var random:Void->Float;
     var changeSignal:Rule->Void;
 
-    @:final public function init(params:Dynamic):Void {
+    @:final public function init(params:Params):Void {
         this.params = params;
         _init();
     }

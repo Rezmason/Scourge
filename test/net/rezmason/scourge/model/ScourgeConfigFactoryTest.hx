@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model;
 
 import haxe.ds.StringMap;
-
+import haxe.Unserializer;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;
@@ -20,6 +20,7 @@ import net.rezmason.scourge.model.piece.DropPieceRule;
 import net.rezmason.scourge.model.piece.PieceAspect;
 import net.rezmason.scourge.model.piece.SwapAspect;
 import net.rezmason.scourge.tools.Resource;
+import net.rezmason.utils.SafeSerializer;
 
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.GridUtils;
@@ -76,6 +77,11 @@ class ScourgeConfigFactoryTest
         stateHistorian.reset();
 
         combinedRules = null;
+    }
+
+    @Test
+    public function configIsSerializable():Void {
+        config = Unserializer.run(SafeSerializer.run(config));
     }
 
     @Test
@@ -282,11 +288,9 @@ class ScourgeConfigFactoryTest
     }
 
     private function makeState():Void {
-        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config);
-        var basicRulesByName:Map<String, Rule> = ScourgeConfigFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
-        var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
+        var basicRulesByName:Map<String, Rule> = config.makeRules();
         var random:Void->Float = function() return 0;
-        combinedRules = ScourgeConfigFactory.combineRules(combinedConfig, basicRulesByName);
+        combinedRules = ScourgeConfigFactory.combineRules(config, basicRulesByName);
         
         var builderRuleKeys:Array<String> = ScourgeConfigFactory.makeBuilderRuleList();
         var basicRules:Array<Rule> = [];

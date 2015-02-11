@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.piece;
 
 import net.rezmason.scourge.tools.Resource;
 
-class PieceConfig extends Config<PieceParams> {
+class PieceConfig<RP, MP> extends Config<PieceParams, RP, MP> {
 
     var pieces:Pieces;
 
@@ -11,12 +11,16 @@ class PieceConfig extends Config<PieceParams> {
         pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
     }
 
-    override public function id():String {
-        return 'piece';
-    }
-
-    public override function ruleComposition():RuleComposition {
-        return null;
+    override public function composition():Map<String, RuleComposition<PieceParams, RP, MP>> {
+        return [
+            'swap' => {def:SwapPieceRule, type:Action(null), presenter:null, 
+                condition:function(p) return !p.allowAllPieces && p.allowSwapping,
+            },
+            'pick' => {def:PickPieceRule, type:Action(null), presenter:null, 
+                condition:function(p) return !p.allowAllPieces,
+            },
+            'drop' => {def:DropPieceRule, type:Action(null), presenter:null},
+        ];
     }
 
     override public function defaultParams():Null<PieceParams> {
@@ -33,7 +37,7 @@ class PieceConfig extends Config<PieceParams> {
             dropGrowsGraph:false,
             dropDiagOnly:false,
             allowPiecePick:false,
-            allowSkipping:true,
+            allowSkipping:false,
 
             startingSwaps:5,
 

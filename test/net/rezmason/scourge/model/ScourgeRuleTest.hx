@@ -69,7 +69,7 @@ class ScourgeRuleTest
 
         // make board config and generate board
         var buildBoardRule:BuildBoardRule = new BuildBoardRule();
-        buildBoardRule.init({circular:circular, initGrid:initGrid});
+        buildBoardRule.init({numPlayers:numPlayers, circular:circular, initGrid:initGrid});
 
         rules.unshift(buildBoardRule);
         rules.unshift(buildPlayersRule);

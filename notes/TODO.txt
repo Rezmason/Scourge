@@ -1,14 +1,8 @@
 There's more to ROPES than rules
-    ROPES is a way of building games, AND PRESENTING THEM.
-
-    ScourgeConfigFactory to GameContext
-        No Siphon
-        Explicitly maps rules, views, etc
-
+    Replace ScourgeConfigFactory with ScourgeConfig
+        "joint rules"
+        actions
     Drag Game into ROPES
-        WinAspect
-        PlyAspect
-            Separate consecutive skips maybe
 
 Entity system
     A "Sequencer" Reckoner finds and sequences changes and their causes

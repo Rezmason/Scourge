@@ -88,7 +88,6 @@ class PlayGameConsoleCommand extends ConsoleCommand {
 
         cfg.metaParams.globalProperties[SwapAspect.NUM_SWAPS.id].maxAmount = 5;
         cfg.metaParams.globalProperties[BiteAspect.NUM_BITES.id].maxAmount = 5;
-        cfg.pieceParams.allowSkipping = false;
 
         gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animateMils, isReplay, seed);
         showBody();

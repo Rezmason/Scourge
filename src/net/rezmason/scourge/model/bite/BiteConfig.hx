@@ -1,13 +1,11 @@
 package net.rezmason.scourge.model.bite;
 
-class BiteConfig extends Config<BiteParams> {
+class BiteConfig<RP, MP> extends Config<BiteParams, RP, MP> {
 
-    override public function id():String {
-        return 'bite';
-    }
-
-    public override function ruleComposition():RuleComposition {
-        return null;
+    override public function composition():Map<String, RuleComposition<BiteParams, RP, MP>> {
+        return [
+            'bite' => {def:BiteRule, type:Action(null), presenter:null, condition:function(p) return p.allowBiting},
+        ];
     }
 
     override public function defaultParams():Null<BiteParams> {

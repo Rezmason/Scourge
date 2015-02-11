@@ -5,6 +5,7 @@ import net.rezmason.ropes.StatePlan;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.RopesTypes;
+import net.rezmason.ropes.CacheRule;
 import net.rezmason.scourge.model.meta.PlyAspect;
 import net.rezmason.scourge.model.meta.WinAspect;
 import net.rezmason.utils.Zig;
@@ -49,17 +50,8 @@ class Game {
 
         // Build the game from the config
 
-        var ruleConfig:Map<String, Dynamic> = ScourgeConfigFactory.makeRuleConfig(config);
-        var basicRulesByName:Map<String, Rule> = ScourgeConfigFactory.makeBasicRules(ScourgeConfigFactory.ruleDefs, ruleConfig);
-
-        if (cacheMoves) {
-            for (key in basicRulesByName.keys().a2z()) {
-                basicRulesByName[key] = ScourgeConfigFactory.makeCacheRule(basicRulesByName[key], invalidateSignal, get_revision);
-            }
-        }
-
-        var combinedConfig:Map<String, Array<String>> = ScourgeConfigFactory.makeCombinedRuleCfg(config);
-        var combinedRules:Map<String, Rule> = ScourgeConfigFactory.combineRules(combinedConfig, basicRulesByName);
+        var basicRulesByName:Map<String, Rule> = config.makeRules(cacheMoves ? makeCacheRule : null);
+        var combinedRules:Map<String, Rule> = ScourgeConfigFactory.combineRules(config, basicRulesByName);
         var builderRuleKeys:Array<String> = ScourgeConfigFactory.makeBuilderRuleList();
         var basicRules:Array<Rule> = [];
         var builderRules:Array<Rule> = [];
@@ -188,6 +180,12 @@ class Game {
         historian.key.lock();
         for (action in actions) action.collectMoves();
         historian.key.unlock();
+    }
+
+    private function makeCacheRule(rule:Rule):Rule {
+        var cacheRule:CacheRule = new CacheRule();
+        cacheRule.init({rule:rule, invalidateSignal:invalidateSignal, revGetter:get_revision});
+        return cacheRule;
     }
 
     private function makeRuleAlertFunction(fn) return (fn == null) ? null : function(rule:Rule) fn(rule.myName());
