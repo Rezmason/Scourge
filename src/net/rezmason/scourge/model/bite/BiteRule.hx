@@ -9,7 +9,7 @@ import net.rezmason.scourge.model.meta.FreshnessAspect;
 import net.rezmason.ropes.aspect.PlyAspect;
 
 using Lambda;
-using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.ropes.aspect.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;

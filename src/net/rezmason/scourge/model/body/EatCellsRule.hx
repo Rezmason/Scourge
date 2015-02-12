@@ -8,7 +8,7 @@ import net.rezmason.ropes.aspect.PlyAspect;
 import net.rezmason.ds.ShitList;
 
 using Lambda;
-using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.ropes.aspect.AspectUtils;
 using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.MapUtils;

@@ -2,12 +2,12 @@ package net.rezmason.ropes.state;
 
 import haxe.ds.ArraySort;
 
-import net.rezmason.ropes.GridLocus;
+import net.rezmason.ropes.grid.GridLocus;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.aspect.Aspect.*;
 
 using Lambda;
-using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;

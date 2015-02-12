@@ -1,9 +1,9 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.grid;
 
 import haxe.Serializer;
 import haxe.Unserializer;
-import net.rezmason.ropes.GridDirection.*;
-import net.rezmason.ropes.GridLocus;
+import net.rezmason.ropes.grid.GridDirection.*;
+import net.rezmason.ropes.grid.GridLocus;
 import net.rezmason.ds.ShitList;
 
 using Lambda;

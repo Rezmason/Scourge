@@ -11,7 +11,7 @@ import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.piece.DropPieceRule.DropPieceMove;
 
-using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.grid.GridUtils;
 
 class BasicSmarts extends Smarts {
 

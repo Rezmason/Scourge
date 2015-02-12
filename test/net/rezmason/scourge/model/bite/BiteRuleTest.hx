@@ -13,7 +13,7 @@ import net.rezmason.scourge.model.meta.FreshnessAspect;
 
 using Lambda;
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.ropes.state.StatePlan;
 using net.rezmason.utils.Pointers;
 

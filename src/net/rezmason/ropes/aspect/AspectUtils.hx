@@ -4,7 +4,7 @@ import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 
 using Lambda;
-using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class AspectUtils {

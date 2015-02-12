@@ -5,14 +5,14 @@ import VisualAssert;
 
 import net.rezmason.ropes.aspect.Aspect;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.GridDirection.*;
-import net.rezmason.ropes.GridLocus;
+import net.rezmason.ropes.grid.GridDirection.*;
+import net.rezmason.ropes.grid.GridLocus;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.body.CavityRule;
 
 
-using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.state.StatePlan;
 using net.rezmason.utils.Pointers;

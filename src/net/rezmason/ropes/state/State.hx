@@ -1,8 +1,8 @@
 package net.rezmason.ropes.state;
 
 import net.rezmason.ropes.RopesTypes;
-
-using net.rezmason.ropes.GridUtils;
+import net.rezmason.ropes.grid.GridLocus;
+using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class State {

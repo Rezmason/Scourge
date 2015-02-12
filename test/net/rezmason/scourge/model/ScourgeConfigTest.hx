@@ -21,7 +21,7 @@ import net.rezmason.scourge.tools.Resource;
 import net.rezmason.utils.SafeSerializer;
 
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.ropes.state.StatePlan;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;

@@ -1,6 +1,7 @@
 package net.rezmason.ropes;
 
 import net.rezmason.ropes.aspect.Aspect.*;
+import net.rezmason.ropes.grid.GridLocus;
 
 using net.rezmason.utils.History;
 using net.rezmason.utils.Pointers;

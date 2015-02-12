@@ -6,7 +6,7 @@ import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
 
 using Lambda;
-using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.ropes.aspect.AspectUtils;
 using net.rezmason.utils.Pointers;
 

@@ -3,7 +3,7 @@ package net.rezmason.scourge.model.body;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.GridLocus;
+import net.rezmason.ropes.grid.GridLocus;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
@@ -11,7 +11,7 @@ import net.rezmason.scourge.model.body.EatCellsRule;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
 import net.rezmason.ropes.aspect.PlyAspect;
 
-using net.rezmason.ropes.GridUtils;
+using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.state.StatePlan;
 using net.rezmason.utils.Pointers;

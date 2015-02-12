@@ -1,4 +1,4 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.grid;
 
 @:enum abstract GridDirection(Int) {
     @:to public inline function toInt():Int return cast this;

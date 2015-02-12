@@ -1,6 +1,6 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.grid;
 
-@:allow(net.rezmason.ropes.GridUtils)
+@:allow(net.rezmason.ropes.grid.GridUtils)
 class GridLocus<T> {
     public var value(default, null):T;
     public var neighbors(default, null):Array<GridLocus<T>>;
