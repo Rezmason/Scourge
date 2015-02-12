@@ -1,7 +1,7 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.ds.ShitList;
-import net.rezmason.ropes.Game;
+import net.rezmason.ropes.play.Game;
 import net.rezmason.ropes.aspect.Aspect;
 import net.rezmason.ropes.grid.GridLocus;
 import net.rezmason.ropes.RopesTypes;

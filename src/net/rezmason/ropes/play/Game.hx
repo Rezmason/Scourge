@@ -1,4 +1,4 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.play;
 
 import net.rezmason.ropes.rule.CacheRule;
 import net.rezmason.ropes.RopesTypes;

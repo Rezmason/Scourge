@@ -1,6 +1,6 @@
 package net.rezmason.scourge.controller;
 
-import net.rezmason.ropes.Game;
+import net.rezmason.ropes.play.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
