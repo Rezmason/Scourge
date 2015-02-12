@@ -8,7 +8,7 @@ import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.aspects.*;
 import net.rezmason.utils.Zig;
 
-using net.rezmason.ropes.StatePlan;
+using net.rezmason.ropes.state.StatePlan;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 

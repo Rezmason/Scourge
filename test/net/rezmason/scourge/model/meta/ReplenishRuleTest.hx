@@ -8,7 +8,7 @@ import net.rezmason.scourge.model.meta.ReplenishableAspect;
 import net.rezmason.scourge.model.meta.ReplenishRule;
 import net.rezmason.scourge.model.test.TestAspect;
 
-using net.rezmason.ropes.StatePlan;
+using net.rezmason.ropes.state.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class ReplenishRuleTest extends ScourgeRuleTest

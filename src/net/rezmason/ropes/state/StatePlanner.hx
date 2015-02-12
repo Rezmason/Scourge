@@ -1,4 +1,4 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.state;
 
 import haxe.ds.ArraySort;
 

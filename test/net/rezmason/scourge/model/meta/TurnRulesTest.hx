@@ -20,7 +20,7 @@ import net.rezmason.scourge.model.test.TestPieceRule;
 
 // using net.rezmason.ropes.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.ropes.StatePlan;
+using net.rezmason.ropes.state.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class TurnRulesTest extends ScourgeRuleTest

@@ -6,6 +6,8 @@ import haxe.macro.Expr;
 #end
 
 import net.rezmason.ropes.RopesTypes;
+import net.rezmason.ropes.state.State;
+import net.rezmason.ropes.state.StatePlan;
 
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.MapUtils;

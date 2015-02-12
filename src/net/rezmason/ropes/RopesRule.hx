@@ -1,6 +1,7 @@
 package net.rezmason.ropes;
 
 import net.rezmason.ropes.RopesTypes;
+import net.rezmason.ropes.state.State;
 
 class RopesRule<Params> extends Reckoner {
 

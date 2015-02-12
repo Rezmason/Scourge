@@ -14,7 +14,7 @@ import net.rezmason.scourge.model.body.CavityRule;
 
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.ropes.StatePlan;
+using net.rezmason.ropes.state.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class CavityRuleTest extends ScourgeRuleTest

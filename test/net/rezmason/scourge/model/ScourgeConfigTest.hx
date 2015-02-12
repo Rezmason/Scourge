@@ -5,9 +5,9 @@ import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.State;
-import net.rezmason.ropes.StateHistorian;
-import net.rezmason.ropes.StatePlanner;
+import net.rezmason.ropes.state.State;
+import net.rezmason.ropes.state.StateHistorian;
+import net.rezmason.ropes.state.StatePlanner;
 import net.rezmason.ropes.aspect.Aspect;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.body.BodyAspect;
@@ -22,7 +22,7 @@ import net.rezmason.utils.SafeSerializer;
 
 using net.rezmason.scourge.model.BoardUtils;
 using net.rezmason.ropes.GridUtils;
-using net.rezmason.ropes.StatePlan;
+using net.rezmason.ropes.state.StatePlan;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;
 

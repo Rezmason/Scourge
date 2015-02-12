@@ -4,9 +4,9 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.State;
-import net.rezmason.ropes.StateHistorian;
-import net.rezmason.ropes.StatePlanner;
+import net.rezmason.ropes.state.State;
+import net.rezmason.ropes.state.StateHistorian;
+import net.rezmason.ropes.state.StatePlanner;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
 import net.rezmason.scourge.model.body.EatCellsRule;
 import net.rezmason.scourge.model.build.BuildBoardRule;
@@ -17,7 +17,7 @@ import net.rezmason.scourge.tools.Resource;
 
 using net.rezmason.utils.Pointers;
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.ropes.StatePlan;
+using net.rezmason.ropes.state.StatePlan;
 
 class StateHistorianTest {
 

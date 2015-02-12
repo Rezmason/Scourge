@@ -1,4 +1,4 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.state;
 
 import haxe.Unserializer;
 import net.rezmason.ropes.RopesTypes;

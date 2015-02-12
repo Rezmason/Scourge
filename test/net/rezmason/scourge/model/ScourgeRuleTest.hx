@@ -4,10 +4,10 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.State;
-import net.rezmason.ropes.StatePlan;
-import net.rezmason.ropes.StatePlanner;
-import net.rezmason.ropes.StateHistorian;
+import net.rezmason.ropes.state.State;
+import net.rezmason.ropes.state.StatePlan;
+import net.rezmason.ropes.state.StatePlanner;
+import net.rezmason.ropes.state.StateHistorian;
 import net.rezmason.scourge.model.build.BuildBoardRule;
 import net.rezmason.scourge.model.build.BuildGlobalRule;
 import net.rezmason.scourge.model.build.BuildPlayersRule;

@@ -6,15 +6,15 @@ import VisualAssert;
 import net.rezmason.ropes.aspect.Aspect;
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.State;
-import net.rezmason.ropes.StatePlanner;
+import net.rezmason.ropes.state.State;
+import net.rezmason.ropes.state.StatePlanner;
 import net.rezmason.scourge.model.test.TestAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.build.BuildGlobalRule;
 import net.rezmason.scourge.model.test.TestRule;
 
 using net.rezmason.ropes.GridUtils;
-using net.rezmason.ropes.StatePlan;
+using net.rezmason.ropes.state.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class StatePlannerTest {
