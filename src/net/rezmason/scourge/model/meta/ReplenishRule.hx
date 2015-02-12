@@ -1,12 +1,12 @@
 package net.rezmason.scourge.model.meta;
 
-import net.rezmason.ropes.Aspect.*;
+import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.RopesRule;
 
 using Lambda;
 using net.rezmason.utils.Alphabetizer;
-using net.rezmason.ropes.AspectUtils;
+using net.rezmason.ropes.aspect.AspectUtils;
 using net.rezmason.utils.Pointers;
 
 class ReplenishRule extends RopesRule<ReplenishParams> {

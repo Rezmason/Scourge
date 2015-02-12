@@ -12,7 +12,7 @@ import net.rezmason.scourge.model.build.BuildBoardRule;
 import net.rezmason.scourge.model.build.BuildGlobalRule;
 import net.rezmason.scourge.model.build.BuildPlayersRule;
 
-using net.rezmason.ropes.AspectUtils;
+using net.rezmason.ropes.aspect.AspectUtils;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 

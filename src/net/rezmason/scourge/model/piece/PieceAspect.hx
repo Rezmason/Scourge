@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.piece;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.aspect.Aspect;
 
 class PieceAspect extends Aspect {
     @aspect(0) var PIECES_PICKED;

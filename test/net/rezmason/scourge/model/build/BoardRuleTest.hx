@@ -3,14 +3,14 @@ package net.rezmason.scourge.model.build;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.aspect.Aspect;
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.build.BuildBoardRule;
 import net.rezmason.scourge.model.build.BuildPlayersRule;
-import net.rezmason.ropes.PlyAspect;
+import net.rezmason.ropes.aspect.PlyAspect;
 
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;

@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model;
 
-import net.rezmason.ropes.Aspect.*;
+import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;

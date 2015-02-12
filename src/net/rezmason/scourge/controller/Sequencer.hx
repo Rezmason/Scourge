@@ -3,7 +3,7 @@ package net.rezmason.scourge.controller;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.ecce.Query;
-import net.rezmason.ropes.Aspect.*;
+import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.Reckoner;
 import net.rezmason.scourge.controller.PlayerSystem;

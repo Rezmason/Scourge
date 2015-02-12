@@ -3,14 +3,14 @@ package net.rezmason.scourge.model.meta;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.aspect.Aspect;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.piece.DropPieceRule;
-import net.rezmason.ropes.PlyAspect;
+import net.rezmason.ropes.aspect.PlyAspect;
 import net.rezmason.scourge.model.meta.SkipAspect;
-import net.rezmason.ropes.WinAspect;
+import net.rezmason.ropes.aspect.WinAspect;
 import net.rezmason.scourge.model.meta.EndTurnRule;
 import net.rezmason.scourge.model.meta.ForfeitRule;
 import net.rezmason.scourge.model.meta.KillHeadlessBodyRule;

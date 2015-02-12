@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.build;
 
-import net.rezmason.ropes.Aspect.*;
+import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.GridDirection.*;
 import net.rezmason.ropes.GridLocus;
@@ -10,7 +10,7 @@ import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.TempParams;
 
 using Lambda;
-using net.rezmason.ropes.AspectUtils;
+using net.rezmason.ropes.aspect.AspectUtils;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.Pointers;
 

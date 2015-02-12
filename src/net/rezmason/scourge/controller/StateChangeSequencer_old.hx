@@ -2,7 +2,7 @@ package net.rezmason.scourge.controller;
 
 import net.rezmason.ds.ShitList;
 import net.rezmason.ropes.Game;
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.aspect.Aspect;
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.aspects.*;

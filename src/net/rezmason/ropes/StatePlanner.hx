@@ -4,7 +4,7 @@ import haxe.ds.ArraySort;
 
 import net.rezmason.ropes.GridLocus;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.Aspect.*;
+import net.rezmason.ropes.aspect.Aspect.*;
 
 using Lambda;
 using net.rezmason.ropes.GridUtils;

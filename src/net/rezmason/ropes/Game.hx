@@ -1,13 +1,13 @@
 package net.rezmason.ropes;
 
 import net.rezmason.ropes.CacheRule;
-import net.rezmason.ropes.PlyAspect;
+import net.rezmason.ropes.aspect.PlyAspect;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.State;
 import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlan;
 import net.rezmason.ropes.StatePlanner;
-import net.rezmason.ropes.WinAspect;
+import net.rezmason.ropes.aspect.WinAspect;
 import net.rezmason.utils.Zig;
 
 using net.rezmason.utils.Alphabetizer;

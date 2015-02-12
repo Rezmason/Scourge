@@ -1,4 +1,4 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.aspect;
 
 #if macro
 import haxe.macro.Context;
@@ -6,7 +6,7 @@ import haxe.macro.Expr;
 import net.rezmason.ropes.RopesTypes;
 #end
 
-#if !macro @:autoBuild(net.rezmason.ropes.Aspect.build()) #end class Aspect {
+#if !macro @:autoBuild(net.rezmason.ropes.aspect.Aspect.build()) #end class Aspect {
     public inline static var TRUE:Int = 1;
     public inline static var FALSE:Int = 0;
     public inline static var NULL:Int = -1;

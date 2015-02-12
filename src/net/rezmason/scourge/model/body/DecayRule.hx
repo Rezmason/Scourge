@@ -1,13 +1,13 @@
 package net.rezmason.scourge.model.body;
 
-import net.rezmason.ropes.Aspect.*;
+import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
 
 using Lambda;
 
-using net.rezmason.ropes.AspectUtils;
+using net.rezmason.ropes.aspect.AspectUtils;
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;

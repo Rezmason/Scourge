@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.meta;
 
-import net.rezmason.ropes.Aspect;
+import net.rezmason.ropes.aspect.Aspect;
 
 class ReplenishableAspect extends Aspect {
     @aspect(null) var STATE_REP_FIRST;
