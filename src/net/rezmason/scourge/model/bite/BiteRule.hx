@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.bite;
 
 import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.rule.BaseRule;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
@@ -21,7 +21,7 @@ typedef BiteMove = {>Move,
     var duplicate:Bool;
 }
 
-class BiteRule extends RopesRule<BiteParams> {
+class BiteRule extends BaseRule<BiteParams> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;

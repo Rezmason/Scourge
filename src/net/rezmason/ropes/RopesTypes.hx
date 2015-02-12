@@ -2,6 +2,7 @@ package net.rezmason.ropes;
 
 import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.grid.GridLocus;
+import net.rezmason.ropes.rule.BaseRule;
 
 using net.rezmason.utils.History;
 using net.rezmason.utils.Pointers;
@@ -20,4 +21,4 @@ typedef AspectLookup = Map<String, AspectPtr>; // The indices of property types 
 typedef Move = {id:Int, ?relatedID:Int, ?weight:Float};
 typedef SavedState = {data:String};
 typedef StateHistory = History<Atom>;
-typedef Rule = RopesRule<Dynamic>;
+typedef Rule = BaseRule<Dynamic>;

@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.meta;
 
 import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.rule.BaseRule;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 
@@ -11,7 +11,7 @@ using Lambda;
 using net.rezmason.ropes.aspect.AspectUtils;
 using net.rezmason.utils.Pointers;
 
-class KillHeadlessBodyRule extends RopesRule<Void> {
+class KillHeadlessBodyRule extends BaseRule<Void> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;

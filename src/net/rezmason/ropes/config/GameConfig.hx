@@ -1,7 +1,7 @@
 package net.rezmason.ropes.config;
 
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.JointRule;
+import net.rezmason.ropes.rule.JointRule;
 
 using net.rezmason.utils.Alphabetizer;
 

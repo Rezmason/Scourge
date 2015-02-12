@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.piece;
 
 import net.rezmason.ropes.aspect.Aspect.*;
-import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.rule.BaseRule;
 
 import net.rezmason.scourge.model.piece.PieceAspect;
 import net.rezmason.ropes.aspect.PlyAspect;
@@ -10,7 +10,7 @@ using Lambda;
 
 using net.rezmason.utils.Pointers;
 
-class SwapPieceRule extends RopesRule<SwapPieceParams> {
+class SwapPieceRule extends BaseRule<SwapPieceParams> {
 
     @player(SwapAspect.NUM_SWAPS) var numSwaps_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;

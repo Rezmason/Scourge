@@ -1,6 +1,6 @@
 package net.rezmason.ropes;
 
-import net.rezmason.ropes.CacheRule;
+import net.rezmason.ropes.rule.CacheRule;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.aspect.PlyAspect;
 import net.rezmason.ropes.aspect.WinAspect;

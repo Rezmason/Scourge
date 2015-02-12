@@ -1,4 +1,4 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.rule;
 
 import net.rezmason.utils.Zig;
 import net.rezmason.ropes.RopesTypes;
@@ -11,7 +11,7 @@ typedef CacheParams = {
     var revGetter:Void->Int;
 };
 
-class CacheRule extends RopesRule<CacheParams> {
+class CacheRule extends BaseRule<CacheParams> {
 
     private var rule:Rule;
     private var moveCache:Array<Array<Move>> = [];

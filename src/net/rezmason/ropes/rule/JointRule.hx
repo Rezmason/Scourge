@@ -1,10 +1,10 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.rule;
 
 import net.rezmason.ropes.RopesTypes;
 
 using net.rezmason.utils.MapUtils;
 
-class JointRule extends RopesRule<Array<Rule>> {
+class JointRule extends BaseRule<Array<Rule>> {
 
     override private function _init():Void {
         for (rule in params) {

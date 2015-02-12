@@ -1,9 +1,9 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.rule;
 
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.state.State;
 
-class RopesRule<Params> extends Reckoner {
+class BaseRule<Params> extends Reckoner {
 
     var historyState:State;
     var history:StateHistory;

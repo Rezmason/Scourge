@@ -1,9 +1,9 @@
 package net.rezmason.scourge.model.build;
 
-import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.rule.BaseRule;
 import net.rezmason.ropes.aspect.PlyAspect;
 
-class BuildGlobalRule extends RopesRule<BuildGlobalParams> {
+class BuildGlobalRule extends BaseRule<BuildGlobalParams> {
 
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 

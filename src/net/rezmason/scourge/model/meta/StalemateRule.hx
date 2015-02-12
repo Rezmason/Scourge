@@ -2,12 +2,12 @@ package net.rezmason.scourge.model.meta;
 
 import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.aspect.WinAspect;
-import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.rule.BaseRule;
 import net.rezmason.scourge.model.body.BodyAspect;
 
 using net.rezmason.utils.Pointers;
 
-class StalemateRule extends RopesRule<StalemateParams> {
+class StalemateRule extends BaseRule<StalemateParams> {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @player(SkipAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;

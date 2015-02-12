@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.test;
 
 //import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.rule.BaseRule;
 import net.rezmason.scourge.model.piece.PieceAspect;
 
 using net.rezmason.utils.Pointers;
@@ -12,7 +12,7 @@ typedef TestPieceParams = {
     var rotation:Int;
 }
 
-class TestPieceRule extends RopesRule<TestPieceParams> {
+class TestPieceRule extends BaseRule<TestPieceParams> {
 
     @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
     @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;

@@ -2,7 +2,7 @@ package net.rezmason.scourge.model.body;
 
 import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.rule.BaseRule;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
 
 using Lambda;
@@ -10,7 +10,7 @@ using net.rezmason.ropes.grid.GridUtils;
 using net.rezmason.ropes.aspect.AspectUtils;
 using net.rezmason.utils.Pointers;
 
-class CavityRule extends RopesRule<Void> {
+class CavityRule extends BaseRule<Void> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.CAVITY_NEXT) var cavityNext_;

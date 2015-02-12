@@ -4,7 +4,7 @@ import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.grid.GridDirection.*;
 import net.rezmason.ropes.grid.GridLocus;
-import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.rule.BaseRule;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.TempParams;
@@ -16,7 +16,7 @@ using net.rezmason.utils.Pointers;
 
 typedef XY = {x:Float, y:Float};
 
-class BuildBoardRule extends RopesRule<FullBuildBoardParams> {
+class BuildBoardRule extends BaseRule<FullBuildBoardParams> {
 
     // Creates boards for "skirmish games"
 

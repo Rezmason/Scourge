@@ -3,7 +3,7 @@ package net.rezmason.scourge.model.piece;
 import net.rezmason.ropes.aspect.Aspect.*;
 import net.rezmason.ropes.grid.GridDirection.*;
 import net.rezmason.ropes.grid.GridLocus;
-import net.rezmason.ropes.RopesRule;
+import net.rezmason.ropes.rule.BaseRule;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.TempParams;
@@ -30,7 +30,7 @@ typedef DropPieceMove = {>Move,
     var duplicate:Bool;
 }
 
-class DropPieceRule extends RopesRule<FullDropPieceParams> {
+class DropPieceRule extends BaseRule<FullDropPieceParams> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;
