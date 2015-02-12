@@ -5,7 +5,7 @@ import net.rezmason.ropes.RopesRule;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.TempParams;
-import net.rezmason.scourge.model.meta.PlyAspect;
+import net.rezmason.ropes.PlyAspect;
 
 using net.rezmason.ropes.AspectUtils;
 using net.rezmason.utils.Pointers;

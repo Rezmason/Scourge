@@ -3,10 +3,10 @@ package net.rezmason.scourge.textview;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.scourge.controller.BasicSmarts;
 import net.rezmason.scourge.controller.BotSystem;
-import net.rezmason.scourge.controller.IPlayer;
+import net.rezmason.ropes.IPlayer;
 import net.rezmason.scourge.controller.PlayerSystem;
 import net.rezmason.scourge.controller.RandomSmarts;
-import net.rezmason.scourge.controller.Referee;
+import net.rezmason.ropes.Referee;
 import net.rezmason.scourge.controller.ReplaySmarts;
 import net.rezmason.scourge.controller.Sequencer;
 import net.rezmason.scourge.model.ScourgeConfig;
@@ -43,7 +43,7 @@ class GameSystem {
         }
 
         if (isReplay) {
-            config = referee.lastGameConfig;
+            config = cast referee.lastGameConfig;
             var floats:Array<Float> = referee.lastGame.floats.copy();
             randGen = function() return floats.shift();
         }

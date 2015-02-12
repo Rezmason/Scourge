@@ -1,6 +1,7 @@
 package net.rezmason.scourge.model.meta;
 
 import net.rezmason.ropes.Aspect.*;
+import net.rezmason.ropes.PlyAspect;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.body.BodyAspect;
 

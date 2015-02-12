@@ -1,5 +1,8 @@
 package net.rezmason.scourge.model.body;
 
+import net.rezmason.ropes.Config;
+import net.rezmason.ropes.RuleComposition;
+
 class BodyConfig<RP, MP> extends Config<BodyParams, RP, MP> {
 
     override public function composition():Map<String, RuleComposition<BodyParams, RP, MP>> {

@@ -9,7 +9,7 @@ import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.body.EatCellsRule;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
-import net.rezmason.scourge.model.meta.PlyAspect;
+import net.rezmason.ropes.PlyAspect;
 
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;

@@ -1,7 +1,8 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.ropes.Reckoner;
-import net.rezmason.scourge.model.Game;
+import net.rezmason.ropes.Game;
+import net.rezmason.ropes.GameEvent;
 import net.rezmason.scourge.model.ScourgeConfig;
 
 class Smarts extends Reckoner {

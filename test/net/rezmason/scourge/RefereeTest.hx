@@ -3,13 +3,12 @@ package net.rezmason.scourge;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 
+import net.rezmason.ropes.Game;
+import net.rezmason.ropes.Referee;
 import net.rezmason.scourge.tools.Resource;
-
-import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
 
-import net.rezmason.scourge.controller.IPlayer;
-import net.rezmason.scourge.controller.Referee;
+import net.rezmason.ropes.IPlayer;
 import net.rezmason.scourge.controller.TestPlayer;
 
 using net.rezmason.scourge.model.BoardUtils;

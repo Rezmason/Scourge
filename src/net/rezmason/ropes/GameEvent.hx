@@ -1,4 +1,4 @@
-package net.rezmason.scourge.controller;
+package net.rezmason.ropes;
 
 enum GameEvent {
     SubmitMove(turn:Int, action:String, move:Int);

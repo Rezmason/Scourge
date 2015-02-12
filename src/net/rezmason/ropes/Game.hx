@@ -1,13 +1,13 @@
-package net.rezmason.scourge.model;
+package net.rezmason.ropes;
 
+import net.rezmason.ropes.CacheRule;
+import net.rezmason.ropes.PlyAspect;
+import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.State;
+import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlan;
 import net.rezmason.ropes.StatePlanner;
-import net.rezmason.ropes.StateHistorian;
-import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.CacheRule;
-import net.rezmason.scourge.model.meta.PlyAspect;
-import net.rezmason.scourge.model.meta.WinAspect;
+import net.rezmason.ropes.WinAspect;
 import net.rezmason.utils.Zig;
 
 using net.rezmason.utils.Alphabetizer;
@@ -40,7 +40,7 @@ class Game {
         invalidateSignal = new Zig();
     }
 
-    public function begin(config:ScourgeConfig, randomFunction:Void->Float, alertFunction:String->Void, savedState:SavedState = null):Int {
+    public function begin(config:GameConfig<Dynamic, Dynamic>, randomFunction:Void->Float, alertFunction:String->Void, savedState:SavedState = null):Int {
 
         if (hasBegun) {
             throw 'The game has already begun; it cannot begin again until you end it.';

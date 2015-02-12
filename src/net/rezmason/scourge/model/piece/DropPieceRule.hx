@@ -10,7 +10,7 @@ import net.rezmason.scourge.model.TempParams;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
-import net.rezmason.scourge.model.meta.PlyAspect;
+import net.rezmason.ropes.PlyAspect;
 import net.rezmason.scourge.model.meta.SkipAspect;
 
 using Lambda;

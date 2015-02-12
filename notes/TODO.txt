@@ -1,5 +1,4 @@
-There's more to ROPES than rules
-    Drag Game into ROPES
+play replay fails
 
 Entity system
     A "Sequencer" Reckoner finds and sequences changes and their causes

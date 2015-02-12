@@ -4,7 +4,7 @@ import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesRule;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
-import net.rezmason.scourge.model.meta.PlyAspect;
+import net.rezmason.ropes.PlyAspect;
 import net.rezmason.ds.ShitList;
 
 using Lambda;

@@ -1,5 +1,8 @@
 package net.rezmason.scourge.model.build;
 
+import net.rezmason.ropes.Config;
+import net.rezmason.ropes.RuleComposition;
+
 class BuildConfig<RP, MP> extends Config<BuildParams, RP, MP> {
 
     var initGrid:String;

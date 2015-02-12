@@ -1,5 +1,8 @@
 package net.rezmason.scourge.model.bite;
 
+import net.rezmason.ropes.Config;
+import net.rezmason.ropes.RuleComposition;
+
 class BiteConfig<RP, MP> extends Config<BiteParams, RP, MP> {
 
     override public function composition():Map<String, RuleComposition<BiteParams, RP, MP>> {

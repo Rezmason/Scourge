@@ -1,4 +1,4 @@
-package net.rezmason.scourge.model;
+package net.rezmason.ropes;
 
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.JointRule;
@@ -11,13 +11,13 @@ class GameConfig<RP, MP> {
     public var movePresenters(default, null):Map<String, Class<MP>>;
     public var actionIDs(default, null):Array<String>;
     public var defaultActionIDs(default, null):Array<String>;
+    public var params:Map<String, Dynamic>;
 
     var configDefs:Map<String, Class<Config<Dynamic, RP, MP>>>;
     var jointRuleDefs:Array<JointRuleDef>;
     var fallbackRP:Class<RP>;
     var fallbackMP:Class<MP>;
     
-    var params:Map<String, Dynamic>;
     var rulesByID:Map<String, Class<Rule>>;
     var configIDsByRuleID:Map<String, String>;
     var conditionsByRuleID:Map<String, Dynamic->Bool>;

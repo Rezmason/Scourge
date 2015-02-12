@@ -1,3 +1,3 @@
-package net.rezmason.scourge.model;
+package net.rezmason.ropes;
 
 typedef JointRuleDef = {id:String, sequence:Array<String>};

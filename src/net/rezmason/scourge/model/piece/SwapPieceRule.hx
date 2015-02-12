@@ -4,7 +4,7 @@ import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesRule;
 
 import net.rezmason.scourge.model.piece.PieceAspect;
-import net.rezmason.scourge.model.meta.PlyAspect;
+import net.rezmason.ropes.PlyAspect;
 
 using Lambda;
 

@@ -1,4 +1,4 @@
-package net.rezmason.scourge.model.meta;
+package net.rezmason.ropes;
 
 import net.rezmason.ropes.Aspect;
 

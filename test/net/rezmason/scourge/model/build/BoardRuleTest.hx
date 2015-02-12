@@ -10,7 +10,7 @@ import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.build.BuildBoardRule;
 import net.rezmason.scourge.model.build.BuildPlayersRule;
-import net.rezmason.scourge.model.meta.PlyAspect;
+import net.rezmason.ropes.PlyAspect;
 
 using net.rezmason.ropes.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;

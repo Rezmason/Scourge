@@ -1,4 +1,4 @@
-package net.rezmason.scourge.controller;
+package net.rezmason.ropes;
 
 import net.rezmason.ropes.RopesTypes.SavedState;
 

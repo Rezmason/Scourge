@@ -1,7 +1,8 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.ropes.RopesTypes.Move;
-import net.rezmason.scourge.model.Game;
+import net.rezmason.ropes.Game;
+import net.rezmason.ropes.GameEvent;
 
 class ReplaySmarts extends Smarts {
 

@@ -7,7 +7,7 @@ import net.rezmason.ropes.Aspect.*;
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.Reckoner;
 import net.rezmason.scourge.controller.PlayerSystem;
-import net.rezmason.scourge.model.Game;
+import net.rezmason.ropes.Game;
 import net.rezmason.scourge.model.aspects.*;
 import net.rezmason.scourge.components.*;
 import net.rezmason.utils.Pointers;

@@ -1,15 +1,15 @@
 package net.rezmason.scourge.controller;
 
+import net.rezmason.ropes.Aspect.*;
+import net.rezmason.ropes.Game;
+import net.rezmason.ropes.GameEvent;
 import net.rezmason.ropes.RopesTypes.Move;
-import net.rezmason.scourge.model.Game;
-import net.rezmason.scourge.model.ScourgeConfig;
-
 import net.rezmason.ropes.RopesTypes;
+import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.piece.DropPieceRule.DropPieceMove;
-import net.rezmason.ropes.Aspect.*;
 
 using net.rezmason.ropes.GridUtils;
 

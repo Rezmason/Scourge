@@ -1,5 +1,8 @@
 package net.rezmason.scourge.model.meta;
 
+import net.rezmason.ropes.Config;
+import net.rezmason.ropes.RuleComposition;
+
 class MetaConfig<RP, MP> extends Config<MetaParams, RP, MP> {
 
     override public function composition():Map<String, RuleComposition<MetaParams, RP, MP>> {

@@ -6,7 +6,7 @@ import net.rezmason.ropes.RopesRule;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
-import net.rezmason.scourge.model.meta.PlyAspect;
+import net.rezmason.ropes.PlyAspect;
 
 using Lambda;
 using net.rezmason.ropes.GridUtils;
