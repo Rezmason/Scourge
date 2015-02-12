@@ -20,31 +20,33 @@ class ScourgeConfig extends GameConfig<RP, MP> {
     public var metaParams(get, null):MetaParams;
     public var pieceParams(get, null):PieceParams;
     
-    static var scourgeDefs:Map<String, Class<Config<Dynamic, RP, MP>>> = [
-        'bite'  => BiteConfig,
-        'body'  => BodyConfig,
-        'build' => BuildConfig,
-        'meta'  => MetaConfig,
-        'piece' => PieceConfig,
-    ];
-
-    static var cleanUp:String = 'cleanUp';
-    static var wrapUp:String = 'wrapUp';
-
-    static var combinedDefs:Map<String, Array<String>> = [
-        cleanUp     => ['decay', 'cavity', 'killHeadlessBody', 'oneLivingPlayer', 'resetFreshness'],
-        wrapUp      => ['endTurn', 'replenish', 'pick'],
-        'start'     => [cleanUp, 'pick'],
-        'forfeit'   => ['forfeit', cleanUp, wrapUp],
-        'drop'      => ['drop', 'eatCells', cleanUp, wrapUp, 'stalemate'],
-        'swap'      => ['swap', 'pick'],
-        'bite'      => ['bite', cleanUp],
-    ];
-
     public function new() {
         
-        super(scourgeDefs);
+        configDefs = [
+            'bite'  => BiteConfig,
+            'body'  => BodyConfig,
+            'build' => BuildConfig,
+            'meta'  => MetaConfig,
+            'piece' => PieceConfig,
+        ];
 
+        jointRuleDefs = [
+            {id:'cleanUp',  sequence:['decay', 'cavity', 'killHeadlessBody', 'oneLivingPlayer', 'resetFreshness']},
+            {id:'wrapUp',   sequence:['endTurn', 'replenish', 'pick']},
+            {id:'start',    sequence:['cleanUp', 'pick']},
+            {id:'forfeit',  sequence:['forfeit', 'cleanUp', 'wrapUp']},
+            {id:'drop',     sequence:['drop', 'eatCells', 'cleanUp', 'wrapUp', 'stalemate']},
+            {id:'swap',     sequence:['swap', 'pick']},
+            {id:'bite',     sequence:['bite', 'cleanUp']},
+            {id:'build',    sequence:['buildGlobal', 'buildPlayers', 'buildBoard']},
+        ];
+
+        defaultActionIDs = ['drop', 'forfeit'];
+
+        fallbackRP = null;
+        fallbackMP = null;
+
+        parseConfigDefs();
         metaParams.globalProperties[NUM_SWAPS.id] = { prop:NUM_SWAPS, amount:1, period:4, maxAmount:10 };
         metaParams.globalProperties[NUM_BITES.id] = { prop:NUM_BITES, amount:1, period:3, maxAmount:10 };
     }

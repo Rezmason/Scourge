@@ -24,9 +24,9 @@ class Game {
     public var hasBegun(get, null):Bool;
     public var checksum(get, null):Int;
 
+    var rules:Map<String, Rule>;
     var historian:StateHistorian;
-    var actions:Array<Rule>;
-    var defaultActions:Array<Rule>;
+    var defaultActionIDs:Array<String>;
     var winner_:AspectPtr;
     var currentPlayer_:AspectPtr;
     var planner:StatePlanner;
@@ -48,26 +48,13 @@ class Game {
 
         var ruleAlertFunction = makeRuleAlertFunction(alertFunction);
 
-        // Build the game from the config
-
-        var basicRulesByName:Map<String, Rule> = config.makeRules(cacheMoves ? makeCacheRule : null);
-        var combinedRules:Map<String, Rule> = ScourgeConfigFactory.combineRules(config, basicRulesByName);
-        var builderRuleKeys:Array<String> = ScourgeConfigFactory.makeBuilderRuleList();
-        var basicRules:Array<Rule> = [];
-        var builderRules:Array<Rule> = [];
-        for (key in basicRulesByName.keys().a2z()) {
-            var builderRuleIndex:Int = builderRuleKeys.indexOf(key);
-            if (builderRuleIndex == -1) basicRules.push(basicRulesByName[key]);
-            else builderRules[builderRuleIndex] = basicRulesByName[key];
-        }
-        while (builderRules.remove(null)) {}
-
-        // Plan the state
-
-        plan = planner.planState(state, builderRules.concat(basicRules));
-
-        for (rule in builderRules.concat(basicRules)) {
-            rule.prime(state, plan, historian.history, historian.historyState, randomFunction, ruleAlertFunction);
+        rules = config.makeRules(cacheMoves ? makeCacheRule : null);
+        actionIDs = config.actionIDs;
+        defaultActionIDs = config.defaultActionIDs;
+        plan = planner.planState(state, rules);
+        primeRule(rules['build'], randomFunction, ruleAlertFunction);
+        for (key in rules.keys().a2z()) {
+            if (!rules[key].primed) primeRule(rules[key], randomFunction, ruleAlertFunction);
         }
 
         // Grab some aspect pointers so we can quickly evaluate the state
@@ -75,25 +62,13 @@ class Game {
         winner_ = plan.onGlobal(WinAspect.WINNER);
         currentPlayer_ = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
 
-        // Find the player actions
-
-        actionIDs = ScourgeConfigFactory.makeActionList(config);
-        actions = [];
-        for (actionID in actionIDs) actions.push(combinedRules[actionID]);
-
-        // Find the default actions
-
-        var defaultActionIDs:Array<String> = ScourgeConfigFactory.makeDefaultActionList();
-        defaultActions = [];
-        for (defaultActionID in defaultActionIDs) defaultActions.push(combinedRules[defaultActionID]);
-
         // Find the start action and make it happen
 
         if (savedState != null) {
             historian.load(savedState);
         } else {
             historian.key.lock();
-            var startAction = combinedRules[ScourgeConfigFactory.makeStartAction()];
+            var startAction = rules['start'];
             startAction.update();
             historian.key.unlock();
             startAction.chooseMove();
@@ -105,6 +80,10 @@ class Game {
         return historian.history.revision;
     }
 
+    function primeRule(rule, randomFunction, alertFunction) {
+        rule.prime(state, plan, historian.history, historian.historyState, randomFunction, alertFunction);
+    }
+
     public function save():SavedState { return historian.save(); }
 
     public function end():Void {
@@ -114,46 +93,49 @@ class Game {
 
         historian.reset();
         invalidateSignal.removeAll();
-        actions = null;
+        rules = null;
         actionIDs = null;
+        defaultActionIDs = null;
     }
 
     public function forget():Void { historian.history.forget(); }
 
-    public function getMovesForAction(index:Int):Array<Move> {
+    public function getMovesForAction(id:String):Array<Move> {
+        if (actionIDs.indexOf(id) == -1) throw 'Action $id does not exist.';
         historian.key.lock();
-        actions[index].update();
-        var moves:Array<Move> = actions[index].moves;
+        rules[id].update();
+        var moves:Array<Move> = rules[id].moves;
         historian.key.unlock();
         return moves;
     }
 
-    public function getQuantumMovesForAction(index:Int):Array<Move> {
+    public function getQuantumMovesForAction(id:String):Array<Move> {
+        if (actionIDs.indexOf(id) == -1) throw 'Action $id does not exist.';
         historian.key.lock();
-        actions[index].update();
-        var quantumMoves:Array<Move> = actions[index].quantumMoves;
+        rules[id].update();
+        var quantumMoves:Array<Move> = rules[id].quantumMoves;
         historian.key.unlock();
         return quantumMoves;
     }
 
-    public function chooseMove(actionIndex:Int, moveIndex:Int = 0, isQuantum:Bool = false, cleanUp:Bool = true):Int {
+    public function chooseMove(actionID:String, moveIndex:Int = 0, isQuantum:Bool = false, cleanUp:Bool = true):Int {
 
-        if (actionIndex < 0 || actionIndex > actionIDs.length - 1) throw 'Invalid action';
+        if (actionIDs.indexOf(actionID) == -1) throw 'Action $actionID does not exist.';
 
         if (isQuantum) {
-            if (moveIndex < 0 || moveIndex > getQuantumMovesForAction(actionIndex).length - 1) {
-                throw 'Invalid quantum move for action ${actionIDs[actionIndex]}';
+            if (moveIndex < 0 || moveIndex > getQuantumMovesForAction(actionID).length - 1) {
+                throw 'Invalid quantum move for action $actionID}';
             } else {
-                actions[actionIndex].chooseQuantumMove(moveIndex);
+                rules[actionID].chooseQuantumMove(moveIndex);
             }
         } else {
-            var numMovesForAction:Int = getMovesForAction(actionIndex).length - 1;
+            var numMovesForAction:Int = getMovesForAction(actionID).length - 1;
             if (moveIndex < 0) {
-                throw 'Invalid move for action ${actionIDs[actionIndex]}: $moveIndex < 0';
+                throw 'Invalid move for action $actionID: $moveIndex < 0';
             } else if (moveIndex > numMovesForAction) {
-                throw 'Invalid move for action ${actionIDs[actionIndex]}: $moveIndex > $numMovesForAction';
+                throw 'Invalid move for action $actionID: $moveIndex > $numMovesForAction';
             } else {
-                actions[actionIndex].chooseMove(moveIndex);
+                rules[actionID].chooseMove(moveIndex);
             }
         }
 
@@ -178,7 +160,7 @@ class Game {
 
     private function collectAllMoves():Void {
         historian.key.lock();
-        for (action in actions) action.collectMoves();
+        for (id in actionIDs) rules[id].collectMoves();
         historian.key.unlock();
     }
 
@@ -200,7 +182,7 @@ class Game {
 
     private function get_state():State { return historian.state; }
 
-    private function get_hasBegun():Bool { return actions != null; }
+    private function get_hasBegun():Bool { return rules != null; }
 
     private function get_checksum():Int { return historian.history.getChecksum(); }
 }

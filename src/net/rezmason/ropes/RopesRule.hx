@@ -10,6 +10,7 @@ class RopesRule<Params> extends Reckoner {
 
     public var moves(default, null):Array<Move> = [{id:0}];
     public var quantumMoves(default, null):Array<Move> = [];
+    public var primed(default, null):Bool;
     
     private function _prime():Void {}
     private function _init():Void {}
@@ -24,6 +25,7 @@ class RopesRule<Params> extends Reckoner {
     @:final public function init(params:Params):Void {
         this.params = params;
         _init();
+        primed = false;
     }
 
     @:final public function prime(state, plan, history, historyState, random:Void->Float, changeSignal:Rule->Void = null):Void {
@@ -31,8 +33,8 @@ class RopesRule<Params> extends Reckoner {
         this.historyState = historyState;
         this.changeSignal = changeSignal;
         this.random = random;
-
         primePointers(state, plan);
+        primed = true;
 
         #if ROPES_VERBOSE trace('${myName()} initializing'); #end
         _prime();

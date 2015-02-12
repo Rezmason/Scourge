@@ -1,7 +1,6 @@
 package net.rezmason.scourge.textview.commands;
 
 import net.rezmason.scourge.model.ScourgeConfig;
-import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.model.bite.BiteAspect;
 import net.rezmason.scourge.model.piece.SwapAspect;
 import net.rezmason.scourge.textview.GameSystem;

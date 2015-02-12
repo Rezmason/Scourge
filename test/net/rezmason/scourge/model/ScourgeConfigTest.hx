@@ -1,6 +1,5 @@
 package net.rezmason.scourge.model;
 
-import haxe.ds.StringMap;
 import haxe.Unserializer;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
@@ -11,7 +10,6 @@ import net.rezmason.ropes.StateHistorian;
 import net.rezmason.ropes.StatePlanner;
 import net.rezmason.ropes.Aspect;
 import net.rezmason.scourge.model.ScourgeConfig;
-import net.rezmason.scourge.model.ScourgeConfigFactory;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.meta.PlyAspect;
@@ -28,7 +26,7 @@ using net.rezmason.ropes.StatePlan;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;
 
-class ScourgeConfigFactoryTest
+class ScourgeConfigTest
 {
     var stateHistorian:StateHistorian;
     var history:StateHistory;
@@ -36,7 +34,7 @@ class ScourgeConfigFactoryTest
     var historyState:State;
     var plan:StatePlan;
     var config:ScourgeConfig;
-    var combinedRules:StringMap<Rule>;
+    var rules:Map<String, Rule>;
 
     var startAction:Rule;
     var biteAction:Rule;
@@ -62,7 +60,7 @@ class ScourgeConfigFactoryTest
     public function afterClass():Void {
         stateHistorian.reset();
 
-        combinedRules = null;
+        rules = null;
         config = null;
         stateHistorian = null;
         history = null;
@@ -76,7 +74,7 @@ class ScourgeConfigFactoryTest
         config = new ScourgeConfig();
         stateHistorian.reset();
 
-        combinedRules = null;
+        rules = null;
     }
 
     @Test
@@ -88,11 +86,11 @@ class ScourgeConfigFactoryTest
     public function allActionsRegisteredTest():Void {
         makeState();
         
-        for (action in ScourgeConfigFactory.makeActionList(config)) {
-            Assert.isNotNull(combinedRules.get(action));
+        for (action in config.actionIDs) {
+            Assert.isNotNull(rules.get(action));
         }
         
-        Assert.isNotNull(combinedRules.get(ScourgeConfigFactory.makeStartAction()));
+        Assert.isNotNull(rules.get('start'));
     }
 
     @Test
@@ -288,34 +286,26 @@ class ScourgeConfigFactoryTest
     }
 
     private function makeState():Void {
-        var basicRulesByName:Map<String, Rule> = config.makeRules();
         var random:Void->Float = function() return 0;
-        combinedRules = ScourgeConfigFactory.combineRules(config, basicRulesByName);
+
+        rules = config.makeRules();
         
-        var builderRuleKeys:Array<String> = ScourgeConfigFactory.makeBuilderRuleList();
-        var basicRules:Array<Rule> = [];
-        var builderRules:Array<Rule> = [];
-
-        for (key in basicRulesByName.keys().a2z()) {
-            var builderRuleIndex:Int = builderRuleKeys.indexOf(key);
-            if (builderRuleIndex == -1) basicRules.push(basicRulesByName[key]);
-            else builderRules[builderRuleIndex] = basicRulesByName[key];
-        }
-        while (builderRules.remove(null)) {}
-
         // Plan the state
-        plan = new StatePlanner().planState(state, builderRules.concat(basicRules));
+        plan = new StatePlanner().planState(state, rules);
 
         // Prime the rules
-        for (rule in builderRules.concat(basicRules)) {
-            rule.prime(state, plan, history, historyState, random);
+        rules['build'].prime(state, plan, history, historyState, random);
+        for (key in rules.keys().a2z()) {
+            if (!rules[key].primed) {
+                rules[key].prime(state, plan, history, historyState, random);
+            }
         }
 
-        startAction = combinedRules.get(ScourgeConfigFactory.makeStartAction());
-        biteAction = combinedRules.get('biteAction');
-        swapAction = combinedRules.get('swapAction');
-        quitAction = combinedRules.get('quitAction');
-        dropAction = combinedRules.get('dropAction');
+        startAction = rules.get('start');
+        biteAction = rules.get('bite');
+        swapAction = rules.get('swap');
+        quitAction = rules.get('forfeit');
+        dropAction = rules.get('drop');
     }
 
 }

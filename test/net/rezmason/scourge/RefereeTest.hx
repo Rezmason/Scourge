@@ -7,7 +7,6 @@ import net.rezmason.scourge.tools.Resource;
 
 import net.rezmason.scourge.model.Game;
 import net.rezmason.scourge.model.ScourgeConfig;
-import net.rezmason.scourge.model.ScourgeConfigFactory;
 
 import net.rezmason.scourge.controller.IPlayer;
 import net.rezmason.scourge.controller.Referee;

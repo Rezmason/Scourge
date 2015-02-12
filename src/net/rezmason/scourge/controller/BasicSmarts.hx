@@ -2,7 +2,6 @@ package net.rezmason.scourge.controller;
 
 import net.rezmason.ropes.RopesTypes.Move;
 import net.rezmason.scourge.model.Game;
-import net.rezmason.scourge.model.ScourgeAction.*;
 import net.rezmason.scourge.model.ScourgeConfig;
 
 import net.rezmason.ropes.RopesTypes;
@@ -16,10 +15,11 @@ using net.rezmason.ropes.GridUtils;
 
 class BasicSmarts extends Smarts {
 
-    private var dropActionIndex:Int;
-    private var swapActionIndex:Int;
-    private var biteActionIndex:Int;
-    private var quitActionIndex:Int;
+    static var dropActionID:String = 'drop';
+    static var swapActionID:String = 'swap';
+    static var biteActionID:String = 'bite';
+    static var quitActionID:String = 'forfeit';
+
     private var otherActionIndices:Array<Int>;
     private var canSkip:Bool;
 
@@ -29,10 +29,6 @@ class BasicSmarts extends Smarts {
     
     override public function init(game:Game, config:ScourgeConfig, id:Int, random:Void->Float):Void {
         super.init(game, config, id, random);
-        dropActionIndex = game.actionIDs.indexOf(DROP_ACTION);
-        swapActionIndex = game.actionIDs.indexOf(SWAP_ACTION);
-        biteActionIndex = game.actionIDs.indexOf(BITE_ACTION);
-        quitActionIndex = game.actionIDs.indexOf(QUIT_ACTION);
         canSkip = config.pieceParams.allowSkipping;
 
         occupier_ = game.plan.onNode(OwnershipAspect.OCCUPIER);
@@ -43,7 +39,7 @@ class BasicSmarts extends Smarts {
         var type:GameEvent = null;
         var rev:Int = game.revision;
         
-        var dropMoves:Array<Move> = game.getMovesForAction(dropActionIndex);
+        var dropMoves:Array<Move> = game.getMovesForAction(dropActionID);
         var choice:Int = 0;
         var numSkipMoves:Int = canSkip ? 1 : 0;
         
@@ -54,43 +50,43 @@ class BasicSmarts extends Smarts {
                 if (dropMoves.length - numSkipMoves > 15) {
                     choice = numSkipMoves + prunedMoves[randIntRange(prunedMoves.length)];
                 } else {
-                    choice = findBestMoveIndex(dropActionIndex, prunedMoves.iterator(), getSizeDelta);
+                    choice = findBestMoveIndex(dropActionID, prunedMoves.iterator(), getSizeDelta);
                 }
-                type = SubmitMove(rev, dropActionIndex, choice);
+                type = SubmitMove(rev, dropActionID, choice);
             }
         }
 
         if (type == null) {
-            var swapMoves:Array<Move> = game.getMovesForAction(swapActionIndex);
+            var swapMoves:Array<Move> = game.getMovesForAction(swapActionID);
             if (swapMoves.length > 0) {
                 choice = randIntRange(swapMoves.length);
-                type = SubmitMove(rev, swapActionIndex, choice);
+                type = SubmitMove(rev, swapActionID, choice);
             }
         }
 
         if (type == null) {
-            var biteMoves:Array<Move> = game.getMovesForAction(biteActionIndex);
+            var biteMoves:Array<Move> = game.getMovesForAction(biteActionID);
             if (biteMoves.length > 0) {
                 // pruning
                 var biteSizes:Array<Int> = biteMoves.map(function(_) return (cast _).bitNodes.length);
                 var maxBiteSize:Int = biteSizes[biteSizes.length - 1];
                 var maxBiteSizeIndex:Int = biteSizes.indexOf(maxBiteSize);
                 
-                choice = findBestMoveIndex(biteActionIndex, maxBiteSizeIndex...biteMoves.length, getSizeDelta);
-                type = SubmitMove(rev, biteActionIndex, choice);
+                choice = findBestMoveIndex(biteActionID, maxBiteSizeIndex...biteMoves.length, getSizeDelta);
+                type = SubmitMove(rev, biteActionID, choice);
             }
         }
 
         if (type == null) {
             if (canSkip) {
-                type = SubmitMove(rev, dropActionIndex, choice);
+                type = SubmitMove(rev, dropActionID, choice);
             }
         }
 
         if (type == null) {
-            var quitMoves:Array<Move> = game.getMovesForAction(quitActionIndex);
+            var quitMoves:Array<Move> = game.getMovesForAction(quitActionID);
             if (quitMoves.length > 0) {
-                type = SubmitMove(rev, quitActionIndex, choice);
+                type = SubmitMove(rev, quitActionID, choice);
             }
         }
 
@@ -126,13 +122,13 @@ class BasicSmarts extends Smarts {
         return prunedIndices;
     }
 
-    function findBestMoveIndex(actionIndex:Int, itr:Iterator<Int>, eval:Void->Int):Int {
+    function findBestMoveIndex(actionID:String, itr:Iterator<Int>, eval:Void->Int):Int {
         var extreme:Null<Int> = null;
         var extremeIndex:Int = 0;
         var rev:Int = game.revision;
         while (itr.hasNext()) {
             var index:Int = itr.next();
-            game.chooseMove(actionIndex, index);
+            game.chooseMove(actionID, index);
             var value:Int = eval();
             game.rewind(rev);
             if (extreme == null || extreme > value) {

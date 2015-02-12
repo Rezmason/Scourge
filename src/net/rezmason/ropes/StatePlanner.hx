@@ -17,20 +17,17 @@ class StatePlanner {
 
     }
 
-    public function planState(state:State, rules:Array<Rule>):StatePlan {
+    public function planState(state:State, rules:Iterable<Rule>):StatePlan {
         if (rules == null) return null;
 
         var plan:StatePlan = new StatePlan();
-
-        for (ike in 0...rules.length) if (rules.indexOf(rules[ike]) != ike) rules[ike] = null;
-        rules = rules.copy();
-        while (rules.remove(null)) {}
 
         var globalRequirements:AspectRequirements = new AspectRequirements();
         var playerRequirements:AspectRequirements = new AspectRequirements();
         var nodeRequirements:AspectRequirements = new AspectRequirements();
 
         for (rule in rules) {
+            if (rule == null) continue;
             globalRequirements.absorb(rule.globalAspectRequirements);
             playerRequirements.absorb(rule.playerAspectRequirements);
             nodeRequirements.absorb(rule.nodeAspectRequirements);

@@ -1,29 +1,26 @@
 package net.rezmason.scourge.model;
 
 import net.rezmason.ropes.RopesTypes;
+import net.rezmason.ropes.JointRule;
 
 using net.rezmason.utils.Alphabetizer;
 
 class GameConfig<RP, MP> {
     
-    var params(default, null):Map<String, Dynamic>;
-    var configs(default, null):Map<String, Config<Dynamic, RP, MP>>;
-    var rulePresenters(default, null):Map<String, Class<RP>>;
-    var movePresenters(default, null):Map<String, Class<MP>>;
-    var builderRules(default, null):Array<Class<Rule>>;
-    var rules(default, null):Array<Class<Rule>>;
-    var rulesByID(default, null):Map<String, Class<Rule>>;
-    var configIDsByRuleID(default, null):Map<String, String>;
-    var conditionsByRuleID(default, null):Map<String, Dynamic->Bool>;
+    public var rulePresenters(default, null):Map<String, Class<RP>>;
+    public var movePresenters(default, null):Map<String, Class<MP>>;
+    public var actionIDs(default, null):Array<String>;
+    public var defaultActionIDs(default, null):Array<String>;
 
+    var configDefs:Map<String, Class<Config<Dynamic, RP, MP>>>;
+    var jointRuleDefs:Array<JointRuleDef>;
     var fallbackRP:Class<RP>;
     var fallbackMP:Class<MP>;
-    var defs:Map<String, Class<Config<Dynamic, RP, MP>>>;
-
-    public function new(defs:Map<String, Class<Config<Dynamic, RP, MP>>>) {
-        this.defs = defs;
-        parseDefs();
-    }
+    
+    var params:Map<String, Dynamic>;
+    var rulesByID:Map<String, Class<Rule>>;
+    var configIDsByRuleID:Map<String, String>;
+    var conditionsByRuleID:Map<String, Dynamic->Bool>;
 
     public function makeRules(ruleMap:Rule->Rule = null):Map<String, Rule> {
         var rules = new Map();
@@ -36,23 +33,30 @@ class GameConfig<RP, MP> {
                 rules[key] = rule;
             }
         }
+
+        for (def in jointRuleDefs) {
+            var sequence = [for (id in def.sequence) if (rules[id] != null) rules[id]];
+            if (sequence.length > 0) {
+                var jointRule = new JointRule();
+                jointRule.init(sequence);
+                rules[def.id] = jointRule;
+            }
+        }
+
         return rules;
     }
 
-    function parseDefs() {
+    function parseConfigDefs() {
         params = new Map();
-        configs = new Map();
         rulePresenters = new Map();
         movePresenters = new Map();
-        builderRules = [];
-        rules = [];
         rulesByID = new Map();
         configIDsByRuleID = new Map();
         conditionsByRuleID = new Map();
+        actionIDs = [];
 
-        for (configKey in defs.keys().a2z()) {
-            var config:Config<Dynamic, RP, MP> = Type.createInstance(defs[configKey], []);
-            configs[configKey] = config;
+        for (configKey in configDefs.keys().a2z()) {
+            var config:Config<Dynamic, RP, MP> = Type.createInstance(configDefs[configKey], []);
             params[configKey] = config.defaultParams();
 
             var composition = config.composition();
@@ -62,12 +66,13 @@ class GameConfig<RP, MP> {
                 rulePresenters[compKey] = (ruleComp.presenter == null) ? fallbackRP : ruleComp.presenter;
 
                 switch (ruleComp.type) {
-                    case Simple: 
-                    case Action(presenter): movePresenters[compKey] = (presenter == null) ? fallbackMP : presenter;
-                    case Builder: builderRules.push(ruleComp.def);
+                    case Action(presenter): 
+                        actionIDs.push(compKey);
+                        movePresenters[compKey] = (presenter == null) ? fallbackMP : presenter;
+                    case _:
+
                 }
 
-                rules.push(ruleComp.def);
                 rulesByID[compKey] = ruleComp.def;
                 configIDsByRuleID[compKey] = configKey;
                 conditionsByRuleID[compKey] = ruleComp.condition;
@@ -77,16 +82,20 @@ class GameConfig<RP, MP> {
 
     function hxSerialize(s:haxe.Serializer):Void {
         var defNames:Map<String, String> = new Map();
-        for (key in defs.keys()) defNames[key] = Type.getClassName(defs[key]);
+        for (key in configDefs.keys()) defNames[key] = Type.getClassName(configDefs[key]);
         s.serialize(defNames);
+        s.serialize(jointRuleDefs);
+        s.serialize(defaultActionIDs);
         s.serialize(params);
     }
 
     function hxUnserialize(s:haxe.Unserializer):Void {
         var defNames:Map<String, String> = s.unserialize();
-        defs = new Map();
-        for (key in defNames.keys()) defs[key] = cast Type.resolveClass(defNames[key]);
-        parseDefs();
+        configDefs = new Map();
+        for (key in defNames.keys()) configDefs[key] = cast Type.resolveClass(defNames[key]);
+        jointRuleDefs = s.unserialize();
+        defaultActionIDs = s.unserialize();
+        parseConfigDefs();
         params = s.unserialize();
     }
 }

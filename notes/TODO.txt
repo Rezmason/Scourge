@@ -1,7 +1,4 @@
 There's more to ROPES than rules
-    Replace ScourgeConfigFactory with ScourgeConfig
-        "joint rules"
-        actions
     Drag Game into ROPES
 
 Entity system

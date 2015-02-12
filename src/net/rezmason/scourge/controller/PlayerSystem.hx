@@ -52,7 +52,7 @@ class PlayerSystem implements IPlayer {
                 }
             case RelayMove(turn, action, move):
                 if (turn == game.revision) {
-                    if (usesSignals) moveStartSignal.dispatch(game.currentPlayer, game.actionIDs[action], move);
+                    if (usesSignals) moveStartSignal.dispatch(game.currentPlayer, action, move);
                     isGameUpdating = true;
                     if (game.hasBegun) updateGame(action, move);
                     isGameUpdating = false;
@@ -86,7 +86,7 @@ class PlayerSystem implements IPlayer {
 
     private function takeTurn():Void if (isMyTurn()) play();
     private function end():Void game.end();
-    private function updateGame(actionIndex:Int, move:Int):Void game.chooseMove(actionIndex, move);
+    private function updateGame(actionID:String, move:Int):Void game.chooseMove(actionID, move);
     private function play():Void throw "Override this.";
     private function retrieveRandomFloat():Float return floats.shift();
 
