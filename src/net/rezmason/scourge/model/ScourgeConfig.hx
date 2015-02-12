@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model;
 
-import net.rezmason.ropes.GameConfig;
+import net.rezmason.ropes.config.GameConfig;
 
 import net.rezmason.scourge.model.bite.BiteAspect.*;
 import net.rezmason.scourge.model.piece.SwapAspect.*;

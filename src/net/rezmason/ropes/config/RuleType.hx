@@ -1,4 +1,4 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.config;
 
 enum RuleType<MovePresenter> {
     Simple;

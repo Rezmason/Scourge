@@ -1,4 +1,4 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.config;
 
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.JointRule;

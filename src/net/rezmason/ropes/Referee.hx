@@ -4,7 +4,7 @@ import haxe.Timer;
 
 import net.rezmason.ropes.RopesTypes;
 import net.rezmason.ropes.Game;
-import net.rezmason.ropes.GameConfig;
+import net.rezmason.ropes.config.GameConfig;
 import net.rezmason.utils.SafeSerializer;
 import net.rezmason.utils.UnixTime;
 import net.rezmason.utils.Zig;

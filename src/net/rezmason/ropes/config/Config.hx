@@ -1,4 +1,4 @@
-package net.rezmason.ropes;
+package net.rezmason.ropes.config;
 
 class Config<Params, RP, MP> {
     public function new() {}
