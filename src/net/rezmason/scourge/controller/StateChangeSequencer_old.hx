@@ -5,7 +5,7 @@ import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.praxis.grid.GridLocus;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.scourge.model.aspects.*;
+import net.rezmason.scourge.game.aspects.*;
 import net.rezmason.utils.Zig;
 
 using net.rezmason.praxis.state.StatePlan;

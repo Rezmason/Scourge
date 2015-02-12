@@ -1,8 +1,8 @@
 package net.rezmason.scourge.textview.commands;
 
-import net.rezmason.scourge.model.ScourgeConfig;
-import net.rezmason.scourge.model.bite.BiteAspect;
-import net.rezmason.scourge.model.piece.SwapAspect;
+import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.bite.BiteAspect;
+import net.rezmason.scourge.game.piece.SwapAspect;
 import net.rezmason.scourge.textview.GameSystem;
 import net.rezmason.scourge.textview.console.ConsoleCommand;
 import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;

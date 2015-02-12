@@ -3,7 +3,7 @@ package net.rezmason.scourge.controller;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.GameEvent;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeConfig;
 
 class Smarts extends Reckoner {
 

@@ -5,11 +5,11 @@ import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.GameEvent;
 import net.rezmason.praxis.PraxisTypes.Move;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.scourge.model.ScourgeConfig;
-import net.rezmason.scourge.model.body.BodyAspect;
-import net.rezmason.scourge.model.body.OwnershipAspect;
-import net.rezmason.scourge.model.body.OwnershipAspect;
-import net.rezmason.scourge.model.piece.DropPieceRule.DropPieceMove;
+import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.body.BodyAspect;
+import net.rezmason.scourge.game.body.OwnershipAspect;
+import net.rezmason.scourge.game.body.OwnershipAspect;
+import net.rezmason.scourge.game.piece.DropPieceRule.DropPieceMove;
 
 using net.rezmason.praxis.grid.GridUtils;
 

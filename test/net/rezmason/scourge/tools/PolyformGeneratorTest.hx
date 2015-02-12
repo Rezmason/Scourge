@@ -3,8 +3,8 @@ package net.rezmason.scourge.tools;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.scourge.model.PieceTypes;
-import net.rezmason.scourge.model.Pieces;
+import net.rezmason.scourge.game.PieceTypes;
+import net.rezmason.scourge.game.Pieces;
 import net.rezmason.polyform.PolyformGenerator;
 import net.rezmason.scourge.tools.Resource;
 

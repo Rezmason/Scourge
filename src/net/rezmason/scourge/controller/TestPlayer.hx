@@ -1,7 +1,7 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.praxis.play.Game;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
 typedef TestProxy = Game->(Void->Void)->Void;

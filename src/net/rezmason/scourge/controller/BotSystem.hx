@@ -3,7 +3,7 @@ package net.rezmason.scourge.controller;
 import haxe.Timer;
 import net.rezmason.praxis.play.GameEvent;
 import net.rezmason.praxis.play.IPlayer;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
 class BotSystem extends PlayerSystem {

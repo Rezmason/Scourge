@@ -8,7 +8,7 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.scourge.controller.PlayerSystem;
 import net.rezmason.praxis.play.Game;
-import net.rezmason.scourge.model.meta.FreshnessAspect;
+import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.scourge.components.*;
 import net.rezmason.utils.Pointers;
 import net.rezmason.utils.Zig;

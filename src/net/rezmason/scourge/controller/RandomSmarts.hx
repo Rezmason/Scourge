@@ -3,7 +3,7 @@ package net.rezmason.scourge.controller;
 import net.rezmason.praxis.PraxisTypes.Move;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.GameEvent;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeConfig;
 
 using Lambda;
 

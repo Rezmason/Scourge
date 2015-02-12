@@ -5,7 +5,7 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.GameEvent;
 import net.rezmason.praxis.play.IPlayer;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
 using Lambda;

@@ -9,7 +9,7 @@ import net.rezmason.scourge.controller.PlayerSystem;
 import net.rezmason.scourge.controller.RandomSmarts;
 import net.rezmason.scourge.controller.ReplaySmarts;
 import net.rezmason.scourge.controller.Sequencer;
-import net.rezmason.scourge.model.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.textview.core.Body;
 
 class GameSystem {
