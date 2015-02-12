@@ -50,7 +50,7 @@ class RefereeTest {
         if (prevData.charAt(prevData.length - 1) == '\n') prevData = prevData.substr(0, -1);
 
         // trace(prevData);
-        // trace(data);
+        trace(data);
 
         var ike:Int = 0;
         while (ike < prevData.length) {
