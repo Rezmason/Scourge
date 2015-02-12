@@ -1,17 +1,17 @@
 package net.rezmason.scourge.controller;
 
-import net.rezmason.ropes.aspect.Aspect.*;
-import net.rezmason.ropes.play.Game;
-import net.rezmason.ropes.play.GameEvent;
-import net.rezmason.ropes.RopesTypes.Move;
-import net.rezmason.ropes.RopesTypes;
+import net.rezmason.praxis.aspect.Aspect.*;
+import net.rezmason.praxis.play.Game;
+import net.rezmason.praxis.play.GameEvent;
+import net.rezmason.praxis.PraxisTypes.Move;
+import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.piece.DropPieceRule.DropPieceMove;
 
-using net.rezmason.ropes.grid.GridUtils;
+using net.rezmason.praxis.grid.GridUtils;
 
 class BasicSmarts extends Smarts {
 

@@ -1,10 +1,10 @@
 package net.rezmason.scourge.controller;
 
 import haxe.Unserializer;
-import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.play.Game;
-import net.rezmason.ropes.play.GameEvent;
-import net.rezmason.ropes.play.IPlayer;
+import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.play.Game;
+import net.rezmason.praxis.play.GameEvent;
+import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.utils.Zig;
 
@@ -26,7 +26,7 @@ class PlayerSystem implements IPlayer {
     private var isWaitingToProceed:Bool = false;
     private var usesSignals:Bool;
 
-    @:allow(net.rezmason.ropes.play.Referee)
+    @:allow(net.rezmason.praxis.play.Referee)
     private var playSignal:Zig<GameEvent->Void>;
     
     function new(usesSignals:Bool, cacheMoves:Bool):Void {

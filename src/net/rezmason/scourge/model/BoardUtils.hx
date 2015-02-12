@@ -1,14 +1,14 @@
 package net.rezmason.scourge.model;
 
-import net.rezmason.ropes.aspect.Aspect.*;
-import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.grid.GridDirection.*;
-import net.rezmason.ropes.grid.GridLocus;
-import net.rezmason.ropes.state.State;
-import net.rezmason.ropes.state.StatePlan;
+import net.rezmason.praxis.aspect.Aspect.*;
+import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.grid.GridDirection.*;
+import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.praxis.state.State;
+import net.rezmason.praxis.state.StatePlan;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 
-using net.rezmason.ropes.grid.GridUtils;
+using net.rezmason.praxis.grid.GridUtils;
 
 class BoardUtils {
 

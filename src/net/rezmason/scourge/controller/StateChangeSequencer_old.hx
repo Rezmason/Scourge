@@ -1,15 +1,15 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.ds.ShitList;
-import net.rezmason.ropes.play.Game;
-import net.rezmason.ropes.aspect.Aspect;
-import net.rezmason.ropes.grid.GridLocus;
-import net.rezmason.ropes.RopesTypes;
+import net.rezmason.praxis.play.Game;
+import net.rezmason.praxis.aspect.Aspect;
+import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.model.aspects.*;
 import net.rezmason.utils.Zig;
 
-using net.rezmason.ropes.state.StatePlan;
-using net.rezmason.ropes.grid.GridUtils;
+using net.rezmason.praxis.state.StatePlan;
+using net.rezmason.praxis.grid.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class StateChangeSequencer implements IPlayerMediator {

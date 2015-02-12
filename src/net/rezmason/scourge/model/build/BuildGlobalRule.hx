@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.build;
 
-import net.rezmason.ropes.rule.BaseRule;
-import net.rezmason.ropes.aspect.PlyAspect;
+import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.aspect.PlyAspect;
 
 class BuildGlobalRule extends BaseRule<BuildGlobalParams> {
 

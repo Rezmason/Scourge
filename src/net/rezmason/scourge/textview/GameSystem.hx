@@ -1,8 +1,8 @@
 package net.rezmason.scourge.textview;
 
 import net.rezmason.ecce.Ecce;
-import net.rezmason.ropes.play.IPlayer;
-import net.rezmason.ropes.play.Referee;
+import net.rezmason.praxis.play.IPlayer;
+import net.rezmason.praxis.play.Referee;
 import net.rezmason.scourge.controller.BasicSmarts;
 import net.rezmason.scourge.controller.BotSystem;
 import net.rezmason.scourge.controller.PlayerSystem;

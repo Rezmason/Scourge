@@ -2,10 +2,10 @@ package net.rezmason.scourge.model;
 
 import massive.munit.Assert;
 import VisualAssert;
-import net.rezmason.ropes.grid.GridDirection.*;
-import net.rezmason.ropes.grid.GridLocus;
+import net.rezmason.praxis.grid.GridDirection.*;
+import net.rezmason.praxis.grid.GridLocus;
 
-using net.rezmason.ropes.grid.GridUtils;
+using net.rezmason.praxis.grid.GridUtils;
 
 class GridUtilsTest {
 

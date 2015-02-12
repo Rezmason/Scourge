@@ -3,18 +3,18 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.aspect.Aspect;
-import net.rezmason.ropes.grid.GridLocus;
-import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.state.State;
-import net.rezmason.ropes.state.StatePlanner;
+import net.rezmason.praxis.aspect.Aspect;
+import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.state.State;
+import net.rezmason.praxis.state.StatePlanner;
 import net.rezmason.scourge.model.test.TestAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.build.BuildGlobalRule;
 import net.rezmason.scourge.model.test.TestRule;
 
-using net.rezmason.ropes.grid.GridUtils;
-using net.rezmason.ropes.state.StatePlan;
+using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.praxis.state.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class StatePlannerTest {

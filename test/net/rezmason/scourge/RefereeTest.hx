@@ -3,9 +3,9 @@ package net.rezmason.scourge;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 
-import net.rezmason.ropes.play.Game;
-import net.rezmason.ropes.play.IPlayer;
-import net.rezmason.ropes.play.Referee;
+import net.rezmason.praxis.play.Game;
+import net.rezmason.praxis.play.IPlayer;
+import net.rezmason.praxis.play.Referee;
 import net.rezmason.scourge.controller.TestPlayer;
 import net.rezmason.scourge.model.ScourgeConfig;
 import net.rezmason.scourge.tools.Resource;

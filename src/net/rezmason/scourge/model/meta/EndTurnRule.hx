@@ -1,8 +1,8 @@
 package net.rezmason.scourge.model.meta;
 
-import net.rezmason.ropes.aspect.Aspect.*;
-import net.rezmason.ropes.aspect.PlyAspect;
-import net.rezmason.ropes.rule.BaseRule;
+import net.rezmason.praxis.aspect.Aspect.*;
+import net.rezmason.praxis.aspect.PlyAspect;
+import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.model.body.BodyAspect;
 
 class EndTurnRule extends BaseRule<Void> {

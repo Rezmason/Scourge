@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.piece;
 
-import net.rezmason.ropes.config.Config;
-import net.rezmason.ropes.config.RuleComposition;
+import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.RuleComposition;
 import net.rezmason.scourge.tools.Resource;
 
 class PieceConfig<RP, MP> extends Config<PieceParams, RP, MP> {

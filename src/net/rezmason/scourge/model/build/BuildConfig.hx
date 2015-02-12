@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.build;
 
-import net.rezmason.ropes.config.Config;
-import net.rezmason.ropes.config.RuleComposition;
+import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.RuleComposition;
 
 class BuildConfig<RP, MP> extends Config<BuildParams, RP, MP> {
 

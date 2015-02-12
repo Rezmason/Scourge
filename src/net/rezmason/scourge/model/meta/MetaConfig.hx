@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.meta;
 
-import net.rezmason.ropes.config.Config;
-import net.rezmason.ropes.config.RuleComposition;
+import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.RuleComposition;
 
 class MetaConfig<RP, MP> extends Config<MetaParams, RP, MP> {
 

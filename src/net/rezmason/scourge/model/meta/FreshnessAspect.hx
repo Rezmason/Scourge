@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.meta;
 
-import net.rezmason.ropes.aspect.Aspect;
+import net.rezmason.praxis.aspect.Aspect;
 
 class FreshnessAspect extends Aspect {
     @aspect(NULL) var FRESHNESS;

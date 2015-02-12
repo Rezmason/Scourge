@@ -3,10 +3,10 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.state.State;
-import net.rezmason.ropes.state.StateHistorian;
-import net.rezmason.ropes.state.StatePlanner;
+import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.state.State;
+import net.rezmason.praxis.state.StateHistorian;
+import net.rezmason.praxis.state.StatePlanner;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
 import net.rezmason.scourge.model.body.EatCellsRule;
 import net.rezmason.scourge.model.build.BuildBoardRule;
@@ -17,7 +17,7 @@ import net.rezmason.scourge.tools.Resource;
 
 using net.rezmason.utils.Pointers;
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.ropes.state.StatePlan;
+using net.rezmason.praxis.state.StatePlan;
 
 class StateHistorianTest {
 

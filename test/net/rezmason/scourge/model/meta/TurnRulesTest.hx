@@ -3,14 +3,14 @@ package net.rezmason.scourge.model.meta;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.aspect.Aspect;
-import net.rezmason.ropes.RopesTypes;
+import net.rezmason.praxis.aspect.Aspect;
+import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.piece.DropPieceRule;
-import net.rezmason.ropes.aspect.PlyAspect;
+import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.scourge.model.meta.SkipAspect;
-import net.rezmason.ropes.aspect.WinAspect;
+import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.scourge.model.meta.EndTurnRule;
 import net.rezmason.scourge.model.meta.ForfeitRule;
 import net.rezmason.scourge.model.meta.KillHeadlessBodyRule;
@@ -18,9 +18,9 @@ import net.rezmason.scourge.model.meta.OneLivingPlayerRule;
 import net.rezmason.scourge.model.meta.StalemateRule;
 import net.rezmason.scourge.model.test.TestPieceRule;
 
-// using net.rezmason.ropes.grid.GridUtils;
+// using net.rezmason.praxis.grid.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.ropes.state.StatePlan;
+using net.rezmason.praxis.state.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class TurnRulesTest extends ScourgeRuleTest

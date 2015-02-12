@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.test;
 
-import net.rezmason.ropes.RopesTypes;
+import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.model.test.TestAspect;
 
 class TestRule extends Rule {

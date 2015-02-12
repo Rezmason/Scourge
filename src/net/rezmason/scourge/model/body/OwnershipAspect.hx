@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.body;
 
-import net.rezmason.ropes.aspect.Aspect;
+import net.rezmason.praxis.aspect.Aspect;
 
 class OwnershipAspect extends Aspect {
     @aspect(false) var IS_FILLED;

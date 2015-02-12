@@ -1,6 +1,6 @@
 package net.rezmason.scourge.components;
 
-import net.rezmason.ropes.RopesTypes.AspectSet;
+import net.rezmason.praxis.PraxisTypes.AspectSet;
 import net.rezmason.ecce.Component;
 
 class BoardSpace extends Component {

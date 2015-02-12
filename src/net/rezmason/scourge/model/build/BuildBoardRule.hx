@@ -1,17 +1,17 @@
 package net.rezmason.scourge.model.build;
 
-import net.rezmason.ropes.aspect.Aspect.*;
-import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.grid.GridDirection.*;
-import net.rezmason.ropes.grid.GridLocus;
-import net.rezmason.ropes.rule.BaseRule;
+import net.rezmason.praxis.aspect.Aspect.*;
+import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.grid.GridDirection.*;
+import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 import net.rezmason.scourge.model.TempParams;
 
 using Lambda;
-using net.rezmason.ropes.aspect.AspectUtils;
-using net.rezmason.ropes.grid.GridUtils;
+using net.rezmason.praxis.aspect.AspectUtils;
+using net.rezmason.praxis.grid.GridUtils;
 using net.rezmason.utils.Pointers;
 
 typedef XY = {x:Float, y:Float};

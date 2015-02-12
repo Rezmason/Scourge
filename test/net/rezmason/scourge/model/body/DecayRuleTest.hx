@@ -3,15 +3,15 @@ package net.rezmason.scourge.model.body;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.aspect.Aspect;
-import net.rezmason.ropes.RopesTypes;
+import net.rezmason.praxis.aspect.Aspect;
+import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.DecayRule;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 
-using net.rezmason.ropes.grid.GridUtils;
+using net.rezmason.praxis.grid.GridUtils;
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.ropes.state.StatePlan;
+using net.rezmason.praxis.state.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class DecayRuleTest extends ScourgeRuleTest

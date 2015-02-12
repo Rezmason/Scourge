@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.bite;
 
-import net.rezmason.ropes.config.Config;
-import net.rezmason.ropes.config.RuleComposition;
+import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.RuleComposition;
 
 class BiteConfig<RP, MP> extends Config<BiteParams, RP, MP> {
 

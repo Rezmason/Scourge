@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.test;
 
-import net.rezmason.ropes.aspect.Aspect;
+import net.rezmason.praxis.aspect.Aspect;
 
 class TestAspect extends Aspect {
     @aspect(0) var VALUE_1;

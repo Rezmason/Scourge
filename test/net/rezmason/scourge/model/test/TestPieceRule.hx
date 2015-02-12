@@ -1,7 +1,7 @@
 package net.rezmason.scourge.model.test;
 
-//import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.rule.BaseRule;
+//import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.model.piece.PieceAspect;
 
 using net.rezmason.utils.Pointers;

@@ -1,14 +1,14 @@
 package net.rezmason.scourge.model.meta;
 
-import net.rezmason.ropes.aspect.Aspect.*;
-import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.rule.BaseRule;
+import net.rezmason.praxis.aspect.Aspect.*;
+import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.body.OwnershipAspect;
 
 using Lambda;
 
-using net.rezmason.ropes.aspect.AspectUtils;
+using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.Pointers;
 
 class KillHeadlessBodyRule extends BaseRule<Void> {

@@ -3,8 +3,8 @@ package net.rezmason.scourge.model.piece;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.aspect.Aspect;
+import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.scourge.model.body.BodyAspect;
 import net.rezmason.scourge.model.meta.FreshnessAspect;
 import net.rezmason.scourge.model.piece.PieceAspect;
@@ -16,7 +16,7 @@ import net.rezmason.scourge.tools.Resource;
 import net.rezmason.scourge.model.TempParams;
 
 using net.rezmason.scourge.model.BoardUtils;
-using net.rezmason.ropes.state.StatePlan;
+using net.rezmason.praxis.state.StatePlan;
 using net.rezmason.utils.Pointers;
 
 class PieceRulesTest extends ScourgeRuleTest

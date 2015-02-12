@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.build;
 
-import net.rezmason.ropes.rule.BaseRule;
+import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.model.TempParams;
 
 class BuildPlayersRule extends BaseRule<FullBuildPlayersParams> {

@@ -1,6 +1,6 @@
 package net.rezmason.scourge.model.meta;
 
-import net.rezmason.ropes.RopesTypes;
+import net.rezmason.praxis.PraxisTypes;
 
 typedef ReplenishableProperty = {
     var prop:AspectProperty;

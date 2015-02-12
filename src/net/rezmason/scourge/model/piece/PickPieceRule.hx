@@ -1,13 +1,13 @@
 package net.rezmason.scourge.model.piece;
 
-import net.rezmason.ropes.aspect.Aspect.*;
-import net.rezmason.ropes.rule.BaseRule;
-import net.rezmason.ropes.RopesTypes;
+import net.rezmason.praxis.aspect.Aspect.*;
+import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.model.PieceTypes;
 import net.rezmason.scourge.model.TempParams;
-import net.rezmason.ropes.aspect.PlyAspect;
+import net.rezmason.praxis.aspect.PlyAspect;
 
-using net.rezmason.ropes.aspect.AspectUtils;
+using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.Pointers;
 
 typedef PickPieceMove = {>Move,

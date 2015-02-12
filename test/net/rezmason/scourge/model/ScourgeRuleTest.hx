@@ -3,17 +3,17 @@ package net.rezmason.scourge.model;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.ropes.RopesTypes;
-import net.rezmason.ropes.state.State;
-import net.rezmason.ropes.state.StatePlan;
-import net.rezmason.ropes.state.StatePlanner;
-import net.rezmason.ropes.state.StateHistorian;
+import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.state.State;
+import net.rezmason.praxis.state.StatePlan;
+import net.rezmason.praxis.state.StatePlanner;
+import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.scourge.model.build.BuildBoardRule;
 import net.rezmason.scourge.model.build.BuildGlobalRule;
 import net.rezmason.scourge.model.build.BuildPlayersRule;
 
-using net.rezmason.ropes.aspect.AspectUtils;
-using net.rezmason.ropes.grid.GridUtils;
+using net.rezmason.praxis.aspect.AspectUtils;
+using net.rezmason.praxis.grid.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class ScourgeRuleTest
