@@ -109,18 +109,13 @@ class Game {
         return moves;
     }
 
-    public function chooseMove(actionID:String, moveIndex:Int = 0, isQuantum:Bool = false, cleanUp:Bool = true):Int {
+    public function chooseMove(actionID:String, moveIndex:Int = 0, cleanUp:Bool = true):Int {
 
         if (actionIDs.indexOf(actionID) == -1) throw 'Action $actionID does not exist.';
-
         var numMovesForAction:Int = getMovesForAction(actionID).length;
-        if (moveIndex < 0) {
-            throw 'Invalid move for action $actionID: $moveIndex < 0';
-        } else if (moveIndex >= numMovesForAction) {
-            throw 'Invalid move for action $actionID: $moveIndex >= $numMovesForAction';
-        } else {
-            rules[actionID].chooseMove(moveIndex);
-        }
+        if (moveIndex < 0) throw 'Invalid move for action $actionID: $moveIndex < 0';
+        if (moveIndex >= numMovesForAction) throw 'Invalid move for action $actionID: $moveIndex >= $numMovesForAction';
+        rules[actionID].chooseMove(moveIndex);
 
         pushHist();
         if (cleanUp) {
