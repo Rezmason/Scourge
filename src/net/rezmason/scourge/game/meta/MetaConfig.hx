@@ -14,7 +14,7 @@ class MetaConfig<RP, MP> extends Config<MetaParams, RP, MP> {
             'replenish'         => {def:ReplenishRule,          type:Simple,       presenter:null},
             'resetFreshness'    => {def:ResetFreshnessRule,     type:Simple,       presenter:null},
             'stalemate'         => {def:StalemateRule,          type:Simple,       presenter:null, 
-                condition:function(p) return p.maxSkips > 0,
+                isIncluded:function(p) return p.maxSkips > 0,
             },
         ];
     }

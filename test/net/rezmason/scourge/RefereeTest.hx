@@ -49,7 +49,6 @@ class RefereeTest {
         var prevData:String = Resource.getString('tables/serializedState.txt');
         if (prevData.charAt(prevData.length - 1) == '\n') prevData = prevData.substr(0, -1);
 
-        // trace(prevData);
         // trace(data);
 
         var ike:Int = 0;
@@ -57,8 +56,6 @@ class RefereeTest {
             Assert.areEqual('$ike: ' + prevData.substr(ike, 200), '$ike: ' + data.substr(ike, 200));
             ike += 200;
         }
-
-        // Assert.areEqual(prevData, data);
     }
 
     #if neko @Ignore('Runs too slow on NekoVM') #end

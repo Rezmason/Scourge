@@ -49,9 +49,7 @@ class ScourgeRuleTest
         plan = null;
     }
 
-    private function makeState(rules:Array<Rule> = null,  numPlayers:Int = 1, initGrid:String = null, circular:Bool = false, random:Void->Float = null):Void {
-
-        if (random == null) random = function() return 0;
+    private function makeState(rules:Array<Rule> = null,  numPlayers:Int = 1, initGrid:String = null, circular:Bool = false):Void {
 
         history.wipe();
         historyState.wipe();
@@ -76,7 +74,7 @@ class ScourgeRuleTest
         rules.unshift(buildStateRule);
 
         plan = new StatePlanner().planState(state, rules);
-        for (rule in rules) rule.prime(state, plan, history, historyState, random);
+        for (rule in rules) rule.prime(state, plan, history, historyState);
     }
 
     private function testListLength(expectedLength:Int, first:AspectSet, next:AspectPtr, prev:AspectPtr):Int {

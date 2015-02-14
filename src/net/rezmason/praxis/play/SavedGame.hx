@@ -5,6 +5,6 @@ import net.rezmason.praxis.PraxisTypes.SavedState;
 typedef SavedGame = {
     var state:SavedState;
     var log:Array<GameEvent>;
-    var floats:Array<Float>;
+    var floatsLog:Array<Float>;
     var timeSaved:Int;
 }

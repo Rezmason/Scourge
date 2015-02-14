@@ -20,7 +20,6 @@ class PlayerSystem implements IPlayer {
     public var moveStepSignal(default, null):Zig<String->Void> = new Zig();
 
     private var game:Game;
-    private var floats:Array<Float> = [];
     private var config:ScourgeConfig;
     private var isGameUpdating:Bool = false;
     private var isWaitingToProceed:Bool = false;
@@ -65,8 +64,6 @@ class PlayerSystem implements IPlayer {
                         takeTurn();
                     }
                 }
-            case RandomFloats(turn, data): 
-                if (turn == game.revision) floats = Unserializer.run(data);
             case End: 
                 if (game.hasBegun) {
                     if (usesSignals) gameEndedSignal.dispatch();
@@ -79,7 +76,7 @@ class PlayerSystem implements IPlayer {
     private function init(configData:String, saveData:String):Void {
         var savedState:SavedState = saveData != null ? Unserializer.run(saveData).state : null;
         config = Unserializer.run(configData);
-        game.begin(config, retrieveRandomFloat, onMoveStep, savedState);
+        game.begin(config, onMoveStep, savedState);
     }
 
     private inline function onMoveStep(cause:String):Void {
@@ -90,7 +87,6 @@ class PlayerSystem implements IPlayer {
     private function end():Void game.end();
     private function updateGame(actionID:String, move:Int):Void game.chooseMove(actionID, move);
     private function play():Void throw "Override this.";
-    private function retrieveRandomFloat():Float return floats.shift();
 
     private function isMyTurn():Bool {
         throw "Override this.";

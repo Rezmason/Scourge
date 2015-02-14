@@ -38,7 +38,7 @@ class Game {
         invalidateSignal = new Zig();
     }
 
-    public function begin(config:GameConfig<Dynamic, Dynamic>, randomFunction:Void->Float, alertFunction:String->Void, savedState:SavedState = null):Int {
+    public function begin(config:GameConfig<Dynamic, Dynamic>, alertFunction:String->Void, savedState:SavedState = null):Int {
 
         if (hasBegun) {
             throw 'The game has already begun; it cannot begin again until you end it.';
@@ -50,9 +50,9 @@ class Game {
         actionIDs = config.actionIDs;
         defaultActionIDs = config.defaultActionIDs;
         plan = planner.planState(state, rules);
-        primeRule(rules['build'], randomFunction, ruleAlertFunction);
+        primeRule(rules['build'], ruleAlertFunction);
         for (key in rules.keys().a2z()) {
-            if (!rules[key].primed) primeRule(rules[key], randomFunction, ruleAlertFunction);
+            if (!rules[key].primed) primeRule(rules[key], ruleAlertFunction);
         }
 
         // Grab some aspect pointers so we can quickly evaluate the state
@@ -78,8 +78,8 @@ class Game {
         return historian.history.revision;
     }
 
-    function primeRule(rule, randomFunction, alertFunction) {
-        rule.prime(state, plan, historian.history, historian.historyState, randomFunction, alertFunction);
+    function primeRule(rule, alertFunction) {
+        rule.prime(state, plan, historian.history, historian.historyState, alertFunction);
     }
 
     public function save():SavedState { return historian.save(); }
@@ -98,6 +98,8 @@ class Game {
 
     public function forget():Void { historian.history.forget(); }
 
+    public inline function isRuleRandom(id):Bool return rules[id] != null && rules[id].isRandom;
+
     public function getMovesForAction(id:String):Array<Move> {
         if (actionIDs.indexOf(id) == -1) throw 'Action $id does not exist.';
         historian.key.lock();
@@ -107,34 +109,17 @@ class Game {
         return moves;
     }
 
-    public function getQuantumMovesForAction(id:String):Array<Move> {
-        if (actionIDs.indexOf(id) == -1) throw 'Action $id does not exist.';
-        historian.key.lock();
-        rules[id].update();
-        var quantumMoves:Array<Move> = rules[id].quantumMoves;
-        historian.key.unlock();
-        return quantumMoves;
-    }
-
     public function chooseMove(actionID:String, moveIndex:Int = 0, isQuantum:Bool = false, cleanUp:Bool = true):Int {
 
         if (actionIDs.indexOf(actionID) == -1) throw 'Action $actionID does not exist.';
 
-        if (isQuantum) {
-            if (moveIndex < 0 || moveIndex > getQuantumMovesForAction(actionID).length - 1) {
-                throw 'Invalid quantum move for action $actionID}';
-            } else {
-                rules[actionID].chooseQuantumMove(moveIndex);
-            }
+        var numMovesForAction:Int = getMovesForAction(actionID).length;
+        if (moveIndex < 0) {
+            throw 'Invalid move for action $actionID: $moveIndex < 0';
+        } else if (moveIndex >= numMovesForAction) {
+            throw 'Invalid move for action $actionID: $moveIndex >= $numMovesForAction';
         } else {
-            var numMovesForAction:Int = getMovesForAction(actionID).length - 1;
-            if (moveIndex < 0) {
-                throw 'Invalid move for action $actionID: $moveIndex < 0';
-            } else if (moveIndex > numMovesForAction) {
-                throw 'Invalid move for action $actionID: $moveIndex > $numMovesForAction';
-            } else {
-                rules[actionID].chooseMove(moveIndex);
-            }
+            rules[actionID].chooseMove(moveIndex);
         }
 
         pushHist();

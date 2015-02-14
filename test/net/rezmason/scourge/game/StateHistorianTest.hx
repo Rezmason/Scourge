@@ -45,8 +45,7 @@ class StateHistorianTest {
         var history:StateHistory = historian.history;
         var historyState:State = historian.historyState;
         var state:State = historian.state;
-        var random:Void->Float = function() return 0;
-
+        
         var config = {
             firstPlayer:0,
             numPlayers:2,
@@ -62,7 +61,6 @@ class StateHistorianTest {
             allowRotating:true,
             allowAll:false,
             hatSize:1,
-            randomFunction:function() return 0,
             pieces:new Pieces(Resource.getString('tables/pieces.json.txt'))
         }
 
@@ -80,7 +78,7 @@ class StateHistorianTest {
 
         var rules:Array<Rule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];
         var plan:StatePlan = new StatePlanner().planState(state, rules);
-        for (rule in rules) rule.prime(state, plan, history, historyState, random);
+        for (rule in rules) rule.prime(state, plan, history, historyState);
         var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
 
 

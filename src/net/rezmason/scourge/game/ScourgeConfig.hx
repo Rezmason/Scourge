@@ -34,11 +34,11 @@ class ScourgeConfig extends GameConfig<RP, MP> {
 
         jointRuleDefs = [
             {id:'cleanUp',  sequence:['decay', 'cavity', 'killHeadlessBody', 'oneLivingPlayer', 'resetFreshness']},
-            {id:'wrapUp',   sequence:['endTurn', 'replenish', 'pick']},
-            {id:'start',    sequence:['cleanUp', 'pick']},
+            {id:'wrapUp',   sequence:['endTurn', 'replenish']}, /*'pick'*/
+            {id:'start',    sequence:['cleanUp']}, /*'pick'*/
             {id:'forfeit',  sequence:['forfeit', 'cleanUp', 'wrapUp']},
             {id:'drop',     sequence:['drop', 'eatCells', 'cleanUp', 'wrapUp', 'stalemate']},
-            {id:'swap',     sequence:['swap', 'pick']},
+            {id:'swap',     sequence:['swap']}, /*'pick'*/
             {id:'bite',     sequence:['bite', 'cleanUp']},
             {id:'build',    sequence:['buildGlobal', 'buildPlayers', 'buildBoard']},
         ];

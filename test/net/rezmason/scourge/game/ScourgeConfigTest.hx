@@ -38,6 +38,7 @@ class ScourgeConfigTest
 
     var startAction:Rule;
     var biteAction:Rule;
+    var pickAction:Rule;
     var swapAction:Rule;
     var quitAction:Rule;
     var dropAction:Rule;
@@ -155,6 +156,9 @@ class ScourgeConfigTest
 
         VisualAssert.assert('two player grab', state.spitBoard(plan));
 
+        pickAction.update();
+        pickAction.chooseMove(); // pick
+
         biteAction.update();
         biteAction.chooseMove(4); // bite
 
@@ -169,6 +173,9 @@ class ScourgeConfigTest
         dropAction.chooseMove(); // skip
 
         VisualAssert.assert('no difference', state.spitBoard(plan));
+
+        pickAction.update();
+        pickAction.chooseMove(); // pick
 
         dropAction.update();
         dropAction.chooseMove(); // skip
@@ -193,6 +200,8 @@ class ScourgeConfigTest
         makeState();
         startAction.update();
         startAction.chooseMove();
+        pickAction.update();
+        pickAction.chooseMove();
 
         var numSwaps_:AspectPtr = plan.onPlayer(SwapAspect.NUM_SWAPS);
         var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -202,8 +211,11 @@ class ScourgeConfigTest
         var pickedPieces:Array<Null<Int>> = [];
 
         for (ike in 0...config.pieceParams.startingSwaps) {
+
             swapAction.update();
             swapAction.chooseMove();
+            pickAction.update();
+            pickAction.chooseMove();
 
             var piece:Int = state.global[pieceTableID_];
 
@@ -266,15 +278,24 @@ class ScourgeConfigTest
 
         VisualAssert.assert('two player grab', state.spitBoard(plan));
 
+        pickAction.update();
+        pickAction.chooseMove(); // pick
+
         dropAction.update();
         dropAction.chooseMove(110); // drop, eat
 
         VisualAssert.assert('player zero dropped an ---, ate player one\'s leg; small new cavity', state.spitBoard(plan));
 
+        pickAction.update();
+        pickAction.chooseMove(); // pick
+
         dropAction.update();
         dropAction.chooseMove(); // skip
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+
+        pickAction.update();
+        pickAction.chooseMove(); // pick
 
         dropAction.update();
         dropAction.chooseMove(104); // drop, eat, kill
@@ -286,23 +307,22 @@ class ScourgeConfigTest
     }
 
     private function makeState():Void {
-        var random:Void->Float = function() return 0;
-
         rules = config.makeRules();
         
         // Plan the state
         plan = new StatePlanner().planState(state, rules);
 
         // Prime the rules
-        rules['build'].prime(state, plan, history, historyState, random);
+        rules['build'].prime(state, plan, history, historyState);
         for (key in rules.keys().a2z()) {
             if (!rules[key].primed) {
-                rules[key].prime(state, plan, history, historyState, random);
+                rules[key].prime(state, plan, history, historyState);
             }
         }
 
         startAction = rules.get('start');
         biteAction = rules.get('bite');
+        pickAction = rules.get('pick');
         swapAction = rules.get('swap');
         quitAction = rules.get('forfeit');
         dropAction = rules.get('drop');

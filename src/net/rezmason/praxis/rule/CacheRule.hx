@@ -15,10 +15,10 @@ class CacheRule extends BaseRule<CacheParams> {
 
     private var rule:Rule;
     private var moveCache:Array<Array<Move>> = [];
-    private var quantumMoveCache:Array<Array<Move>> = [];
 
     override public function _init():Void {
         rule = params.rule;
+        this.isRandom = rule.isRandom;
         params.invalidateSignal.add(invalidate);
 
         globalAspectRequirements.absorb(rule.globalAspectRequirements);
@@ -26,20 +26,18 @@ class CacheRule extends BaseRule<CacheParams> {
         nodeAspectRequirements.absorb(rule.nodeAspectRequirements);
     }
 
-    override public function _prime():Void rule.prime(state, plan, history, historyState, random, changeSignal);
+    override public function _prime():Void rule.prime(state, plan, history, historyState, changeSignal);
 
     override private function _update():Void {
         var rev:Int = params.revGetter();
         if (moveCache[rev] != null) {
             #if ROPES_VERBOSE trace('Cached: $rule $rev'); #end
             rule.moves = moves = moveCache[rev];
-            rule.quantumMoves = quantumMoves = quantumMoveCache[rev];
         }
         else {
             #if ROPES_VERBOSE trace('Not cached: $rule $rev'); #end
             rule.update();
             moveCache[rev] = moves = rule.moves;
-            quantumMoveCache[rev] = quantumMoves = rule.quantumMoves;
         }
     }
 
@@ -54,15 +52,6 @@ class CacheRule extends BaseRule<CacheParams> {
         rule.collectMoves();
     }
 
-    override private function _chooseQuantumMove(choice:Int):Void {
-        #if ROPES_VERBOSE trace('<'); #end
-        rule.chooseQuantumMove(choice);
-        #if ROPES_VERBOSE trace('>'); #end
-    }
-
-    function invalidate(rev:Int):Void {
-        moveCache = moveCache.splice(rev, moveCache.length);
-        quantumMoveCache = quantumMoveCache.splice(rev, quantumMoveCache.length);
-    }
+    function invalidate(rev:Int):Void moveCache = moveCache.splice(rev, moveCache.length);
 }
 

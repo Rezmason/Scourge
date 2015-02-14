@@ -22,7 +22,6 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
     static var stateReqs:AspectRequirements;
 
     private var allMoves:Array<PickPieceMove>;
-    private var pickMove:Move;
 
     // This rule is surprisingly complex
 
@@ -54,35 +53,22 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
 
     override private function _update():Void {
         if (remakeHat()) {
-            // The hat's been refilled; all piece moves are available as quantum moves
-            moves = [pickMove];
-            quantumMoves = cast allMoves.copy();
+            // The hat's been refilled; all piece moves are available as moves
+            moves = cast allMoves.copy();
         } else if (state.global[pieceTableID_] == NULL) {
-            moves = [pickMove];
-
-            // Iterate over the hat's contents and include the corresopnding quantum moves
+            // Iterate over the hat's contents and include the corresponding moves
 
             var quantumPieceMoves:Array<PickPieceMove> = [];
             var firstHatPiece:AspectSet = getExtra(state.global[pieceHatFirst_]);
             var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
             for (piece in hatPieces) quantumPieceMoves.push(allMoves[piece[pieceMoveID_]]);
-            quantumMoves = cast quantumPieceMoves;
+            moves = cast quantumPieceMoves;
         } else {
             moves = [];
         }
     }
 
     override private function _chooseMove(choice:Int):Void {
-        var move:PickPieceMove = cast moves[choice];
-        // A selection is made randomly
-        if (remakeHat()) buildHat();
-        move = pickMoveFromHat();
-        setPiece(move.pieceTableID, move.reflection, move.rotation);
-        signalChange();
-    }
-
-    override private function _chooseQuantumMove(choice:Int):Void {
-        // The player's choice is selected
         var move:PickPieceMove = cast moves[choice];
         if (remakeHat()) buildHat();
         pickMoveFromHat(move);
@@ -95,8 +81,7 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
         // are reused throughout the game to represent the hat's contents.
 
         allMoves = [];
-        pickMove = {id:0};
-
+        
         // We create the table of piece frequencies from the params
 
         var pieceFrequencies:Array<Null<Int>> = [];
@@ -169,7 +154,7 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
         state.global[pieceRotation_] = rotation;
     }
 
-    private function pickMoveFromHat(move:PickPieceMove = null):PickPieceMove {
+    private function pickMoveFromHat(move:PickPieceMove):PickPieceMove {
 
         var firstHatPiece:AspectSet = getExtra(state.global[pieceHatFirst_]);
         var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
@@ -186,16 +171,7 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
             maxWeight += allMoves[piece[pieceMoveID_]].weight;
         }
 
-        var pickedPiece:AspectSet = null;
-        if (move == null) {
-            var pick:Float = random() * maxWeight;
-            pickedPiece = hatPieces[binarySearch(pick, weights)];
-            move = allMoves[pickedPiece[pieceMoveID_]];
-        } else {
-            pickedPiece = getExtra(move.hatIndex);
-        }
-
-
+        var pickedPiece:AspectSet = getExtra(move.hatIndex);
         state.global[piecesPicked_] = state.global[piecesPicked_] + 1;
 
         var nextPiece:AspectSet = pickedPiece.removeSet(state.extras, pieceHatNext_, pieceHatPrev_);

@@ -9,8 +9,8 @@ class BaseRule<Params> extends Reckoner {
     var history:StateHistory;
     var params:Params;
 
+    public var isRandom(default, null):Bool;
     public var moves(default, null):Array<Move> = [{id:0}];
-    public var quantumMoves(default, null):Array<Move> = [];
     public var primed(default, null):Bool;
     
     private function _prime():Void {}
@@ -18,22 +18,20 @@ class BaseRule<Params> extends Reckoner {
     private function _update():Void {}
     private function _chooseMove(choice:Int):Void {}
     private function _collectMoves():Void {}
-    private function _chooseQuantumMove(choice:Int):Void {}
 
-    var random:Void->Float;
     var changeSignal:Rule->Void;
 
-    @:final public function init(params:Params):Void {
+    @:final public function init(params:Params, isRandom:Bool = false):Void {
         this.params = params;
+        this.isRandom = isRandom;
         _init();
         primed = false;
     }
 
-    @:final public function prime(state, plan, history, historyState, random:Void->Float, changeSignal:Rule->Void = null):Void {
+    @:final public function prime(state, plan, history, historyState, changeSignal:Rule->Void = null):Void {
         this.history = history;
         this.historyState = historyState;
         this.changeSignal = changeSignal;
-        this.random = random;
         primePointers(state, plan);
         primed = true;
 
@@ -62,14 +60,6 @@ class BaseRule<Params> extends Reckoner {
 
     @:final public function collectMoves():Void {
         _collectMoves();
-    }
-
-    @:final public function chooseQuantumMove(choice:Int):Void {
-        if (quantumMoves == null || quantumMoves.length < choice || quantumMoves[choice] == null) {
-            throw 'Invalid choice index.';
-        }
-        #if ROPES_VERBOSE trace('${myName()}choosing quantum move $choice'); #end
-        _chooseQuantumMove(choice);
     }
 
     @:final inline function signalChange() if (changeSignal != null) changeSignal(this);

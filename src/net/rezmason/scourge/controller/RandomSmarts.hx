@@ -1,20 +1,25 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.praxis.PraxisTypes.Move;
+import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.GameEvent;
 import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.piece.PieceAspect;
 
 using Lambda;
 
 class RandomSmarts extends Smarts {
 
+    static var pickActionID:String = 'pick';
     static var dropActionID:String = 'drop';
     static var swapActionID:String = 'swap';
     static var biteActionID:String = 'bite';
     static var quitActionID:String = 'forfeit';
     private var otherActionIndices:Array<Int>;
     private var canSkip:Bool;
+
+    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
     
     override public function init(game:Game, config:ScourgeConfig, id:Int, random:Void->Float):Void {
         super.init(game, config, id, random);
@@ -31,6 +36,10 @@ class RandomSmarts extends Smarts {
 
         var dropMoves:Array<Move> = game.getMovesForAction(dropActionID);
         var choice:Int = 0;
+
+        if (state.global[pieceTableID_] == NULL) {
+            type = SubmitMove(rev, pickActionID, choice);
+        }
         
         if (type == null) {
             var canDrop:Bool = dropMoves.length > (canSkip ? 1 : 0);

@@ -6,5 +6,6 @@ typedef RuleComposition<Params, RulePresenter, MovePresenter> = {
     def:Class<Rule>,
     type:RuleType<MovePresenter>,
     presenter:Class<RulePresenter>,
-    ?condition:Params->Bool
+    ?isIncluded:Params->Bool,
+    ?isRandom:Params->Bool,
 }

@@ -20,15 +20,19 @@ class GameConfig<RP, MP> {
     
     var rulesByID:Map<String, Class<Rule>>;
     var configIDsByRuleID:Map<String, String>;
-    var conditionsByRuleID:Map<String, Dynamic->Bool>;
+    var inclusionConditionsByRuleID:Map<String, Dynamic->Bool>;
+    var randomConditionsByRuleID:Map<String, Dynamic->Bool>;
 
     public function makeRules(ruleMap:Rule->Rule = null):Map<String, Rule> {
         var rules = new Map();
         for (key in rulesByID.keys().a2z()) {
             var ruleParams = params[configIDsByRuleID[key]];
-            if (conditionsByRuleID[key] == null || conditionsByRuleID[key](ruleParams)) {
+            var inclusionCondition = inclusionConditionsByRuleID[key];
+            if (inclusionCondition == null || inclusionCondition(ruleParams)) {
+                var randomCondition = randomConditionsByRuleID[key];
+                var isRandom = randomCondition == null || randomCondition(ruleParams);
                 var rule = Type.createInstance(rulesByID[key], []);
-                rule.init(ruleParams);
+                rule.init(ruleParams, isRandom);
                 if (ruleMap != null) rule = ruleMap(rule);
                 rules[key] = rule;
             }
@@ -52,7 +56,8 @@ class GameConfig<RP, MP> {
         movePresenters = new Map();
         rulesByID = new Map();
         configIDsByRuleID = new Map();
-        conditionsByRuleID = new Map();
+        inclusionConditionsByRuleID = new Map();
+        randomConditionsByRuleID = new Map();
         actionIDs = [];
 
         for (configKey in configDefs.keys().a2z()) {
@@ -75,7 +80,8 @@ class GameConfig<RP, MP> {
 
                 rulesByID[compKey] = ruleComp.def;
                 configIDsByRuleID[compKey] = configKey;
-                conditionsByRuleID[compKey] = ruleComp.condition;
+                inclusionConditionsByRuleID[compKey] = ruleComp.isIncluded;
+                randomConditionsByRuleID[compKey] = ruleComp.isRandom;
             }
         }
     }

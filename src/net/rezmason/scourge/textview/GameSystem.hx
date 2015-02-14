@@ -44,7 +44,7 @@ class GameSystem {
 
         if (isReplay) {
             config = cast referee.lastGameConfig;
-            var floats:Array<Float> = referee.lastGame.floats.copy();
+            var floats:Array<Float> = referee.lastGame.floatsLog.copy();
             randGen = function() return floats.shift();
         }
 

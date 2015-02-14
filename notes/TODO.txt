@@ -1,4 +1,11 @@
-play replay fails
+Kick piece picking out of drop piece rule
+    allowPiecePick should just be the isRandom condition of the pick piece rule
+
+Const some strings
+    Scourge actions
+    Praxis stuff
+        build
+        start
 
 Entity system
     A "Sequencer" Reckoner finds and sequences changes and their causes

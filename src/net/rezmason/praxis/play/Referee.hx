@@ -21,7 +21,6 @@ class Referee {
     var log:Array<GameEvent>;
     var floatsLog:Array<Float>;
     var randGen:Void->Float;
-    var floats:Array<Float>;
     var busy:Bool;
 
     public var lastGame(default, null):SavedGame;
@@ -32,7 +31,6 @@ class Referee {
     public function new():Void {
         game = new Game(false);
         busy = false;
-        floats = [];
     }
 
     public function beginGame(players:Array<IPlayer>, randGen:Void->Float, gameConfig:GameConfig<Dynamic, Dynamic>, savedGame:SavedGame = null):Void {
@@ -49,8 +47,8 @@ class Referee {
         floatsLog = [];
 
         if (savedGame != null) {
-            log = copyLog(savedGame.log);
-            floatsLog = savedGame.floats.copy();
+            log = savedGame.log.copy();
+            floatsLog = savedGame.floatsLog.copy();
             serializedSavedGame = SafeSerializer.run(savedGame);
             savedGameState = savedGame.state;
         }
@@ -63,10 +61,8 @@ class Referee {
             playerListeners[ike] = handlePlaySignal.bind(ike);
             players[ike].playSignal.add(playerListeners[ike]);
         }
-        clearFloats();
-
-        game.begin(gameConfig, generateRandomFloat, null, savedGameState);
-        broadcastAndLog(getFloatsAction(0));
+        
+        game.begin(gameConfig, null, savedGameState);
         broadcastAndLog(Init(SafeSerializer.run(gameConfig), serializedSavedGame));
     }
 
@@ -81,9 +77,9 @@ class Referee {
     }
 
     public function saveGame():SavedGame {
-        var savedLog:Array<GameEvent> = copyLog(log);
+        var savedLog:Array<GameEvent> = log.copy();
         var savedFloats:Array<Float> = floatsLog.copy();
-        return {state:game.save(), log:savedLog, floats:savedFloats, timeSaved:UnixTime.now()};
+        return {state:game.save(), log:savedLog, floatsLog:savedFloats, timeSaved:UnixTime.now()};
     }
 
     function spitAspectLookup(lkp:AspectLookup):String {
@@ -102,9 +98,10 @@ class Referee {
                 if (!gameBegun) throw 'Game has not begun!';
                 if (playerIndex == game.currentPlayer && turn == game.revision) {
                     if (busy) throw 'Players must not submit moves synchronously!';
-                    clearFloats();
+                    if (game.isRuleRandom(action)) {
+                        move = Std.int(generateRandomFloat() * game.getMovesForAction(action).length);
+                    }
                     game.chooseMove(action, move);
-                    broadcastAndLog(getFloatsAction(game.revision - 1));
                     broadcastAndLog(RelayMove(turn, action, move));
                     if (game.winner >= 0) endGame(); // TEMPORARY
                 }
@@ -121,23 +118,10 @@ class Referee {
         busy = wasBusy;
     }
 
-    private inline static function copyLog(source:Array<GameEvent>):Array<GameEvent> {
-        return source.map(Reflect.copy).array();
-    }
-
-    private function clearFloats():Void {
-        floats.splice(0, floats.length);
-    }
-
     private function generateRandomFloat():Float {
         var float:Float = randGen();
-        floats.push(float);
         floatsLog.push(float);
         return float;
-    }
-
-    private function getFloatsAction(rev:Int):GameEvent {
-        return RandomFloats(rev, SafeSerializer.run(floats));
     }
 
     private inline function get_gameBegun():Bool return game.hasBegun;

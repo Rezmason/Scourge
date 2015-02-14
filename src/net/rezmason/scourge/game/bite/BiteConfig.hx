@@ -7,7 +7,7 @@ class BiteConfig<RP, MP> extends Config<BiteParams, RP, MP> {
 
     override public function composition():Map<String, RuleComposition<BiteParams, RP, MP>> {
         return [
-            'bite' => {def:BiteRule, type:Action(null), presenter:null, condition:function(p) return p.allowBiting},
+            'bite' => {def:BiteRule, type:Action(null), presenter:null, isIncluded:function(p) return p.allowBiting},
         ];
     }
 

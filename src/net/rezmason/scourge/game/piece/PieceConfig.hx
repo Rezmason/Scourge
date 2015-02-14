@@ -16,10 +16,11 @@ class PieceConfig<RP, MP> extends Config<PieceParams, RP, MP> {
     override public function composition():Map<String, RuleComposition<PieceParams, RP, MP>> {
         return [
             'swap' => {def:SwapPieceRule, type:Action(null), presenter:null, 
-                condition:function(p) return !p.allowAllPieces && p.allowSwapping,
+                isIncluded:function(p) return !p.allowAllPieces && p.allowSwapping,
             },
             'pick' => {def:PickPieceRule, type:Action(null), presenter:null, 
-                condition:function(p) return !p.allowAllPieces,
+                isIncluded:function(p) return !p.allowAllPieces,
+                isRandom:function(p) return true,
             },
             'drop' => {def:DropPieceRule, type:Action(null), presenter:null},
         ];

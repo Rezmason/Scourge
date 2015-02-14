@@ -15,30 +15,29 @@ class ReplaySmarts extends Smarts {
     }
 
     override public function choose():GameEvent {
-        
-        var found:Bool = false;
         var event:GameEvent = null;
+        var moveActionID:String = null;
+        var moveIndex:Int = 0;
 
-        while (!found) {
+        while (moveActionID == null) {
             event = log.shift();
             switch (event) {
-                case SubmitMove(_, _, _): found = true;
+                case RelayMove(_, actionID, index): 
+                    moveActionID = actionID;
+                    moveIndex = index;
                 case _:
             }
         }
 
-        var params = Type.enumParameters(event);
-        var actionID:String = params[0];
-        var moveIndex:Int = params[1];
-        var moves:Array<Move> = game.getMovesForAction(actionID);
+        var moves:Array<Move> = game.getMovesForAction(moveActionID);
         
         if (moves.length < moveIndex + 1) {
-            // trace('Move failure: $event < ${moves.length}');
+            trace('Move failure: $event < ${moves.length}');
             event = null;
         }
 
         if (event == null) event = SubmitMove(game.revision, 'forfeit', 0);
-        // trace(event);
+        trace(event);
         return event;
     }
 }

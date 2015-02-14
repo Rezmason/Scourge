@@ -364,8 +364,7 @@ class PieceRulesTest extends ScourgeRuleTest
         pickPieceRule.update();
 
         for (ike in 0...hatSize * 2) {
-            Assert.areEqual(1, pickPieceRule.moves.length);
-            Assert.areEqual(pieceTableIDs.length - (ike % hatSize), pickPieceRule.quantumMoves.length);
+            Assert.areEqual(pieceTableIDs.length - (ike % hatSize), pickPieceRule.moves.length);
             pickPieceRule.chooseMove();
             Assert.areEqual(pieceTableIDs[ike % hatSize], state.global[pieceTableID_]);
             state.global[pieceTableID_] =  Aspect.NULL;
@@ -393,8 +392,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         pickPieceRule.update();
 
-        Assert.areEqual(1, pickPieceRule.moves.length);
-        Assert.areEqual(12, pickPieceRule.quantumMoves.length);
+        Assert.areEqual(12, pickPieceRule.moves.length);
     }
 
     @Test
@@ -417,8 +415,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         pickPieceRule.update();
 
-        Assert.areEqual(1, pickPieceRule.moves.length);
-        Assert.areEqual(23, pickPieceRule.quantumMoves.length);
+        Assert.areEqual(23, pickPieceRule.moves.length);
     }
 
     @Test

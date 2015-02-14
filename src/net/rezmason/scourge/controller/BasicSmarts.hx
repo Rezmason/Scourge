@@ -1,15 +1,16 @@
 package net.rezmason.scourge.controller;
 
+import net.rezmason.praxis.PraxisTypes.Move;
+import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.GameEvent;
-import net.rezmason.praxis.PraxisTypes.Move;
-import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.piece.DropPieceRule.DropPieceMove;
+import net.rezmason.scourge.game.piece.PieceAspect;
 
 using net.rezmason.praxis.grid.GridUtils;
 
@@ -18,11 +19,13 @@ class BasicSmarts extends Smarts {
     static var dropActionID:String = 'drop';
     static var swapActionID:String = 'swap';
     static var biteActionID:String = 'bite';
+    static var pickActionID:String = 'pick';
     static var quitActionID:String = 'forfeit';
 
     private var otherActionIndices:Array<Int>;
     private var canSkip:Bool;
 
+    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
@@ -42,6 +45,10 @@ class BasicSmarts extends Smarts {
         var dropMoves:Array<Move> = game.getMovesForAction(dropActionID);
         var choice:Int = 0;
         var numSkipMoves:Int = canSkip ? 1 : 0;
+
+        if (state.global[pieceTableID_] == NULL) {
+            type = SubmitMove(rev, pickActionID, choice);
+        }
         
         if (type == null) {
             var canDrop:Bool = dropMoves.length > numSkipMoves;
