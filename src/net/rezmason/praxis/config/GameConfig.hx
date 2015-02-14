@@ -47,6 +47,9 @@ class GameConfig<RP, MP> {
             }
         }
 
+        if (rules['build'] == null) throw '"build" rule not found.';
+        if (rules['start'] == null) throw '"start" rule not found.';
+
         return rules;
     }
 

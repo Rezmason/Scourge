@@ -1,9 +1,3 @@
-Const some strings
-    Scourge actions
-    Praxis stuff
-        build
-        start
-
 Entity system
     A "Sequencer" Reckoner finds and sequences changes and their causes
         The Sequencer maps causes to Presenters, and passes them entities that changed, to which they attach animations
