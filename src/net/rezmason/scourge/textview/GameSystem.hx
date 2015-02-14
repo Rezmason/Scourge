@@ -1,13 +1,12 @@
 package net.rezmason.scourge.textview;
 
 import net.rezmason.ecce.Ecce;
+import net.rezmason.praxis.bot.BotSystem;
+import net.rezmason.praxis.bot.ReplaySmarts;
 import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.praxis.play.Referee;
+import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.controller.BasicSmarts;
-import net.rezmason.scourge.controller.BotSystem;
-import net.rezmason.scourge.controller.PlayerSystem;
-import net.rezmason.scourge.controller.RandomSmarts;
-import net.rezmason.scourge.controller.ReplaySmarts;
 import net.rezmason.scourge.controller.Sequencer;
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.textview.core.Body;

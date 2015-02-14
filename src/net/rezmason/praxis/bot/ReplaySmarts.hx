@@ -1,6 +1,7 @@
-package net.rezmason.scourge.controller;
+package net.rezmason.praxis.bot;
 
 import net.rezmason.praxis.PraxisTypes.Move;
+import net.rezmason.praxis.bot.Smarts;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.GameEvent;
 

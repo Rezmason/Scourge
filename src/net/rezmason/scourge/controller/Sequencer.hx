@@ -6,7 +6,7 @@ import net.rezmason.ecce.Query;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.Reckoner;
-import net.rezmason.scourge.controller.PlayerSystem;
+import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.scourge.components.*;

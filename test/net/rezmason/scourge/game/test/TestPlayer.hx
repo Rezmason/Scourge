@@ -1,7 +1,9 @@
-package net.rezmason.scourge.controller;
+package net.rezmason.scourge.game.test;
 
+import net.rezmason.praxis.bot.Smarts;
+import net.rezmason.praxis.bot.RandomSmarts;
 import net.rezmason.praxis.play.Game;
-import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.utils.Zig;
 
 typedef TestProxy = Game->(Void->Void)->Void;

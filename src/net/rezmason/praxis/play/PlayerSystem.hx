@@ -1,11 +1,8 @@
-package net.rezmason.scourge.controller;
+package net.rezmason.praxis.play;
 
 import haxe.Unserializer;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.play.Game;
-import net.rezmason.praxis.play.GameEvent;
-import net.rezmason.praxis.play.IPlayer;
-import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.praxis.config.GameConfig;
 import net.rezmason.utils.Zig;
 
 using Lambda;
@@ -20,7 +17,7 @@ class PlayerSystem implements IPlayer {
     public var moveStepSignal(default, null):Zig<String->Void> = new Zig();
 
     private var game:Game;
-    private var config:ScourgeConfig;
+    private var config:GameConfig<Dynamic, Dynamic>;
     private var isGameUpdating:Bool = false;
     private var isWaitingToProceed:Bool = false;
     private var usesSignals:Bool;

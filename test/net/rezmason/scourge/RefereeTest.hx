@@ -6,8 +6,8 @@ import massive.munit.async.AsyncFactory;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.praxis.play.Referee;
-import net.rezmason.scourge.controller.TestPlayer;
 import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.test.TestPlayer;
 import net.rezmason.scourge.tools.Resource;
 
 using net.rezmason.scourge.game.BoardUtils;

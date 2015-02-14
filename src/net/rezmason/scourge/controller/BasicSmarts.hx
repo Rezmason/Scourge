@@ -3,9 +3,10 @@ package net.rezmason.scourge.controller;
 import net.rezmason.praxis.PraxisTypes.Move;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.Aspect.*;
+import net.rezmason.praxis.bot.Smarts;
+import net.rezmason.praxis.config.GameConfig;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.GameEvent;
-import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
@@ -22,7 +23,6 @@ class BasicSmarts extends Smarts {
     static var pickActionID:String = 'pick';
     static var quitActionID:String = 'forfeit';
 
-    private var otherActionIndices:Array<Int>;
     private var canSkip:Bool;
 
     @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
@@ -30,9 +30,9 @@ class BasicSmarts extends Smarts {
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     
-    override public function init(game:Game, config:ScourgeConfig, id:Int, random:Void->Float):Void {
+    override public function init(game:Game, config:GameConfig<Dynamic, Dynamic>, id:Int, random:Void->Float):Void {
         super.init(game, config, id, random);
-        canSkip = config.pieceParams.allowSkipping;
+        canSkip = config.params['piece'].allowSkipping;
 
         occupier_ = game.plan.onNode(OwnershipAspect.OCCUPIER);
         isFilled_ = game.plan.onNode(OwnershipAspect.IS_FILLED);

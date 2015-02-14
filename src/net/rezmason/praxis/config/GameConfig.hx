@@ -47,8 +47,7 @@ class GameConfig<RP, MP> {
             }
         }
 
-        if (rules['build'] == null) throw '"build" rule not found.';
-        if (rules['start'] == null) throw '"start" rule not found.';
+        for (id in ['build', 'start', 'forfeit']) if (!rules.exists(id)) throw '"$id" rule not found.';
 
         return rules;
     }

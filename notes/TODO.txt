@@ -29,6 +29,11 @@ Board
     Figure out how to do "pain"-related things
     Pool objects
 
+Some Haxe stuff
+    https://github.com/DanielUranga/openfl-harfbuzz
+    https://github.com/larsiusprime/crashdumper
+    https://github.com/Justinfront/hxDaedalus
+
 OpenFL 2.0 support
     Remember, munit breaks the HTML5 build target
 
