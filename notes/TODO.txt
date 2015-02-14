@@ -82,7 +82,7 @@ Music box inspired microfluidic lab controller:
 https://www.youtube.com/watch?v=kNQToOEFNmY
 
 hashed turn based network games:
-http://vimeo.com/87682214
+http://florincoin.org/game
 
 Move the logic into a Worker
     Worker tests are failing in-game on Flash and HTML5 targets
