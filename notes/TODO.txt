@@ -1,8 +1,6 @@
 Entity system
     A "Sequencer" Reckoner finds and sequences changes and their causes
         The Sequencer maps causes to Presenters, and passes them entities that changed, to which they attach animations
-        
-Move old projects out of repo
 
 The Loupe
     Get it ON the board
@@ -103,7 +101,7 @@ Implement noneuclidean walking and running
 
 It'd be fun to make a branch that renders glyphs as points
 
-Finalize ROPES classes
+Finalize Praxis classes
 
 Save states and save testing
     If the code for a rule changes, the games that used earlier versions of that rule are kind of botched
@@ -143,15 +141,11 @@ ExternalPlayer
 
 Later
 
-    Package the Rule Oriented Paradigm Entity System so other people can use it
-
-        'Tie down your game design'
-        'Constraints can be a good thing'
-
-        Create tic tac toe example for ROPES
-        Create readme and license files for ROPES
-        Migrate tests to tic tac toe
-        Move ROPES to a haxe lib
+    Package Praxis so other people can use it
+        Create tic tac toe example for Praxis
+        Write munit tests for tic tac toe project
+        Create readme and license files for Praxis
+        Move Praxis to a haxe lib
 
     Level Editing - Just a bunch of demiurgic rules
 
