@@ -20,7 +20,7 @@ class PieceConfig<RP, MP> extends Config<PieceParams, RP, MP> {
             },
             'pick' => {def:PickPieceRule, type:Action(null), presenter:null, 
                 isIncluded:function(p) return !p.allowAllPieces,
-                isRandom:function(p) return true,
+                isRandom:function(p) return !p.allowPiecePick,
             },
             'drop' => {def:DropPieceRule, type:Action(null), presenter:null},
         ];

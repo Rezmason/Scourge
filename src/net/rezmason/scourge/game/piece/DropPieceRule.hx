@@ -23,7 +23,6 @@ typedef DropPieceMove = {>Move,
     var targetNode:Int;
     var numAddedNodes:Int;
     var addedNodes:Array<Int>;
-    var pieceID:Int;
     var rotation:Int;
     var reflection:Int;
     var coord:IntCoord;
@@ -57,10 +56,7 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
         // Setting this to false also forces players to forfeit if they can't place a piece
         if (params.allowSkipping) dropMoves.push(cast nowhereMove);
 
-        var pieceIDs:Array<Int> = [];
-        if (params.allowPiecePick) for (pieceID in params.pieceTableIDs) pieceIDs.push(pieceID);
-        else if (state.global[pieceTableID_] != NULL) pieceIDs.push(state.global[pieceTableID_]);
-
+        
         // get current player head
         var currentPlayer:Int = state.global[currentPlayer_];
         var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
@@ -70,8 +66,10 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
 
         var pieceReflection:Int = state.global[pieceReflection_];
         var pieceRotation:Int = state.global[pieceRotation_];
+        
+        var pieceID:Int = state.global[pieceTableID_];
 
-        for (pieceID in pieceIDs) {
+        if (pieceID != NULL) {
 
             var freePiece:FreePiece = params.pieces.getPieceById(pieceID);
 
@@ -123,7 +121,6 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
                                 var dropMove:DropPieceMove = getMove();
                                 dropMove.targetNode = getID(node);
                                 dropMove.coord = homeCoord;
-                                dropMove.pieceID = pieceID;
                                 dropMove.rotation = rotationIndex;
                                 dropMove.reflection = reflectionIndex;
                                 dropMove.id = dropMoves.length;
@@ -164,7 +161,6 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
         return {
             id:-1,
             targetNode:NULL,
-            pieceID:-1,
             reflection:-1,
             rotation:-1,
             numAddedNodes:0,
@@ -182,7 +178,8 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
         var player:AspectSet = getPlayer(currentPlayer);
 
         if (move.targetNode != NULL) {
-            var freePiece:FreePiece = params.pieces.getPieceById(move.pieceID);
+            var pieceID:Int = state.global[pieceTableID_];
+            var freePiece:FreePiece = params.pieces.getPieceById(pieceID);
             var targetLocus:BoardLocus = getLocus(move.targetNode);
             var coords:Array<IntCoord> = freePiece.getPiece(move.reflection, move.rotation).cells;
             var homeCoord:IntCoord = move.coord;
