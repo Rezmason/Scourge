@@ -142,14 +142,14 @@ class PostSystem extends LabSystem {
         var upper:Float = heightThreshold + heightEnvelope;
 
         var innerGlow:Float = 0.8;
-        var outerGlow:Float = 0.4;
+        var outerGlow:Float = 0.2;
         var shine:Float = 0.3;
 
         var nudge:Float = 0.005;
 
         params = [lower, upper, innerGlow, shine];
         params2 = [nudge, outerGlow, 0, 0];
-        color = [0.8, 0.2, 0.8, 1.0];
+        color = [0.4, 0.9, 0.1, 1.0];
 
         lightVector = new Vector3D(1, 1, 1);
         lightVector.normalize();
@@ -199,7 +199,7 @@ class PostSystem extends LabSystem {
                 float height = texture2D(uMetaballSampler, vUV).b;
 
                 float brightness1 = outerGlow * (height / lower);
-                float brightness2 = 0.5 + 0.5 * height * (innerGlow - height);
+                float brightness2 = 0.9 + 0.1 * height * (innerGlow - height);
                 brightness2 = brightness2 * min(1.0, (height - lower) / (upper - lower)) + outerGlow;
                 
                 float isInside = (height < lower) ? 0.0 : 1.0; // Using conditions to create multipliers makes AGAL happier
