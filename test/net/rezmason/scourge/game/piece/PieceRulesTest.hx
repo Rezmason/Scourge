@@ -12,7 +12,7 @@ import net.rezmason.scourge.game.piece.DropPieceRule;
 import net.rezmason.scourge.game.piece.PickPieceRule;
 import net.rezmason.scourge.game.piece.SwapPieceRule;
 import net.rezmason.scourge.game.test.TestPieceRule;
-import net.rezmason.scourge.tools.Resource;
+import net.rezmason.utils.openfl.Resource;
 import net.rezmason.scourge.game.TempParams;
 
 using net.rezmason.scourge.game.BoardUtils;

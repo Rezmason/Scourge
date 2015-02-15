@@ -1,4 +1,4 @@
-package net.rezmason.scourge.tools;
+package net.rezmason.utils.openfl;
 
 #if openfl
 import openfl.Assets;

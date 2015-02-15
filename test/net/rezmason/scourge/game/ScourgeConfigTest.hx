@@ -17,7 +17,7 @@ import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.scourge.game.piece.DropPieceRule;
 import net.rezmason.scourge.game.piece.PieceAspect;
 import net.rezmason.scourge.game.piece.SwapAspect;
-import net.rezmason.scourge.tools.Resource;
+import net.rezmason.utils.openfl.Resource;
 import net.rezmason.utils.SafeSerializer;
 
 using net.rezmason.scourge.game.BoardUtils;

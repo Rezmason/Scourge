@@ -6,7 +6,7 @@ import VisualAssert;
 import net.rezmason.scourge.game.PieceTypes;
 import net.rezmason.scourge.game.Pieces;
 import net.rezmason.polyform.PolyformGenerator;
-import net.rezmason.scourge.tools.Resource;
+import net.rezmason.utils.openfl.Resource;
 
 import haxe.JSON;
 

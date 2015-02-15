@@ -2,7 +2,7 @@ package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.config.Config;
 import net.rezmason.praxis.config.RuleComposition;
-import net.rezmason.scourge.tools.Resource;
+import net.rezmason.utils.openfl.Resource;
 
 class PieceConfig<RP, MP> extends Config<PieceParams, RP, MP> {
 

@@ -13,7 +13,7 @@ import net.rezmason.scourge.game.build.BuildBoardRule;
 import net.rezmason.scourge.game.build.BuildPlayersRule;
 import net.rezmason.scourge.game.build.BuildGlobalRule;
 import net.rezmason.scourge.game.piece.PickPieceRule;
-import net.rezmason.scourge.tools.Resource;
+import net.rezmason.utils.openfl.Resource;
 
 using net.rezmason.utils.Pointers;
 using net.rezmason.scourge.game.BoardUtils;

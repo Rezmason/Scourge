@@ -8,7 +8,7 @@ import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.praxis.play.Referee;
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.game.test.TestPlayer;
-import net.rezmason.scourge.tools.Resource;
+import net.rezmason.utils.openfl.Resource;
 
 using net.rezmason.scourge.game.BoardUtils;
 class RefereeTest {
