@@ -1,6 +1,7 @@
-Entity system
-    A "Sequencer" Reckoner finds and sequences changes and their causes
-        The Sequencer maps causes to Presenters, and passes them entities that changed, to which they attach animations
+Board animation
+    Create GlyphAnimator
+    Gamesystem: connect glyph animator to ecce, update function, and sequencer's proceed function
+    Create presenter subclasses for all those rules, reference them in the configs
 
 The Loupe
     Get it ON the board

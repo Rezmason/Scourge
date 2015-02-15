@@ -8,6 +8,7 @@ import net.rezmason.praxis.play.Referee;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.controller.BasicSmarts;
 import net.rezmason.scourge.controller.Sequencer;
+import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.textview.core.Body;
 
@@ -60,6 +61,10 @@ class GameSystem {
         // TODO: recycle
         var sequencer = new Sequencer(ecce);
         sequencer.connect(watchedPlayer);
+
+        var rulePresenter:RulePresenter = Type.createInstance(config.fallbackRP, []);
+        sequencer.gameStartSignal.add(rulePresenter.init);
+        sequencer.boardChangeSignal.add(rulePresenter.presentBoardChange);
         
         referee.beginGame(players, randGen, config);
     }

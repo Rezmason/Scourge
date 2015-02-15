@@ -121,11 +121,11 @@ class Sequencer extends Reckoner {
         // FOR NOW:
         var count = 0;
         for (e in qAnimations) {
+            trace(e.get(GlyphAnimation));
             ecce.collect(e);
             count++;
         }
         
         proceed();
     }
-
 }

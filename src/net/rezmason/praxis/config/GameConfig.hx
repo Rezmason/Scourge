@@ -12,11 +12,11 @@ class GameConfig<RP, MP> {
     public var actionIDs(default, null):Array<String>;
     public var defaultActionIDs(default, null):Array<String>;
     public var params:Map<String, Dynamic>;
+    public var fallbackRP(default, null):Class<RP>;
+    public var fallbackMP(default, null):Class<MP>;
 
     var configDefs:Map<String, Class<Config<Dynamic, RP, MP>>>;
     var jointRuleDefs:Array<JointRuleDef>;
-    var fallbackRP:Class<RP>;
-    var fallbackMP:Class<MP>;
     
     var rulesByID:Map<String, Class<Rule>>;
     var configIDsByRuleID:Map<String, String>;
