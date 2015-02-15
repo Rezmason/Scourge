@@ -57,12 +57,10 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
             moves = cast allMoves.copy();
         } else if (state.global[pieceTableID_] == NULL) {
             // Iterate over the hat's contents and include the corresponding moves
-
-            var quantumPieceMoves:Array<PickPieceMove> = [];
+            moves = [];
             var firstHatPiece:AspectSet = getExtra(state.global[pieceHatFirst_]);
             var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
-            for (piece in hatPieces) quantumPieceMoves.push(allMoves[piece[pieceMoveID_]]);
-            moves = cast quantumPieceMoves;
+            for (piece in hatPieces) moves.push(allMoves[piece[pieceMoveID_]]);
         } else {
             moves = [];
         }
