@@ -58,8 +58,6 @@ class Sequencer extends Reckoner {
         this.player = null;
     }
 
-    public function proceed():Void player.proceed();
-
     function onGameBegun(game) {
         this.game = game;
         primePointers(game.state, game.plan);
@@ -103,6 +101,7 @@ class Sequencer extends Reckoner {
         var animations:Array<Array<GlyphAnimation>> = [];
         for (e in qAnimations) {
             var glyphAnimation = e.get(GlyphAnimation);
+            glyphAnimation.time = 0;
             if (animations[glyphAnimation.index] == null) animations[glyphAnimation.index] = [glyphAnimation];
             else animations[glyphAnimation.index].push(glyphAnimation);
         }
@@ -126,6 +125,6 @@ class Sequencer extends Reckoner {
             count++;
         }
         
-        proceed();
+        player.proceed();
     }
 }

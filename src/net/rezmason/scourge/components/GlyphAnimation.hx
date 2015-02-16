@@ -12,6 +12,7 @@ class GlyphAnimation extends Component {
     public var duration:Float;
     public var overlap:Float;
     public var startTime:Float;
+    public var time:Float;
     public var subject:Entity;
     
     public var topFrom:Glyph;
@@ -25,6 +26,7 @@ class GlyphAnimation extends Component {
     override function copyFrom(other:Component) {
         if (other != null) {
             var otherGA:GlyphAnimation = cast other;
+            time = otherGA.time;
             index = otherGA.index;
             duration = otherGA.duration;
             overlap = otherGA.overlap;
