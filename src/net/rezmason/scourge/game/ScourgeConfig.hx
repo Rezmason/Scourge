@@ -2,8 +2,6 @@ package net.rezmason.scourge.game;
 
 import net.rezmason.praxis.config.GameConfig;
 
-import net.rezmason.scourge.controller.RulePresenter;
-
 import net.rezmason.scourge.game.bite.BiteAspect.*;
 import net.rezmason.scourge.game.piece.SwapAspect.*;
 
@@ -13,9 +11,10 @@ import net.rezmason.scourge.game.build.*;
 import net.rezmason.scourge.game.meta.*;
 import net.rezmason.scourge.game.piece.*;
 
+typedef RP = #if HEADLESS Dynamic #else net.rezmason.scourge.controller.RulePresenter #end;
 typedef MP = Dynamic; // TODO
 
-class ScourgeConfig extends GameConfig<RulePresenter, MP> {
+class ScourgeConfig extends GameConfig<RP, MP> {
 
     public var biteParams(get, null):BiteParams;
     public var bodyParams(get, null):BodyParams;
@@ -46,7 +45,7 @@ class ScourgeConfig extends GameConfig<RulePresenter, MP> {
 
         defaultActionIDs = ['drop', 'forfeit'];
 
-        fallbackRP = RulePresenter;
+        fallbackRP = #if HEADLESS null #else RP #end;
         fallbackMP = null;
 
         parseConfigDefs();
