@@ -1,3 +1,14 @@
+Create a board body
+    Have a system populate it with glyphs from board spaces
+    For now, put board spaces in a cube
+
+Move the board generation code to a factory
+    It should generate a list of "loci" and a corresponding list of XYZs
+    Pass the "loci" into the BuildBoardRule config
+    Populate the board body with the XYZ data
+
+Switch tests and game to using factory and simplified BuildBoardRule
+
 Board animation
     Create GlyphAnimator
     Gamesystem: connect glyph animator to ecce, update function, and sequencer's proceed function
