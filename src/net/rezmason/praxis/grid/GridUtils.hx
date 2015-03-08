@@ -35,12 +35,10 @@ class GridUtils {
     public inline static function attach<T> (locus1:GridLocus<T>, locus2:GridLocus<T>, directionForward:Int, directionBack:Int = -1):GridLocus<T> {
         if (locus1 != null) {
             locus1.neighbors[directionForward] = locus2;
-            locus1.headingOffsets[directionForward] = 0;
         }
         if (locus2 != null) {
             if (directionBack == -1) directionBack = (directionForward + 4) % 8;
             locus2.neighbors[directionBack] = locus1;
-            locus1.headingOffsets[directionBack] = 0;
         }
         return locus2;
     }
@@ -105,37 +103,6 @@ class GridUtils {
                 }
             }
             locus = newLoci.pop();
-        }
-
-        return loci;
-    }
-
-    public inline static function serializeGrid<T>(s:Serializer, sourceList:Array<GridLocus<T>>):Void {
-        var data:Array<Array<Dynamic>> = [];
-
-        for (locus in sourceList) {
-            var neighbors:Array<Null<Int>> = [];
-            for (ike in 0...locus.neighbors.length) {
-                if (locus.neighbors[ike] != null) neighbors[ike] = locus.neighbors[ike].id;
-                else neighbors[ike] = -1;
-            }
-            data.push([locus.value, neighbors, locus.headingOffsets]);
-        }
-
-        s.serialize(data);
-    }
-
-    public inline static function unserializeGrid<T>(s:Unserializer):Array<GridLocus<T>> {
-        var data:Array<Array<Dynamic>> = s.unserialize();
-
-        var loci:Array<GridLocus<T>> = [for (ike in 0...data.length) new GridLocus<T>(ike, data[ike][0])];
-
-        for (ike in 0...loci.length) {
-            var neighbors:Array<Null<Int>> = data[ike][1];
-            var headingOffsets:Array<Null<Int>> = data[ike][2];
-            var locus:GridLocus<T> = loci[ike];
-            for (ike in 0...neighbors.length) if (neighbors[ike] != -1) locus.neighbors[ike] = loci[neighbors[ike]];
-            for (ike in 0...headingOffsets.length) locus.headingOffsets[ike] = headingOffsets[ike];
         }
 
         return loci;

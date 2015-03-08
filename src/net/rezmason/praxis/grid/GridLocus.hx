@@ -4,7 +4,6 @@ package net.rezmason.praxis.grid;
 class GridLocus<T> {
     public var value(default, null):T;
     public var neighbors(default, null):Array<GridLocus<T>>;
-    public var headingOffsets(default, null):Array<Int>;
 
     var _orthoNeighbors:Array<GridLocus<T>>;
     var _diagNeighbors:Array<GridLocus<T>>;
@@ -17,6 +16,5 @@ class GridLocus<T> {
         neighbors = [];
         _orthoNeighbors = null;
         _diagNeighbors = null;
-        headingOffsets = [0, 0, 0, 0, 0, 0, 0, 0];
     }
 }

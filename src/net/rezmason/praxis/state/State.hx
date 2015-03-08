@@ -11,7 +11,7 @@ class State {
     public var globals(default, null):Array<AspectSet>;
     public var players(default, null):Array<AspectSet>;
     public var nodes(default, null):Array<AspectSet>;
-    public var loci(default, null):Array<GridLocus<AspectSet>>; // aka BoardLocus
+    public var loci(default, set):Array<GridLocus<AspectSet>>; // aka BoardLocus
     public var extras(default, null):Array<AspectSet>;
     public var key(default, set):PtrKey;
 
@@ -36,15 +36,14 @@ class State {
     function hxSerialize(s:haxe.Serializer):Void {
         s.serialize(globals);
         s.serialize(players);
-        s.serializeGrid(loci); // implicitly serializes nodes
+        s.serialize(nodes);
         s.serialize(extras);
     }
 
     function hxUnserialize(s:haxe.Unserializer):Void {
         globals = s.unserialize();
         players = s.unserialize();
-        loci    = s.unserializeGrid();
-        nodes = [for (locus in loci) locus.value];
+        nodes   = s.unserialize();
         extras  = s.unserialize();
         resolve();
     }
@@ -54,7 +53,13 @@ class State {
         return val;
     }
 
+    public function set_loci(val:Array<GridLocus<AspectSet>>):Array<GridLocus<AspectSet>> {
+        if (loci == null) loci = val;
+        return val;
+    }
+
     public function resolve() {
         global = globals[0];
+        loci = [];
     }
 }

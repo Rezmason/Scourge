@@ -37,7 +37,6 @@ class PieceConfig<RP, MP> extends Config<PieceParams, RP, MP> {
 
             dropOverlapsSelf:false,
             dropOrthoOnly:true,
-            dropGrowsGraph:false,
             dropDiagOnly:false,
             allowPiecePick:false,
             allowSkipping:false,
