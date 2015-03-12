@@ -48,7 +48,7 @@ import net.rezmason.praxis.PraxisTypes;
 
         msg += '\n';
 
-        #if ROPES_MACRO_VERBOSE
+        #if PRAXIS_MACRO_VERBOSE
             Sys.print(msg);
         #end
 

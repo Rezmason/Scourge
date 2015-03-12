@@ -129,7 +129,7 @@ using net.rezmason.utils.Pointers;
         fields.push(overrider('__initRequirements', declarations, pos));
         fields.push(overrider('__initPointers', assignments, pos));
 
-        #if ROPES_MACRO_VERBOSE
+        #if PRAXIS_MACRO_VERBOSE
             Sys.print(msg);
         #end
 

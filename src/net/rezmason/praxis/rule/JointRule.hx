@@ -25,7 +25,7 @@ class JointRule extends BaseRule<Array<Rule>> {
     }
 
     override private function _chooseMove(choice:Int):Void {
-        #if ROPES_VERBOSE trace('{'); #end
+        #if PRAXIS_VERBOSE trace('{'); #end
 
         params[0].chooseMove(choice);
         for (ike in 1...params.length) {
@@ -34,7 +34,7 @@ class JointRule extends BaseRule<Array<Rule>> {
             rule.chooseMove();
         }
 
-        #if ROPES_VERBOSE trace('}'); #end
+        #if PRAXIS_VERBOSE trace('}'); #end
     }
 
     override private function _collectMoves():Void params[0].collectMoves();

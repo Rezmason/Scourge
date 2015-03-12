@@ -31,20 +31,20 @@ class CacheRule extends BaseRule<CacheParams> {
     override private function _update():Void {
         var rev:Int = params.revGetter();
         if (moveCache[rev] != null) {
-            #if ROPES_VERBOSE trace('Cached: $rule $rev'); #end
+            #if PRAXIS_VERBOSE trace('Cached: $rule $rev'); #end
             rule.moves = moves = moveCache[rev];
         }
         else {
-            #if ROPES_VERBOSE trace('Not cached: $rule $rev'); #end
+            #if PRAXIS_VERBOSE trace('Not cached: $rule $rev'); #end
             rule.update();
             moveCache[rev] = moves = rule.moves;
         }
     }
 
     override private function _chooseMove(choice:Int):Void {
-        #if ROPES_VERBOSE trace('<'); #end
+        #if PRAXIS_VERBOSE trace('<'); #end
         rule.chooseMove(choice);
-        #if ROPES_VERBOSE trace('>'); #end
+        #if PRAXIS_VERBOSE trace('>'); #end
     }
 
     override private function _collectMoves():Void {

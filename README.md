@@ -10,19 +10,19 @@ Scourge is written in [Haxe](http://www.haxe.org/), a highly versatile language 
 
 **NOTE: Scourge is currently built with Haxe 3 RC and Git-hosted haxelibs. Consequently it may be difficult to configure your build environment to build both Scourge and Haxe 2 projects easily.**
 
-Scourge is written on top of a framework called the ROPES, which I'm developing simultaneously. While the ROPES primarily must support Scourge, it is designed to support the development of all sorts of turn-based games. At some point after Scourge is up and running, the ROPES will receive the attention it needs to stand alone as a separate project.
+Scourge is written on top of a framework called Praxis, which I'm developing simultaneously. While Praxis primarily must support Scourge, it is designed to support the development of all sorts of turn-based games. At some point after Scourge is up and running, Praxis will receive the attention it needs to stand alone as a separate project.
 
 # Project Goals
 
 I intend to achieve several things with this project:
 
-+ Create a game with the same mechanics and gameplay on all platforms targetable by [NME](http://www.haxenme.org/)
++ Create a game with the same mechanics and gameplay on all platforms targetable by [OpenFL](http://www.openfl.org/)
 + Structure the development of the game with a unit testing framework (in this case, [MassiveUnit](https://github.com/massiveinteractive/MassiveUnit)... stop giggling)
-+ Create a game framework called the ROPES that can be used to represent a large number of turn-based games
++ Create a game framework called Praxis that can be used to represent a large number of turn-based games
 + Ressurect the Fungus game variety, and expand on it with new and compelling game mechanics
 + Tell a compelling story with non-human characters
 + Release a game that costs money, but whose [source code is freely accessible](http://www.fsf.org/)
-+ Write computer opponenets of various types
++ Write computer opponents of various types
 + Create a game view that is based on OpenGL-style graphics APIs on multiple platforms
 + Create a game whose rules may be highly configurable at runtime
 + Implement multiplayer game support across all platforms, including chat support and multiplayer game configuration
@@ -33,6 +33,6 @@ If you have an interest in this project, please [contact me](mailto:jeremysachs@
 
 # Legal?
 
-The source for Scourge and the ROPES is released under the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+The source for Scourge and Praxis is released under the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-Scourge and the Ropes are trademarks of Jeremy Sachs. Blerp.
+Scourge and Praxis are trademarks of Jeremy Sachs. Blerp.

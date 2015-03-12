@@ -17,8 +17,8 @@
 	<assets path="shaders" include="*.vert|*.frag" />
 	<!-- <haxedef name="VISUAL_TEST" if="mac" /> -->
 	<!-- <haxedef name="USE_POINTERS" /> -->
-	<!-- <haxedef name="ROPES_VERBOSE" /> -->
-	<!-- <haxedef name="ROPES_MACRO_VERBOSE" /> -->
+	<!-- <haxedef name="PRAXIS_VERBOSE" /> -->
+	<!-- <haxedef name="PRAXIS_MACRO_VERBOSE" /> -->
 	<haxedef name="stage3d" if="flash" />
 	<haxedef name="glsl2agal" if="flash" />
 	<!-- <haxeflag name="-D" value="dump=pretty" /> -->

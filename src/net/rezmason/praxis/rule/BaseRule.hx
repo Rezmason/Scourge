@@ -35,12 +35,12 @@ class BaseRule<Params> extends Reckoner {
         primePointers(state, plan);
         primed = true;
 
-        #if ROPES_VERBOSE trace('${myName()} initializing'); #end
+        #if PRAXIS_VERBOSE trace('${myName()} initializing'); #end
         _prime();
     }
 
     @:final public function update():Void {
-        #if ROPES_VERBOSE trace('${myName()} updating'); #end
+        #if PRAXIS_VERBOSE trace('${myName()} updating'); #end
         _update();
     }
 
@@ -51,7 +51,7 @@ class BaseRule<Params> extends Reckoner {
         if (moves == null || moves.length < choice || moves[choice] == null) {
             throw 'Invalid choice index.';
         }
-        #if ROPES_VERBOSE
+        #if PRAXIS_VERBOSE
             if (defaultChoice) trace('${myName()} choosing default move');
             else trace('${myName()} choosing move $choice');
         #end
