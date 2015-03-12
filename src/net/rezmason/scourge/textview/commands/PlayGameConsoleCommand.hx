@@ -2,6 +2,7 @@ package net.rezmason.scourge.textview.commands;
 
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.game.bite.BiteAspect;
+import net.rezmason.scourge.game.build.PetriBoardFactory;
 import net.rezmason.scourge.game.piece.SwapAspect;
 import net.rezmason.scourge.textview.GameSystem;
 import net.rezmason.scourge.textview.console.ConsoleCommand;
@@ -78,11 +79,11 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         var pieces = cfg.pieceParams.pieces;
         for (ike in 0...4) pieceTableIDs = pieceTableIDs.concat(pieces.getAllPieceIDsOfSize(ike + 1));
 
+        cfg.buildParams.numPlayers = numPlayers;
+        cfg.buildParams.loci = PetriBoardFactory.create(numPlayers, circular);
         cfg.pieceParams.pieceTableIDs = pieceTableIDs;
         cfg.pieceParams.allowRotating = true;
-        cfg.buildParams.circular = circular;
         cfg.pieceParams.allowSkipping = false;
-        cfg.buildParams.numPlayers = numPlayers;
         cfg.bodyParams.includeCavities = true;
 
         cfg.metaParams.globalProperties[SwapAspect.NUM_SWAPS.id].maxAmount = 5;

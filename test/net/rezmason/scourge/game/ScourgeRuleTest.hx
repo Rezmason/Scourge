@@ -11,6 +11,7 @@ import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.scourge.game.build.BuildBoardRule;
 import net.rezmason.scourge.game.build.BuildGlobalRule;
 import net.rezmason.scourge.game.build.BuildPlayersRule;
+import net.rezmason.scourge.game.build.PetriBoardFactory;
 
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.praxis.grid.GridUtils;
@@ -49,7 +50,7 @@ class ScourgeRuleTest
         plan = null;
     }
 
-    private function makeState(rules:Array<Rule> = null,  numPlayers:Int = 1, initGrid:String = null, circular:Bool = false):Void {
+    private function makeState(rules:Array<Rule> = null, numPlayers:Int = 1, initGrid:String = null, circular:Bool = false):Void {
 
         history.wipe();
         historyState.wipe();
@@ -67,7 +68,7 @@ class ScourgeRuleTest
 
         // make board config and generate board
         var buildBoardRule:BuildBoardRule = new BuildBoardRule();
-        buildBoardRule.init({numPlayers:numPlayers, circular:circular, initGrid:initGrid});
+        buildBoardRule.init({numPlayers:numPlayers, loci:PetriBoardFactory.create(numPlayers, circular, initGrid)});
 
         rules.unshift(buildBoardRule);
         rules.unshift(buildPlayersRule);

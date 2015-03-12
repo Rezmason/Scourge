@@ -11,6 +11,7 @@ import net.rezmason.scourge.controller.Sequencer;
 import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.textview.core.Body;
+import net.rezmason.scourge.textview.board.BoardSystem;
 
 class GameSystem {
 
@@ -61,7 +62,8 @@ class GameSystem {
         // TODO: recycle
         var sequencer = new Sequencer(ecce);
         sequencer.connect(watchedPlayer);
-
+        var boardSystem:BoardSystem = new BoardSystem(board, ecce);
+        boardSystem.buildBoard(config.buildParams.loci);
         var rulePresenter:RulePresenter = Type.createInstance(config.fallbackRP, []);
         sequencer.gameStartSignal.add(rulePresenter.init);
         sequencer.boardChangeSignal.add(rulePresenter.presentBoardChange);

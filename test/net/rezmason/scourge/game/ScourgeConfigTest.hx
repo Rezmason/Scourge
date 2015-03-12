@@ -5,24 +5,25 @@ import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
 import massive.munit.util.Timer;
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.aspect.Aspect;
+import net.rezmason.praxis.aspect.PlyAspect;
+import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.praxis.state.StatePlanner;
-import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.praxis.aspect.PlyAspect;
-import net.rezmason.praxis.aspect.WinAspect;
+import net.rezmason.scourge.game.build.PetriBoardFactory;
 import net.rezmason.scourge.game.piece.DropPieceRule;
 import net.rezmason.scourge.game.piece.PieceAspect;
 import net.rezmason.scourge.game.piece.SwapAspect;
-import net.rezmason.utils.openfl.Resource;
 import net.rezmason.utils.SafeSerializer;
+import net.rezmason.utils.openfl.Resource;
 
-using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.praxis.grid.GridUtils;
 using net.rezmason.praxis.state.StatePlan;
+using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;
 
@@ -85,6 +86,7 @@ class ScourgeConfigTest
 
     @Test
     public function allActionsRegisteredTest():Void {
+        config.buildParams.loci = PetriBoardFactory.create();
         makeState();
         
         for (action in config.actionIDs) {
@@ -99,7 +101,7 @@ class ScourgeConfigTest
         // decay, cavity, killHeadlessPlayer, oneLivingPlayer, pickPiece
 
         config.buildParams.numPlayers = 2;
-        config.buildParams.initGrid = TestBoards.twoPlayerBullshit;
+        config.buildParams.loci = PetriBoardFactory.create(2, false, TestBoards.twoPlayerBullshit);
         makeState();
 
         VisualAssert.assert('floating zero square, stringy player one with no head', state.spitBoard(plan));
@@ -139,8 +141,8 @@ class ScourgeConfigTest
         // bite, decay, cavity, killHeadlessPlayer, oneLivingPlayer
 
         config.buildParams.numPlayers = 2;
+        config.buildParams.loci = PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab);
         config.biteParams.startingBites = 5;
-        config.buildParams.initGrid = TestBoards.twoPlayerGrab;
         makeState();
 
         VisualAssert.assert('two player grab', state.spitBoard(plan));
@@ -196,7 +198,7 @@ class ScourgeConfigTest
         config.pieceParams.hatSize = 3;
         config.pieceParams.startingSwaps = 6;
         config.pieceParams.allowFlipping = true;
-
+        config.buildParams.loci = PetriBoardFactory.create();
         makeState();
         startAction.update();
         startAction.chooseMove();
@@ -235,6 +237,7 @@ class ScourgeConfigTest
         // forfeit, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece
 
         config.buildParams.numPlayers = 2;
+        config.buildParams.loci = PetriBoardFactory.create();
         makeState();
         startAction.update();
         startAction.chooseMove();
@@ -268,8 +271,8 @@ class ScourgeConfigTest
         // dropPiece, eatCells, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
         config.buildParams.numPlayers = 2;
+        config.buildParams.loci = PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab);
         config.pieceParams.pieceTableIDs = [pieces.getPieceIdBySizeAndIndex(3, 1)]; // '--- block'
-        config.buildParams.initGrid = TestBoards.twoPlayerGrab;
         makeState();
         startAction.update();
         startAction.chooseMove();

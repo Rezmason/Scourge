@@ -12,6 +12,7 @@ import net.rezmason.scourge.game.body.EatCellsRule;
 import net.rezmason.scourge.game.build.BuildBoardRule;
 import net.rezmason.scourge.game.build.BuildPlayersRule;
 import net.rezmason.scourge.game.build.BuildGlobalRule;
+import net.rezmason.scourge.game.build.PetriBoardFactory;
 import net.rezmason.scourge.game.piece.PickPieceRule;
 import net.rezmason.utils.openfl.Resource;
 
@@ -49,8 +50,7 @@ class StateHistorianTest {
         var config = {
             firstPlayer:0,
             numPlayers:2,
-            circular:false,
-            initGrid:TestBoards.twoPlayerGrab,
+            loci:PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab),
 
             recursive:false,
             eatHeads:true,

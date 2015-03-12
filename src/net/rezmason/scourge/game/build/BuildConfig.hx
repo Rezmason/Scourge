@@ -23,11 +23,8 @@ class BuildConfig<RP, MP> extends Config<BuildParams, RP, MP> {
     override public function defaultParams():Null<BuildParams> {
         return {
             firstPlayer:0,
-
             numPlayers:4,
-
-            circular:false,
-            initGrid:initGrid,
+            loci:null,
         };
     }
 }

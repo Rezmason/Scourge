@@ -4,11 +4,10 @@ package net.rezmason.praxis.grid;
 class GridLocus<T> {
     public var value(default, null):T;
     public var neighbors(default, null):Array<GridLocus<T>>;
+    public var id(default, null):Int;
 
     var _orthoNeighbors:Array<GridLocus<T>>;
     var _diagNeighbors:Array<GridLocus<T>>;
-
-    var id:Int;
 
     public function new(id:Int, value:T):Void {
         this.value = value;
