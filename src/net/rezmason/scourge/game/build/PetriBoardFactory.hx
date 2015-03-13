@@ -24,7 +24,7 @@ class PetriBoardFactory {
         // Player 1's head is at a 45 degree angle
 
         var headAngle:Float = 2 / numPlayers;
-        var boardRadius:Float = (numPlayers == 1) ? 0 : PLAYER_DIST / (2 * Math.sin(Math.PI * headAngle * 0.5));
+        var innerRadius:Float = (numPlayers == 1) ? 0 : PLAYER_DIST / (2 * Math.sin(Math.PI * headAngle * 0.5));
 
         // First, find the bounds of the rectangle containing all heads as if they were arranged on a circle
 
@@ -33,8 +33,8 @@ class PetriBoardFactory {
             var angle:Float = Math.PI * (ike * headAngle + START_ANGLE);
             var coord:XYZ = {x:0, y:0, z:0};
             headCoords.push(coord);
-            coord.x = Math.cos(angle) * boardRadius;
-            coord.y = Math.sin(angle) * boardRadius;
+            coord.x = Math.cos(angle) * innerRadius;
+            coord.y = Math.sin(angle) * innerRadius;
         }
 
         var minHeadX:Float = Math.POSITIVE_INFINITY;
@@ -53,8 +53,8 @@ class PetriBoardFactory {
         // but relatively unevenly positioned away from the edges of the board.
         // So we scale their positions to fit within a square.
 
-        var headScaleX:Float = (maxHeadX - minHeadX + 1) / (2 * boardRadius);
-        var headScaleY:Float = (maxHeadY - minHeadY + 1) / (2 * boardRadius);
+        var headScaleX:Float = (maxHeadX - minHeadX + 1) / (2 * innerRadius);
+        var headScaleY:Float = (maxHeadY - minHeadY + 1) / (2 * innerRadius);
 
         minHeadX = Math.floor(minHeadX / headScaleX);
         minHeadY = Math.floor(minHeadY / headScaleY);
@@ -75,10 +75,11 @@ class PetriBoardFactory {
         populateGraphHeads(topLeft, headCoords);
         if (hasInitGrid) initGraph(topLeft, initGrid, boardWidth);
 
+        var outerRadius:Float = (boardWidth - 1) / 2;
         for (locus in loci) {
             var pos = locus.value.pos;
-            pos.x = (pos.x - (boardWidth - 1) / 2);
-            pos.y = (pos.y - (boardWidth - 1) / 2);
+            pos.x = pos.x - outerRadius;
+            pos.y = outerRadius - pos.y;
             pos.z = (pos.x * pos.x + pos.y * pos.y) * -0.02;
         }
 
