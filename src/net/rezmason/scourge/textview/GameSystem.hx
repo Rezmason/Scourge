@@ -62,11 +62,13 @@ class GameSystem {
         // TODO: recycle
         var sequencer = new Sequencer(ecce);
         sequencer.connect(watchedPlayer);
-        var boardSystem:BoardSystem = new BoardSystem(board, ecce);
-        boardSystem.buildBoard(config.buildParams.loci);
+        
         var rulePresenter:RulePresenter = Type.createInstance(config.fallbackRP, []);
         sequencer.gameStartSignal.add(rulePresenter.init);
         sequencer.boardChangeSignal.add(rulePresenter.presentBoardChange);
+        
+        var boardSystem:BoardSystem = new BoardSystem(ecce, board);
+        sequencer.gameStartSignal.add(boardSystem.init);
         
         referee.beginGame(players, randGen, config);
     }

@@ -10,7 +10,7 @@ using Lambda;
 class PlayerSystem implements IPlayer {
 
     public var index(default, null):Int;
-    public var gameBegunSignal(default, null):Zig<Game->Void> = new Zig();
+    public var gameBegunSignal(default, null):Zig<GameConfig<Dynamic, Dynamic>->Game->Void> = new Zig();
     public var gameEndedSignal(default, null):Zig<Void->Void> = new Zig();
     public var moveStartSignal(default, null):Zig<Int->String->Int->Void> = new Zig();
     public var moveStopSignal(default, null):Zig<Void->Void> = new Zig();
@@ -43,7 +43,7 @@ class PlayerSystem implements IPlayer {
                     init(configData, saveData);
                     if (usesSignals) {
                         isWaitingToProceed = true;
-                        gameBegunSignal.dispatch(game);
+                        gameBegunSignal.dispatch(config, game);
                     } else {
                         takeTurn();
                     }

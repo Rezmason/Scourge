@@ -39,7 +39,7 @@ class RulePresenter extends Reckoner {
         if (anim.bottomFrom == null) anim.bottomFrom = GlyphUtils.createGlyph();
         if (anim.bottomTo == null) anim.bottomTo = GlyphUtils.createGlyph();
         
-        var space = entity.get(BoardSpace);
+        var space = entity.get(BoardNodeState);
         populateGlyphs(anim.topFrom, anim.bottomFrom, space.lastValues);
         populateGlyphs(anim.topTo,   anim.bottomTo,   space.values);
     }

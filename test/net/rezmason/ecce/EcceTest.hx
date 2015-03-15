@@ -39,7 +39,7 @@ class EcceTest {
 
         for (e in q2) trace(e.get(Thing1));
 
-        var classes:Array<Class<Component>> = [Thing1, Thing2, Thing3];
+        var classes:Array<Class<Dynamic>> = [Thing1, Thing2, Thing3];
 
         for (ike in 0...1000) {
             var t = classes[Std.random(3)];
@@ -50,6 +50,6 @@ class EcceTest {
     }
 }
 
-class Thing1 extends Component { public function new() {} }
-class Thing2 extends Component { public function new() {} }
-class Thing3 extends Component { public function new() {} }
+class Thing1 { public function new() {} }
+class Thing2 { public function new() {} }
+class Thing3 { public function new() {} }

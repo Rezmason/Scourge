@@ -3,23 +3,26 @@ package net.rezmason.scourge.controller;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.ecce.Query;
-import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.Reckoner;
-import net.rezmason.praxis.play.PlayerSystem;
+import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
-import net.rezmason.scourge.game.meta.FreshnessAspect;
+import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.components.*;
+import net.rezmason.scourge.components.BoardNodeView;
+import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.utils.Pointers;
 import net.rezmason.utils.Zig;
 
 class Sequencer extends Reckoner {
 
     var ecce:Ecce = null;
+    var config:ScourgeConfig = null;
     var game:Game = null;
     var player:PlayerSystem = null;
     var boardEntities:Map<Int, Entity>;
-    var qBoardSpaces:Query;
+    var qBoardNodeStates:Query;
     var qAnimations:Query;
     var lastMaxFreshness:Int;
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
@@ -32,7 +35,7 @@ class Sequencer extends Reckoner {
     public function new(ecce:Ecce) {
         super();
         this.ecce = ecce;
-        qBoardSpaces = ecce.query([BoardSpace]);
+        qBoardNodeStates = ecce.query([BoardNodeState]);
         qAnimations = ecce.query([GlyphAnimation]);
         boardEntities = new Map();
     }
@@ -48,7 +51,7 @@ class Sequencer extends Reckoner {
 
     public function onGameEnded():Void {
         for (key in boardEntities.keys()) boardEntities.remove(key);
-        for (entity in qBoardSpaces) ecce.collect(entity);
+        for (entity in qBoardNodeStates) ecce.collect(entity);
 
         player.gameBegunSignal.remove(onGameBegun);
         player.moveStartSignal.remove(onMoveStart);
@@ -58,16 +61,19 @@ class Sequencer extends Reckoner {
         this.player = null;
     }
 
-    function onGameBegun(game) {
+    function onGameBegun(config, game) {
         this.game = game;
+        this.config = cast config;
+        var loci = this.config.buildParams.loci;
         primePointers(game.state, game.plan);
 
         for (node in state.nodes) {
-            var e = ecce.dispense([BoardSpace]);
-            var boardSpace = e.get(BoardSpace);
-            boardSpace.ident = node[ident_];
-            boardSpace.values = node;
-            boardSpace.lastValues = node.copy();
+            var e = ecce.dispense([BoardNodeState, BoardNodeView]);
+            var nodeState = e.get(BoardNodeState);
+            nodeState.ident = node[ident_];
+            nodeState.values = node;
+            nodeState.lastValues = node.copy();
+            e.get(BoardNodeView).locus = loci[nodeState.ident];
         }
         gameStartSignal.dispatch(game, ecce);
         player.proceed();
@@ -76,20 +82,20 @@ class Sequencer extends Reckoner {
     function onMoveStart(currentPlayer:Int, actionID:String, move:Int) {
         trace('Player $currentPlayer does $actionID #$move');
         lastMaxFreshness = 0;
-        for (e in qBoardSpaces) {
-            var boardSpace = e.get(BoardSpace);
-            boardSpace.values.copyTo(boardSpace.values);
+        for (e in qBoardNodeStates) {
+            var nodeState = e.get(BoardNodeState);
+            nodeState.values.copyTo(nodeState.values);
         }
     }
 
     function onMoveStep(cause:String) {
         var maxFreshness:Int = state.global[maxFreshness_];
         if (maxFreshness > lastMaxFreshness) {
-            for (e in qBoardSpaces) {
-                var freshness:Int = e.get(BoardSpace).values[freshness_];
+            for (e in qBoardNodeStates) {
+                var freshness:Int = e.get(BoardNodeState).values[freshness_];
                 if (freshness >= lastMaxFreshness) {
                     boardChangeSignal.dispatch(cause, freshness, e);
-                    e.get(BoardSpace).values.copyTo(e.get(BoardSpace).lastValues);
+                    e.get(BoardNodeState).values.copyTo(e.get(BoardNodeState).lastValues);
                 }
             }
             lastMaxFreshness = maxFreshness;

@@ -1,12 +1,11 @@
 package net.rezmason.scourge.components;
 
-import net.rezmason.ecce.Component;
 import net.rezmason.ecce.Entity;
 import net.rezmason.scourge.textview.core.Glyph;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class GlyphAnimation extends Component {
+class GlyphAnimation {
 
     public var index:Int;
     public var duration:Float;
@@ -23,7 +22,7 @@ class GlyphAnimation extends Component {
 
     public var ease:Float->Float;
 
-    override function copyFrom(other:Component) {
+    function copyFrom(other:GlyphAnimation) {
         if (other != null) {
             var otherGA:GlyphAnimation = cast other;
             time = otherGA.time;

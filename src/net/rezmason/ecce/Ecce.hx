@@ -11,12 +11,12 @@ class Ecce {
     var typeBitfields:ObjectMap<Dynamic, Bitfield> = new ObjectMap();
     var queriesByBitfield:Map<Bitfield, Query> = new Map();
     var transitionsByBitfield:Map<Bitfield, Map<Bitfield, Array<Query>>> = new Map();
-    var componentPools:ObjectMap<Dynamic, Array<Component>> = new ObjectMap();
-    var componentBases:ObjectMap<Dynamic, Component> = new ObjectMap();
+    var componentPools:ObjectMap<Dynamic, Array<Dynamic>> = new ObjectMap();
+    var componentBases:ObjectMap<Dynamic, Dynamic> = new ObjectMap();
 
     public function new() query([]);
 
-    public function dispense(types:Array<Class<Component>> = null) {
+    public function dispense(types:Array<Class<Dynamic>> = null) {
         var e = entityPool.pop();
         if (e == null) e = new Entity(this);
         e.inUse = true;
@@ -42,9 +42,9 @@ class Ecce {
         return e2;
     }
 
-    public function get(types:Array<Class<Component>> = null) return getByBitfield(getBitfieldForTypes(types));
+    public function get(types:Array<Class<Dynamic>> = null) return getByBitfield(getBitfieldForTypes(types));
 
-    public function query(types:Array<Class<Component>>) {
+    public function query(types:Array<Class<Dynamic>>) {
         var bitfield = getBitfieldForTypes(types);
         if (queriesByBitfield[bitfield] == null) {
             if (numEntities > 0) throw 'New queries cannot be made while there are entities dispensed.';
@@ -75,20 +75,21 @@ class Ecce {
         e.bitfield = bitfield;
     }
 
-    @:allow(net.rezmason.ecce) function dispenseComponent(type:Class<Component>) {
+    @:allow(net.rezmason.ecce) function dispenseComponent(type:Class<Dynamic>) {
         initComponentPool(type);
         var comp = componentPools.get(type).pop();
         if (comp == null) comp = Type.createInstance(type, []);
-        comp.copyFrom(componentBases.get(type));
+        if (Reflect.hasField(comp, "copyFrom")) comp.copyFrom(componentBases.get(type));
+        else copyComp(comp, componentBases.get(type));
         return comp;
     }
 
-    @:allow(net.rezmason.ecce) function collectComponent(type:Class<Component>, comp:Component) {
+    @:allow(net.rezmason.ecce) function collectComponent(type:Class<Dynamic>, comp:Dynamic) {
         initComponentPool(type);
         componentPools.get(type).push(comp);
     }
 
-    inline function initComponentPool(type:Class<Component>) {
+    inline function initComponentPool(type:Class<Dynamic>) {
         if (!componentPools.exists(type)) {
             componentPools.set(type, []);
             componentBases.set(type, Type.createInstance(type, []));
@@ -101,7 +102,7 @@ class Ecce {
         return ret;
     }
     
-    inline function getBitfieldForTypes(types:Array<Class<Component>> = null) {
+    inline function getBitfieldForTypes(types:Array<Class<Dynamic>> = null) {
         var bitfield = 0;
         if (types != null) for (type in types) bitfield = bitfield | getBitfieldForType(type);
         return bitfield;
@@ -110,5 +111,11 @@ class Ecce {
     inline function getBitfieldForType(type) {
         if (!typeBitfields.exists(type)) typeBitfields.set(type, 1 << maxBitfield++);
         return typeBitfields.get(type);
+    }
+
+    @:allow(net.rezmason.ecce) inline static function copyComp(to:Dynamic, from:Dynamic) {
+        if (to != null && from != null) {
+            for (field in Reflect.fields(to)) Reflect.setField(to, field, Reflect.field(from, field));
+        }
     }
 }
