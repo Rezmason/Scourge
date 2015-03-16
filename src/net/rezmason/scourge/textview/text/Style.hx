@@ -34,31 +34,20 @@ class Style {
     }
 
     function updateSpan(span:Span, delta:Float):Void {
-
         var glyphs = span.glyphs;
-        var basics = span.basics;
-
         if (glyphs.length == 0) return;
-
-        var r:Float = basics[0];
-        var g:Float = basics[1];
-        var b:Float = basics[2];
-        var i:Float = basics[3];
-        var f:Float = basics[4];
-        var a:Float = basics[5];
-        var h:Float = basics[6];
-        var s:Float = basics[7];
-        var p:Float = basics[8];
-
-        for (glyph in glyphs) {
-            glyph.set_rgb(r, g, b);
-            glyph.set_i(i);
-            glyph.set_f(f);
-            glyph.set_a(a);
-            glyph.set_h(h);
-            glyph.set_s(s);
-            glyph.set_p(p);
-        }
+        var basics = span.basics;
+        for (glyph in glyphs) glyph.SET({
+            r:basics[0],
+            g:basics[1],
+            b:basics[2],
+            i:basics[3],
+            f:basics[4],
+            a:basics[5],
+            h:basics[6],
+            s:basics[7],
+            p:basics[8]
+        });
     }
 
     public function handleSpanInteraction(span:Span, type:MouseInteractionType):Void {

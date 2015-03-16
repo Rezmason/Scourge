@@ -72,25 +72,16 @@ class BoardSystem {
         for (entity in qBoardView) {
             var view = entity.get(BoardNodeView);
             var locus = view.locus;
-
             if (trimmings[locus.id]) continue;
+            var pos = locus.value.pos;
             
-            var bottom = body.getGlyphByID(itr + 0);
-            var top = body.getGlyphByID(itr + 1);
-            var over = body.getGlyphByID(itr + 2);
+            var bottom = view.bottom = body.getGlyphByID(itr + 0).SET({pos:pos}, true);
+            var top    = view.top =    body.getGlyphByID(itr + 1).SET({pos:pos, p:-0.03}, true);
+            var over   = view.over =   body.getGlyphByID(itr + 2).SET({pos:pos, p: 0.06}, true);
 
-            view.bottom = bottom;
-            view.top = top;
-            view.over = over;
-
-            bottom.reset();
-            top.reset();
-            over.reset();
-
-            top.set_pos(locus.value.pos);
-            
             if (locus.value.isWall) {
                 top.set_color(WALL_COLOR);
+                bottom.set_color(BOARD_COLOR);
                 var numNeighbors:Int = 0;
                 var bitfield:Int = 0;
                 for (neighbor in locus.orthoNeighbors()) {
@@ -100,7 +91,13 @@ class BoardSystem {
                     numNeighbors++;
                 }
                 top.set_char(Utf8.charCodeAt(BOX_SYMBOLS, bitfield));
+                bottom.set_char(Utf8.charCodeAt(BOX_SYMBOLS, bitfield));
+
                 top.set_h(body.glyphTexture.font.glyphRatio);
+                bottom.set_h(body.glyphTexture.font.glyphRatio);
+            } else {
+                bottom.set_char(BOARD_CODE);
+                bottom.set_color(BOARD_COLOR);
             }
             itr += 3;
         }

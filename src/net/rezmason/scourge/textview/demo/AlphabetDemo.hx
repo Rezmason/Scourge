@@ -6,6 +6,7 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.GlyphTexture;
+import net.rezmason.scourge.textview.ColorPalette;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -34,19 +35,18 @@ class AlphabetDemo {
         body.interactionSignal.add(receiveInteraction);
 
         for (glyph in body.eachGlyph()) {
-
             var id:Int = glyph.id;
             var col:Int = id % numCols;
             var row:Int = Std.int(id / numCols);
-            var x:Float = ((col + 0.5) / numCols - 0.5);
-            var y:Float = ((row + 0.5) / numRows    - 0.5);
-            var charCode:Int = Utf8.charCodeAt(CHARS, id % CHARS.length);
 
-            glyph.set_xyz(x, y, 0);
-            glyph.set_rgb(1, 1, 1);
-            glyph.set_i(0.1);
-            glyph.set_char(charCode);
-            glyph.set_paint(glyph.id + 1);
+            glyph.SET({
+                x: ((col + 0.5) / numCols - 0.5),
+                y: ((row + 0.5) / numRows - 0.5),
+                char: Utf8.charCodeAt(CHARS, id % CHARS.length),
+                color: ColorPalette.WHITE,
+                i:0.1,
+                paint: glyph.id + 1
+            });
         }
     }
 

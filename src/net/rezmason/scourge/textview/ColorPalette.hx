@@ -5,5 +5,6 @@ class ColorPalette {
     public static var BOARD_COLOR:Color = Color.fromHex(0x202020);
     public static var WALL_COLOR:Color = Color.fromHex(0x808080);
     public static var UI_COLOR:Color = Color.fromHex(0xFFFFFF);
-    public static var BLACK:Color = Color.fromHex(0x000000);
+    public static var BLACK:Color = new Color(0, 0, 0);
+    public static var WHITE:Color = new Color(1, 1, 1);
 }

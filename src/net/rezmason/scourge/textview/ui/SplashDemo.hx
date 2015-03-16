@@ -80,18 +80,10 @@ class SplashDemo {
 
                 for (ike in 0...thickness) {
                     var glyph:Glyph = body.getGlyphByID(glyphID);
-
                     glyphTower.push(glyph);
-                    
-                    glyph.set_xyz(x, y, z);
-                    glyph.set_color(color);
-                    glyph.set_i(0);
-                    glyph.set_char(charCode);
-                    glyph.set_paint(glyph.id);
-
+                    glyph.SET({x:x, y:y, z:z, color:color, i:0, char:charCode, paint:glyph.id});
                     z += 0.01;
                     color = color * 0.2;
-
                     glyphID++;
                 }
 

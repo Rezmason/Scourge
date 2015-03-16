@@ -1,10 +1,15 @@
 package net.rezmason.scourge.textview.core;
 
+#if macro
+import haxe.macro.Context;
+import haxe.macro.Expr;
+#else
 import net.rezmason.gl.Data;
 
 import net.rezmason.utils.FatChar;
 import net.rezmason.utils.display.FlatFont;
 import net.rezmason.scourge.textview.core.Almanac.*;
+#end
 
 class GlyphUtils {
 
@@ -12,6 +17,7 @@ class GlyphUtils {
 
     // Color
 
+    #if !macro
     public inline static function get_r(gl:Glyph) return gl.color[gl.id * COLOR_FLOATS_PER_GLYPH + R_OFFSET];
     public inline static function set_r(gl:Glyph, v) return pop4(gl.color, gl.id * COLOR_FLOATS_PER_GLYPH, R_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
 
@@ -218,5 +224,21 @@ class GlyphUtils {
             vec[glyphOffset + propOffset + 3 * step] = val;
         }
         return val;
+    }
+    #end
+
+    macro public static function SET(gl:Expr, params:Expr, reset:Bool = false):Expr {
+        var expressions = [];
+        if (reset) expressions.push(macro $p{['GlyphUtils', 'reset']}(${gl}));
+        switch (params.expr) {
+            case EObjectDecl(fields):
+                for (field in fields) {
+                    expressions.push(macro $p{['GlyphUtils', 'set_' + field.field]}(${gl}, ${field.expr}));
+                }
+            case EBlock(exprs) if (exprs.length == 0):
+            case _: throw 'params argument must be and anonymous object.';
+        }
+        expressions.push(macro ${gl});
+        return macro $b{expressions};
     }
 }
