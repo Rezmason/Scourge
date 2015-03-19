@@ -7,6 +7,7 @@ import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.praxis.play.Referee;
 import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.build.PetriBoardFactory;
 import net.rezmason.scourge.game.test.TestPlayer;
 import net.rezmason.utils.openfl.Resource;
 
@@ -41,6 +42,7 @@ class RefereeTest {
         players = [];
         for (ike in 0...4) players.push(new TestPlayer(ike, noop, random));
         var config:ScourgeConfig = new ScourgeConfig();
+        config.buildParams.loci = PetriBoardFactory.create(2);
         referee.beginGame(players, randGen, config);
 
         var savedGame = referee.saveGame();
@@ -78,6 +80,7 @@ class RefereeTest {
 
         Assert.isFalse(referee.gameBegun);
         var config:ScourgeConfig = new ScourgeConfig();
+        config.buildParams.loci = PetriBoardFactory.create(2);
         referee.beginGame(players, randGen, config);
         Assert.isTrue(referee.gameBegun);
 

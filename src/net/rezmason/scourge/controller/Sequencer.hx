@@ -9,7 +9,6 @@ import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.components.*;
-import net.rezmason.scourge.components.BoardNodeView;
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.utils.Pointers;
@@ -76,6 +75,7 @@ class Sequencer extends Reckoner {
             e.get(BoardNodeView).locus = loci[nodeState.ident];
         }
         gameStartSignal.dispatch(game, ecce);
+        
         player.proceed();
     }
 

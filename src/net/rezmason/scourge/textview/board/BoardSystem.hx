@@ -48,8 +48,12 @@ class BoardSystem {
                     }
                 }
 
-                if (hasEmptyNeighbor) numSpacesThatMatter++;
-                else trimmings[locus.id] = true;
+                if (hasEmptyNeighbor) {
+                    numSpacesThatMatter++;
+                } else {
+                    trimmings[locus.id] = true;
+                    entity.remove(BoardNodeView);
+                }
             } else {
                 numSpacesThatMatter++;
             }
@@ -72,12 +76,11 @@ class BoardSystem {
         for (entity in qBoardView) {
             var view = entity.get(BoardNodeView);
             var locus = view.locus;
-            if (trimmings[locus.id]) continue;
             var pos = locus.value.pos;
             
-            var bottom = view.bottom = body.getGlyphByID(itr + 0).SET({pos:pos}, true);
-            var top    = view.top =    body.getGlyphByID(itr + 1).SET({pos:pos, p:-0.03}, true);
-            var over   = view.over =   body.getGlyphByID(itr + 2).SET({pos:pos, p: 0.06}, true);
+            var bottom = view.bottom = body.getGlyphByID(itr + 0).reset().SET({pos:pos});
+            var top    = view.top =    body.getGlyphByID(itr + 1).reset().SET({pos:pos, p:-0.03});
+            var over   = view.over =   body.getGlyphByID(itr + 2).reset().SET({pos:pos, p: 0.06});
 
             if (locus.value.isWall) {
                 top.set_color(WALL_COLOR);

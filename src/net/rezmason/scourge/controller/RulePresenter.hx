@@ -27,6 +27,7 @@ class RulePresenter extends Reckoner {
     }
 
     public function presentBoardChange(cause:String, index:Int, entity:Entity):Void {
+
         var anim:GlyphAnimation = ecce.dispense([GlyphAnimation]).get(GlyphAnimation);
         anim.subject = entity;
         anim.duration = 1;
@@ -42,6 +43,8 @@ class RulePresenter extends Reckoner {
         var space = entity.get(BoardNodeState);
         populateGlyphs(anim.topFrom, anim.bottomFrom, space.lastValues);
         populateGlyphs(anim.topTo,   anim.bottomTo,   space.values);
+
+        entity.get(BoardNodeView).top.SET({char:97, r:anim.topTo.get_r(), g:anim.topTo.get_g(), b:anim.topTo.get_b()});
     }
 
     function populateGlyphs(topGlyph:Glyph, bottomGlyph:Glyph, values:AspectSet) {
@@ -50,10 +53,10 @@ class RulePresenter extends Reckoner {
         if (occupier != NULL) {
             var color = TEAM_COLORS[occupier];
             bottomGlyph.set_color(color * 0.4);
-            if (isFilled) topGlyph.set_color(color);
+            topGlyph.set_color(isFilled ? color : BLACK);
         } else {
             bottomGlyph.set_color(BOARD_COLOR);
-            if (isFilled) topGlyph.set_color(WALL_COLOR);
+            topGlyph.set_color(isFilled ? WALL_COLOR : BLACK);
         }
     }
 }

@@ -196,13 +196,14 @@ class GlyphUtils {
         reset(gl);
     }
 
-    public inline static function reset(gl:Glyph):Void {
+    public inline static function reset(gl:Glyph):Glyph {
         set_distort(gl, 1, 1, 0); // h, s, p
         set_xyz(gl, 0, 0, 0); // x, y, z
         set_rgb(gl, 1, 1, 1); // r, g, b
         set_fx(gl, 0, 0.5, 0); // i, f, a
         // We don't reset the font.
         set_char(gl, -1);
+        return gl;
     }
 
     public inline static function toString(gl:Glyph):String return String.fromCharCode(gl.charCode);
@@ -227,18 +228,22 @@ class GlyphUtils {
     }
     #end
 
-    macro public static function SET(gl:Expr, params:Expr, reset:Bool = false):Expr {
-        var expressions = [];
-        if (reset) expressions.push(macro $p{['GlyphUtils', 'reset']}(${gl}));
+    macro public static function SET(gl:Expr, params:Expr):Expr {
+        switch (Context.typeExpr(gl).t) {
+            case TInst(ref, _) if (ref.get().name == 'Glyph'):
+            case _: throw 'gl argument must be a Glyph.';
+        }
+
+        var expressions = [macro var __gl__ = ${gl}];
         switch (params.expr) {
             case EObjectDecl(fields):
                 for (field in fields) {
-                    expressions.push(macro $p{['GlyphUtils', 'set_' + field.field]}(${gl}, ${field.expr}));
+                    expressions.push(macro $p{['GlyphUtils', 'set_' + field.field]}(__gl__, ${field.expr}));
                 }
             case EBlock(exprs) if (exprs.length == 0):
             case _: throw 'params argument must be and anonymous object.';
         }
-        expressions.push(macro ${gl});
+        expressions.push(macro __gl__);
         return macro $b{expressions};
     }
 }
