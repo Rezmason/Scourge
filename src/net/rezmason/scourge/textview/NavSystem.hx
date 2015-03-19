@@ -15,6 +15,7 @@ class NavSystem {
         pages = new Map();
         pageHistory = [];
         this.engine = engine;
+        engine.readySignal.add(onEngineReady);
     }
 
     public function addPage(name:String, page:NavPage):Void {
@@ -51,8 +52,12 @@ class NavSystem {
     }
 
     private function setPageTo(page:NavPage):Void {
-        if (currentPage != null) for (scene in currentPage.eachScene()) engine.removeScene(scene);
+        if (engine.ready && currentPage != null) for (scene in currentPage.eachScene()) engine.removeScene(scene);
         currentPage = page;
+        if (engine.ready && currentPage != null) for (scene in currentPage.eachScene()) engine.addScene(scene);
+    }
+
+    private function onEngineReady() {
         if (currentPage != null) for (scene in currentPage.eachScene()) engine.addScene(scene);
     }
 }

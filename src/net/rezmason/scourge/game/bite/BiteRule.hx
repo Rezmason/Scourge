@@ -8,7 +8,6 @@ import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 
-using Lambda;
 using net.rezmason.praxis.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.MapUtils;
@@ -103,7 +102,7 @@ class BiteRule extends BaseRule<BiteParams> {
                         for (bitNodeID in move.bitNodes) {
                             var bitLocus:BoardLocus = getLocus(bitNodeID);
                             for (neighbor in neighborsFor(bitLocus)) {
-                                if (isValidEnemy(headIDs, currentPlayer, neighbor.value) && !move.bitNodes.has(getID(neighbor.value))) {
+                                if (isValidEnemy(headIDs, currentPlayer, neighbor.value) && move.bitNodes.indexOf(getID(neighbor.value)) == -1) {
                                     newMoves.push(getMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move));
                                 }
                             }
@@ -214,7 +213,7 @@ class BiteRule extends BaseRule<BiteParams> {
         if (node[occupier_] == allegiance) val = false; // Can't be the current player
         else if (node[occupier_] == NULL) val = false; // Can't be the current player
         else if (!params.biteThroughCavities && node[isFilled_] == FALSE) val = false; // Must be filled, or must allow biting through a cavity
-        else if (!params.biteHeads && headIDs.has(getID(node))) val = false;
+        else if (!params.biteHeads && headIDs.indexOf(getID(node)) != -1) val = false;
 
         return val;
     }
@@ -243,7 +242,7 @@ class BiteRule extends BaseRule<BiteParams> {
     inline function movesAreEqual(move1:BiteMove, move2:BiteMove):Bool {
         var val:Bool = true;
         if (move1.bitNodes.length != move2.bitNodes.length) val = false;
-        else for (bitNode in move1.bitNodes) if (!move2.bitNodes.has(bitNode)) { val = false; break; }
+        else for (bitNode in move1.bitNodes) if (move2.bitNodes.indexOf(bitNode) == -1) { val = false; break; }
         return val;
     }
 

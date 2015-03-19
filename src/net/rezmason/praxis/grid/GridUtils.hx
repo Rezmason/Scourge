@@ -5,6 +5,7 @@ import haxe.Unserializer;
 import net.rezmason.praxis.grid.GridDirection.*;
 import net.rezmason.praxis.grid.GridLocus;
 import net.rezmason.ds.ShitList;
+import net.rezmason.utils.SkipIterator;
 
 using Lambda;
 using net.rezmason.utils.MapUtils;
@@ -20,7 +21,7 @@ class GridUtils {
 
     public inline static function allDirections():Iterator<Int> { return 0...8; }
 
-    public inline static function orthoDirections():Iterator<Int> { return [0, 2, 4, 6].iterator(); }
+    public inline static function orthoDirections():Iterator<Int> { return new SkipIterator(0, 8, 2); }
 
     // Returns the furthest reachable locus from the given locus in the specified direction
     public inline static function run<T> (locus:GridLocus<T>, direction:Int, maxDist:Int = -1):GridLocus<T> {

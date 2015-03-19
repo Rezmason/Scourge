@@ -12,6 +12,7 @@ class History<T> {
     private var changeCount:Int;
     private var fullChanges:Array<Array<T>>;
     private var incrementalChanges:Array<Map<Int, T>>;
+    private var incrementalChangeIndices:Array<Array<Int>>;
 
     public function new():Void {
         length = 0;
@@ -20,6 +21,7 @@ class History<T> {
         array = [];
         oldArray = [];
         incrementalChanges = [];
+        incrementalChangeIndices = [];
         fullChanges = [[]];
     }
 
@@ -33,6 +35,7 @@ class History<T> {
 
     public function forget():Void {
         incrementalChanges.splice(0, revision + 1);
+        incrementalChangeIndices.splice(0, revision + 1);
         fullChanges.splice(0, revision + 1);
         for (ike in 0...length) oldArray[ike] = array[ike];
         fullChanges[0] = array.copy();
@@ -61,14 +64,16 @@ class History<T> {
                 var incrRev:Int = fullRev + 1;
                 for (ike in incrRev...goalRev + 1) {
                     var incrementalChange:Map<Int, T> = incrementalChanges[ike];
-                    for (key in incrementalChange.keys()) {
-                        array[key] = oldArray[key] = incrementalChange[key];
+                    var indices = incrementalChangeIndices[ike];
+                    for (index in indices) {
+                        array[index] = oldArray[index] = incrementalChange[index];
                     }
                 }
             }
             var deadRev:Int = goalRev + 1;
             fullChanges.splice(deadRev, revision - deadRev + 1);
             incrementalChanges.splice(deadRev, revision - deadRev + 1);
+            incrementalChangeIndices.splice(deadRev, revision - deadRev + 1);
             revision = goalRev;
         }
     }
@@ -91,6 +96,7 @@ class History<T> {
                 }
             }
             incrementalChanges[revision] = map;
+            incrementalChangeIndices[revision] = [for (key in map.keys()) key];
         }
 
         return revision;

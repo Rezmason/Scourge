@@ -61,8 +61,17 @@ class CavityRule extends BaseRule<Void> {
 
         if (bodyNode != null) {
             var occupier:Int = bodyNode[occupier_];
-            var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_);
-            edgeNodes = edgeNodes.filter(hasDifferentNeighbor.bind(occupier));
+            var edgeNodes = [];
+            for (node in bodyNode.listToArray(state.nodes, bodyNext_)) {
+                var hasDifferentNeighbor = false;
+                for (neighbor in getNodeLocus(node).orthoNeighbors()) {
+                    if (neighbor == null || neighbor.value[isFilled_] == FALSE || neighbor.value[occupier_] != occupier) {
+                        hasDifferentNeighbor = true;
+                        break;
+                    }
+                }
+                if (hasDifferentNeighbor) edgeNodes.push(node);
+            }
 
             // For each edge node,
             for (edgeNode in edgeNodes) {
@@ -171,19 +180,6 @@ class CavityRule extends BaseRule<Void> {
         }
 
         return numCavityNodes > 0;
-    }
-
-    inline function hasDifferentNeighbor(allegiance:Int, node:AspectSet):Bool {
-        var exists:Bool = false;
-
-        for (neighbor in getNodeLocus(node).orthoNeighbors()) {
-            if (neighbor == null || neighbor.value[isFilled_] == FALSE || neighbor.value[occupier_] != allegiance) {
-                exists = true;
-                break;
-            }
-        }
-
-        return exists;
     }
 
     inline function makeEdge(id:Int, direction:Int):Int return (id << 3) | (direction & 7);
