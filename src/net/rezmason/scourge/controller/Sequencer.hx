@@ -20,7 +20,6 @@ class Sequencer extends Reckoner {
     var config:ScourgeConfig = null;
     var game:Game = null;
     var player:PlayerSystem = null;
-    var boardEntities:Map<Int, Entity>;
     var qBoardNodeStates:Query;
     var qAnimations:Query;
     var lastMaxFreshness:Int;
@@ -36,7 +35,6 @@ class Sequencer extends Reckoner {
         this.ecce = ecce;
         qBoardNodeStates = ecce.query([BoardNodeState]);
         qAnimations = ecce.query([GlyphAnimation]);
-        boardEntities = new Map();
     }
 
     public function connect(player:PlayerSystem):Void {
@@ -49,8 +47,7 @@ class Sequencer extends Reckoner {
     }
 
     public function onGameEnded():Void {
-        for (key in boardEntities.keys()) boardEntities.remove(key);
-        for (entity in qBoardNodeStates) ecce.collect(entity);
+        for (entity in ecce.get()) ecce.collect(entity);
 
         player.gameBegunSignal.remove(onGameBegun);
         player.moveStartSignal.remove(onMoveStart);
@@ -75,6 +72,7 @@ class Sequencer extends Reckoner {
             e.get(BoardNodeView).locus = loci[nodeState.ident];
         }
         gameStartSignal.dispatch(game, ecce);
+        for (e in qBoardNodeStates) boardChangeSignal.dispatch(null, 0, e);
         
         player.proceed();
     }

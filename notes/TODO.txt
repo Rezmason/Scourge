@@ -1,5 +1,3 @@
-Presenters should all respond to game init too
-
 Board animation
     Create GlyphAnimator
     Gamesystem: connect glyph animator to ecce, update function, and sequencer's proceed function

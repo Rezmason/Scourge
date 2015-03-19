@@ -28,6 +28,9 @@ class RulePresenter extends Reckoner {
 
     public function presentBoardChange(cause:String, index:Int, entity:Entity):Void {
 
+        var view = entity.get(BoardNodeView);
+        if (view == null || view.locus.value.isWall) return;
+
         var anim:GlyphAnimation = ecce.dispense([GlyphAnimation]).get(GlyphAnimation);
         anim.subject = entity;
         anim.duration = 1;
@@ -40,11 +43,11 @@ class RulePresenter extends Reckoner {
         if (anim.bottomFrom == null) anim.bottomFrom = GlyphUtils.createGlyph();
         if (anim.bottomTo == null) anim.bottomTo = GlyphUtils.createGlyph();
         
-        var space = entity.get(BoardNodeState);
-        populateGlyphs(anim.topFrom, anim.bottomFrom, space.lastValues);
-        populateGlyphs(anim.topTo,   anim.bottomTo,   space.values);
+        var nodeState = entity.get(BoardNodeState);
+        populateGlyphs(anim.topFrom, anim.bottomFrom, nodeState.lastValues);
+        populateGlyphs(anim.topTo,   anim.bottomTo,   nodeState.values);
 
-        entity.get(BoardNodeView).top.SET({char:97, r:anim.topTo.get_r(), g:anim.topTo.get_g(), b:anim.topTo.get_b()});
+        view.top.SET({char:97, r:anim.topTo.get_r(), g:anim.topTo.get_g(), b:anim.topTo.get_b()});
     }
 
     function populateGlyphs(topGlyph:Glyph, bottomGlyph:Glyph, values:AspectSet) {
