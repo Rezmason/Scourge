@@ -16,6 +16,8 @@ import net.rezmason.utils.Zig;
 
 class Sequencer extends Reckoner {
 
+    inline static var MAX_END_TIME:Int = 2;
+
     var ecce:Ecce = null;
     var config:ScourgeConfig = null;
     var game:Game = null;
@@ -23,9 +25,10 @@ class Sequencer extends Reckoner {
     var qBoardNodeStates:Query;
     var qAnimations:Query;
     var lastMaxFreshness:Int;
+    var waitingToProceed:Bool;
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
-    public var gameChangeSignal(default, null):Zig<String->Void> = new Zig();
-    public var boardChangeSignal(default, null):Zig<String->Int->Entity->Void> = new Zig();
+    public var moveSequencedSignal(default, null):Zig<Void->Void> = new Zig();
+    public var boardChangeSignal(default, null):Zig<String->Null<Int>->Entity->Void> = new Zig();
 
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
@@ -35,6 +38,7 @@ class Sequencer extends Reckoner {
         this.ecce = ecce;
         qBoardNodeStates = ecce.query([BoardNodeState]);
         qAnimations = ecce.query([GlyphAnimation]);
+        waitingToProceed = false;
     }
 
     public function connect(player:PlayerSystem):Void {
@@ -47,7 +51,7 @@ class Sequencer extends Reckoner {
     }
 
     public function onGameEnded():Void {
-        for (entity in ecce.get()) ecce.collect(entity);
+        if (!waitingToProceed) for (entity in ecce.get()) ecce.collect(entity);
 
         player.gameBegunSignal.remove(onGameBegun);
         player.moveStartSignal.remove(onMoveStart);
@@ -72,13 +76,14 @@ class Sequencer extends Reckoner {
             e.get(BoardNodeView).locus = loci[nodeState.ident];
         }
         gameStartSignal.dispatch(game, ecce);
-        for (e in qBoardNodeStates) boardChangeSignal.dispatch(null, 0, e);
+        for (e in qBoardNodeStates) boardChangeSignal.dispatch(null, null, e);
         
+        // waitingToProceed = true;
         player.proceed();
     }
 
     function onMoveStart(currentPlayer:Int, actionID:String, move:Int) {
-        trace('Player $currentPlayer does $actionID #$move');
+        // trace('Player $currentPlayer does $actionID #$move');
         lastMaxFreshness = 0;
         for (e in qBoardNodeStates) {
             var nodeState = e.get(BoardNodeState);
@@ -98,7 +103,6 @@ class Sequencer extends Reckoner {
             }
             lastMaxFreshness = maxFreshness;
         }
-        gameChangeSignal.dispatch(cause);
     }
 
     function onMoveStop() {
@@ -121,14 +125,30 @@ class Sequencer extends Reckoner {
             startTime = lastAnim.startTime + lastAnim.duration * (1 - lastAnim.overlap);
         }
 
-        // FOR NOW:
-        var count = 0;
-        for (e in qAnimations) {
-            trace(e.get(GlyphAnimation));
-            ecce.collect(e);
-            count++;
+        var finalAnims = animations[animations.length - 1];
+        if (finalAnims != null) {
+            var finalAnim = finalAnims[finalAnims.length - 1];
+            var scale = MAX_END_TIME / (finalAnim.startTime + finalAnim.duration);
+            if (scale < 1) {
+                for (anims in animations) {
+                    for (anim in anims) {
+                        anim.startTime *= scale;
+                        anim.overlap *= scale;
+                        anim.duration *= scale;
+                    }
+                }
+            }
         }
         
-        player.proceed();
+        waitingToProceed = true;
+        moveSequencedSignal.dispatch();
+    }
+
+    public function proceed() {
+        if (waitingToProceed) {
+            waitingToProceed = false;
+            if (player != null) player.proceed();
+            else for (entity in ecce.get()) ecce.collect(entity);
+        }
     }
 }

@@ -61,16 +61,20 @@ class GlyphUtils {
         gl.shape = new VertexArray(SHAPE_FLOATS_PER_GLYPH);
         gl.color = new VertexArray(COLOR_FLOATS_PER_GLYPH);
         gl.paint = new VertexArray(PAINT_FLOATS_PER_GLYPH);
+        init(gl);
         return gl;
     }
 
-    public inline static function copy(gl:Glyph):Glyph {
-        var copy = createGlyph();
-        init(copy);
-        for (ike in 0...SHAPE_FLOATS_PER_GLYPH) copy.shape[ike] = gl.shape[gl.id + ike];
-        for (ike in 0...COLOR_FLOATS_PER_GLYPH) copy.color[ike] = gl.color[gl.id + ike];
-        for (ike in 0...PAINT_FLOATS_PER_GLYPH) copy.paint[ike] = gl.paint[gl.id + ike];
-        return copy;
+    public inline static function clone(src:Glyph):Glyph {
+        var gl = createGlyph();
+        copyFrom(gl, src);
+        return gl;
+    }
+
+    public inline static function copyFrom(gl:Glyph, src:Glyph):Void {
+        for (ike in 0...SHAPE_FLOATS_PER_GLYPH) gl.shape[gl.id * SHAPE_FLOATS_PER_GLYPH + ike] = src.shape[src.id * SHAPE_FLOATS_PER_GLYPH + ike];
+        for (ike in 0...COLOR_FLOATS_PER_GLYPH) gl.color[gl.id * COLOR_FLOATS_PER_GLYPH + ike] = src.color[src.id * COLOR_FLOATS_PER_GLYPH + ike];
+        for (ike in 0...PAINT_FLOATS_PER_GLYPH) gl.paint[gl.id * PAINT_FLOATS_PER_GLYPH + ike] = src.paint[src.id * PAINT_FLOATS_PER_GLYPH + ike];
     }
 
     // Shape

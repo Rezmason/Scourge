@@ -33,11 +33,11 @@ class GlyphAnimation {
             subject = otherGA.subject;
             ease = otherGA.ease;
 
-            if (otherGA.topFrom != null) topFrom = otherGA.topFrom.copy();
-            if (otherGA.topTo   != null) topTo   = otherGA.topTo.copy();
+            if (otherGA.topFrom != null) topFrom = otherGA.topFrom.clone();
+            if (otherGA.topTo   != null) topTo   = otherGA.topTo.clone();
 
-            if (otherGA.bottomFrom != null) bottomFrom = otherGA.bottomFrom.copy();
-            if (otherGA.bottomTo   != null) bottomTo   = otherGA.bottomTo.copy();
+            if (otherGA.bottomFrom != null) bottomFrom = otherGA.bottomFrom.clone();
+            if (otherGA.bottomTo   != null) bottomTo   = otherGA.bottomTo.clone();
         }
     }
 }

@@ -11,7 +11,8 @@ import net.rezmason.scourge.controller.Sequencer;
 import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.textview.core.Body;
-import net.rezmason.scourge.textview.board.BoardSystem;
+import net.rezmason.scourge.textview.board.BoardAnimator;
+import net.rezmason.scourge.textview.board.BoardInitializer;
 
 class GameSystem {
 
@@ -24,7 +25,9 @@ class GameSystem {
 
     public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, thinkPeriod:Int, animateMils:Int, isReplay:Bool, seed:UInt):Void {
 
-        if (referee.gameBegun) referee.endGame();
+        if (referee.gameBegun) {
+            referee.endGame();
+        }
 
         var randGen:Void->Float = lgm(seed);
         var randBot:Void->Float = lgm(seed); // TODO: seed should only be given to *internal* bots
@@ -67,9 +70,13 @@ class GameSystem {
         sequencer.gameStartSignal.add(rulePresenter.init);
         sequencer.boardChangeSignal.add(rulePresenter.presentBoardChange);
         
-        var boardSystem:BoardSystem = new BoardSystem(ecce, board);
-        sequencer.gameStartSignal.add(boardSystem.init);
-        
+        var boardInitializer:BoardInitializer = new BoardInitializer(ecce, board);
+        sequencer.gameStartSignal.add(function(_, _) boardInitializer.init());
+
+        var boardAnimator:BoardAnimator = new BoardAnimator(ecce, board, animateMils);
+        sequencer.moveSequencedSignal.add(boardAnimator.wake);
+        boardAnimator.animCompleteSignal.add(sequencer.proceed);
+
         referee.beginGame(players, randGen, config);
     }
 
