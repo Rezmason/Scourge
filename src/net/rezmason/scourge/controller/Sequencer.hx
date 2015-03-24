@@ -70,7 +70,7 @@ class Sequencer extends Reckoner {
         for (node in state.nodes) {
             var e = ecce.dispense([BoardNodeState, BoardNodeView]);
             var nodeState = e.get(BoardNodeState);
-            nodeState.ident = node[ident_];
+            nodeState.ident = getID(node);
             nodeState.values = node;
             nodeState.lastValues = node.copy();
             e.get(BoardNodeView).locus = loci[nodeState.ident];

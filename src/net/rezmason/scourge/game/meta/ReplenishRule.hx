@@ -48,19 +48,19 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
         // Create the replenishables
         for (repProp in globalProperties) {
             var replenishable:AspectSet = makeReplenishable(repProp, plan.globalAspectLookup);
-            repProp.replenishableID = replenishable[ident_];
+            repProp.replenishableID = getID(replenishable);
             stateReps.push(replenishable);
         }
 
         for (repProp in playerProperties) {
             var replenishable:AspectSet = makeReplenishable(repProp, plan.playerAspectLookup);
-            repProp.replenishableID = replenishable[ident_];
+            repProp.replenishableID = getID(replenishable);
             playerReps.push(replenishable);
         }
 
         for (repProp in nodeProperties) {
             var replenishable:AspectSet = makeReplenishable(repProp, plan.nodeAspectLookup);
-            repProp.replenishableID = replenishable[ident_];
+            repProp.replenishableID = getID(replenishable);
             nodeReps.push(replenishable);
         }
 
@@ -68,21 +68,21 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
 
         if (stateReps.length > 0) {
             stateReps.chainByAspect(ident_, repNext_, repPrev_);
-            state.global[stateRepFirst_] = stateReps[0][ident_];
+            state.global[stateRepFirst_] = getID(stateReps[0]);
         } else {
             state.global[stateRepFirst_] = NULL;
         }
 
         if (playerReps.length > 0) {
             playerReps.chainByAspect(ident_, repNext_, repPrev_);
-            state.global[playerRepFirst_] = playerReps[0][ident_];
+            state.global[playerRepFirst_] = getID(playerReps[0]);
         } else {
             state.global[playerRepFirst_] = NULL;
         }
 
         if (nodeReps.length > 0) {
             nodeReps.chainByAspect(ident_, repNext_, repPrev_);
-            state.global[nodeRepFirst_] = nodeReps[0][ident_];
+            state.global[nodeRepFirst_] = getID(nodeReps[0]);
         } else {
             state.global[nodeRepFirst_] = NULL;
         }

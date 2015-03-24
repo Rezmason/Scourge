@@ -129,7 +129,7 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
         }
 
         allPieces.chainByAspect(ident_, pieceNext_, piecePrev_);
-        state.global[pieceFirst_] = allPieces[0][ident_];
+        state.global[pieceFirst_] = getID(allPieces[0]);
     }
 
     private function generateMove(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):PickPieceMove {
@@ -177,7 +177,7 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
         if (pickedPiece == firstHatPiece) {
             firstHatPiece = nextPiece;
             if (firstHatPiece == null) state.global[pieceHatFirst_] = NULL;
-            else state.global[pieceHatFirst_] = firstHatPiece[ident_];
+            else state.global[pieceHatFirst_] = getID(firstHatPiece);
         }
 
         return move;
@@ -187,7 +187,7 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
         var firstPiece:AspectSet = getExtra(state.global[pieceFirst_]);
         var allPieces:Array<AspectSet> = firstPiece.listToArray(state.extras, pieceNext_);
         allPieces.chainByAspect(ident_, pieceHatNext_, pieceHatPrev_);
-        state.global[pieceHatFirst_] = firstPiece[ident_];
+        state.global[pieceHatFirst_] = getID(firstPiece);
         state.global[piecesPicked_] = 0;
         state.global[pieceHatPlayer_] = state.global[currentPlayer_];
     }

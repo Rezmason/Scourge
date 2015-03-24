@@ -172,7 +172,7 @@ class CavityRule extends BaseRule<Void> {
             for (node in cavityNodes) createCavity(playerID, maxFreshness, node);
 
             cavityNodes.chainByAspect(ident_, cavityNext_, cavityPrev_);
-            player[cavityFirst_] = cavityNodes[0][ident_];
+            player[cavityFirst_] = getID(cavityNodes[0]);
 
             // Cavities affect the player's total area:
             var totalArea:Int = player[totalArea_] + cavityNodes.length;
