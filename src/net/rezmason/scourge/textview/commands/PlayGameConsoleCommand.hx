@@ -26,7 +26,7 @@ class PlayGameConsoleCommand extends ConsoleCommand {
 
         keys['playerPattern'] = PLAYER_PATTERN;
         keys['thinkPeriod'] = INTEGERS;
-        keys['animateMils'] = INTEGERS;
+        keys['animationLength'] = REALS;
         keys['seed'] = INTEGERS;
         flags.push('replay');
         flags.push('circular');
@@ -67,9 +67,9 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         if (thinkPeriodString == null) thinkPeriodString = '10';
         var thinkPeriod:Int = Std.parseInt(thinkPeriodString);
 
-        var animateMilsString:String = args.keyValuePairs['animateMils'];
-        if (animateMilsString == null) animateMilsString = '1000';
-        var animateMils:Int = Std.parseInt(animateMilsString);
+        var animationLengthString:String = args.keyValuePairs['animationLength'];
+        if (animationLengthString == null) animationLengthString = '1';
+        var animationLength:Float = Std.parseFloat(animationLengthString);
 
         var circular:Bool = args.flags.has('circular');
 
@@ -89,7 +89,7 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         cfg.metaParams.globalProperties[SwapAspect.NUM_SWAPS.id].maxAmount = 5;
         cfg.metaParams.globalProperties[BiteAspect.NUM_BITES.id].maxAmount = 5;
 
-        gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animateMils, isReplay, seed);
+        gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animationLength, isReplay, seed);
         showBody();
 
         if (isReplay) message = 'Replaying last game.';

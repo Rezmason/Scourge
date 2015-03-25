@@ -1,16 +1,18 @@
 package net.rezmason.scourge.controller;
 
-import net.rezmason.scourge.textview.ColorPalette.*;
+import net.kawa.tween.easing.*;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.praxis.PraxisTypes.AspectSet;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
+import net.rezmason.scourge.Strings.*;
 import net.rezmason.scourge.components.*;
-import net.rezmason.scourge.textview.core.Glyph;
+import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.kawa.tween.easing.*;
+import net.rezmason.scourge.textview.ColorPalette.*;
+import net.rezmason.scourge.textview.core.Glyph;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -20,6 +22,7 @@ class RulePresenter extends Reckoner {
     
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @player(BodyAspect.HEAD) var head_;
 
     @:final public function init(game:Game, ecce:Ecce) {
         primePointers(game.state, game.plan);
@@ -64,6 +67,14 @@ class RulePresenter extends Reckoner {
             var color = TEAM_COLORS[occupier];
             bottomGlyph.set_color(color * 0.4);
             topGlyph.set_color(isFilled ? color : BLACK);
+            if (isFilled) {
+                var code = (getPlayer(occupier)[head_] == getID(values)) ? HEAD_CODE : BODY_CODE;
+                bottomGlyph.set_char(code);
+                topGlyph.set_char(code);
+            } else {
+                bottomGlyph.set_char(CAVITY_CODE);
+                topGlyph.set_char(-1);
+            }
         } else {
             bottomGlyph.set_color(BOARD_COLOR);
             topGlyph.set_color(isFilled ? WALL_COLOR : BLACK);

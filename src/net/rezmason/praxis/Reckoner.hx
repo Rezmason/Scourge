@@ -51,6 +51,12 @@ using net.rezmason.utils.Pointers;
         __initPointers();
     }
 
+    @:final public function dismiss():Void {
+        if (this.state == null) throw 'Reckoner was not yet primed.';
+        this.state = null;
+        this.plan = null;
+    }
+
     @:final inline function getID(aspectSet:AspectSet):Int return aspectSet[ident_];
     @:final inline function getNodeLocus(node:AspectSet):BoardLocus return getLocus(getID(node));
 

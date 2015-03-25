@@ -1,5 +1,7 @@
 package net.rezmason.scourge.textview;
 
+import haxe.ds.ObjectMap;
+
 import net.rezmason.ecce.Ecce;
 import net.rezmason.praxis.bot.BotSystem;
 import net.rezmason.praxis.bot.ReplaySmarts;
@@ -13,20 +15,32 @@ import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.board.BoardAnimator;
 import net.rezmason.scourge.textview.board.BoardInitializer;
-
 class GameSystem {
 
     public var board(default, null):Body = new Body();
     public var hasLastGame(get, never):Bool;
     var referee:Referee = new Referee();
     var ecce:Ecce = new Ecce();
+    var rulePresentersByClass:ObjectMap<Dynamic, RulePresenter> = new ObjectMap();
+    var sequencer:Sequencer;
+    var boardInitializer:BoardInitializer;
+    var boardAnimator:BoardAnimator;
 
-    public function new():Void {}
+    public function new():Void {
+        sequencer = new Sequencer(ecce);
+        boardInitializer = new BoardInitializer(ecce, board);
+        sequencer.gameStartSignal.add(function(_, _) boardInitializer.init());
+        boardAnimator = new BoardAnimator(ecce, board);
+        sequencer.moveSequencedSignal.add(boardAnimator.wake);
+        sequencer.gameEndSignal.add(boardAnimator.cancel);
+        boardAnimator.animCompleteSignal.add(sequencer.proceed);
+    }
 
-    public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, thinkPeriod:Int, animateMils:Int, isReplay:Bool, seed:UInt):Void {
+    public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, thinkPeriod:Int, animationLength:Float, isReplay:Bool, seed:UInt):Void {
 
         if (referee.gameBegun) {
             referee.endGame();
+            for (presenter in rulePresentersByClass) presenter.dismiss();
         }
 
         var randGen:Void->Float = lgm(seed);
@@ -62,21 +76,16 @@ class GameSystem {
             }
         }
 
-        // TODO: recycle
-        var sequencer = new Sequencer(ecce);
+        sequencer.animationLength = animationLength;
         sequencer.connect(watchedPlayer);
+        var fallbackRP = config.fallbackRP;
+        if (!rulePresentersByClass.exists(fallbackRP)) {
+            var fallback = Type.createInstance(fallbackRP, []);
+            sequencer.gameStartSignal.add(fallback.init);
+            sequencer.boardChangeSignal.add(fallback.presentBoardChange);
+            rulePresentersByClass.set(fallbackRP, fallback);
+        }
         
-        var rulePresenter:RulePresenter = Type.createInstance(config.fallbackRP, []);
-        sequencer.gameStartSignal.add(rulePresenter.init);
-        sequencer.boardChangeSignal.add(rulePresenter.presentBoardChange);
-        
-        var boardInitializer:BoardInitializer = new BoardInitializer(ecce, board);
-        sequencer.gameStartSignal.add(function(_, _) boardInitializer.init());
-
-        var boardAnimator:BoardAnimator = new BoardAnimator(ecce, board, animateMils);
-        sequencer.moveSequencedSignal.add(boardAnimator.wake);
-        boardAnimator.animCompleteSignal.add(sequencer.proceed);
-
         referee.beginGame(players, randGen, config);
     }
 

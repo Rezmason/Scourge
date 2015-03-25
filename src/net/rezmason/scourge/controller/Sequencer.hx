@@ -16,8 +16,6 @@ import net.rezmason.utils.Zig;
 
 class Sequencer extends Reckoner {
 
-    inline static var MAX_END_TIME:Int = 2;
-
     var ecce:Ecce = null;
     var config:ScourgeConfig = null;
     var game:Game = null;
@@ -27,8 +25,10 @@ class Sequencer extends Reckoner {
     var lastMaxFreshness:Int;
     var waitingToProceed:Bool;
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
+    public var gameEndSignal(default, null):Zig<Void->Void> = new Zig();
     public var moveSequencedSignal(default, null):Zig<Void->Void> = new Zig();
     public var boardChangeSignal(default, null):Zig<String->Null<Int>->Entity->Void> = new Zig();
+    public var animationLength(default, set):Float;
 
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
@@ -39,6 +39,7 @@ class Sequencer extends Reckoner {
         qBoardNodeStates = ecce.query([BoardNodeState]);
         qAnimations = ecce.query([GlyphAnimation]);
         waitingToProceed = false;
+        animationLength = 1;
     }
 
     public function connect(player:PlayerSystem):Void {
@@ -51,14 +52,16 @@ class Sequencer extends Reckoner {
     }
 
     public function onGameEnded():Void {
-        if (!waitingToProceed) for (entity in ecce.get()) ecce.collect(entity);
-
         player.gameBegunSignal.remove(onGameBegun);
         player.moveStartSignal.remove(onMoveStart);
         player.moveStepSignal.remove(onMoveStep);
         player.moveStopSignal.remove(onMoveStop);
         player.gameEndedSignal.remove(onGameEnded);
         this.player = null;
+        dismiss();
+        for (e in ecce.get()) ecce.collect(e);
+        waitingToProceed = false;
+        gameEndSignal.dispatch();
     }
 
     function onGameBegun(config, game) {
@@ -128,7 +131,7 @@ class Sequencer extends Reckoner {
         var finalAnims = animations[animations.length - 1];
         if (finalAnims != null) {
             var finalAnim = finalAnims[finalAnims.length - 1];
-            var scale = MAX_END_TIME / (finalAnim.startTime + finalAnim.duration);
+            var scale = animationLength / (finalAnim.startTime + finalAnim.duration);
             if (scale < 1) {
                 for (anims in animations) {
                     for (anim in anims) {
@@ -150,5 +153,10 @@ class Sequencer extends Reckoner {
             if (player != null) player.proceed();
             else for (entity in ecce.get()) ecce.collect(entity);
         }
+    }
+
+    inline function set_animationLength(val:Float):Float {
+        animationLength = Math.max(val, 0);
+        return animationLength;
     }
 }

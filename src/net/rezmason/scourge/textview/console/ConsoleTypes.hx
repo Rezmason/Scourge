@@ -7,6 +7,7 @@ class ConsoleRestriction {
 
     public inline static var PLAYER_PATTERN:String = 'bhBH';
     public inline static var INTEGERS:String = '01234567890';
+    public inline static var REALS:String = INTEGERS + '.';
     public inline static var LOWER_CASE:String = 'abcdefghijklmnopqrstuvwxyz';
     public inline static var UPPER_CASE:String = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 

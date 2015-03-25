@@ -16,14 +16,12 @@ class BoardAnimator {
     var qBoardView:Query;
     var qAnimations:Query;
     var time:Float;
-    var speed:Float;
 
     public var animCompleteSignal(default, null):Zig<Void->Void> = new Zig();
 
-    public function new(ecce:Ecce, body:Body, animateMils:Int):Void {
+    public function new(ecce:Ecce, body:Body):Void {
         this.ecce = ecce;
         this.body = body;
-        speed = 1000 / animateMils;
         qBoardView = ecce.query([BoardNodeView]);
         qAnimations = ecce.query([GlyphAnimation]);
     }
@@ -34,8 +32,10 @@ class BoardAnimator {
         update(0);
     }
 
+    public function cancel() body.updateSignal.remove(update);
+
     function update(delta:Float):Void {
-        time += delta * speed;
+        time += delta;
 
         var count = 0;
         for (e in qAnimations) {
