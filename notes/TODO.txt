@@ -1,5 +1,8 @@
+The board settler should position glyphs in that neat way they used to
+Maybe the systems should be commands mapped to signals
 Create presenter subclasses for all those rules, reference them in the configs
-Rise, fall stuff
+Create ripple behavior
+Figure out how to do "pain"-related things
 
 The Loupe
     Get it ON the board
@@ -22,11 +25,6 @@ We can support more Bodies by making IDs dynamic
 
 Settings page
 Game config page
-
-Board
-    Change ripple behavior
-    Figure out how to do "pain"-related things
-    Pool objects
 
 Some Haxe stuff
     https://github.com/DanielUranga/openfl-harfbuzz

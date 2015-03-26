@@ -15,6 +15,8 @@ import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.board.BoardAnimator;
 import net.rezmason.scourge.textview.board.BoardInitializer;
+import net.rezmason.scourge.textview.board.BoardSettler;
+
 class GameSystem {
 
     public var board(default, null):Body = new Body();
@@ -24,15 +26,18 @@ class GameSystem {
     var rulePresentersByClass:ObjectMap<Dynamic, RulePresenter> = new ObjectMap();
     var sequencer:Sequencer;
     var boardInitializer:BoardInitializer;
+    var boardSettler:BoardSettler;
     var boardAnimator:BoardAnimator;
 
     public function new():Void {
         sequencer = new Sequencer(ecce);
         boardInitializer = new BoardInitializer(ecce, board);
-        sequencer.gameStartSignal.add(function(_, _) boardInitializer.init());
+        boardSettler = new BoardSettler(ecce, board);
+        sequencer.gameStartSignal.add(function(_, _) boardInitializer.run());
+        sequencer.moveSettlingSignal.add(boardSettler.run);
         boardAnimator = new BoardAnimator(ecce, board);
         sequencer.moveSequencedSignal.add(boardAnimator.wake);
-        sequencer.gameEndSignal.add(boardAnimator.cancel);
+        sequencer.moveSettlingSignal.add(function(_) boardAnimator.wake());
         boardAnimator.animCompleteSignal.add(sequencer.proceed);
     }
 
@@ -40,8 +45,11 @@ class GameSystem {
 
         if (referee.gameBegun) {
             referee.endGame();
-            for (presenter in rulePresentersByClass) presenter.dismiss();
+            boardAnimator.cancel();
         }
+        
+        for (e in ecce.get()) ecce.collect(e);
+        for (presenter in rulePresentersByClass) presenter.dismiss();
 
         var randGen:Void->Float = lgm(seed);
         var randBot:Void->Float = lgm(seed); // TODO: seed should only be given to *internal* bots

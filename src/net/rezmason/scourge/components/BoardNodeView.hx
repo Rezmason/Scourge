@@ -9,4 +9,5 @@ class BoardNodeView {
     public var over:Glyph;
     public var top:Glyph;
     public var bottom:Glyph;
+    public var raised:Bool;
 }

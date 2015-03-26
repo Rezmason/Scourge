@@ -27,7 +27,7 @@ class BoardInitializer {
         qBoardView = ecce.query([BoardNodeView]);
     }
 
-    public function init() {
+    public function run() {
         // First pass: tag and remove view from unnecessary walls, calculate approximate board radius
         var numSpacesThatMatter = 0;
         var trimmings:Map<Int, Bool> = new Map();

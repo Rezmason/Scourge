@@ -21,12 +21,13 @@ class Sequencer extends Reckoner {
     var game:Game = null;
     var player:PlayerSystem = null;
     var qBoardNodeStates:Query;
+    var qBoardViews:Query;
     var qAnimations:Query;
     var lastMaxFreshness:Int;
     var waitingToProceed:Bool;
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
-    public var gameEndSignal(default, null):Zig<Void->Void> = new Zig();
     public var moveSequencedSignal(default, null):Zig<Void->Void> = new Zig();
+    public var moveSettlingSignal(default, null):Zig<Bool->Void> = new Zig();
     public var boardChangeSignal(default, null):Zig<String->Null<Int>->Entity->Void> = new Zig();
     public var animationLength(default, set):Float;
 
@@ -37,6 +38,7 @@ class Sequencer extends Reckoner {
         super();
         this.ecce = ecce;
         qBoardNodeStates = ecce.query([BoardNodeState]);
+        qBoardViews = ecce.query([BoardNodeView]);
         qAnimations = ecce.query([GlyphAnimation]);
         waitingToProceed = false;
         animationLength = 1;
@@ -59,9 +61,7 @@ class Sequencer extends Reckoner {
         player.gameEndedSignal.remove(onGameEnded);
         this.player = null;
         dismiss();
-        for (e in ecce.get()) ecce.collect(e);
         waitingToProceed = false;
-        gameEndSignal.dispatch();
     }
 
     function onGameBegun(config, game) {
@@ -80,13 +80,11 @@ class Sequencer extends Reckoner {
         }
         gameStartSignal.dispatch(game, ecce);
         for (e in qBoardNodeStates) boardChangeSignal.dispatch(null, null, e);
-        
-        // waitingToProceed = true;
+        moveSettlingSignal.dispatch(true);
         player.proceed();
     }
 
     function onMoveStart(currentPlayer:Int, actionID:String, move:Int) {
-        // trace('Player $currentPlayer does $actionID #$move');
         lastMaxFreshness = 0;
         for (e in qBoardNodeStates) {
             var nodeState = e.get(BoardNodeState);
@@ -149,9 +147,16 @@ class Sequencer extends Reckoner {
 
     public function proceed() {
         if (waitingToProceed) {
-            waitingToProceed = false;
-            if (player != null) player.proceed();
-            else for (entity in ecce.get()) ecce.collect(entity);
+            for (entity in qBoardViews) {
+                if (entity.get(BoardNodeView).raised) {
+                    moveSettlingSignal.dispatch(false);
+                    return;
+                }
+            }
+            if (waitingToProceed) {
+                waitingToProceed = false;
+                player.proceed();
+            }
         }
     }
 
