@@ -17,14 +17,14 @@ class BoardInitializer {
 
     var body:Body;
     var ecce:Ecce;
-    var qBoardView:Query;
+    var qBoard:Query;
 
     public var animCompleteSignal(default, null):Zig<Void->Void> = new Zig();
 
     public function new(ecce:Ecce, body:Body):Void {
         this.ecce = ecce;
         this.body = body;
-        qBoardView = ecce.query([BoardNodeView]);
+        qBoard = ecce.query([BoardNodeView, BoardNodeState]);
     }
 
     public function run() {
@@ -32,12 +32,13 @@ class BoardInitializer {
         var numSpacesThatMatter = 0;
         var trimmings:Map<Int, Bool> = new Map();
         var maxDistSquared:Float = 0;
-        for (entity in qBoardView) {
-            var locus = entity.get(BoardNodeView).locus;
-            if (locus.value.isWall) {
+        for (entity in qBoard) {
+            var nodeState = entity.get(BoardNodeState);
+            var view = entity.get(BoardNodeView);
+            if (nodeState.petriData.isWall) {
                 var hasEmptyNeighbor = false;
-                for (neighbor in locus.neighbors) {
-                    if (neighbor != null && !neighbor.value.isWall) {
+                for (neighbor in nodeState.locus.neighbors) {
+                    if (neighbor != null && !neighbor.value.get(BoardNodeState).petriData.isWall) {
                         hasEmptyNeighbor = true;
                         break;
                     }
@@ -45,13 +46,13 @@ class BoardInitializer {
                 if (hasEmptyNeighbor) {
                     numSpacesThatMatter++;
                 } else {
-                    trimmings[locus.id] = true;
+                    trimmings[nodeState.locus.id] = true;
                     entity.remove(BoardNodeView);
                 }
             } else {
                 numSpacesThatMatter++;
             }
-            var pos = locus.value.pos;
+            var pos = nodeState.petriData.pos;
             var distSquared = pos.x * pos.x + pos.y * pos.y + pos.z * pos.z;
             if (maxDistSquared < distSquared) maxDistSquared = distSquared;
         }
@@ -65,22 +66,22 @@ class BoardInitializer {
         // Second pass: populate views with glyphs, draw the walls (which don't change)
         var itr = 0;
         body.growTo(numSpacesThatMatter * 3);
-        for (entity in qBoardView) {
+        for (entity in qBoard) {
             var view = entity.get(BoardNodeView);
-            var locus = view.locus;
-            var pos = locus.value.pos;
+            var nodeState = entity.get(BoardNodeState);
+            var pos = nodeState.petriData.pos;
             
             var bottom = view.bottom = body.getGlyphByID(itr + 0).reset().SET({pos:pos});
             var top    = view.top =    body.getGlyphByID(itr + 1).reset().SET({pos:pos, p:-0.01});
             var over   = view.over =   body.getGlyphByID(itr + 2).reset().SET({pos:pos, p:-0.03});
 
-            if (locus.value.isWall) {
+            if (nodeState.petriData.isWall) {
                 top.set_color(WALL_COLOR);
                 bottom.set_color(BOARD_COLOR);
                 var numNeighbors:Int = 0;
                 var bitfield:Int = 0;
-                for (neighbor in locus.orthoNeighbors()) {
-                    if (neighbor != null && !trimmings[neighbor.id] && neighbor.value.isWall) {
+                for (neighbor in nodeState.locus.orthoNeighbors()) {
+                    if (neighbor != null && !trimmings[neighbor.id] && neighbor.value.get(BoardNodeState).petriData.isWall) {
                         bitfield = bitfield | (1 << numNeighbors);
                     }
                     numNeighbors++;

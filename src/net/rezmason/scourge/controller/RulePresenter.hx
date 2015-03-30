@@ -32,9 +32,10 @@ class RulePresenter extends Reckoner {
 
     @:final public function presentBoardChange(cause:String, index:Null<Int>, subject:Entity):Void {
         if (id != null && cause != id) return;
+        var nodeState = subject.get(BoardNodeState);
+        if (nodeState == null || nodeState.petriData.isWall) return;
         var view = subject.get(BoardNodeView);
-        if (view == null || view.locus.value.isWall) return;
-        animateGlyphs(view, subject.get(BoardNodeState), index, subject);
+        animateGlyphs(view, nodeState, index, subject);
         view.raised = true;
     }
 

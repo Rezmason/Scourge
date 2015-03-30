@@ -6,6 +6,7 @@ import net.rezmason.ecce.Query;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
+import net.rezmason.praxis.grid.GridLocus;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.components.*;
@@ -14,6 +15,8 @@ import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.utils.Pointers;
 import net.rezmason.utils.Zig;
+
+using net.rezmason.praxis.grid.GridUtils;
 
 class Sequencer extends Reckoner {
 
@@ -70,19 +73,30 @@ class Sequencer extends Reckoner {
     function onGameBegun(config, game) {
         this.game = game;
         this.config = cast config;
-        var loci = this.config.buildParams.loci;
+        var petriLoci = this.config.buildParams.loci;
+        var loci:Array<GridLocus<Entity>> = [];
         primePointers(game.state, game.plan);
 
-        for (node in state.nodes) {
+        for (node in eachNode()) {
+            var id = getID(node);
             var e = ecce.dispense([BoardNodeState, BoardNodeView]);
             var nodeState = e.get(BoardNodeState);
-            nodeState.ident = getID(node);
             nodeState.values = node;
             nodeState.lastValues = node.copy();
             nodeState.lastValues[occupier_] = NULL;
             nodeState.lastValues[isFilled_] = FALSE;
-            e.get(BoardNodeView).locus = loci[nodeState.ident];
+            loci[id] = new GridLocus(id, e);
+            nodeState.locus = loci[id];
+            nodeState.petriData = petriLoci[id].value;
         }
+
+        for (ike in 0...loci.length) {
+            for (direction in GridUtils.allDirections()) {
+                var neighbor = petriLoci[ike].neighbors[direction];
+                if (neighbor != null) loci[ike].attach(loci[neighbor.id], direction);
+            }
+        }
+
         gameStartSignal.dispatch(game, ecce);
         for (e in qBoardNodeStates) boardChangeSignal.dispatch(null, null, e);
 
