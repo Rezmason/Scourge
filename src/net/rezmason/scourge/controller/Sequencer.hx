@@ -10,6 +10,7 @@ import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.utils.Pointers;
 import net.rezmason.utils.Zig;
@@ -27,10 +28,12 @@ class Sequencer extends Reckoner {
     var waitingToProceed:Bool;
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
     public var moveSequencedSignal(default, null):Zig<Void->Void> = new Zig();
-    public var moveSettlingSignal(default, null):Zig<Bool->Void> = new Zig();
+    public var moveSettlingSignal(default, null):Zig<Void->Void> = new Zig();
     public var boardChangeSignal(default, null):Zig<String->Null<Int>->Entity->Void> = new Zig();
     public var animationLength(default, set):Float;
 
+    @node(OwnershipAspect.IS_FILLED) var isFilled_;
+    @node(OwnershipAspect.OCCUPIER) var occupier_;
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
@@ -76,12 +79,15 @@ class Sequencer extends Reckoner {
             nodeState.ident = getID(node);
             nodeState.values = node;
             nodeState.lastValues = node.copy();
+            nodeState.lastValues[occupier_] = NULL;
+            nodeState.lastValues[isFilled_] = FALSE;
             e.get(BoardNodeView).locus = loci[nodeState.ident];
         }
         gameStartSignal.dispatch(game, ecce);
         for (e in qBoardNodeStates) boardChangeSignal.dispatch(null, null, e);
-        moveSettlingSignal.dispatch(true);
-        player.proceed();
+
+        waitingToProceed = true;
+        moveSequencedSignal.dispatch();
     }
 
     function onMoveStart(currentPlayer:Int, actionID:String, move:Int) {
@@ -149,7 +155,7 @@ class Sequencer extends Reckoner {
         if (waitingToProceed) {
             for (entity in qBoardViews) {
                 if (entity.get(BoardNodeView).raised) {
-                    moveSettlingSignal.dispatch(false);
+                    moveSettlingSignal.dispatch();
                     return;
                 }
             }

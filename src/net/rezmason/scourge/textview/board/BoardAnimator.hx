@@ -76,10 +76,9 @@ class BoardAnimator {
             p:from.get_p() * inv + to.get_p() * frac,
         });
         
-        if (from.get_char() != to.get_char()) {
-            if (from.get_char() != to.get_char()) glyph.set_f(Math.abs(frac - 0.5));
-            var char:Int = frac < 0.5 ? from.get_char() : to.get_char();
-            if (glyph.get_char() != char) glyph.set_char(char);
-        }
+        var fromChar = from.get_char();
+        var toChar = to.get_char();
+        if (fromChar != toChar) glyph.set_f(Math.abs(frac - 0.5));
+        glyph.set_char(frac < 0.5 ? fromChar : toChar);
     }
 }

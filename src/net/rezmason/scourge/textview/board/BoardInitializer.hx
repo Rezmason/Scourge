@@ -93,7 +93,7 @@ class BoardInitializer {
             } else {
                 bottom.set_char(BOARD_CODE);
                 bottom.set_color(BOARD_COLOR);
-                top.set_char(BODY_CODE);
+                top.set_char(-1);
                 top.set_color(BLACK);
             }
             itr += 3;

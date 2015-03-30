@@ -1,6 +1,6 @@
-The board settler should position glyphs in that neat way they used to
-Maybe the systems should be commands mapped to signals
-Create presenter subclasses for all those rules, reference them in the configs
+The board settler should position glyphs in that neat way the old system used to do
+Maybe the systems should be broken down into simpler commands mapped to signals
+Create presenter subclasses for all the rules, reference them in the configs
 Create ripple behavior
 Figure out how to do "pain"-related things
 

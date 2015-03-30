@@ -34,13 +34,11 @@ class RulePresenter extends Reckoner {
         if (id != null && cause != id) return;
         var view = subject.get(BoardNodeView);
         if (view == null || view.locus.value.isWall) return;
-        var nodeState = subject.get(BoardNodeState);
-        if (index != null) animateGlyphs(view, nodeState, index, subject);
-        else populateGlyphs(view.top, view.bottom, nodeState.values);
+        animateGlyphs(view, subject.get(BoardNodeState), index, subject);
         view.raised = true;
     }
 
-    @:final function createAnimation(view:BoardNodeView, index:Int, subject:Entity) {
+    @:final function createAnimation(view:BoardNodeView, index:Null<Int>, subject:Entity) {
         var anim = ecce.dispense([GlyphAnimation]).get(GlyphAnimation);
         anim.subject = subject;
         anim.index = index;
@@ -86,7 +84,7 @@ class RulePresenter extends Reckoner {
         }
     }
 
-    function animateGlyphs(view:BoardNodeView, nodeState:BoardNodeState, index:Int, subject:Entity):Void {
+    function animateGlyphs(view:BoardNodeView, nodeState:BoardNodeState, index:Null<Int>, subject:Entity):Void {
         var anim = createAnimation(view, index, subject);
         populateGlyphs(anim.topFrom, anim.bottomFrom, nodeState.lastValues);
         populateGlyphs(anim.topTo,   anim.bottomTo,   nodeState.values);
