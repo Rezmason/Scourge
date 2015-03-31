@@ -74,6 +74,10 @@ class BoardAnimator {
             a:from.get_a() * inv + to.get_a() * frac,
             s:from.get_s() * inv + to.get_s() * frac,
             p:from.get_p() * inv + to.get_p() * frac,
+
+            x:from.get_x() * inv + to.get_x() * frac,
+            y:from.get_y() * inv + to.get_y() * frac,
+            z:from.get_z() * inv + to.get_z() * frac,
         });
         
         var fromChar = from.get_char();

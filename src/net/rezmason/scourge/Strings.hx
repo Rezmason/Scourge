@@ -25,7 +25,7 @@ class Strings {
     //public inline static var BOX_SYMBOLS:String = ' ╹╺╰╻┃╭┣╸╯━┻╮┫┳╋';
     //public inline static var BOX_SYMBOLS:String = ' ╵╶└╷│┌├╴┘─┴┐┤┬┼';
     public inline static var BOX_SYMBOLS:String = ' ╵╶╰╷│╭├╴╯─┴╮┤┬┼';
-    public inline static var BODY_GLYPHS:String = ' пгчцълкпрншьэм!';
+    public inline static var BODY_GLYPHS:String = ' пгчцълкпрншьэмх';
 
     public inline static var BOARD_CODE:Int = '+'.code(); // ¤
     public inline static var WALL_CODE:Int = '╋'.code();

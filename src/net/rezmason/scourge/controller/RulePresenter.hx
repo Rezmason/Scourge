@@ -67,21 +67,27 @@ class RulePresenter extends Reckoner {
         
         if (occupier != NULL) {
             var color = TEAM_COLORS[occupier];
-            bottomGlyph.set_color(color * 0.4);
             topGlyph.set_color(isFilled ? color : BLACK);
             bottomGlyph.set_s(1.5);
             if (isFilled) {
+                bottomGlyph.set_color(color * 0.3);
                 var code = (getPlayer(occupier)[head_] == getID(values)) ? HEAD_CODE : BODY_CODE;
                 bottomGlyph.set_char(code);
                 topGlyph.set_char(code);
             } else {
-                bottomGlyph.set_char(CAVITY_CODE);
+                bottomGlyph.set_color(color * 0.3);
+                bottomGlyph.set_char(BOARD_CODE);
+                bottomGlyph.set_s(1);
                 topGlyph.set_char(-1);
             }
         } else {
-            bottomGlyph.set_s(1);
             bottomGlyph.set_color(BOARD_COLOR);
-            topGlyph.set_color(isFilled ? WALL_COLOR : BLACK);
+            bottomGlyph.set_s(1);
+            if (!isFilled) {
+                bottomGlyph.set_color(BOARD_COLOR);
+                bottomGlyph.set_char(BOARD_CODE);
+                topGlyph.set_color(BLACK);
+            }
         }
     }
 
@@ -89,6 +95,9 @@ class RulePresenter extends Reckoner {
         var anim = createAnimation(view, index, subject);
         populateGlyphs(anim.topFrom, anim.bottomFrom, nodeState.lastValues);
         populateGlyphs(anim.topTo,   anim.bottomTo,   nodeState.values);
+
+        anim.topTo.set_pos(nodeState.petriData.pos);
+        anim.bottomTo.set_pos(nodeState.petriData.pos);
         anim.topTo.set_p(-0.05);
     }
 }

@@ -35,6 +35,8 @@ class GameSystem {
         boardSettler = new BoardSettler(ecce, board);
         sequencer.gameStartSignal.add(function(_, _) boardInitializer.run());
         sequencer.moveSettlingSignal.add(boardSettler.run);
+        sequencer.gameStartSignal.add(function(game, _) boardSettler.init(game));
+        sequencer.gameEndSignal.add(boardSettler.dismiss);
         boardAnimator = new BoardAnimator(ecce, board);
         sequencer.moveSequencedSignal.add(boardAnimator.wake);
         sequencer.moveSettlingSignal.add(boardAnimator.wake);

@@ -30,6 +30,7 @@ class Sequencer extends Reckoner {
     var lastMaxFreshness:Int;
     var waitingToProceed:Bool;
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
+    public var gameEndSignal(default, null):Zig<Void->Void> = new Zig();
     public var moveSequencedSignal(default, null):Zig<Void->Void> = new Zig();
     public var moveSettlingSignal(default, null):Zig<Void->Void> = new Zig();
     public var boardChangeSignal(default, null):Zig<String->Null<Int>->Entity->Void> = new Zig();
@@ -59,7 +60,7 @@ class Sequencer extends Reckoner {
         player.gameEndedSignal.add(onGameEnded);
     }
 
-    public function onGameEnded():Void {
+    function onGameEnded():Void {
         player.gameBegunSignal.remove(onGameBegun);
         player.moveStartSignal.remove(onMoveStart);
         player.moveStepSignal.remove(onMoveStep);
@@ -68,6 +69,7 @@ class Sequencer extends Reckoner {
         this.player = null;
         dismiss();
         waitingToProceed = false;
+        gameEndSignal.dispatch();
     }
 
     function onGameBegun(config, game) {
@@ -118,8 +120,9 @@ class Sequencer extends Reckoner {
             for (e in qBoardNodeStates) {
                 var freshness:Int = e.get(BoardNodeState).values[freshness_];
                 if (freshness >= lastMaxFreshness) {
+                    var nodeState = e.get(BoardNodeState);
                     boardChangeSignal.dispatch(cause, freshness, e);
-                    e.get(BoardNodeState).values.copyTo(e.get(BoardNodeState).lastValues);
+                    nodeState.values.copyTo(e.get(BoardNodeState).lastValues);
                 }
             }
             lastMaxFreshness = maxFreshness;

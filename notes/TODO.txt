@@ -1,8 +1,13 @@
-The board settler should position glyphs in that neat way the old system used to do
+Extend the animation speed concept to more systems
+    Initialization
+    Settling
+Replace a bunch of glyph stuff with SET
 Maybe the systems should be broken down into simpler commands mapped to signals
 Create presenter subclasses for all the rules, reference them in the configs
 Create ripple behavior
 Figure out how to do "pain"-related things
+
+Visualize what's going on inside BasicSmarts' edge move pruner, and fix it
 
 The Loupe
     Get it ON the board
