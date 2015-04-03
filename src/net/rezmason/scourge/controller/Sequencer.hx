@@ -101,7 +101,7 @@ class Sequencer extends Reckoner {
 
         gameStartSignal.dispatch(game, ecce);
         for (e in qBoardNodeStates) boardChangeSignal.dispatch(null, null, e);
-
+        scaleAnims();
         waitingToProceed = true;
         moveSequencedSignal.dispatch();
     }
@@ -130,6 +130,28 @@ class Sequencer extends Reckoner {
     }
 
     function onMoveStop() {
+        scaleAnims();
+        waitingToProceed = true;
+        moveSequencedSignal.dispatch();
+    }
+
+    public function proceed() {
+        if (waitingToProceed) {
+            for (entity in qBoardViews) {
+                if (entity.get(BoardNodeView).raised) {
+                    moveSettlingSignal.dispatch();
+                    scaleAnims();
+                    return;
+                }
+            }
+            if (waitingToProceed) {
+                waitingToProceed = false;
+                player.proceed();
+            }
+        }
+    }
+
+    function scaleAnims():Void {
         var animations:Array<Array<GlyphAnimation>> = [];
         for (e in qAnimations) {
             var glyphAnimation = e.get(GlyphAnimation);
@@ -161,24 +183,6 @@ class Sequencer extends Reckoner {
                         anim.duration *= scale;
                     }
                 }
-            }
-        }
-        
-        waitingToProceed = true;
-        moveSequencedSignal.dispatch();
-    }
-
-    public function proceed() {
-        if (waitingToProceed) {
-            for (entity in qBoardViews) {
-                if (entity.get(BoardNodeView).raised) {
-                    moveSettlingSignal.dispatch();
-                    return;
-                }
-            }
-            if (waitingToProceed) {
-                waitingToProceed = false;
-                player.proceed();
             }
         }
     }
