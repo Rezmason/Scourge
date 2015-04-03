@@ -85,9 +85,10 @@ class BoardSettler extends Reckoner {
                 }
                 var pos = nodeState.petriData.pos;
                 var nudge = nudgeArray[bitfield];
+                var x = nudge == null ? Math.random() * 0.4 - 0.2 : nudge.x;
+                var y = nudge == null ? Math.random() * 0.4 - 0.2 : nudge.y;
                 var char = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
-                anim.topTo.SET({x:pos.x + nudge.x * 0.1, y:pos.y + nudge.y * 0.1, char:char});
-                anim.bottomTo.SET({x:pos.x + nudge.x * 0.3, y:pos.y + nudge.y * 0.3, char:char});
+                anim.topTo.SET({x:pos.x + x * 0.2, y:pos.y + y * 0.2, char:char});
             }
         }
     }
@@ -113,7 +114,7 @@ class BoardSettler extends Reckoner {
             {x:lt      , y:dn      , z:0}, // ┓
             {x:lt * 0.5, y:0       , z:0}, // ┫
             {x:0       , y:dn * 0.5, z:0}, // ┳
-            {x:0       , y:0,        z:0}, // ╋
+            null, // ╋
         ];
     }
 }

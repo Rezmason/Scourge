@@ -25,11 +25,11 @@ class Strings {
     //public inline static var BOX_SYMBOLS:String = ' ╹╺╰╻┃╭┣╸╯━┻╮┫┳╋';
     //public inline static var BOX_SYMBOLS:String = ' ╵╶└╷│┌├╴┘─┴┐┤┬┼';
     public inline static var BOX_SYMBOLS:String = ' ╵╶╰╷│╭├╴╯─┴╮┤┬┼';
-    public inline static var BODY_GLYPHS:String = ' пгчцълкпрншьэмх';
+    public inline static var BODY_GLYPHS:String = ' пгчцълкпрншьэмж';
 
     public inline static var BOARD_CODE:Int = '+'.code(); // ¤
     public inline static var WALL_CODE:Int = '╋'.code();
-    public inline static var CAVITY_CODE:Int = 'ж'.code();
+    // public inline static var CAVITY_CODE:Int = 'ж'.code();
     public inline static var BODY_CODE:Int = '•'.code();
     public inline static var HEAD_CODE:Int = 'Ω'.code();
     public inline static var UI_CODE:Int = ''.code();

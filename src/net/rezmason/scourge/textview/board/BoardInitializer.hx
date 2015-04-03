@@ -76,8 +76,6 @@ class BoardInitializer {
             var over   = view.over =   body.getGlyphByID(itr + 2).reset().SET({pos:pos, p:-0.03});
 
             if (nodeState.petriData.isWall) {
-                top.set_color(WALL_COLOR);
-                bottom.set_color(BOARD_COLOR);
                 var numNeighbors:Int = 0;
                 var bitfield:Int = 0;
                 for (neighbor in nodeState.locus.orthoNeighbors()) {
@@ -86,16 +84,13 @@ class BoardInitializer {
                     }
                     numNeighbors++;
                 }
-                top.set_char(Utf8.charCodeAt(BOX_SYMBOLS, bitfield));
-                bottom.set_char(Utf8.charCodeAt(BOX_SYMBOLS, bitfield));
-
-                top.set_h(body.glyphTexture.font.glyphRatio);
-                bottom.set_h(body.glyphTexture.font.glyphRatio);
+                var char = Utf8.charCodeAt(BOX_SYMBOLS, bitfield);
+                var stretch = body.glyphTexture.font.glyphRatio;
+                bottom.SET({char:char, color:BOARD_COLOR, h:stretch});
+                top.SET({char:char, color:WALL_COLOR, h:stretch});
             } else {
-                bottom.set_char(BOARD_CODE);
-                bottom.set_color(BOARD_COLOR);
-                top.set_char(-1);
-                top.set_color(BLACK);
+                bottom.SET({char:BOARD_CODE, color:BOARD_COLOR});
+                top.SET({char:-1, color:BLACK});
             }
             itr += 3;
         }

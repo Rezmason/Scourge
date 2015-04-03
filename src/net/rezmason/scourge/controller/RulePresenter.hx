@@ -20,6 +20,11 @@ class RulePresenter extends Reckoner {
 
     var ecce:Ecce = null;
     var id:String = null;
+
+    var subject:Entity;
+    var index:Null<Int>;
+    var nodeView:BoardNodeView;
+    var nodeState:BoardNodeState;
     
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
@@ -32,14 +37,16 @@ class RulePresenter extends Reckoner {
 
     @:final public function presentBoardChange(cause:String, index:Null<Int>, subject:Entity):Void {
         if (id != null && cause != id) return;
-        var nodeState = subject.get(BoardNodeState);
+        nodeState = subject.get(BoardNodeState);
         if (nodeState == null || nodeState.petriData.isWall) return;
-        var view = subject.get(BoardNodeView);
-        animateGlyphs(view, nodeState, index, subject);
-        view.raised = true;
+        this.index = index;
+        this.subject = subject;
+        nodeView = subject.get(BoardNodeView);
+        animateGlyphs();
+        nodeView.raised = true;
     }
 
-    @:final function createAnimation(view:BoardNodeView, index:Null<Int>, subject:Entity) {
+    @:final function createAnimation() {
         var anim = ecce.dispense([GlyphAnimation]).get(GlyphAnimation);
         anim.subject = subject;
         anim.index = index;
@@ -53,10 +60,10 @@ class RulePresenter extends Reckoner {
         anim.overlap = 0.;
         anim.ease = Quad.easeInOut;
 
-        anim.topFrom.copyFrom(view.top);
-        anim.topTo.copyFrom(view.top);
-        anim.bottomFrom.copyFrom(view.bottom);
-        anim.bottomTo.copyFrom(view.bottom);
+        anim.topFrom.copyFrom(nodeView.top);
+        anim.topTo.copyFrom(nodeView.top);
+        anim.bottomFrom.copyFrom(nodeView.bottom);
+        anim.bottomTo.copyFrom(nodeView.bottom);
 
         return anim;
     }
@@ -67,37 +74,31 @@ class RulePresenter extends Reckoner {
         
         if (occupier != NULL) {
             var color = TEAM_COLORS[occupier];
-            topGlyph.set_color(isFilled ? color : BLACK);
-            bottomGlyph.set_s(1.5);
             if (isFilled) {
-                bottomGlyph.set_color(color * 0.3);
                 var code = (getPlayer(occupier)[head_] == getID(values)) ? HEAD_CODE : BODY_CODE;
-                bottomGlyph.set_char(code);
-                topGlyph.set_char(code);
+                bottomGlyph.SET({char:code, color:color * 0.3, s:1.8});
+                topGlyph.SET({char:code, color:color});
             } else {
-                bottomGlyph.set_color(color * 0.3);
-                bottomGlyph.set_char(BOARD_CODE);
-                bottomGlyph.set_s(1);
-                topGlyph.set_char(-1);
+                bottomGlyph.SET({char:BOARD_CODE, color:color * 0.3, s:1});
+                topGlyph.SET({char:BODY_CODE, color:BLACK});
             }
         } else {
             bottomGlyph.set_color(BOARD_COLOR);
             bottomGlyph.set_s(1);
             if (!isFilled) {
-                bottomGlyph.set_color(BOARD_COLOR);
                 bottomGlyph.set_char(BOARD_CODE);
                 topGlyph.set_color(BLACK);
             }
         }
     }
 
-    function animateGlyphs(view:BoardNodeView, nodeState:BoardNodeState, index:Null<Int>, subject:Entity):Void {
-        var anim = createAnimation(view, index, subject);
+    function animateGlyphs():Void {
+        var anim = createAnimation();
         populateGlyphs(anim.topFrom, anim.bottomFrom, nodeState.lastValues);
         populateGlyphs(anim.topTo,   anim.bottomTo,   nodeState.values);
 
-        anim.topTo.set_pos(nodeState.petriData.pos);
         anim.bottomTo.set_pos(nodeState.petriData.pos);
+        anim.topTo.set_pos(nodeState.petriData.pos);
         anim.topTo.set_p(-0.05);
     }
 }
