@@ -45,8 +45,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Should go to the next player who is alive (has a head)
 
-        var endTurnRule:EndTurnRule = new EndTurnRule();
-        endTurnRule.init(null);
+        var endTurnRule:EndTurnRule = new EndTurnRule(null);
         makeState([endTurnRule], 4, TestBoards.emptySquareFourPlayerSkirmish);
 
         var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
@@ -80,8 +79,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Should unassign head of current player
 
-        var forfeitRule:ForfeitRule = new ForfeitRule();
-        forfeitRule.init(null);
+        var forfeitRule:ForfeitRule = new ForfeitRule(null);
         makeState([forfeitRule], 4, TestBoards.oaf);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
@@ -118,8 +116,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Should remove heads that are not occupied by their owner
 
-        var killHeadlessBodyRule:KillHeadlessBodyRule = new KillHeadlessBodyRule();
-        killHeadlessBodyRule.init(null);
+        var killHeadlessBodyRule:KillHeadlessBodyRule = new KillHeadlessBodyRule(null);
         makeState([killHeadlessBodyRule], 4);
 
         // Change occupier of current player\'s head
@@ -154,9 +151,7 @@ class TurnRulesTest extends ScourgeRuleTest
     public function skipsExhaustedTest():Void {
 
         // Create a four-player game with a max skip of five times
-        var stalemateRule:StalemateRule = new StalemateRule();
-        stalemateRule.init(null);
-        stalemateRule.init({maxSkips:5});
+        var stalemateRule:StalemateRule = new StalemateRule({maxSkips:5});
         makeState([stalemateRule], 4);
 
         var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
@@ -191,8 +186,7 @@ class TurnRulesTest extends ScourgeRuleTest
     public function onlyLivingPlayerTest():Void {
 
         // Create a four-player game
-        var oneLivingPlayerRule:OneLivingPlayerRule = new OneLivingPlayerRule();
-        oneLivingPlayerRule.init(null);
+        var oneLivingPlayerRule:OneLivingPlayerRule = new OneLivingPlayerRule(null);
         makeState([oneLivingPlayerRule], 4);
 
         var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);

@@ -3,7 +3,7 @@ package net.rezmason.scourge.game.meta;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.rule.BaseRule;
 
-class ResetFreshnessRule extends BaseRule<Void> {
+class ResetFreshnessRule extends BaseRule<Dynamic> {
 
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;

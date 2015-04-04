@@ -7,7 +7,7 @@ import net.rezmason.scourge.game.body.BodyAspect;
 
 using net.rezmason.utils.Pointers;
 
-class OneLivingPlayerRule extends BaseRule<Void> {
+class OneLivingPlayerRule extends BaseRule<Dynamic> {
 
     @player(BodyAspect.HEAD) var head_;
     @global(WinAspect.WINNER) var winner_;

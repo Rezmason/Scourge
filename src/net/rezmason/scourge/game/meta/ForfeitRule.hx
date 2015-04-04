@@ -6,7 +6,7 @@ import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.game.body.BodyAspect;
 
-class ForfeitRule extends BaseRule<Void> {
+class ForfeitRule extends BaseRule<Dynamic> {
 
     @player(BodyAspect.HEAD) var head_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;

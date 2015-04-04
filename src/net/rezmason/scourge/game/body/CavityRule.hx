@@ -10,7 +10,7 @@ using net.rezmason.praxis.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.Pointers;
 
-class CavityRule extends BaseRule<Void> {
+class CavityRule extends BaseRule<Dynamic> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.CAVITY_NEXT) var cavityNext_;

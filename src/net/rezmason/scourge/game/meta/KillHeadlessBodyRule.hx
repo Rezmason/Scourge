@@ -11,7 +11,7 @@ using Lambda;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.Pointers;
 
-class KillHeadlessBodyRule extends BaseRule<Void> {
+class KillHeadlessBodyRule extends BaseRule<Dynamic> {
 
     @node(BodyAspect.BODY_NEXT) var bodyNext_;
     @node(BodyAspect.BODY_PREV) var bodyPrev_;

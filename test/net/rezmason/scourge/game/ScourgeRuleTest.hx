@@ -59,16 +59,14 @@ class ScourgeRuleTest
         if (rules == null) rules = [];
 
         // make state config and generate state
-        var buildStateRule:BuildGlobalRule = new BuildGlobalRule();
-        buildStateRule.init({firstPlayer:0});
+        var buildStateRule:BuildGlobalRule = new BuildGlobalRule({firstPlayer:0});
 
         // make player config and generate players
-        var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule();
-        buildPlayersRule.init({numPlayers:numPlayers});
+        var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule({numPlayers:numPlayers});
 
         // make board config and generate board
-        var buildBoardRule:BuildBoardRule = new BuildBoardRule();
-        buildBoardRule.init({numPlayers:numPlayers, loci:PetriBoardFactory.create(numPlayers, circular, initGrid)});
+        var boardParams = {numPlayers:numPlayers, loci:PetriBoardFactory.create(numPlayers, circular, initGrid)};
+        var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardParams);
 
         rules.unshift(buildBoardRule);
         rules.unshift(buildPlayersRule);

@@ -31,8 +31,7 @@ class GameConfig<RP, MP> {
             if (inclusionCondition == null || inclusionCondition(ruleParams)) {
                 var randomCondition = randomConditionsByRuleID[key];
                 var isRandom = randomCondition == null || randomCondition(ruleParams);
-                var rule = Type.createInstance(rulesByID[key], []);
-                rule.init(ruleParams, isRandom);
+                var rule = Type.createInstance(rulesByID[key], [ruleParams, isRandom]);
                 if (ruleMap != null) rule = ruleMap(rule);
                 rules[key] = rule;
             }
@@ -40,11 +39,7 @@ class GameConfig<RP, MP> {
 
         for (def in jointRuleDefs) {
             var sequence = [for (id in def.sequence) if (rules[id] != null) rules[id]];
-            if (sequence.length > 0) {
-                var jointRule = new JointRule();
-                jointRule.init(sequence);
-                rules[def.id] = jointRule;
-            }
+            if (sequence.length > 0) rules[def.id] = new JointRule(sequence);
         }
 
         for (id in ['build', 'start', 'forfeit']) if (!rules.exists(id)) throw '"$id" rule not found.';
@@ -70,12 +65,12 @@ class GameConfig<RP, MP> {
             for (compKey in composition.keys().a2z()) {
                 var ruleComp = composition[compKey];
                 
-                rulePresenters[compKey] = (ruleComp.presenter == null) ? fallbackRP : ruleComp.presenter;
+                rulePresenters[compKey] = ruleComp.presenter;
 
                 switch (ruleComp.type) {
                     case Action(presenter): 
                         actionIDs.push(compKey);
-                        movePresenters[compKey] = (presenter == null) ? fallbackMP : presenter;
+                        movePresenters[compKey] = presenter;
                     case _:
 
                 }

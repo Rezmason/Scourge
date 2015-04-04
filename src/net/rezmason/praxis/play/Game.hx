@@ -143,9 +143,7 @@ class Game {
     }
 
     private function makeCacheRule(rule:Rule):Rule {
-        var cacheRule:CacheRule = new CacheRule();
-        cacheRule.init({rule:rule, invalidateSignal:invalidateSignal, revGetter:get_revision});
-        return cacheRule;
+        return new CacheRule({rule:rule, invalidateSignal:invalidateSignal, revGetter:get_revision});
     }
 
     private function makeRuleAlertFunction(fn) return (fn == null) ? null : function(rule:Rule) fn(rule.myName());

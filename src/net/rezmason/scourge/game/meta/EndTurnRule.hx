@@ -5,7 +5,7 @@ import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.game.body.BodyAspect;
 
-class EndTurnRule extends BaseRule<Void> {
+class EndTurnRule extends BaseRule<Dynamic> {
 
     @player(BodyAspect.HEAD) var head_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;

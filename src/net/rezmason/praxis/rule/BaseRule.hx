@@ -21,7 +21,8 @@ class BaseRule<Params> extends Reckoner {
 
     var changeSignal:Rule->Void;
 
-    @:final public function init(params:Params, isRandom:Bool = false):Void {
+    public function new(params:Params, isRandom:Bool = false):Void {
+        super();
         this.params = params;
         this.isRandom = isRandom;
         _init();
