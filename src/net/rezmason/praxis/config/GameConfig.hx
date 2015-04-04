@@ -87,6 +87,8 @@ class GameConfig<RP, MP> {
         var defNames:Map<String, String> = new Map();
         for (key in configDefs.keys()) defNames[key] = Type.getClassName(configDefs[key]);
         s.serialize(defNames);
+        s.serialize(fallbackRP == null ? null : Type.getClassName(fallbackRP));
+        s.serialize(fallbackMP == null ? null : Type.getClassName(fallbackMP));
         s.serialize(jointRuleDefs);
         s.serialize(defaultActionIDs);
         s.serialize(params);
@@ -96,6 +98,10 @@ class GameConfig<RP, MP> {
         var defNames:Map<String, String> = s.unserialize();
         configDefs = new Map();
         for (key in defNames.keys()) configDefs[key] = cast Type.resolveClass(defNames[key]);
+        var fallbackRPName = s.unserialize();
+        fallbackRP = fallbackRPName == null ? null : cast Type.resolveClass(fallbackRPName);
+        var fallbackMPName = s.unserialize();
+        fallbackMP = fallbackMPName == null ? null : cast Type.resolveClass(fallbackMPName);
         jointRuleDefs = s.unserialize();
         defaultActionIDs = s.unserialize();
         parseConfigDefs();
