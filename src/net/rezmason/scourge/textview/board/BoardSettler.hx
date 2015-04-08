@@ -42,7 +42,7 @@ class BoardSettler extends Reckoner {
         for (entity in qBoard) {
             var view = entity.get(BoardNodeView);
             var nodeState = entity.get(BoardNodeState);
-            if (view.raised) {
+            if (view.changed) {
                 affectedEntities[entity] = true;
                 for (neighbor in nodeState.locus.orthoNeighbors()) affectedEntities.set(neighbor.value, true);
             }
@@ -50,7 +50,7 @@ class BoardSettler extends Reckoner {
         
         for (entity in affectedEntities.keys()) {
             var view = entity.get(BoardNodeView);
-            view.raised = false;
+            view.changed = false;
             
             var nodeState = entity.get(BoardNodeState);
 

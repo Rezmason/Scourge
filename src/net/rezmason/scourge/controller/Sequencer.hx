@@ -10,6 +10,7 @@ import net.rezmason.praxis.grid.GridLocus;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.components.*;
+import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
@@ -29,6 +30,7 @@ class Sequencer extends Reckoner {
     var qAnimations:Query;
     var lastMaxFreshness:Int;
     var waitingToProceed:Bool;
+    var rulePresentersByCause:Map<String, RulePresenter>;
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
     public var gameEndSignal(default, null):Zig<Void->Void> = new Zig();
     public var moveSequencedSignal(default, null):Zig<Void->Void> = new Zig();
@@ -67,6 +69,8 @@ class Sequencer extends Reckoner {
         player.moveStopSignal.remove(onMoveStop);
         player.gameEndedSignal.remove(onGameEnded);
         this.player = null;
+        for (presenter in rulePresentersByCause) if (presenter != null) presenter.dismiss();
+        rulePresentersByCause = null;
         dismiss();
         waitingToProceed = false;
         gameEndSignal.dispatch();
@@ -78,6 +82,12 @@ class Sequencer extends Reckoner {
         var petriLoci = this.config.buildParams.loci;
         var loci:Array<GridLocus<Entity>> = [];
         primePointers(game.state, game.plan);
+
+        rulePresentersByCause = [null => Type.createInstance(this.config.fallbackRP, [game, ecce])];
+        for (cause in this.config.rulePresenters.keys()) {
+            var rpClass = this.config.rulePresenters[cause];
+            if (rpClass != null) rulePresentersByCause[cause] = Type.createInstance(rpClass, [game, ecce]);
+        }
 
         for (node in eachNode()) {
             var id = getID(node);
@@ -100,7 +110,7 @@ class Sequencer extends Reckoner {
         }
 
         gameStartSignal.dispatch(game, ecce);
-        for (e in qBoardNodeStates) boardChangeSignal.dispatch(null, null, e);
+        for (e in qBoardNodeStates) rulePresentersByCause[null].presentBoardChange(null, e);
         scaleAnims();
         waitingToProceed = true;
         moveSequencedSignal.dispatch();
@@ -115,13 +125,15 @@ class Sequencer extends Reckoner {
     }
 
     function onMoveStep(cause:String) {
+        var presenter = rulePresentersByCause[cause];
+        if (presenter == null) presenter = rulePresentersByCause[null];
         var maxFreshness:Int = state.global[maxFreshness_];
         if (maxFreshness > lastMaxFreshness) {
             for (e in qBoardNodeStates) {
                 var freshness:Int = e.get(BoardNodeState).values[freshness_];
                 if (freshness >= lastMaxFreshness) {
                     var nodeState = e.get(BoardNodeState);
-                    boardChangeSignal.dispatch(cause, freshness, e);
+                    presenter.presentBoardChange(freshness, e);
                     nodeState.values.copyTo(e.get(BoardNodeState).lastValues);
                 }
             }
@@ -138,7 +150,7 @@ class Sequencer extends Reckoner {
     public function proceed() {
         if (waitingToProceed) {
             for (entity in qBoardViews) {
-                if (entity.get(BoardNodeView).raised) {
+                if (entity.get(BoardNodeView).changed) {
                     moveSettlingSignal.dispatch();
                     scaleAnims();
                     return;

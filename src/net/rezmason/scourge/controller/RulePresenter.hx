@@ -19,8 +19,7 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 class RulePresenter extends Reckoner {
 
     var ecce:Ecce = null;
-    var id:String = null;
-
+    
     var subject:Entity;
     var index:Null<Int>;
     var nodeView:BoardNodeView;
@@ -30,20 +29,20 @@ class RulePresenter extends Reckoner {
     @node(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.HEAD) var head_;
 
-    @:final public function init(game:Game, ecce:Ecce) {
+    public function new(game:Game, ecce:Ecce) {
+        super();
         primePointers(game.state, game.plan);
         this.ecce = ecce;
     }
 
-    @:final public function presentBoardChange(cause:String, index:Null<Int>, subject:Entity):Void {
-        if (id != null && cause != id) return;
+    @:final public function presentBoardChange(index:Null<Int>, subject:Entity):Void {
         nodeState = subject.get(BoardNodeState);
         if (nodeState == null || nodeState.petriData.isWall) return;
         this.index = index;
         this.subject = subject;
         nodeView = subject.get(BoardNodeView);
         animateGlyphs();
-        nodeView.raised = true;
+        nodeView.changed = true;
     }
 
     @:final function createAnimation() {

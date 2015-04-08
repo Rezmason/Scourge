@@ -1,7 +1,5 @@
 package net.rezmason.scourge.textview;
 
-import haxe.ds.ObjectMap;
-
 import net.rezmason.ecce.Ecce;
 import net.rezmason.praxis.bot.BotSystem;
 import net.rezmason.praxis.bot.ReplaySmarts;
@@ -10,7 +8,6 @@ import net.rezmason.praxis.play.Referee;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.controller.BasicSmarts;
 import net.rezmason.scourge.controller.Sequencer;
-import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeConfig;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.board.BoardAnimator;
@@ -23,7 +20,6 @@ class GameSystem {
     public var hasLastGame(get, never):Bool;
     var referee:Referee = new Referee();
     var ecce:Ecce = new Ecce();
-    var rulePresentersByClass:ObjectMap<Dynamic, RulePresenter> = new ObjectMap();
     var sequencer:Sequencer;
     var boardInitializer:BoardInitializer;
     var boardSettler:BoardSettler;
@@ -51,8 +47,7 @@ class GameSystem {
         }
         
         for (e in ecce.get()) ecce.collect(e);
-        for (presenter in rulePresentersByClass) presenter.dismiss();
-
+        
         var randGen:Void->Float = lgm(seed);
         var randBot:Void->Float = lgm(seed); // TODO: seed should only be given to *internal* bots
         var botSystem:BotSystem = null;
@@ -88,14 +83,6 @@ class GameSystem {
 
         sequencer.animationLength = animationLength;
         sequencer.connect(watchedPlayer);
-        var fallbackRP = config.fallbackRP;
-        if (!rulePresentersByClass.exists(fallbackRP)) {
-            var fallback = Type.createInstance(fallbackRP, []);
-            sequencer.gameStartSignal.add(fallback.init);
-            sequencer.boardChangeSignal.add(fallback.presentBoardChange);
-            rulePresentersByClass.set(fallbackRP, fallback);
-        }
-        
         referee.beginGame(players, randGen, config);
     }
 
