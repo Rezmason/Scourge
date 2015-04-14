@@ -1,11 +1,10 @@
-Maybe the systems should be broken down into simpler commands mapped to signals
 Create presenter subclasses for all the rules, reference them in the configs
+Break down the GameSystem into a GameContext, a BeginGameCommand, etc
 Figure out how to do "pain"-related things
     Settler updates node distances
     Then RulePresenters get a chance to respond to moves
 Create ripple behavior
 
-Visualize what's going on inside BasicSmarts' edge move pruner, and fix it
 
 The Loupe
     Get it ON the board
