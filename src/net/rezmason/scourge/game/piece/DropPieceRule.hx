@@ -171,27 +171,16 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
     }
 
     override private function _chooseMove(choice:Int):Void {
-
         var move:DropPieceMove = cast moves[choice];
-
         var currentPlayer:Int = state.global[currentPlayer_];
         var player:AspectSet = getPlayer(currentPlayer);
 
         if (move.targetNode != NULL) {
-            var pieceID:Int = state.global[pieceTableID_];
-            var freePiece:FreePiece = params.pieces.getPieceById(pieceID);
-            var targetLocus:BoardLocus = getLocus(move.targetNode);
-            var coords:Array<IntCoord> = freePiece.getPiece(move.reflection, move.rotation).cells;
-            var homeCoord:IntCoord = move.coord;
             var maxFreshness:Int = state.global[maxFreshness_];
-
             var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
-
-            for (coord in coords) bodyNode = fillAndOccupyCell(walkLocus(targetLocus, coord, homeCoord).value, currentPlayer, maxFreshness, bodyNode);
+            for (id in move.addedNodes) bodyNode = fillAndOccupyCell(getNode(id), currentPlayer, maxFreshness, bodyNode);
             player[bodyFirst_] = getID(bodyNode);
-
             state.global[maxFreshness_] = maxFreshness + 1;
-
             player[numConsecutiveSkips_] = 0;
         } else {
             player[numConsecutiveSkips_] = player[numConsecutiveSkips_] + 1;

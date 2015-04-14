@@ -12,6 +12,7 @@ import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.piece.DropPieceRule.DropPieceMove;
 import net.rezmason.scourge.game.piece.PieceAspect;
+import net.rezmason.scourge.game.BoardUtils;
 
 using net.rezmason.praxis.grid.GridUtils;
 
@@ -53,11 +54,11 @@ class BasicSmarts extends Smarts {
         if (type == null) {
             var canDrop:Bool = dropMoves.length > numSkipMoves;
             if (canDrop) {
-                var prunedMoves:Array<Int> = pruneMoves(dropMoves, dropMoveHugsEdges);
-                if (dropMoves.length - numSkipMoves > 15) {
-                    choice = numSkipMoves + prunedMoves[randIntRange(prunedMoves.length)];
+                var prunedMoveIDs:Array<Int> = pruneMoves(dropMoves, dropMoveHugsEdges);
+                if (prunedMoveIDs.length > 15) {
+                    choice = numSkipMoves + prunedMoveIDs[randIntRange(prunedMoveIDs.length)];
                 } else {
-                    choice = findBestMoveIndex(dropActionID, prunedMoves.iterator(), getSizeDelta);
+                    choice = findBestMoveID(dropActionID, prunedMoveIDs.iterator(), getSizeDelta);
                 }
                 type = SubmitMove(rev, dropActionID, choice);
             }
@@ -79,7 +80,7 @@ class BasicSmarts extends Smarts {
                 var maxBiteSize:Int = biteSizes[biteSizes.length - 1];
                 var maxBiteSizeIndex:Int = biteSizes.indexOf(maxBiteSize);
                 
-                choice = findBestMoveIndex(biteActionID, maxBiteSizeIndex...biteMoves.length, getSizeDelta);
+                choice = findBestMoveID(biteActionID, maxBiteSizeIndex...biteMoves.length, getSizeDelta);
                 type = SubmitMove(rev, biteActionID, choice);
             }
         }
@@ -123,26 +124,41 @@ class BasicSmarts extends Smarts {
     }
 
     function pruneMoves(moves:Array<Move>, eval:Move->Bool):Array<Int> {
-        var prunedIndices:Array<Int> = [];
-        for (index in 0...moves.length) if (eval(moves[index])) prunedIndices.push(index);
-        if (prunedIndices.length == 0) for (index in 0...moves.length) prunedIndices.push(index);
-        return prunedIndices;
+        var goodMoveIDs:Array<Int> = [];
+        for (move in moves) if (eval(move)) goodMoveIDs.push(move.id);
+        if (goodMoveIDs.length == 0) for (move in moves) goodMoveIDs.push(move.id);
+        return goodMoveIDs;
     }
 
-    function findBestMoveIndex(actionID:String, itr:Iterator<Int>, eval:Void->Int):Int {
-        var extreme:Null<Int> = null;
-        var extremeIndex:Int = 0;
+    function findBestMoveID(actionID:String, itr:Iterator<Int>, eval:Void->Int):Int {
+        var bestScore:Null<Int> = null;
+        var bestMoveID:Int = 0;
         var rev:Int = game.revision;
         while (itr.hasNext()) {
-            var index:Int = itr.next();
-            game.chooseMove(actionID, index);
-            var value:Int = eval();
+            var moveID:Int = itr.next();
+            game.chooseMove(actionID, moveID);
+            var score:Int = eval();
             game.rewind(rev);
-            if (extreme == null || extreme > value) {
-                extreme = value;
-                extremeIndex = index;
+            if (bestScore == null || bestScore > score) {
+                bestScore = score;
+                bestMoveID = moveID;
             }
         }
-        return extremeIndex;
+        return bestMoveID;
+    }
+
+    function spitMoves(actionID, moves:Array<Move>, ?eval:Move->Dynamic):Void {
+        trace('Current board:');
+        trace(net.rezmason.scourge.game.BoardUtils.spitBoard(state, plan));
+        trace('------');
+        var rev:Int = game.revision;
+        for (ike in 0...moves.length) {
+            trace('Attempting move $ike (${moves[ike]}):');
+            game.chooseMove(actionID, moves[ike].id);
+            trace(BoardUtils.spitBoard(state, plan, true, (cast moves[ike]).addedNodes));
+            if (eval != null) trace(eval(moves[ike]));
+            game.rewind(rev);
+            trace('------');
+        }
     }
 }

@@ -7,6 +7,7 @@ import net.rezmason.praxis.grid.GridLocus;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StatePlan;
 import net.rezmason.scourge.game.body.OwnershipAspect;
+import net.rezmason.utils.Pointers;
 
 using net.rezmason.praxis.grid.GridUtils;
 
@@ -20,7 +21,7 @@ class BoardUtils {
         return state.loci[0].run(NW).run(W).run(N).run(S, south).run(E, east);
     }
 
-    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, evaluator:AspectSet->String = null):String {
+    public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, focus:Array<Int> = null):String {
         if (state.loci.length == 0) return 'empty grid';
 
         var str:String = '';
@@ -29,12 +30,13 @@ class BoardUtils {
 
         var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];
+        var ident_:AspectPtr = Ptr.intToPointer(0, state.key);
 
         for (row in grid.walk(S)) {
             str += '\n';
             for (column in row.walk(E)) {
                 var char:String = null;
-                if (evaluator != null) char = evaluator(column.value);
+                if (focus != null && focus.indexOf(column.value[ident_]) != -1) char = '@';
                 if (char == null) {
                     var occupier:Null<Int> = column.value[occupier_];
                     var isFilled:Null<Int> = column.value[isFilled_];
