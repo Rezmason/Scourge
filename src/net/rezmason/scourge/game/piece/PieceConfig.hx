@@ -1,10 +1,10 @@
 package net.rezmason.scourge.game.piece;
 
-import net.rezmason.praxis.config.Config;
-import net.rezmason.praxis.config.RuleComposition;
+import net.rezmason.scourge.game.ConfigTypes;
 import net.rezmason.utils.openfl.Resource;
+import net.rezmason.praxis.config.RuleType;
 
-class PieceConfig<RP, MP> extends Config<PieceParams, RP, MP> {
+class PieceConfig extends ScourgeConfig<PieceParams> {
 
     var pieces:Pieces;
 
@@ -13,7 +13,7 @@ class PieceConfig<RP, MP> extends Config<PieceParams, RP, MP> {
         pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
     }
 
-    override public function composition():Map<String, RuleComposition<PieceParams, RP, MP>> {
+    override function get_composition():Map<String, ScourgeRuleComposition<PieceParams>> {
         return [
             'swap' => {def:SwapPieceRule, type:Action(null), presenter:null, 
                 isIncluded:function(p) return !p.allowAllPieces && p.allowSwapping,
@@ -26,7 +26,7 @@ class PieceConfig<RP, MP> extends Config<PieceParams, RP, MP> {
         ];
     }
 
-    override public function defaultParams():Null<PieceParams> {
+    override function get_defaultParams() {
         return {
             allowFlipping:false,
             allowRotating:true,

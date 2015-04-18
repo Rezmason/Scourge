@@ -8,7 +8,7 @@ import net.rezmason.praxis.play.Referee;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.controller.BasicSmarts;
 import net.rezmason.scourge.controller.Sequencer;
-import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.board.BoardAnimator;
 import net.rezmason.scourge.textview.board.BoardInitializer;
@@ -39,7 +39,7 @@ class GameSystem {
         boardAnimator.animCompleteSignal.add(sequencer.proceed);
     }
 
-    public function beginGame(config:ScourgeConfig, playerPattern:Array<String>, thinkPeriod:Int, animationLength:Float, isReplay:Bool, seed:UInt):Void {
+    public function beginGame(config:ScourgeGameConfig, playerPattern:Array<String>, thinkPeriod:Int, animationLength:Float, isReplay:Bool, seed:UInt):Void {
 
         if (referee.gameBegun) {
             referee.endGame();

@@ -1,11 +1,11 @@
 package net.rezmason.scourge.game.body;
 
-import net.rezmason.praxis.config.Config;
-import net.rezmason.praxis.config.RuleComposition;
+import net.rezmason.scourge.game.ConfigTypes;
 
-class BodyConfig<RP, MP> extends Config<BodyParams, RP, MP> {
 
-    override public function composition():Map<String, RuleComposition<BodyParams, RP, MP>> {
+class BodyConfig extends ScourgeConfig<BodyParams> {
+
+    override function get_composition():Map<String, ScourgeRuleComposition<BodyParams>> {
         return [
             'cavity'    => {def:CavityRule,     type:Simple, presenter:null, 
                 isIncluded:function(p) return p.includeCavities
@@ -15,7 +15,7 @@ class BodyConfig<RP, MP> extends Config<BodyParams, RP, MP> {
         ];
     }
 
-    override public function defaultParams():Null<BodyParams> {
+    override function get_defaultParams() {
         return {
             eatRecursively:true,
             eatHeads:true,

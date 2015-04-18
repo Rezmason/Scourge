@@ -1,11 +1,10 @@
 package net.rezmason.scourge.game.meta;
 
-import net.rezmason.praxis.config.Config;
-import net.rezmason.praxis.config.RuleComposition;
+import net.rezmason.scourge.game.ConfigTypes;
 
-class MetaConfig<RP, MP> extends Config<MetaParams, RP, MP> {
+class MetaConfig extends ScourgeConfig<MetaParams> {
 
-    override public function composition():Map<String, RuleComposition<MetaParams, RP, MP>> {
+    override function get_composition():Map<String, ScourgeRuleComposition<MetaParams>> {
         return [
             'endTurn'           => {def:EndTurnRule,            type:Simple,       presenter:null},
             'forfeit'           => {def:ForfeitRule,            type:Action(null), presenter:null},
@@ -19,7 +18,7 @@ class MetaConfig<RP, MP> extends Config<MetaParams, RP, MP> {
         ];
     }
 
-    override public function defaultParams():Null<MetaParams> {
+    override function get_defaultParams() {
         return {
             maxSkips: 3,
             playerProperties: new Map(),

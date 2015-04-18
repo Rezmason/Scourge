@@ -59,9 +59,9 @@ class GameConfig<RP, MP> {
 
         for (configKey in configDefs.keys().a2z()) {
             var config:Config<Dynamic, RP, MP> = Type.createInstance(configDefs[configKey], []);
-            params[configKey] = config.defaultParams();
+            params[configKey] = config.defaultParams;
 
-            var composition = config.composition();
+            var composition = config.composition;
             for (compKey in composition.keys().a2z()) {
                 var ruleComp = composition[compKey];
                 

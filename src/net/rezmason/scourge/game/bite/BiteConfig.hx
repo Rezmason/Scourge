@@ -1,17 +1,16 @@
 package net.rezmason.scourge.game.bite;
 
-import net.rezmason.praxis.config.Config;
-import net.rezmason.praxis.config.RuleComposition;
+import net.rezmason.scourge.game.ConfigTypes;
 
-class BiteConfig<RP, MP> extends Config<BiteParams, RP, MP> {
+class BiteConfig extends ScourgeConfig<BiteParams> {
 
-    override public function composition():Map<String, RuleComposition<BiteParams, RP, MP>> {
+    override function get_composition():Map<String, ScourgeRuleComposition<BiteParams>> {
         return [
             'bite' => {def:BiteRule, type:Action(null), presenter:null, isIncluded:function(p) return p.allowBiting},
         ];
     }
 
-    override public function defaultParams():Null<BiteParams> {
+    override function get_defaultParams() {
         return {
             minReach: 1,
             maxReach: 3,

@@ -1,9 +1,8 @@
 package net.rezmason.scourge.game.build;
 
-import net.rezmason.praxis.config.Config;
-import net.rezmason.praxis.config.RuleComposition;
+import net.rezmason.scourge.game.ConfigTypes;
 
-class BuildConfig<RP, MP> extends Config<BuildParams, RP, MP> {
+class BuildConfig extends ScourgeConfig<BuildParams> {
 
     var initGrid:String;
 
@@ -12,7 +11,7 @@ class BuildConfig<RP, MP> extends Config<BuildParams, RP, MP> {
         initGrid = null;
     }
 
-    override public function composition():Map<String, RuleComposition<BuildParams, RP, MP>> {
+    override function get_composition():Map<String, ScourgeRuleComposition<BuildParams>> {
         return [
             'buildGlobal'   => {def:BuildGlobalRule,    type:Builder, presenter:null},
             'buildPlayers'  => {def:BuildPlayersRule,   type:Builder, presenter:null},
@@ -20,7 +19,7 @@ class BuildConfig<RP, MP> extends Config<BuildParams, RP, MP> {
         ];
     }
 
-    override public function defaultParams():Null<BuildParams> {
+    override function get_defaultParams() {
         return {
             firstPlayer:0,
             numPlayers:4,

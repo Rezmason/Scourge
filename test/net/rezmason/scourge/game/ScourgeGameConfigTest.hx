@@ -11,7 +11,7 @@ import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.praxis.state.StatePlanner;
-import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
@@ -27,14 +27,14 @@ using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.Pointers;
 
-class ScourgeConfigTest
+class ScourgeGameConfigTest
 {
     var stateHistorian:StateHistorian;
     var history:StateHistory;
     var state:State;
     var historyState:State;
     var plan:StatePlan;
-    var config:ScourgeConfig;
+    var config:ScourgeGameConfig;
     var rules:Map<String, Rule>;
 
     var startAction:Rule;
@@ -50,7 +50,7 @@ class ScourgeConfigTest
 
     @BeforeClass
     public function beforeClass():Void {
-        config = new ScourgeConfig();
+        config = new ScourgeGameConfig();
         stateHistorian = new StateHistorian();
 
         history = stateHistorian.history;
@@ -73,7 +73,7 @@ class ScourgeConfigTest
 
     @Before
     public function setup():Void {
-        config = new ScourgeConfig();
+        config = new ScourgeGameConfig();
         stateHistorian.reset();
 
         rules = null;

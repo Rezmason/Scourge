@@ -6,7 +6,7 @@ import massive.munit.async.AsyncFactory;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.praxis.play.Referee;
-import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
 import net.rezmason.scourge.game.test.TestPlayer;
 import net.rezmason.utils.openfl.Resource;
@@ -41,7 +41,7 @@ class RefereeTest {
 
         players = [];
         for (ike in 0...4) players.push(new TestPlayer(ike, noop, random));
-        var config:ScourgeConfig = new ScourgeConfig();
+        var config:ScourgeGameConfig = new ScourgeGameConfig();
         config.buildParams.loci = PetriBoardFactory.create(2);
         referee.beginGame(players, randGen, config);
 
@@ -79,7 +79,7 @@ class RefereeTest {
         for (ike in 0...4) players.push(new TestPlayer(ike, defer, random));
 
         Assert.isFalse(referee.gameBegun);
-        var config:ScourgeConfig = new ScourgeConfig();
+        var config:ScourgeGameConfig = new ScourgeGameConfig();
         config.buildParams.loci = PetriBoardFactory.create(2);
         referee.beginGame(players, randGen, config);
         Assert.isTrue(referee.gameBegun);

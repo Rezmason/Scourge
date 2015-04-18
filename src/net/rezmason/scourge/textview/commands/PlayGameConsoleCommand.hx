@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.commands;
 
-import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.bite.BiteAspect;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
 import net.rezmason.scourge.game.piece.SwapAspect;
@@ -73,7 +73,7 @@ class PlayGameConsoleCommand extends ConsoleCommand {
 
         var circular:Bool = args.flags.has('circular');
 
-        var cfg:ScourgeConfig = new ScourgeConfig();
+        var cfg:ScourgeGameConfig = new ScourgeGameConfig();
 
         var pieceTableIDs:Array<Int> = [];
         var pieces = cfg.pieceParams.pieces;

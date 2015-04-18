@@ -11,7 +11,7 @@ import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.controller.RulePresenter;
-import net.rezmason.scourge.game.ScourgeConfig;
+import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.utils.Pointers;
@@ -22,7 +22,7 @@ using net.rezmason.praxis.grid.GridUtils;
 class Sequencer extends Reckoner {
 
     var ecce:Ecce = null;
-    var config:ScourgeConfig = null;
+    var config:ScourgeGameConfig = null;
     var game:Game = null;
     var player:PlayerSystem = null;
     var qBoardNodeStates:Query;
