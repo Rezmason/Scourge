@@ -44,16 +44,12 @@ class Game {
             throw 'The game has already begun; it cannot begin again until you end it.';
         }
 
-        var ruleAlertFunction = makeRuleAlertFunction(alertFunction);
-
         rules = config.makeRules(cacheMoves ? makeCacheRule : null);
         actionIDs = config.actionIDs;
         defaultActionIDs = config.defaultActionIDs;
         plan = planner.planState(state, rules);
-        primeRule(rules['build'], ruleAlertFunction);
-        for (key in rules.keys().a2z()) {
-            if (!rules[key].primed) primeRule(rules[key], ruleAlertFunction);
-        }
+        primeRule('build', alertFunction);
+        for (id in rules.keys().a2z()) if (!rules[id].primed) primeRule(id, alertFunction);
 
         // Grab some aspect pointers so we can quickly evaluate the state
 
@@ -78,8 +74,9 @@ class Game {
         return historian.history.revision;
     }
 
-    function primeRule(rule, alertFunction) {
-        rule.prime(state, plan, historian.history, historian.historyState, alertFunction);
+    inline function primeRule(id:String, alertFunction:String->Void) {
+        var func = alertFunction == null ? null : alertFunction.bind(id);
+        rules[id].prime(state, plan, historian.history, historian.historyState, func);
     }
 
     public function save():SavedState { return historian.save(); }
@@ -145,8 +142,6 @@ class Game {
     private function makeCacheRule(rule:Rule):Rule {
         return new CacheRule({rule:rule, invalidateSignal:invalidateSignal, revGetter:get_revision});
     }
-
-    private function makeRuleAlertFunction(fn) return (fn == null) ? null : function(rule:Rule) fn(rule.myName());
 
     private function get_actionIDs():Array<String> { return actionIDs.copy(); }
 

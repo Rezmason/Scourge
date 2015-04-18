@@ -19,7 +19,7 @@ class BaseRule<Params> extends Reckoner {
     private function _chooseMove(choice:Int):Void {}
     private function _collectMoves():Void {}
 
-    var changeSignal:Rule->Void;
+    var changeSignal:Void->Void;
 
     public function new(params:Params, isRandom:Bool = false):Void {
         super();
@@ -29,7 +29,7 @@ class BaseRule<Params> extends Reckoner {
         primed = false;
     }
 
-    @:final public function prime(state, plan, history, historyState, changeSignal:Rule->Void = null):Void {
+    @:final public function prime(state, plan, history, historyState, changeSignal:Void->Void = null):Void {
         this.history = history;
         this.historyState = historyState;
         this.changeSignal = changeSignal;
@@ -63,13 +63,7 @@ class BaseRule<Params> extends Reckoner {
         _collectMoves();
     }
 
-    @:final inline function signalChange() if (changeSignal != null) changeSignal(this);
-
-    @:final public inline function myName():String {
-        var name:String = Type.getClassName(Type.getClass(this));
-        name = name.substr(name.lastIndexOf('.') + 1);
-        return name;
-    }
+    @:final inline function signalChange() if (changeSignal != null) changeSignal();
 
     @:final inline function addGlobal():AspectSet {
         return addAspectSet(plan.globalAspectTemplate, state.globals, historyState.globals, 0);

@@ -98,8 +98,8 @@ using net.rezmason.utils.Pointers;
         var msg:String = 'Reckoner processing $className  ';
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
-        var declarations:Array<Expr> = [];
-        var assignments:Array<Expr> = [];
+        var declarations:Array<Expr> = [macro super.__initRequirements()];
+        var assignments:Array<Expr> = [macro super.__initPointers()];
 
         for (field in fields) {
 
