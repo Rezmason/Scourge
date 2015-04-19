@@ -25,15 +25,16 @@ class GameConfig<RP, MP> {
 
     public function makeRules(ruleMap:Rule->Rule = null):Map<String, Rule> {
         var rules = new Map();
-        for (key in rulesByID.keys().a2z()) {
-            var ruleParams = params[configIDsByRuleID[key]];
-            var inclusionCondition = inclusionConditionsByRuleID[key];
+        for (ruleID in rulesByID.keys().a2z()) {
+            var ruleParams = params[configIDsByRuleID[ruleID]];
+            var inclusionCondition = inclusionConditionsByRuleID[ruleID];
             if (inclusionCondition == null || inclusionCondition(ruleParams)) {
-                var randomCondition = randomConditionsByRuleID[key];
+                var randomCondition = randomConditionsByRuleID[ruleID];
                 var isRandom = randomCondition != null && randomCondition(ruleParams);
-                var rule = Type.createInstance(rulesByID[key], [ruleParams, isRandom]);
+                var rule = Type.createInstance(rulesByID[ruleID], [ruleParams, isRandom]);
+                rule.id = ruleID;
                 if (ruleMap != null) rule = ruleMap(rule);
-                rules[key] = rule;
+                rules[ruleID] = rule;
             }
         }
 

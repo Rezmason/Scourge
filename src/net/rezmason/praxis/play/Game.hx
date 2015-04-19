@@ -75,8 +75,7 @@ class Game {
     }
 
     inline function primeRule(id:String, alertFunction:String->Void) {
-        var func = alertFunction == null ? null : alertFunction.bind(id);
-        rules[id].prime(state, plan, historian.history, historian.historyState, func);
+        rules[id].prime(state, plan, historian.history, historian.historyState, alertFunction);
     }
 
     public function save():SavedState { return historian.save(); }
