@@ -40,12 +40,14 @@ class BoardAnimator {
         var count = 0;
         for (e in qAnimations) {
             count++;
+            count++;
             var anim = e.get(GlyphAnimation);
             if (anim.startTime < time) {
+                count--;
                 var percent = (time - anim.startTime) / anim.duration;
                 var frac = anim.ease(percent);
                 var view = anim.subject.get(BoardNodeView);
-                if (percent > 1) {
+                if (percent >= 1) {
                     view.top.copyFrom(anim.topTo);
                     view.bottom.copyFrom(anim.bottomTo);
                     ecce.collect(e);
@@ -71,15 +73,21 @@ class BoardAnimator {
             r:from.get_r() * inv + to.get_r() * frac,
             g:from.get_g() * inv + to.get_g() * frac,
             b:from.get_b() * inv + to.get_b() * frac,
+            // U
+            // V
+            // i:from.get_i() * inv + to.get_i() * frac,
+            f:from.get_f() * inv + to.get_f() * frac,
             a:from.get_a() * inv + to.get_a() * frac,
-            s:from.get_s() * inv + to.get_s() * frac,
-            p:from.get_p() * inv + to.get_p() * frac,
-
             x:from.get_x() * inv + to.get_x() * frac,
             y:from.get_y() * inv + to.get_y() * frac,
             z:from.get_z() * inv + to.get_z() * frac,
+            // CH
+            // CV
+            // h:from.get_h() * inv + to.get_h() * frac,
+            s:from.get_s() * inv + to.get_s() * frac,
+            p:from.get_p() * inv + to.get_p() * frac,
         });
-        
+
         var fromChar = from.get_char();
         var toChar = to.get_char();
         if (fromChar != toChar) glyph.set_f(Math.abs(frac - 0.5));

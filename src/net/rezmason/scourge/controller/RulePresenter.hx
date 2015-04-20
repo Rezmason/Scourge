@@ -41,8 +41,7 @@ class RulePresenter extends Reckoner {
         this.index = index;
         this.subject = subject;
         nodeView = subject.get(BoardNodeView);
-        animateGlyphs();
-        nodeView.changed = true;
+        nodeView.changed = nodeView.changed || animateGlyphs();
     }
 
     @:final function createAnimation() {
@@ -55,7 +54,8 @@ class RulePresenter extends Reckoner {
         if (anim.bottomFrom == null) anim.bottomFrom = GlyphUtils.createGlyph();
         if (anim.bottomTo == null) anim.bottomTo = GlyphUtils.createGlyph();
 
-        anim.duration = 1;
+        anim.startTime = 0;
+        anim.duration = 0.125;
         anim.overlap = 0.;
         anim.ease = Quad.easeInOut;
 
@@ -76,7 +76,7 @@ class RulePresenter extends Reckoner {
             if (isFilled) {
                 var code = (getPlayer(occupier)[head_] == getID(values)) ? HEAD_CODE : BODY_CODE;
                 bottomGlyph.SET({char:code, color:color * 0.3, s:1.8});
-                topGlyph.SET({char:code, color:color});
+                topGlyph.SET({char:code, color:color, f:0.6});
             } else {
                 bottomGlyph.SET({char:BOARD_CODE, color:color * 0.3, s:1});
                 topGlyph.SET({char:BODY_CODE, color:BLACK});
@@ -91,7 +91,7 @@ class RulePresenter extends Reckoner {
         }
     }
 
-    function animateGlyphs():Void {
+    function animateGlyphs():Bool {
         var anim = createAnimation();
         populateGlyphs(anim.topFrom, anim.bottomFrom, nodeState.lastValues);
         populateGlyphs(anim.topTo,   anim.bottomTo,   nodeState.values);
@@ -99,5 +99,7 @@ class RulePresenter extends Reckoner {
         anim.bottomTo.set_pos(nodeState.petriData.pos);
         anim.topTo.set_pos(nodeState.petriData.pos);
         anim.topTo.set_p(-0.05);
+
+        return true;
     }
 }

@@ -171,18 +171,24 @@ class Sequencer extends Reckoner {
             if (animations[glyphAnimation.index] == null) animations[glyphAnimation.index] = [glyphAnimation];
             else animations[glyphAnimation.index].push(glyphAnimation);
         }
+
         var startTime:Float = 0;
         for (ike in 0...animations.length) {
             var anims = animations[ike];
             if (anims == null) continue;
             var lastAnim = anims[0];
+            var lastAnimEndTime:Float = 0;
             for (anim in anims) {
-                anim.startTime = startTime;
-                if (anim.duration * (1 - anim.overlap) > lastAnim.duration * (1 - lastAnim.overlap)) lastAnim = anim;
+                anim.startTime += startTime;
+                var animEndTime = startTime + anim.duration * (1 - anim.overlap);
+                if (animEndTime > lastAnimEndTime) {
+                    lastAnim = anim;
+                    lastAnimEndTime = animEndTime;
+                }
             }
             startTime = lastAnim.startTime + lastAnim.duration * (1 - lastAnim.overlap);
         }
-
+        
         var finalAnims = animations[animations.length - 1];
         if (finalAnims != null) {
             var finalAnim = finalAnims[finalAnims.length - 1];
@@ -191,7 +197,6 @@ class Sequencer extends Reckoner {
                 for (anims in animations) {
                     for (anim in anims) {
                         anim.startTime *= scale;
-                        anim.overlap *= scale;
                         anim.duration *= scale;
                     }
                 }

@@ -21,23 +21,4 @@ class GlyphAnimation {
     public var bottomTo:Glyph;
 
     public var ease:Float->Float;
-
-    function copyFrom(other:GlyphAnimation) {
-        if (other != null) {
-            var otherGA:GlyphAnimation = cast other;
-            time = otherGA.time;
-            index = otherGA.index;
-            duration = otherGA.duration;
-            overlap = otherGA.overlap;
-            startTime = otherGA.startTime;
-            subject = otherGA.subject;
-            ease = otherGA.ease;
-
-            if (otherGA.topFrom != null) topFrom = otherGA.topFrom.clone();
-            if (otherGA.topTo   != null) topTo   = otherGA.topTo.clone();
-
-            if (otherGA.bottomFrom != null) bottomFrom = otherGA.bottomFrom.clone();
-            if (otherGA.bottomTo   != null) bottomTo   = otherGA.bottomTo.clone();
-        }
-    }
 }

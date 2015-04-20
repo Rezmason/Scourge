@@ -88,7 +88,7 @@ class BoardSettler extends Reckoner {
                 var x = nudge == null ? Math.random() * 0.4 - 0.2 : nudge.x;
                 var y = nudge == null ? Math.random() * 0.4 - 0.2 : nudge.y;
                 var char = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
-                anim.topTo.SET({x:pos.x + x * 0.2, y:pos.y + y * 0.2, char:char});
+                anim.topTo.SET({x:pos.x + x * 0.1, y:pos.y + y * 0.1, char:char});
             }
         }
     }

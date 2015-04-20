@@ -4,6 +4,10 @@ import net.rezmason.scourge.game.ConfigTypes;
 import net.rezmason.utils.openfl.Resource;
 import net.rezmason.praxis.config.RuleType;
 
+#if !HEADLESS
+    import net.rezmason.scourge.controller.DropPieceRulePresenter;
+#end
+
 class PieceConfig extends ScourgeConfig<PieceParams> {
 
     var pieces:Pieces;
@@ -22,7 +26,7 @@ class PieceConfig extends ScourgeConfig<PieceParams> {
                 isIncluded:function(p) return !p.allowAllPieces,
                 isRandom:function(p) return !p.allowPiecePick,
             },
-            'drop' => {def:DropPieceRule, type:Action(null), presenter:null},
+            'drop' => {def:DropPieceRule, type:Action(null), presenter:#if HEADLESS null #else DropPieceRulePresenter #end},
         ];
     }
 

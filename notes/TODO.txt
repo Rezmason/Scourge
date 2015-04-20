@@ -1,4 +1,3 @@
-Create presenter subclasses for all the rules, reference them in the configs
 Break down the GameSystem into a GameContext, a BeginGameCommand, etc
 Figure out how to do "pain"-related things
     Settler updates node distances
