@@ -1,11 +1,11 @@
-package net.rezmason.scourge.textview.commands;
+package net.rezmason.scourge.textview.useractions;
 
 import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.bite.BiteAspect;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
 import net.rezmason.scourge.game.piece.SwapAspect;
 import net.rezmason.scourge.textview.GameSystem;
-import net.rezmason.scourge.textview.console.ConsoleCommand;
+import net.rezmason.scourge.textview.console.UserAction;
 import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
@@ -13,7 +13,7 @@ import net.rezmason.utils.santa.Present;
 
 using Lambda;
 
-class PlayGameConsoleCommand extends ConsoleCommand {
+class PlayGameAction extends UserAction {
     
     var showBody:Void->Void;
     var gameSystem:GameSystem;
@@ -32,12 +32,12 @@ class PlayGameConsoleCommand extends ConsoleCommand {
         flags.push('circular');
     }
 
-    override public function hint(args:ConsoleCommandArgs):Void {
+    override public function hint(args:UserActionArgs):Void {
         var message = '';
         hintSignal.dispatch(message, null);
     }
 
-    override public function execute(args:ConsoleCommandArgs):Void {
+    override public function execute(args:UserActionArgs):Void {
         var message = '';
 
         var isReplay:Bool = args.flags.has('replay');

@@ -1,6 +1,6 @@
-package net.rezmason.scourge.textview.commands;
+package net.rezmason.scourge.textview.useractions;
 
-import net.rezmason.scourge.textview.console.ConsoleCommand;
+import net.rezmason.scourge.textview.console.UserAction;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
@@ -9,7 +9,7 @@ import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.scourge.textview.ui.UIElement;
 import net.rezmason.utils.santa.Present;
 
-class SetFontConsoleCommand extends ConsoleCommand {
+class SetFontAction extends UserAction {
 
     var uiBody:UIElement;
     var fontManager:FontManager;
@@ -25,7 +25,7 @@ class SetFontConsoleCommand extends ConsoleCommand {
         fontManager = new Present(FontManager);
     }
 
-    override public function hint(args:ConsoleCommandArgs):Void {
+    override public function hint(args:UserActionArgs):Void {
         var message:String = null;
         var hints:Array<ConsoleToken> = null;
         if (args.pendingKey == 'size') {
@@ -47,7 +47,7 @@ class SetFontConsoleCommand extends ConsoleCommand {
         hintSignal.dispatch(message, hints);
     }
 
-    override public function execute(args:ConsoleCommandArgs):Void {
+    override public function execute(args:UserActionArgs):Void {
 
         var message:String = null;
 

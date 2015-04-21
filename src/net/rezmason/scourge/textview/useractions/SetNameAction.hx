@@ -1,12 +1,12 @@
-package net.rezmason.scourge.textview.commands;
+package net.rezmason.scourge.textview.useractions;
 
 import massive.munit.TestRunner;
 
-import net.rezmason.scourge.textview.console.ConsoleCommand;
+import net.rezmason.scourge.textview.console.UserAction;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.Interpreter;
 
-class SetNameConsoleCommand extends ConsoleCommand {
+class SetNameAction extends UserAction {
 
     var interpreter:Interpreter;
 
@@ -16,7 +16,7 @@ class SetNameConsoleCommand extends ConsoleCommand {
         this.interpreter = interpreter;
     }
 
-    override public function execute(args:ConsoleCommandArgs):Void {
+    override public function execute(args:UserActionArgs):Void {
         var name:String = args.tail;
         if (name == null) name = "SOME DWEEB";
         var color = Std.random(0xFF) << 16 | Std.random(0xFF) << 8 | Std.random(0xFF);

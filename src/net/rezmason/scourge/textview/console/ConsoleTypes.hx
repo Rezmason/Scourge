@@ -25,7 +25,7 @@ enum ConsoleTokenType {
     Key;
     Value;
     Flag;
-    CommandName;
+    ActionName;
     Tail;
     TailMarker;
 }
@@ -40,21 +40,21 @@ typedef ConsoleState = {
     @:optional var completeError:String;
     @:optional var finalError:String;
     @:optional var hintError:String;
-    @:optional var commandError:String;
+    @:optional var actionError:String;
 
     @:optional var autoTail:Bool;
 
-    @:optional var args:ConsoleCommandArgs;
-    @:optional var currentCommand:ConsoleCommand;
+    @:optional var args:UserActionArgs;
+    @:optional var currentAction:UserAction;
     @:optional var keyReg:Map<String, Bool>;
     @:optional var flagReg:Map<String, Bool>;
     @:optional var tailMarkerPresent:Bool;
 
     @:optional var hints:Array<ConsoleToken>;
-    @:optional var commandHints:Array<ConsoleToken>;
+    @:optional var actionHints:Array<ConsoleToken>;
 }
 
-typedef ConsoleCommandArgs = {
+typedef UserActionArgs = {
     var flags:Array<String>;
     var keyValuePairs:Map<String, String>;
     var tail:String;

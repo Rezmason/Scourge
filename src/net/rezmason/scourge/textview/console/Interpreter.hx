@@ -20,12 +20,12 @@ using net.rezmason.utils.CharCode;
  * An Interpreter sits atop a ConsoleUIMediator, interpreting interactions of that mediator and populating it with text.
  * Whereas a ConsoleUIMediator operates on spans of text, an Interpreter operates on tokens.
  * Tokens have types, and the validity of a token depends on type, token order and argument availability.
- * Arguments are derived from the properties of ConsoleCommands, which are subscribed to the Interpreter.
- * This is the second role of an Interpreter - to send arguments to ConsoleCommands, and to interpret their output while
+ * Arguments are derived from the properties of UserActions, which are subscribed to the Interpreter.
+ * This is the second role of an Interpreter - to send arguments to UserActions, and to interpret their output while
  * waiting for them to complete.
  *
  * Interpreters are meant to behave like terminal emulators with syntax highlighting and text completion.
- * That includes a history of previously entered commands. Consequently, much of an Interpreter's state is
+ * That includes a history of previously entered actions. Consequently, much of an Interpreter's state is
  * kept in a memento stored in its history.
  */
 
@@ -39,10 +39,10 @@ class Interpreter {
     var console:ConsoleUIMediator;
     var cState:ConsoleState;
     var iState:InterpreterState;
-    var commands:Map<String, ConsoleCommand>;
-    var runningCommand:ConsoleCommand;
+    var actions:Map<String, UserAction>;
+    var runningAction:UserAction;
     var prompt:String;
-    var commandHintString:String;
+    var actionHintString:String;
     var outputString:String;
     var combinedString:String;
     var cHistory:Array<String>;
@@ -63,19 +63,19 @@ class Interpreter {
         mHistIndex = 0;
 
         iState = Idle;
-        commands = new Map();
-        runningCommand = null;
+        actions = new Map();
+        runningAction = null;
 
         console.loadStyles([
             ConsoleStrings.BREATHING_PROMPT_STYLE,
             ConsoleStrings.WAIT_STYLES,
-            ConsoleStrings.COMMAND_HINT_STYLE,
+            ConsoleStrings.ACTION_HINT_STYLE,
             ConsoleStrings.INPUT_STYLE,
             ConsoleStrings.ERROR_STYLES,
             ConsoleStrings.INTERPRETER_STYLES,
         ].join(''));
 
-        commandHintString = '';
+        actionHintString = '';
         outputString = '';
 
         tokensByID = new Map();
@@ -84,17 +84,17 @@ class Interpreter {
         printInteractiveText();
     }
 
-    public function addCommand(command:ConsoleCommand):Void {
-        if (command != null) {
-            if (commands[command.name] != null && commands[command.name] != command) {
-                throw 'Existing command with name ${command.name}';
+    public function addAction(action:UserAction):Void {
+        if (action != null) {
+            if (actions[action.name] != null && actions[action.name] != action) {
+                throw 'Existing action with name ${action.name}';
             }
-            commands[command.name] = command;
+            actions[action.name] = action;
         }
     }
 
-    public function removeCommand(command:ConsoleCommand):Void {
-        commands.remove(command.name);
+    public function removeAction(action:UserAction):Void {
+        actions.remove(action.name);
     }
 
     /**
@@ -135,8 +135,8 @@ class Interpreter {
                 }
         }
 
-        if (key != Keyboard.LEFT && key != Keyboard.RIGHT) checkForCommandHintCondition();
-        else commandHintString = '';
+        if (key != Keyboard.LEFT && key != Keyboard.RIGHT) checkForActionHintCondition();
+        else actionHintString = '';
 
         combineStrings();
         printInteractiveText();
@@ -178,20 +178,20 @@ class Interpreter {
         if (cState.completeError == null && cState.finalError == null) {
             // Flush the hint stuff from the state. That stuff doesn't belong in the history.
             cState.hints = null;
-            cState.commandHints = null;
-            commandHintString = '';
+            cState.actionHints = null;
+            actionHintString = '';
             // Add the old output and current input to the log.
             combineStrings(false);
             appendInteractiveText();
             outputString = '';
-            // Call the command.
-            if (length(cState.input.text) > 0) waitForCommandExecution();
+            // Call the action.
+            if (length(cState.input.text) > 0) waitForActionExecution();
             // Append the state to the history, and make a new state.
             var stateString:String = stringifyState();
             if (length(stateString) > 0 && (cHistory.length <= 1 || cHistory[cHistory.length - 2] != stateString)) {
                 cHistory.pop();
                 var tokenType:ConsoleTokenType = currentToken.type;
-                if (tokenType == CommandName || tokenType == Flag || tokenType == TailMarker) stateString += ' ';
+                if (tokenType == ActionName || tokenType == Flag || tokenType == TailMarker) stateString += ' ';
                 cHistory.push(stateString);
                 cHistory.push('');
             }
@@ -257,7 +257,7 @@ class Interpreter {
         // A quick note about history.
         // Most Unix shells have a history that is immutable that's behind the scenes,
         // and is cloned into a mutable history. Users can mess with the whole mutable history,
-        // but as soon as they execute a command, that history is replaced with a fresh clone
+        // but as soon as they execute a action, that history is replaced with a fresh clone
         // of the immutable one. Interpreters behave the same way.
 
         if (mHistIndex > 0) {
@@ -308,7 +308,7 @@ class Interpreter {
         } else {
             // Add a character to the current token, if it's allowed.
             var restriction:String = null;
-            if (token.prev != null && token.prev.type == Key) restriction = cState.currentCommand.keys[token.prev.text];
+            if (token.prev != null && token.prev.type == Key) restriction = cState.currentAction.keys[token.prev.text];
             if (restriction == null || restriction.indexOf(char) != -1) {
                 if (token.next != null || cState.hintError == null) {
                     trimState();
@@ -348,7 +348,7 @@ class Interpreter {
     function printInteractiveText():Void console.setInteractiveText(combinedString);
 
     /**
-     * Combines input, output, errors, hints and command hints into a single string to send to the console.
+     * Combines input, output, errors, hints and action hints into a single string to send to the console.
      */
     function combineStrings(includeCaret:Bool = true):Void {
         combinedString = outputString + '¶{}';
@@ -366,28 +366,28 @@ class Interpreter {
 
             combinedString += prompt + inputString + '\n';
             if (length(hintString) > 0) combinedString += hintString + '\n';
-            if (length(commandHintString) > 0) {
+            if (length(actionHintString) > 0) {
                 if (length(hintString) > 0) combinedString += '\n';
-                combinedString += commandHintString + '\n';
+                combinedString += actionHintString + '\n';
             }
         }
     }
 
     /**
-     * Another "entry point". Hover events are forwarded to the current command.
+     * Another "entry point". Hover events are forwarded to the current action.
      * Click events are resolved to either a token or a hint.
      */
     function handleMouseInteraction(id:String, type:MouseInteractionType):Void {
         if (iState == Idle) {
             switch (type) {
                 case ENTER:
-                    if (hintsByID[id] != null && cState.currentCommand != null) {
+                    if (hintsByID[id] != null && cState.currentAction != null) {
                         bakeArgs(false);
-                        cState.currentCommand.hintRollOver(cState.args, hintsByID[id]);
+                        cState.currentAction.hintRollOver(cState.args, hintsByID[id]);
                     }
                 case EXIT:
-                    if (hintsByID[id] != null && cState.currentCommand != null) {
-                        cState.currentCommand.hintRollOut();
+                    if (hintsByID[id] != null && cState.currentAction != null) {
+                        cState.currentAction.hintRollOut();
                     }
                 case CLICK:
                     if (tokensByID[id] != null) {
@@ -398,7 +398,7 @@ class Interpreter {
                         // Clicking a hint assigns the text of the hint to the current token.
                         adoptHint(hintsByID[id]);
                     }
-                    checkForCommandHintCondition();
+                    checkForActionHintCondition();
                     combineStrings();
                     printInteractiveText();
                 case _:
@@ -427,35 +427,35 @@ class Interpreter {
         var hints:Array<ConsoleToken> = null;
 
         if (token == cState.input) {
-            // The first token is always a command name.
-            type = CommandName;
+            // The first token is always a action name.
+            type = ActionName;
             if (isComplete && length(currentText) > 0) {
-                if (commands[currentText] == null) {
-                    completeError = 'Command not found.';
+                if (actions[currentText] == null) {
+                    completeError = 'Action not found.';
                 } else {
 
-                    // Resolve the named command to the current command.
+                    // Resolve the named action to the current action.
                     // Populate the state's key, flag and tail marker registries.
 
-                    var command:ConsoleCommand = commands[currentText];
-                    cState.currentCommand = command;
-                    cState.autoTail = command.flags.empty() && command.keys.empty();
+                    var action:UserAction = actions[currentText];
+                    cState.currentAction = action;
+                    cState.autoTail = action.flags.empty() && action.keys.empty();
 
                     var keyReg:Map<String, Bool> = new Map();
-                    for (key in command.keys.keys()) keyReg[key] = false;
+                    for (key in action.keys.keys()) keyReg[key] = false;
                     cState.keyReg = keyReg;
 
                     var flagReg:Map<String, Bool> = new Map();
-                    for (flag in command.flags) flagReg[flag] = false;
+                    for (flag in action.flags) flagReg[flag] = false;
                     cState.flagReg = flagReg;
 
                     cState.tailMarkerPresent = false;
                 }
             } else {
 
-                // Produce hints for command names.
+                // Produce hints for action names.
 
-                hints = commands.keys().intoArray().filter(startsWith.bind(_, currentText)).map(argToHint.bind(_, CommandName));
+                hints = actions.keys().intoArray().filter(startsWith.bind(_, currentText)).map(argToHint.bind(_, ActionName));
                 if (hints.empty()) {
                     if (length(currentText) > 0) hintError = 'No matches found.';
                 } else {
@@ -486,7 +486,7 @@ class Interpreter {
                     }
                 case _:
                     if (cState.autoTail) {
-                        // Auto tail, for simple commands.
+                        // Auto tail, for simple actions.
                         type = Tail;
                         token.type = type;
                     } else if (!cState.tailMarkerPresent && currentText == ':') {
@@ -576,9 +576,9 @@ class Interpreter {
         var hint:ConsoleToken = null;
         if (cState.hints != null && cState.hints.length > index) {
             hint = cState.hints[index];
-        } else if (cState.commandHints != null && cState.commandHints.length > index) {
+        } else if (cState.actionHints != null && cState.actionHints.length > index) {
             if (cState.hints != null) index -= cState.hints.length;
-            hint = cState.commandHints[index];
+            hint = cState.actionHints[index];
         }
 
         if (hint != null) adoptHint(hint);
@@ -600,10 +600,10 @@ class Interpreter {
     }
 
     /**
-     * Commands have no need for tokens; the interpreter sends them a ConsoleCommandArgs object.
+     * Actions have no need for tokens; the interpreter sends them a UserActionArgs object.
      */
     inline function bakeArgs(isFinal:Bool):Void {
-        if (cState.currentCommand != null && cState.args == null) {
+        if (cState.currentAction != null && cState.args == null) {
             if (cState.args == null) cState.args = {flags:[], keyValuePairs:new Map(), tail:null};
 
             var flags:Array<String> = cState.args.flags;
@@ -694,44 +694,44 @@ class Interpreter {
     }
 
     /**
-     * If an Interpreter is idle and has a command, it may poll the command for command-specific hints.
+     * If an Interpreter is idle and has a action, it may poll the action for action-specific hints.
      */
-    inline function checkForCommandHintCondition():Void {
+    inline function checkForActionHintCondition():Void {
         var shouldWait:Bool = false;
-        if (iState == Idle && cState.currentCommand != null) {
+        if (iState == Idle && cState.currentAction != null) {
             var lastToken:ConsoleToken = cState.input;
             while (lastToken.next != null) lastToken = lastToken.next;
             shouldWait = lastToken.type == Value || (lastToken.prev != null && lastToken.prev.type == Key);
         }
 
-        if (shouldWait) waitForCommandHints();
-        else commandHintString = '';
+        if (shouldWait) waitForActionHints();
+        else actionHintString = '';
     }
 
     /**
-     * Freezes the console, sends args to the command and awaits a hint response.
+     * Freezes the console, sends args to the action and awaits a hint response.
      */
-    function waitForCommandHints():Void {
+    function waitForActionHints():Void {
         cState.args = null;
         bakeArgs(false);
         console.freeze();
         iState = Hinting;
-        cState.currentCommand.hintSignal.add(onCommandHint);
-        Timer.delay(function() cState.currentCommand.hint(cState.args), 0);
+        cState.currentAction.hintSignal.add(onActionHint);
+        Timer.delay(function() cState.currentAction.hint(cState.args), 0);
     }
 
     /**
-     * Unfreezes the console and processes the command hints.
+     * Unfreezes the console and processes the action hints.
      */
-    function onCommandHint(str:String, commandHints:Array<ConsoleToken>):Void {
-        cState.commandHints = commandHints;
+    function onActionHint(str:String, actionHints:Array<ConsoleToken>):Void {
+        cState.actionHints = actionHints;
 
-        var commandHintStrings:Array<String> = [];
-        if (str != null) commandHintStrings.push('  §{${ConsoleStrings.COMMAND_HINT_STYLENAME}}$str§{}');
-        if (commandHints != null && commandHints.length > 0) commandHintStrings.push(printHints(commandHints));
-        commandHintString = commandHintStrings.join('\n');
+        var actionHintStrings:Array<String> = [];
+        if (str != null) actionHintStrings.push('  §{${ConsoleStrings.ACTION_HINT_STYLENAME}}$str§{}');
+        if (actionHints != null && actionHints.length > 0) actionHintStrings.push(printHints(actionHints));
+        actionHintString = actionHintStrings.join('\n');
 
-        cState.currentCommand.hintSignal.remove(onCommandHint);
+        cState.currentAction.hintSignal.remove(onActionHint);
         iState = Idle;
         console.unfreeze();
         combineStrings();
@@ -739,26 +739,26 @@ class Interpreter {
     }
 
     /**
-     * Freezes the console, sends args to the command and awaits an execution response.
+     * Freezes the console, sends args to the action and awaits an execution response.
      */
-    function waitForCommandExecution():Void {
+    function waitForActionExecution():Void {
         cState.args = null;
         bakeArgs(true);
         console.freeze();
         iState = Executing;
-        runningCommand = cState.currentCommand;
-        runningCommand.outputSignal.add(onCommandExecute);
-        var args:ConsoleCommandArgs = cState.args;
-        Timer.delay(function() runningCommand.execute(args), 0);
+        runningAction = cState.currentAction;
+        runningAction.outputSignal.add(onActionExecute);
+        var args:UserActionArgs = cState.args;
+        Timer.delay(function() runningAction.execute(args), 0);
     }
 
     /**
-     * Appends the output, and, if the command has finished, unfreezes the console.
+     * Appends the output, and, if the action has finished, unfreezes the console.
      */
-    function onCommandExecute(str:String, done:Bool):Void {
+    function onActionExecute(str:String, done:Bool):Void {
         if (done) {
-            runningCommand.outputSignal.remove(onCommandExecute);
-            runningCommand = null;
+            runningAction.outputSignal.remove(onActionExecute);
+            runningAction = null;
             console.unfreeze();
             iState = Idle;
         }
@@ -795,7 +795,7 @@ class Interpreter {
         styleNamesByType[Key] = ConsoleStrings.KEY_STYLENAME;
         styleNamesByType[Value] = ConsoleStrings.VALUE_STYLENAME;
         styleNamesByType[Flag] = ConsoleStrings.FLAG_STYLENAME;
-        styleNamesByType[CommandName] = ConsoleStrings.COMMAND_NAME_STYLENAME;
+        styleNamesByType[ActionName] = ConsoleStrings.ACTION_NAME_STYLENAME;
         styleNamesByType[Tail] = ConsoleStrings.TAIL_STYLENAME;
         styleNamesByType[TailMarker] = ConsoleStrings.TAIL_MARKER_STYLENAME;
         return styleNamesByType;

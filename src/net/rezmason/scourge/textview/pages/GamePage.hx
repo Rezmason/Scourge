@@ -3,7 +3,7 @@ package net.rezmason.scourge.textview.pages;
 import flash.geom.Rectangle;
 
 import net.rezmason.scourge.textview.GameSystem;
-import net.rezmason.scourge.textview.commands.*;
+import net.rezmason.scourge.textview.useractions.*;
 import net.rezmason.scourge.textview.console.*;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Scene;
@@ -46,18 +46,18 @@ class GamePage extends NavPage {
         console.scene.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
         scenes.push(console.scene);
 
-        interpreter.addCommand(new RunTestsConsoleCommand());
-        interpreter.addCommand(new SetFontConsoleCommand(console));
-        interpreter.addCommand(new SetNameConsoleCommand(interpreter));
-        interpreter.addCommand(new PrintConsoleCommand());
-        interpreter.addCommand(new PlayGameConsoleCommand(showBodyByName.bind('board')));
+        interpreter.addAction(new RunTestsAction());
+        interpreter.addAction(new SetFontAction(console));
+        interpreter.addAction(new SetNameAction(interpreter));
+        interpreter.addAction(new PrintAction());
+        interpreter.addAction(new PlayGameAction(showBodyByName.bind('board')));
         
-        interpreter.addCommand(new SimpleCommand('clear', function (args, outputSignal) {
+        interpreter.addAction(new SimpleAction('clear', function (args, outputSignal) {
             consoleMed.clearText();
             outputSignal.dispatch(null, true);
         }));
 
-        interpreter.addCommand(new SimpleCommand('show', function (args, outputSignal) {
+        interpreter.addAction(new SimpleAction('show', function (args, outputSignal) {
             var bodyName:String = args.tail;
             var message:String = null;
             if (bodiesByName[bodyName] != null) {

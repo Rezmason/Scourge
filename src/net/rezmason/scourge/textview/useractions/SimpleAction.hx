@@ -1,12 +1,12 @@
-package net.rezmason.scourge.textview.commands;
+package net.rezmason.scourge.textview.useractions;
 
-import net.rezmason.scourge.textview.console.ConsoleCommand;
+import net.rezmason.scourge.textview.console.UserAction;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.utils.Zig;
 
-class SimpleCommand extends ConsoleCommand {
+class SimpleAction extends UserAction {
 
-    var func:ConsoleCommandArgs->Zig<String->Bool->Void>->Void;
+    var func:UserActionArgs->Zig<String->Bool->Void>->Void;
 
     public function new(name, func):Void {
         super();

@@ -3,7 +3,7 @@ package net.rezmason.scourge.textview.console;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.utils.Zig;
 
-class ConsoleCommand {
+class UserAction {
 
     public var name(default, null):String;
     public var flags(default, null):Array<String>;
@@ -20,8 +20,8 @@ class ConsoleCommand {
         keys = new Map();
     }
 
-    public function hint(args:ConsoleCommandArgs):Void hintSignal.dispatch(null, null);
-    public function execute(args:ConsoleCommandArgs):Void outputSignal.dispatch(null, true);
-    public function hintRollOver(args:ConsoleCommandArgs, hint:ConsoleToken):Void { }
+    public function hint(args:UserActionArgs):Void hintSignal.dispatch(null, null);
+    public function execute(args:UserActionArgs):Void outputSignal.dispatch(null, true);
+    public function hintRollOver(args:UserActionArgs, hint:ConsoleToken):Void { }
     public function hintRollOut():Void { }
 }
