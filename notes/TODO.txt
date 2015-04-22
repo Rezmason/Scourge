@@ -1,4 +1,5 @@
-Maybe cut up Sequencer
+Killed enemy cells don't transition properly into cavity
+    1331990525
 Figure out how to do "pain"-related things
     Settler updates node distances
     Then RulePresenters get a chance to respond to moves
