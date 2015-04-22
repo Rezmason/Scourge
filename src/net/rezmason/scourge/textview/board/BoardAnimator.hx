@@ -6,12 +6,13 @@ import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.santa.Present;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class BoardAnimator {
 
-    var body:Body;
+    var board:Body;
     var ecce:Ecce;
     var qBoardView:Query;
     var qAnimations:Query;
@@ -19,20 +20,20 @@ class BoardAnimator {
 
     public var animCompleteSignal(default, null):Zig<Void->Void> = new Zig();
 
-    public function new(ecce:Ecce, body:Body):Void {
-        this.ecce = ecce;
-        this.body = body;
+    public function new():Void {
+        ecce = new Present(Ecce);
+        board = new Present(Body, 'board');
         qBoardView = ecce.query([BoardNodeView]);
         qAnimations = ecce.query([GlyphAnimation]);
     }
 
     public function wake() {
         time = 0;
-        body.updateSignal.add(update);
+        board.updateSignal.add(update);
         update(0);
     }
 
-    public function cancel() body.updateSignal.remove(update);
+    public function cancel() board.updateSignal.remove(update);
 
     function update(delta:Float):Void {
         time += delta;
@@ -60,7 +61,7 @@ class BoardAnimator {
         }
 
         if (count == 0) {
-            body.updateSignal.remove(update);
+            board.updateSignal.remove(update);
             animCompleteSignal.dispatch();
         }
     }

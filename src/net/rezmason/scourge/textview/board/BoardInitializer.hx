@@ -9,21 +9,22 @@ import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.textview.ColorPalette.*;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.santa.Present;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.praxis.grid.GridUtils;
 
 class BoardInitializer {
 
-    var body:Body;
+    var board:Body;
     var ecce:Ecce;
     var qBoard:Query;
 
     public var animCompleteSignal(default, null):Zig<Void->Void> = new Zig();
 
-    public function new(ecce:Ecce, body:Body):Void {
-        this.ecce = ecce;
-        this.body = body;
+    public function new():Void {
+        ecce = new Present(Ecce);
+        board = new Present(Body, 'board');
         qBoard = ecce.query([BoardNodeView, BoardNodeState]);
     }
 
@@ -57,23 +58,23 @@ class BoardInitializer {
             if (maxDistSquared < distSquared) maxDistSquared = distSquared;
         }
 
-        // Scale body so that board fits within scene's bounds
-        body.transform.identity();
+        // Scale board so that board fits within scene's bounds
+        board.transform.identity();
         var scale = 0.8 / Math.sqrt(maxDistSquared * 2);
-        body.transform.appendScale(scale, scale, scale);
-        body.glyphScale = scale * 0.35;
+        board.transform.appendScale(scale, scale, scale);
+        board.glyphScale = scale * 0.35;
 
         // Second pass: populate views with glyphs, draw the walls (which don't change)
         var itr = 0;
-        body.growTo(numSpacesThatMatter * 3);
+        board.growTo(numSpacesThatMatter * 3);
         for (entity in qBoard) {
             var view = entity.get(BoardNodeView);
             var nodeState = entity.get(BoardNodeState);
             var pos = nodeState.petriData.pos;
             
-            var bottom = view.bottom = body.getGlyphByID(itr + 0).reset().SET({pos:pos});
-            var top    = view.top =    body.getGlyphByID(itr + 1).reset().SET({pos:pos, p:-0.01});
-            var over   = view.over =   body.getGlyphByID(itr + 2).reset().SET({pos:pos, p:-0.03});
+            var bottom = view.bottom = board.getGlyphByID(itr + 0).reset().SET({pos:pos});
+            var top    = view.top =    board.getGlyphByID(itr + 1).reset().SET({pos:pos, p:-0.01});
+            var over   = view.over =   board.getGlyphByID(itr + 2).reset().SET({pos:pos, p:-0.03});
 
             if (nodeState.petriData.isWall) {
                 var numNeighbors:Int = 0;
@@ -85,7 +86,7 @@ class BoardInitializer {
                     numNeighbors++;
                 }
                 var char = Utf8.charCodeAt(BOX_SYMBOLS, bitfield);
-                var stretch = body.glyphTexture.font.glyphRatio;
+                var stretch = board.glyphTexture.font.glyphRatio;
                 bottom.SET({char:char, color:BOARD_COLOR, h:stretch});
                 top.SET({char:char, color:WALL_COLOR, h:stretch});
             } else {

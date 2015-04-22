@@ -16,6 +16,7 @@ import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.utils.Pointers;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.santa.Present;
 
 using net.rezmason.praxis.grid.GridUtils;
 
@@ -43,9 +44,9 @@ class Sequencer extends Reckoner {
     @node(FreshnessAspect.FRESHNESS) var freshness_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
-    public function new(ecce:Ecce) {
+    public function new() {
         super();
-        this.ecce = ecce;
+        ecce = new Present(Ecce);
         qBoardNodeStates = ecce.query([BoardNodeState]);
         qBoardViews = ecce.query([BoardNodeView]);
         qAnimations = ecce.query([GlyphAnimation]);
@@ -71,6 +72,7 @@ class Sequencer extends Reckoner {
         this.player = null;
         for (presenter in rulePresentersByCause) if (presenter != null) presenter.dismiss();
         rulePresentersByCause = null;
+        if (game.winner == -1) for (e in qAnimations) ecce.collect(e);
         dismiss();
         waitingToProceed = false;
         gameEndSignal.dispatch();

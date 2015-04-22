@@ -2,7 +2,6 @@ package net.rezmason.scourge.textview.pages;
 
 import flash.geom.Rectangle;
 
-import net.rezmason.scourge.textview.GameSystem;
 import net.rezmason.scourge.textview.useractions.*;
 import net.rezmason.scourge.textview.console.*;
 import net.rezmason.scourge.textview.core.Body;
@@ -34,13 +33,12 @@ class GamePage extends NavPage {
         var alphabetDemo:AlphabetDemo = new AlphabetDemo();
         var glyphDemo:GlyphDemo = new GlyphDemo();
         var eyeCandyDemo:EyeCandyDemo = new EyeCandyDemo();
-        var gameSystem:GameSystem = new Present(GameSystem);
 
         bodiesByName = new Map();
         bodiesByName['alphabet'] = alphabetDemo.body;
         bodiesByName['sdf']      = glyphDemo.body;
         bodiesByName['test']     = eyeCandyDemo.body;
-        bodiesByName['board']    = gameSystem.board;
+        bodiesByName['board']    = new Present(Body, 'board');
 
         console.hasScrollBar = true;
         console.scene.camera.rect = new Rectangle(0.6, 0, 0.4, 1);

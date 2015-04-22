@@ -4,11 +4,11 @@ import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.bite.BiteAspect;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
 import net.rezmason.scourge.game.piece.SwapAspect;
-import net.rezmason.scourge.textview.GameSystem;
 import net.rezmason.scourge.textview.console.UserAction;
 import net.rezmason.scourge.textview.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;
+import net.rezmason.scourge.textview.errands.BeginGameErrand;
 import net.rezmason.utils.santa.Present;
 
 using Lambda;
@@ -16,12 +16,14 @@ using Lambda;
 class PlayGameAction extends UserAction {
     
     var showBody:Void->Void;
-    var gameSystem:GameSystem;
+    var isReplay:Bool;
+    var errand:BeginGameErrand;
+    var seed:UInt;
+    var numPlayers:Int;
 
     public function new(showBody:Void->Void):Void {
         super();
         this.showBody = showBody;
-        this.gameSystem = new Present(GameSystem);
         name = 'play';
 
         keys['playerPattern'] = PLAYER_PATTERN;
@@ -38,25 +40,14 @@ class PlayGameAction extends UserAction {
     }
 
     override public function execute(args:UserActionArgs):Void {
-        var message = '';
-
-        var isReplay:Bool = args.flags.has('replay');
-
-        if (isReplay && !gameSystem.hasLastGame) {
-            message = styleError('Referee has no last game to replay.');
-            outputSignal.dispatch(message, true);
-            return;
-        }
-
-        var seed:UInt = 0;
-
+        isReplay = args.flags.has('replay');
         if (args.keyValuePairs.exists('seed')) seed = Std.parseInt(args.keyValuePairs['seed']);
         else seed = Std.int(Math.random() * 0x7FFFFFFF);
 
         var playerPatternString:String = args.keyValuePairs['playerPattern'];
         if (playerPatternString == null) playerPatternString = 'bb';
         var playerPattern:Array<String> = playerPatternString.split('');
-        var numPlayers:Int = playerPattern.length;
+        numPlayers = playerPattern.length;
         if (numPlayers > 8) numPlayers = 8;
         if (numPlayers < 2) numPlayers = 2;
 
@@ -89,11 +80,20 @@ class PlayGameAction extends UserAction {
         cfg.metaParams.globalProperties[SwapAspect.NUM_SWAPS.id].maxAmount = 5;
         cfg.metaParams.globalProperties[BiteAspect.NUM_BITES.id].maxAmount = 5;
 
-        gameSystem.beginGame(cfg, playerPattern, thinkPeriod, animationLength, isReplay, seed);
-        showBody();
+        errand = new BeginGameErrand(cfg, playerPattern, thinkPeriod, animationLength, isReplay, seed);
+        errand.onComplete.add(onErrandComplete);
+        errand.run();
+    }
 
-        if (isReplay) message = 'Replaying last game.';
-        else message = 'Starting $numPlayers-player game with seed $seed.';
+    function onErrandComplete(success, message) {
+        errand.onComplete.removeAll();
+        if (success) {
+            showBody();
+            if (isReplay) message = 'Replaying last game.';
+            else message = 'Starting $numPlayers-player game with seed $seed.';
+        } else {
+            message = 'ERROR: $message';
+        }
         outputSignal.dispatch(message, true);
     }
 }

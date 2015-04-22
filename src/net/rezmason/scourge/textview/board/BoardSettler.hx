@@ -8,8 +8,8 @@ import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.scourge.components.*;
-import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.game.body.OwnershipAspect;
+import net.rezmason.utils.santa.Present;
 
 import net.kawa.tween.easing.*;
 
@@ -20,17 +20,15 @@ class BoardSettler extends Reckoner {
 
     static var nudgeArray:Array<XYZ> = makeNudgeArray();
 
-    var body:Body;
     var ecce:Ecce;
     var qBoard:Query;
 
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
 
-    public function new(ecce:Ecce, body:Body):Void {
+    public function new():Void {
         super();
-        this.ecce = ecce;
-        this.body = body;
+        ecce = new Present(Ecce);
         qBoard = ecce.query([BoardNodeView, BoardNodeState]);
     }
 

@@ -4,7 +4,7 @@ import flash.Lib;
 import flash.display.Stage;
 import flash.events.Event;
 
-import net.rezmason.scourge.textview.GameSystem;
+import net.rezmason.scourge.GameContext;
 import net.rezmason.scourge.textview.NavSystem;
 import net.rezmason.scourge.textview.ScourgeNavPageAddresses;
 import net.rezmason.scourge.textview.core.Engine;
@@ -35,7 +35,7 @@ class Context {
         Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));
 
         makeEngine();
-        makeGameSystem();
+        new GameContext();
         makeNavSystem();
     }
 
@@ -54,8 +54,6 @@ class Context {
         onResize();
         onActivate();
     }
-
-    function makeGameSystem():Void Santa.mapToClass(GameSystem, Singleton(new GameSystem()));
 
     function makeNavSystem():Void {
         var navSystem:NavSystem = new NavSystem(engine);

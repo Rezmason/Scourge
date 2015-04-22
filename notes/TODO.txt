@@ -1,4 +1,4 @@
-Break down the GameSystem into a GameContext, a BeginGameCommand, etc
+Maybe cut up Sequencer
 Figure out how to do "pain"-related things
     Settler updates node distances
     Then RulePresenters get a chance to respond to moves

@@ -1,50 +1,42 @@
-package net.rezmason.scourge.textview;
+package net.rezmason.scourge.textview.errands;
 
 import net.rezmason.ecce.Ecce;
 import net.rezmason.praxis.bot.BotSystem;
 import net.rezmason.praxis.bot.ReplaySmarts;
 import net.rezmason.praxis.play.IPlayer;
-import net.rezmason.praxis.play.Referee;
 import net.rezmason.praxis.play.PlayerSystem;
+import net.rezmason.praxis.play.Referee;
 import net.rezmason.scourge.controller.BasicSmarts;
 import net.rezmason.scourge.controller.Sequencer;
 import net.rezmason.scourge.game.ScourgeGameConfig;
-import net.rezmason.scourge.textview.core.Body;
-import net.rezmason.scourge.textview.board.BoardAnimator;
-import net.rezmason.scourge.textview.board.BoardInitializer;
-import net.rezmason.scourge.textview.board.BoardSettler;
+import net.rezmason.utils.Errand;
+import net.rezmason.utils.santa.Present;
 
-class GameSystem {
+class BeginGameErrand extends Errand<Bool->String->Void> {
 
-    public var board(default, null):Body = new Body();
-    public var hasLastGame(get, never):Bool;
-    var referee:Referee = new Referee();
-    var ecce:Ecce = new Ecce();
-    var sequencer:Sequencer;
-    var boardInitializer:BoardInitializer;
-    var boardSettler:BoardSettler;
-    var boardAnimator:BoardAnimator;
+    var config:ScourgeGameConfig;
+    var playerPattern:Array<String>;
+    var thinkPeriod:Int;
+    var animationLength:Float;
+    var isReplay:Bool;
+    var seed:UInt;
 
-    public function new():Void {
-        sequencer = new Sequencer(ecce);
-        boardInitializer = new BoardInitializer(ecce, board);
-        boardSettler = new BoardSettler(ecce, board);
-        sequencer.gameStartSignal.add(function(_, _) boardInitializer.run());
-        sequencer.moveSettlingSignal.add(boardSettler.run);
-        sequencer.gameStartSignal.add(function(game, _) boardSettler.init(game));
-        sequencer.gameEndSignal.add(boardSettler.dismiss);
-        boardAnimator = new BoardAnimator(ecce, board);
-        sequencer.moveSequencedSignal.add(boardAnimator.wake);
-        sequencer.moveSettlingSignal.add(boardAnimator.wake);
-        boardAnimator.animCompleteSignal.add(sequencer.proceed);
+    public function new(config:ScourgeGameConfig, playerPattern:Array<String>, thinkPeriod:Int, animationLength:Float, isReplay:Bool, seed:UInt):Void {
+        this.config = config;
+        this.playerPattern = playerPattern;
+        this.thinkPeriod = thinkPeriod;
+        this.animationLength = animationLength;
+        this.isReplay = isReplay;
+        this.seed = seed;
     }
 
-    public function beginGame(config:ScourgeGameConfig, playerPattern:Array<String>, thinkPeriod:Int, animationLength:Float, isReplay:Bool, seed:UInt):Void {
+    override public function run():Void {
 
-        if (referee.gameBegun) {
-            referee.endGame();
-            boardAnimator.cancel();
-        }
+        var referee:Referee = new Present(Referee);
+        var ecce:Ecce = new Present(Ecce);
+        var sequencer:Sequencer = new Present(Sequencer);
+
+        if (referee.gameBegun) referee.endGame();
         
         for (e in ecce.get()) ecce.collect(e);
         
@@ -67,6 +59,10 @@ class GameSystem {
 
         if (isReplay) {
             config = cast referee.lastGameConfig;
+            if (config == null) {
+                onComplete.dispatch(false, 'Referee has no last game to replay.');
+                return;
+            }
             var floats:Array<Float> = referee.lastGame.floatsLog.copy();
             randGen = function() return floats.shift();
         }
@@ -84,6 +80,7 @@ class GameSystem {
         sequencer.animationLength = animationLength;
         sequencer.connect(watchedPlayer);
         referee.beginGame(players, randGen, config);
+        onComplete.dispatch(true, null);
     }
 
     function lgm(n:UInt):Void->Float {
@@ -94,6 +91,4 @@ class GameSystem {
             return n / div;
         }
     }
-
-    function get_hasLastGame():Bool return referee.lastGame != null;
 }
