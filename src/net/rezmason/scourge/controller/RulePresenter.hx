@@ -41,7 +41,7 @@ class RulePresenter extends Reckoner {
         this.index = index;
         this.subject = subject;
         nodeView = subject.get(BoardNodeView);
-        nodeView.changed = nodeView.changed || animateGlyphs();
+        nodeView.changed = animateGlyphs() || nodeView.changed;
     }
 
     @:final function createAnimation() {

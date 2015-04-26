@@ -1,4 +1,3 @@
-Killed enemy cells don't transition properly into cavity
     1331990525
 Figure out how to do "pain"-related things
     Settler updates node distances
