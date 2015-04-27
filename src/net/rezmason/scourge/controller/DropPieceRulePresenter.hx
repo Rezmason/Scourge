@@ -6,7 +6,7 @@ import net.rezmason.scourge.Strings.*;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class DropPieceRulePresenter extends RulePresenter {
-    override function animateGlyphs():Bool {
+    override function animateGlyphs() {
         var slam = createAnimation();
         populateGlyphs(slam.topFrom, slam.bottomFrom, nodeState.lastValues);
         slam.topFrom.SET({color:BLACK, s:1.2, f:0.7, char:BODY_CODE, p:-0.5});
@@ -26,7 +26,5 @@ class DropPieceRulePresenter extends RulePresenter {
 
         cool.startTime = slam.duration;
         cool.duration = 0.25;
-
-        return true;
     }
 }

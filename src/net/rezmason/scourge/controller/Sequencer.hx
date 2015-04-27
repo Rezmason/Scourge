@@ -31,6 +31,7 @@ class Sequencer extends Reckoner {
     var qAnimations:Query;
     var lastMaxFreshness:Int;
     var waitingToProceed:Bool;
+    var sequence:Array<Array<Array<Entity>>> = [];
     var rulePresentersByCause:Map<String, RulePresenter>;
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
     public var gameEndSignal(default, null):Zig<Void->Void> = new Zig();
@@ -112,8 +113,8 @@ class Sequencer extends Reckoner {
         }
 
         gameStartSignal.dispatch(game, ecce);
-        for (e in qBoardNodeStates) rulePresentersByCause[null].presentBoardChange(null, e);
-        scaleAnims();
+        sequence[0] = [for (e in qBoardNodeStates) rulePresentersByCause[null].presentBoardEffect(e)];
+        processSequence();
         waitingToProceed = true;
         moveSequencedSignal.dispatch();
     }
@@ -134,9 +135,10 @@ class Sequencer extends Reckoner {
             for (e in qBoardNodeStates) {
                 var freshness:Int = e.get(BoardNodeState).values[freshness_];
                 if (freshness >= lastMaxFreshness) {
+                    if (sequence[freshness] == null) sequence[freshness] = [];
+                    sequence[freshness].push(presenter.presentBoardEffect(e));
                     var nodeState = e.get(BoardNodeState);
-                    presenter.presentBoardChange(freshness, e);
-                    nodeState.values.copyTo(e.get(BoardNodeState).lastValues);
+                    nodeState.values.copyTo(nodeState.lastValues);
                 }
             }
             lastMaxFreshness = maxFreshness;
@@ -144,7 +146,7 @@ class Sequencer extends Reckoner {
     }
 
     function onMoveStop() {
-        scaleAnims();
+        processSequence();
         waitingToProceed = true;
         moveSequencedSignal.dispatch();
     }
@@ -154,7 +156,7 @@ class Sequencer extends Reckoner {
             for (entity in qBoardViews) {
                 if (entity.get(BoardNodeView).changed) {
                     moveSettlingSignal.dispatch();
-                    scaleAnims();
+                    processSequence();
                     return;
                 }
             }
@@ -165,42 +167,36 @@ class Sequencer extends Reckoner {
         }
     }
 
-    function scaleAnims():Void {
-        var animations:Array<Array<GlyphAnimation>> = [];
-        for (e in qAnimations) {
-            var glyphAnimation = e.get(GlyphAnimation);
-            glyphAnimation.time = 0;
-            if (animations[glyphAnimation.index] == null) animations[glyphAnimation.index] = [glyphAnimation];
-            else animations[glyphAnimation.index].push(glyphAnimation);
-        }
-
+    function processSequence():Void {
+        var animations = [];
         var startTime:Float = 0;
-        for (ike in 0...animations.length) {
-            var anims = animations[ike];
-            if (anims == null) continue;
-            var lastAnim = anims[0];
+        for (step in sequence) { // steps correspond to freshness
+            if (step == null) continue;
+            var lastAnim = null;
             var lastAnimEndTime:Float = 0;
-            for (anim in anims) {
-                anim.startTime += startTime;
-                var animEndTime = startTime + anim.duration * (1 - anim.overlap);
-                if (animEndTime > lastAnimEndTime) {
-                    lastAnim = anim;
-                    lastAnimEndTime = animEndTime;
+            for (effect in step) { // effects correspond to nodes on the board
+                if (effect == null) continue;
+                for (e in effect) {
+                    var anim = e.get(GlyphAnimation);
+                    var subjectNodeState = anim.subject.get(BoardNodeState);
+                    anim.startTime += startTime;
+                    animations.push(anim);
+                    if (anim.startTime + anim.duration > lastAnimEndTime) {
+                        lastAnim = anim;
+                        lastAnimEndTime = anim.startTime + anim.duration;
+                    }
                 }
             }
-            startTime = lastAnim.startTime + lastAnim.duration * (1 - lastAnim.overlap);
+            if (lastAnim != null) startTime = lastAnim.startTime + lastAnim.duration * (1 - 0); // TODO: overlap
         }
-        
-        var finalAnims = animations[animations.length - 1];
-        if (finalAnims != null) {
-            var finalAnim = finalAnims[finalAnims.length - 1];
+        sequence.splice(0, sequence.length);
+        var finalAnim = animations[animations.length - 1];
+        if (finalAnim != null) {
             var scale = animationLength / (finalAnim.startTime + finalAnim.duration);
             if (scale < 1) {
-                for (anims in animations) {
-                    for (anim in anims) {
-                        anim.startTime *= scale;
-                        anim.duration *= scale;
-                    }
+                for (anim in animations) {
+                    anim.startTime *= scale;
+                    anim.duration *= scale;
                 }
             }
         }

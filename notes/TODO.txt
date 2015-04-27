@@ -1,4 +1,4 @@
-    1331990525
+Pretty damn sure the bots aren't able to rotate their pieces for some reason
 Figure out how to do "pain"-related things
     Settler updates node distances
     Then RulePresenters get a chance to respond to moves

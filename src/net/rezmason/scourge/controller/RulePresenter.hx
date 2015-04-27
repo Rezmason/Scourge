@@ -21,9 +21,10 @@ class RulePresenter extends Reckoner {
     var ecce:Ecce = null;
     
     var subject:Entity;
-    var index:Null<Int>;
     var nodeView:BoardNodeView;
     var nodeState:BoardNodeState;
+    var animationEntities:Array<Entity>;
+    var effectOverlap(default, null):Float;
     
     @node(OwnershipAspect.IS_FILLED) var isFilled_;
     @node(OwnershipAspect.OCCUPIER) var occupier_;
@@ -33,21 +34,28 @@ class RulePresenter extends Reckoner {
         super();
         primePointers(game.state, game.plan);
         this.ecce = ecce;
+        effectOverlap = 0;
     }
 
-    @:final public function presentBoardChange(index:Null<Int>, subject:Entity):Void {
+    @:final public function presentBoardEffect(subject:Entity):Array<Entity> {
         nodeState = subject.get(BoardNodeState);
-        if (nodeState == null || nodeState.petriData.isWall) return;
-        this.index = index;
+        if (nodeState == null || nodeState.petriData.isWall) return null;
         this.subject = subject;
         nodeView = subject.get(BoardNodeView);
-        nodeView.changed = animateGlyphs() || nodeView.changed;
+        animateGlyphs();
+        var entities = animationEntities;
+        animationEntities = null;
+        if (entities != null) nodeView.changed = true;
+        return entities;
     }
 
     @:final function createAnimation() {
-        var anim = ecce.dispense([GlyphAnimation]).get(GlyphAnimation);
+        var animEntity = ecce.dispense([GlyphAnimation]);
+        if (animationEntities == null) animationEntities = [];
+        animationEntities.push(animEntity);
+
+        var anim = animEntity.get(GlyphAnimation);
         anim.subject = subject;
-        anim.index = index;
         
         if (anim.topFrom == null) anim.topFrom = GlyphUtils.createGlyph();
         if (anim.topTo == null) anim.topTo = GlyphUtils.createGlyph();
@@ -56,7 +64,6 @@ class RulePresenter extends Reckoner {
 
         anim.startTime = 0;
         anim.duration = 0.125;
-        anim.overlap = 0.;
         anim.ease = Quad.easeInOut;
 
         anim.topFrom.copyFrom(nodeView.top);
@@ -91,7 +98,7 @@ class RulePresenter extends Reckoner {
         }
     }
 
-    function animateGlyphs():Bool {
+    function animateGlyphs() {
         var anim = createAnimation();
         populateGlyphs(anim.topFrom, anim.bottomFrom, nodeState.lastValues);
         populateGlyphs(anim.topTo,   anim.bottomTo,   nodeState.values);
@@ -99,7 +106,5 @@ class RulePresenter extends Reckoner {
         anim.bottomTo.set_pos(nodeState.petriData.pos);
         anim.topTo.set_pos(nodeState.petriData.pos);
         anim.topTo.set_p(-0.05);
-
-        return true;
     }
 }

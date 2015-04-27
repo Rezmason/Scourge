@@ -41,10 +41,8 @@ class BoardAnimator {
         var count = 0;
         for (e in qAnimations) {
             count++;
-            count++;
             var anim = e.get(GlyphAnimation);
             if (anim.startTime < time) {
-                count--;
                 var percent = (time - anim.startTime) / anim.duration;
                 var frac = anim.ease(percent);
                 var view = anim.subject.get(BoardNodeView);
