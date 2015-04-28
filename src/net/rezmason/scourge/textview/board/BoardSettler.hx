@@ -58,6 +58,7 @@ class BoardSettler extends Reckoner {
             if (anim.topTo == null) anim.topTo = GlyphUtils.createGlyph();
             if (anim.bottomFrom == null) anim.bottomFrom = GlyphUtils.createGlyph();
             if (anim.bottomTo == null) anim.bottomTo = GlyphUtils.createGlyph();
+            anim.startTime = 0;
             anim.duration = 0.3;
             anim.ease = Quad.easeInOut;
             
