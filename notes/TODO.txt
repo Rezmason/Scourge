@@ -1,10 +1,3 @@
-Pretty damn sure the bots aren't able to rotate their pieces for some reason
-Figure out how to do "pain"-related things
-    Settler updates node distances
-    Then RulePresenters get a chance to respond to moves
-Create ripple behavior
-
-
 The Loupe
     Get it ON the board
     Get it to traverse the board
@@ -32,12 +25,23 @@ Some Haxe stuff
     https://github.com/larsiusprime/crashdumper
     https://github.com/Justinfront/hxDaedalus
 
-OpenFL 2.0 support
-    Remember, munit breaks the HTML5 build target
+Upgrade to latest OpenFL
 
 Flash 12 support
     Context3DBufferUsage
     Context3D::createVertexBuffer
+
+Smarten up the AI
+    Prune moves
+    Weigh moves
+        Negative weights:
+            "vulnerability"– susceptability to SOME attack
+            "threat"– susceptability to EXISTING attack
+
+Figure out how to do "pain"-related things
+    BoardMeasurer updates node distances
+    Then RulePresenters get a chance to respond to moves; they get to work with the whole board
+Create ripple behavior
 
 Wrap shaders in a soft fuzzy blanket, so they don't fucking piss themselves
     GLSL2AGAL output includes stuff that helps validate parameter setting and so on
