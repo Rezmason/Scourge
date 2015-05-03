@@ -1,18 +1,32 @@
 The Loupe
-    Get it ON the board
-    Get it to traverse the board
-        BoardSystem needs to expose glyph position somehow
-    Then, get it to display the current piece
+    Draw it out
+    For now, just a Body with box drawing
+    Add it as child to board
+    Add it as 'loupe' to injector
+    Board interaction signal should drive LoupeSwipeSystem
+        LoupeSwipeSystem converts dx and dy into cardinal motion
+            dx and dy also affect brightness of cardinal indicators of loupe
+            A cardinal motion interpretation *resets* the swipe origin
+            A cardinal motion also changes the "focus" of the loupe
+                Focus of loupe is NOT its center; focus is the node on the piece that traverses
+                The focus can change, if the user wants, by touching a node in the loupe
+                The loupe is always centered by AVERAGING the positions of the piece nodes
+    Then, get the Loupe to display the current piece
+        Swapping should swap the piece
     Then, give it buttons
 
 Where does the loupe live?
     SwipeView 2.0
         Round rectangles showing information
         You pull them out, they expand to loupes
-            One for placement
-            One for biting
+            One for piece moves
+            One for bite moves
             One for player stats
             One for DNA?
+
+Make the bots "use" the SwipeView
+
+There could be WAY more symbols than spaces, and it might look nicer
 
 We can support more Bodies by making IDs dynamic
     Engine, render methods create them from display list
