@@ -21,7 +21,7 @@ import net.rezmason.utils.display.SDFTypes;
 import net.rezmason.utils.workers.TempAgency;
 import net.rezmason.utils.workers.Golem;
 
-using haxe.JSON;
+using haxe.Json;
 
 using Lambda;
 using net.rezmason.utils.Alphabetizer;

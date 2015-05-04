@@ -14,7 +14,7 @@ import net.rezmason.gl.glsl2agal.GLSL2AGALTypes;
 import net.rezmason.utils.workers.Golem;
 import net.rezmason.utils.workers.TempAgency;
 
-using haxe.JSON;
+using haxe.Json;
 
 /**
 

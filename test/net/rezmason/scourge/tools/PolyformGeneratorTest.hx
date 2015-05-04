@@ -8,7 +8,7 @@ import net.rezmason.scourge.game.Pieces;
 import net.rezmason.polyform.PolyformGenerator;
 import net.rezmason.utils.openfl.Resource;
 
-import haxe.JSON;
+import haxe.Json;
 
 class PolyformGeneratorTest {
 

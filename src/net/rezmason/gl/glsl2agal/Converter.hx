@@ -2,6 +2,7 @@ package net.rezmason.gl.glsl2agal;
 
 import flash.display3D.Context3DProgramType;
 import haxe.io.Bytes;
+import haxe.Json;
 import com.adobe.utils.AGALMiniAssembler;
 import net.rezmason.gl.glsl2agal.GLSL2AGALTypes;
 import net.rezmason.utils.workers.BasicWorker;
@@ -53,7 +54,7 @@ class Converter extends BasicWorker<GLSLInput, AGALOutput> {
 
             if (assembler == null) assembler = new AGALMiniAssembler();
 
-            json = haxe.JSON.Json.parse(jsonString);
+            json = Json.parse(jsonString);
 
             var asm = json.agalasm;
             if (input.texParam != null) {

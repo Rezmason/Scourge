@@ -5,7 +5,7 @@ import flash.geom.Matrix;
 
 import haxe.Utf8;
 
-using haxe.JSON;
+using haxe.Json;
 
 typedef CharCoord = {x:Int, y:Int};
 typedef UV = {u:Float, v:Float};

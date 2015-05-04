@@ -12,8 +12,6 @@
 
 	<classpath name="src" />
 
-	<haxedef name="haxeJSON" />
-
 	<haxelib name="golems" />
 	<haxelib name="openfl" />
 	<haxelib name="format" />

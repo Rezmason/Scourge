@@ -2,7 +2,7 @@ package net.rezmason.scourge.game;
 
 import net.rezmason.scourge.game.PieceTypes;
 
-using haxe.JSON;
+using haxe.Json;
 
 class Pieces {
 
