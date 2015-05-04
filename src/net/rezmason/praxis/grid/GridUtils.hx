@@ -110,14 +110,14 @@ class GridUtils {
     }
 
     // Shortcuts
-    public inline static function nw<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[NW]; }
-    public inline static function  n<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[N ]; }
-    public inline static function ne<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[NE]; }
-    public inline static function  e<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[E ]; }
-    public inline static function se<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[SE]; }
-    public inline static function  s<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[S ]; }
-    public inline static function sw<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[SW]; }
-    public inline static function  w<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[W ]; }
+    public inline static function nw<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[cast NW]; }
+    public inline static function  n<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[cast N ]; }
+    public inline static function ne<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[cast NE]; }
+    public inline static function  e<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[cast E ]; }
+    public inline static function se<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[cast SE]; }
+    public inline static function  s<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[cast S ]; }
+    public inline static function sw<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[cast SW]; }
+    public inline static function  w<T> (locus:GridLocus<T>):GridLocus<T> { return locus.neighbors[cast W ]; }
 }
 
 class GridWalker<T> {
