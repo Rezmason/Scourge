@@ -14,6 +14,7 @@
 
 	<haxedef name="haxeJSON" />
 
+	<haxelib name="golems" />
 	<haxelib name="openfl" />
 	<haxelib name="format" />
 

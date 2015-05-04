@@ -4,6 +4,7 @@ import flash.display.BitmapData;
 import flash.geom.Matrix;
 
 import haxe.Utf8;
+import haxe.io.Bytes;
 
 import flash.display.BlendMode;
 import flash.geom.Rectangle;
@@ -16,6 +17,7 @@ import flash.text.Font;
 import flash.utils.ByteArray;
 
 import net.rezmason.utils.display.FlatFont;
+import net.rezmason.utils.display.SDFTypes;
 import net.rezmason.utils.workers.TempAgency;
 import net.rezmason.utils.workers.Golem;
 
@@ -23,12 +25,6 @@ using haxe.JSON;
 
 using Lambda;
 using net.rezmason.utils.Alphabetizer;
-
-typedef SerializedBitmap = {
-    var width:Int;
-    var height:Int;
-    var bytes:ByteArray;
-}
 
 typedef CharacterSet = {
     var font:Font;
@@ -45,6 +41,7 @@ class FlatFontGenerator {
         if (sdfAgency == null) {
             sdfAgency = new TempAgency(Golem.rise('SDFWorker.hxml'), 10);
             sdfAgency.onDone = sdfAgency.die;
+            sdfAgency.onError = function(_) trace(_);
         }
 
         if (glyphWidth  == 0) glyphWidth  = 1;
@@ -164,9 +161,12 @@ class FlatFontGenerator {
         function addSDF(index:Int, sdf:SerializedBitmap):Void {
             numSDFs++;
 
+            var ba = sdf.bytes.getData();
+            ba.endian = flash.utils.Endian.BIG_ENDIAN;
+            ba.position = 0;
+            
             var bd:BitmapData = new BitmapData(sdf.width, sdf.height, true, 0x0);
-            sdf.bytes.position = 0;
-            bd.setPixels(bd.rect, sdf.bytes);
+            bd.setPixels(bd.rect, ba);
 
             bds[index] = bd;
             trace('$index: $numSDFs / $numChars');
@@ -176,8 +176,8 @@ class FlatFontGenerator {
         for (ike in 0...numChars) {
             var bd:BitmapData = glyphBD.clone();
             bd.draw(glyphs[ike], glyphMat, null, BlendMode.NORMAL, null, true);
-
-            var sb:SerializedBitmap = {width:bd.width, height:bd.height, bytes:bd.getPixels(bd.rect)};
+            var sb:SerializedBitmap = {width:bd.width, height:bd.height, bytes:Bytes.ofData(bd.getPixels(bd.rect))};
+            // addSDF(ike, SDF.process({source:sb, cutoff:cutoff}));
             sdfAgency.addWork({source:sb, cutoff:cutoff}, addSDF.bind(ike));
         }
     }

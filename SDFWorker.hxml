@@ -3,5 +3,6 @@
 -swf golems/SDFWorker.swf
 -swf-version 11.4
 -cp src
+-lib golems
 #-debug
 -dce no
