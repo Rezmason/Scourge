@@ -13,6 +13,7 @@
     <haxedef name="advanced-telemetry" if="flash"/>
     <haxedef name="glsl2agal" if="flash"/>
     <haxedef name="stage3d" if="flash"/>
+    <haxedef name="dom" if="html5"/>
     <haxelib name="golems"/>
     <haxelib name="openfl"/>
     
