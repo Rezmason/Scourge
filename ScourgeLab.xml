@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-    <meta title="ScourgeLab" description="" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" />
+    <meta title="ScourgeLab" description="" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net"/>
     <app title="ScourgeLab" file="ScourgeLab" main="ScourgeLab" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="12.0"/>
+    
     <set name="fullscreen" unless="mac"/>
+    <window width="720" height="720" fps="30" orientation="portrait" background="#000000" resizable="false"/>
+    
+    <set name="BUILD_DIR" value="Export/Lab"/>
+    
+    <classpath name="src"/>
+    
     <haxedef name="advanced-telemetry" if="flash"/>
-    <window width="720" height="720" fps="30" orientation="portrait" background="#000000" resizable="false" />
-    <set name="BUILD_DIR" value="Export/Lab" />
-    <classpath name="src" />
-    <!-- <classpath name="thirdparty/kawanet_ktween/src" /> -->
-    <assets path="shaders" include="*.vert|*.frag" />
-    <haxedef name="stage3d" if="flash" />
-    <haxedef name="glsl2agal" if="flash" />
-    <set name="html5-backend" value="openfl-html5-dom" />
-    <haxelib name="openfl" />
-    <haxelib name="golems" />
-    <set name="custom-html5-backend" />
-    <haxelib name="openfl-html5-revised" if="html5" />
-    <assets path="assets/metaballs" rename="metaballs" />
+    <haxedef name="glsl2agal" if="flash"/>
+    <haxedef name="stage3d" if="flash"/>
+    <haxelib name="golems"/>
+    <haxelib name="openfl"/>
+    
+    <assets path="shaders" include="*.vert|*.frag"/>
+
+    <assets path="assets/metaballs" rename="metaballs"/>
 </project>

@@ -1,42 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-	<meta title="Scourge" description="An early first playable version of Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" />
-	<app title="Scourge" file="Scourge" main="Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="12.0"/>
-	<set name="fullscreen" unless="mac"/>
-	<window width="0" height="0" fps="30" orientation="portrait" background="#000000" resizable="true" unless="mac"/>
-	<window width="1152" height="720" fps="30" orientation="portrait" background="#000000" resizable="true" borderless="true" if="mac" />
-	<!-- <window width="720" height="720" fps="30" orientation="portrait" background="#000000" resizable="false" if="mac" /> -->
-	<set name="BUILD_DIR" value="Export/Scourge/release" unless="debug" />
-	<set name="BUILD_DIR" value="Export/Scourge/debug" if="debug" />
-	<classpath name="src" />
-	<classpath name="thirdparty/kawanet_ktween/src" />
-	<haxelib name="munit" />
-	<haxelib name="golems" />
-	<classpath name="test" />
-	<assets path="tables" include="*.txt" />
-	<assets path="shaders" include="*.vert|*.frag" />
-	<!-- <haxedef name="VISUAL_TEST" if="mac" /> -->
-	<!-- <haxedef name="USE_POINTERS" /> -->
-	<!-- <haxedef name="PRAXIS_VERBOSE" /> -->
-	<!-- <haxedef name="PRAXIS_MACRO_VERBOSE" /> -->
-	<haxedef name="stage3d" if="flash" />
-	<haxedef name="glsl2agal" if="flash" />
-	<!-- <haxeflag name="-D" value="dump=pretty" /> -->
-	<haxedef name="advanced-telemetry" if="debug"/>
-	<!-- <haxedef name="dce" value="no" if="flash"/> -->
-	<!-- <compilerflag name="-xml" value="scourge.xml"/> -->
-	<!-- <compilerflag name="--macro" value="this.is.how.you.run.a.Compiler.macro()"/> -->
-	<set name="html5-backend" value="openfl-html5-dom" />
-	<haxelib name="openfl" />
-	<set name="custom-html5-backend" />
-	<haxelib name="openfl-html5-revised" if="html5" />
-	<assets path="assets/flatfonts" rename="flatfonts" />
-	<assets path="assets/metaballs" rename="metaballs" />
-	<assets path="assets/exampletext" rename="exampletext" />
-	<assets path="assets/text" rename="text" />
-	<!-- <ndll name="std" /> -->
-	<!-- <ndll name="regexp" /> -->
-	<!-- <ndll name="zlib" /> -->
-	<!-- <ndll name="nme" haxelib="nme" /> -->
-	<!-- <icon path="Assets/nme.svg" /> -->
+    <meta title="Scourge" description="An early first playable version of Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net"/>
+    <app title="Scourge" file="Scourge" main="Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="12.0"/>
+    
+    <set name="fullscreen" unless="mac"/>
+    <window width="0" height="0" fps="30" orientation="portrait" background="#000000" resizable="true" unless="mac"/>
+    <window width="1152" height="720" fps="30" orientation="portrait" background="#000000" resizable="true" borderless="true" if="mac"/>
+    
+    <set name="BUILD_DIR" value="Export/Scourge/release" unless="debug"/>
+    <set name="BUILD_DIR" value="Export/Scourge/debug" if="debug"/>
+    
+    <classpath name="src"/>
+    <classpath name="thirdparty/kawanet_ktween/src"/>
+    <classpath name="test"/>
+    
+    <haxedef name="advanced-telemetry" if="debug"/>
+    <haxedef name="glsl2agal" if="flash"/>
+    <haxedef name="stage3d" if="flash"/>
+    <haxelib name="golems"/>
+    <haxelib name="munit"/>
+    <haxelib name="openfl"/>
+    
+    <assets path="tables" include="*.txt"/>
+    <assets path="shaders" include="*.vert|*.frag"/>
+
+    <assets path="assets/flatfonts" rename="flatfonts"/>
+    <assets path="assets/metaballs" rename="metaballs"/>
+    <assets path="assets/exampletext" rename="exampletext"/>
+    <assets path="assets/text" rename="text"/>
 </project>
