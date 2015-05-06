@@ -226,8 +226,8 @@ class GLSystem {
     }
 
     public inline function enableExtension(extName:String):Void {
-        #if !flash
-            GL.getExtension(extName);
+        #if js
+            trace('$extName --> ${@:privateAccess (GL.context).getExtension(extName)}');
         #end
     }
 

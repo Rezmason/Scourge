@@ -6,7 +6,8 @@
     <set name="fullscreen" unless="mac"/>
     <window width="720" height="720" fps="30" orientation="portrait" background="#000000" resizable="false"/>
     
-    <set name="BUILD_DIR" value="Export/Lab"/>
+    <set name="BUILD_DIR" value="Export/ScourgeLab/release" unless="debug"/>
+    <set name="BUILD_DIR" value="Export/ScourgeLab/debug" if="debug"/>
     
     <classpath name="src"/>
     

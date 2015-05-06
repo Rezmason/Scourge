@@ -25,16 +25,16 @@ class BitmapDataTexture extends Texture {
             nativeTexture = recTex;
         #else
             nativeTexture = GL.createTexture();
-            GL.bindTexture (GL.TEXTURE_2D, nativeTexture);
+            GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
             
             var pixelData = @:privateAccess (bitmapData.__image).data;
-            GL.texImage2D (GL.TEXTURE_2D, 0, GL.RGBA, bitmapData.width, bitmapData.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pixelData);
+            GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, bitmapData.width, bitmapData.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pixelData);
             
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-            GL.bindTexture (GL.TEXTURE_2D, null);
+            GL.bindTexture(GL.TEXTURE_2D, null);
         #end
     }
 
@@ -50,6 +50,7 @@ class BitmapDataTexture extends Texture {
                 prog.setTextureAt(location, nativeTexture);
             #else
                 GL.activeTexture(GL.TEXTURE0 + index);
+                GL.uniform1i(location, index);
                 GL.bindTexture (GL.TEXTURE_2D, nativeTexture);
             #end
         }
