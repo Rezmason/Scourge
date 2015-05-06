@@ -48,6 +48,7 @@ class UIScrollBar {
 
     public inline function updatePosition(x:Float, y:Float, thumbY:Float, thumbHeight:Float, trackHeight:Float):Void {
         
+        if (Math.isNaN(thumbHeight)) thumbHeight = 1;
         if (thumbHeight >= 1) {
             trackGlyph.set_rgb(0, 0, 0);
             thumbGlyph.set_rgb(0, 0, 0);
@@ -57,6 +58,7 @@ class UIScrollBar {
         }
 
         if (Math.isNaN(thumbY)) thumbY = 0;
+
         thumbGlyph.set_s(thumbHeight);
         thumbGlyph.set_h(0.65 / thumbHeight);
 

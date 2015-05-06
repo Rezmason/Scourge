@@ -63,6 +63,8 @@ class UIElement {
         scene = new Scene();
         scene.camera.scaleMode = EXACT_FIT;
         scene.resizeSignal.add(resize);
+        viewPixelWidth = 0;
+        viewPixelHeight = 0;
         body = new Body();
         scene.root.addChild(body);
         body.interactionSignal.add(receiveInteraction);
