@@ -225,9 +225,11 @@ class GLSystem {
         #end
     }
 
-    public inline function enableExtension(extName:String):Void {
+    public inline function enableExtension(extName:String):Bool {
         #if !flash
-            GL.getExtension(extName);
+            return GL.getExtension(extName) != null;
+        #else
+            return true;
         #end
     }
 
