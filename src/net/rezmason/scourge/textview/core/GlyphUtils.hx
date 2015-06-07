@@ -248,7 +248,7 @@ class GlyphUtils {
                     expressions.push(macro $p{['GlyphUtils', 'set_' + field.field]}(__gl__, ${field.expr}));
                 }
             case EBlock(exprs) if (exprs.length == 0):
-            case _: throw 'params argument must be and anonymous object.';
+            case _: throw 'params argument must be an anonymous object.';
         }
         expressions.push(macro __gl__);
         return macro $b{expressions};

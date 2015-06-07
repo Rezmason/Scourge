@@ -38,7 +38,6 @@ class SplashPage extends NavPage {
         var uiRect:Rectangle = new Rectangle(0.0, 0.4, 1.0, 0.6);
         uiRect.inflate(-0.02, -0.02);
         nav.scene.camera.rect = uiRect;
-        nav.scene.root.addChild(nav.body);
         nav.setFontSize(28);
         scenes.push(nav.scene);
 

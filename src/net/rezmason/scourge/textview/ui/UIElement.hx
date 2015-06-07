@@ -210,8 +210,8 @@ class UIElement {
         if (viewPixelWidth == 0 || viewPixelHeight == 0) return;
 
         glyphWidthInPixels = glyphHeightInPixels / body.glyphTexture.font.glyphRatio;
-        glyphWidth = glyphWidthInPixels * scene.camera.rect.width / viewPixelWidth;
-        glyphHeight = glyphHeightInPixels * scene.camera.rect.height / viewPixelHeight;
+        glyphWidth = glyphWidthInPixels / viewPixelWidth * scene.camera.rect.width;
+        glyphHeight = glyphHeightInPixels / viewPixelHeight * scene.camera.rect.height;
         
         body.glyphScale = glyphWidth;
         

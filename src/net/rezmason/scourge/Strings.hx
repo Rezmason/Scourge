@@ -21,11 +21,16 @@ class Strings {
     public inline static var SYMBOLS:String = '<>[]{}-=!@#$%^*()_+';
     public inline static var WEIRD_SYMBOLS:String = '¤¬øΔΩ•◊';
     
-    //public inline static var BOX_SYMBOLS:String = ' ╹╺┗╻┃┏┣╸┛━┻┓┫┳╋';
-    //public inline static var BOX_SYMBOLS:String = ' ╹╺╰╻┃╭┣╸╯━┻╮┫┳╋';
     //public inline static var BOX_SYMBOLS:String = ' ╵╶└╷│┌├╴┘─┴┐┤┬┼';
     public inline static var BOX_SYMBOLS:String = ' ╵╶╰╷│╭├╴╯─┴╮┤┬┼';
     public inline static var BODY_GLYPHS:String = ' пгчцълкпрншьэмж';
+
+    public inline static var BOTTOM_LEFT = '╰';
+    public inline static var BOTTOM_RIGHT = '╯';
+    public inline static var TOP_LEFT = '╭';
+    public inline static var TOP_RIGHT = '╮';
+    public inline static var HORIZONTAL = '─';
+    public inline static var VERTICAL = '│';
 
     public inline static var BOARD_CODE:Int = '+'.code(); // ¤
     public inline static var WALL_CODE:Int = '╋'.code();

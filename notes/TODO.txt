@@ -24,6 +24,8 @@ Where does the loupe live?
             One for player stats
             One for DNA?
 
+Try replacing Reflect-on-Dynamic with DynamicAccess
+
 Make the bots "use" the SwipeView
 
 There could be WAY more symbols than spaces, and it might look nicer

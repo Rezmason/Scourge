@@ -26,6 +26,7 @@ class FlatFont {
     var missingChars:Array<Int>;
     var defaultCharCoord:CharCoord;
     var jsonString:String;
+    var charUVs:Map<Int, Array<UV>>;
 
     public var glyphWidth(default, null):Int;
     public var glyphHeight(default, null):Int;
@@ -44,6 +45,7 @@ class FlatFont {
         this.jsonString = jsonString;
         charCoords = new Map();
         missingChars = [];
+        charUVs = new Map();
 
         var expandedJSON:FlatFontJSON = jsonString.parse();
         glyphWidth = expandedJSON.glyphWidth;
@@ -76,43 +78,29 @@ class FlatFont {
         return mat;
     }
 
-    public inline function getCharUVs(char:String, crop:Float = 0):Array<UV> {
-        return getCharCodeUVs(Utf8.charCodeAt(char, 0), crop);
+    public inline function getCharUVs(char:String):Array<UV> {
+        return getCharCodeUVs(Utf8.charCodeAt(char, 0));
     }
 
-    public inline function getCharCodeUVs(code:Int, crop:Float = 0):Array<UV> {
-        var charCoord:CharCoord = charCoords[code];
-        if (charCoord == null) charCoord = defaultCharCoord;
+    public inline function getCharCodeUVs(code:Int):Array<UV> {
+        var uvs:Array<UV> = charUVs[code];
+        if (uvs == null) {
+            uvs = [];
+            var charCoord:CharCoord = charCoords[code];
+            if (charCoord == null) charCoord = defaultCharCoord;
 
-        var bumpU:Float = 0.5 / bdWidth;
-        var bumpV:Float = 0.5 / bdHeight;
+            var bumpU:Float = 0.5 / bdWidth;
+            var bumpV:Float = 0.5 / bdHeight;
 
-        var uvs:Array<UV> = [];
-        var u:Float = charCoord.x / bdWidth;
-        var v:Float = charCoord.y / bdHeight;
+            var u:Float = charCoord.x / bdWidth;
+            var v:Float = charCoord.y / bdHeight;
 
-        uvs.push({u:u                  + bumpU, v:v               + bumpV});
-        uvs.push({u:u + columnFraction - bumpU, v:v               + bumpV});
-        uvs.push({u:u + columnFraction - bumpU, v:v + rowFraction - bumpV});
-        uvs.push({u:u                  + bumpU, v:v + rowFraction - bumpV});
-
-        if (crop != 0) {
-
-            var cropU:Float = crop * glyphWidth / bdWidth;
-
-            uvs[0].u += cropU;
-            uvs[1].u -= cropU;
-            uvs[2].u -= cropU;
-            uvs[3].u += cropU;
-
-            var cropV:Float = crop * glyphHeight / bdHeight;
-
-            uvs[0].v += cropV;
-            uvs[1].v += cropV;
-            uvs[2].v -= cropV;
-            uvs[3].v -= cropV;
+            uvs.push({u:u                  + bumpU, v:v               + bumpV});
+            uvs.push({u:u + columnFraction - bumpU, v:v               + bumpV});
+            uvs.push({u:u + columnFraction - bumpU, v:v + rowFraction - bumpV});
+            uvs.push({u:u                  + bumpU, v:v + rowFraction - bumpV});
+            charUVs[code] = uvs;
         }
-
         return uvs;
     }
 
