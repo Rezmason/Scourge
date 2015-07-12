@@ -1,7 +1,18 @@
-The Loupe
-    Draw it out
-    For now, just a Body with box drawing
-    Add it as child to board
+Loupe
+    
+    Okay, here's what's up
+        show loupe
+            LoupeDemo has a loupe
+            Arrow keys change loupe's size
+        Has a border box
+        Has a UIMediator
+        Floats over *everything*
+    The Loupe *snaps around* glyphs
+        Some method takes a Body and an array of IDs, transforms them into LoupeSpace, and *clones* them in the Loupe
+    The UIElement grows to surround these clones
+    And the border box grows to surround the UIElement
+    That's what's up.
+
     Add it as 'loupe' to injector
     Board interaction signal should drive LoupeSwipeSystem
         LoupeSwipeSystem converts dx and dy into cardinal motion
@@ -15,7 +26,7 @@ The Loupe
         Swapping should swap the piece
     Then, give it buttons
 
-Where does the loupe live?
+Where's this all going?
     SwipeView 2.0
         Round rectangles showing information
         You pull them out, they expand to loupes
