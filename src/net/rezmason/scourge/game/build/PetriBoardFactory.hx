@@ -1,7 +1,7 @@
 package net.rezmason.scourge.game.build;
 
 import net.rezmason.praxis.grid.GridDirection.*;
-import net.rezmason.scourge.XYZ;
+import net.rezmason.scourge.Vec3;
 import net.rezmason.scourge.game.build.PetriTypes;
 
 using net.rezmason.praxis.grid.GridUtils;
@@ -28,10 +28,10 @@ class PetriBoardFactory {
 
         // First, find the bounds of the rectangle containing all heads as if they were arranged on a circle
 
-        var headCoords:Array<XYZ> = [];
+        var headCoords:Array<Vec3> = [];
         for (ike in 0...numPlayers) {
             var angle:Float = Math.PI * (ike * headAngle + START_ANGLE);
-            var coord:XYZ = {x:0, y:0, z:0};
+            var coord:Vec3 = new Vec3(0, 0, 0);
             headCoords.push(coord);
             coord.x = Math.cos(angle) * innerRadius;
             coord.y = Math.sin(angle) * innerRadius;
@@ -111,7 +111,7 @@ class PetriBoardFactory {
     }
 
     inline static function addLocus(loci:Array<PetriLocus>, x:Float, y:Float):PetriLocus {
-        var locus = new PetriLocus(loci.length, {pos:{x:x, y:y, z:0}, isWall:false, isHead:false, owner:-1});
+        var locus = new PetriLocus(loci.length, {pos:new Vec3(x, y, 0), isWall:false, isHead:false, owner:-1});
         loci.push(locus);
         return locus;
     }
@@ -123,9 +123,9 @@ class PetriBoardFactory {
         for (locus in grid.run(E).walk(S)) locus.value.isWall = true;
     }
 
-    inline static function populateGraphHeads(grid:PetriLocus, headCoords:Array<XYZ>):Void {
+    inline static function populateGraphHeads(grid:PetriLocus, headCoords:Array<Vec3>):Void {
         for (ike in 0...headCoords.length) {
-            var coord:XYZ = headCoords[ike];
+            var coord:Vec3 = headCoords[ike];
             var head = grid.run(E, Std.int(coord.x)).run(S, Std.int(coord.y)).value;
             head.isHead = true;
             head.owner = ike;

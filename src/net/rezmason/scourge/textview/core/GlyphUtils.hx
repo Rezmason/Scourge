@@ -42,9 +42,9 @@ class GlyphUtils {
         set_b(gl, b);
     }
 
-    public inline static function get_color(gl:Glyph):Color return new Color(get_r(gl), get_g(gl), get_b(gl));
+    public inline static function get_color(gl:Glyph):Vec3 return new Vec3(get_r(gl), get_g(gl), get_b(gl));
 
-    public inline static function set_color(gl:Glyph, color:Color) {
+    public inline static function set_color(gl:Glyph, color:Vec3) {
         set_r(gl, color.r);
         set_g(gl, color.g);
         set_b(gl, color.b);
@@ -104,7 +104,7 @@ class GlyphUtils {
         set_z(gl, z);
     }
 
-    public inline static function set_pos(gl:Glyph, pos:XYZ) {
+    public inline static function set_pos(gl:Glyph, pos:Vec3) {
         set_x(gl, pos.x);
         set_y(gl, pos.y);
         set_z(gl, pos.z);
@@ -170,7 +170,7 @@ class GlyphUtils {
     public inline static function get_paint(gl:Glyph) return gl.paintHex;
 
     public inline static function set_paint(gl:Glyph, val:Int) {
-        #if debug if (val > 0xFFFF) throw 'Glyph cannot be painted color ${Color.fromHex(val)}'; #end
+        #if debug if (val > 0xFFFF) throw 'Glyph cannot be painted color ${Vec3.fromHex(val)}'; #end
         if (gl.paintHex != val) {
 
             var paintR = ((val >>  8) & 0xFF) / 0xFF;
