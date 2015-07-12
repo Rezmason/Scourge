@@ -33,6 +33,17 @@ class SplashPage extends NavPage {
         splashScene.root.addChild(splashDemo.body);
         scenes.push(splashScene);
 
+        /*
+        var box = new net.rezmason.scourge.textview.ui.BorderBox();
+        var boxScene = new Scene();
+        boxScene.camera.rect = new Rectangle(0, 0, 1, 1);
+        boxScene.root.addChild(box.body);
+        scenes.push(boxScene);
+        box.width = 0.85;
+        box.height = 0.75;
+        box.redraw();
+        */
+
         navMed = new UIMediator();
         nav = new UIElement(navMed);
         var uiRect:Rectangle = new Rectangle(0.0, 0.4, 1.0, 0.6);

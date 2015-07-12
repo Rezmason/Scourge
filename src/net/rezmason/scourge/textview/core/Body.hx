@@ -24,6 +24,7 @@ class Body extends SceneNode<Body> {
     public var fontChangedSignal(default, null):Zig<Void->Void>;
     public var interactionSignal(default, null):Zig<Int->Interaction->Void>;
     public var updateSignal(default, null):Zig<Float->Void>;
+    public var sceneSetSignal(default, null):Zig<Void->Void>;
 
     @:allow(net.rezmason.scourge.textview.core) var segments(default, null):Array<BodySegment>;
     @:allow(net.rezmason.scourge.textview.core) var params(default, null):Array<Float>;
@@ -37,6 +38,7 @@ class Body extends SceneNode<Body> {
         fontChangedSignal = new Zig();
         interactionSignal = new Zig();
         updateSignal = new Zig();
+        sceneSetSignal = new Zig();
         id = ++_ids;
         glyphs = [];
         var fontManager:FontManager = new Present(FontManager);
@@ -140,6 +142,7 @@ class Body extends SceneNode<Body> {
         if (this.scene != null) this.scene.resizeSignal.add(updateGlyphTransform);
         if (lastScene == null) for (segment in segments) segment.update();
         for (child in children()) child.setScene(scene);
+        sceneSetSignal.dispatch();
     }
 
     function updateGlyphTexture(glyphTexture:GlyphTexture):Void {

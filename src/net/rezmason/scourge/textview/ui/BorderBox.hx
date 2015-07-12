@@ -15,9 +15,12 @@ class BorderBox {
     public var width(default, set):Float = 0;
     public var height(default, set):Float = 0;
     public var glyphWidth(default, set):Float = 0.1;
-    public function new() {}
+    var redrawDeferred = false;
+    
+    public function new() body.sceneSetSignal.add(redraw);
 
     public function redraw() {
+        if (body.scene == null) return;
         body.glyphScale = glyphWidth * body.scene.camera.rect.width / body.glyphTexture.font.glyphRatio;
         var numGlyphsWide = Std.int(Math.ceil(width / glyphWidth));
         var numGlyphsHigh = Std.int(Math.ceil(height / glyphWidth));
