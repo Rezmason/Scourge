@@ -306,7 +306,9 @@ class UIElement {
             var dpi:Null<Float> = Reflect.field(flash.Lib.current.loaderInfo.parameters, 'dpi');
             if (dpi == null) dpi = NATIVE_DPI;
             return dpi;
-        #else return Capabilities.screenDPI;
+        #else
+            return NATIVE_DPI; // God damn it
+            // return Capabilities.screenDPI;
         #end
     }
 

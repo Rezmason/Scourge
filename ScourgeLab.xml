@@ -6,20 +6,17 @@
     <set name="fullscreen" unless="mac"/>
     <window width="720" height="720" fps="30" orientation="portrait" background="#000000" resizable="false"/>
     
-    <set name="BUILD_DIR" value="Export/Lab/release" unless="debug" />
-    <set name="BUILD_DIR" value="Export/Lab/debug" if="debug" />
+    <set name="BUILD_DIR" value="Export/ScourgeLab/release" unless="debug"/>
+    <set name="BUILD_DIR" value="Export/ScourgeLab/debug" if="debug"/>
     
     <classpath name="src"/>
     
     <haxedef name="advanced-telemetry" if="flash"/>
     <haxedef name="glsl2agal" if="flash"/>
     <haxedef name="stage3d" if="flash"/>
+    <haxedef name="dom" if="html5"/>
     <haxelib name="golems"/>
-    
-    <set name="html5-backend" value="openfl-html5-dom" />
-    <haxelib name="openfl" />
-    <set name="custom-html5-backend" />
-    <haxelib name="openfl-html5-revised" if="html5" />
+    <haxelib name="openfl"/>
     
     <assets path="shaders" include="*.vert|*.frag"/>
 

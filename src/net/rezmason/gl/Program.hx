@@ -10,6 +10,7 @@ import net.rezmason.gl.GLTypes;
 #else
     import openfl.gl.GL;
     import openfl.gl.GLShader;
+    import openfl.utils.Float32Array;
 #end
 
 @:allow(net.rezmason.gl)
@@ -34,6 +35,8 @@ class Program extends Artifact {
         ];
 
         static var vec:Vector<Float> = new Vector();
+    #else
+        var matrixArray:Float32Array;
     #end
 
     function new(vertSource:String, fragSource:String):Void {
@@ -52,6 +55,7 @@ class Program extends Artifact {
             prog.onLoad = handleLoad;
             prog.load(vertSource, fragSource);
         #else
+            matrixArray = new Float32Array(new Matrix3D().rawData);
             handleLoad();
         #end
     }
@@ -106,7 +110,9 @@ class Program extends Artifact {
             #if flash
                 prog.setUniformFromMatrix(location, matrix, true);
             #else
-                GL.uniformMatrix3D(location, false, matrix);
+                var mData = matrix.rawData;
+                for (ike in 0...mData.length) matrixArray[ike] = mData[ike];
+                GL.uniformMatrix4fv(location, false, matrixArray);
             #end
         }
     }
@@ -164,7 +170,7 @@ class Program extends Artifact {
         }
     }
 
-    inline function getUniformLocation(name:String):UniformLocation {
+    inline function getUniformLocation(name:String):Null<UniformLocation> {
         if (!uniformLocations.exists(name)) {
             #if flash
                 uniformLocations[name] = prog.getUniformLocation(name);
@@ -175,7 +181,7 @@ class Program extends Artifact {
         return uniformLocations[name];
     }
 
-    inline function getAttribsLocation(name:String):AttribsLocation {
+    inline function getAttribsLocation(name:String):Null<AttribsLocation> {
         if (!attribsLocations.exists(name)) {
             #if flash
                 attribsLocations[name] = prog.getAttribLocation(name);
