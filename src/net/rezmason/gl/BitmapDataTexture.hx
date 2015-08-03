@@ -5,6 +5,7 @@ import net.rezmason.gl.GLTypes;
 
 #if !flash
     import openfl.gl.GL;
+    import lime.graphics.PixelFormat;
 #end
 
 class BitmapDataTexture extends Texture {
@@ -29,7 +30,10 @@ class BitmapDataTexture extends Texture {
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
             
-            var pixelData = @:privateAccess (bitmapData.__image).data;
+            var image = @:privateAccess (bitmapData.__image).clone();
+            image.format = PixelFormat.RGBA32;
+            var pixelData = image.data;
+            
             GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, bitmapData.width, bitmapData.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pixelData);
             
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
