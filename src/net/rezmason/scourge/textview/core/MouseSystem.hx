@@ -36,6 +36,8 @@ class MouseSystem {
     var bitmapData:BitmapData;
     var rectRegionsByID:Map<Int, Rectangle>;
     var lastRectRegionID:Null<Int>;
+    var lastX:Float;
+    var lastY:Float;
     // var _view:MouseView;
 
     var hoverHit:Hit;
@@ -59,6 +61,8 @@ class MouseSystem {
         updateSignal = new Zig();
         rectRegionsByID = null;
         lastRectRegionID = null;
+        lastX = 0;
+        lastY = 0;
 
         hoverHit = NULL_HIT;
         pressHit = NULL_HIT;
@@ -107,6 +111,10 @@ class MouseSystem {
 
     public function setRectRegions(rectRegionsByID:Map<Int, Rectangle>):Void {
         this.rectRegionsByID = rectRegionsByID;
+        if (rectRegionsByID[lastRectRegionID] == null) {
+            lastRectRegionID = null;
+            onMouseMove(lastMoveEvent);
+        }
     }
 
     public function invalidate():Void invalid = true;
@@ -199,24 +207,9 @@ class MouseSystem {
     */
 
     function onMouseMove(event:MouseEvent):Void {
-
         if (!initialized) return;
-
-        if (invalid) {
-            if (bitmapData == null) {
-                bitmapData = new BitmapData(width, height, false, 0xFF00FF);
-                // _view.bitmap.bitmapData = bitmapData;
-            }
-
-            outputBuffer.resize(width, height);
-            if (data == null) data = outputBuffer.createReadbackData();
-
-            updateSignal.dispatch();
-            outputBuffer.readBack(outputBuffer, data);
-            // fartBD();
-
-            invalid = false;
-        }
+        if (event.stageX > 0 && event.stageX < 1) return; // God damn touch events!!
+        if (invalid) refresh();
 
         var hit:Hit = getHit(event.stageX, event.stageY);
         if (hitsEqual(hit, hoverHit)) {
@@ -228,17 +221,27 @@ class MouseSystem {
         }
 
         lastMoveEvent = event;
+        lastX = event.stageX;
+        lastY = event.stageY;
     }
     
     function onMouseDown(event:MouseEvent):Void {
         if (!initialized) return;
+        if (event.stageX > 0 && event.stageX < 1) return; // God damn touch events!!
+        if (invalid) refresh();
         pressHit = getHit(event.stageX, event.stageY);
+        lastX = event.stageX;
+        lastY = event.stageY;
         sendInteraction(pressHit, event, MOUSE_DOWN);
     }
 
     function onMouseUp(event:MouseEvent):Void {
         if (!initialized) return;
+        if (event.stageX > 0 && event.stageX < 1) return; // God damn touch events!!
+        if (invalid) refresh();
         var hit:Hit = getHit(event.stageX, event.stageY);
+        lastX = event.stageX;
+        lastY = event.stageY;
         sendInteraction(hit, event, MOUSE_UP);
         sendInteraction(pressHit, event, hitsEqual(hit, pressHit) ? CLICK : DROP);
         pressHit = NULL_HIT;
@@ -250,6 +253,22 @@ class MouseSystem {
             var y:Float = event == null ? Math.NaN : event.stageY;
             interact.dispatch(hit.bodyID, hit.glyphID, MOUSE(type, x, y));
         }
+    }
+
+    inline function refresh() {
+        if (bitmapData == null) {
+            bitmapData = new BitmapData(width, height, false, 0xFF00FF);
+            // _view.bitmap.bitmapData = bitmapData;
+        }
+
+        outputBuffer.resize(width, height);
+        if (data == null) data = outputBuffer.createReadbackData();
+
+        updateSignal.dispatch();
+        outputBuffer.readBack(outputBuffer, data);
+        // fartBD();
+
+        invalid = false;
     }
 
     /*
