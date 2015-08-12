@@ -3,7 +3,7 @@ package net.rezmason.gl;
 #if flash
     typedef BlendFactor = flash.display3D.Context3DBlendFactor;
 #else
-    import openfl.gl.GL;
+    import lime.graphics.opengl.GL;
 
     abstract BlendFactor(Int) {
         inline function new(val:Int):Void this = val;

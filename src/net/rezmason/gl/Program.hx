@@ -1,6 +1,5 @@
 package net.rezmason.gl;
 
-import flash.geom.Matrix3D;
 import net.rezmason.gl.Data;
 import net.rezmason.gl.GLTypes;
 
@@ -8,9 +7,9 @@ import net.rezmason.gl.GLTypes;
     import flash.Vector;
     import flash.display3D.Context3DVertexBufferFormat;
 #else
-    import openfl.gl.GL;
-    import openfl.gl.GLShader;
-    import openfl.utils.Float32Array;
+    import lime.graphics.opengl.GL;
+    import lime.graphics.opengl.GLShader;
+    import lime.utils.Float32Array;
 #end
 
 @:allow(net.rezmason.gl)
@@ -36,7 +35,7 @@ class Program extends Artifact {
 
         static var vec:Vector<Float> = new Vector();
     #else
-        var matrixArray:Float32Array;
+        
     #end
 
     function new(vertSource:String, fragSource:String):Void {
@@ -55,7 +54,6 @@ class Program extends Artifact {
             prog.onLoad = handleLoad;
             prog.load(vertSource, fragSource);
         #else
-            matrixArray = new Float32Array(new Matrix3D().rawData);
             handleLoad();
         #end
     }
@@ -104,15 +102,13 @@ class Program extends Artifact {
         attribsLocations = null;
     }
 
-    public inline function setProgramConstantsFromMatrix(uName:String, matrix:Matrix3D):Void {
+    public inline function setProgramConstantsFromMatrix(uName:String, matrix:Matrix4):Void {
         var location = getUniformLocation(uName);
         if (location != null) {
             #if flash
                 prog.setUniformFromMatrix(location, matrix, true);
             #else
-                var mData = matrix.rawData;
-                for (ike in 0...mData.length) matrixArray[ike] = mData[ike];
-                GL.uniformMatrix4fv(location, false, matrixArray);
+                GL.uniformMatrix4fv(location, false, matrix);
             #end
         }
     }

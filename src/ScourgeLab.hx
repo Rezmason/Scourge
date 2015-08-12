@@ -1,9 +1,20 @@
 package;
 
-class ScourgeLab {
+import lime.app.Application;
 
-    public static function main():Void {
+class ScourgeLab extends Application {
+    
+    override public function exec() {
         #if flash flash.Lib.redirectTraces(); #end
-        new net.rezmason.scourge.Lab(flash.Lib.current.stage);
+        new net.rezmason.scourge.Lab(window.width, window.height);
+        return super.exec();
+    }
+
+    public override function onRenderContextLost():Void {
+        super.onRenderContextLost();
+    }
+
+    public override function onRenderContextRestored(_):Void {
+        super.onRenderContextRestored(_);
     }
 }

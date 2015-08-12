@@ -3,9 +3,9 @@ package net.rezmason.gl;
 import net.rezmason.gl.GLTypes;
 
 #if !flash
-    import openfl.gl.GL;
-    import openfl.gl.GLFramebuffer;
-    import openfl.gl.GLRenderbuffer;
+    import lime.graphics.opengl.GL;
+    import lime.graphics.opengl.GLFramebuffer;
+    import lime.graphics.opengl.GLRenderbuffer;
 #end
 
 @:allow(net.rezmason.gl)

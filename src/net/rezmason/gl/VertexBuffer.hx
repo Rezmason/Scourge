@@ -5,7 +5,7 @@ import net.rezmason.gl.BufferUsage;
 import net.rezmason.gl.Data;
 
 #if !flash
-    import openfl.gl.GL;
+    import lime.graphics.opengl.GL;
 #end
 
 @:allow(net.rezmason.gl)

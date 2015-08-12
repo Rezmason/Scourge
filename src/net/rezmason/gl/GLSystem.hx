@@ -1,21 +1,21 @@
 package net.rezmason.gl;
 
-import flash.display.BitmapData;
-import flash.geom.Rectangle;
-import flash.Lib;
-
 import net.rezmason.gl.GLTypes;
 
 #if flash
+    import flash.Lib;
+    import flash.display.BitmapData;
     import flash.display.Stage;
     import flash.display3D.Context3DCompareMode;
     import flash.display3D.Context3DProfile;
     import flash.display3D.Context3DRenderMode;
     import flash.display3D.Context3DTextureFormat;
     import flash.events.Event;
+    import flash.geom.Rectangle;
 #else
-    import openfl.display.OpenGLView;
-    import openfl.gl.GL;
+    import lime.app.Application;
+    import lime.graphics.Renderer;
+    import lime.graphics.opengl.GL;
 #end
 
 class GLSystem {
@@ -26,7 +26,7 @@ class GLSystem {
         var stage:Stage;
         var stageRect:Rectangle;
     #else
-        var openGLView:OpenGLView;
+        var renderer:Renderer;
     #end
 
     var context:Context;
@@ -69,15 +69,10 @@ class GLSystem {
                 stage3D.requestContext3D(cast Context3DRenderMode.AUTO, cast "standard"); // Context3DProfile.STANDARD
             }
         #else
-            if (OpenGLView.isSupported) {
-                openGLView = new OpenGLView();
-                context = GL;
-                Lib.current.stage.addChild(openGLView);
-                initialized = true;
-                onConnect();
-            } else {
-                trace('OpenGLView isn\'t supported.');
-            }
+            renderer = Application.current.renderer;
+            context = GL;
+            initialized = true;
+            onConnect();
         #end
     }
 
@@ -131,7 +126,7 @@ class GLSystem {
             stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
             stage.addEventListener(Event.RESIZE, onResize);
         #else
-            openGLView.render = onRender;
+            renderer.onRender.add(function(_) onRender(new Rectangle(0, 0, renderer.window.width, renderer.window.height)));
         #end
         for (artifact in artifacts) {
             if (artifact.isDisposed) artifacts.remove(artifact);
@@ -195,8 +190,8 @@ class GLSystem {
         return registerArtifact(new ReadbackOutputBuffer());
     }
     
-    public inline function createBitmapDataTexture(bmd:BitmapData):BitmapDataTexture {
-        return registerArtifact(new BitmapDataTexture(bmd));
+    public inline function createImageTexture(img:Image):ImageTexture {
+        return registerArtifact(new ImageTexture(img));
     }
 
     public inline function setProgram(program:Program):Void {
@@ -226,8 +221,8 @@ class GLSystem {
     }
 
     public inline function enableExtension(extName:String):Void {
-        #if js
-            trace('$extName --> ${@:privateAccess (GL.context).getExtension(extName)}');
+        #if !flash
+            GL.getExtension(extName);
         #end
     }
 

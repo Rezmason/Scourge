@@ -8,7 +8,7 @@ package net.rezmason.gl;
         var DYNAMIC_DRAW = "dynamicDraw";
     }
 #else
-    import openfl.gl.GL;
+    import lime.graphics.opengl.GL;
     @:enum abstract BufferUsage(Int) {
         @:to public inline function toInt():Int return cast this;
         var STATIC_DRAW = GL.STATIC_DRAW;

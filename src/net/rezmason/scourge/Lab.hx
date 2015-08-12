@@ -1,13 +1,10 @@
 package net.rezmason.scourge;
 
-import openfl.Assets.*;
-import flash.Vector;
-import flash.display.Stage;
-import flash.geom.Matrix3D;
-import flash.geom.Vector3D;
+import lime.Assets.*;
 
 import net.rezmason.gl.*;
 import net.rezmason.gl.Data;
+import net.rezmason.gl.GLTypes;
 
 import net.rezmason.scourge.waves.WavePool;
 import net.rezmason.scourge.waves.Ripple;
@@ -17,14 +14,16 @@ import net.rezmason.utils.Zig;
 
 class Lab {
 
-    var stage:Stage;
+    var width:Int;
+    var height:Int;
     var glSys:GLSystem;
     var glFlow:GLFlowControl;
     var metaballSystem:MetaballSystem;
     var postSystem:PostSystem;
 
-    public function new(stage:Stage):Void {
-        this.stage = stage;
+    public function new(width:Int, height:Int):Void {
+        this.width = width;
+        this.height = height;
         glSys = new GLSystem();
         glFlow = glSys.getFlowControl();
         glFlow.onConnect = onConnect;
@@ -32,10 +31,10 @@ class Lab {
     }
 
     function onConnect():Void {
-        metaballSystem = new MetaballSystem(glSys, stage.stageWidth, stage.stageHeight);
+        metaballSystem = new MetaballSystem(glSys, width, height);
         metaballSystem.loadSig.add(onLoaded);
         
-        postSystem = new PostSystem(glSys, stage.stageWidth, stage.stageHeight, metaballSystem);
+        postSystem = new PostSystem(glSys, width, height, metaballSystem);
         postSystem.loadSig.add(onLoaded);
         
         metaballSystem.init();
@@ -123,8 +122,8 @@ class PostSystem extends LabSystem {
     var params:Array<Float>;
     var params2:Array<Float>;
 
-    var lightVector:Vector3D;
-    var globMat:Matrix3D;
+    var lightVector:Vector4;
+    var globMat:Matrix4;
     var time:Float;
 
     public function new(glSys:GLSystem, width:Int, height:Int, metaballSystem:MetaballSystem):Void {
@@ -151,14 +150,14 @@ class PostSystem extends LabSystem {
         params2 = [nudge, outerGlow, 0, 0];
         color = [0.4, 0.9, 0.1, 1.0];
 
-        lightVector = new Vector3D(1, 1, 1);
+        lightVector = new Vector4(1, 1, 1);
         lightVector.normalize();
         light = [lightVector.x, lightVector.y, lightVector.z, lightVector.w];
 
-        globMat = new Matrix3D();
+        globMat = new Matrix4();
         
         metaballTexture = cast(metaballSystem.buffer, TextureOutputBuffer).texture;
-        globTexture = glSys.createBitmapDataTexture(getBitmapData('metaballs/glob.png'));
+        globTexture = glSys.createImageTexture(getImage('metaballs/glob.png'));
 
         buffer = glSys.viewportOutputBuffer;
         buffer.resize(width, height);
@@ -264,7 +263,7 @@ class PostSystem extends LabSystem {
 
         globMat.identity();
         globMat.appendTranslation(-0.5, -0.5, -0.0);
-        globMat.appendRotation(time, Vector3D.Z_AXIS);
+        globMat.appendRotation(time, Vector4.Z_AXIS);
         globMat.appendTranslation(0.5, 0.5, 0.0);
 
         //params[2] = Math.cos(time) + 0.8;
@@ -313,8 +312,8 @@ class MetaballSystem extends LabSystem {
     var texture:Texture;
     var program:Program;
 
-    var bodyTransform:Matrix3D;
-    var cameraTransform:Matrix3D;
+    var bodyTransform:Matrix4;
+    var cameraTransform:Matrix4;
 
     public var buffer:OutputBuffer;
 
@@ -338,11 +337,11 @@ class MetaballSystem extends LabSystem {
         time = 0;
 
         glSys.enableExtension("OES_texture_float"); // THIS IS NEEDED for all textures to be floating point
-        texture = glSys.createBitmapDataTexture(getBitmapData('metaballs/metaball.png'));
+        texture = glSys.createImageTexture(getImage('metaballs/metaball.png'));
 
-        bodyTransform = new Matrix3D();
-        cameraTransform = new Matrix3D();
-        cameraTransform.rawData = Vector.ofArray(cast [2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1]);
+        bodyTransform = new Matrix4();
+        cameraTransform = new Matrix4();
+        cameraTransform.rawData = cast [2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1];
 
         buffer = glSys.createTextureOutputBuffer();
         buffer.resize(width, height);
@@ -483,7 +482,7 @@ class MetaballSystem extends LabSystem {
     override function update():Void {
         time += 0.2;
         
-        //bodyTransform.appendRotation(1, Vector3D.Z_AXIS);
+        //bodyTransform.appendRotation(1, Vector4.Z_AXIS);
 
         pool.update(0.2);
 

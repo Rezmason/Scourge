@@ -7,7 +7,7 @@ import net.rezmason.gl.Data;
     import flash.display.BitmapData;
     import flash.display3D.Context3DTextureFormat;
 #else
-    import openfl.gl.GL;
+    import lime.graphics.opengl.GL;
 #end
 
 class TextureOutputBuffer extends OutputBuffer {

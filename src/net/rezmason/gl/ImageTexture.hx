@@ -1,28 +1,28 @@
 package net.rezmason.gl;
 
-import flash.display.BitmapData;
 import net.rezmason.gl.GLTypes;
 
 #if !flash
-    import openfl.gl.GL;
+    import lime.graphics.opengl.GL;
     import lime.graphics.PixelFormat;
 #end
 
-class BitmapDataTexture extends Texture {
+class ImageTexture extends Texture {
 
-    var bitmapData:BitmapData;
+    var image:Image;
     var nativeTexture:NativeTexture;
 
-    public function new(bitmapData:BitmapData):Void {
+    public function new(image:Image):Void {
         super();
-        this.bitmapData = bitmapData;
+        this.image = image;
     }
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
         #if flash
-            var recTex = context.createRectangleTexture(bitmapData.width, bitmapData.height, cast "rgbaHalfFloat", false); // Context3DTextureFormat.RGBA_HALF_FLOAT
-            recTex.uploadFromBitmapData(bitmapData);
+            var recTex = context.createRectangleTexture(image.width, image.height, cast "rgbaHalfFloat", false); // Context3DTextureFormat.RGBA_HALF_FLOAT
+            var bmd = @:privateAccess image.buffer.__srcBitmapData;
+            recTex.uploadFromBitmapData(bmd);
             nativeTexture = recTex;
         #else
             nativeTexture = GL.createTexture();
@@ -30,11 +30,11 @@ class BitmapDataTexture extends Texture {
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
             
-            var image = @:privateAccess (bitmapData.__image).clone();
-            image.format = PixelFormat.RGBA32;
-            var pixelData = image.data;
+            var tempImage = image.clone();
+            tempImage.format = PixelFormat.RGBA32;
+            var pixelData = tempImage.data;
             
-            GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, bitmapData.width, bitmapData.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pixelData);
+            GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, image.width, image.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pixelData);
             
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
             GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);

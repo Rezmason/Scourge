@@ -3,7 +3,7 @@ package net.rezmason.gl;
 import net.rezmason.gl.GLTypes;
 
 #if !flash
-    import openfl.gl.GL;
+    import lime.graphics.opengl.GL;
 #end
 
 class ViewportOutputBuffer extends OutputBuffer {

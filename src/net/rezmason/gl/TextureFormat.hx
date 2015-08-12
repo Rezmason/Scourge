@@ -1,7 +1,7 @@
 package net.rezmason.gl;
 
 #if !flash
-    import openfl.gl.GL;
+    import lime.graphics.opengl.GL;
 #end
 
 #if flash
