@@ -1,9 +1,12 @@
 package;
 
-class Scourge {
-    public static function main():Void {
+import lime.app.Application;
+
+class Scourge extends Application {
+    override public function exec() {
         #if flash flash.Lib.redirectTraces(); #end
-        trace('\n${openfl.Assets.getText('text/splash.txt')}');
+        trace('\n${lime.Assets.getText('text/splash.txt')}');
         new net.rezmason.scourge.Context();
+        return super.exec();
     }
 }

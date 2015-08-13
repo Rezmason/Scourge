@@ -1,7 +1,7 @@
 package net.rezmason.scourge.textview.console;
 
-import flash.ui.Keyboard;
-
+import lime.ui.KeyCode;
+import lime.ui.KeyModifier;
 import haxe.Timer;
 import haxe.Utf8;
 
@@ -115,27 +115,27 @@ class Interpreter {
     /**
      * Sort of the "entry point". The majority of the work starts here.
      */
-    function handleKeyboard(key:UInt, charCode:UInt, alt:Bool, ctrl:Bool):Void {
+    function handleKeyboard(keyCode:KeyCode, modifier:KeyModifier):Void {
 
         clearInteractiveTokens();
 
-        switch (key) {
-            case Keyboard.BACKSPACE: handleBackspace(alt, ctrl);
-            case Keyboard.ENTER: handleEnter();
-            case Keyboard.ESCAPE: handleEscape();
-            case Keyboard.LEFT: handleCaretLeft(alt, ctrl);
-            case Keyboard.RIGHT: handleCaretRight(alt, ctrl);
-            case Keyboard.UP: handleUp();
-            case Keyboard.DOWN: handleDown();
-            case Keyboard.TAB: handleTab();
+        switch (keyCode) {
+            case BACKSPACE: handleBackspace(modifier.altKey, modifier.ctrlKey);
+            case RETURN: handleEnter();
+            case ESCAPE: handleEscape();
+            case LEFT: handleCaretLeft(modifier.altKey, modifier.ctrlKey);
+            case RIGHT: handleCaretRight(modifier.altKey, modifier.ctrlKey);
+            case UP: handleUp();
+            case DOWN: handleDown();
+            case TAB: handleTab();
             case _:
-                if (charCode > 0) {
-                    if (ctrl) handleHotKey(charCode, alt);
-                    else handleChar(charCode);
+                if (keyCode != UNKNOWN) {
+                    if (modifier.ctrlKey) handleHotKey(keyCode, modifier.altKey);
+                    else handleChar(keyCode);
                 }
         }
 
-        if (key != Keyboard.LEFT && key != Keyboard.RIGHT) checkForActionHintCondition();
+        if (keyCode != LEFT && keyCode != RIGHT) checkForActionHintCondition();
         else actionHintString = '';
 
         combineStrings();

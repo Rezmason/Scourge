@@ -118,7 +118,6 @@ class Engine {
         glFlow.onRender = onRender;
         glFlow.onDisconnect = onDisconnect;
         glFlow.onConnect = onConnect;
-        // mouseSystem.view.addEventListener(MouseEvent.CLICK, onMouseViewClick);
     }
 
     function onRender(width:Int, height:Int):Void {
@@ -221,8 +220,6 @@ class Engine {
             Timer.delay(glFlow.connect, mils);
         }
     }
-
-    // function onMouseViewClick(?event:Event):Void mouseSystem.invalidate();
 
     function handleInteraction(bodyID:Null<Int>, glyphID:Null<Int>, interaction:Interaction):Void {
         fetchBodies();

@@ -63,7 +63,7 @@ class AlphabetDemo {
                     case CLICK: glyph.set_s(3 - glyph.get_s());
                     case _:
                 }
-            case KEYBOARD(type, key, char, shift, alt, ctrl):
+            case KEYBOARD(type, keyCode, modifier):
         }
     }
 }

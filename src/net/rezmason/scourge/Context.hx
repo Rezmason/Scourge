@@ -1,8 +1,6 @@
 package net.rezmason.scourge;
 
-import flash.Lib;
-import flash.display.Stage;
-import flash.events.Event;
+import lime.app.Application;
 
 import net.rezmason.scourge.GameContext;
 import net.rezmason.scourge.textview.NavSystem;
@@ -15,13 +13,14 @@ import net.rezmason.utils.santa.Santa;
 
 class Context {
 
-    var stage:Stage;
+    var shim:Shim;
     var engine:Engine;
     var glSys:GLSystem;
     var glFlow:GLFlowControl;
 
     public function new():Void {
-        stage = Lib.current.stage;
+        shim = new Shim();
+        Application.current.addModule(shim);
         glSys = new GLSystem();
         glFlow = glSys.getFlowControl();
         glFlow.onConnect = onGLConnect;
@@ -31,7 +30,7 @@ class Context {
     function onGLConnect():Void {
         glFlow.onConnect = null;
         Santa.mapToClass(GLSystem, Singleton(glSys));
-        Santa.mapToClass(Stage, Singleton(stage));
+        Santa.mapToClass(Shim, Singleton(shim));
         Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));
 
         makeEngine();
@@ -46,13 +45,14 @@ class Context {
     }
 
     function addListeners():Void {
-        stage.addEventListener(Event.ACTIVATE, onActivate);
-        stage.addEventListener(Event.DEACTIVATE, onDeactivate);
-        stage.addEventListener(Event.RESIZE, onResize);
+        shim.activateSignal.add(engine.activate);
+        shim.deactivateSignal.add(engine.deactivate);
+        shim.resizeSignal.add(engine.setSize);
 
-        // these kind of already happened, so we just trigger them
-        onResize();
-        onActivate();
+        #if flash flash.Lib.current.stage.dispatchEvent(new flash.events.Event('resize')); #end
+        var window = Application.current.window;
+        engine.setSize(window.width, window.height);
+        engine.activate();
     }
 
     function makeNavSystem():Void {
@@ -63,8 +63,4 @@ class Context {
 
         navSystem.goto(Page(ScourgeNavPageAddresses.SPLASH));
     }
-
-    function onResize(?event:Event):Void engine.setSize(stage.stageWidth, stage.stageHeight);
-    function onActivate(?event:Event):Void engine.activate();
-    function onDeactivate(?event:Event):Void engine.deactivate();
 }

@@ -1,4 +1,6 @@
 Lime conversion
+    Flash init step
+    Refactor shim, engine, GLSystem
 Colors should be Vec3, not Int
     Lab
     Interpreter
@@ -21,11 +23,6 @@ Loupe
     The UIElement grows to surround these clones
     And the border box grows to surround the UIElement
     That's what's up.
-
-Fix bitmap texture; it's obviously broken in html5 ScourgeLab
-    [Warning] WebGL: drawElements: texture bound to texture unit 0 is not renderable. It maybe non-power-of-2 and have incompatible texture filtering or is not 'texture complete', or it is a float/half-float type with linear filtering and without the relevant float/half-float linear extension enabled. (webgl-debug.js, line 232)
-    [Log] WebGL error INVALID_ENUM in drawElements(TRIANGLES, 6, UNSIGNED_SHORT, 0) (webgl-debug.js, line 15)
-    [Log] WebGL error INVALID_ENUM in bindBuffer(ARRAY_BUFFER, [object WebGLBuffer]) (webgl-debug.js, line 15)
 
     Add it as 'loupe' to injector
     Board interaction signal should drive LoupeSwipeSystem

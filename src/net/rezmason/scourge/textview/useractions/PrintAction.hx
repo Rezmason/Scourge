@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.useractions;
 
-import openfl.Assets.*;
+import lime.Assets.*;
 import net.rezmason.scourge.textview.console.UserAction;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.ConsoleUtils.*;

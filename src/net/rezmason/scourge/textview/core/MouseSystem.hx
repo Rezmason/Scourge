@@ -1,13 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.display.BitmapData;
-import flash.display.Sprite;
-import flash.display.Stage;
-import flash.events.MouseEvent;
 import net.rezmason.gl.GLTypes;
-// import flash.geom.Matrix;
-import flash.utils.ByteArray;
-import flash.Vector;
 
 import net.rezmason.gl.GLSystem;
 import net.rezmason.gl.ReadbackOutputBuffer;
@@ -22,47 +15,41 @@ typedef Hit = {
     var glyphID:Null<Int>;
 }
 
+typedef XY = { x:Float, y:Float };
+
 class MouseSystem {
 
     static var NULL_HIT:Hit = {bodyID:null, glyphID:null};
 
     public var isAttached(default, null):Bool;
     public var outputBuffer(default, null):ReadbackOutputBuffer;
-    // public var view(get, null):Sprite;
     public var invalid(default, null):Bool;
     public var interact(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
     public var updateSignal(default, null):Zig<Void->Void>;
     var data:ReadbackData;
-    var bitmapData:BitmapData;
     var rectRegionsByID:Map<Int, Rectangle>;
     var lastRectRegionID:Null<Int>;
     var lastX:Float;
     var lastY:Float;
-    // var _view:MouseView;
-
+    
     var hoverHit:Hit;
     var pressHit:Hit;
-    var lastMoveEvent:MouseEvent;
     var width:Int;
     var height:Int;
     var initialized:Bool;
     var glSys:GLSystem;
-    var stage:Stage;
+    var shim:Shim;
 
     public function new():Void {
-        // _view = new MouseView(0.2, 1);
-        // _view = new MouseView(0.2, 40);
-        // _view = new MouseView(1.0, 40, 0.5);
-        // stage.addChild(_view);
         isAttached = false;
         interact = new Zig();
-        stage = new Present(Stage);
+        shim = new Present(Shim);
         glSys = new Present(GLSystem);
         updateSignal = new Zig();
         rectRegionsByID = null;
         lastRectRegionID = null;
-        lastX = 0;
-        lastY = 0;
+        lastX = Math.NaN;
+        lastY = Math.NaN;
 
         hoverHit = NULL_HIT;
         pressHit = NULL_HIT;
@@ -78,9 +65,9 @@ class MouseSystem {
     public function attach():Void {
         if (!isAttached) {
             isAttached = true;
-            stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-            stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-            stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+            shim.mouseMoveSignal.add(onMouseMove);
+            shim.mouseDownSignal.add(onMouseDown);
+            shim.mouseUpSignal.add(onMouseUp);
             invalidate();
         }
     }
@@ -88,9 +75,9 @@ class MouseSystem {
     public function detach():Void {
         if (isAttached) {
             isAttached = false;
-            stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-            stage.removeEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-            stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+            shim.mouseMoveSignal.remove(onMouseMove);
+            shim.mouseDownSignal.remove(onMouseDown);
+            shim.mouseUpSignal.remove(onMouseUp);
         }
     }
 
@@ -99,12 +86,7 @@ class MouseSystem {
             initialized = true;
             this.width = width;
             this.height = height;
-
-            if (bitmapData != null) bitmapData.dispose();
-            bitmapData = null;
-            // _view.bitmap.bitmapData = null;
             data = null;
-
             invalidate();
         }
     }
@@ -113,7 +95,7 @@ class MouseSystem {
         this.rectRegionsByID = rectRegionsByID;
         if (rectRegionsByID[lastRectRegionID] == null) {
             lastRectRegionID = null;
-            onMouseMove(lastMoveEvent);
+            onMouseMove(lastX, lastY);
         }
     }
 
@@ -172,8 +154,6 @@ class MouseSystem {
             glyphID = rawID & 0xFFFF;
         }
 
-        // _view.update(x, y, rawID);
-
         return {bodyID:bodyID, glyphID:glyphID};
     }
 
@@ -181,101 +161,57 @@ class MouseSystem {
         return (data[index] << 16) | (data[index + 1] << 8) | (data[index + 2] << 0);
     }
 
-    /*
-    function fartBD():Void {
-
-        var byteArray:ByteArray = #if js new FriendlyByteArray(data) #else data #end ;
-        byteArray.position = 0;
-
-        var dupe:BitmapData = bitmapData.clone();
-        dupe.setPixels(bitmapData.rect, byteArray);
-
-        var flipMat:Matrix = new Matrix();
-        #if js
-            flipMat.scale(1, -1);
-            flipMat.translate(0, dupe.height);
-        #end
-
-        bitmapData.lock();
-        bitmapData.fillRect(bitmapData.rect, 0xFF000000);
-        bitmapData.draw(dupe, flipMat);
-        bitmapData.unlock();
-        dupe.dispose();
-
-        _view.bitmap.bitmapData = bitmapData;
-    }
-    */
-
-    function onMouseMove(event:MouseEvent):Void {
+    function onMouseMove(x:Float, y:Float):Void {
         if (!initialized) return;
-        if (event.stageX > 0 && event.stageX < 1) return; // God damn touch events!!
+        if (x > 0 && x < 1) return; // God damn touch events!!
         if (invalid) refresh();
 
-        var hit:Hit = getHit(event.stageX, event.stageY);
+        var hit:Hit = getHit(x, y);
         if (hitsEqual(hit, hoverHit)) {
-            sendInteraction(hit, event, MOVE);
+            sendInteraction(hit, x, y, MOVE);
         } else {
-            sendInteraction(hoverHit, event, EXIT);
+            sendInteraction(hoverHit, x, y, EXIT);
             hoverHit = hit;
-            sendInteraction(hoverHit, event, ENTER);
+            sendInteraction(hoverHit, x, y, ENTER);
         }
 
-        lastMoveEvent = event;
-        lastX = event.stageX;
-        lastY = event.stageY;
+        lastX = x;
+        lastY = y;
     }
     
-    function onMouseDown(event:MouseEvent):Void {
+    function onMouseDown(x:Float, y:Float, button:Int):Void {
         if (!initialized) return;
-        if (event.stageX > 0 && event.stageX < 1) return; // God damn touch events!!
+        if (x > 0 && x < 1) return; // God damn touch events!!
         if (invalid) refresh();
-        pressHit = getHit(event.stageX, event.stageY);
-        lastX = event.stageX;
-        lastY = event.stageY;
-        sendInteraction(pressHit, event, MOUSE_DOWN);
+        pressHit = getHit(x, y);
+        lastX = x;
+        lastY = y;
+        sendInteraction(pressHit, x, y, MOUSE_DOWN);
     }
 
-    function onMouseUp(event:MouseEvent):Void {
+    function onMouseUp(x:Float, y:Float, button:Int):Void {
         if (!initialized) return;
-        if (event.stageX > 0 && event.stageX < 1) return; // God damn touch events!!
+        if (x> 0 && x< 1) return; // God damn touch events!!
         if (invalid) refresh();
-        var hit:Hit = getHit(event.stageX, event.stageY);
-        lastX = event.stageX;
-        lastY = event.stageY;
-        sendInteraction(hit, event, MOUSE_UP);
-        sendInteraction(pressHit, event, hitsEqual(hit, pressHit) ? CLICK : DROP);
+        var hit:Hit = getHit(x, y);
+        lastX = x;
+        lastY = y;
+        sendInteraction(hit, x, y, MOUSE_UP);
+        sendInteraction(pressHit, x, y, hitsEqual(hit, pressHit) ? CLICK : DROP);
         pressHit = NULL_HIT;
     }
 
-    inline function sendInteraction(hit:Hit, event:MouseEvent, type:MouseInteractionType):Void {
-        if (hit.bodyID != null) {
-            var x:Float = event == null ? Math.NaN : event.stageX;
-            var y:Float = event == null ? Math.NaN : event.stageY;
-            interact.dispatch(hit.bodyID, hit.glyphID, MOUSE(type, x, y));
-        }
+    inline function sendInteraction(hit:Hit, x:Float, y:Float, type:MouseInteractionType):Void {
+        if (hit.bodyID != null) interact.dispatch(hit.bodyID, hit.glyphID, MOUSE(type, x, y));
     }
 
     inline function refresh() {
-        if (bitmapData == null) {
-            bitmapData = new BitmapData(width, height, false, 0xFF00FF);
-            // _view.bitmap.bitmapData = bitmapData;
-        }
-
         outputBuffer.resize(width, height);
         if (data == null) data = outputBuffer.createReadbackData();
-
         updateSignal.dispatch();
         outputBuffer.readBack(outputBuffer, data);
-        // fartBD();
-
         invalid = false;
     }
-
-    /*
-    function get_view():Sprite {
-        return _view;
-    }
-    */
 
     inline function hitsEqual(h1:Hit, h2:Hit):Bool {
         var val:Bool = false;
@@ -285,24 +221,3 @@ class MouseSystem {
     }
 
 }
-/*
-#if js
-
-    // This is only used for visual debugging, so I'm kind of okay with not including it in OpenFL
-
-    class FriendlyByteArray extends ByteArray {
-
-        public function new(?input:ReadbackData):Void {
-            if (input == null) super();
-            else setBytes(input);
-        }
-
-        public function setBytes(input:ReadbackData):Void {
-            byteView = input;
-            length = input.length;
-            allocated = length;
-            this.data = untyped __new__('DataView', input.buffer);
-        }
-    }
-#end
-*/

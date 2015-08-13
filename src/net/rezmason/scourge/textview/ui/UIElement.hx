@@ -1,7 +1,6 @@
 package net.rezmason.scourge.textview.ui;
 
 import net.rezmason.gl.GLTypes;
-import flash.system.Capabilities;
 
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.CameraScaleMode;
@@ -307,7 +306,6 @@ class UIElement {
             return dpi;
         #else
             return NATIVE_DPI; // God damn it
-            // return Capabilities.screenDPI;
         #end
     }
 

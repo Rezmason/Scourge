@@ -1,7 +1,6 @@
 package net.rezmason.scourge.textview.demo;
 
 import net.rezmason.gl.GLTypes;
-import flash.ui.Keyboard;
 
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Glyph;
@@ -110,12 +109,12 @@ class EyeCandyDemo {
                     case MOVE, ENTER, EXIT: if (dragging) updateDrag(x, y);
                     case _:
                 }
-            case KEYBOARD(type, key, char, shift, alt, ctrl):
+            case KEYBOARD(type, keyCode, modifier):
                 if (type == KEY_DOWN) {
-                    switch (key) {
-                        case Keyboard.LEFT:  setSize(Std.int(body.numGlyphs * (shift ? 0.666 : 0.9)));
-                        case Keyboard.RIGHT: setSize(Std.int(body.numGlyphs * (shift ? 1.500 : 1.1)));
-                        case _: setGlobalChar(cast char);
+                    switch (keyCode) {
+                        case LEFT:  setSize(Std.int(body.numGlyphs * (modifier.shiftKey ? 0.666 : 0.9)));
+                        case RIGHT: setSize(Std.int(body.numGlyphs * (modifier.shiftKey ? 1.500 : 1.1)));
+                        case _: setGlobalChar(cast keyCode);
                     }
                 }
         }

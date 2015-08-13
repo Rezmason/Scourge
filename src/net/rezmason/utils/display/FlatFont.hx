@@ -1,7 +1,5 @@
 package net.rezmason.utils.display;
 
-// import flash.display.BitmapData;
-// import flash.geom.Matrix;
 import lime.graphics.Image;
 
 import haxe.Utf8;

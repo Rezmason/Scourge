@@ -1,7 +1,5 @@
 package net.rezmason.scourge.textview.useractions;
 
-import massive.munit.TestRunner;
-
 import net.rezmason.scourge.textview.console.UserAction;
 import net.rezmason.scourge.textview.console.ConsoleTypes;
 import net.rezmason.scourge.textview.console.Interpreter;

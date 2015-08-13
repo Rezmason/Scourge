@@ -2,7 +2,6 @@ package net.rezmason.scourge.textview.core;
 
 import net.rezmason.gl.GLTypes;
 import lime.math.Vector2;
-import flash.Vector;
 
 class Camera {
 
@@ -101,7 +100,7 @@ class Camera {
     }
 
     inline function applyVP(x:Float, y:Float):Void {
-        var rawData:Vector<Float> = transform.rawData;
+        var rawData:Array<Float> = transform.rawData;
         rawData[8] =  ((x + vanishingPoint.x) * 2 - 1);
         rawData[9] = -((y + vanishingPoint.y) * 2 - 1);
         transform.rawData = rawData;
@@ -109,7 +108,7 @@ class Camera {
 
     inline function makeProjection():Matrix4 {
         var mat:Matrix4 = new Matrix4();
-        var rawData:Vector<Float> = mat.rawData;
+        var rawData:Array<Float> = mat.rawData;
         rawData[10] =  2;
         rawData[11] =  1;
         rawData[14] = -2;

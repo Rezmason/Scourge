@@ -1,6 +1,8 @@
 package net.rezmason.scourge.textview.console;
 
 import haxe.Utf8;
+import lime.ui.KeyCode;
+import lime.ui.KeyModifier;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Interaction;
@@ -16,7 +18,7 @@ private typedef FrozenInteraction = { id:Int, interaction:Interaction };
 class ConsoleUIMediator extends UIMediator {
 
     public var frozen(default, null):Bool;
-    public var keyboardSignal(default, null):Zig<UInt->UInt->Bool->Bool->Void>;
+    public var keyboardSignal(default, null):Zig<KeyCode->KeyModifier->Void>;
     
     var caretStyle:AnimatedStyle;
     var caretSpan:Span;
@@ -95,8 +97,8 @@ class ConsoleUIMediator extends UIMediator {
             frozenQueue.add({id:id, interaction:interaction});
         } else {
             switch (interaction) {
-                case KEYBOARD(type, key, char, shift, alt, ctrl) if (type == KEY_DOWN || type == KEY_REPEAT):
-                    keyboardSignal.dispatch(key, char, alt, ctrl);
+                case KEYBOARD(type, keyCode, modifier) if (type == KEY_DOWN || type == KEY_REPEAT):
+                    keyboardSignal.dispatch(keyCode, modifier);
                 case _: super.receiveInteraction(id, interaction);
             }
         }
