@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core.rendermethods;
 
-import openfl.Assets.getText;
+import lime.Assets.getText;
 
 import net.rezmason.scourge.textview.core.BodySegment;
 import net.rezmason.scourge.textview.core.GlyphTexture;

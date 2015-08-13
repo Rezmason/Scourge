@@ -1,7 +1,7 @@
 package net.rezmason.scourge.textview.pages;
 
-import flash.geom.Rectangle;
-import openfl.Assets;
+import lime.Assets;
+import net.rezmason.gl.GLTypes;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.ui.UIElement;
 import net.rezmason.scourge.textview.ui.UIMediator;

@@ -1,6 +1,5 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.display.BitmapData;
 import net.rezmason.utils.display.FlatFont;
 import net.rezmason.gl.Texture;
 import net.rezmason.gl.GLSystem;
@@ -17,6 +16,6 @@ class GlyphTexture {
         this.name = name;
         this.font = font;
         var glSys:GLSystem = new Present(GLSystem);
-        texture = glSys.createBitmapDataTexture(font.getBitmapDataClone());
+        texture = glSys.createImageTexture(font.getImageClone());
     }
 }

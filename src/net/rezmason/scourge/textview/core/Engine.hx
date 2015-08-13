@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.geom.Rectangle;
+import net.rezmason.gl.GLTypes;
 
 import haxe.Timer;
 

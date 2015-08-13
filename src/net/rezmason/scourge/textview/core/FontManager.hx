@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import openfl.Assets;
+import lime.Assets;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.Zig;
@@ -14,7 +14,7 @@ class FontManager {
         fontTextures = new Map();
         for (name in fontNames) {
             var path:String = 'flatfonts/${name}_flat';
-            var font:FlatFont = new FlatFont(Assets.getBitmapData('$path.png'), Assets.getText('$path.json'));
+            var font:FlatFont = new FlatFont(Assets.getImage('$path.png'), Assets.getText('$path.json'));
             fontTextures[name] = cast new GlyphTexture(name, font);
         }
 

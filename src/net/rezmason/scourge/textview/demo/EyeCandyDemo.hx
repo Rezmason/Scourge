@@ -1,8 +1,6 @@
 package net.rezmason.scourge.textview.demo;
 
-import flash.geom.Matrix3D;
-import flash.geom.Rectangle;
-import flash.geom.Vector3D;
+import net.rezmason.gl.GLTypes;
 import flash.ui.Keyboard;
 
 import net.rezmason.scourge.textview.core.Body;
@@ -26,9 +24,9 @@ class EyeCandyDemo {
     var dragging:Bool;
     var dragX:Float;
     var dragY:Float;
-    var dragStartTransform:Matrix3D;
-    var rawTransform:Matrix3D;
-    var setBackTransform:Matrix3D;
+    var dragStartTransform:Matrix4;
+    var rawTransform:Matrix4;
+    var setBackTransform:Matrix4;
 
     public function new(num:Int = 2400):Void {
 
@@ -40,10 +38,10 @@ class EyeCandyDemo {
         time = 0;
 
         dragging = false;
-        dragStartTransform = new Matrix3D();
-        rawTransform = new Matrix3D();
-        rawTransform.appendRotation( 45, Vector3D.X_AXIS);
-        rawTransform.appendRotation(315, Vector3D.Z_AXIS);
+        dragStartTransform = new Matrix4();
+        rawTransform = new Matrix4();
+        rawTransform.appendRotation( 45, Vector4.X_AXIS);
+        rawTransform.appendRotation(315, Vector4.Z_AXIS);
         setBackTransform = rawTransform.clone();
         setBackTransform.appendTranslation(0, 0, 0.5);
         body.transform.copyFrom(setBackTransform);
@@ -92,7 +90,7 @@ class EyeCandyDemo {
         time += delta;
 
         body.transform.identity();
-        body.transform.appendRotation(time * 30, Vector3D.Z_AXIS);
+        body.transform.appendRotation(time * 30, Vector4.Z_AXIS);
         body.transform.append(setBackTransform);
 
         for (glyph in body.eachGlyph()) {
@@ -132,8 +130,8 @@ class EyeCandyDemo {
 
     inline function updateDrag(x:Float, y:Float):Void {
         rawTransform.copyFrom(dragStartTransform);
-        rawTransform.appendRotation((dragX - x) * 180, Vector3D.Y_AXIS);
-        rawTransform.appendRotation((dragY - y) * 180, Vector3D.X_AXIS);
+        rawTransform.appendRotation((dragX - x) * 180, Vector4.Y_AXIS);
+        rawTransform.appendRotation((dragY - y) * 180, Vector4.X_AXIS);
         setBackTransform.copyFrom(rawTransform);
         setBackTransform.appendTranslation(0, 0, 0.5);
     }

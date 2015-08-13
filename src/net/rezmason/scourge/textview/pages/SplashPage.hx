@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.pages;
 
-import flash.geom.Rectangle;
+import net.rezmason.gl.GLTypes;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.Scene;
 import net.rezmason.scourge.textview.ui.SplashDemo;

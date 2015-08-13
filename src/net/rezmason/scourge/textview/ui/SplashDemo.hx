@@ -1,9 +1,7 @@
 package net.rezmason.scourge.textview.ui;
 
-import flash.geom.Matrix3D;
-import flash.geom.Rectangle;
-import flash.geom.Vector3D;
-import openfl.Assets;
+import lime.Assets;
+import net.rezmason.gl.GLTypes;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
@@ -93,7 +91,7 @@ class SplashDemo {
 
         body.transform.appendScale(1, -1, 1);
         body.transform.appendScale(0.9, 0.9, 0.9);
-        body.transform.appendRotation(20, Vector3D.X_AXIS);
+        body.transform.appendRotation(20, Vector4.X_AXIS);
     }
 
     function update(delta:Float):Void {

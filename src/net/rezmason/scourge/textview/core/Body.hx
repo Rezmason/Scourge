@@ -1,7 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.geom.Matrix3D;
-import flash.geom.Rectangle;
+import net.rezmason.gl.GLTypes;
 
 import net.rezmason.ds.SceneNode;
 import net.rezmason.utils.Zig;
@@ -15,8 +14,8 @@ class Body extends SceneNode<Body> {
 
     public var numGlyphs(default, null):Int;
     public var id(default, null):Int;
-    public var transform(default, null):Matrix3D;
-    public var concatenatedTransform(get, null):Matrix3D;
+    public var transform(default, null):Matrix4;
+    public var concatenatedTransform(get, null):Matrix4;
     public var glyphScale(default, set):Float;
     public var glyphTexture(default, set):GlyphTexture;
     public var scene(default, null):Scene;
@@ -30,7 +29,7 @@ class Body extends SceneNode<Body> {
     @:allow(net.rezmason.scourge.textview.core) var params(default, null):Array<Float>;
     
     var trueNumGlyphs:Int;
-    var concatMat:Matrix3D;
+    var concatMat:Matrix4;
     var glyphs:Array<Glyph>;
 
     public function new():Void {
@@ -51,8 +50,8 @@ class Body extends SceneNode<Body> {
         segments = [];
         glyphs = [];
 
-        transform = new Matrix3D();
-        concatMat = new Matrix3D();
+        transform = new Matrix4();
+        concatMat = new Matrix4();
         params = [0, 0, 0, 0];
         params[2] = id / 0xFF;
         glyphScale = 1;
@@ -174,7 +173,7 @@ class Body extends SceneNode<Body> {
         }
     }
 
-    function get_concatenatedTransform():Matrix3D {
+    function get_concatenatedTransform():Matrix4 {
         concatMat.copyFrom(transform);
         if (parent != null) concatMat.append(parent.concatenatedTransform);
         return concatMat;

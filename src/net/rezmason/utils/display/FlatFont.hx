@@ -1,7 +1,8 @@
 package net.rezmason.utils.display;
 
-import flash.display.BitmapData;
-import flash.geom.Matrix;
+// import flash.display.BitmapData;
+// import flash.geom.Matrix;
+import lime.graphics.Image;
 
 import haxe.Utf8;
 
@@ -21,7 +22,7 @@ typedef FlatFontJSON = {
 @:allow(net.rezmason.utils.display.FlatFontGenerator)
 class FlatFont {
 
-    var bitmapData:BitmapData;
+    var image:Image;
     var charCoords:Map<Int, CharCoord>;
     var missingChars:Array<Int>;
     var defaultCharCoord:CharCoord;
@@ -36,11 +37,11 @@ class FlatFont {
     public var rowFraction(default, null):Float;
     public var columnFraction(default, null):Float;
 
-    public function new(bitmapData:BitmapData, jsonString:String):Void {
+    public function new(image:Image, jsonString:String):Void {
 
-        this.bitmapData = bitmapData;
-        bdWidth = bitmapData.width;
-        bdHeight = bitmapData.height;
+        this.image = image;
+        bdWidth = image.width;
+        bdHeight = image.height;
 
         this.jsonString = jsonString;
         charCoords = new Map();
@@ -51,8 +52,8 @@ class FlatFont {
         glyphWidth = expandedJSON.glyphWidth;
         glyphHeight = expandedJSON.glyphHeight;
         glyphRatio = expandedJSON.glyphRatio;
-        rowFraction = glyphHeight / bitmapData.height;
-        columnFraction = glyphWidth / bitmapData.width;
+        rowFraction = glyphHeight / image.height;
+        columnFraction = glyphWidth / image.width;
 
         for (field in Reflect.fields(expandedJSON.charCoords)) {
             var code:Int = Std.parseInt(field.substr(1));
@@ -63,7 +64,7 @@ class FlatFont {
 
         defaultCharCoord = {x:0, y:0};
     }
-
+    /*
     public inline function getCharMatrix(char:String):Matrix {
         return getCharCodeMatrix(Utf8.charCodeAt(char, 0));
     }
@@ -77,7 +78,7 @@ class FlatFont {
         }
         return mat;
     }
-
+    */
     public inline function getCharUVs(char:String):Array<UV> {
         return getCharCodeUVs(Utf8.charCodeAt(char, 0));
     }
@@ -104,7 +105,7 @@ class FlatFont {
         return uvs;
     }
 
-    public inline function getBitmapDataClone():BitmapData { return bitmapData.clone(); }
+    public inline function getImageClone():Image { return image.clone(); }
 
     public inline function exportJSON():String { return jsonString; }
 }

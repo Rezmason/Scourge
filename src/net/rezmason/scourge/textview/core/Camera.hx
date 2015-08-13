@@ -1,15 +1,14 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.geom.Matrix3D;
-import flash.geom.Point;
-import flash.geom.Rectangle;
+import net.rezmason.gl.GLTypes;
+import lime.math.Vector2;
 import flash.Vector;
 
 class Camera {
 
     inline static function DEFAULT_VIEW_RECT():Rectangle return new Rectangle(0, 0, 1, 1);
     
-    public var transform(default, null):Matrix3D;
+    public var transform(default, null):Matrix4;
     public var scaleMode(default, set):CameraScaleMode;
     public var glyphScaleMode(default, set):CameraGlyphScaleMode;
     public var rect(default, set):Rectangle;
@@ -18,12 +17,12 @@ class Camera {
     var scaleX:Float;
     var scaleY:Float;
     
-    var vanishingPoint:Point;
+    var vanishingPoint:Vector2;
 
     var stageWidth:Int;
     var stageHeight:Int;
 
-    var projection:Matrix3D;
+    var projection:Matrix4;
 
     public function new():Void {
         stageWidth = 0;
@@ -31,9 +30,9 @@ class Camera {
         glyphScale = 0;
         scaleX = 1;
         scaleY = 1;
-        transform = new Matrix3D();
+        transform = new Matrix4();
         projection = makeProjection();
-        vanishingPoint = new Point();
+        vanishingPoint = new Vector2();
         
         rect = DEFAULT_VIEW_RECT();
         scaleMode = SHOW_ALL;
@@ -108,8 +107,8 @@ class Camera {
         transform.rawData = rawData;
     }
 
-    inline function makeProjection():Matrix3D {
-        var mat:Matrix3D = new Matrix3D();
+    inline function makeProjection():Matrix4 {
+        var mat:Matrix4 = new Matrix4();
         var rawData:Vector<Float> = mat.rawData;
         rawData[10] =  2;
         rawData[11] =  1;

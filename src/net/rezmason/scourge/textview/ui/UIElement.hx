@@ -1,7 +1,6 @@
 package net.rezmason.scourge.textview.ui;
 
-import flash.geom.Matrix3D;
-import flash.geom.Rectangle;
+import net.rezmason.gl.GLTypes;
 import flash.system.Capabilities;
 
 import net.rezmason.scourge.textview.core.Body;
@@ -29,7 +28,7 @@ class UIElement {
     var glyphHeightInPixels:Float;
     var glyphWidth:Float;
     var glyphHeight:Float;
-    var baseTransform:Matrix3D;
+    var baseTransform:Matrix4;
 
     var viewPixelWidth:Float;
     var viewPixelHeight:Float;
@@ -74,7 +73,7 @@ class UIElement {
         
         spaceCode = ' '.charCodeAt(0);
 
-        baseTransform = new Matrix3D();
+        baseTransform = new Matrix4();
         baseTransform.appendScale(1, -1, 1);
 
         glyphHeightInPoints = DEFAULT_GLYPH_HEIGHT_IN_POINTS;

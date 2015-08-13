@@ -4,8 +4,8 @@ import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.events.MouseEvent;
-import flash.geom.Rectangle;
-import flash.geom.Matrix;
+import net.rezmason.gl.GLTypes;
+// import flash.geom.Matrix;
 import flash.utils.ByteArray;
 import flash.Vector;
 

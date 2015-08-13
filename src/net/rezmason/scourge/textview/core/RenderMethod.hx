@@ -1,7 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import flash.geom.Matrix3D;
-import flash.geom.Vector3D;
+import net.rezmason.gl.GLTypes;
 
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
@@ -12,7 +11,7 @@ import net.rezmason.gl.Program;
 
 class RenderMethod {
 
-    static var unitVec:Vector3D = new Vector3D(1, 0, 0);
+    static var unitVec:Vector4 = new Vector4(1, 0, 0);
 
     public var program(default, null):Program;
     public var programLoaded(get, null):Bool;
