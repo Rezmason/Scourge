@@ -3,6 +3,8 @@ package net.rezmason.utils.display;
 import flash.display.BitmapData;
 import flash.geom.Matrix;
 
+import lime.graphics.Image;
+
 import haxe.Utf8;
 import haxe.io.Bytes;
 
@@ -155,7 +157,7 @@ class FlatFontGenerator {
                 missingChars:missingChars
             };
 
-            cbk (new FlatFont(bitmapData, json.stringify()));
+            cbk (new FlatFont(Image.fromBitmapData(bitmapData), json.stringify()));
         }
 
         function addSDF(index:Int, sdf:SerializedBitmap):Void {

@@ -59,7 +59,7 @@ class ScourgeAssetGen {
     }
 
     static function deployFont(font:FlatFont, id:String):Void {
-        var fontBD:BitmapData = font.getBitmapDataClone();
+        var fontBD:BitmapData = @:privateAccess font.getImageClone().buffer.__srcBitmapData;
 
         var sprite:Sprite = new Sprite();
         sprite.addChild(new Bitmap(fontBD));
