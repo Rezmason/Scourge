@@ -163,7 +163,6 @@ class MouseSystem {
 
     function onMouseMove(x:Float, y:Float):Void {
         if (!initialized) return;
-        if (x > 0 && x < 1) return; // God damn touch events!!
         if (invalid) refresh();
 
         var hit:Hit = getHit(x, y);
@@ -181,7 +180,6 @@ class MouseSystem {
     
     function onMouseDown(x:Float, y:Float, button:Int):Void {
         if (!initialized) return;
-        if (x > 0 && x < 1) return; // God damn touch events!!
         if (invalid) refresh();
         pressHit = getHit(x, y);
         lastX = x;
@@ -191,7 +189,6 @@ class MouseSystem {
 
     function onMouseUp(x:Float, y:Float, button:Int):Void {
         if (!initialized) return;
-        if (x> 0 && x< 1) return; // God damn touch events!!
         if (invalid) refresh();
         var hit:Hit = getHit(x, y);
         lastX = x;
