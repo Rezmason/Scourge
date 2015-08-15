@@ -29,7 +29,7 @@ class BuildBoardRule extends BaseRule<FullBuildBoardParams> {
         for (petriCell in params.cells) addSpace();
         for (petriCell in params.cells) {
             var petriDatum = petriCell.value;
-            var spaceCell = state.cells[petriCell.id];
+            var spaceCell = state.cells.getCell(petriCell.id);
             var space = spaceCell.value;
 
             if (petriDatum.isWall == true) {
@@ -43,7 +43,7 @@ class BuildBoardRule extends BaseRule<FullBuildBoardParams> {
 
             for (direction in GridUtils.allDirections()) {
                 var neighbor = petriCell.neighbors[direction];
-                if (neighbor != null) spaceCell.attach(state.cells[neighbor.id], direction);
+                if (neighbor != null) spaceCell.attach(state.cells.getCell(neighbor.id), direction);
             }
         }
 

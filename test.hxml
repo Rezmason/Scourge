@@ -43,28 +43,28 @@
 -js build/js_test.js
 --next
 
-# Neko
+# # Neko
 
--main TestMain
--lib hamcrest
--lib munit
--lib msignal
--lib golems
--cp src
--debug
--resource tables/pieces.json.txt@tables/pieces.json.txt
--resource tables/serializedState.txt@tables/serializedState.txt
-#-D VISUAL_TEST
-#-D TIME_TESTS
--D USE_POINTERS
--D haxeJSON
--D HEADLESS
-#-D PRAXIS_VERBOSE
-#-D PRAXIS_MACRO_VERBOSE
+# -main TestMain
+# -lib hamcrest
+# -lib munit
+# -lib msignal
+# -lib golems
+# -cp src
+# -debug
+# -resource tables/pieces.json.txt@tables/pieces.json.txt
+# -resource tables/serializedState.txt@tables/serializedState.txt
+# #-D VISUAL_TEST
+# #-D TIME_TESTS
+# -D USE_POINTERS
+# -D haxeJSON
+# -D HEADLESS
+# #-D PRAXIS_VERBOSE
+# #-D PRAXIS_MACRO_VERBOSE
 
--cp test
--neko build/neko_test.n
---next
+# -cp test
+# -neko build/neko_test.n
+# --next
 
 # CPP
 

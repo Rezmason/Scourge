@@ -102,12 +102,12 @@ class Sequencer extends Reckoner {
             spaceState.lastValues[isFilled_] = FALSE;
             cells[id] = new Cell(id, e);
             spaceState.cell = cells[id];
-            spaceState.petriData = petriCells[id].value;
+            spaceState.petriData = petriCells.getCell(id).value;
         }
 
         for (ike in 0...cells.length) {
             for (direction in GridUtils.allDirections()) {
-                var neighbor = petriCells[ike].neighbors[direction];
+                var neighbor = petriCells.getCell(ike).neighbors[direction];
                 if (neighbor != null) cells[ike].attach(cells[neighbor.id], direction);
             }
         }

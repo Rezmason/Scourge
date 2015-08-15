@@ -114,7 +114,7 @@ class BasicSmarts extends Smarts {
         var dropMove:DropPieceMove = cast move;
         if (dropMove.addedSpaces == null || dropMove.addedSpaces.length == 0) return false;
         for (spaceID in dropMove.addedSpaces) {
-            for (neighborCell in game.state.cells[spaceID].orthoNeighbors()) {
+            for (neighborCell in game.state.cells.getCell(spaceID).orthoNeighbors()) {
                 if (neighborCell.value[isFilled_] == TRUE && neighborCell.value[occupier_] == NULL) {
                     return true;
                 }

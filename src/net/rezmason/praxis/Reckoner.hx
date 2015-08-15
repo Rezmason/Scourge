@@ -62,7 +62,7 @@ using net.rezmason.utils.Pointers;
     @:final inline function getSpaceCell(space:AspectSet):BoardCell return getCell(getID(space));
 
     @:final inline function getSpace(index:Int):AspectSet return state.spaces[index];
-    @:final inline function getCell(index:Int):BoardCell return state.cells[index];
+    @:final inline function getCell(index:Int):BoardCell return state.cells.getCell(index);
     @:final inline function getPlayer(index:Int):AspectSet return state.players[index];
     @:final inline function getCard(index:Int):AspectSet return state.cards[index];
     @:final inline function getExtra(index:Int):AspectSet return state.extras[index];

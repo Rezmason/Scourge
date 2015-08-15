@@ -18,7 +18,7 @@ class BoardUtils {
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
     public inline static function grabXY(state:State, east:Int, south:Int):BoardCell {
-        return state.cells[0].run(NW).run(W).run(N).run(S, south).run(E, east);
+        return state.cells.getCell(0).run(NW).run(W).run(N).run(S, south).run(E, east);
     }
 
     public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, focus:Array<Int> = null):String {
@@ -26,7 +26,7 @@ class BoardUtils {
 
         var str:String = '';
 
-        var grid:BoardCell = state.cells[0].run(NW).run(W).run(N);
+        var grid:BoardCell = state.cells.getCell(0).run(NW).run(W).run(N);
 
         var occupier_:AspectPtr = plan.spaceAspectLookup[OwnershipAspect.OCCUPIER.id];
         var isFilled_:AspectPtr = plan.spaceAspectLookup[OwnershipAspect.IS_FILLED.id];

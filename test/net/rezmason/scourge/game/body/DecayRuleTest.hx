@@ -69,7 +69,7 @@ class DecayRuleTest extends ScourgeRuleTest
         makeState([decayRule], 1, TestBoards.loosePetri);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var head:BoardCell = state.cells[state.players[0][head_]];
+        var head:BoardCell = state.cells.getCell(state.players[0][head_]);
         var bump:BoardCell = head.nw();
 
         var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);

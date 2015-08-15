@@ -1,7 +1,7 @@
 package net.rezmason.praxis.state;
 
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.grid.Cell;
+import net.rezmason.grid.Grid;
 using net.rezmason.grid.GridUtils;
 using net.rezmason.utils.Pointers;
 
@@ -12,7 +12,7 @@ class State {
     public var players(default, null):Array<AspectSet>;
     public var cards(default, null):Array<AspectSet>;
     public var spaces(default, null):Array<AspectSet>;
-    public var cells(default, set):Array<Cell<AspectSet>>; // aka BoardCell
+    public var cells(default, set):Grid<AspectSet>; // aka BoardGrid
     public var extras(default, null):Array<AspectSet>;
     public var key(default, set):PtrKey;
 
@@ -22,7 +22,7 @@ class State {
         players = [];
         cards   = [];
         spaces  = [];
-        cells   = [];
+        cells   = new Grid();
         extras  = [];
     }
 
@@ -32,7 +32,7 @@ class State {
         players.splice(0, players.length);
         cards.splice  (0, cards.length);
         spaces.splice (0, spaces.length);
-        cells.splice  (0, cells.length);
+        cells.wipe();
         extras.splice (0, extras.length);
     }
 
@@ -58,13 +58,13 @@ class State {
         return val;
     }
 
-    public function set_cells(val:Array<Cell<AspectSet>>):Array<Cell<AspectSet>> {
+    public function set_cells(val:Grid<AspectSet>):Grid<AspectSet> {
         if (cells == null) cells = val;
         return val;
     }
 
     public function resolve() {
         global = globals[0];
-        cells = [];
+        cells = new Grid();
     }
 }

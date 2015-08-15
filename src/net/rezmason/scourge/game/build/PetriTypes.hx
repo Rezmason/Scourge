@@ -1,6 +1,7 @@
 package net.rezmason.scourge.game.build;
 
 import net.rezmason.grid.Cell;
+import net.rezmason.grid.Grid;
 
 typedef PetriData = {
     var pos:Vec3;
@@ -10,3 +11,4 @@ typedef PetriData = {
 }
 
 typedef PetriCell = Cell<PetriData>;
+typedef PetriGrid = Grid<PetriData>;

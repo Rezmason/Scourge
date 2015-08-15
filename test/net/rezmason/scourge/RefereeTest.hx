@@ -31,7 +31,6 @@ class RefereeTest {
 
     }
 
-    #if neko @Ignore('Runs too slow on NekoVM') #end
     @Test
     public function serializeTest():Void {
 
@@ -51,7 +50,7 @@ class RefereeTest {
         var prevData:String = Resource.getString('tables/serializedState.txt');
         if (prevData.charAt(prevData.length - 1) == '\n') prevData = prevData.substr(0, -1);
 
-        trace(data);
+        // trace(data);
 
         var ike:Int = 0;
         while (ike < prevData.length) {
@@ -60,7 +59,6 @@ class RefereeTest {
         }
     }
 
-    #if neko @Ignore('Runs too slow on NekoVM') #end
     @Test
     public function saveTest():Void {
 

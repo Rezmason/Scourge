@@ -158,7 +158,7 @@ class CavityRule extends BaseRule<Dynamic> {
         }
 
         var numCavitySpaces:Int = 0;
-        for (cell in cells.expandGraphSequence(true, isEmpty)) {
+        for (cell in cells.expandGridSequence(true, isEmpty)) {
             cavitySpaces[numCavitySpaces] = cell.value;
             numCavitySpaces++;
         }

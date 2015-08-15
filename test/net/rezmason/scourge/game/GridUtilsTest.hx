@@ -50,9 +50,9 @@ class GridUtilsTest {
         for (n in first.walk(E)) ike++;
         Assert.areEqual(10, ike);
 
-        Assert.areEqual(10, first.getGraphSequence().length);
+        Assert.areEqual(10, first.getGridSequence().length);
 
-        Assert.areEqual(5, first.getGraphSequence(underFiveOnly).length);
+        Assert.areEqual(5, first.getGridSequence(underFiveOnly).length);
     }
 
     function underFiveOnly(val:Int, connection:Int):Bool { return val < 5; }

@@ -79,7 +79,7 @@ class CavityRuleTest extends ScourgeRuleTest
         makeState([cavityRule], 1, TestBoards.cavityCity);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var head:BoardCell = state.cells[state.players[0][head_]];
+        var head:BoardCell = state.cells.getCell(state.players[0][head_]);
         var bump:BoardCell = head.run(S, 5);
 
         var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);

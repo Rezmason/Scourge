@@ -29,7 +29,7 @@ class SwapPieceRule extends BaseRule<SwapPieceParams> {
     }
 
     override private function _chooseMove(choice:Int):Void {
-                var currentPlayer:Int = state.global[currentPlayer_];
+        var currentPlayer:Int = state.global[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
         getPlayer(currentPlayer)[numSwaps_] = numSwaps - 1;
         state.global[pieceTableID_] = NULL;

@@ -80,8 +80,7 @@ class BaseRule<Params> extends Reckoner {
 
     @:final inline function addSpace():AspectSet {
         var space = addAspectSet(plan.spaceAspectTemplate, state.spaces, historyState.spaces, numSpaces());
-        var cell:BoardCell = new BoardCell(getID(space), space);
-        state.cells.push(cell);
+        state.cells.addCell(space);
         return space;
     }
 

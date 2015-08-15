@@ -39,7 +39,7 @@ class DecayRule extends BaseRule<DecayParams> {
         }
 
         // Use the heads as starting points for a flood fill of connected living cells
-        var livingBodyNeighbors:Array<BoardCell> = heads.expandGraph(params.decayOrthogonallyOnly, isLivingBodyNeighbor);
+        var livingBodyNeighbors:Array<BoardCell> = heads.expandGrid(params.decayOrthogonallyOnly, isLivingBodyNeighbor);
 
         var cellDied = false;
         // Remove cells from player bodies

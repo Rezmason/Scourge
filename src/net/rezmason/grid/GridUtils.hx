@@ -51,11 +51,11 @@ class GridUtils {
         return cell._diagNeighbors;
     }
 
-    public inline static function getGraph<T>(source:Cell<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
-        return expandGraph([source], orthoOnly, spreadFilter);
+    public inline static function getGrid<T>(source:Cell<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
+        return expandGrid([source], orthoOnly, spreadFilter);
     }
 
-    public inline static function expandGraph<T>(sources:Array<Cell<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
+    public inline static function expandGrid<T>(sources:Array<Cell<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
         var cells:Array<Cell<T>> = [];
         for (cell in sources) cells[cell.id] = cell;
         var newCells:ShitList<Cell<T>> = new ShitList(sources);
@@ -77,11 +77,11 @@ class GridUtils {
         return cells;
     }
 
-    public inline static function getGraphSequence<T>(source:Cell<T>, orthoOnly:Null<Bool> = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
-        return expandGraphSequence([source], orthoOnly, spreadFilter);
+    public inline static function getGridSequence<T>(source:Cell<T>, orthoOnly:Null<Bool> = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
+        return expandGridSequence([source], orthoOnly, spreadFilter);
     }
 
-    public inline static function expandGraphSequence<T>(sources:Array<Cell<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
+    public inline static function expandGridSequence<T>(sources:Array<Cell<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
         var cells:Array<Cell<T>> = sources.copy();
         var newCells:ShitList<Cell<T>> = new ShitList(sources);
 

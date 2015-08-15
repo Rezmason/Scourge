@@ -4,5 +4,5 @@ import net.rezmason.grid.Cell;
 import net.rezmason.scourge.game.build.PetriTypes;
 
 typedef BuildBoardParams = {
-    public var cells:Array<Cell<PetriData>>;
+    public var cells:PetriGrid;
 }

@@ -1,9 +1,4 @@
-MUnit C++ target is crashing
-        RefereeTest
-            GameConfig serialization
-                GridLocus serialization
-
-Rethink GridLocus
+Rethink grid Cell
     Diagonals should be derived from orthogonals after grid construction
     GridUtils getGraph vs getGraphSequence?
 
