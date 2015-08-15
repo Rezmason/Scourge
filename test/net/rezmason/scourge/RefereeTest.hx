@@ -37,7 +37,7 @@ class RefereeTest {
 
         function noop(game:Game, func:Void->Void) {}
 
-        var random:Void->Float = Math.random;
+        var random:Void->Float = function() return 0.5;
 
         players = [];
         for (ike in 0...4) players.push(new TestPlayer(ike, noop, random));
@@ -73,7 +73,7 @@ class RefereeTest {
             deferredCalls.push(func);
         }
 
-        var random:Void->Float = Math.random;
+        var random:Void->Float = function() return 0.5;
 
         players = [];
         for (ike in 0...4) players.push(new TestPlayer(ike, defer, random));

@@ -1,5 +1,14 @@
+MUnit C++ target is crashing
+        RefereeTest
+            GameConfig serialization
+                GridLocus serialization
+
+Rethink GridLocus
+    Diagonals should be derived from orthogonals after grid construction
+    GridUtils getGraph vs getGraphSequence?
+
 Lime conversion
-    Flash init step
+    Move Flash init step from Context
     Refactor shim, engine, GLSystem
 Colors should be Vec3, not Int
     Lab

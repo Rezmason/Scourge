@@ -18,7 +18,6 @@
     <haxedef name="glsl2agal" if="flash"/>
     <haxedef name="stage3d" if="flash"/>
     <haxelib name="golems"/>
-    <!-- <haxelib name="munit"/> -->
     <haxelib name="lime"/>
     
     <assets path="tables" include="*.txt"/>

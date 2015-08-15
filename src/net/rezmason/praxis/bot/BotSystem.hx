@@ -49,21 +49,15 @@ class BotSystem extends PlayerSystem {
     }
 
     private function beat(cbk:Void->Void):Void {
-        #if neko
-            cbk();
-        #else
-            var period:Int = 10;
-            if (game.hasBegun) period = currentPlayer().period;
-            var timer:Timer = new Timer(period);
-            timer.run = onBeat.bind(timer, cbk);
-        #end
+        var period:Int = 10;
+        if (game.hasBegun) period = currentPlayer().period;
+        var timer:Timer = new Timer(period);
+        timer.run = onBeat.bind(timer, cbk);
     }
 
     private function onBeat(timer:Timer, cbk:Void->Void):Void {
-        #if !neko
-            timer.stop();
-            if (game.hasBegun) cbk();
-        #end
+        timer.stop();
+        if (game.hasBegun) cbk();
     }
 
     private inline function currentPlayer():BotPlayer return botsByIndex[game.currentPlayer];

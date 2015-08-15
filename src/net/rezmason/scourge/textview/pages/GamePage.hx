@@ -43,7 +43,6 @@ class GamePage extends NavPage {
         console.scene.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
         scenes.push(console.scene);
 
-        interpreter.addAction(new RunTestsAction());
         interpreter.addAction(new SetFontAction(console));
         interpreter.addAction(new SetNameAction(interpreter));
         interpreter.addAction(new PrintAction());
