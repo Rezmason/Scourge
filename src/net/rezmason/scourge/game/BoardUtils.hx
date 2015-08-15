@@ -2,14 +2,14 @@ package net.rezmason.scourge.game;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.grid.GridDirection.*;
-import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.grid.GridDirection.*;
+import net.rezmason.grid.Cell;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StatePlan;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.utils.Pointers;
 
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 
 class BoardUtils {
 
@@ -17,16 +17,16 @@ class BoardUtils {
 
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
-    public inline static function grabXY(state:State, east:Int, south:Int):BoardLocus {
-        return state.loci[0].run(NW).run(W).run(N).run(S, south).run(E, east);
+    public inline static function grabXY(state:State, east:Int, south:Int):BoardCell {
+        return state.cells[0].run(NW).run(W).run(N).run(S, south).run(E, east);
     }
 
     public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, focus:Array<Int> = null):String {
-        if (state.loci.length == 0) return 'empty grid';
+        if (state.cells.length == 0) return 'empty grid';
 
         var str:String = '';
 
-        var grid:BoardLocus = state.loci[0].run(NW).run(W).run(N);
+        var grid:BoardCell = state.cells[0].run(NW).run(W).run(N);
 
         var occupier_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.OCCUPIER.id];
         var isFilled_:AspectPtr = plan.nodeAspectLookup[OwnershipAspect.IS_FILLED.id];

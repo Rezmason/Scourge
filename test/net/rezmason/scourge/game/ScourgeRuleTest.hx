@@ -14,7 +14,7 @@ import net.rezmason.scourge.game.build.BuildPlayersRule;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
 
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class ScourgeRuleTest
@@ -65,7 +65,7 @@ class ScourgeRuleTest
         var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule({numPlayers:numPlayers});
 
         // make board config and generate board
-        var boardParams = {numPlayers:numPlayers, loci:PetriBoardFactory.create(numPlayers, circular, initGrid)};
+        var boardParams = {numPlayers:numPlayers, cells:PetriBoardFactory.create(numPlayers, circular, initGrid)};
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(boardParams);
 
         rules.unshift(buildBoardRule);

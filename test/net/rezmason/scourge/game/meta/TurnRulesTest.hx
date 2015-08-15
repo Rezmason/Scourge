@@ -18,7 +18,7 @@ import net.rezmason.scourge.game.meta.OneLivingPlayerRule;
 import net.rezmason.scourge.game.meta.StalemateRule;
 import net.rezmason.scourge.game.test.TestPieceRule;
 
-// using net.rezmason.praxis.grid.GridUtils;
+// using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.praxis.state.StatePlan;
 using net.rezmason.utils.Pointers;

@@ -14,7 +14,7 @@ import net.rezmason.utils.santa.Present;
 import net.kawa.tween.easing.*;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 
 class BoardSettler extends Reckoner {
 
@@ -42,7 +42,7 @@ class BoardSettler extends Reckoner {
             var nodeState = entity.get(BoardNodeState);
             if (view.changed) {
                 affectedEntities[entity] = true;
-                for (neighbor in nodeState.locus.orthoNeighbors()) affectedEntities.set(neighbor.value, true);
+                for (neighbor in nodeState.cell.orthoNeighbors()) affectedEntities.set(neighbor.value, true);
             }
         }
         
@@ -73,7 +73,7 @@ class BoardSettler extends Reckoner {
             if (!nodeState.petriData.isHead && nodeState.values[isFilled_] == TRUE && occupier != -1) {
                 var numNeighbors:Int = 0;
                 var bitfield:Int = 0;
-                for (neighbor in nodeState.locus.orthoNeighbors()) {
+                for (neighbor in nodeState.cell.orthoNeighbors()) {
                     if (neighbor != null) {
                         var neighborValues = neighbor.value.get(BoardNodeState).values;
                         if (neighborValues[isFilled_] == TRUE && neighborValues[occupier_] == occupier) {

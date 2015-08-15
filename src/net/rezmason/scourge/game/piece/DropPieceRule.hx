@@ -1,8 +1,8 @@
 package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.aspect.Aspect.*;
-import net.rezmason.praxis.grid.GridDirection.*;
-import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.grid.GridDirection.*;
+import net.rezmason.grid.Cell;
 import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.PieceTypes;
@@ -14,7 +14,7 @@ import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.scourge.game.meta.SkipAspect;
 
 using Lambda;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
@@ -105,7 +105,7 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
                             var addedNodes:Array<Int> = [];
 
                             for (coord in piece.cells) {
-                                var nodeAtCoord:AspectSet = walkLocus(getNodeLocus(node), coord, homeCoord).value;
+                                var nodeAtCoord:AspectSet = walkCell(getNodeCell(node), coord, homeCoord).value;
                                 addedNodes.push(getID(nodeAtCoord));
                                 numAddedNodes++;
                                 var occupier:Int = nodeAtCoord[occupier_];
@@ -195,7 +195,7 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
     inline function hasFreeEdge(node:AspectSet):Bool {
         var exists:Bool = false;
 
-        for (neighbor in neighborsFor(getNodeLocus(node), params.dropOrthoOnly)) {
+        for (neighbor in neighborsFor(getNodeCell(node), params.dropOrthoOnly)) {
             if (neighbor.value[isFilled_] == FALSE) {
                 exists = true;
                 break;
@@ -232,7 +232,7 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
     }
 
     // A works-for-now function for translating piece coords into nodes accessible from a given starting point
-    inline function walkLocus(locus:BoardLocus, fromCoord:IntCoord, toCoord:IntCoord):BoardLocus {
+    inline function walkCell(cell:BoardCell, fromCoord:IntCoord, toCoord:IntCoord):BoardCell {
         var dn:Int = 0;
         var dw:Int = 0;
         var de:Int = toCoord.x - fromCoord.x;
@@ -248,10 +248,10 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
             ds = 0;
         }
 
-        return locus.run(N, dn).run(S, ds).run(E, de).run(W, dw);
+        return cell.run(N, dn).run(S, ds).run(E, de).run(W, dw);
     }
 
-    inline function neighborsFor(locus:BoardLocus, ortho:Bool):Array<BoardLocus> {
-        return ortho ? locus.orthoNeighbors() : locus.neighbors;
+    inline function neighborsFor(cell:BoardCell, ortho:Bool):Array<BoardCell> {
+        return ortho ? cell.orthoNeighbors() : cell.neighbors;
     }
 }

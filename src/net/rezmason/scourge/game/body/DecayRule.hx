@@ -8,7 +8,7 @@ import net.rezmason.scourge.game.meta.FreshnessAspect;
 using Lambda;
 
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
@@ -30,16 +30,16 @@ class DecayRule extends BaseRule<DecayParams> {
 
         // Grab all the player heads
 
-        var heads:Array<BoardLocus> = [];
+        var heads:Array<BoardCell> = [];
         for (player in eachPlayer()) {
             var headIndex:Int = player[head_];
             if (headIndex != NULL && getNode(headIndex)[occupier_] == getID(player)) {
-                heads.push(getLocus(headIndex));
+                heads.push(getCell(headIndex));
             }
         }
 
         // Use the heads as starting points for a flood fill of connected living cells
-        var livingBodyNeighbors:Array<BoardLocus> = heads.expandGraph(params.decayOrthogonallyOnly, isLivingBodyNeighbor);
+        var livingBodyNeighbors:Array<BoardCell> = heads.expandGraph(params.decayOrthogonallyOnly, isLivingBodyNeighbor);
 
         var cellDied = false;
         // Remove cells from player bodies

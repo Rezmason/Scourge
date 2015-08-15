@@ -1,4 +1,4 @@
-package net.rezmason.praxis.grid;
+package net.rezmason.grid;
 
 @:enum abstract GridDirection(Int) {
     @:to public inline function toInt():Int return cast this;

@@ -12,7 +12,7 @@ import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.utils.Zig;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 
 class BoardAnimator {
 
@@ -39,10 +39,10 @@ class BoardAnimator {
         var trimmings:Map<Int, Bool> = new Map();
         var maxDistSquared:Float = 0;
         for (entity in qBoardView) {
-            var locus = entity.get(BoardNodeView).locus;
-            if (locus.value.isWall) {
+            var cell = entity.get(BoardNodeView).cell;
+            if (cell.value.isWall) {
                 var hasEmptyNeighbor = false;
-                for (neighbor in locus.neighbors) {
+                for (neighbor in cell.neighbors) {
                     if (neighbor != null && !neighbor.value.isWall) {
                         hasEmptyNeighbor = true;
                         break;
@@ -51,13 +51,13 @@ class BoardAnimator {
                 if (hasEmptyNeighbor) {
                     numSpacesThatMatter++;
                 } else {
-                    trimmings[locus.id] = true;
+                    trimmings[cell.id] = true;
                     entity.remove(BoardNodeView);
                 }
             } else {
                 numSpacesThatMatter++;
             }
-            var pos = locus.value.pos;
+            var pos = cell.value.pos;
             var distSquared = pos.x * pos.x + pos.y * pos.y + pos.z * pos.z;
             if (maxDistSquared < distSquared) maxDistSquared = distSquared;
         }
@@ -73,19 +73,19 @@ class BoardAnimator {
         body.growTo(numSpacesThatMatter * 3);
         for (entity in qBoardView) {
             var view = entity.get(BoardNodeView);
-            var locus = view.locus;
-            var pos = locus.value.pos;
+            var cell = view.cell;
+            var pos = cell.value.pos;
             
             var bottom = view.bottom = body.getGlyphByID(itr + 0).reset().SET({pos:pos});
             var top    = view.top =    body.getGlyphByID(itr + 1).reset().SET({pos:pos, p:-0.03});
             var over   = view.over =   body.getGlyphByID(itr + 2).reset().SET({pos:pos, p: 0.06});
 
-            if (locus.value.isWall) {
+            if (cell.value.isWall) {
                 top.set_color(WALL_COLOR);
                 bottom.set_color(BOARD_COLOR);
                 var numNeighbors:Int = 0;
                 var bitfield:Int = 0;
-                for (neighbor in locus.orthoNeighbors()) {
+                for (neighbor in cell.orthoNeighbors()) {
                     if (neighbor != null && !trimmings[neighbor.id] && neighbor.value.isWall) {
                         bitfield = bitfield | (1 << numNeighbors);
                     }

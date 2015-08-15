@@ -58,20 +58,20 @@ using net.rezmason.utils.Pointers;
     }
 
     @:final inline function getID(aspectSet:AspectSet):Int return aspectSet[ident_];
-    @:final inline function getNodeLocus(node:AspectSet):BoardLocus return getLocus(getID(node));
+    @:final inline function getNodeCell(node:AspectSet):BoardCell return getCell(getID(node));
 
     @:final inline function getNode(index:Int):AspectSet return state.nodes[index];
-    @:final inline function getLocus(index:Int):BoardLocus return state.loci[index];
+    @:final inline function getCell(index:Int):BoardCell return state.cells[index];
     @:final inline function getPlayer(index:Int):AspectSet return state.players[index];
     @:final inline function getExtra(index:Int):AspectSet return state.extras[index];
 
     @:final inline function eachNode():Iterator<AspectSet> return state.nodes.iterator();
-    @:final inline function eachLocus():Iterator<BoardLocus> return state.loci.iterator();
+    @:final inline function eachCell():Iterator<BoardCell> return state.cells.iterator();
     @:final inline function eachPlayer():Iterator<AspectSet> return state.players.iterator();
     @:final inline function eachExtra():Iterator<AspectSet> return state.extras.iterator();
 
     @:final inline function numNodes():Int return state.nodes.length;
-    @:final inline function numLoci():Int return state.loci.length; // should be the same as numNodes though
+    @:final inline function numCells():Int return state.cells.length; // should be the same as numNodes though
     @:final inline function numPlayers():Int return state.players.length;
     @:final inline function numExtras():Int return state.extras.length;
 

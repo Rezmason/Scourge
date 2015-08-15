@@ -1,8 +1,8 @@
 package net.rezmason.praxis.state;
 
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.grid.GridLocus;
-using net.rezmason.praxis.grid.GridUtils;
+import net.rezmason.grid.Cell;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class State {
@@ -11,7 +11,7 @@ class State {
     public var globals(default, null):Array<AspectSet>;
     public var players(default, null):Array<AspectSet>;
     public var nodes(default, null):Array<AspectSet>;
-    public var loci(default, set):Array<GridLocus<AspectSet>>; // aka BoardLocus
+    public var cells(default, set):Array<Cell<AspectSet>>; // aka BoardCell
     public var extras(default, null):Array<AspectSet>;
     public var key(default, set):PtrKey;
 
@@ -20,7 +20,7 @@ class State {
         globals = [];
         players = [];
         nodes   = [];
-        loci    = [];
+        cells    = [];
         extras  = [];
     }
 
@@ -29,7 +29,7 @@ class State {
         globals.splice(0, globals.length);
         players.splice(0, players.length);
         nodes.splice  (0, nodes.length);
-        loci.splice   (0, loci.length);
+        cells.splice   (0, cells.length);
         extras.splice (0, extras.length);
     }
 
@@ -53,13 +53,13 @@ class State {
         return val;
     }
 
-    public function set_loci(val:Array<GridLocus<AspectSet>>):Array<GridLocus<AspectSet>> {
-        if (loci == null) loci = val;
+    public function set_cells(val:Array<Cell<AspectSet>>):Array<Cell<AspectSet>> {
+        if (cells == null) cells = val;
         return val;
     }
 
     public function resolve() {
         global = globals[0];
-        loci = [];
+        cells = [];
     }
 }

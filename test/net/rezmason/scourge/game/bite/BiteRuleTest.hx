@@ -13,7 +13,7 @@ import net.rezmason.scourge.game.meta.FreshnessAspect;
 
 using Lambda;
 using net.rezmason.scourge.game.BoardUtils;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.state.StatePlan;
 using net.rezmason.utils.Pointers;
 
@@ -316,8 +316,8 @@ class BiteRuleTest extends ScourgeRuleTest
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var enemyHeadID:Int = state.players[1][head_];
-        var enemyHead:BoardLocus = state.loci[enemyHeadID];
-        var cavity:BoardLocus = enemyHead.s().s().e();
+        var enemyHead:BoardCell = state.cells[enemyHeadID];
+        var cavity:BoardCell = enemyHead.s().s().e();
         cavity.value[occupier_] = 1;
 
         VisualAssert.assert('two player bite with small cavity in player one', state.spitBoard(plan));

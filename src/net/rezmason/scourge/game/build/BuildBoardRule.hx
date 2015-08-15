@@ -2,8 +2,8 @@ package net.rezmason.scourge.game.build;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.grid.GridDirection.*;
-import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.grid.GridDirection.*;
+import net.rezmason.grid.Cell;
 import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
@@ -11,7 +11,7 @@ import net.rezmason.scourge.game.TempParams;
 
 using Lambda;
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.utils.Pointers;
 
 typedef XY = {x:Float, y:Float};
@@ -26,11 +26,11 @@ class BuildBoardRule extends BaseRule<FullBuildBoardParams> {
 
     override private function _prime():Void {
         var bodyNodesByPlayer:Array<Array<AspectSet>> = [for (ike in 0...numPlayers()) []];
-        for (petriLocus in params.loci) addNode();
-        for (petriLocus in params.loci) {
-            var petriDatum = petriLocus.value;
-            var nodeLocus = state.loci[petriLocus.id];
-            var node = nodeLocus.value;
+        for (petriCell in params.cells) addNode();
+        for (petriCell in params.cells) {
+            var petriDatum = petriCell.value;
+            var nodeCell = state.cells[petriCell.id];
+            var node = nodeCell.value;
 
             if (petriDatum.isWall == true) {
                 node[isFilled_] = TRUE;
@@ -38,12 +38,12 @@ class BuildBoardRule extends BaseRule<FullBuildBoardParams> {
                 node[isFilled_] = TRUE;
                 node[occupier_] = petriDatum.owner;
                 bodyNodesByPlayer[petriDatum.owner].push(node);
-                if (petriDatum.isHead) getPlayer(petriDatum.owner)[head_] = petriLocus.id;
+                if (petriDatum.isHead) getPlayer(petriDatum.owner)[head_] = petriCell.id;
             }
 
             for (direction in GridUtils.allDirections()) {
-                var neighbor = petriLocus.neighbors[direction];
-                if (neighbor != null) nodeLocus.attach(state.loci[neighbor.id], direction);
+                var neighbor = petriCell.neighbors[direction];
+                if (neighbor != null) nodeCell.attach(state.cells[neighbor.id], direction);
             }
         }
 

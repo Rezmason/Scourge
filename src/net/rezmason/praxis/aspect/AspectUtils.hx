@@ -4,7 +4,7 @@ import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
 
 using Lambda;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.utils.Pointers;
 
 class AspectUtils {

@@ -44,7 +44,7 @@ class StateHistorian {
         var oldState = state;
         state = Unserializer.run(savedState.data);
         state.key = key;
-        if (oldState != null) state.loci = oldState.loci.copy();
+        if (oldState != null) state.cells = oldState.cells.copy();
     }
 
     public function reset():Void {

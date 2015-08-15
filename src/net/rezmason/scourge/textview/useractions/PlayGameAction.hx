@@ -71,7 +71,7 @@ class PlayGameAction extends UserAction {
         for (ike in 0...4) pieceTableIDs = pieceTableIDs.concat(pieces.getAllPieceIDsOfSize(ike + 1));
 
         cfg.buildParams.numPlayers = numPlayers;
-        cfg.buildParams.loci = PetriBoardFactory.create(numPlayers, circular);
+        cfg.buildParams.cells = PetriBoardFactory.create(numPlayers, circular);
         cfg.pieceParams.pieceTableIDs = pieceTableIDs;
         cfg.pieceParams.allowRotating = true;
         cfg.pieceParams.allowSkipping = false;

@@ -2,10 +2,10 @@ package net.rezmason.scourge.game;
 
 import massive.munit.Assert;
 import VisualAssert;
-import net.rezmason.praxis.grid.GridDirection.*;
-import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.grid.GridDirection.*;
+import net.rezmason.grid.Cell;
 
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 
 class GridUtilsTest {
 
@@ -29,11 +29,11 @@ class GridUtilsTest {
     public function rowTest():Void {
         nodeItr = 0;
 
-        var node:GridLocus<Int> = makeNode();
-        var first:GridLocus<Int> = node;
+        var node:Cell<Int> = makeNode();
+        var first:Cell<Int> = node;
         Assert.areEqual(0, node.value);
         for (i in 1...10) node = node.attach(makeNode(), E);
-        var last:GridLocus<Int> = node;
+        var last:Cell<Int> = node;
         Assert.areEqual(10 - 1, node.run(E).value);
         Assert.areEqual(last, first.run(E));
         Assert.areEqual(first, last.run(W));
@@ -57,8 +57,8 @@ class GridUtilsTest {
 
     function underFiveOnly(val:Int, connection:Int):Bool { return val < 5; }
 
-    function makeNode():GridLocus<Int> {
-        var node:GridLocus<Int> = new GridLocus<Int>(nodeItr, nodeItr);
+    function makeNode():Cell<Int> {
+        var node:Cell<Int> = new Cell<Int>(nodeItr, nodeItr);
         nodeItr++;
         return node;
     }

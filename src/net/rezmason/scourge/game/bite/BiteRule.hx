@@ -8,7 +8,7 @@ import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
@@ -63,15 +63,15 @@ class BiteRule extends BaseRule<BiteParams> {
 
             var newMoves:Array<BiteMove> = [];
             for (node in frontNodes) {
-                var locus:BoardLocus = getNodeLocus(node);
-                for (neighbor in neighborsFor(locus)) {
+                var cell:BoardCell = getNodeCell(node);
+                for (neighbor in neighborsFor(cell)) {
                     if (isValidEnemy(headIDs, currentPlayer, neighbor.value)) {
                         var move:BiteMove = getMove(getID(node), [getID(neighbor.value)]);
                         if (!params.omnidirectional && params.baseReachOnThickness) {
                             // The baseReachOnThickness params param uses this data to determine how far to extend a bite
-                            var backwards:Int = (locus.neighbors.indexOf(neighbor) + 4) % 8;
+                            var backwards:Int = (cell.neighbors.indexOf(neighbor) + 4) % 8;
                             var depth:Int = 0;
-                            for (innerNode in locus.walk(backwards)) {
+                            for (innerNode in cell.walk(backwards)) {
                                 if (innerNode.value[occupier_] == currentPlayer) depth++;
                                 else break;
                             }
@@ -100,8 +100,8 @@ class BiteRule extends BaseRule<BiteParams> {
                     if (params.omnidirectional) {
                         // Omnidirectional moves are squiggly
                         for (bitNodeID in move.bitNodes) {
-                            var bitLocus:BoardLocus = getLocus(bitNodeID);
-                            for (neighbor in neighborsFor(bitLocus)) {
+                            var bitCell:BoardCell = getCell(bitNodeID);
+                            for (neighbor in neighborsFor(bitCell)) {
                                 if (isValidEnemy(headIDs, currentPlayer, neighbor.value) && move.bitNodes.indexOf(getID(neighbor.value)) == -1) {
                                     newMoves.push(getMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move));
                                 }
@@ -109,10 +109,10 @@ class BiteRule extends BaseRule<BiteParams> {
                         }
                     } else if (!params.baseReachOnThickness || move.bitNodes.length < move.thickness) {
                         // Straight moves are a little easier to generate
-                        var firstBitLocus:BoardLocus = getLocus(move.bitNodes[0]);
-                        var lastBitLocus:BoardLocus = getLocus(move.bitNodes[move.bitNodes.length - 1]);
-                        var direction:Int = getLocus(move.targetNode).neighbors.indexOf(firstBitLocus);
-                        var neighbor:BoardLocus = lastBitLocus.neighbors[direction];
+                        var firstBitCell:BoardCell = getCell(move.bitNodes[0]);
+                        var lastBitCell:BoardCell = getCell(move.bitNodes[move.bitNodes.length - 1]);
+                        var direction:Int = getCell(move.targetNode).neighbors.indexOf(firstBitCell);
+                        var neighbor:BoardCell = lastBitCell.neighbors[direction];
                         if (isValidEnemy(headIDs, currentPlayer, neighbor.value)) {
                             var nextMove:BiteMove = getMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move);
                             nextMove.thickness = move.thickness;
@@ -188,7 +188,7 @@ class BiteRule extends BaseRule<BiteParams> {
     // "front" as in "battle front". Areas where the current player touches other players
     /*
     inline function isFront(headIDs:Array<Int>, node:AspectSet):Bool {
-        return neighborsFor(getNodeLocus(node)).isNotNull(isValidEnemy.bind(headIDs, node[occupier_]));
+        return neighborsFor(getNodeCell(node)).isNotNull(isValidEnemy.bind(headIDs, node[occupier_]));
     }
     */
 
@@ -197,7 +197,7 @@ class BiteRule extends BaseRule<BiteParams> {
 
         var occupier:Int = node[occupier_];
 
-        for (neighbor in neighborsFor(getNodeLocus(node))) {
+        for (neighbor in neighborsFor(getNodeCell(node))) {
             if (isValidEnemy(headIDs, occupier, neighbor.value)) {
                 isNotNull = true;
                 break;
@@ -259,7 +259,7 @@ class BiteRule extends BaseRule<BiteParams> {
         return firstIndex;
     }
 
-    inline function neighborsFor(node:BoardLocus):Array<BoardLocus> {
+    inline function neighborsFor(node:BoardCell):Array<BoardCell> {
         return params.orthoOnly ? node.orthoNeighbors() : node.neighbors;
     }
 }

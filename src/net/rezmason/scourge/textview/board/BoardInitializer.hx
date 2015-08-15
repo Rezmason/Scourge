@@ -12,7 +12,7 @@ import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 
 class BoardInitializer {
 
@@ -38,7 +38,7 @@ class BoardInitializer {
             var view = entity.get(BoardNodeView);
             if (nodeState.petriData.isWall) {
                 var hasEmptyNeighbor = false;
-                for (neighbor in nodeState.locus.neighbors) {
+                for (neighbor in nodeState.cell.neighbors) {
                     if (neighbor != null && !neighbor.value.get(BoardNodeState).petriData.isWall) {
                         hasEmptyNeighbor = true;
                         break;
@@ -47,7 +47,7 @@ class BoardInitializer {
                 if (hasEmptyNeighbor) {
                     numSpacesThatMatter++;
                 } else {
-                    trimmings[nodeState.locus.id] = true;
+                    trimmings[nodeState.cell.id] = true;
                     entity.remove(BoardNodeView);
                 }
             } else {
@@ -79,7 +79,7 @@ class BoardInitializer {
             if (nodeState.petriData.isWall) {
                 var numNeighbors:Int = 0;
                 var bitfield:Int = 0;
-                for (neighbor in nodeState.locus.orthoNeighbors()) {
+                for (neighbor in nodeState.cell.orthoNeighbors()) {
                     if (neighbor != null && !trimmings[neighbor.id] && neighbor.value.get(BoardNodeState).petriData.isWall) {
                         bitfield = bitfield | (1 << numNeighbors);
                     }

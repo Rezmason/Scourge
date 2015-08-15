@@ -1,10 +1,10 @@
 package net.rezmason.scourge.game.build;
 
-import net.rezmason.praxis.grid.GridDirection.*;
+import net.rezmason.grid.GridDirection.*;
 import net.rezmason.scourge.Vec3;
 import net.rezmason.scourge.game.build.PetriTypes;
 
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 
 class PetriBoardFactory {
 
@@ -18,7 +18,7 @@ class PetriBoardFactory {
     private static var INIT_GRID_CLEANER:EReg = ~/(\n\t)/g;
     private static var NUMERIC_CHAR:EReg = ~/(\d)/g;
 
-    public static function create(numPlayers:Int = 2, circular:Bool = false, initGrid:String = null):Array<PetriLocus> {
+    public static function create(numPlayers:Int = 2, circular:Bool = false, initGrid:String = null):Array<PetriCell> {
 
         // Players' heads are spaced evenly apart from one another along the perimeter of a circle.
         // Player 1's head is at a 45 degree angle
@@ -67,8 +67,8 @@ class PetriBoardFactory {
         }
 
         var boardWidth:Int = Std.int(maxHeadX - minHeadX + 1 + 2 * PADDING);
-        var loci:Array<PetriLocus> = makeSquareGraph(boardWidth);
-        var topLeft = loci[0];
+        var cells:Array<PetriCell> = makeSquareGraph(boardWidth);
+        var topLeft = cells[0];
         var hasInitGrid:Bool = initGrid != null && initGrid.length > 0;
         obstructGraphRim(topLeft);
         if (circular) encircleGraph(topLeft, boardWidth * 0.5 - RIM);
@@ -76,28 +76,28 @@ class PetriBoardFactory {
         if (hasInitGrid) initGraph(topLeft, initGrid, boardWidth);
 
         var outerRadius:Float = (boardWidth - 1) / 2;
-        for (locus in loci) {
-            var pos = locus.value.pos;
+        for (cell in cells) {
+            var pos = cell.value.pos;
             pos.x = pos.x - outerRadius;
             pos.y = outerRadius - pos.y;
             pos.z = (pos.x * pos.x + pos.y * pos.y) * -0.02;
         }
 
-        return loci;
+        return cells;
     }
 
-    inline static function makeSquareGraph(width:Int):Array<PetriLocus> {
+    inline static function makeSquareGraph(width:Int):Array<PetriCell> {
 
-        var loci = [];
+        var cells = [];
 
         // Make a connected grid of nodes with default values
-        var locus:PetriLocus = addLocus(loci, 0, 0);
-        var row:PetriLocus = locus;
-        for (ike in 1...width) locus = locus.attach(addLocus(loci, ike, 0), E);
+        var cell:PetriCell = addCell(cells, 0, 0);
+        var row:PetriCell = cell;
+        for (ike in 1...width) cell = cell.attach(addCell(cells, ike, 0), E);
 
         for (ike in 1...width) {
             for (column in row.walk(E)) {
-                var next:PetriLocus = addLocus(loci, column.value.pos.x, ike);
+                var next:PetriCell = addCell(cells, column.value.pos.x, ike);
                 column.attach(next, S);
                 next.attach(column.w(), NW);
                 next.attach(column.e(), NE);
@@ -107,23 +107,23 @@ class PetriBoardFactory {
         }
 
         // run to the northwest
-        return loci;
+        return cells;
     }
 
-    inline static function addLocus(loci:Array<PetriLocus>, x:Float, y:Float):PetriLocus {
-        var locus = new PetriLocus(loci.length, {pos:new Vec3(x, y, 0), isWall:false, isHead:false, owner:-1});
-        loci.push(locus);
-        return locus;
+    inline static function addCell(cells:Array<PetriCell>, x:Float, y:Float):PetriCell {
+        var cell = new PetriCell(cells.length, {pos:new Vec3(x, y, 0), isWall:false, isHead:false, owner:-1});
+        cells.push(cell);
+        return cell;
     }
 
-    inline static function obstructGraphRim(grid:PetriLocus):Void {
-        for (locus in grid.walk(E)) locus.value.isWall = true;
-        for (locus in grid.walk(S)) locus.value.isWall = true;
-        for (locus in grid.run(S).walk(E)) locus.value.isWall = true;
-        for (locus in grid.run(E).walk(S)) locus.value.isWall = true;
+    inline static function obstructGraphRim(grid:PetriCell):Void {
+        for (cell in grid.walk(E)) cell.value.isWall = true;
+        for (cell in grid.walk(S)) cell.value.isWall = true;
+        for (cell in grid.run(S).walk(E)) cell.value.isWall = true;
+        for (cell in grid.run(E).walk(S)) cell.value.isWall = true;
     }
 
-    inline static function populateGraphHeads(grid:PetriLocus, headCoords:Array<Vec3>):Void {
+    inline static function populateGraphHeads(grid:PetriCell, headCoords:Array<Vec3>):Void {
         for (ike in 0...headCoords.length) {
             var coord:Vec3 = headCoords[ike];
             var head = grid.run(E, Std.int(coord.x)).run(S, Std.int(coord.y)).value;
@@ -132,7 +132,7 @@ class PetriBoardFactory {
         }
     }
 
-    inline static function encircleGraph(grid:PetriLocus, radius:Float):Void {
+    inline static function encircleGraph(grid:PetriCell, radius:Float):Void {
         // Circular levels' cells are obstructed if they're too far from the board's center
 
         var y:Int = 0;
@@ -151,7 +151,7 @@ class PetriBoardFactory {
         }
     }
 
-    inline static function initGraph(grid:PetriLocus, initGrid:String, boardWidth:Int):Void {
+    inline static function initGraph(grid:PetriCell, initGrid:String, boardWidth:Int):Void {
 
         // Refer to the initGrid to assign initial values to nodes
 

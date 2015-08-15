@@ -6,7 +6,7 @@ import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 
 using Lambda;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.Pointers;
 
@@ -64,7 +64,7 @@ class CavityRule extends BaseRule<Dynamic> {
             var edgeNodes = [];
             for (node in bodyNode.listToArray(state.nodes, bodyNext_)) {
                 var hasDifferentNeighbor = false;
-                for (neighbor in getNodeLocus(node).orthoNeighbors()) {
+                for (neighbor in getNodeCell(node).orthoNeighbors()) {
                     if (neighbor == null || neighbor.value[isFilled_] == FALSE || neighbor.value[occupier_] != occupier) {
                         hasDifferentNeighbor = true;
                         break;
@@ -75,10 +75,10 @@ class CavityRule extends BaseRule<Dynamic> {
 
             // For each edge node,
             for (edgeNode in edgeNodes) {
-                var edgeLocus = getNodeLocus(edgeNode);
+                var edgeCell = getNodeCell(edgeNode);
                 // For each empty ortho neighbor,
                 for (direction in GridUtils.orthoDirections()) {
-                    var neighbor = edgeLocus.neighbors[direction];
+                    var neighbor = edgeCell.neighbors[direction];
                     if (neighbor.value[isFilled_] == FALSE || neighbor.value[occupier_] != occupier) {
                         // make an edge that's in-no-group
                         currentEdge = makeEdge(getID(edgeNode), direction);
@@ -118,13 +118,13 @@ class CavityRule extends BaseRule<Dynamic> {
                 {
                     changeInDirection = -2;
                     nextDirection = (direction + 6) % 8;
-                    nextEdge = makeEdge(getID(getLocus(inID).neighbors[(direction + 1) % 8].value), nextDirection);
+                    nextEdge = makeEdge(getID(getCell(inID).neighbors[(direction + 1) % 8].value), nextDirection);
                 }
                 if (edgeGroupIDs[nextEdge] == null)
                 {
                     changeInDirection = 0;
                     nextDirection = direction;
-                    nextEdge = makeEdge(getID(getLocus(inID).neighbors[(direction + 2) % 8].value), nextDirection);
+                    nextEdge = makeEdge(getID(getCell(inID).neighbors[(direction + 2) % 8].value), nextDirection);
                 }
                 if (edgeGroupIDs[nextEdge] == null)
                 {
@@ -147,19 +147,19 @@ class CavityRule extends BaseRule<Dynamic> {
                 // Error, probably!
         }
 
-        var loci:Array<BoardLocus> = [];
+        var cells:Array<BoardCell> = [];
 
         for (ike in 0...numGroups) {
             if (groupAngles[ike] == -8) {
                 // Add its interior to the cavityNodes
                 currentEdge = groupFirstEdges[ike];
-                loci.push(getLocus(getEdgeID(currentEdge)).neighbors[getEdgeDirection(currentEdge)]);
+                cells.push(getCell(getEdgeID(currentEdge)).neighbors[getEdgeDirection(currentEdge)]);
             }
         }
 
         var numCavityNodes:Int = 0;
-        for (locus in loci.expandGraphSequence(true, isEmpty)) {
-            cavityNodes[numCavityNodes] = locus.value;
+        for (cell in cells.expandGraphSequence(true, isEmpty)) {
+            cavityNodes[numCavityNodes] = cell.value;
             numCavityNodes++;
         }
 

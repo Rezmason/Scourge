@@ -2,12 +2,12 @@ package net.rezmason.praxis.state;
 
 import haxe.ds.ArraySort;
 
-import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.grid.Cell;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.Aspect.*;
 
 using Lambda;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;

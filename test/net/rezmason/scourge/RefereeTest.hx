@@ -42,7 +42,7 @@ class RefereeTest {
         players = [];
         for (ike in 0...4) players.push(new TestPlayer(ike, noop, random));
         var config:ScourgeGameConfig = new ScourgeGameConfig();
-        config.buildParams.loci = PetriBoardFactory.create(2);
+        config.buildParams.cells = PetriBoardFactory.create(2);
         referee.beginGame(players, randGen, config);
 
         var savedGame = referee.saveGame();
@@ -80,7 +80,7 @@ class RefereeTest {
 
         Assert.isFalse(referee.gameBegun);
         var config:ScourgeGameConfig = new ScourgeGameConfig();
-        config.buildParams.loci = PetriBoardFactory.create(2);
+        config.buildParams.cells = PetriBoardFactory.create(2);
         referee.beginGame(players, randGen, config);
         Assert.isTrue(referee.gameBegun);
 

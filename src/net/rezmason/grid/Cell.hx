@@ -1,13 +1,13 @@
-package net.rezmason.praxis.grid;
+package net.rezmason.grid;
 
-@:allow(net.rezmason.praxis.grid.GridUtils)
-class GridLocus<T> {
+@:allow(net.rezmason.grid.GridUtils)
+class Cell<T> {
     public var value(default, null):T;
-    public var neighbors(default, null):Array<GridLocus<T>>;
+    public var neighbors(default, null):Array<Cell<T>>;
     public var id(default, null):Int;
 
-    var _orthoNeighbors:Array<GridLocus<T>>;
-    var _diagNeighbors:Array<GridLocus<T>>;
+    var _orthoNeighbors:Array<Cell<T>>;
+    var _diagNeighbors:Array<Cell<T>>;
 
     public function new(id:Int, value:T):Void {
         this.value = value;

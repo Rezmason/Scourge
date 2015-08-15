@@ -14,7 +14,7 @@ import net.rezmason.scourge.game.piece.DropPieceRule.DropPieceMove;
 import net.rezmason.scourge.game.piece.PieceAspect;
 import net.rezmason.scourge.game.BoardUtils;
 
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 
 class BasicSmarts extends Smarts {
 
@@ -114,8 +114,8 @@ class BasicSmarts extends Smarts {
         var dropMove:DropPieceMove = cast move;
         if (dropMove.addedNodes == null || dropMove.addedNodes.length == 0) return false;
         for (nodeID in dropMove.addedNodes) {
-            for (neighborLocus in game.state.loci[nodeID].orthoNeighbors()) {
-                if (neighborLocus.value[isFilled_] == TRUE && neighborLocus.value[occupier_] == NULL) {
+            for (neighborCell in game.state.cells[nodeID].orthoNeighbors()) {
+                if (neighborCell.value[isFilled_] == TRUE && neighborCell.value[occupier_] == NULL) {
                     return true;
                 }
             }

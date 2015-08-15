@@ -6,7 +6,7 @@ import net.rezmason.ecce.Query;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
-import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.grid.Cell;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.components.*;
@@ -18,7 +18,7 @@ import net.rezmason.utils.Pointers;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 
 class Sequencer extends Reckoner {
 
@@ -82,8 +82,8 @@ class Sequencer extends Reckoner {
     function onGameBegun(config, game) {
         this.game = game;
         this.config = cast config;
-        var petriLoci = this.config.buildParams.loci;
-        var loci:Array<GridLocus<Entity>> = [];
+        var petriCells = this.config.buildParams.cells;
+        var cells:Array<Cell<Entity>> = [];
         primePointers(game.state, game.plan);
 
         rulePresentersByCause = [null => Type.createInstance(this.config.fallbackRP, [game, ecce])];
@@ -100,15 +100,15 @@ class Sequencer extends Reckoner {
             nodeState.lastValues = node.copy();
             nodeState.lastValues[occupier_] = NULL;
             nodeState.lastValues[isFilled_] = FALSE;
-            loci[id] = new GridLocus(id, e);
-            nodeState.locus = loci[id];
-            nodeState.petriData = petriLoci[id].value;
+            cells[id] = new Cell(id, e);
+            nodeState.cell = cells[id];
+            nodeState.petriData = petriCells[id].value;
         }
 
-        for (ike in 0...loci.length) {
+        for (ike in 0...cells.length) {
             for (direction in GridUtils.allDirections()) {
-                var neighbor = petriLoci[ike].neighbors[direction];
-                if (neighbor != null) loci[ike].attach(loci[neighbor.id], direction);
+                var neighbor = petriCells[ike].neighbors[direction];
+                if (neighbor != null) cells[ike].attach(cells[neighbor.id], direction);
             }
         }
 

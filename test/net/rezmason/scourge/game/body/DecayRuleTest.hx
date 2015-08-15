@@ -9,7 +9,7 @@ import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.DecayRule;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.praxis.state.StatePlan;
 using net.rezmason.utils.Pointers;
@@ -69,8 +69,8 @@ class DecayRuleTest extends ScourgeRuleTest
         makeState([decayRule], 1, TestBoards.loosePetri);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var head:BoardLocus = state.loci[state.players[0][head_]];
-        var bump:BoardLocus = head.nw();
+        var head:BoardCell = state.cells[state.players[0][head_]];
+        var bump:BoardCell = head.nw();
 
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);

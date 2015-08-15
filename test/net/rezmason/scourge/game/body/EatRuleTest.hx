@@ -3,7 +3,7 @@ package net.rezmason.scourge.game.body;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.grid.Cell;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
@@ -11,7 +11,7 @@ import net.rezmason.scourge.game.body.EatCellsRule;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.praxis.state.StatePlan;
 using net.rezmason.utils.Pointers;

@@ -23,7 +23,7 @@ class BuildConfig extends ScourgeConfig<BuildParams> {
         return {
             firstPlayer:0,
             numPlayers:4,
-            loci:null,
+            cells:null,
         };
     }
 }

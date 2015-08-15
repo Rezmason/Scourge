@@ -1,3 +1,9 @@
+Renaming again
+    Node --> Space
+
+Add card support
+    Pieces are just cards
+
 MUnit C++ target is crashing
         RefereeTest
             GameConfig serialization

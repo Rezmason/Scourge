@@ -50,7 +50,7 @@ class StateHistorianTest {
         var config = {
             firstPlayer:0,
             numPlayers:2,
-            loci:PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab),
+            cells:PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab),
 
             recursive:false,
             eatHeads:true,

@@ -21,7 +21,7 @@ import net.rezmason.scourge.game.piece.SwapAspect;
 import net.rezmason.utils.SafeSerializer;
 import net.rezmason.utils.openfl.Resource;
 
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.state.StatePlan;
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.utils.Alphabetizer;
@@ -86,7 +86,7 @@ class ScourgeGameConfigTest
 
     @Test
     public function allActionsRegisteredTest():Void {
-        config.buildParams.loci = PetriBoardFactory.create();
+        config.buildParams.cells = PetriBoardFactory.create();
         makeState();
         
         for (action in config.actionIDs) {
@@ -101,7 +101,7 @@ class ScourgeGameConfigTest
         // decay, cavity, killHeadlessPlayer, oneLivingPlayer, pickPiece
 
         config.buildParams.numPlayers = 2;
-        config.buildParams.loci = PetriBoardFactory.create(2, false, TestBoards.twoPlayerBullshit);
+        config.buildParams.cells = PetriBoardFactory.create(2, false, TestBoards.twoPlayerBullshit);
         makeState();
 
         VisualAssert.assert('floating zero square, stringy player one with no head', state.spitBoard(plan));
@@ -141,7 +141,7 @@ class ScourgeGameConfigTest
         // bite, decay, cavity, killHeadlessPlayer, oneLivingPlayer
 
         config.buildParams.numPlayers = 2;
-        config.buildParams.loci = PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab);
+        config.buildParams.cells = PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab);
         config.biteParams.startingBites = 5;
         makeState();
 
@@ -198,7 +198,7 @@ class ScourgeGameConfigTest
         config.pieceParams.hatSize = 3;
         config.pieceParams.startingSwaps = 6;
         config.pieceParams.allowFlipping = true;
-        config.buildParams.loci = PetriBoardFactory.create();
+        config.buildParams.cells = PetriBoardFactory.create();
         makeState();
         startAction.update();
         startAction.chooseMove();
@@ -237,7 +237,7 @@ class ScourgeGameConfigTest
         // forfeit, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece
 
         config.buildParams.numPlayers = 2;
-        config.buildParams.loci = PetriBoardFactory.create();
+        config.buildParams.cells = PetriBoardFactory.create();
         makeState();
         startAction.update();
         startAction.chooseMove();
@@ -271,7 +271,7 @@ class ScourgeGameConfigTest
         // dropPiece, eatCells, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
         config.buildParams.numPlayers = 2;
-        config.buildParams.loci = PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab);
+        config.buildParams.cells = PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab);
         config.pieceParams.pieceTableIDs = [pieces.getPieceIdBySizeAndIndex(3, 1)]; // '--- block'
         makeState();
         startAction.update();

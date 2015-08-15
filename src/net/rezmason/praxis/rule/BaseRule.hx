@@ -76,8 +76,8 @@ class BaseRule<Params> extends Reckoner {
 
     @:final inline function addNode():AspectSet {
         var node = addAspectSet(plan.nodeAspectTemplate, state.nodes, historyState.nodes, numNodes());
-        var locus:BoardLocus = new BoardLocus(getID(node), node);
-        state.loci.push(locus);
+        var cell:BoardCell = new BoardCell(getID(node), node);
+        state.cells.push(cell);
         return node;
     }
 

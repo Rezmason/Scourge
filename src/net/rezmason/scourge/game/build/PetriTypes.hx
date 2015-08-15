@@ -1,6 +1,6 @@
 package net.rezmason.scourge.game.build;
 
-import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.grid.Cell;
 
 typedef PetriData = {
     var pos:Vec3;
@@ -9,4 +9,4 @@ typedef PetriData = {
     var owner:Int;
 }
 
-typedef PetriLocus = GridLocus<PetriData>;
+typedef PetriCell = Cell<PetriData>;

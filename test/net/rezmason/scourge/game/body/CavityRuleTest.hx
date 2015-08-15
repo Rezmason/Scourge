@@ -5,14 +5,14 @@ import VisualAssert;
 
 import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.grid.GridDirection.*;
-import net.rezmason.praxis.grid.GridLocus;
+import net.rezmason.grid.GridDirection.*;
+import net.rezmason.grid.Cell;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.body.CavityRule;
 
 
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.praxis.state.StatePlan;
 using net.rezmason.utils.Pointers;
@@ -79,8 +79,8 @@ class CavityRuleTest extends ScourgeRuleTest
         makeState([cavityRule], 1, TestBoards.cavityCity);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var head:BoardLocus = state.loci[state.players[0][head_]];
-        var bump:BoardLocus = head.run(S, 5);
+        var head:BoardCell = state.cells[state.players[0][head_]];
+        var bump:BoardCell = head.run(S, 5);
 
         var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);

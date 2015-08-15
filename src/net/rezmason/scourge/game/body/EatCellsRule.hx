@@ -8,7 +8,7 @@ import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.ds.ShitList;
 
 using Lambda;
-using net.rezmason.praxis.grid.GridUtils;
+using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.MapUtils;
@@ -58,9 +58,9 @@ class EatCellsRule extends BaseRule<EatCellsParams> {
             // search in all directions
             for (direction in directionsFor(params.eatOrthogonallyOnly)) {
                 var pendingNodes:Array<AspectSet> = [];
-                var locus:BoardLocus = getNodeLocus(node);
-                for (scout in locus.walk(direction)) {
-                    if (scout == locus) continue; // starting node
+                var cell:BoardCell = getNodeCell(node);
+                for (scout in cell.walk(direction)) {
+                    if (scout == cell) continue; // starting node
                     if (scout.value[isFilled_] > 0) {
                         var scoutOccupier:Int = scout.value[occupier_];
                         if (scoutOccupier == currentPlayer || eatenNodes[getID(scout.value)] != null) {
