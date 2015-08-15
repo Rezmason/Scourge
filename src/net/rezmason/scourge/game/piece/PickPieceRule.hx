@@ -19,19 +19,17 @@ typedef PickPieceMove = {>Move,
 
 class PickPieceRule extends BaseRule<FullPickPieceParams> {
 
-    static var stateReqs:AspectRequirements;
-
     private var allMoves:Array<PickPieceMove>;
 
     // This rule is surprisingly complex
 
-    @extra(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_;
-    @extra(PieceAspect.PIECE_HAT_PREV) var pieceHatPrev_;
+    @card(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_;
+    @card(PieceAspect.PIECE_HAT_PREV) var pieceHatPrev_;
 
-    @extra(PieceAspect.PIECE_NEXT) var pieceNext_;
-    @extra(PieceAspect.PIECE_PREV) var piecePrev_;
+    @card(PieceAspect.PIECE_NEXT) var pieceNext_;
+    @card(PieceAspect.PIECE_PREV) var piecePrev_;
 
-    @extra(PieceAspect.PIECE_OPTION_ID) var pieceMoveID_;
+    @card(PieceAspect.PIECE_OPTION_ID) var pieceMoveID_;
 
     @global(PieceAspect.PIECES_PICKED) var piecesPicked_;
     @global(PieceAspect.PIECE_FIRST) var pieceFirst_;
@@ -58,8 +56,8 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
         } else if (state.global[pieceTableID_] == NULL) {
             // Iterate over the hat's contents and include the corresponding moves
             moves = [];
-            var firstHatPiece:AspectSet = getExtra(state.global[pieceHatFirst_]);
-            var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
+            var firstHatPiece:AspectSet = getCard(state.global[pieceHatFirst_]);
+            var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.cards, pieceHatNext_);
             for (piece in hatPieces) moves.push(allMoves[piece[pieceMoveID_]]);
         } else {
             moves = [];
@@ -119,11 +117,11 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
             }
         }
 
-        // Create a hat extra for every move
+        // Create a hat card for every move
         var allPieces:Array<AspectSet> = [];
         for (move in allMoves) {
-            move.hatIndex = numExtras();
-            var piece:AspectSet = addExtra();
+            move.hatIndex = numCards();
+            var piece:AspectSet = addCard();
             piece[pieceMoveID_] = move.id;
             allPieces.push(piece);
         }
@@ -153,26 +151,11 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
     }
 
     private function pickMoveFromHat(move:PickPieceMove):PickPieceMove {
-
-        var firstHatPiece:AspectSet = getExtra(state.global[pieceHatFirst_]);
-        var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.extras, pieceHatNext_);
-
-        // Because pieces are differently weighted, we need to use a binary search algo
-        // to retrieve a picked piece
-
-        // ...or maybe not. TODO: Revisit this
-
-        var maxWeight:Float = 0;
-        var weights:Array<Float> = [];
-        for (piece in hatPieces) {
-            weights.push(maxWeight);
-            maxWeight += allMoves[piece[pieceMoveID_]].weight;
-        }
-
-        var pickedPiece:AspectSet = getExtra(move.hatIndex);
+        var firstHatPiece:AspectSet = getCard(state.global[pieceHatFirst_]);
+        var pickedPiece:AspectSet = getCard(move.hatIndex);
         state.global[piecesPicked_] = state.global[piecesPicked_] + 1;
 
-        var nextPiece:AspectSet = pickedPiece.removeSet(state.extras, pieceHatNext_, pieceHatPrev_);
+        var nextPiece:AspectSet = pickedPiece.removeSet(state.cards, pieceHatNext_, pieceHatPrev_);
 
         if (pickedPiece == firstHatPiece) {
             firstHatPiece = nextPiece;
@@ -184,30 +167,12 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
     }
 
     private function buildHat():Void {
-        var firstPiece:AspectSet = getExtra(state.global[pieceFirst_]);
-        var allPieces:Array<AspectSet> = firstPiece.listToArray(state.extras, pieceNext_);
+        var firstPiece:AspectSet = getCard(state.global[pieceFirst_]);
+        var allPieces:Array<AspectSet> = firstPiece.listToArray(state.cards, pieceNext_);
         allPieces.chainByAspect(ident_, pieceHatNext_, pieceHatPrev_);
         state.global[pieceHatFirst_] = getID(firstPiece);
         state.global[piecesPicked_] = 0;
         state.global[pieceHatPlayer_] = state.global[currentPlayer_];
-    }
-
-    private function binarySearch(val:Float, list:Array<Float>):Int {
-
-        function search(min:Int, max:Int):Int {
-
-            var halfway:Int = Std.int((min + max) * 0.5);
-            var output:Int = halfway;
-
-            if (max < min) output = -1;
-            else if (max - min == 1) output = (list[max] - val > val - list[min]) ? min : max;
-            else if (list[halfway] > val) output = search(min, halfway);
-            else if (list[halfway] < val) output = search(halfway, max);
-
-            return output;
-        }
-
-        return search(0, list.length - 1);
     }
 
     // We fill the hat up again if it's empty

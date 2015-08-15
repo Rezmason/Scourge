@@ -20,6 +20,7 @@ using net.rezmason.utils.Pointers;
 
     public var globalAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
     public var playerAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
+    public var cardAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
     public var spaceAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
     public var extraAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
 
@@ -63,27 +64,32 @@ using net.rezmason.utils.Pointers;
     @:final inline function getSpace(index:Int):AspectSet return state.spaces[index];
     @:final inline function getCell(index:Int):BoardCell return state.cells[index];
     @:final inline function getPlayer(index:Int):AspectSet return state.players[index];
+    @:final inline function getCard(index:Int):AspectSet return state.cards[index];
     @:final inline function getExtra(index:Int):AspectSet return state.extras[index];
 
     @:final inline function eachSpace():Iterator<AspectSet> return state.spaces.iterator();
     @:final inline function eachCell():Iterator<BoardCell> return state.cells.iterator();
     @:final inline function eachPlayer():Iterator<AspectSet> return state.players.iterator();
+    @:final inline function eachCard():Iterator<AspectSet> return state.cards.iterator();
     @:final inline function eachExtra():Iterator<AspectSet> return state.extras.iterator();
 
-    @:final inline function numSpaces():Int return state.spaces.length;
-    @:final inline function numCells():Int return state.cells.length; // should be the same as numSpaces though
-    @:final inline function numPlayers():Int return state.players.length;
-    @:final inline function numExtras():Int return state.extras.length;
+    @:final inline function numSpaces():UInt return state.spaces.length;
+    @:final inline function numCells():UInt return state.cells.length; // should be the same as numSpaces though
+    @:final inline function numPlayers():UInt return state.players.length;
+    @:final inline function numCards():UInt return state.cards.length;
+    @:final inline function numExtras():UInt return state.extras.length;
 
     @:final inline function addGlobalAspectRequirement(req:AspectProperty):Void globalAspectRequirements [req.id] = req;
     @:final inline function addPlayerAspectRequirement(req:AspectProperty):Void playerAspectRequirements [req.id] = req;
     @:final inline function addSpaceAspectRequirement(req:AspectProperty):Void spaceAspectRequirements [req.id] = req;
+    @:final inline function addCardAspectRequirement(req:AspectProperty):Void cardAspectRequirements [req.id] = req;
 
     #if macro
     private static var lkpSources:Map<String, String> = [
         'global'=>'plan',
         'player'=>'plan',
         'space'=>'plan',
+        'card'=>'plan',
         'extra'=>'this',
     ];
 

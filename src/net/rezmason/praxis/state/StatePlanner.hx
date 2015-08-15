@@ -24,18 +24,21 @@ class StatePlanner {
 
         var globalRequirements:AspectRequirements = new AspectRequirements();
         var playerRequirements:AspectRequirements = new AspectRequirements();
+        var cardRequirements:AspectRequirements = new AspectRequirements();
         var spaceRequirements:AspectRequirements = new AspectRequirements();
 
         for (rule in rules) {
             if (rule == null) continue;
             globalRequirements.absorb(rule.globalAspectRequirements);
             playerRequirements.absorb(rule.playerAspectRequirements);
+            cardRequirements.absorb(rule.cardAspectRequirements);
             spaceRequirements.absorb(rule.spaceAspectRequirements);
             // trace(Type.getClassName(Type.getClass(rule)));
         }
 
         planAspects(globalRequirements, plan.globalAspectLookup, plan.globalAspectTemplate, state.key);
         planAspects(playerRequirements, plan.playerAspectLookup, plan.playerAspectTemplate, state.key);
+        planAspects(cardRequirements, plan.cardAspectLookup, plan.cardAspectTemplate, state.key);
         planAspects(spaceRequirements, plan.spaceAspectLookup, plan.spaceAspectTemplate, state.key);
 
         return plan;

@@ -74,6 +74,10 @@ class BaseRule<Params> extends Reckoner {
         return addAspectSet(plan.playerAspectTemplate, state.players, historyState.players, numPlayers());
     }
 
+    @:final inline function addCard():AspectSet {
+        return addAspectSet(plan.cardAspectTemplate, state.cards, historyState.cards, numCards());
+    }
+
     @:final inline function addSpace():AspectSet {
         var space = addAspectSet(plan.spaceAspectTemplate, state.spaces, historyState.spaces, numSpaces());
         var cell:BoardCell = new BoardCell(getID(space), space);

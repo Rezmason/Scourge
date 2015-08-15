@@ -10,6 +10,7 @@ class State {
     public var global(default, null):AspectSet;
     public var globals(default, null):Array<AspectSet>;
     public var players(default, null):Array<AspectSet>;
+    public var cards(default, null):Array<AspectSet>;
     public var spaces(default, null):Array<AspectSet>;
     public var cells(default, set):Array<Cell<AspectSet>>; // aka BoardCell
     public var extras(default, null):Array<AspectSet>;
@@ -19,8 +20,9 @@ class State {
         this.key = key;
         globals = [];
         players = [];
-        spaces   = [];
-        cells    = [];
+        cards   = [];
+        spaces  = [];
+        cells   = [];
         extras  = [];
     }
 
@@ -28,14 +30,16 @@ class State {
         global = null;
         globals.splice(0, globals.length);
         players.splice(0, players.length);
-        spaces.splice  (0, spaces.length);
-        cells.splice   (0, cells.length);
+        cards.splice  (0, cards.length);
+        spaces.splice (0, spaces.length);
+        cells.splice  (0, cells.length);
         extras.splice (0, extras.length);
     }
 
     function hxSerialize(s:haxe.Serializer):Void {
         s.serialize(globals);
         s.serialize(players);
+        s.serialize(cards);
         s.serialize(spaces);
         s.serialize(extras);
     }
@@ -43,7 +47,8 @@ class State {
     function hxUnserialize(s:haxe.Unserializer):Void {
         globals = s.unserialize();
         players = s.unserialize();
-        spaces   = s.unserialize();
+        cards   = s.unserialize();
+        spaces  = s.unserialize();
         extras  = s.unserialize();
         resolve();
     }

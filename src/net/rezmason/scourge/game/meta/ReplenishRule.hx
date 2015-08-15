@@ -20,21 +20,25 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
 
     @global(ReplenishableAspect.STATE_REP_FIRST) var stateRepFirst_;
     @global(ReplenishableAspect.PLAYER_REP_FIRST) var playerRepFirst_;
+    @global(ReplenishableAspect.CARD_REP_FIRST) var cardRepFirst_;
     @global(ReplenishableAspect.NODE_REP_FIRST) var spaceRepFirst_;
 
     private var globalProperties:Array<ReplenishableProperty>;
     private var playerProperties:Array<ReplenishableProperty>;
+    private var cardProperties:Array<ReplenishableProperty>;
     private var spaceProperties:Array<ReplenishableProperty>;
     
     override public function _init():Void {
 
         globalProperties = [ for (key in params.globalProperties.keys().a2z() ) params.globalProperties[key] ];
         playerProperties = [ for (key in params.playerProperties.keys().a2z() ) params.playerProperties[key] ];
-        spaceProperties   = [ for (key in params.spaceProperties  .keys().a2z() ) params.spaceProperties  [key] ];
+        cardProperties   = [ for (key in params.cardProperties  .keys().a2z() ) params.cardProperties  [key] ];
+        spaceProperties  = [ for (key in params.spaceProperties .keys().a2z() ) params.spaceProperties [key] ];
 
         for (rProp in globalProperties ) addGlobalAspectRequirement(rProp.prop);
         for (rProp in playerProperties ) addPlayerAspectRequirement(rProp.prop);
-        for (rProp in spaceProperties   ) addSpaceAspectRequirement  (rProp.prop);
+        for (rProp in cardProperties   ) addCardAspectRequirement  (rProp.prop);
+        for (rProp in spaceProperties  ) addSpaceAspectRequirement (rProp.prop);
     }
 
     override private function _prime():Void {
@@ -43,6 +47,7 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
 
         var stateReps:Array<AspectSet> = [];
         var playerReps:Array<AspectSet> = [];
+        var cardReps:Array<AspectSet> = [];        
         var spaceReps:Array<AspectSet> = [];
 
         // Create the replenishables
@@ -56,6 +61,12 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
             var replenishable:AspectSet = makeReplenishable(repProp, plan.playerAspectLookup);
             repProp.replenishableID = getID(replenishable);
             playerReps.push(replenishable);
+        }
+
+        for (repProp in cardProperties) {
+            var replenishable:AspectSet = makeReplenishable(repProp, plan.cardAspectLookup);
+            repProp.replenishableID = getID(replenishable);
+            cardReps.push(replenishable);
         }
 
         for (repProp in spaceProperties) {
@@ -80,6 +91,13 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
             state.global[playerRepFirst_] = NULL;
         }
 
+        if (cardReps.length > 0) {
+            cardReps.chainByAspect(ident_, repNext_, repPrev_);
+            state.global[cardRepFirst_] = getID(cardReps[0]);
+        } else {
+            state.global[cardRepFirst_] = NULL;
+        }
+
         if (spaceReps.length > 0) {
             spaceReps.chainByAspect(ident_, repNext_, repPrev_);
             state.global[spaceRepFirst_] = getID(spaceReps[0]);
@@ -91,6 +109,7 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
     override private function _chooseMove(choice:Int):Void {
         updateReps(globalProperties, [state.global]);
         updateReps(playerProperties, state.players);
+        updateReps(cardProperties, state.cards);
         updateReps(spaceProperties, state.spaces);
         signalChange();
     }

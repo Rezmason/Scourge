@@ -23,6 +23,7 @@ class CacheRule extends BaseRule<CacheParams> {
 
         globalAspectRequirements.absorb(rule.globalAspectRequirements);
         playerAspectRequirements.absorb(rule.playerAspectRequirements);
+        cardAspectRequirements.absorb(rule.cardAspectRequirements);
         spaceAspectRequirements.absorb(rule.spaceAspectRequirements);
     }
 

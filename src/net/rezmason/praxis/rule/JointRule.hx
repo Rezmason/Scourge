@@ -10,6 +10,7 @@ class JointRule extends BaseRule<Array<Rule>> {
         for (rule in params) {
             globalAspectRequirements.absorb(rule.globalAspectRequirements);
             playerAspectRequirements.absorb(rule.playerAspectRequirements);
+            cardAspectRequirements.absorb(rule.cardAspectRequirements);
             spaceAspectRequirements.absorb(rule.spaceAspectRequirements);
         }
         isRandom = params[0].isRandom;

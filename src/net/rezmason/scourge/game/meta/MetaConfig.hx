@@ -23,6 +23,7 @@ class MetaConfig extends ScourgeConfig<MetaParams> {
             maxSkips: 3,
             playerProperties: new Map(),
             spaceProperties: new Map(),
+            cardProperties: new Map(),
             globalProperties: new Map(),
         };
     }

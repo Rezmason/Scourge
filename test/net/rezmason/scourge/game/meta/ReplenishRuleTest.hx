@@ -34,6 +34,7 @@ class ReplenishRuleTest extends ScourgeRuleTest
         var params:ReplenishParams = {
             globalProperties:null,
             playerProperties:null,
+            cardProperties:null,
             spaceProperties:null,
         };
 
@@ -48,6 +49,8 @@ class ReplenishRuleTest extends ScourgeRuleTest
             TestAspect.VALUE_2.id => { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
             TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
+
+        params.cardProperties = new Map();
 
         params.spaceProperties = [
             TestAspect.VALUE_1.id => { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
