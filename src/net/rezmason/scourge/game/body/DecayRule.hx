@@ -39,7 +39,7 @@ class DecayRule extends BaseRule<DecayParams> {
         }
 
         // Use the heads as starting points for a flood fill of connected living cells
-        var livingBodyNeighbors:Array<BoardCell> = heads.expandGrid(params.decayOrthogonallyOnly, isLivingBodyNeighbor);
+        var livingBodyNeighbors:BoardSelection = heads.select().expand(params.decayOrthogonallyOnly, isLivingBodyNeighbor);
 
         var cellDied = false;
         // Remove cells from player bodies
@@ -50,7 +50,7 @@ class DecayRule extends BaseRule<DecayParams> {
             var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != NULL) {
                 for (space in getSpace(bodyFirst).iterate(state.spaces, bodyNext_)) {
-                    if (livingBodyNeighbors[getID(space)] == null) {
+                    if (!livingBodyNeighbors.contains(getID(space))) {
                         bodyFirst = killCell(space, maxFreshness, bodyFirst);
                         cellDied = true;
                     } else {

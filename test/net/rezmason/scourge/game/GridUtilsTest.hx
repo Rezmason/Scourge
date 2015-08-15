@@ -50,9 +50,15 @@ class GridUtilsTest {
         for (n in first.walk(E)) ike++;
         Assert.areEqual(10, ike);
 
-        Assert.areEqual(10, first.getGridSequence().length);
+        Assert.areEqual(10, measureIterator([first].select().expand().iterator()));
 
-        Assert.areEqual(5, first.getGridSequence(underFiveOnly).length);
+        Assert.areEqual(5, measureIterator([first].select().expand(false, underFiveOnly).iterator()));
+    }
+
+    function measureIterator(itr:Iterator<Cell<Dynamic>>) {
+        var count = 0;
+        for (cell in itr) count++;
+        return count;
     }
 
     function underFiveOnly(val:Int, connection:Int):Bool { return val < 5; }

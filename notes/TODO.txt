@@ -1,7 +1,3 @@
-Rethink grid Cell
-    Diagonals should be derived from orthogonals after grid construction
-    GridUtils getGraph vs getGraphSequence?
-
 Lime conversion
     Move Flash init step from Context
     Refactor shim, engine, GLSystem

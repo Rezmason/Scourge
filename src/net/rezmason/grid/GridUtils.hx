@@ -1,13 +1,7 @@
 package net.rezmason.grid;
 
 import net.rezmason.grid.GridDirection.*;
-import net.rezmason.ds.ShitList;
 import net.rezmason.utils.SkipIterator;
-
-using Lambda;
-using net.rezmason.utils.MapUtils;
-
-typedef SpreadFilter<T> = T->T->Bool;
 
 class GridUtils {
 
@@ -51,59 +45,10 @@ class GridUtils {
         return cell._diagNeighbors;
     }
 
-    public inline static function getGrid<T>(source:Cell<T>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
-        return expandGrid([source], orthoOnly, spreadFilter);
-    }
-
-    public inline static function expandGrid<T>(sources:Array<Cell<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
-        var cells:Array<Cell<T>> = [];
-        for (cell in sources) cells[cell.id] = cell;
-        var newCells:ShitList<Cell<T>> = new ShitList(sources);
-
-        var cell:Cell<T> = newCells.pop();
-        while (cell != null) {
-
-            var neighbors:Array<Cell<T>> = orthoOnly ? orthoNeighbors(cell) : cell.neighbors;
-
-            for (neighbor in neighbors) {
-                if (neighbor != null && cells[neighbor.id] == null && (spreadFilter == null || spreadFilter(neighbor.value, cell.value))) {
-                    cells[neighbor.id] = neighbor;
-                    newCells.add(neighbor);
-                }
-            }
-            cell = newCells.pop();
-        }
-
-        return cells;
-    }
-
-    public inline static function getGridSequence<T>(source:Cell<T>, orthoOnly:Null<Bool> = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
-        return expandGridSequence([source], orthoOnly, spreadFilter);
-    }
-
-    public inline static function expandGridSequence<T>(sources:Array<Cell<T>>, orthoOnly:Bool = false, spreadFilter:SpreadFilter<T> = null):Array<Cell<T>> {
-        var cells:Array<Cell<T>> = sources.copy();
-        var newCells:ShitList<Cell<T>> = new ShitList(sources);
-
-        var cellsByID:Array<Cell<T>> = [];
-        for (cell in cells) cellsByID[cell.id] = cell;
-
-        var cell:Cell<T> = newCells.pop();
-        while (cell != null) {
-
-            var neighbors:Array<Cell<T>> = orthoOnly ? orthoNeighbors(cell) : cell.neighbors;
-
-            for (neighbor in neighbors) {
-                if (neighbor != null && cellsByID[neighbor.id] == null && (spreadFilter == null || spreadFilter(neighbor.value, cell.value))) {
-                    cells.push(neighbor);
-                    newCells.add(neighbor);
-                    cellsByID[neighbor.id] = neighbor;
-                }
-            }
-            cell = newCells.pop();
-        }
-
-        return cells;
+    public inline static function select<T>(cells:Array<Cell<T>>) {
+        var selection = new Selection();
+        for (cell in cells) selection.add(cell);
+        return selection;
     }
 
     // Shortcuts
