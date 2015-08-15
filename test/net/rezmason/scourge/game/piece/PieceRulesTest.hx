@@ -93,11 +93,11 @@ class PieceRulesTest extends ScourgeRuleTest
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
 
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
-        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
+        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
+        var bodySpace:AspectSet = state.spaces[state.players[0][bodyFirst_]];
 
-        Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
+        Assert.areEqual(0, testListLength(numCells, bodySpace, bodyNext_, bodyPrev_));
     }
 
     @Test

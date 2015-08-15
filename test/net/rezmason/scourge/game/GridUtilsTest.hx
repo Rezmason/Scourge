@@ -9,7 +9,7 @@ using net.rezmason.grid.GridUtils;
 
 class GridUtilsTest {
 
-    var nodeItr:Int;
+    var spaceItr:Int;
     #if TIME_TESTS
     var time:Float;
 
@@ -27,19 +27,19 @@ class GridUtilsTest {
 
     @Test
     public function rowTest():Void {
-        nodeItr = 0;
+        spaceItr = 0;
 
-        var node:Cell<Int> = makeNode();
-        var first:Cell<Int> = node;
-        Assert.areEqual(0, node.value);
-        for (i in 1...10) node = node.attach(makeNode(), E);
-        var last:Cell<Int> = node;
-        Assert.areEqual(10 - 1, node.run(E).value);
+        var space:Cell<Int> = makeSpace();
+        var first:Cell<Int> = space;
+        Assert.areEqual(0, space.value);
+        for (i in 1...10) space = space.attach(makeSpace(), E);
+        var last:Cell<Int> = space;
+        Assert.areEqual(10 - 1, space.run(E).value);
         Assert.areEqual(last, first.run(E));
         Assert.areEqual(first, last.run(W));
 
-        nodeItr = 10;
-        for (n in node.walk(W)) Assert.areEqual(n.value, --nodeItr);
+        spaceItr = 10;
+        for (n in space.walk(W)) Assert.areEqual(n.value, --spaceItr);
 
         var ike:Int = 0;
 
@@ -57,9 +57,9 @@ class GridUtilsTest {
 
     function underFiveOnly(val:Int, connection:Int):Bool { return val < 5; }
 
-    function makeNode():Cell<Int> {
-        var node:Cell<Int> = new Cell<Int>(nodeItr, nodeItr);
-        nodeItr++;
-        return node;
+    function makeSpace():Cell<Int> {
+        var space:Cell<Int> = new Cell<Int>(spaceItr, spaceItr);
+        spaceItr++;
+        return space;
     }
 }

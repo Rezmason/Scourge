@@ -28,15 +28,15 @@ class BasicSmarts extends Smarts {
 
     @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
     
     override public function init(game:Game, config:GameConfig<Dynamic, Dynamic>, id:Int, random:Void->Float):Void {
         super.init(game, config, id, random);
         canSkip = config.params['piece'].allowSkipping;
 
-        occupier_ = game.plan.onNode(OwnershipAspect.OCCUPIER);
-        isFilled_ = game.plan.onNode(OwnershipAspect.IS_FILLED);
+        occupier_ = game.plan.onSpace(OwnershipAspect.OCCUPIER);
+        isFilled_ = game.plan.onSpace(OwnershipAspect.IS_FILLED);
     }
 
     override public function choose():GameEvent {
@@ -76,7 +76,7 @@ class BasicSmarts extends Smarts {
             var biteMoves:Array<Move> = game.getMovesForAction(biteActionID);
             if (biteMoves.length > 0) {
                 // pruning
-                var biteSizes:Array<Int> = biteMoves.map(function(_) return (cast _).bitNodes.length);
+                var biteSizes:Array<Int> = biteMoves.map(function(_) return (cast _).bitSpaces.length);
                 var maxBiteSize:Int = biteSizes[biteSizes.length - 1];
                 var maxBiteSizeIndex:Int = biteSizes.indexOf(maxBiteSize);
                 
@@ -112,9 +112,9 @@ class BasicSmarts extends Smarts {
 
     function dropMoveHugsEdges(move:Move):Bool {
         var dropMove:DropPieceMove = cast move;
-        if (dropMove.addedNodes == null || dropMove.addedNodes.length == 0) return false;
-        for (nodeID in dropMove.addedNodes) {
-            for (neighborCell in game.state.cells[nodeID].orthoNeighbors()) {
+        if (dropMove.addedSpaces == null || dropMove.addedSpaces.length == 0) return false;
+        for (spaceID in dropMove.addedSpaces) {
+            for (neighborCell in game.state.cells[spaceID].orthoNeighbors()) {
                 if (neighborCell.value[isFilled_] == TRUE && neighborCell.value[occupier_] == NULL) {
                     return true;
                 }
@@ -155,7 +155,7 @@ class BasicSmarts extends Smarts {
         for (ike in 0...moves.length) {
             trace('Attempting move $ike (${moves[ike]}):');
             game.chooseMove(actionID, moves[ike].id);
-            trace(BoardUtils.spitBoard(state, plan, true, (cast moves[ike]).addedNodes));
+            trace(BoardUtils.spitBoard(state, plan, true, (cast moves[ike]).addedSpaces));
             if (eval != null) trace(eval(moves[ike]));
             game.rewind(rev);
             trace('------');

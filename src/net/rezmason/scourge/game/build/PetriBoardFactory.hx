@@ -90,7 +90,7 @@ class PetriBoardFactory {
 
         var cells = [];
 
-        // Make a connected grid of nodes with default values
+        // Make a connected grid of spaces with default values
         var cell:PetriCell = addCell(cells, 0, 0);
         var row:PetriCell = cell;
         for (ike in 1...width) cell = cell.attach(addCell(cells, ike, 0), E);
@@ -153,7 +153,7 @@ class PetriBoardFactory {
 
     inline static function initGraph(grid:PetriCell, initGrid:String, boardWidth:Int):Void {
 
-        // Refer to the initGrid to assign initial values to nodes
+        // Refer to the initGrid to assign initial values to spaces
 
         var initGridWidth:Int = boardWidth + 1;
 

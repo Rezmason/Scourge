@@ -16,11 +16,11 @@ using net.rezmason.utils.Pointers;
 
 class EatCellsRule extends BaseRule<EatCellsParams> {
 
-    @node(BodyAspect.BODY_NEXT) var bodyNext_;
-    @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(FreshnessAspect.FRESHNESS) var freshness_;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(BodyAspect.BODY_NEXT) var bodyNext_;
+    @space(BodyAspect.BODY_PREV) var bodyPrev_;
+    @space(FreshnessAspect.FRESHNESS) var freshness_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
@@ -30,7 +30,7 @@ class EatCellsRule extends BaseRule<EatCellsParams> {
 
         var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = getPlayer(currentPlayer)[head_];
-        var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
+        var bodySpace:AspectSet = getSpace(getPlayer(currentPlayer)[bodyFirst_]);
         var maxFreshness:Int = state.global[maxFreshness_];
 
         // List all the players' heads
@@ -38,69 +38,69 @@ class EatCellsRule extends BaseRule<EatCellsParams> {
         var headIndices:Array<Int> = [];
         for (player in eachPlayer()) headIndices.push(player[head_]);
 
-        // Find all fresh body nodes of the current player
+        // Find all fresh body spaces of the current player
 
-        var newNodes:ShitList<AspectSet> = new ShitList(bodyNode.listToArray(state.nodes, bodyNext_).filter(isFresh));
+        var newSpaces:ShitList<AspectSet> = new ShitList(bodySpace.listToArray(state.spaces, bodyNext_).filter(isFresh));
 
-        var newNodesByID:Array<AspectSet> = [];
-        for (node in newNodes) newNodesByID[getID(node)] = node;
+        var newSpacesByID:Array<AspectSet> = [];
+        for (space in newSpaces) newSpacesByID[getID(space)] = space;
 
-        var eatenNodes:Array<AspectSet> = [];
-        var eatenNodeGroups:Array<Array<AspectSet>> = [];
+        var eatenSpaces:Array<AspectSet> = [];
+        var eatenSpaceGroups:Array<Array<AspectSet>> = [];
 
         // We search space for uninterrupted regions of player cells that begin and end
         // with cells of the current player. We propagate these searches from cells
-        // that have been freshly eaten, starting with the current player's fresh nodes
+        // that have been freshly eaten, starting with the current player's fresh spaces
 
-        var node:AspectSet = newNodes.pop();
-        if (node != null) newNodesByID[getID(node)] = null;
-        while (node != null) {
+        var space:AspectSet = newSpaces.pop();
+        if (space != null) newSpacesByID[getID(space)] = null;
+        while (space != null) {
             // search in all directions
             for (direction in directionsFor(params.eatOrthogonallyOnly)) {
-                var pendingNodes:Array<AspectSet> = [];
-                var cell:BoardCell = getNodeCell(node);
+                var pendingSpaces:Array<AspectSet> = [];
+                var cell:BoardCell = getSpaceCell(space);
                 for (scout in cell.walk(direction)) {
-                    if (scout == cell) continue; // starting node
+                    if (scout == cell) continue; // starting space
                     if (scout.value[isFilled_] > 0) {
                         var scoutOccupier:Int = scout.value[occupier_];
-                        if (scoutOccupier == currentPlayer || eatenNodes[getID(scout.value)] != null) {
-                            // Add nodes to the eaten region
-                            for (pendingNode in pendingNodes) {
-                                var playerID:Int = headIndices.indexOf(getID(pendingNode));
-                                if (playerID != -1 && params.takeBodiesFromEatenHeads) pendingNodes.absorb(getBody(playerID)); // body-from-head eating
-                                else if (params.eatRecursively && newNodesByID[getID(pendingNode)] == null) newNodes.add(pendingNode); // recursive eating
+                        if (scoutOccupier == currentPlayer || eatenSpaces[getID(scout.value)] != null) {
+                            // Add spaces to the eaten region
+                            for (pendingSpace in pendingSpaces) {
+                                var playerID:Int = headIndices.indexOf(getID(pendingSpace));
+                                if (playerID != -1 && params.takeBodiesFromEatenHeads) pendingSpaces.absorb(getBody(playerID)); // body-from-head eating
+                                else if (params.eatRecursively && newSpacesByID[getID(pendingSpace)] == null) newSpaces.add(pendingSpace); // recursive eating
 
-                                eatenNodes[getID(pendingNode)] = pendingNode;
+                                eatenSpaces[getID(pendingSpace)] = pendingSpace;
                             }
-                            eatenNodeGroups.push(pendingNodes);
+                            eatenSpaceGroups.push(pendingSpaces);
                             break;
                         } else if (headIndices[scoutOccupier] == getID(scout.value)) {
                             // Only eat heads if the params specifies this
-                            if (params.eatHeads) pendingNodes.push(scout.value);
+                            if (params.eatHeads) pendingSpaces.push(scout.value);
                             //else break;
                         } else {
-                            pendingNodes.push(scout.value);
+                            pendingSpaces.push(scout.value);
                         }
                     } else {
                         break;
                     }
                 }
             }
-            node = newNodes.pop();
-            if (node != null) newNodesByID[getID(node)] = null;
+            space = newSpaces.pop();
+            if (space != null) newSpacesByID[getID(space)] = null;
         }
 
         // Update cells in the eaten region
-        for (group in eatenNodeGroups) {
-            var nodesEaten = false;
-            for (node in group) {
-                if (node != null && node[occupier_] != currentPlayer) {
-                    node[occupier_] = currentPlayer;
-                    node[freshness_] = maxFreshness;
-                    nodesEaten = true;
+        for (group in eatenSpaceGroups) {
+            var spacesEaten = false;
+            for (space in group) {
+                if (space != null && space[occupier_] != currentPlayer) {
+                    space[occupier_] = currentPlayer;
+                    space[freshness_] = maxFreshness;
+                    spacesEaten = true;
                 }
             }
-            if (nodesEaten) maxFreshness++;
+            if (spacesEaten) maxFreshness++;
         }
 
         state.global[maxFreshness_] = maxFreshness;
@@ -112,10 +112,10 @@ class EatCellsRule extends BaseRule<EatCellsParams> {
 
             var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != NULL) {
-                var body:Array<AspectSet> = getNode(bodyFirst).listToArray(state.nodes, bodyNext_);
+                var body:Array<AspectSet> = getSpace(bodyFirst).listToArray(state.spaces, bodyNext_);
                 var revisedBody:Array<AspectSet> = [];
-                for (node in body) {
-                    if (node[isFilled_] == TRUE && node[occupier_] == playerID) revisedBody.push(node);
+                for (space in body) {
+                    if (space[isFilled_] == TRUE && space[occupier_] == playerID) revisedBody.push(space);
                 }
                 revisedBody.chainByAspect(ident_, bodyNext_, bodyPrev_);
                 if (revisedBody.length > 0) player[bodyFirst_] = getID(revisedBody[0]);
@@ -124,24 +124,24 @@ class EatCellsRule extends BaseRule<EatCellsParams> {
 
             var head:Int = player[head_];
             if (head != NULL) {
-                var headNode:AspectSet = getNode(head);
-                if (headNode[occupier_] != playerID) player[head_] = NULL;
+                var headSpace:AspectSet = getSpace(head);
+                if (headSpace[occupier_] != playerID) player[head_] = NULL;
             }
         }
 
-        // Add the filled eaten nodes to the current player body
-        for (node in eatenNodes) {
-            if (node != null && node[isFilled_] == TRUE) {
-                bodyNode = bodyNode.addSet(node, state.nodes, ident_, bodyNext_, bodyPrev_);
+        // Add the filled eaten spaces to the current player body
+        for (space in eatenSpaces) {
+            if (space != null && space[isFilled_] == TRUE) {
+                bodySpace = bodySpace.addSet(space, state.spaces, ident_, bodyNext_, bodyPrev_);
             }
         }
-        getPlayer(currentPlayer)[bodyFirst_] = getID(bodyNode);
+        getPlayer(currentPlayer)[bodyFirst_] = getID(bodySpace);
         signalChange();
     }
 
     function getBody(playerID:Int):Array<AspectSet> {
-        var bodyNode:AspectSet = getNode(getPlayer(playerID)[bodyFirst_]);
-        return bodyNode.listToArray(state.nodes, bodyNext_);
+        var bodySpace:AspectSet = getSpace(getPlayer(playerID)[bodyFirst_]);
+        return bodySpace.listToArray(state.spaces, bodyNext_);
     }
 
     function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
@@ -149,8 +149,8 @@ class EatCellsRule extends BaseRule<EatCellsParams> {
         return me[occupier_] == you[occupier_];
     }
 
-    function isFresh(node:AspectSet):Bool {
-        return node[freshness_] != NULL;
+    function isFresh(space:AspectSet):Bool {
+        return space[freshness_] != NULL;
     }
 
     function directionsFor(ortho:Bool):Iterator<Int> {

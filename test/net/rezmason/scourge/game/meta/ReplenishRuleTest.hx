@@ -34,7 +34,7 @@ class ReplenishRuleTest extends ScourgeRuleTest
         var params:ReplenishParams = {
             globalProperties:null,
             playerProperties:null,
-            nodeProperties:null,
+            spaceProperties:null,
         };
 
         params.globalProperties = [
@@ -49,7 +49,7 @@ class ReplenishRuleTest extends ScourgeRuleTest
             TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
-        params.nodeProperties = [
+        params.spaceProperties = [
             TestAspect.VALUE_1.id => { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
             TestAspect.VALUE_2.id => { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
             TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
@@ -67,9 +67,9 @@ class ReplenishRuleTest extends ScourgeRuleTest
         var playerValue2_:AspectPtr = plan.onPlayer(TestAspect.VALUE_2);
         var playerValue3_:AspectPtr = plan.onPlayer(TestAspect.VALUE_3);
 
-        var nodeValue1_:AspectPtr = plan.onNode(TestAspect.VALUE_1);
-        var nodeValue2_:AspectPtr = plan.onNode(TestAspect.VALUE_2);
-        var nodeValue3_:AspectPtr = plan.onNode(TestAspect.VALUE_3);
+        var spaceValue1_:AspectPtr = plan.onSpace(TestAspect.VALUE_1);
+        var spaceValue2_:AspectPtr = plan.onSpace(TestAspect.VALUE_2);
+        var spaceValue3_:AspectPtr = plan.onSpace(TestAspect.VALUE_3);
 
         var expectedValues1:Array<Int> = [0,1,2,3,];
         var expectedValues2:Array<Int> = [0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,];
@@ -91,10 +91,10 @@ class ReplenishRuleTest extends ScourgeRuleTest
                 Assert.areEqual(expectedValues3[index3], player[playerValue3_]);
             }
 
-            for (node in state.nodes) {
-                Assert.areEqual(expectedValues1[index1], node[nodeValue1_]);
-                Assert.areEqual(expectedValues2[index2], node[nodeValue2_]);
-                Assert.areEqual(expectedValues3[index3], node[nodeValue3_]);
+            for (space in state.spaces) {
+                Assert.areEqual(expectedValues1[index1], space[spaceValue1_]);
+                Assert.areEqual(expectedValues2[index2], space[spaceValue2_]);
+                Assert.areEqual(expectedValues3[index3], space[spaceValue3_]);
             }
 
             replenishRule.chooseMove();

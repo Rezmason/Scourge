@@ -5,11 +5,11 @@ import net.rezmason.praxis.rule.BaseRule;
 
 class ResetFreshnessRule extends BaseRule<Dynamic> {
 
-    @node(FreshnessAspect.FRESHNESS) var freshness_;
+    @space(FreshnessAspect.FRESHNESS) var freshness_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
     
     override private function _chooseMove(choice:Int):Void {
-        for (node in eachNode()) node[freshness_] = NULL;
+        for (space in eachSpace()) space[freshness_] = NULL;
         state.global[maxFreshness_] = 0;
         signalChange();
     }

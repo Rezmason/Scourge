@@ -80,15 +80,15 @@ class ScourgeRuleTest
         var count:Int = 0;
         var last:AspectSet = null;
 
-        for (node in first.iterate(state.nodes, next)) {
+        for (space in first.iterate(state.spaces, next)) {
             count++;
-            last = node;
+            last = space;
             if (count > expectedLength) break;
         }
         if (expectedLength != count) return expectedLength - count;
 
         count = 0;
-        for (node in last.iterate(state.nodes, prev)) {
+        for (space in last.iterate(state.spaces, prev)) {
             count++;
             if (count > expectedLength) break;
         }

@@ -84,12 +84,12 @@ class TurnRulesTest extends ScourgeRuleTest
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
-        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
-        var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
+        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var isFilled_:AspectPtr = plan.onSpace(OwnershipAspect.IS_FILLED);
 
         var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
-        var playerHead:AspectSet = state.nodes[head];
+        var playerHead:AspectSet = state.spaces[head];
 
         forfeitRule.update();
         var moves:Array<Move> = forfeitRule.moves;
@@ -123,13 +123,13 @@ class TurnRulesTest extends ScourgeRuleTest
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
-        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
-        var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
+        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var isFilled_:AspectPtr = plan.onSpace(OwnershipAspect.IS_FILLED);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
 
         var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
-        var playerHead:AspectSet = state.nodes[head];
+        var playerHead:AspectSet = state.spaces[head];
 
         playerHead[occupier_] = 1;
 

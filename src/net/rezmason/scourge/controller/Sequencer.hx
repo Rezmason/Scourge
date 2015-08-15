@@ -26,7 +26,7 @@ class Sequencer extends Reckoner {
     var config:ScourgeGameConfig = null;
     var game:Game = null;
     var player:PlayerSystem = null;
-    var qBoardNodeStates:Query;
+    var qBoardSpaceStates:Query;
     var qBoardViews:Query;
     var qAnimations:Query;
     var lastMaxFreshness:Int;
@@ -40,16 +40,16 @@ class Sequencer extends Reckoner {
     public var boardChangeSignal(default, null):Zig<String->Null<Int>->Entity->Void> = new Zig();
     public var animationLength(default, set):Float;
 
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
-    @node(FreshnessAspect.FRESHNESS) var freshness_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(FreshnessAspect.FRESHNESS) var freshness_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
     public function new() {
         super();
         ecce = new Present(Ecce);
-        qBoardNodeStates = ecce.query([BoardNodeState]);
-        qBoardViews = ecce.query([BoardNodeView]);
+        qBoardSpaceStates = ecce.query([BoardSpaceState]);
+        qBoardViews = ecce.query([BoardSpaceView]);
         qAnimations = ecce.query([GlyphAnimation]);
         waitingToProceed = false;
         animationLength = 1;
@@ -92,17 +92,17 @@ class Sequencer extends Reckoner {
             if (rpClass != null) rulePresentersByCause[cause] = Type.createInstance(rpClass, [game, ecce]);
         }
 
-        for (node in eachNode()) {
-            var id = getID(node);
-            var e = ecce.dispense([BoardNodeState, BoardNodeView]);
-            var nodeState = e.get(BoardNodeState);
-            nodeState.values = node;
-            nodeState.lastValues = node.copy();
-            nodeState.lastValues[occupier_] = NULL;
-            nodeState.lastValues[isFilled_] = FALSE;
+        for (space in eachSpace()) {
+            var id = getID(space);
+            var e = ecce.dispense([BoardSpaceState, BoardSpaceView]);
+            var spaceState = e.get(BoardSpaceState);
+            spaceState.values = space;
+            spaceState.lastValues = space.copy();
+            spaceState.lastValues[occupier_] = NULL;
+            spaceState.lastValues[isFilled_] = FALSE;
             cells[id] = new Cell(id, e);
-            nodeState.cell = cells[id];
-            nodeState.petriData = petriCells[id].value;
+            spaceState.cell = cells[id];
+            spaceState.petriData = petriCells[id].value;
         }
 
         for (ike in 0...cells.length) {
@@ -113,7 +113,7 @@ class Sequencer extends Reckoner {
         }
 
         gameStartSignal.dispatch(game, ecce);
-        sequence[0] = [for (e in qBoardNodeStates) rulePresentersByCause[null].presentBoardEffect(e)];
+        sequence[0] = [for (e in qBoardSpaceStates) rulePresentersByCause[null].presentBoardEffect(e)];
         processSequence();
         waitingToProceed = true;
         moveSequencedSignal.dispatch();
@@ -121,9 +121,9 @@ class Sequencer extends Reckoner {
 
     function onMoveStart(currentPlayer:Int, actionID:String, move:Int) {
         lastMaxFreshness = 0;
-        for (e in qBoardNodeStates) {
-            var nodeState = e.get(BoardNodeState);
-            nodeState.values.copyTo(nodeState.values);
+        for (e in qBoardSpaceStates) {
+            var spaceState = e.get(BoardSpaceState);
+            spaceState.values.copyTo(spaceState.values);
         }
     }
 
@@ -132,13 +132,13 @@ class Sequencer extends Reckoner {
         if (presenter == null) presenter = rulePresentersByCause[null];
         var maxFreshness:Int = state.global[maxFreshness_];
         if (maxFreshness > lastMaxFreshness) {
-            for (e in qBoardNodeStates) {
-                var freshness:Int = e.get(BoardNodeState).values[freshness_];
+            for (e in qBoardSpaceStates) {
+                var freshness:Int = e.get(BoardSpaceState).values[freshness_];
                 if (freshness >= lastMaxFreshness) {
                     if (sequence[freshness] == null) sequence[freshness] = [];
                     sequence[freshness].push(presenter.presentBoardEffect(e));
-                    var nodeState = e.get(BoardNodeState);
-                    nodeState.values.copyTo(nodeState.lastValues);
+                    var spaceState = e.get(BoardSpaceState);
+                    spaceState.values.copyTo(spaceState.lastValues);
                 }
             }
             lastMaxFreshness = maxFreshness;
@@ -154,7 +154,7 @@ class Sequencer extends Reckoner {
     public function proceed() {
         if (waitingToProceed) {
             for (entity in qBoardViews) {
-                if (entity.get(BoardNodeView).changed) {
+                if (entity.get(BoardSpaceView).changed) {
                     moveSettlingSignal.dispatch();
                     processSequence();
                     return;
@@ -174,11 +174,11 @@ class Sequencer extends Reckoner {
             if (step == null) continue;
             var lastAnim = null;
             var lastAnimEndTime:Float = 0;
-            for (effect in step) { // effects correspond to nodes on the board
+            for (effect in step) { // effects correspond to spaces on the board
                 if (effect == null) continue;
                 for (e in effect) {
                     var anim = e.get(GlyphAnimation);
-                    var subjectNodeState = anim.subject.get(BoardNodeState);
+                    var subjectSpaceState = anim.subject.get(BoardSpaceState);
                     anim.startTime += startTime;
                     animations.push(anim);
                     if (anim.startTime + anim.duration > lastAnimEndTime) {

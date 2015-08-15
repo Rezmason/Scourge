@@ -23,13 +23,13 @@ class BoardSettler extends Reckoner {
     var ecce:Ecce;
     var qBoard:Query;
 
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
 
     public function new():Void {
         super();
         ecce = new Present(Ecce);
-        qBoard = ecce.query([BoardNodeView, BoardNodeState]);
+        qBoard = ecce.query([BoardSpaceView, BoardSpaceState]);
     }
 
     @:final public function init(game:Game) primePointers(game.state, game.plan);
@@ -38,19 +38,19 @@ class BoardSettler extends Reckoner {
         var affectedEntities:Map<Entity, Bool> = new Map();
 
         for (entity in qBoard) {
-            var view = entity.get(BoardNodeView);
-            var nodeState = entity.get(BoardNodeState);
+            var view = entity.get(BoardSpaceView);
+            var spaceState = entity.get(BoardSpaceState);
             if (view.changed) {
                 affectedEntities[entity] = true;
-                for (neighbor in nodeState.cell.orthoNeighbors()) affectedEntities.set(neighbor.value, true);
+                for (neighbor in spaceState.cell.orthoNeighbors()) affectedEntities.set(neighbor.value, true);
             }
         }
         
         for (entity in affectedEntities.keys()) {
-            var view = entity.get(BoardNodeView);
+            var view = entity.get(BoardSpaceView);
             view.changed = false;
             
-            var nodeState = entity.get(BoardNodeState);
+            var spaceState = entity.get(BoardSpaceState);
 
             var anim = ecce.dispense([GlyphAnimation]).get(GlyphAnimation);
             anim.subject = entity;
@@ -69,20 +69,20 @@ class BoardSettler extends Reckoner {
 
             anim.topTo.set_p(-0.01);
 
-            var occupier = nodeState.values[occupier_];
-            if (!nodeState.petriData.isHead && nodeState.values[isFilled_] == TRUE && occupier != -1) {
+            var occupier = spaceState.values[occupier_];
+            if (!spaceState.petriData.isHead && spaceState.values[isFilled_] == TRUE && occupier != -1) {
                 var numNeighbors:Int = 0;
                 var bitfield:Int = 0;
-                for (neighbor in nodeState.cell.orthoNeighbors()) {
+                for (neighbor in spaceState.cell.orthoNeighbors()) {
                     if (neighbor != null) {
-                        var neighborValues = neighbor.value.get(BoardNodeState).values;
+                        var neighborValues = neighbor.value.get(BoardSpaceState).values;
                         if (neighborValues[isFilled_] == TRUE && neighborValues[occupier_] == occupier) {
                             bitfield = bitfield | (1 << numNeighbors);
                         }
                     }
                     numNeighbors++;
                 }
-                var pos = nodeState.petriData.pos;
+                var pos = spaceState.petriData.pos;
                 var nudge = nudgeArray[bitfield];
                 var x = nudge == null ? Math.random() * 0.4 - 0.2 : nudge.x;
                 var y = nudge == null ? Math.random() * 0.4 - 0.2 : nudge.y;

@@ -20,9 +20,9 @@ using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
 typedef DropPieceMove = {>Move,
-    var targetNode:Int;
-    var numAddedNodes:Int;
-    var addedNodes:Array<Int>;
+    var targetSpace:Int;
+    var numAddedSpaces:Int;
+    var addedSpaces:Array<Int>;
     var rotation:Int;
     var reflection:Int;
     var coord:IntCoord;
@@ -31,11 +31,11 @@ typedef DropPieceMove = {>Move,
 
 class DropPieceRule extends BaseRule<FullDropPieceParams> {
 
-    @node(BodyAspect.BODY_NEXT) var bodyNext_;
-    @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(FreshnessAspect.FRESHNESS) var freshness_;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(BodyAspect.BODY_NEXT) var bodyNext_;
+    @space(BodyAspect.BODY_PREV) var bodyPrev_;
+    @space(FreshnessAspect.FRESHNESS) var freshness_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(SkipAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
@@ -59,10 +59,10 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
         
         // get current player head
         var currentPlayer:Int = state.global[currentPlayer_];
-        var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
+        var bodySpace:AspectSet = getSpace(getPlayer(currentPlayer)[bodyFirst_]);
 
-        // Find edge nodes of current player
-        var edgeNodes:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_).filter(hasFreeEdge);
+        // Find edge spaces of current player
+        var edgeSpaces:Array<AspectSet> = bodySpace.listToArray(state.spaces, bodyNext_).filter(hasFreeEdge);
 
         var pieceReflection:Int = state.global[pieceReflection_];
         var pieceRotation:Int = state.global[pieceRotation_];
@@ -87,8 +87,8 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
                     if (!params.allowRotating && rotationIndex != allowedRotationIndex) continue;
                     var piece:Piece = freePiece.getPiece(reflectionIndex, rotationIndex);
 
-                    // For each edge node,
-                    for (node in edgeNodes) {
+                    // For each edge space,
+                    for (space in edgeSpaces) {
 
                         // Generate the piece's footprint
 
@@ -101,15 +101,15 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
 
                             var valid:Bool = true;
 
-                            var numAddedNodes:Int = 0;
-                            var addedNodes:Array<Int> = [];
+                            var numAddedSpaces:Int = 0;
+                            var addedSpaces:Array<Int> = [];
 
                             for (coord in piece.cells) {
-                                var nodeAtCoord:AspectSet = walkCell(getNodeCell(node), coord, homeCoord).value;
-                                addedNodes.push(getID(nodeAtCoord));
-                                numAddedNodes++;
-                                var occupier:Int = nodeAtCoord[occupier_];
-                                var isFilled:Int = nodeAtCoord[isFilled_];
+                                var spaceAtCoord:AspectSet = walkCell(getSpaceCell(space), coord, homeCoord).value;
+                                addedSpaces.push(getID(spaceAtCoord));
+                                numAddedSpaces++;
+                                var occupier:Int = spaceAtCoord[occupier_];
+                                var isFilled:Int = spaceAtCoord[isFilled_];
 
                                 if (isFilled == TRUE && !(params.dropOverlapsSelf && occupier == currentPlayer)) {
                                     valid = false;
@@ -119,13 +119,13 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
 
                             if (valid) {
                                 var dropMove:DropPieceMove = getMove();
-                                dropMove.targetNode = getID(node);
+                                dropMove.targetSpace = getID(space);
                                 dropMove.coord = homeCoord;
                                 dropMove.rotation = rotationIndex;
                                 dropMove.reflection = reflectionIndex;
                                 dropMove.id = dropMoves.length;
-                                dropMove.numAddedNodes = numAddedNodes;
-                                dropMove.addedNodes = addedNodes;
+                                dropMove.numAddedSpaces = numAddedSpaces;
+                                dropMove.addedSpaces = addedSpaces;
                                 dropMove.duplicate = false;
                                 dropMoves.push(dropMove);
                             }
@@ -160,11 +160,11 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
     inline static function makeMove():DropPieceMove {
         return {
             id:-1,
-            targetNode:NULL,
+            targetSpace:NULL,
             reflection:-1,
             rotation:-1,
-            numAddedNodes:0,
-            addedNodes:null,
+            numAddedSpaces:0,
+            addedSpaces:null,
             coord:null,
             duplicate:false,
         };
@@ -175,11 +175,11 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
         var currentPlayer:Int = state.global[currentPlayer_];
         var player:AspectSet = getPlayer(currentPlayer);
 
-        if (move.targetNode != NULL) {
+        if (move.targetSpace != NULL) {
             var maxFreshness:Int = state.global[maxFreshness_];
-            var bodyNode:AspectSet = getNode(getPlayer(currentPlayer)[bodyFirst_]);
-            for (id in move.addedNodes) bodyNode = fillAndOccupyCell(getNode(id), currentPlayer, maxFreshness, bodyNode);
-            player[bodyFirst_] = getID(bodyNode);
+            var bodySpace:AspectSet = getSpace(getPlayer(currentPlayer)[bodyFirst_]);
+            for (id in move.addedSpaces) bodySpace = fillAndOccupyCell(getSpace(id), currentPlayer, maxFreshness, bodySpace);
+            player[bodyFirst_] = getID(bodySpace);
             state.global[maxFreshness_] = maxFreshness + 1;
             player[numConsecutiveSkips_] = 0;
         } else {
@@ -192,10 +192,10 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
 
     override private function _collectMoves():Void movePool = allMoves.copy();
 
-    inline function hasFreeEdge(node:AspectSet):Bool {
+    inline function hasFreeEdge(space:AspectSet):Bool {
         var exists:Bool = false;
 
-        for (neighbor in neighborsFor(getNodeCell(node), params.dropOrthoOnly)) {
+        for (neighbor in neighborsFor(getSpaceCell(space), params.dropOrthoOnly)) {
             if (neighbor.value[isFilled_] == FALSE) {
                 exists = true;
                 break;
@@ -207,13 +207,13 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
 
     inline function movesAreEqual(move1:DropPieceMove, move2:DropPieceMove):Bool {
         var val:Bool = true;
-        //if (move1.targetNode != move2.targetNode) val = false;
-        if (move1.numAddedNodes != move2.numAddedNodes) {
+        //if (move1.targetSpace != move2.targetSpace) val = false;
+        if (move1.numAddedSpaces != move2.numAddedSpaces) {
             val = false;
         } else {
-            for (addedNodeID1 in move1.addedNodes) {
-                for (addedNodeID2 in move2.addedNodes) {
-                    if (addedNodeID1 == addedNodeID2) {
+            for (addedSpaceID1 in move1.addedSpaces) {
+                for (addedSpaceID2 in move2.addedSpaces) {
+                    if (addedSpaceID1 == addedSpaceID2) {
                         val = false;
                         break;
                     }
@@ -224,14 +224,14 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
         return val;
     }
 
-    inline function fillAndOccupyCell(me:AspectSet, currentPlayer:Int, maxFreshness, bodyNode:AspectSet):AspectSet {
+    inline function fillAndOccupyCell(me:AspectSet, currentPlayer:Int, maxFreshness, bodySpace:AspectSet):AspectSet {
         if (me[occupier_] != currentPlayer || me[isFilled_] == FALSE) me[freshness_] = maxFreshness;
         me[occupier_] = currentPlayer;
         me[isFilled_] = TRUE;
-        return bodyNode.addSet(me, state.nodes, ident_, bodyNext_, bodyPrev_);
+        return bodySpace.addSet(me, state.spaces, ident_, bodyNext_, bodyPrev_);
     }
 
-    // A works-for-now function for translating piece coords into nodes accessible from a given starting point
+    // A works-for-now function for translating piece coords into spaces accessible from a given starting point
     inline function walkCell(cell:BoardCell, fromCoord:IntCoord, toCoord:IntCoord):BoardCell {
         var dn:Int = 0;
         var dw:Int = 0;

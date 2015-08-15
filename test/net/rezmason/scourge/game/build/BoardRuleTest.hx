@@ -39,7 +39,7 @@ class BoardRuleTest extends ScourgeRuleTest {
 
         makeState(null, 4);
 
-        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
+        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
         for (player in state.players) {
@@ -47,8 +47,8 @@ class BoardRuleTest extends ScourgeRuleTest {
             Assert.areNotEqual(Aspect.NULL, player[head_]);
         }
 
-        for (node in state.nodes) {
-            Assert.isNotNull(node);
+        for (space in state.spaces) {
+            Assert.isNotNull(space);
         }
 
         VisualAssert.assert('Should appear to be four integers, equally spaced and equally distant from the edges of a box', state.spitBoard(plan));
@@ -94,12 +94,12 @@ class BoardRuleTest extends ScourgeRuleTest {
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan, false), '').length;
 
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
+        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
 
         var bodyFirst:Int = state.players[0][bodyFirst_];
         Assert.areNotEqual(Aspect.NULL, bodyFirst);
 
-        testListLength(numCells, state.nodes[bodyFirst], bodyNext_, bodyPrev_);
+        testListLength(numCells, state.spaces[bodyFirst], bodyNext_, bodyPrev_);
     }
 }

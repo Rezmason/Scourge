@@ -102,7 +102,7 @@ class BiteRuleTest extends ScourgeRuleTest
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
         for (move in moves) {
-            if (move.bitNodes.length == biteParams.maxReach) {
+            if (move.bitSpaces.length == biteParams.maxReach) {
                 biteRule.chooseMove(move.id);
                 break;
             }
@@ -147,7 +147,7 @@ class BiteRuleTest extends ScourgeRuleTest
         stateHistorian.write();
 
         for (move in moves) {
-            if (move.bitNodes.length == biteParams.maxReach) {
+            if (move.bitSpaces.length == biteParams.maxReach) {
                 biteRule.chooseMove(move.id);
                 break;
             }
@@ -190,7 +190,7 @@ class BiteRuleTest extends ScourgeRuleTest
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
         for (move in moves) {
-            if (move.bitNodes.length == biteParams.maxReach) {
+            if (move.bitSpaces.length == biteParams.maxReach) {
                 biteRule.chooseMove(move.id);
                 break;
             }
@@ -236,7 +236,7 @@ class BiteRuleTest extends ScourgeRuleTest
         Assert.areEqual(20, numCells); // 20 cells for player 1
 
         for (move in moves) {
-            if (move.bitNodes.has(enemyHeadID)) {
+            if (move.bitSpaces.has(enemyHeadID)) {
                 biteRule.chooseMove(move.id);
                 break;
             }
@@ -278,11 +278,11 @@ class BiteRuleTest extends ScourgeRuleTest
         Assert.areEqual(20, moves.length);
         var numCells:Int = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(20, numCells); // 20 cells for player 1
-        var numBitNodes:Int = 0;
+        var numBitSpaces:Int = 0;
         var thickestMoveID:Int = -1;
         for (move in moves) {
-            if (numBitNodes < move.bitNodes.length) {
-                numBitNodes = move.bitNodes.length;
+            if (numBitSpaces < move.bitSpaces.length) {
+                numBitSpaces = move.bitSpaces.length;
                 thickestMoveID = move.id;
             }
         }
@@ -291,7 +291,7 @@ class BiteRuleTest extends ScourgeRuleTest
         VisualAssert.assert('two player bite, deep bite right through the middle', state.spitBoard(plan));
 
         numCells = ~/([^1])/g.replace(state.spitBoard(plan), '').length;
-        Assert.areEqual(20 - numBitNodes, numCells); // 19 cells for player 1
+        Assert.areEqual(20 - numBitSpaces, numCells); // 19 cells for player 1
 
         testEnemyBody(numCells);
     }
@@ -314,7 +314,7 @@ class BiteRuleTest extends ScourgeRuleTest
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
+        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
         var enemyHeadID:Int = state.players[1][head_];
         var enemyHead:BoardCell = state.cells[enemyHeadID];
         var cavity:BoardCell = enemyHead.s().s().e();
@@ -333,7 +333,7 @@ class BiteRuleTest extends ScourgeRuleTest
 
         var cavityID:Int = getID(cavity.value);
         for (move in moves) {
-            if (move.bitNodes.has(cavityID)) {
+            if (move.bitSpaces.has(cavityID)) {
                 biteRule.chooseMove(move.id);
                 break;
             }
@@ -349,10 +349,10 @@ class BiteRuleTest extends ScourgeRuleTest
 
     private function testEnemyBody(expectedSize:Int):Void {
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
-        var bodyNode:AspectSet = state.nodes[state.players[1][bodyFirst_]];
+        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
+        var bodySpace:AspectSet = state.spaces[state.players[1][bodyFirst_]];
 
-        Assert.areEqual(0, testListLength(expectedSize, bodyNode, bodyNext_, bodyPrev_));
+        Assert.areEqual(0, testListLength(expectedSize, bodySpace, bodyNext_, bodyPrev_));
     }
 }

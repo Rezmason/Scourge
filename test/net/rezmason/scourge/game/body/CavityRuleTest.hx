@@ -62,10 +62,10 @@ class CavityRuleTest extends ScourgeRuleTest
         Assert.areEqual(31, numCavityCells);
 
         var cavityFirst_:AspectPtr = plan.onPlayer(BodyAspect.CAVITY_FIRST);
-        var cavityNext_:AspectPtr = plan.onNode(BodyAspect.CAVITY_NEXT);
-        var cavityPrev_:AspectPtr = plan.onNode(BodyAspect.CAVITY_PREV);
-        var cavityNode:AspectSet = state.nodes[state.players[0][cavityFirst_]];
-        Assert.areEqual(0, testListLength(numCavityCells, cavityNode, cavityNext_, cavityPrev_));
+        var cavityNext_:AspectPtr = plan.onSpace(BodyAspect.CAVITY_NEXT);
+        var cavityPrev_:AspectPtr = plan.onSpace(BodyAspect.CAVITY_PREV);
+        var cavitySpace:AspectSet = state.spaces[state.players[0][cavityFirst_]];
+        Assert.areEqual(0, testListLength(numCavityCells, cavitySpace, cavityNext_, cavityPrev_));
 
         var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         var totalArea:Int = state.players[0][totalArea_];
@@ -82,8 +82,8 @@ class CavityRuleTest extends ScourgeRuleTest
         var head:BoardCell = state.cells[state.players[0][head_]];
         var bump:BoardCell = head.run(S, 5);
 
-        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
-        var isFilled_:AspectPtr = plan.onNode(OwnershipAspect.IS_FILLED);
+        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var isFilled_:AspectPtr = plan.onSpace(OwnershipAspect.IS_FILLED);
         bump.value[occupier_] = 0;
         bump.value[isFilled_] = Aspect.TRUE;
 
@@ -113,10 +113,10 @@ class CavityRuleTest extends ScourgeRuleTest
         Assert.areEqual(31, numCavityCells);
 
         var cavityFirst_:AspectPtr = plan.onPlayer(BodyAspect.CAVITY_FIRST);
-        var cavityNext_:AspectPtr = plan.onNode(BodyAspect.CAVITY_NEXT);
-        var cavityPrev_:AspectPtr = plan.onNode(BodyAspect.CAVITY_PREV);
-        var cavityNode:AspectSet = state.nodes[state.players[0][cavityFirst_]];
-        Assert.areEqual(0, testListLength(numCavityCells, cavityNode, cavityNext_, cavityPrev_));
+        var cavityNext_:AspectPtr = plan.onSpace(BodyAspect.CAVITY_NEXT);
+        var cavityPrev_:AspectPtr = plan.onSpace(BodyAspect.CAVITY_PREV);
+        var cavitySpace:AspectSet = state.spaces[state.players[0][cavityFirst_]];
+        Assert.areEqual(0, testListLength(numCavityCells, cavitySpace, cavityNext_, cavityPrev_));
 
         totalArea = state.players[0][totalArea_];
         Assert.areEqual(numCells + numCavityCells, totalArea);

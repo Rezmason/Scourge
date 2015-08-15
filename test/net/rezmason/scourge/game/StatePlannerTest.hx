@@ -61,8 +61,8 @@ class StatePlannerTest {
             Assert.isNotNull(state.players[ike][playerTestValue_]);
         }
 
-        // Make sure there's the right aspects on each node
-        var nodeTestValue_:AspectPtr = plan.onNode(TestAspect.VALUE_1);
-        for (node in state.nodes) Assert.isNotNull(node[nodeTestValue_]);
+        // Make sure there's the right aspects on each space
+        var spaceTestValue_:AspectPtr = plan.onSpace(TestAspect.VALUE_1);
+        for (space in state.spaces) Assert.isNotNull(space[spaceTestValue_]);
     }
 }

@@ -14,11 +14,11 @@ using net.rezmason.utils.Pointers;
 
 class DecayRule extends BaseRule<DecayParams> {
 
-    @node(BodyAspect.BODY_NEXT) var bodyNext_;
-    @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(FreshnessAspect.FRESHNESS) var freshness_;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(BodyAspect.BODY_NEXT) var bodyNext_;
+    @space(BodyAspect.BODY_PREV) var bodyPrev_;
+    @space(FreshnessAspect.FRESHNESS) var freshness_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
@@ -33,7 +33,7 @@ class DecayRule extends BaseRule<DecayParams> {
         var heads:Array<BoardCell> = [];
         for (player in eachPlayer()) {
             var headIndex:Int = player[head_];
-            if (headIndex != NULL && getNode(headIndex)[occupier_] == getID(player)) {
+            if (headIndex != NULL && getSpace(headIndex)[occupier_] == getID(player)) {
                 heads.push(getCell(headIndex));
             }
         }
@@ -49,9 +49,9 @@ class DecayRule extends BaseRule<DecayParams> {
 
             var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != NULL) {
-                for (node in getNode(bodyFirst).iterate(state.nodes, bodyNext_)) {
-                    if (livingBodyNeighbors[getID(node)] == null) {
-                        bodyFirst = killCell(node, maxFreshness, bodyFirst);
+                for (space in getSpace(bodyFirst).iterate(state.spaces, bodyNext_)) {
+                    if (livingBodyNeighbors[getID(space)] == null) {
+                        bodyFirst = killCell(space, maxFreshness, bodyFirst);
                         cellDied = true;
                     } else {
                         totalArea++;
@@ -72,14 +72,14 @@ class DecayRule extends BaseRule<DecayParams> {
         return me[occupier_] == you[occupier_];
     }
 
-    function killCell(node:AspectSet, freshness:Int, firstIndex:Int):Int {
-        node[isFilled_] = FALSE;
-        node[occupier_] = NULL;
-        node[freshness_] = freshness;
+    function killCell(space:AspectSet, freshness:Int, firstIndex:Int):Int {
+        space[isFilled_] = FALSE;
+        space[occupier_] = NULL;
+        space[freshness_] = freshness;
 
-        var nextNode:AspectSet = node.removeSet(state.nodes, bodyNext_, bodyPrev_);
-        if (firstIndex == getID(node)) {
-            firstIndex = (nextNode == null) ? NULL : getID(nextNode);
+        var nextSpace:AspectSet = space.removeSet(state.spaces, bodyNext_, bodyPrev_);
+        if (firstIndex == getID(space)) {
+            firstIndex = (nextSpace == null) ? NULL : getID(nextSpace);
         }
         return firstIndex;
     }

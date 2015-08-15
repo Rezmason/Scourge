@@ -5,7 +5,7 @@ import net.rezmason.praxis.PraxisTypes.AspectSet;
 import net.rezmason.grid.Cell;
 import net.rezmason.scourge.game.build.PetriTypes;
 
-class BoardNodeState {
+class BoardSpaceState {
     public var values:AspectSet;
     public var lastValues:AspectSet;
     public var petriData:PetriData;

@@ -254,15 +254,15 @@ class ScourgeGameConfigTest
     public function dropActionTest():Void {
         /*
         // Useful for interpreting drop moves
-        function hilightNodes(move, node) {
-            var id:Int = state.nodes.indexOf(node);
-            var addedNodes:Array<Int> = (cast move).addedNodes;
-            if (addedNodes.indexOf(id) != -1) return '@';
+        function hilightSpaces(move, space) {
+            var id:Int = state.spaces.indexOf(space);
+            var addedSpaces:Array<Int> = (cast move).addedSpaces;
+            if (addedSpaces.indexOf(id) != -1) return '@';
             return null;
         }
         for (move in dropAction.moves) {
             trace(move);
-            trace(state.spitBoard(plan, true, hilightNodes.bind(move)));
+            trace(state.spitBoard(plan, true, hilightSpaces.bind(move)));
         }
         /**/
         
@@ -277,7 +277,7 @@ class ScourgeGameConfigTest
         startAction.update();
         startAction.chooseMove();
 
-        var occupier_:AspectPtr = plan.onNode(OwnershipAspect.OCCUPIER);
+        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
 
         VisualAssert.assert('two player grab', state.spitBoard(plan));
 

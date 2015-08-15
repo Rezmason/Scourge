@@ -12,12 +12,12 @@ using net.rezmason.utils.Pointers;
 
 class CavityRule extends BaseRule<Dynamic> {
 
-    @node(BodyAspect.BODY_NEXT) var bodyNext_;
-    @node(BodyAspect.CAVITY_NEXT) var cavityNext_;
-    @node(BodyAspect.CAVITY_PREV) var cavityPrev_;
-    @node(FreshnessAspect.FRESHNESS) var freshness_;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(BodyAspect.BODY_NEXT) var bodyNext_;
+    @space(BodyAspect.CAVITY_NEXT) var cavityNext_;
+    @space(BodyAspect.CAVITY_PREV) var cavityPrev_;
+    @space(FreshnessAspect.FRESHNESS) var freshness_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.CAVITY_FIRST) var cavityFirst_;
     @player(BodyAspect.HEAD) var head_;
@@ -27,7 +27,7 @@ class CavityRule extends BaseRule<Dynamic> {
     var allEdges:Array<Int> = [];
     var groupFirstEdges:Array<Int> = [];
     var groupAngles:Array<Int> = [];
-    var cavityNodes:Array<AspectSet> = [];
+    var cavitySpaces:Array<AspectSet> = [];
 
     override private function _chooseMove(choice:Int):Void {
         var maxFreshness:Int = state.global[maxFreshness_];
@@ -41,8 +41,8 @@ class CavityRule extends BaseRule<Dynamic> {
     private function eraseCavities(player:AspectSet, maxFreshness):Bool {
         var cavityFirst:Int = player[cavityFirst_];
         if (cavityFirst != NULL) {
-            var oldCavityNodes = getNode(cavityFirst).listToAssocArray(state.nodes, cavityNext_, ident_);
-            for (node in oldCavityNodes) if (node != null) clearCavityCell(node, maxFreshness);
+            var oldCavitySpaces = getSpace(cavityFirst).listToAssocArray(state.spaces, cavityNext_, ident_);
+            for (space in oldCavitySpaces) if (space != null) clearCavityCell(space, maxFreshness);
             player[cavityFirst_] = NULL;
         }
         return cavityFirst != NULL;
@@ -56,32 +56,32 @@ class CavityRule extends BaseRule<Dynamic> {
         var currentGroupIndex:Int = 0;
         var currentEdge:Int = 0;
 
-        // Find edge nodes of current player
-        var bodyNode:AspectSet = getNode(player[bodyFirst_]);
+        // Find edge spaces of current player
+        var bodySpace:AspectSet = getSpace(player[bodyFirst_]);
 
-        if (bodyNode != null) {
-            var occupier:Int = bodyNode[occupier_];
-            var edgeNodes = [];
-            for (node in bodyNode.listToArray(state.nodes, bodyNext_)) {
+        if (bodySpace != null) {
+            var occupier:Int = bodySpace[occupier_];
+            var edgeSpaces = [];
+            for (space in bodySpace.listToArray(state.spaces, bodyNext_)) {
                 var hasDifferentNeighbor = false;
-                for (neighbor in getNodeCell(node).orthoNeighbors()) {
+                for (neighbor in getSpaceCell(space).orthoNeighbors()) {
                     if (neighbor == null || neighbor.value[isFilled_] == FALSE || neighbor.value[occupier_] != occupier) {
                         hasDifferentNeighbor = true;
                         break;
                     }
                 }
-                if (hasDifferentNeighbor) edgeNodes.push(node);
+                if (hasDifferentNeighbor) edgeSpaces.push(space);
             }
 
-            // For each edge node,
-            for (edgeNode in edgeNodes) {
-                var edgeCell = getNodeCell(edgeNode);
+            // For each edge space,
+            for (edgeSpace in edgeSpaces) {
+                var edgeCell = getSpaceCell(edgeSpace);
                 // For each empty ortho neighbor,
                 for (direction in GridUtils.orthoDirections()) {
                     var neighbor = edgeCell.neighbors[direction];
                     if (neighbor.value[isFilled_] == FALSE || neighbor.value[occupier_] != occupier) {
                         // make an edge that's in-no-group
-                        currentEdge = makeEdge(getID(edgeNode), direction);
+                        currentEdge = makeEdge(getID(edgeSpace), direction);
                         edgeGroupIDs[currentEdge] = -1;
                         allEdges[numEdges] = currentEdge;
                         numEdges++;
@@ -151,35 +151,35 @@ class CavityRule extends BaseRule<Dynamic> {
 
         for (ike in 0...numGroups) {
             if (groupAngles[ike] == -8) {
-                // Add its interior to the cavityNodes
+                // Add its interior to the cavitySpaces
                 currentEdge = groupFirstEdges[ike];
                 cells.push(getCell(getEdgeID(currentEdge)).neighbors[getEdgeDirection(currentEdge)]);
             }
         }
 
-        var numCavityNodes:Int = 0;
+        var numCavitySpaces:Int = 0;
         for (cell in cells.expandGraphSequence(true, isEmpty)) {
-            cavityNodes[numCavityNodes] = cell.value;
-            numCavityNodes++;
+            cavitySpaces[numCavitySpaces] = cell.value;
+            numCavitySpaces++;
         }
 
-        if (numCavityNodes > 0) {
+        if (numCavitySpaces > 0) {
 
-            cavityNodes.splice(numCavityNodes, cavityNodes.length);
+            cavitySpaces.splice(numCavitySpaces, cavitySpaces.length);
 
-            // Cavity nodes that haven't changed don't get freshened
+            // Cavity spaces that haven't changed don't get freshened
             var playerID:Int = getID(player);
-            for (node in cavityNodes) createCavity(playerID, maxFreshness, node);
+            for (space in cavitySpaces) createCavity(playerID, maxFreshness, space);
 
-            cavityNodes.chainByAspect(ident_, cavityNext_, cavityPrev_);
-            player[cavityFirst_] = getID(cavityNodes[0]);
+            cavitySpaces.chainByAspect(ident_, cavityNext_, cavityPrev_);
+            player[cavityFirst_] = getID(cavitySpaces[0]);
 
             // Cavities affect the player's total area:
-            var totalArea:Int = player[totalArea_] + cavityNodes.length;
+            var totalArea:Int = player[totalArea_] + cavitySpaces.length;
             player[totalArea_] = totalArea;
         }
 
-        return numCavityNodes > 0;
+        return numCavitySpaces > 0;
     }
 
     inline function makeEdge(id:Int, direction:Int):Int return (id << 3) | (direction & 7);
@@ -188,15 +188,15 @@ class CavityRule extends BaseRule<Dynamic> {
 
     inline function isEmpty(me:AspectSet, you:AspectSet):Bool return me[isFilled_] == FALSE;
 
-    inline function createCavity(occupier:Int, maxFreshness:Int, node:AspectSet):Void {
-        node[isFilled_] = FALSE;
-        node[occupier_] = occupier;
-        node[freshness_] = maxFreshness;
+    inline function createCavity(occupier:Int, maxFreshness:Int, space:AspectSet):Void {
+        space[isFilled_] = FALSE;
+        space[occupier_] = occupier;
+        space[freshness_] = maxFreshness;
     }
 
-    inline function clearCavityCell(node:AspectSet, maxFreshness:Int):Void {
-        if (node[isFilled_] == FALSE) node[occupier_] = NULL;
-        node[freshness_] = maxFreshness;
-        node.removeSet(state.nodes, cavityNext_, cavityPrev_);
+    inline function clearCavityCell(space:AspectSet, maxFreshness:Int):Void {
+        if (space[isFilled_] == FALSE) space[occupier_] = NULL;
+        space[freshness_] = maxFreshness;
+        space.removeSet(state.spaces, cavityNext_, cavityPrev_);
     }
 }

@@ -20,7 +20,7 @@ using net.rezmason.utils.Pointers;
 
     public var globalAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
     public var playerAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
-    public var nodeAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
+    public var spaceAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
     public var extraAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
 
     private var extraAspectTemplate:AspectSet = new AspectSet();
@@ -58,32 +58,32 @@ using net.rezmason.utils.Pointers;
     }
 
     @:final inline function getID(aspectSet:AspectSet):Int return aspectSet[ident_];
-    @:final inline function getNodeCell(node:AspectSet):BoardCell return getCell(getID(node));
+    @:final inline function getSpaceCell(space:AspectSet):BoardCell return getCell(getID(space));
 
-    @:final inline function getNode(index:Int):AspectSet return state.nodes[index];
+    @:final inline function getSpace(index:Int):AspectSet return state.spaces[index];
     @:final inline function getCell(index:Int):BoardCell return state.cells[index];
     @:final inline function getPlayer(index:Int):AspectSet return state.players[index];
     @:final inline function getExtra(index:Int):AspectSet return state.extras[index];
 
-    @:final inline function eachNode():Iterator<AspectSet> return state.nodes.iterator();
+    @:final inline function eachSpace():Iterator<AspectSet> return state.spaces.iterator();
     @:final inline function eachCell():Iterator<BoardCell> return state.cells.iterator();
     @:final inline function eachPlayer():Iterator<AspectSet> return state.players.iterator();
     @:final inline function eachExtra():Iterator<AspectSet> return state.extras.iterator();
 
-    @:final inline function numNodes():Int return state.nodes.length;
-    @:final inline function numCells():Int return state.cells.length; // should be the same as numNodes though
+    @:final inline function numSpaces():Int return state.spaces.length;
+    @:final inline function numCells():Int return state.cells.length; // should be the same as numSpaces though
     @:final inline function numPlayers():Int return state.players.length;
     @:final inline function numExtras():Int return state.extras.length;
 
     @:final inline function addGlobalAspectRequirement(req:AspectProperty):Void globalAspectRequirements [req.id] = req;
     @:final inline function addPlayerAspectRequirement(req:AspectProperty):Void playerAspectRequirements [req.id] = req;
-    @:final inline function addNodeAspectRequirement(req:AspectProperty):Void nodeAspectRequirements [req.id] = req;
+    @:final inline function addSpaceAspectRequirement(req:AspectProperty):Void spaceAspectRequirements [req.id] = req;
 
     #if macro
     private static var lkpSources:Map<String, String> = [
         'global'=>'plan',
         'player'=>'plan',
-        'node'=>'plan',
+        'space'=>'plan',
         'extra'=>'this',
     ];
 

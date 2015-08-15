@@ -46,10 +46,10 @@ class EatRuleTest extends ScourgeRuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
+        var freshness_:AspectPtr = plan.onSpace(FreshnessAspect.FRESHNESS);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
+        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
 
         state.grabXY(7, 7).value[freshness_] = 1;
         state.grabXY(9, 7).value[freshness_] = 1;
@@ -72,9 +72,9 @@ class EatRuleTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 6, numCells);
 
-        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
+        var bodySpace:AspectSet = state.spaces[state.players[0][bodyFirst_]];
 
-        Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
+        Assert.areEqual(0, testListLength(numCells, bodySpace, bodyNext_, bodyPrev_));
     }
 
     @Test
@@ -90,10 +90,10 @@ class EatRuleTest extends ScourgeRuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
+        var freshness_:AspectPtr = plan.onSpace(FreshnessAspect.FRESHNESS);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
+        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
 
         state.grabXY(7, 7).value[freshness_] = 1;
         state.grabXY(9, 7).value[freshness_] = 1;
@@ -113,9 +113,9 @@ class EatRuleTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 6 + 1, numCells);
 
-        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
+        var bodySpace:AspectSet = state.spaces[state.players[0][bodyFirst_]];
 
-        Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
+        Assert.areEqual(0, testListLength(numCells, bodySpace, bodyNext_, bodyPrev_));
     }
 
     @Test
@@ -131,10 +131,10 @@ class EatRuleTest extends ScourgeRuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
+        var freshness_:AspectPtr = plan.onSpace(FreshnessAspect.FRESHNESS);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
+        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
 
         state.grabXY(12, 6).value[freshness_] = 1;
 
@@ -150,9 +150,9 @@ class EatRuleTest extends ScourgeRuleTest
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(25 + 13, numCells); // Eat everything
 
-        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
+        var bodySpace:AspectSet = state.spaces[state.players[0][bodyFirst_]];
 
-        Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
+        Assert.areEqual(0, testListLength(numCells, bodySpace, bodyNext_, bodyPrev_));
     }
 
     @Test
@@ -168,7 +168,7 @@ class EatRuleTest extends ScourgeRuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
+        var freshness_:AspectPtr = plan.onSpace(FreshnessAspect.FRESHNESS);
 
         state.grabXY(12, 6).value[freshness_] = 1;
 
@@ -183,11 +183,11 @@ class EatRuleTest extends ScourgeRuleTest
         Assert.areEqual(25 + 1, numCells); // Only eat the head
 
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
-        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
+        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
+        var bodySpace:AspectSet = state.spaces[state.players[0][bodyFirst_]];
 
-        Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
+        Assert.areEqual(0, testListLength(numCells, bodySpace, bodyNext_, bodyPrev_));
     }
 
     @Test
@@ -203,10 +203,10 @@ class EatRuleTest extends ScourgeRuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.onNode(FreshnessAspect.FRESHNESS);
+        var freshness_:AspectPtr = plan.onSpace(FreshnessAspect.FRESHNESS);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onNode(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onNode(BodyAspect.BODY_PREV);
+        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
 
         state.grabXY(6, 13).value[freshness_] = 1;
         state.grabXY(7, 13).value[freshness_] = 1;
@@ -228,9 +228,9 @@ class EatRuleTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(76 + 14, numCells);
 
-        var bodyNode:AspectSet = state.nodes[state.players[0][bodyFirst_]];
+        var bodySpace:AspectSet = state.spaces[state.players[0][bodyFirst_]];
 
-        Assert.areEqual(0, testListLength(numCells, bodyNode, bodyNext_, bodyPrev_));
+        Assert.areEqual(0, testListLength(numCells, bodySpace, bodyNext_, bodyPrev_));
     }
 
 

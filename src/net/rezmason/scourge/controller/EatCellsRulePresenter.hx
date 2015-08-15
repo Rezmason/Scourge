@@ -9,9 +9,9 @@ class EatCellsRulePresenter extends RulePresenter {
     override function animateGlyphs() {
         var anim = createAnimation();
         var oldChar = anim.topFrom.get_char();
-        populateGlyphs(anim.topFrom, anim.bottomFrom, nodeState.lastValues);
+        populateGlyphs(anim.topFrom, anim.bottomFrom, spaceState.lastValues);
         anim.topFrom.set_char(oldChar);
-        populateGlyphs(anim.topTo,   anim.bottomTo,   nodeState.values);
+        populateGlyphs(anim.topTo,   anim.bottomTo,   spaceState.values);
         anim.topTo.set_p(-0.03);
     }
 }

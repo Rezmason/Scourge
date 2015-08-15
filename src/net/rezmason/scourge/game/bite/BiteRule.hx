@@ -14,19 +14,19 @@ using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
 typedef BiteMove = {>Move,
-    var targetNode:Int;
-    var bitNodes:Array<Int>;
+    var targetSpace:Int;
+    var bitSpaces:Array<Int>;
     var thickness:Int;
     var duplicate:Bool;
 }
 
 class BiteRule extends BaseRule<BiteParams> {
 
-    @node(BodyAspect.BODY_NEXT) var bodyNext_;
-    @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(FreshnessAspect.FRESHNESS) var freshness_;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(BodyAspect.BODY_NEXT) var bodyNext_;
+    @space(BodyAspect.BODY_PREV) var bodyPrev_;
+    @space(FreshnessAspect.FRESHNESS) var freshness_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BiteAspect.NUM_BITES) var numBites_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
@@ -55,24 +55,24 @@ class BiteRule extends BaseRule<BiteParams> {
         if (player[numBites_] > 0) {
 
             var totalArea:Int = player[totalArea_];
-            var bodyNode:AspectSet = getNode(player[bodyFirst_]);
-            var body:Array<AspectSet> = bodyNode.listToArray(state.nodes, bodyNext_);
-            var frontNodes:Array<AspectSet> = body.filter(isFront.bind(headIDs));
+            var bodySpace:AspectSet = getSpace(player[bodyFirst_]);
+            var body:Array<AspectSet> = bodySpace.listToArray(state.spaces, bodyNext_);
+            var frontSpaces:Array<AspectSet> = body.filter(isFront.bind(headIDs));
 
             // Grab the valid bites from immediate neighbors
 
             var newMoves:Array<BiteMove> = [];
-            for (node in frontNodes) {
-                var cell:BoardCell = getNodeCell(node);
+            for (space in frontSpaces) {
+                var cell:BoardCell = getSpaceCell(space);
                 for (neighbor in neighborsFor(cell)) {
                     if (isValidEnemy(headIDs, currentPlayer, neighbor.value)) {
-                        var move:BiteMove = getMove(getID(node), [getID(neighbor.value)]);
+                        var move:BiteMove = getMove(getID(space), [getID(neighbor.value)]);
                         if (!params.omnidirectional && params.baseReachOnThickness) {
                             // The baseReachOnThickness params param uses this data to determine how far to extend a bite
                             var backwards:Int = (cell.neighbors.indexOf(neighbor) + 4) % 8;
                             var depth:Int = 0;
-                            for (innerNode in cell.walk(backwards)) {
-                                if (innerNode.value[occupier_] == currentPlayer) depth++;
+                            for (innerSpace in cell.walk(backwards)) {
+                                if (innerSpace.value[occupier_] == currentPlayer) depth++;
                                 else break;
                             }
                             move.thickness = depth;
@@ -99,22 +99,22 @@ class BiteRule extends BaseRule<BiteParams> {
                 for (move in oldMoves) {
                     if (params.omnidirectional) {
                         // Omnidirectional moves are squiggly
-                        for (bitNodeID in move.bitNodes) {
-                            var bitCell:BoardCell = getCell(bitNodeID);
+                        for (bitSpaceID in move.bitSpaces) {
+                            var bitCell:BoardCell = getCell(bitSpaceID);
                             for (neighbor in neighborsFor(bitCell)) {
-                                if (isValidEnemy(headIDs, currentPlayer, neighbor.value) && move.bitNodes.indexOf(getID(neighbor.value)) == -1) {
-                                    newMoves.push(getMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move));
+                                if (isValidEnemy(headIDs, currentPlayer, neighbor.value) && move.bitSpaces.indexOf(getID(neighbor.value)) == -1) {
+                                    newMoves.push(getMove(move.targetSpace, move.bitSpaces.concat([getID(neighbor.value)]), move));
                                 }
                             }
                         }
-                    } else if (!params.baseReachOnThickness || move.bitNodes.length < move.thickness) {
+                    } else if (!params.baseReachOnThickness || move.bitSpaces.length < move.thickness) {
                         // Straight moves are a little easier to generate
-                        var firstBitCell:BoardCell = getCell(move.bitNodes[0]);
-                        var lastBitCell:BoardCell = getCell(move.bitNodes[move.bitNodes.length - 1]);
-                        var direction:Int = getCell(move.targetNode).neighbors.indexOf(firstBitCell);
+                        var firstBitCell:BoardCell = getCell(move.bitSpaces[0]);
+                        var lastBitCell:BoardCell = getCell(move.bitSpaces[move.bitSpaces.length - 1]);
+                        var direction:Int = getCell(move.targetSpace).neighbors.indexOf(firstBitCell);
                         var neighbor:BoardCell = lastBitCell.neighbors[direction];
                         if (isValidEnemy(headIDs, currentPlayer, neighbor.value)) {
-                            var nextMove:BiteMove = getMove(move.targetNode, move.bitNodes.concat([getID(neighbor.value)]), move);
+                            var nextMove:BiteMove = getMove(move.targetSpace, move.bitSpaces.concat([getID(neighbor.value)]), move);
                             nextMove.thickness = move.thickness;
                             newMoves.push(nextMove);
                         }
@@ -148,7 +148,7 @@ class BiteRule extends BaseRule<BiteParams> {
 
         var move:BiteMove = cast moves[choice];
 
-        if (move.targetNode != NULL) {
+        if (move.targetSpace != NULL) {
 
             // Grab data from the move
 
@@ -159,20 +159,20 @@ class BiteRule extends BaseRule<BiteParams> {
 
             // Find the cells removed from each player
 
-            var bitNodesByPlayer:Array<Array<AspectSet>> = [];
-            for (player in eachPlayer()) bitNodesByPlayer.push([]);
+            var bitSpacesByPlayer:Array<Array<AspectSet>> = [];
+            for (player in eachPlayer()) bitSpacesByPlayer.push([]);
 
-            for (bitNodeID in move.bitNodes) {
-                var bitNode:AspectSet = getNode(bitNodeID);
-                bitNodesByPlayer[bitNode[occupier_]].push(bitNode);
+            for (bitSpaceID in move.bitSpaces) {
+                var bitSpace:AspectSet = getSpace(bitSpaceID);
+                bitSpacesByPlayer[bitSpace[occupier_]].push(bitSpace);
             }
 
             // Remove the appropriate cells from each player
 
             for (player in eachPlayer()) {
-                var bitNodes:Array<AspectSet> = bitNodesByPlayer[getID(player)];
+                var bitSpaces:Array<AspectSet> = bitSpacesByPlayer[getID(player)];
                 var bodyFirst:Int = player[bodyFirst_];
-                for (bitNode in bitNodes) bodyFirst = killCell(bitNode, maxFreshness++, bodyFirst);
+                for (bitSpace in bitSpaces) bodyFirst = killCell(bitSpace, maxFreshness++, bodyFirst);
                 player[bodyFirst_] = bodyFirst;
             }
 
@@ -187,17 +187,17 @@ class BiteRule extends BaseRule<BiteParams> {
 
     // "front" as in "battle front". Areas where the current player touches other players
     /*
-    inline function isFront(headIDs:Array<Int>, node:AspectSet):Bool {
-        return neighborsFor(getNodeCell(node)).isNotNull(isValidEnemy.bind(headIDs, node[occupier_]));
+    inline function isFront(headIDs:Array<Int>, space:AspectSet):Bool {
+        return neighborsFor(getSpaceCell(space)).isNotNull(isValidEnemy.bind(headIDs, space[occupier_]));
     }
     */
 
-    inline function isFront(headIDs:Array<Int>, node:AspectSet):Bool {
+    inline function isFront(headIDs:Array<Int>, space:AspectSet):Bool {
         var isNotNull:Bool = false;
 
-        var occupier:Int = node[occupier_];
+        var occupier:Int = space[occupier_];
 
-        for (neighbor in neighborsFor(getNodeCell(node))) {
+        for (neighbor in neighborsFor(getSpaceCell(space))) {
             if (isValidEnemy(headIDs, occupier, neighbor.value)) {
                 isNotNull = true;
                 break;
@@ -207,29 +207,29 @@ class BiteRule extends BaseRule<BiteParams> {
         return isNotNull;
     }
 
-    // Depending on the params, enemy nodes of different kinds can be bitten
-    inline function isValidEnemy(headIDs:Array<Int>, allegiance:Int, node:AspectSet):Bool {
+    // Depending on the params, enemy spaces of different kinds can be bitten
+    inline function isValidEnemy(headIDs:Array<Int>, allegiance:Int, space:AspectSet):Bool {
         var val:Bool = true;
-        if (node[occupier_] == allegiance) val = false; // Can't be the current player
-        else if (node[occupier_] == NULL) val = false; // Can't be the current player
-        else if (!params.biteThroughCavities && node[isFilled_] == FALSE) val = false; // Must be filled, or must allow biting through a cavity
-        else if (!params.biteHeads && headIDs.indexOf(getID(node)) != -1) val = false;
+        if (space[occupier_] == allegiance) val = false; // Can't be the current player
+        else if (space[occupier_] == NULL) val = false; // Can't be the current player
+        else if (!params.biteThroughCavities && space[isFilled_] == FALSE) val = false; // Must be filled, or must allow biting through a cavity
+        else if (!params.biteHeads && headIDs.indexOf(getID(space)) != -1) val = false;
 
         return val;
     }
 
-    inline function getMove(targetNodeID:Int, bitNodes:Array<Int>, relatedMove:BiteMove = null):BiteMove {
+    inline function getMove(targetSpaceID:Int, bitSpaces:Array<Int>, relatedMove:BiteMove = null):BiteMove {
 
         var relatedID:Null<Int> = (relatedMove == null ? null : relatedMove.id);
 
         var move:BiteMove = movePool.pop();
         if (move == null) {
-            move = {id:-1, targetNode:targetNodeID, bitNodes:bitNodes, relatedID:null, thickness:1, duplicate:false};
+            move = {id:-1, targetSpace:targetSpaceID, bitSpaces:bitSpaces, relatedID:null, thickness:1, duplicate:false};
             allMoves.push(move);
         } else {
             move.id = -1;
-            move.targetNode = targetNodeID;
-            move.bitNodes = bitNodes;
+            move.targetSpace = targetSpaceID;
+            move.bitSpaces = bitSpaces;
             move.relatedID = relatedID;
             move.thickness = 1;
             move.duplicate = false;
@@ -238,28 +238,28 @@ class BiteRule extends BaseRule<BiteParams> {
         return move;
     }
 
-    // compares the bit nodes of two moves; if they're the same, then the moves have the same consequence
+    // compares the bit spaces of two moves; if they're the same, then the moves have the same consequence
     inline function movesAreEqual(move1:BiteMove, move2:BiteMove):Bool {
         var val:Bool = true;
-        if (move1.bitNodes.length != move2.bitNodes.length) val = false;
-        else for (bitNode in move1.bitNodes) if (move2.bitNodes.indexOf(bitNode) == -1) { val = false; break; }
+        if (move1.bitSpaces.length != move2.bitSpaces.length) val = false;
+        else for (bitSpace in move1.bitSpaces) if (move2.bitSpaces.indexOf(bitSpace) == -1) { val = false; break; }
         return val;
     }
 
-    inline function killCell(node:AspectSet, freshness:Int, firstIndex:Int):Int {
-        if (node[isFilled_] == TRUE) {
-            var nextNode:AspectSet = node.removeSet(state.nodes, bodyNext_, bodyPrev_);
-            if (firstIndex == getID(node)) firstIndex = nextNode == null ? NULL : getID(nextNode);
-            node[isFilled_] = FALSE;
+    inline function killCell(space:AspectSet, freshness:Int, firstIndex:Int):Int {
+        if (space[isFilled_] == TRUE) {
+            var nextSpace:AspectSet = space.removeSet(state.spaces, bodyNext_, bodyPrev_);
+            if (firstIndex == getID(space)) firstIndex = nextSpace == null ? NULL : getID(nextSpace);
+            space[isFilled_] = FALSE;
         }
 
-        node[occupier_] = NULL;
-        node[freshness_] = freshness;
+        space[occupier_] = NULL;
+        space[freshness_] = freshness;
 
         return firstIndex;
     }
 
-    inline function neighborsFor(node:BoardCell):Array<BoardCell> {
-        return params.orthoOnly ? node.orthoNeighbors() : node.neighbors;
+    inline function neighborsFor(space:BoardCell):Array<BoardCell> {
+        return params.orthoOnly ? space.orthoNeighbors() : space.neighbors;
     }
 }

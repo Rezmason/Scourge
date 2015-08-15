@@ -25,7 +25,7 @@ class BoardInitializer {
     public function new():Void {
         ecce = new Present(Ecce);
         board = new Present(Body, 'board');
-        qBoard = ecce.query([BoardNodeView, BoardNodeState]);
+        qBoard = ecce.query([BoardSpaceView, BoardSpaceState]);
     }
 
     public function run() {
@@ -34,12 +34,12 @@ class BoardInitializer {
         var trimmings:Map<Int, Bool> = new Map();
         var maxDistSquared:Float = 0;
         for (entity in qBoard) {
-            var nodeState = entity.get(BoardNodeState);
-            var view = entity.get(BoardNodeView);
-            if (nodeState.petriData.isWall) {
+            var spaceState = entity.get(BoardSpaceState);
+            var view = entity.get(BoardSpaceView);
+            if (spaceState.petriData.isWall) {
                 var hasEmptyNeighbor = false;
-                for (neighbor in nodeState.cell.neighbors) {
-                    if (neighbor != null && !neighbor.value.get(BoardNodeState).petriData.isWall) {
+                for (neighbor in spaceState.cell.neighbors) {
+                    if (neighbor != null && !neighbor.value.get(BoardSpaceState).petriData.isWall) {
                         hasEmptyNeighbor = true;
                         break;
                     }
@@ -47,13 +47,13 @@ class BoardInitializer {
                 if (hasEmptyNeighbor) {
                     numSpacesThatMatter++;
                 } else {
-                    trimmings[nodeState.cell.id] = true;
-                    entity.remove(BoardNodeView);
+                    trimmings[spaceState.cell.id] = true;
+                    entity.remove(BoardSpaceView);
                 }
             } else {
                 numSpacesThatMatter++;
             }
-            var pos = nodeState.petriData.pos;
+            var pos = spaceState.petriData.pos;
             var distSquared = pos.x * pos.x + pos.y * pos.y + pos.z * pos.z;
             if (maxDistSquared < distSquared) maxDistSquared = distSquared;
         }
@@ -68,19 +68,19 @@ class BoardInitializer {
         var itr = 0;
         board.growTo(numSpacesThatMatter * 3);
         for (entity in qBoard) {
-            var view = entity.get(BoardNodeView);
-            var nodeState = entity.get(BoardNodeState);
-            var pos = nodeState.petriData.pos;
+            var view = entity.get(BoardSpaceView);
+            var spaceState = entity.get(BoardSpaceState);
+            var pos = spaceState.petriData.pos;
             
             var bottom = view.bottom = board.getGlyphByID(itr + 0).reset().SET({pos:pos});
             var top    = view.top =    board.getGlyphByID(itr + 1).reset().SET({pos:pos, p:-0.01});
             var over   = view.over =   board.getGlyphByID(itr + 2).reset().SET({pos:pos, p:-0.03});
 
-            if (nodeState.petriData.isWall) {
+            if (spaceState.petriData.isWall) {
                 var numNeighbors:Int = 0;
                 var bitfield:Int = 0;
-                for (neighbor in nodeState.cell.orthoNeighbors()) {
-                    if (neighbor != null && !trimmings[neighbor.id] && neighbor.value.get(BoardNodeState).petriData.isWall) {
+                for (neighbor in spaceState.cell.orthoNeighbors()) {
+                    if (neighbor != null && !trimmings[neighbor.id] && neighbor.value.get(BoardSpaceState).petriData.isWall) {
                         bitfield = bitfield | (1 << numNeighbors);
                     }
                     numNeighbors++;

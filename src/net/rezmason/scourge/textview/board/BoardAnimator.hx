@@ -23,7 +23,7 @@ class BoardAnimator {
     public function new():Void {
         ecce = new Present(Ecce);
         board = new Present(Body, 'board');
-        qBoardView = ecce.query([BoardNodeView]);
+        qBoardView = ecce.query([BoardSpaceView]);
         qAnimations = ecce.query([GlyphAnimation]);
     }
 
@@ -45,7 +45,7 @@ class BoardAnimator {
             if (anim.startTime < time) {
                 var percent = (time - anim.startTime) / anim.duration;
                 var frac = anim.ease(percent);
-                var view = anim.subject.get(BoardNodeView);
+                var view = anim.subject.get(BoardSpaceView);
                 if (percent >= 1) {
                     view.top.copyFrom(anim.topTo);
                     view.bottom.copyFrom(anim.bottomTo);

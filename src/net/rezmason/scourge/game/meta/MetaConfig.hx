@@ -22,7 +22,7 @@ class MetaConfig extends ScourgeConfig<MetaParams> {
         return {
             maxSkips: 3,
             playerProperties: new Map(),
-            nodeProperties: new Map(),
+            spaceProperties: new Map(),
             globalProperties: new Map(),
         };
     }

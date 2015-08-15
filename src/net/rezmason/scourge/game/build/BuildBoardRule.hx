@@ -17,38 +17,38 @@ using net.rezmason.utils.Pointers;
 typedef XY = {x:Float, y:Float};
 
 class BuildBoardRule extends BaseRule<FullBuildBoardParams> {
-    @node(BodyAspect.BODY_NEXT) var bodyNext_;
-    @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(BodyAspect.BODY_NEXT) var bodyNext_;
+    @space(BodyAspect.BODY_PREV) var bodyPrev_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
 
     override private function _prime():Void {
-        var bodyNodesByPlayer:Array<Array<AspectSet>> = [for (ike in 0...numPlayers()) []];
-        for (petriCell in params.cells) addNode();
+        var bodySpacesByPlayer:Array<Array<AspectSet>> = [for (ike in 0...numPlayers()) []];
+        for (petriCell in params.cells) addSpace();
         for (petriCell in params.cells) {
             var petriDatum = petriCell.value;
-            var nodeCell = state.cells[petriCell.id];
-            var node = nodeCell.value;
+            var spaceCell = state.cells[petriCell.id];
+            var space = spaceCell.value;
 
             if (petriDatum.isWall == true) {
-                node[isFilled_] = TRUE;
+                space[isFilled_] = TRUE;
             } else if (petriDatum.owner != -1) {
-                node[isFilled_] = TRUE;
-                node[occupier_] = petriDatum.owner;
-                bodyNodesByPlayer[petriDatum.owner].push(node);
+                space[isFilled_] = TRUE;
+                space[occupier_] = petriDatum.owner;
+                bodySpacesByPlayer[petriDatum.owner].push(space);
                 if (petriDatum.isHead) getPlayer(petriDatum.owner)[head_] = petriCell.id;
             }
 
             for (direction in GridUtils.allDirections()) {
                 var neighbor = petriCell.neighbors[direction];
-                if (neighbor != null) nodeCell.attach(state.cells[neighbor.id], direction);
+                if (neighbor != null) spaceCell.attach(state.cells[neighbor.id], direction);
             }
         }
 
         for (player in eachPlayer()) {
-            var body = bodyNodesByPlayer[getID(player)];
+            var body = bodySpacesByPlayer[getID(player)];
             if (body.length > 0) {
                 player[bodyFirst_] = getID(body[0]);
                 body.chainByAspect(ident_, bodyNext_, bodyPrev_);

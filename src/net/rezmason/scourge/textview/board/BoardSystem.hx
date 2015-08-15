@@ -29,7 +29,7 @@ class BoardAnimator {
         this.ecce = ecce;
         this.body = body;
         speed = 1000 / animateMils;
-        qBoardView = ecce.query([BoardNodeView]);
+        qBoardView = ecce.query([BoardSpaceView]);
         qAnimations = ecce.query([GlyphAnimation]);
     }
 
@@ -39,7 +39,7 @@ class BoardAnimator {
         var trimmings:Map<Int, Bool> = new Map();
         var maxDistSquared:Float = 0;
         for (entity in qBoardView) {
-            var cell = entity.get(BoardNodeView).cell;
+            var cell = entity.get(BoardSpaceView).cell;
             if (cell.value.isWall) {
                 var hasEmptyNeighbor = false;
                 for (neighbor in cell.neighbors) {
@@ -52,7 +52,7 @@ class BoardAnimator {
                     numSpacesThatMatter++;
                 } else {
                     trimmings[cell.id] = true;
-                    entity.remove(BoardNodeView);
+                    entity.remove(BoardSpaceView);
                 }
             } else {
                 numSpacesThatMatter++;
@@ -72,7 +72,7 @@ class BoardAnimator {
         var itr = 0;
         body.growTo(numSpacesThatMatter * 3);
         for (entity in qBoardView) {
-            var view = entity.get(BoardNodeView);
+            var view = entity.get(BoardSpaceView);
             var cell = view.cell;
             var pos = cell.value.pos;
             
@@ -121,7 +121,7 @@ class BoardAnimator {
             if (anim.startTime < time) {
                 var percent = (time - anim.startTime) / anim.duration;
                 var frac = anim.ease(percent);
-                var view = anim.subject.get(BoardNodeView);
+                var view = anim.subject.get(BoardSpaceView);
                 if (percent > 1) {
                     view.top.copyFrom(anim.topTo);
                     view.bottom.copyFrom(anim.bottomTo);

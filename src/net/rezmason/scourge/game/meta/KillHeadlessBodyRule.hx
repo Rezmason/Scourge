@@ -13,11 +13,11 @@ using net.rezmason.utils.Pointers;
 
 class KillHeadlessBodyRule extends BaseRule<Dynamic> {
 
-    @node(BodyAspect.BODY_NEXT) var bodyNext_;
-    @node(BodyAspect.BODY_PREV) var bodyPrev_;
-    @node(FreshnessAspect.FRESHNESS) var freshness_;
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(BodyAspect.BODY_NEXT) var bodyNext_;
+    @space(BodyAspect.BODY_PREV) var bodyPrev_;
+    @space(FreshnessAspect.FRESHNESS) var freshness_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
@@ -28,7 +28,7 @@ class KillHeadlessBodyRule extends BaseRule<Dynamic> {
 
         var maxFreshness:Int = state.global[maxFreshness_];
 
-        // Check each player to see if they still have head nodes
+        // Check each player to see if they still have head spaces
 
         for (player in eachPlayer()) {
             var playerID:Int = getID(player);
@@ -37,14 +37,14 @@ class KillHeadlessBodyRule extends BaseRule<Dynamic> {
 
             if (head != NULL) {
                 var bodyFirst:Int = player[bodyFirst_];
-                var playerHead:AspectSet = getNode(head);
+                var playerHead:AspectSet = getSpace(head);
                 if (playerHead[occupier_] != playerID || playerHead[isFilled_] == FALSE) {
 
                     // Destroy the head and body
 
                     player[head_] = NULL;
-                    var bodyNode:AspectSet = getNode(bodyFirst);
-                    for (node in bodyNode.listToArray(state.nodes, bodyNext_)) killCell(node, maxFreshness);
+                    var bodySpace:AspectSet = getSpace(bodyFirst);
+                    for (space in bodySpace.listToArray(state.spaces, bodyNext_)) killCell(space, maxFreshness);
                     player[bodyFirst_] = NULL;
                     maxFreshness++;
                 }
@@ -58,12 +58,12 @@ class KillHeadlessBodyRule extends BaseRule<Dynamic> {
         // trace('---');
     }
 
-    function killCell(node:AspectSet, maxFreshness:Int):Void {
-        node[isFilled_] = FALSE;
-        node[occupier_] = NULL;
-        node[freshness_] = maxFreshness;
+    function killCell(space:AspectSet, maxFreshness:Int):Void {
+        space[isFilled_] = FALSE;
+        space[occupier_] = NULL;
+        space[freshness_] = maxFreshness;
 
-        node.removeSet(state.nodes, bodyNext_, bodyPrev_);
+        space.removeSet(state.spaces, bodyNext_, bodyPrev_);
     }
 }
 

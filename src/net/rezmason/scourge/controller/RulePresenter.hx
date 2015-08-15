@@ -21,13 +21,13 @@ class RulePresenter extends Reckoner {
     var ecce:Ecce = null;
     
     var subject:Entity;
-    var nodeView:BoardNodeView;
-    var nodeState:BoardNodeState;
+    var spaceView:BoardSpaceView;
+    var spaceState:BoardSpaceState;
     var animationEntities:Array<Entity>;
     var effectOverlap(default, null):Float;
     
-    @node(OwnershipAspect.IS_FILLED) var isFilled_;
-    @node(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.HEAD) var head_;
 
     public function new(game:Game, ecce:Ecce) {
@@ -38,14 +38,14 @@ class RulePresenter extends Reckoner {
     }
 
     @:final public function presentBoardEffect(subject:Entity):Array<Entity> {
-        nodeState = subject.get(BoardNodeState);
-        if (nodeState == null || nodeState.petriData.isWall) return null;
+        spaceState = subject.get(BoardSpaceState);
+        if (spaceState == null || spaceState.petriData.isWall) return null;
         this.subject = subject;
-        nodeView = subject.get(BoardNodeView);
+        spaceView = subject.get(BoardSpaceView);
         animateGlyphs();
         var entities = animationEntities;
         animationEntities = null;
-        if (entities != null) nodeView.changed = true;
+        if (entities != null) spaceView.changed = true;
         return entities;
     }
 
@@ -66,10 +66,10 @@ class RulePresenter extends Reckoner {
         anim.duration = 0.125;
         anim.ease = Quad.easeInOut;
 
-        anim.topFrom.copyFrom(nodeView.top);
-        anim.topTo.copyFrom(nodeView.top);
-        anim.bottomFrom.copyFrom(nodeView.bottom);
-        anim.bottomTo.copyFrom(nodeView.bottom);
+        anim.topFrom.copyFrom(spaceView.top);
+        anim.topTo.copyFrom(spaceView.top);
+        anim.bottomFrom.copyFrom(spaceView.bottom);
+        anim.bottomTo.copyFrom(spaceView.bottom);
 
         return anim;
     }
@@ -100,11 +100,11 @@ class RulePresenter extends Reckoner {
 
     function animateGlyphs() {
         var anim = createAnimation();
-        populateGlyphs(anim.topFrom, anim.bottomFrom, nodeState.lastValues);
-        populateGlyphs(anim.topTo,   anim.bottomTo,   nodeState.values);
+        populateGlyphs(anim.topFrom, anim.bottomFrom, spaceState.lastValues);
+        populateGlyphs(anim.topTo,   anim.bottomTo,   spaceState.values);
 
-        anim.bottomTo.set_pos(nodeState.petriData.pos);
-        anim.topTo.set_pos(nodeState.petriData.pos);
+        anim.bottomTo.set_pos(spaceState.petriData.pos);
+        anim.topTo.set_pos(spaceState.petriData.pos);
         anim.topTo.set_p(-0.05);
     }
 }

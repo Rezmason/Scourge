@@ -23,7 +23,7 @@ class CacheRule extends BaseRule<CacheParams> {
 
         globalAspectRequirements.absorb(rule.globalAspectRequirements);
         playerAspectRequirements.absorb(rule.playerAspectRequirements);
-        nodeAspectRequirements.absorb(rule.nodeAspectRequirements);
+        spaceAspectRequirements.absorb(rule.spaceAspectRequirements);
     }
 
     override public function _prime():Void rule.prime(state, plan, history, historyState, changeSignal);
