@@ -5,7 +5,7 @@ import net.rezmason.scourge.game.ConfigTypes;
 #if !HEADLESS
     import net.rezmason.scourge.controller.CavityRulePresenter;
     import net.rezmason.scourge.controller.DecayRulePresenter;
-    import net.rezmason.scourge.controller.EatCellsRulePresenter;
+    import net.rezmason.scourge.controller.EatRulePresenter;
 #end
 
 class BodyConfig extends ScourgeConfig<BodyParams> {
@@ -16,7 +16,7 @@ class BodyConfig extends ScourgeConfig<BodyParams> {
                 isIncluded:function(p) return p.includeCavities
             },
             'decay'     => {def:DecayRule,      type:Simple, presenter:#if HEADLESS null #else DecayRulePresenter #end},
-            'eatCells'  => {def:EatCellsRule,   type:Simple, presenter:#if HEADLESS null #else EatCellsRulePresenter #end},
+            'eat'  => {def:EatRule,   type:Simple, presenter:#if HEADLESS null #else EatRulePresenter #end},
         ];
     }
 

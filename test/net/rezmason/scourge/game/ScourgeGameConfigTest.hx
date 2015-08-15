@@ -268,7 +268,7 @@ class ScourgeGameConfigTest
         
         var pieces:Pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
 
-        // dropPiece, eatCells, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
+        // dropPiece, eat, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
         config.buildParams.numPlayers = 2;
         config.buildParams.cells = PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab);

@@ -1,6 +1,6 @@
 package net.rezmason.scourge.game.body;
 
-typedef EatCellsParams = {
+typedef EatParams = {
     public var eatRecursively:Bool;
     public var eatHeads:Bool;
     public var takeBodiesFromEatenHeads:Bool;

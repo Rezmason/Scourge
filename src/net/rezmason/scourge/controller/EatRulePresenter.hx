@@ -5,7 +5,7 @@ import net.kawa.tween.easing.*;
 import net.rezmason.scourge.Strings.*;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
-class EatCellsRulePresenter extends RulePresenter {
+class EatRulePresenter extends RulePresenter {
     override function animateGlyphs() {
         var anim = createAnimation();
         var oldChar = anim.topFrom.get_char();

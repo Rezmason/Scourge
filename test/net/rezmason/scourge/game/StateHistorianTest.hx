@@ -8,7 +8,7 @@ import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.praxis.state.StatePlanner;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
-import net.rezmason.scourge.game.body.EatCellsRule;
+import net.rezmason.scourge.game.body.EatRule;
 import net.rezmason.scourge.game.build.BuildBoardRule;
 import net.rezmason.scourge.game.build.BuildPlayersRule;
 import net.rezmason.scourge.game.build.BuildGlobalRule;
@@ -67,7 +67,7 @@ class StateHistorianTest {
         var buildStateRule:BuildGlobalRule = new BuildGlobalRule(cast config);
         var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule(cast config);
         var buildBoardRule:BuildBoardRule = new BuildBoardRule(cast config);
-        var eatRule:EatCellsRule = new EatCellsRule(cast config);
+        var eatRule:EatRule = new EatRule(cast config);
         var pickPieceRule:PickPieceRule = new PickPieceRule(cast config);
 
         var rules:Array<Rule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];

@@ -35,7 +35,7 @@ class ScourgeGameConfig extends GameConfig<RP, MP> {
             {id:'wrapUp',   sequence:['endTurn', 'replenish']}, /*'pick'*/
             {id:'start',    sequence:['cleanUp']}, /*'pick'*/
             {id:'forfeit',  sequence:['forfeit', 'cleanUp', 'wrapUp']},
-            {id:'drop',     sequence:['drop', 'eatCells', 'cleanUp', 'wrapUp', 'stalemate']},
+            {id:'drop',     sequence:['drop', 'eat', 'cleanUp', 'wrapUp', 'stalemate']},
             {id:'swap',     sequence:['swap']}, /*'pick'*/
             {id:'bite',     sequence:['bite', 'cleanUp']},
             {id:'build',    sequence:['buildGlobal', 'buildPlayers', 'buildBoard']},

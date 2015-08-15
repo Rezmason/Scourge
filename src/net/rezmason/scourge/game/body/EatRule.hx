@@ -14,7 +14,7 @@ using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.Pointers;
 
-class EatCellsRule extends BaseRule<EatCellsParams> {
+class EatRule extends BaseRule<EatParams> {
 
     @space(BodyAspect.BODY_NEXT) var bodyNext_;
     @space(BodyAspect.BODY_PREV) var bodyPrev_;

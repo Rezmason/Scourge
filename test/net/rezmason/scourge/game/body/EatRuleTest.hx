@@ -7,7 +7,7 @@ import net.rezmason.grid.Cell;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.scourge.game.body.EatCellsRule;
+import net.rezmason.scourge.game.body.EatRule;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 
@@ -35,13 +35,13 @@ class EatRuleTest extends ScourgeRuleTest
 
     @Test
     public function eatScourgeRuleTest():Void {
-        var eatParams:EatCellsParams = {
+        var eatParams:EatParams = {
             eatRecursively:false, 
             eatHeads:false, 
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:false
         };
-        var eatRule:EatCellsRule = new EatCellsRule(eatParams);
+        var eatRule:EatRule = new EatRule(eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -79,13 +79,13 @@ class EatRuleTest extends ScourgeRuleTest
 
     @Test
     public function eatRecursivelyScourgeRuleTest():Void {
-        var eatParams:EatCellsParams = {
+        var eatParams:EatParams = {
             eatRecursively:true, 
             eatHeads:false, 
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:false
         };
-        var eatRule:EatCellsRule = new EatCellsRule(eatParams);
+        var eatRule:EatRule = new EatRule(eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -120,13 +120,13 @@ class EatRuleTest extends ScourgeRuleTest
 
     @Test
     public function eatHeadAndBodyScourgeRuleTest():Void {
-        var eatParams:EatCellsParams = {
+        var eatParams:EatParams = {
             eatRecursively:false, 
             eatHeads:true, 
             takeBodiesFromEatenHeads:true, 
             eatOrthogonallyOnly:false
         };
-        var eatRule:EatCellsRule = new EatCellsRule(eatParams);
+        var eatRule:EatRule = new EatRule(eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -157,13 +157,13 @@ class EatRuleTest extends ScourgeRuleTest
 
     @Test
     public function eatHeadKillBodyTest():Void {
-        var eatParams:EatCellsParams = {
+        var eatParams:EatParams = {
             eatRecursively:false, 
             eatHeads:true, 
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:false
         };
-        var eatRule:EatCellsRule = new EatCellsRule(eatParams);
+        var eatRule:EatRule = new EatRule(eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -192,13 +192,13 @@ class EatRuleTest extends ScourgeRuleTest
 
     @Test
     public function eatOrthoScourgeRuleTest():Void {
-        var eatParams:EatCellsParams = {
+        var eatParams:EatParams = {
             eatRecursively:true, 
             eatHeads:false, 
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:true
         };
-        var eatRule:EatCellsRule = new EatCellsRule(eatParams);
+        var eatRule:EatRule = new EatRule(eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerN);
 
         // set up the board for the test
