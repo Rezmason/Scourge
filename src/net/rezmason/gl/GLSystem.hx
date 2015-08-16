@@ -170,11 +170,11 @@ class GLSystem {
         return artifact;
     }
 
-    public inline function createVertexBuffer(numVertices:Int, footprint:Int, ?usage:BufferUsage):VertexBuffer {
+    public inline function createVertexBuffer(numVertices:UInt, footprint:UInt, ?usage:BufferUsage):VertexBuffer {
         return registerArtifact(new VertexBuffer(numVertices, footprint, usage));
     }
 
-    public inline function createIndexBuffer(numIndices:Int, ?usage:BufferUsage):IndexBuffer {
+    public inline function createIndexBuffer(numIndices:UInt, ?usage:BufferUsage):IndexBuffer {
         return registerArtifact(new IndexBuffer(numIndices, usage));
     }
 
@@ -226,11 +226,7 @@ class GLSystem {
         #end
     }
 
-    public inline function clear(color:Int = 0x0, alpha:Float = 1):Void {
-        var red:Float   = ((color >> 16) & 0xFF) / 0xFF;
-        var green:Float = ((color >>  8) & 0xFF) / 0xFF;
-        var blue:Float  = ((color >>  0) & 0xFF) / 0xFF;
-
+    public inline function clear(red:Float, green:Float, blue:Float, alpha:Float = 1):Void {
         #if flash
             context.clear(red, green, blue, alpha);
         #else
@@ -239,7 +235,7 @@ class GLSystem {
         #end
     }
 
-    public inline function draw(indexBuffer:IndexBuffer, firstIndex:Int = 0, numTriangles:Int = 0):Void {
+    public inline function draw(indexBuffer:IndexBuffer, firstIndex:UInt = 0, numTriangles:UInt = 0):Void {
         #if flash
             context.drawTriangles(indexBuffer.buf, firstIndex, numTriangles);
         #else

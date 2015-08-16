@@ -53,7 +53,7 @@ class Interpreter {
     var hintsByID:Map<String, ConsoleToken>;
 
     public function new(console:ConsoleUIMediator):Void {
-        setPrompt('scourge', 0x3060FF);
+        setPrompt('scourge', Vec3.fromHex(0x3060FF));
         this.console = console;
         this.console.keyboardSignal.add(handleKeyboard);
         this.console.mouseSignal.add(handleMouseInteraction);
@@ -101,12 +101,10 @@ class Interpreter {
      * If two human players are taking turns playing on one computer, this prompt will serve to indicate
      * to them whose turn it is.
      */
-    public function setPrompt(name:String, color:Int):Void {
-
-        var r:Float = (color >> 16 & 0xFF) / 0xFF;
-        var g:Float = (color >> 8  & 0xFF) / 0xFF;
-        var b:Float = (color >> 0  & 0xFF) / 0xFF;
-
+    public function setPrompt(name:String, color:Vec3):Void {
+        var r:Float = color.r;
+        var g:Float = color.g;
+        var b:Float = color.b;
         prompt =
         '∂{name:head_prompt_${name}_${Math.random()}, basis:${ConsoleStrings.BREATHING_PROMPT_STYLENAME}, r:$r, g:$g, b:$b}Ω' +
         '§{name:prompt_${name}_${Math.random()}, r:$r, g:$g, b:$b} $name§{}${ConsoleStrings.PROMPT}§{}';

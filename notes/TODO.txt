@@ -1,13 +1,4 @@
-Colors should be Vec3, not Int
-    Lab
-    Interpreter
-    GLSystem.clear
-        So Vec3 should be a GLType
-        Maybe rename it so it's not like Vector4
-
-
-Loupe
-    
+Loupe    
     Okay, here's what's up
         show loupe
             LoupeDemo has a loupe

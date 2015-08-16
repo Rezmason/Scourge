@@ -17,7 +17,7 @@ class SetNameAction extends UserAction {
     override public function execute(args:UserActionArgs):Void {
         var name:String = args.tail;
         if (name == null) name = "SOME DWEEB";
-        var color = Std.random(0xFF) << 16 | Std.random(0xFF) << 8 | Std.random(0xFF);
+        var color = Vec3.fromHex(Std.random(0xFFFFFF)) * 0.5 + 0.5;
         interpreter.setPrompt(name, color);
         outputSignal.dispatch(null, true);
     }

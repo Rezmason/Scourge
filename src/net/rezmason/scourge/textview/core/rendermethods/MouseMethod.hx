@@ -13,7 +13,7 @@ class MouseMethod extends RenderMethod {
 
     public function new():Void {
         super();
-        backgroundColor = 0xFFFFFF;
+        backgroundColor = new Vec3(1, 1, 1);
     }
 
     override public function activate():Void glSys.setProgram(program);

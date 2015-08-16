@@ -15,7 +15,7 @@ class RenderMethod {
 
     public var program(default, null):Program;
     public var programLoaded(get, null):Bool;
-    public var backgroundColor(default, null):Int;
+    public var backgroundColor(default, null):Vec3;
     public var loadedSignal(default, null):Zig<Void->Void>;
     var glSys:GLSystem;
     var vertShader:String;
@@ -23,7 +23,7 @@ class RenderMethod {
 
     function new():Void {
         loadedSignal = new Zig();
-        backgroundColor = 0x0;
+        backgroundColor = new Vec3(0, 0, 0);
         composeShaders();
         glSys = new Present(GLSystem);
     }
@@ -39,7 +39,7 @@ class RenderMethod {
     public inline function start(outputBuffer:OutputBuffer):Void {
         activate();
         glSys.start(outputBuffer);
-        glSys.clear(backgroundColor);
+        glSys.clear(backgroundColor.r, backgroundColor.g, backgroundColor.b);
     }
 
     public inline function finish():Void {
