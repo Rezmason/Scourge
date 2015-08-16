@@ -1,9 +1,13 @@
 package net.rezmason.scourge.textview.core;
 
-import net.rezmason.gl.GLTypes;
-
 import haxe.Timer;
 
+import lime.app.Application;
+import lime.app.Module;
+import lime.ui.KeyCode;
+import lime.ui.KeyModifier;
+
+import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.GLFlowControl;
 import net.rezmason.gl.GLSystem;
@@ -13,7 +17,7 @@ import net.rezmason.utils.santa.Present;
 
 using Lambda;
 
-class Engine {
+class Engine extends Module {
 
     var active:Bool;
     public var framerate(default, set):Float;
@@ -32,11 +36,11 @@ class Engine {
     
     var mouseSystem:MouseSystem;
     var keyboardSystem:KeyboardSystem;
-    var mouseDownTarget:Body;
     var mouseMethod:RenderMethod;
     var prettyMethod:RenderMethod;
 
     public function new(glFlow:GLFlowControl):Void {
+        super();
         this.glFlow = glFlow;
         active = false;
         ready = false;
@@ -48,16 +52,12 @@ class Engine {
         framerate = 1000 / 30;
         bodiesByID = new Map();
         scenes = [];
-    }
 
-    public function init():Void {
-        if (ready) {
-            readySignal.dispatch();
-        } else {
-            initInteractionSystems();
-            initRenderMethods();
-            addListeners();
-        }
+        readySignal.add(onReady);
+        
+        initInteractionSystems();
+        initRenderMethods();
+        addListeners();
     }
 
     public function set_framerate(f:Float):Float return framerate = (f >= 0 ? f : 0);
@@ -67,9 +67,9 @@ class Engine {
         if (!scenes.has(scene)) {
             scenes.push(scene);
             scene.redrawHitSignal.add(updateMouseSystem);
-            scene.invalidatedSignal.add(invalidate);
+            scene.invalidatedSignal.add(invalidateScene);
             scene.resize(width, height);
-            invalidate();
+            invalidateScene();
         }
     }
 
@@ -78,22 +78,46 @@ class Engine {
         if (scenes.has(scene)) {
             scenes.remove(scene);
             scene.redrawHitSignal.remove(updateMouseSystem);
-            scene.invalidatedSignal.remove(invalidate);
-            invalidate();
+            scene.invalidatedSignal.remove(invalidateScene);
+            invalidateScene();
         }
     }
 
-    function invalidate():Void bodiesByID = null;
+    public function setKeyboardFocus(body:Body):Void {
+        #if debug readyCheck(); #end
+        fetchBodies();
+        if (bodiesByID[body.id] == body) keyboardSystem.focusBodyID = body.id;
+    }
+
+    override public function onKeyDown(keyCode, modifier) keyboardSystem.onKeyDown(keyCode, modifier);
+    override public function onKeyUp(keyCode, modifier) keyboardSystem.onKeyUp(keyCode, modifier);
+    override public function onMouseMove(x, y) mouseSystem.onMouseMove(x, y);
+    override public function onMouseDown(x, y, button) mouseSystem.onMouseDown(x, y, button);
+    override public function onMouseUp(x, y, button) mouseSystem.onMouseUp(x, y, button);
+    override public function onWindowActivate() activate();
+    override public function onWindowDeactivate() deactivate();
+    override public function onWindowEnter() activate();
+    override public function onWindowLeave() deactivate();
+    override public function onWindowResize (width, height) setSize(width, height);
+
+    // override public function onRenderContextLost() {}
+    // override public function onRenderContextRestored(_) {}
+    // override public function onTextInput(text) {}
+
+    function onReady():Void {
+        #if flash flash.Lib.current.stage.dispatchEvent(new flash.events.Event('resize')); #end
+        var window = Application.current.window;
+        setSize(window.width, window.height);
+        activate();
+    }
 
     function initInteractionSystems():Void {
         mouseSystem = new MouseSystem();
-        mouseSystem.updateSignal.add(renderMouse);
+        mouseSystem.refreshSignal.add(renderMouse);
+        mouseSystem.interactSignal.add(handleInteraction);
+
         keyboardSystem = new KeyboardSystem();
-
-        mouseSystem.interact.add(handleInteraction);
-        keyboardSystem.interact.add(handleInteraction);
-
-        mouseDownTarget = null;
+        keyboardSystem.interactSignal.add(handleInteraction);
     }
 
     function initRenderMethods():Void {
@@ -121,7 +145,7 @@ class Engine {
     }
 
     function onRender(width:Int, height:Int):Void {
-        if (active) render(prettyMethod, glSys.viewportOutputBuffer);
+        if (active) drawFrame(prettyMethod, glSys.viewportOutputBuffer);
     }
 
     function onDisconnect():Void {
@@ -133,10 +157,10 @@ class Engine {
     }
 
     function renderMouse():Void {
-        render(mouseMethod, mouseSystem.outputBuffer);
+        drawFrame(mouseMethod, mouseSystem.outputBuffer);
     }
 
-    function render(method:RenderMethod, outputBuffer:OutputBuffer):Void {
+    function drawFrame(method:RenderMethod, outputBuffer:OutputBuffer):Void {
         //trace('rendering with method ${Std.is(method, PrettyMethod) ? "pretty" : "mouse"}');
         if (glSys.connected) {
             if (method == null) {
@@ -151,7 +175,7 @@ class Engine {
         }
     }
 
-    public function setSize(width:Int, height:Int):Void {
+    function setSize(width:Int, height:Int):Void {
         #if debug readyCheck(); #end
         this.width = width;
         this.height = height;
@@ -160,7 +184,7 @@ class Engine {
         glSys.viewportOutputBuffer.resize(width, height);
     }
 
-    public function activate():Void {
+    function activate():Void {
         #if debug readyCheck(); #end
         if (active) return;
         active = true;
@@ -173,7 +197,7 @@ class Engine {
         regulateUserInput();
     }
 
-    public function deactivate():Void {
+    function deactivate():Void {
         #if debug readyCheck(); #end
         if (!active) return;
         active = false;
@@ -183,19 +207,8 @@ class Engine {
     }
 
     function regulateUserInput():Void {
-        if (active && glSys.connected) {
-            keyboardSystem.attach();
-            mouseSystem.attach();
-        } else {
-            keyboardSystem.detach();
-            mouseSystem.detach();
-        }
-    }
-
-    public function setKeyboardFocus(body:Body):Void {
-        #if debug readyCheck(); #end
-        fetchBodies();
-        if (bodiesByID[body.id] == body) keyboardSystem.focusBodyID = body.id;
+        keyboardSystem.active = active && glSys.connected;
+        mouseSystem.active = active && glSys.connected;
     }
 
     function onTimer():Void {
@@ -240,6 +253,8 @@ class Engine {
 
         if (target != null) target.interactionSignal.dispatch(glyphID, interaction);
     }
+
+    inline function invalidateScene():Void bodiesByID = null;
 
     inline function fetchBodies():Void {
         if (bodiesByID == null) {

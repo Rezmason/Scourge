@@ -21,11 +21,11 @@ class MouseSystem {
 
     static var NULL_HIT:Hit = {bodyID:null, glyphID:null};
 
-    public var isAttached(default, null):Bool;
+    public var active(default, set):Bool;
     public var outputBuffer(default, null):ReadbackOutputBuffer;
     public var invalid(default, null):Bool;
-    public var interact(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
-    public var updateSignal(default, null):Zig<Void->Void>;
+    public var interactSignal(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
+    public var refreshSignal(default, null):Zig<Void->Void>;
     var data:ReadbackData;
     var rectRegionsByID:Map<Int, Rectangle>;
     var lastRectRegionID:Null<Int>;
@@ -38,14 +38,12 @@ class MouseSystem {
     var height:Int;
     var initialized:Bool;
     var glSys:GLSystem;
-    var shim:Shim;
 
     public function new():Void {
-        isAttached = false;
-        interact = new Zig();
-        shim = new Present(Shim);
+        active = false;
+        interactSignal = new Zig();
         glSys = new Present(GLSystem);
-        updateSignal = new Zig();
+        refreshSignal = new Zig();
         rectRegionsByID = null;
         lastRectRegionID = null;
         lastX = Math.NaN;
@@ -60,25 +58,6 @@ class MouseSystem {
         invalidate();
 
         outputBuffer = glSys.createReadbackOutputBuffer();
-    }
-
-    public function attach():Void {
-        if (!isAttached) {
-            isAttached = true;
-            shim.mouseMoveSignal.add(onMouseMove);
-            shim.mouseDownSignal.add(onMouseDown);
-            shim.mouseUpSignal.add(onMouseUp);
-            invalidate();
-        }
-    }
-
-    public function detach():Void {
-        if (isAttached) {
-            isAttached = false;
-            shim.mouseMoveSignal.remove(onMouseMove);
-            shim.mouseDownSignal.remove(onMouseDown);
-            shim.mouseUpSignal.remove(onMouseUp);
-        }
     }
 
     public function setSize(width:Int, height:Int):Void {
@@ -100,6 +79,51 @@ class MouseSystem {
     }
 
     public function invalidate():Void invalid = true;
+
+    public function onMouseMove(x:Float, y:Float):Void {
+        if (!initialized || !active) return;
+        if (invalid) refresh();
+
+        var hit:Hit = getHit(x, y);
+        if (hitsEqual(hit, hoverHit)) {
+            sendInteraction(hit, x, y, MOVE);
+        } else {
+            sendInteraction(hoverHit, x, y, EXIT);
+            hoverHit = hit;
+            sendInteraction(hoverHit, x, y, ENTER);
+        }
+
+        lastX = x;
+        lastY = y;
+    }
+    
+    public function onMouseDown(x:Float, y:Float, button:Int):Void {
+        if (!initialized || !active) return;
+        if (invalid) refresh();
+        pressHit = getHit(x, y);
+        lastX = x;
+        lastY = y;
+        sendInteraction(pressHit, x, y, MOUSE_DOWN);
+    }
+
+    public function onMouseUp(x:Float, y:Float, button:Int):Void {
+        if (!initialized || !active) return;
+        if (invalid) refresh();
+        var hit:Hit = getHit(x, y);
+        lastX = x;
+        lastY = y;
+        sendInteraction(hit, x, y, MOUSE_UP);
+        sendInteraction(pressHit, x, y, hitsEqual(hit, pressHit) ? CLICK : DROP);
+        pressHit = NULL_HIT;
+    }
+
+    inline function set_active(val:Bool):Bool {
+        if (active != val) {
+            active = val;
+            if (active) invalidate();
+        }
+        return val;
+    }
 
     function getHit(x:Float, y:Float):Hit {
 
@@ -161,51 +185,14 @@ class MouseSystem {
         return (data[index] << 16) | (data[index + 1] << 8) | (data[index + 2] << 0);
     }
 
-    function onMouseMove(x:Float, y:Float):Void {
-        if (!initialized) return;
-        if (invalid) refresh();
-
-        var hit:Hit = getHit(x, y);
-        if (hitsEqual(hit, hoverHit)) {
-            sendInteraction(hit, x, y, MOVE);
-        } else {
-            sendInteraction(hoverHit, x, y, EXIT);
-            hoverHit = hit;
-            sendInteraction(hoverHit, x, y, ENTER);
-        }
-
-        lastX = x;
-        lastY = y;
-    }
-    
-    function onMouseDown(x:Float, y:Float, button:Int):Void {
-        if (!initialized) return;
-        if (invalid) refresh();
-        pressHit = getHit(x, y);
-        lastX = x;
-        lastY = y;
-        sendInteraction(pressHit, x, y, MOUSE_DOWN);
-    }
-
-    function onMouseUp(x:Float, y:Float, button:Int):Void {
-        if (!initialized) return;
-        if (invalid) refresh();
-        var hit:Hit = getHit(x, y);
-        lastX = x;
-        lastY = y;
-        sendInteraction(hit, x, y, MOUSE_UP);
-        sendInteraction(pressHit, x, y, hitsEqual(hit, pressHit) ? CLICK : DROP);
-        pressHit = NULL_HIT;
-    }
-
     inline function sendInteraction(hit:Hit, x:Float, y:Float, type:MouseInteractionType):Void {
-        if (hit.bodyID != null) interact.dispatch(hit.bodyID, hit.glyphID, MOUSE(type, x, y));
+        if (hit.bodyID != null) interactSignal.dispatch(hit.bodyID, hit.glyphID, MOUSE(type, x, y));
     }
 
     inline function refresh() {
         outputBuffer.resize(width, height);
         if (data == null) data = outputBuffer.createReadbackData();
-        updateSignal.dispatch();
+        refreshSignal.dispatch();
         outputBuffer.readBack(outputBuffer, data);
         invalid = false;
     }

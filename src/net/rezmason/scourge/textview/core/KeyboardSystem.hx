@@ -5,12 +5,9 @@ import lime.ui.KeyModifier;
 
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.utils.Zig;
-import net.rezmason.utils.santa.Present;
 
 class KeyboardSystem {
 
-    public var interact(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
-    public var isAttached(default, null):Bool;
     static var allowedSpecialKeys:Map<KeyCode, Bool> = [
         LEFT => true,
         RIGHT => true,
@@ -18,48 +15,30 @@ class KeyboardSystem {
         DOWN => true,
     ];
 
-    var keysDown:Map<Int, Bool>;
-    var shim:Shim;
-    public var focusBodyID:Null<Int>;
+    public var interactSignal(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void> = new Zig();
+    public var active:Bool = false;
+    public var focusBodyID:Null<Int> = null;
+    var keysDown:Map<Int, Bool> = new Map();
 
-    public function new():Void {
-        isAttached = false;
-        interact = new Zig();
-        keysDown = new Map();
-        shim = new Present(Shim);
-        focusBodyID = null;
-    }
+    public function new():Void {}
 
-    public function attach():Void {
-        if (!isAttached) {
-            isAttached = true;
-            shim.keyDownSignal.add(onKeyDown);
-            shim.keyUpSignal.add(onKeyUp);
-            // stage.focus = stage;
+    public function onKeyDown(keyCode:KeyCode, modifier:KeyModifier):Void {
+        if (active) {
+            sendInteraction(keyCode, modifier, keysDown[keyCode] ? KEY_REPEAT : KEY_DOWN);
+            keysDown[keyCode] = true;
         }
     }
 
-    public function detach():Void {
-        if (isAttached) {
-            isAttached = false;
-            shim.keyDownSignal.remove(onKeyDown);
-            shim.keyUpSignal.remove(onKeyUp);
+    public function onKeyUp(keyCode:KeyCode, modifier:KeyModifier):Void {
+        if (active) {
+            sendInteraction(keyCode, modifier, KEY_UP);
+            keysDown[keyCode] = false;
         }
-    }
-
-    function onKeyDown(keyCode:KeyCode, modifier:KeyModifier):Void {
-        sendInteraction(keyCode, modifier, keysDown[keyCode] ? KEY_REPEAT : KEY_DOWN);
-        keysDown[keyCode] = true;
-    }
-
-    function onKeyUp(keyCode:KeyCode, modifier:KeyModifier):Void {
-        sendInteraction(keyCode, modifier, KEY_UP);
-        keysDown[keyCode] = false;
     }
 
     inline function sendInteraction(keyCode:KeyCode, modifier:KeyModifier, type:KeyboardInteractionType):Void {
         if (keyCode & 0x40000000 == 0 || allowedSpecialKeys.exists(keyCode)) {
-            interact.dispatch(focusBodyID, null, KEYBOARD(type, keyCode, modifier));
+            interactSignal.dispatch(focusBodyID, null, KEYBOARD(type, keyCode, modifier));
         }
     }
 
