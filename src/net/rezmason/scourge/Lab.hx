@@ -287,7 +287,7 @@ class PostSystem extends LabSystem {
         program.setVertexBufferAt('aUV',      vertBuffer, 3, 2); // aUV contains u,v
 
         glSys.start(buffer);
-        glSys.clear(0xFF000000);
+        glSys.clear(0, 0, 0);
         glSys.draw(indexBuffer, 0, 2);
         glSys.finish();
 
@@ -530,7 +530,7 @@ class MetaballSystem extends LabSystem {
         program.setVertexBufferAt('aUV',      vertBuffer, 6, 2); // aUV contains u,v
 
         glSys.start(buffer);
-        glSys.clear(0xFF000000);
+        glSys.clear(0, 0, 0);
         glSys.draw(indexBuffer, 0, TpB * NUM_BALLS);
         glSys.finish();
 

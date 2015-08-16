@@ -1,9 +1,9 @@
 package;
 
 import haxe.Utf8;
-
 import haxe.io.BytesOutput;
 import haxe.io.Bytes;
+import lime.app.Application;
 import format.png.Tools;
 import format.png.Writer;
 import flash.Lib;
@@ -26,9 +26,9 @@ import net.rezmason.scourge.Strings;
 @:font("assets/fonts/werf - Profont Cyrillic/werfProFont.ttf") class ProFont_Cy extends Font {}
 @:font("assets/fonts/SourceCodePro_FontsOnly-1.013/TTF/SourceCodePro-Semibold.ttf") class SourceProFont extends Font {}
 
-class ScourgeAssetGen {
+class ScourgeAssetGen extends Application {
 
-    public static function main():Void {
+    override public function init(_):Void {
 
         var current:Sprite = Lib.current;
         current.stage.addEventListener(flash.events.MouseEvent.MOUSE_MOVE, function(e) {

@@ -12,5 +12,5 @@
 
     <haxelib name="format"/>
     <haxelib name="golems"/>
-    <haxelib name="openfl"/>
+    <haxelib name="lime"/>
 </project>
