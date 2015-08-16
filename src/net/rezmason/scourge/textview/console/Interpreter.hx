@@ -131,7 +131,7 @@ class Interpreter {
             case _:
                 if (keyCode != UNKNOWN) {
                     if (modifier.ctrlKey) handleHotKey(keyCode, modifier.altKey);
-                    else handleChar(keyCode);
+                    else handleChar(keyCode, modifier.shiftKey);
                 }
         }
 
@@ -283,8 +283,9 @@ class Interpreter {
         else if (char == ' ') autoComplete();
     }
 
-    inline function handleChar(charCode:Int):Void {
+    inline function handleChar(charCode:Int, shiftKey:Bool):Void {
         var char:String = String.fromCharCode(charCode);
+        if (shiftKey) char = char.toUpperCase();
         var left:String = sub(currentToken.text, 0, caretIndex);
         var right:String = sub(currentToken.text, caretIndex);
         var token:ConsoleToken = currentToken;
@@ -779,7 +780,7 @@ class Interpreter {
 
     inline function loadStateFromString(str:String):Void {
         cState = blankState();
-        Utf8.iter(str, handleChar);
+        Utf8.iter(str, handleChar.bind(_, false));
     }
 
     // shortcut to cState.currentToken

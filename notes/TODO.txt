@@ -1,6 +1,3 @@
-Lime conversion
-    KeyCode to char map doesn't work on web or Flash
-    Move Flash init step from Context
 Colors should be Vec3, not Int
     Lab
     Interpreter
