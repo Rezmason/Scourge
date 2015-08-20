@@ -3,7 +3,7 @@ package net.rezmason.scourge.textview.ui;
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.ColorPalette;
-import net.rezmason.scourge.Color;
+import net.rezmason.scourge.Vec3;
 import net.rezmason.scourge.Strings.*;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.utils.CharCode;
@@ -11,7 +11,7 @@ using net.rezmason.utils.CharCode;
 class BorderBox {
 
     public var body(default, null):Body = new Body();
-    public var color(default, set):Color = ColorPalette.WHITE;
+    public var color(default, set):Vec3 = ColorPalette.WHITE;
     public var width(default, set):Float = 0;
     public var height(default, set):Float = 0;
     public var glyphWidth(default, set):Float = 0.1;

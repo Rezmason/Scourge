@@ -1,38 +1,22 @@
-Loupe    
-    Okay, here's what's up
-        show loupe
-            LoupeDemo has a loupe
-            Arrow keys change loupe's size
-        Has a border box
-        Has a UIMediator
-        Floats over *everything*
-    The Loupe *snaps around* glyphs
-        Some method takes a Body and an array of IDs, transforms them into LoupeSpace, and *clones* them in the Loupe
-    The UIElement grows to surround these clones
-    And the border box grows to surround the UIElement
-    That's what's up.
+Handle overlapping interactive regions
+board and loupe should be on View
+Turn text into floating console
+Tilde key
+Surround in a BorderBox
 
-    Add it as 'loupe' to injector
-    Board interaction signal should drive LoupeSwipeSystem
-        LoupeSwipeSystem converts dx and dy into cardinal motion
-            dx and dy also affect brightness of cardinal indicators of loupe
-            A cardinal motion interpretation *resets* the swipe origin
-            A cardinal motion also changes the "focus" of the loupe
-                Focus of loupe is NOT its center; focus is the node on the piece that traverses
-                The focus can change, if the user wants, by touching a node in the loupe
-                The loupe is always centered by AVERAGING the positions of the piece nodes
-    Then, get the Loupe to display the current piece
-        Swapping should swap the piece
-    Then, give it buttons
+1: board cursor, arrow keys
+2: board cursor, mouse
+3: board cursor, drag and drop
+4: snapping
+5: "attach" loupe to board cursor's glyphs
 
-Where's this all going?
-    SwipeView 2.0
-        Round rectangles showing information
-        You pull them out, they expand to loupes
-            One for piece moves
-            One for bite moves
-            One for player stats
-            One for DNA?
+Add UIElement to Loupe that "encases" content
+Make the border box grow to surround the UIElement, not just the board glyphs
+
+Add loupe sequencing to game presentation
+    Display the current piece in the loupe
+
+Shelf
 
 Try replacing Reflect-on-Dynamic with DynamicAccess
 
