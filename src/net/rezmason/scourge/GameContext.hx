@@ -3,6 +3,7 @@ package net.rezmason.scourge;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.praxis.play.Referee;
 import net.rezmason.scourge.controller.Sequencer;
+import net.rezmason.scourge.textview.View;
 import net.rezmason.scourge.textview.board.BoardAnimator;
 import net.rezmason.scourge.textview.board.BoardInitializer;
 import net.rezmason.scourge.textview.board.BoardSettler;
@@ -14,7 +15,7 @@ class GameContext {
     public function new():Void {
         Santa.mapToClass(Referee, Singleton(new Referee()));
         Santa.mapToClass(Ecce, Singleton(new Ecce()));
-        Santa.mapToID(Body, 'board', Singleton(new Body()));
+        Santa.mapToClass(View, Singleton(new View()));
         
         var sequencer = new Sequencer();
         Santa.mapToClass(Sequencer, Singleton(sequencer));

@@ -1,8 +1,7 @@
-Handle overlapping interactive regions
-board and loupe should be on View
 Turn text into floating console
 Tilde key
 Surround in a BorderBox
+Handle overlapping interactive regions
 
 1: board cursor, arrow keys
 2: board cursor, mouse

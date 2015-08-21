@@ -17,6 +17,7 @@ using net.rezmason.grid.GridUtils;
 class BoardInitializer {
 
     var board:Body;
+    var view:View;
     var ecce:Ecce;
     var qBoard:Query;
 
@@ -24,7 +25,8 @@ class BoardInitializer {
 
     public function new():Void {
         ecce = new Present(Ecce);
-        board = new Present(Body, 'board');
+        view = new Present(View);
+        board = view.board;
         qBoard = ecce.query([BoardSpaceView, BoardSpaceState]);
     }
 

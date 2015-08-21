@@ -12,6 +12,7 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class BoardAnimator {
 
+    var view:View;
     var board:Body;
     var ecce:Ecce;
     var qBoardView:Query;
@@ -22,7 +23,8 @@ class BoardAnimator {
 
     public function new():Void {
         ecce = new Present(Ecce);
-        board = new Present(Body, 'board');
+        view = new Present(View);
+        board = view.board;
         qBoardView = ecce.query([BoardSpaceView]);
         qAnimations = ecce.query([GlyphAnimation]);
     }
