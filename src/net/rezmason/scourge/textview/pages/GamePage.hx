@@ -22,7 +22,6 @@ class GamePage extends NavPage {
 
         mainScene = new Scene();
         mainScene.camera.glyphScaleMode = SCALE_WITH_MIN;
-        mainScene.camera.rect = new Rectangle(0, 0, 0.6, 1);
         scenes.push(mainScene);
         
         consoleMed = new ConsoleUIMediator();
@@ -40,11 +39,12 @@ class GamePage extends NavPage {
         bodiesByName['test']     = eyeCandyDemo.body;
         bodiesByName['board']    = view.body;
 
-        console.hasScrollBar = true;
-        console.scene.camera.rect = new Rectangle(0.6, 0, 0.4, 1);
+        // console.hasScrollBar = true;
+        console.scene.camera.rect = new Rectangle(0, 0, 0.5, 0.5);
         scenes.push(console.scene);
 
         interpreter.addAction(new SetFontAction(console));
+        interpreter.addAction(new SetLayoutAction(console));
         interpreter.addAction(new SetNameAction(interpreter));
         interpreter.addAction(new PrintAction());
         interpreter.addAction(new PlayGameAction(showBodyByName.bind('board')));

@@ -1,4 +1,3 @@
-Turn text into floating console
 Tilde key
 Surround in a BorderBox
 Handle overlapping interactive regions

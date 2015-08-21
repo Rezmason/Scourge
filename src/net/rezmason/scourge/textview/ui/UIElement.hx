@@ -1,5 +1,6 @@
 package net.rezmason.scourge.textview.ui;
 
+import lime.math.Rectangle;
 import net.rezmason.gl.GLTypes;
 
 import net.rezmason.scourge.textview.core.Body;
@@ -96,6 +97,15 @@ class UIElement {
             glyphHeightInPoints = size;
             glyphHeightInPixels = glyphHeightInPoints * getScreenDPI() / NATIVE_DPI;
             recalculateGeometry();
+        }
+        return worked;
+    }
+
+    public function setLayout(x:Float, y:Float, width:Float, height:Float):Bool {
+        var worked = false;
+        if (x >= 0 && x <= 1 && y >= 0 && y <= 1 && width >= 0 && width <= 1 && height >= 0 && height <= 1) {
+            scene.camera.rect = new Rectangle(x, y, width, height);
+            resize();
         }
         return worked;
     }
