@@ -126,7 +126,7 @@ class GLSystem {
             stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
             stage.addEventListener(Event.RESIZE, onResize);
         #else
-            renderer.onRender.add(function(_) onRender(new Rectangle(0, 0, renderer.window.width, renderer.window.height)));
+            renderer.onRender.add(function() onRender(new Rectangle(0, 0, renderer.window.width, renderer.window.height)));
         #end
         for (artifact in artifacts) {
             if (artifact.isDisposed) artifacts.remove(artifact);

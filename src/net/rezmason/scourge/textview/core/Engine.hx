@@ -89,16 +89,16 @@ class Engine extends Module {
         if (bodiesByID[body.id] == body) keyboardSystem.focusBodyID = body.id;
     }
 
-    override public function onKeyDown(keyCode, modifier) keyboardSystem.onKeyDown(keyCode, modifier);
-    override public function onKeyUp(keyCode, modifier) keyboardSystem.onKeyUp(keyCode, modifier);
-    override public function onMouseMove(x, y) mouseSystem.onMouseMove(x, y);
-    override public function onMouseDown(x, y, button) mouseSystem.onMouseDown(x, y, button);
-    override public function onMouseUp(x, y, button) mouseSystem.onMouseUp(x, y, button);
-    override public function onWindowActivate() activate();
-    override public function onWindowDeactivate() deactivate();
-    override public function onWindowEnter() activate();
-    override public function onWindowLeave() deactivate();
-    override public function onWindowResize (width, height) setSize(width, height);
+    override public function onKeyDown(_, keyCode, modifier) keyboardSystem.onKeyDown(keyCode, modifier);
+    override public function onKeyUp(_, keyCode, modifier) keyboardSystem.onKeyUp(keyCode, modifier);
+    override public function onMouseMove(_, x, y) mouseSystem.onMouseMove(x, y);
+    override public function onMouseDown(_, x, y, button) mouseSystem.onMouseDown(x, y, button);
+    override public function onMouseUp(_, x, y, button) mouseSystem.onMouseUp(x, y, button);
+    override public function onWindowActivate(_) activate();
+    override public function onWindowDeactivate(_) deactivate();
+    override public function onWindowEnter(_) activate();
+    override public function onWindowLeave(_) deactivate();
+    override public function onWindowResize(_, width, height) setSize(width, height);
 
     // override public function onRenderContextLost() {}
     // override public function onRenderContextRestored(_) {}
