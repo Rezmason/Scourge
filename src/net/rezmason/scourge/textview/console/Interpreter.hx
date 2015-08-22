@@ -31,6 +31,7 @@ using net.rezmason.utils.CharCode;
 
 class Interpreter {
 
+    static var US_KEYBOARD = "                                 !\"#$%&\"()*+<_>?)!@#$%^&*(::<+>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}^_~ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~";
     static var styleNamesByType:Map<ConsoleTokenType, String> = makeStyleNamesByType();
 
     var currentToken(get, set):ConsoleToken;
@@ -283,7 +284,7 @@ class Interpreter {
 
     inline function handleChar(charCode:Int, shiftKey:Bool):Void {
         var char:String = String.fromCharCode(charCode);
-        if (shiftKey) char = char.toUpperCase();
+        if (shiftKey) char = US_KEYBOARD.charAt(charCode);
         var left:String = sub(currentToken.text, 0, caretIndex);
         var right:String = sub(currentToken.text, caretIndex);
         var token:ConsoleToken = currentToken;
