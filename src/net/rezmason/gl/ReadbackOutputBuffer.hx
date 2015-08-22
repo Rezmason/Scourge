@@ -1,7 +1,7 @@
 package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
-import net.rezmason.gl.Data;
+import net.rezmason.gl.GLTypes;
 
 #if flash
     import flash.display.BitmapData;

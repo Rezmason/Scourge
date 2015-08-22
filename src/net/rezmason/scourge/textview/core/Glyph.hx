@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import net.rezmason.gl.Data;
+import net.rezmason.gl.GLTypes;
 import net.rezmason.utils.display.FlatFont;
 
 @:allow(net.rezmason.scourge.textview.core.BodySegment)

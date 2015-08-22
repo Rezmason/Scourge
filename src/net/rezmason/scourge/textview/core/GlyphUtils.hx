@@ -4,7 +4,7 @@ package net.rezmason.scourge.textview.core;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 #else
-import net.rezmason.gl.Data;
+import net.rezmason.gl.GLTypes;
 
 import net.rezmason.utils.FatChar;
 import net.rezmason.utils.display.FlatFont;

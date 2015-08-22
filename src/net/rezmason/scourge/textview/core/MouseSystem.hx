@@ -4,7 +4,7 @@ import net.rezmason.gl.GLTypes;
 
 import net.rezmason.gl.GLSystem;
 import net.rezmason.gl.ReadbackOutputBuffer;
-import net.rezmason.gl.Data;
+import net.rezmason.gl.GLTypes;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
