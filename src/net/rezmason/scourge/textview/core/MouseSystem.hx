@@ -72,7 +72,7 @@ class MouseSystem {
 
     public function setRectRegions(rectRegionsByID:Map<Int, Rectangle>):Void {
         this.rectRegionsByID = rectRegionsByID;
-        if (rectRegionsByID[lastRectRegionID] == null) {
+        if (lastRectRegionID != null && rectRegionsByID[lastRectRegionID] == null) {
             lastRectRegionID = null;
             onMouseMove(lastX, lastY);
         }
