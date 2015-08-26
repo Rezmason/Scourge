@@ -28,7 +28,7 @@ import net.rezmason.scourge.Strings;
 
 class ScourgeAssetGen extends Application {
 
-    override public function init(_):Void {
+    override public function onPreloadComplete():Void {
 
         var current:Sprite = Lib.current;
         current.stage.addEventListener(flash.events.MouseEvent.MOUSE_MOVE, function(e) {
