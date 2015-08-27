@@ -130,7 +130,7 @@ class UIElement {
         }
 
         updateGlide(delta);
-        uiMediator.updateSpans(delta);
+        uiMediator.updateSpans(delta, dragging);
         findAndPositionCaret();
         taperScrollEdges();
         if (hasScrollBar) scrollBar.updateFade(delta);

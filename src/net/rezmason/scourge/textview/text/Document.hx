@@ -18,8 +18,8 @@ abstract Document(ParsedOutput) {
     public inline function getStyleByName(name:String):Style return this.styles[name];
     public inline function removeAllGlyphs():Void  for (span in this.spans) span.removeAllGlyphs();
 
-    public inline function updateSpans(delta:Float):Void {
-        for (key in this.spansByStyleName.keys()) this.styles[key].update(this.spansByStyleName[key], delta);
+    public inline function updateSpans(delta:Float, force:Bool):Void {
+        for (key in this.spansByStyleName.keys()) this.styles[key].update(this.spansByStyleName[key], delta, force);
     }
 
     public inline function shareWith(otherDoc:Document):Void {

@@ -49,7 +49,7 @@ class AnimatedStyle extends Style {
         super.inherit(parent);
     }
 
-    override public function update(spans:Array<Span>, delta:Float):Void {
+    override public function update(spans:Array<Span>, delta:Float, force:Bool):Void {
         if (persistentState != null) updateState(persistentState, delta);
         for (span in spans) updateSpan(span, delta);
     }

@@ -86,7 +86,7 @@ class UIMediator {
             }
         }
 
-        updateSpans(0);
+        updateSpans(0, true);
 
         return caretGlyphID;
     }
@@ -129,7 +129,7 @@ class UIMediator {
         }
     }
 
-    public function updateSpans(delta:Float):Void compositeDoc.updateSpans(delta);
+    public function updateSpans(delta:Float, force:Bool):Void compositeDoc.updateSpans(delta, force);
 
     public function setText(text:String):Void {
         mainText = text;

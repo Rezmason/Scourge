@@ -19,6 +19,7 @@ class Span {
     var mouseID:Int;
     var isInteractive:Bool;
     var state:SpanState;
+    var styled:Bool;
 
     public function new():Void {
         reset();
@@ -30,6 +31,7 @@ class Span {
         glyphs = null;
         basics = null;
         isInteractive = true;
+        styled = false;
     }
 
     public function init(style:Style, mouseID:Int, id:String):Void {
@@ -37,6 +39,7 @@ class Span {
         this.id = id;
         glyphs = [];
         basics = [];
+        styled = false;
         setMouseID(mouseID);
     }
 

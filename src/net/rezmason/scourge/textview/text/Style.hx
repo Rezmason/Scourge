@@ -26,8 +26,13 @@ class Style {
         isInteractive = false;
     }
 
-    public function update(spans:Array<Span>, delta:Float):Void {
-        for (span in spans) updateSpan(span, delta);
+    public function update(spans:Array<Span>, delta:Float, force:Bool):Void {
+        for (span in spans) {
+            if (force || !span.styled) {
+                span.styled = true;
+                updateSpan(span, delta);
+            }
+        }
     }
 
     function updateSpan(span:Span, delta:Float):Void {

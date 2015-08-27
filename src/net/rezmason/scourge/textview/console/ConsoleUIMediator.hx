@@ -104,9 +104,9 @@ class ConsoleUIMediator extends UIMediator {
         }
     }
 
-    override public function updateSpans(delta:Float):Void {
+    override public function updateSpans(delta:Float, force:Bool):Void {
         caretStyle.updateSpan(caretSpan, delta);
-        super.updateSpans(delta);
+        super.updateSpans(delta, force);
     }
 
     public function addToText(text:String):Void {

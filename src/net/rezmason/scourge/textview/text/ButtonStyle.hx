@@ -41,6 +41,10 @@ class ButtonStyle extends Style {
         super.inherit(parent);
     }
 
+    override public function update(spans:Array<Span>, delta:Float, force:Bool):Void {
+        for (span in spans) updateSpan(span, delta);
+    }
+
     override public function updateSpan(span:Span, delta:Float):Void {
         var state:ButtonSpanState = cast span.state;
 

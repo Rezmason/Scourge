@@ -2,7 +2,7 @@ package net.rezmason.scourge;
 
 @:forward(r, g, b)
 abstract Vec3({r:Float, g:Float, b:Float}) {
-    public function new(r:Float, g:Float, b:Float) this = {r:r, g:g, b:b};
+    public inline function new(r:Float, g:Float, b:Float) this = {r:r, g:g, b:b};
 
     public var x(get, set):Float;
     public var y(get, set):Float;
