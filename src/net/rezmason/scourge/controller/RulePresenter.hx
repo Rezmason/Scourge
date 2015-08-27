@@ -1,6 +1,6 @@
 package net.rezmason.scourge.controller;
 
-import net.kawa.tween.easing.*;
+import motion.easing.*;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.praxis.PraxisTypes.AspectSet;
@@ -64,7 +64,7 @@ class RulePresenter extends Reckoner {
 
         anim.startTime = 0;
         anim.duration = 0.125;
-        anim.ease = Quad.easeInOut;
+        anim.ease = Quad.easeInOut.calculate;
 
         anim.topFrom.copyFrom(spaceView.top);
         anim.topTo.copyFrom(spaceView.top);

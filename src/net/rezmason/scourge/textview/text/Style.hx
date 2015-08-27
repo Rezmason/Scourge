@@ -2,7 +2,6 @@ package net.rezmason.scourge.textview.text;
 
 import net.rezmason.scourge.textview.core.Glyph;
 import net.rezmason.scourge.textview.core.MouseInteractionType;
-import net.rezmason.utils.Siphon;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -15,8 +14,6 @@ class Style {
     public var isInteractive(default, null):Bool;
     public var name(default, null):String;
     public var basis(default, null):String;
-
-    static var easeLibrary:Map<String, Float->Float> = makeEaseLibrary();
 
     static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 'f', 'a', 'h', 's', 'p'];
 
@@ -138,20 +135,5 @@ class Style {
             var fieldValues:Array<Float> = states[ike];
             if (fieldValues != null) basics[ike] = fieldValues[state1] * (1 - ratio) + fieldValues[state2] * ratio;
         }
-    }
-
-    static function makeEaseLibrary():Map<String, Float->Float> {
-        var lib:Map<String, Float->Float> = new Map();
-
-        var easeClasses:Map<String, Class<Dynamic>> = cast Siphon.getDefs('net.kawa.tween.easing', 'thirdparty/kawanet_ktween/src/');
-
-        for (key in easeClasses.keys()) {
-            var clazz = easeClasses[key];
-            for (field in Type.getClassFields(clazz)) {
-                var easeFunc:Dynamic = cast Reflect.field(clazz, field);
-                if (Reflect.isFunction(easeFunc)) lib['${key}_$field'] = cast easeFunc;
-            }
-        }
-        return lib;
     }
 }

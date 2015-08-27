@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.text;
 
-import net.kawa.tween.easing.*;
+import motion.easing.*;
 
 typedef AnimatedSpanState = {
     var time:Float;
@@ -97,8 +97,7 @@ class AnimatedStyle extends Style {
         period = Math.abs(period);
         phase = ((phase % period) + period) % period;
 
-        easeFunc = Style.easeLibrary[cast values['ease']];
-        if (easeFunc == null) easeFunc = Quad.easeInOut;
+        easeFunc = Quad.easeInOut.calculate;
 
         if (values['persist'] == 'true') persistentState = {time:0, playing:true};
 

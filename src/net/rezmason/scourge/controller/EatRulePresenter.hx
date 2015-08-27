@@ -1,7 +1,7 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.scourge.textview.ColorPalette.*;
-import net.kawa.tween.easing.*;
+import motion.easing.*;
 import net.rezmason.scourge.Strings.*;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 

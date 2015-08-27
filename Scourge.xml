@@ -11,12 +11,12 @@
     <set name="BUILD_DIR" value="Export/Scourge/debug" if="debug"/>
     
     <classpath name="src"/>
-    <classpath name="thirdparty/kawanet_ktween/src"/>
     <classpath name="test"/>
     
     <haxedef name="advanced-telemetry" if="debug"/>
     <haxedef name="glsl2agal" if="flash"/>
     <haxedef name="stage3d" if="flash"/>
+    <haxelib name="actuate"/>
     <haxelib name="golems"/>
     <haxelib name="lime"/>
     

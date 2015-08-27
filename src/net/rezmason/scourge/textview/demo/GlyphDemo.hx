@@ -1,7 +1,7 @@
 package net.rezmason.scourge.textview.demo;
 
-import net.kawa.tween.easing.Quint;
-import net.kawa.tween.easing.Linear;
+import motion.easing.Quint;
+import motion.easing.Linear;
 
 import haxe.Utf8;
 
@@ -22,7 +22,7 @@ class GlyphDemo {
     inline static var NUM_PHASES:Int = 3;
     static var periods:Array<Float> = [TWEEN_LENGTH, WAIT_LENGTH, TWEEN_LENGTH];
     static var tweenData:Array<Array<Float>> = [[0,1],[1,1],[1,0]];
-    static var tweens:Array<Float->Float> = [Quint.easeOut, Linear.easeIn, Quint.easeIn];
+    static var tweens:Array<Float->Float> = [Quint.easeOut.calculate, Linear.easeNone.calculate, Quint.easeIn.calculate];
     inline static var CHARS:String = 'ΩSCOURGE';
 
     public var body(default, null):Body;

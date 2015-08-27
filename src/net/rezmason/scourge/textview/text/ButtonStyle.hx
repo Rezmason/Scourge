@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.text;
 
-import net.kawa.tween.easing.Quad;
+import motion.easing.Quad;
 
 import net.rezmason.scourge.textview.core.MouseInteractionType;
 
@@ -98,8 +98,7 @@ class ButtonStyle extends Style {
         period = values['period'];
         if (period == null) period = 1;
         period = Math.abs(period);
-        easeFunc = Style.easeLibrary[cast values['ease']];
-        if (easeFunc == null) easeFunc = Quad.easeInOut;
+        easeFunc = Quad.easeInOut.calculate;
         super.flatten();
     }
 }

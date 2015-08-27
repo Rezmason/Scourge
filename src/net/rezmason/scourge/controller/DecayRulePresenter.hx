@@ -1,7 +1,7 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.scourge.textview.ColorPalette.*;
-import net.kawa.tween.easing.*;
+import motion.easing.*;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class DecayRulePresenter extends RulePresenter {
@@ -12,7 +12,7 @@ class DecayRulePresenter extends RulePresenter {
         wither.bottomTo.set_color(BLACK);
         
         wither.duration = 0.5;
-        wither.ease = Linear.easeIn;
+        wither.ease = Linear.easeNone.calculate;
 
         var fade = createAnimation();
         fade.topFrom.copyFrom(wither.topTo);

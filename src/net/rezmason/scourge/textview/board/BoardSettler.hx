@@ -11,7 +11,7 @@ import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.utils.santa.Present;
 
-import net.kawa.tween.easing.*;
+import motion.easing.*;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
 using net.rezmason.grid.GridUtils;
@@ -60,7 +60,7 @@ class BoardSettler extends Reckoner {
             if (anim.bottomTo == null) anim.bottomTo = GlyphUtils.createGlyph();
             anim.startTime = 0;
             anim.duration = 0.3;
-            anim.ease = Quad.easeInOut;
+            anim.ease = Quad.easeInOut.calculate;
             
             anim.topFrom.copyFrom(view.top);
             anim.topTo.copyFrom(view.top);

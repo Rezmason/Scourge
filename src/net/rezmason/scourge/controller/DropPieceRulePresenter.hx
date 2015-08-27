@@ -1,7 +1,7 @@
 package net.rezmason.scourge.controller;
 
 import net.rezmason.scourge.textview.ColorPalette.*;
-import net.kawa.tween.easing.*;
+import motion.easing.*;
 import net.rezmason.scourge.Strings.*;
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
@@ -14,7 +14,7 @@ class DropPieceRulePresenter extends RulePresenter {
         slam.topTo.SET({color:WHITE, char:slam.topFrom.get_char(), s:1.2, f:0.7, p:-0.05});
         
         slam.duration = 0.125;
-        slam.ease = Linear.easeIn;
+        slam.ease = Linear.easeNone.calculate;
 
         var cool = createAnimation();
         cool.topFrom.copyFrom(slam.topTo);
