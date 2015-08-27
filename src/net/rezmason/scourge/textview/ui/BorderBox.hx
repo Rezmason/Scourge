@@ -68,8 +68,8 @@ class BorderBox {
                 y = (ike - earlyEnd - 0.5 * split) * glyphWidth * centerDim;
                 s = centerDim;
             }
-            body.getGlyphByID(itr++).SET({s:centerDim, h:stretch / s, x: left, y:y, char:VERTICAL.code()});
-            body.getGlyphByID(itr++).SET({s:centerDim, h:stretch / s, x:-left, y:y, char:VERTICAL.code()});
+            body.getGlyphByID(itr++).SET({s:s, h:stretch / s, x: left, y:y, char:VERTICAL.code()});
+            body.getGlyphByID(itr++).SET({s:s, h:stretch / s, x:-left, y:y, char:VERTICAL.code()});
         }
     }
     
