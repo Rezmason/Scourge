@@ -4,8 +4,8 @@
     <app title="Scourge" file="Scourge" main="Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="12.0"/>
     
     <set name="fullscreen" unless="mac"/>
-    <window width="0" height="0" fps="30" orientation="portrait" background="#000000" resizable="true" unless="mac"/>
-    <window width="1152" height="720" fps="30" orientation="portrait" background="#000000" resizable="true" borderless="true" if="mac"/>
+    <window width="0" height="0" fps="60" orientation="portrait" background="#000000" resizable="true" unless="mac"/>
+    <window width="1152" height="720" fps="60" orientation="portrait" background="#000000" resizable="true" borderless="true" if="mac"/>
     
     <set name="BUILD_DIR" value="Export/Scourge/release" unless="debug"/>
     <set name="BUILD_DIR" value="Export/Scourge/debug" if="debug"/>

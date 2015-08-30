@@ -20,7 +20,7 @@ using Lambda;
 class Engine extends Module {
 
     var active:Bool;
-    public var framerate(default, set):Float;
+    public var timestep(default, set):Float;
     public var width(default, null):Int;
     public var height(default, null):Int;
     public var ready(default, null):Bool;
@@ -49,7 +49,7 @@ class Engine extends Module {
         
         width = 1;
         height = 1;
-        framerate = 1000 / 30;
+        timestep = 1000 / 60;
         bodiesByID = new Map();
         scenes = [];
 
@@ -60,7 +60,7 @@ class Engine extends Module {
         addListeners();
     }
 
-    public function set_framerate(f:Float):Float return framerate = (f >= 0 ? f : 0);
+    public function set_timestep(f:Float):Float return timestep = (f >= 0 ? f : 0);
 
     public function addScene(scene:Scene):Void {
         #if debug readyCheck(); #end
@@ -189,7 +189,7 @@ class Engine extends Module {
         if (active) return;
         active = true;
 
-        updateTimer = new Timer(Std.int(framerate));
+        updateTimer = new Timer(Std.int(timestep));
         updateTimer.run = onTimer;
         lastTimeStamp = Timer.stamp();
         setSize(width, height);
