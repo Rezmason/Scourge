@@ -1,7 +1,3 @@
-Tilde key
-Surround in a BorderBox
-Handle overlapping interactive regions
-
 1: board cursor, arrow keys
 2: board cursor, mouse
 3: board cursor, drag and drop
@@ -33,7 +29,12 @@ Some Haxe stuff
     https://github.com/larsiusprime/crashdumper
     https://github.com/Justinfront/hxDaedalus
 
-Upgrade to latest OpenFL
+Minified JS
+    -D js_flatten # flatten package namespaces to single variables
+    -dce full # remove all unused code
+        Problematic; removes constructors that are not explicitly called
+            @:keep and @:keepSub
+    --no-traces # remove all traces
 
 Flash 12 support
     Context3DBufferUsage
