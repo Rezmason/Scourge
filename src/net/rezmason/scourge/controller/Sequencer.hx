@@ -14,7 +14,7 @@ import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
-import net.rezmason.utils.Pointers;
+import net.rezmason.utils.pointers.Pointers;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 

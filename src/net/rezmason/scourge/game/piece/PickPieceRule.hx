@@ -8,7 +8,7 @@ import net.rezmason.scourge.game.TempParams;
 import net.rezmason.praxis.aspect.PlyAspect;
 
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 typedef PickPieceMove = {>Move,
     var hatIndex:Int;

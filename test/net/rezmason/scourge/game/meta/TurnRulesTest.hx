@@ -21,7 +21,7 @@ import net.rezmason.scourge.game.test.TestPieceRule;
 // using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.praxis.state.StatePlan;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class TurnRulesTest extends ScourgeRuleTest
 {

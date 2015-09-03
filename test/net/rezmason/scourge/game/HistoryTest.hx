@@ -7,7 +7,7 @@ import net.rezmason.utils.History;
 
 using Lambda;
 
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class HistoryTest
 {

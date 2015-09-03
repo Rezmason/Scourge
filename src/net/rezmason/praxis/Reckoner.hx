@@ -11,7 +11,7 @@ import net.rezmason.praxis.state.StatePlan;
 
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.MapUtils;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 #if !macro @:autoBuild(net.rezmason.praxis.Reckoner.build()) #end class Reckoner {
 

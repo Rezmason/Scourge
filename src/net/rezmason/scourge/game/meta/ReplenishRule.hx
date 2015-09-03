@@ -7,7 +7,7 @@ import net.rezmason.praxis.rule.BaseRule;
 using Lambda;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class ReplenishRule extends BaseRule<ReplenishParams> {
 

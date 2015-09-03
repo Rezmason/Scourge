@@ -7,7 +7,7 @@ import net.rezmason.grid.Selection;
 import net.rezmason.praxis.rule.BaseRule;
 
 using net.rezmason.utils.History;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 private typedef Atom = Null<Int>; // Our low-level value type
 

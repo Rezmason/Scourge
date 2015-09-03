@@ -15,7 +15,7 @@ import net.rezmason.scourge.game.build.PetriBoardFactory;
 
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.grid.GridUtils;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class ScourgeRuleTest
 {

@@ -2,7 +2,7 @@ package net.rezmason.utils;
 
 import massive.munit.Assert;
 
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class PointersTest {
 

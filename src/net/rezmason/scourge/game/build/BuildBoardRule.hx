@@ -12,7 +12,7 @@ import net.rezmason.scourge.game.TempParams;
 using Lambda;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.grid.GridUtils;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 typedef XY = {x:Float, y:Float};
 

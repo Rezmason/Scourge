@@ -10,7 +10,7 @@ using Lambda;
 using net.rezmason.grid.GridUtils;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.MapUtils;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class StatePlanner {
     public function new():Void {

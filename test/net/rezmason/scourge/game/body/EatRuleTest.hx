@@ -14,7 +14,7 @@ import net.rezmason.praxis.aspect.PlyAspect;
 using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.praxis.state.StatePlan;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class EatRuleTest extends ScourgeRuleTest
 {

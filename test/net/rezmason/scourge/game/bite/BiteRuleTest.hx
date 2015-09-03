@@ -15,7 +15,7 @@ using Lambda;
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.state.StatePlan;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class BiteRuleTest extends ScourgeRuleTest
 {

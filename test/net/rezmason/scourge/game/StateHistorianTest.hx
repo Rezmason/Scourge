@@ -16,7 +16,7 @@ import net.rezmason.scourge.game.build.PetriBoardFactory;
 import net.rezmason.scourge.game.piece.PickPieceRule;
 import net.rezmason.utils.openfl.Resource;
 
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.praxis.state.StatePlan;
 

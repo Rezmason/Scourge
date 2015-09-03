@@ -9,7 +9,7 @@ import net.rezmason.praxis.state.*;
 import net.rezmason.utils.Zig;
 
 using net.rezmason.utils.Alphabetizer;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class Game {
 

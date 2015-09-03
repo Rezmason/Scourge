@@ -8,7 +8,7 @@ import net.rezmason.praxis.aspect.PlyAspect;
 
 using Lambda;
 
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class SwapPieceRule extends BaseRule<SwapPieceParams> {
 

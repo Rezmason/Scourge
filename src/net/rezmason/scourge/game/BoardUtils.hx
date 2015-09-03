@@ -7,7 +7,7 @@ import net.rezmason.grid.Cell;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StatePlan;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.utils.Pointers;
+import net.rezmason.utils.pointers.Pointers;
 
 using net.rezmason.grid.GridUtils;
 

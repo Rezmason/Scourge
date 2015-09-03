@@ -4,7 +4,7 @@ package net.rezmason.scourge.game.test;
 import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.game.piece.PieceAspect;
 
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 typedef TestPieceParams = {
     var pieceTableID:Int;

@@ -9,7 +9,7 @@ import net.rezmason.scourge.game.body.OwnershipAspect;
 using Lambda;
 
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class KillHeadlessBodyRule extends BaseRule<Dynamic> {
 

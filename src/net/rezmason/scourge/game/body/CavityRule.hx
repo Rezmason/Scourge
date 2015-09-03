@@ -8,7 +8,7 @@ import net.rezmason.scourge.game.meta.FreshnessAspect;
 using Lambda;
 using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class CavityRule extends BaseRule<Dynamic> {
 

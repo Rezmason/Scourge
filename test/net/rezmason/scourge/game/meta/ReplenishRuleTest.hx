@@ -9,7 +9,7 @@ import net.rezmason.scourge.game.meta.ReplenishRule;
 import net.rezmason.scourge.game.test.TestAspect;
 
 using net.rezmason.praxis.state.StatePlan;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class ReplenishRuleTest extends ScourgeRuleTest
 {

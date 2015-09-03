@@ -12,7 +12,7 @@ import net.rezmason.scourge.game.body.OwnershipAspect;
 using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.praxis.state.StatePlan;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class DecayRuleTest extends ScourgeRuleTest
 {

@@ -15,7 +15,7 @@ import net.rezmason.scourge.game.test.TestRule;
 
 using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.state.StatePlan;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class StatePlannerTest {
 

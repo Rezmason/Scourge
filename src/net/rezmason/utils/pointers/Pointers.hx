@@ -1,13 +1,13 @@
-package net.rezmason.utils;
+package net.rezmason.utils.pointers;
 
 abstract Ptr<T>(#if USE_POINTERS { i:Null<Int>, t:Null<T>, p:Int } #else Int #end) {
 
-    @:allow(net.rezmason.utils) inline function new(i:Int, p:PtrKey) {
+    @:allow(net.rezmason.utils.pointers) inline function new(i:Int, p:PtrKey) {
         this = #if USE_POINTERS {i:i, t:null, p:p.i()} #else i #end ;
     }
 
-    @:allow(net.rezmason.utils) inline function i():Int return #if USE_POINTERS this.i #else this #end;
-    @:allow(net.rezmason.utils) inline function p():Int return #if USE_POINTERS this.p #else 0 #end;
+    @:allow(net.rezmason.utils.pointers) inline function i():Int return #if USE_POINTERS this.i #else this #end;
+    @:allow(net.rezmason.utils.pointers) inline function p():Int return #if USE_POINTERS this.p #else 0 #end;
 
     public inline function isLocked():Bool return #if USE_POINTERS Locker.locks[this.p] #else false #end ;
     public inline static function intToPointer<T>(i:Int, p:PtrKey):Ptr<T> return new Ptr(i, p);
@@ -58,14 +58,14 @@ abstract PtrSet<T>(Array<T>) {
 
 abstract PtrKey({i:Int}) {
     public inline function new() this = {i:Locker.ids++};
-    @:allow(net.rezmason.utils) inline function i():Int return this.i;
+    @:allow(net.rezmason.utils.pointers) inline function i():Int return this.i;
     public inline function lock():Void { #if USE_POINTERS Locker.locks[this.i] = true; #end }
     public inline function unlock():Void { #if USE_POINTERS Locker.locks[this.i] = false; #end }
 }
 
 class Locker {
-    @:allow(net.rezmason.utils) static var ids:Int = 0;
-    #if USE_POINTERS @:allow(net.rezmason.utils) static var locks:Array<Bool> = []; #end
+    @:allow(net.rezmason.utils.pointers) static var ids:Int = 0;
+    #if USE_POINTERS @:allow(net.rezmason.utils.pointers) static var locks:Array<Bool> = []; #end
 }
 
 class PtrIterator<T> {
@@ -77,7 +77,7 @@ class PtrIterator<T> {
 
     public function new():Void {}
 
-    @:allow(net.rezmason.utils)
+    @:allow(net.rezmason.utils.pointers)
     function attach(a:PtrSet<T>, k:PtrKey):Void {
         this.a = a;
         this.k = k;

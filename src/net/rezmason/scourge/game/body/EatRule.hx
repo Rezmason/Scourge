@@ -12,7 +12,7 @@ using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.MapUtils;
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class EatRule extends BaseRule<EatParams> {
 

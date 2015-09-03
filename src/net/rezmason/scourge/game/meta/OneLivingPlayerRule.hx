@@ -5,7 +5,7 @@ import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.scourge.game.body.BodyAspect;
 
-using net.rezmason.utils.Pointers;
+using net.rezmason.utils.pointers.Pointers;
 
 class OneLivingPlayerRule extends BaseRule<Dynamic> {
 
