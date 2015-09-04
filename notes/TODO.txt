@@ -1,6 +1,5 @@
 Pointers
     Make PointerSource
-    Rename PointerSet to Pointable
     Pointers should be read only or read/write
         Goes into AspectProperty from macros
         Reckoner's primePointers and __initPointers will split into read-only and read-write methods

@@ -6,16 +6,16 @@ abstract Ptr<T>(Int) {
     @:to public inline function toInt() return this;
 }
 
-abstract PtrSet<T>(Array<T>) {
+abstract Pointable<T>(Array<T>) {
 
     public inline function new(a:Array<T> = null) this = (a == null) ? [] : a.copy();
     public inline function wipe():Void this.splice(0, this.length);
-    public inline function copy():PtrSet<T> return new PtrSet(this);
-    public inline function copyTo(dest:PtrSet<T>, offset:Int = 0):Void {
+    public inline function copy():Pointable<T> return new Pointable(this);
+    public inline function copyTo(dest:Pointable<T>, offset:Int = 0):Void {
         for (ike in 0...this.length) dest.write(ike + offset, this[ike]);
     }
-    public inline function map<U>(mapFunc:T->U):PtrSet<U> return new PtrSet(this.map(mapFunc));
-    public inline function mapTo<U>(mapFunc:T->U, dest:PtrSet<U>, offset:Int):Void {
+    public inline function map<U>(mapFunc:T->U):Pointable<U> return new Pointable(this.map(mapFunc));
+    public inline function mapTo<U>(mapFunc:T->U, dest:Pointable<U>, offset:Int):Void {
         for (ike in 0...this.length) dest.write(ike + offset, mapFunc(this[ike]));
     }
 
@@ -34,20 +34,20 @@ abstract PtrSet<T>(Array<T>) {
     public inline function ptr(i:Int):Ptr<T> return new Ptr(i);
     public inline function ptrs(pItr:PtrIterator<T> = null):PtrIterator<T> {
         if (pItr == null) pItr = new PtrIterator();
-        pItr.attach(new PtrSet(this));
+        pItr.attach(new Pointable(this));
         return pItr;
     }
 }
 
 class PtrIterator<T> {
 
-    var a:PtrSet<T>;
+    var a:Pointable<T>;
     var itr:Iterator<Int>;
 
     public function new():Void {}
 
     @:allow(net.rezmason.utils.pointers)
-    function attach(a:PtrSet<T>):Void {
+    function attach(a:Pointable<T>):Void {
         this.a = a;
         itr = 0...a.size();
     }

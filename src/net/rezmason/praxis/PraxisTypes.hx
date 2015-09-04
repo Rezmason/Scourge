@@ -12,7 +12,7 @@ using net.rezmason.utils.pointers.Pointers;
 private typedef Atom = Null<Int>; // Our low-level value type
 
 typedef AspectPtr = Ptr<Atom>;
-typedef AspectSet = PtrSet<Atom>; // The properties of an element of the state
+typedef AspectSet = Pointable<Atom>; // The properties of an element of the state
 typedef AspectItr = PtrIterator<Atom>;
 
 typedef BoardCell = Cell<AspectSet>;
