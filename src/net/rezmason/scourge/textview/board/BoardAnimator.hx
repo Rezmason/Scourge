@@ -15,7 +15,6 @@ class BoardAnimator {
     var view:View;
     var board:Body;
     var ecce:Ecce;
-    var qBoardView:Query;
     var qAnimations:Query;
     var time:Float;
 
@@ -25,7 +24,6 @@ class BoardAnimator {
         ecce = new Present(Ecce);
         view = new Present(View);
         board = view.board;
-        qBoardView = ecce.query([BoardSpaceView]);
         qAnimations = ecce.query([GlyphAnimation]);
     }
 

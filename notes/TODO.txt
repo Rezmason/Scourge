@@ -1,3 +1,17 @@
+Pointers
+    Remove locking
+    Remove USE_POINTERS
+        Look everywhere for references
+    Make PointerSource
+    Rename PointerSet to Pointable
+    Pointers should be read only or read/write
+        Goes into AspectProperty from macros
+        Reckoner's primePointers and __initPointers will split into read-only and read-write methods
+        StatePlan's read-write pointers will only be available to Praxis classes
+            Game will pass read-write pointers to rules that need them
+    Separate Rules into MoveEnumerators and StateMutators
+        Maybe also make StateBuilders
+
 1: board cursor, arrow keys
 2: board cursor, mouse
 3: board cursor, drag and drop

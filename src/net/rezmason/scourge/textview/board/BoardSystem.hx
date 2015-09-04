@@ -18,7 +18,7 @@ class BoardAnimator {
 
     var body:Body;
     var ecce:Ecce;
-    var qBoardView:Query;
+    var qBoardViews:Query;
     var qAnimations:Query;
     var time:Float;
     var speed:Float;
@@ -29,7 +29,7 @@ class BoardAnimator {
         this.ecce = ecce;
         this.body = body;
         speed = 1000 / animateMils;
-        qBoardView = ecce.query([BoardSpaceView]);
+        qBoardViews = ecce.query([BoardSpaceView]);
         qAnimations = ecce.query([GlyphAnimation]);
     }
 
@@ -38,7 +38,7 @@ class BoardAnimator {
         var numSpacesThatMatter = 0;
         var trimmings:Map<Int, Bool> = new Map();
         var maxDistSquared:Float = 0;
-        for (entity in qBoardView) {
+        for (entity in qBoardViews) {
             var cell = entity.get(BoardSpaceView).cell;
             if (cell.value.isWall) {
                 var hasEmptyNeighbor = false;
@@ -71,7 +71,7 @@ class BoardAnimator {
         // Second pass: populate views with glyphs, draw the walls (which don't change)
         var itr = 0;
         body.growTo(numSpacesThatMatter * 3);
-        for (entity in qBoardView) {
+        for (entity in qBoardViews) {
             var view = entity.get(BoardSpaceView);
             var cell = view.cell;
             var pos = cell.value.pos;
