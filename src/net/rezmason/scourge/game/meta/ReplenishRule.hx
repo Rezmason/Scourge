@@ -134,7 +134,7 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
             if (step == repProp.period) {
                 // Time for action! Resolve the pointer and update values at that location
                 step = 0;
-                var ptr:AspectPtr = AspectPtr.intToPointer(replenishable[repPropLookup_], state.key);
+                var ptr:AspectPtr = AspectPtr.intToPointer(replenishable[repPropLookup_]);
                 for (aspectSet in aspectSets) {
                     var value:Int = aspectSet[ptr];
                     value += repProp.amount;

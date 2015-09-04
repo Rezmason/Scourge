@@ -1,7 +1,4 @@
 Pointers
-    Remove locking
-    Remove USE_POINTERS
-        Look everywhere for references
     Make PointerSource
     Rename PointerSet to Pointable
     Pointers should be read only or read/write

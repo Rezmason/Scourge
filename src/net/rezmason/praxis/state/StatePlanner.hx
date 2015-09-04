@@ -36,19 +36,19 @@ class StatePlanner {
             // trace(Type.getClassName(Type.getClass(rule)));
         }
 
-        planAspects(globalRequirements, plan.globalAspectLookup, plan.globalAspectTemplate, state.key);
-        planAspects(playerRequirements, plan.playerAspectLookup, plan.playerAspectTemplate, state.key);
-        planAspects(cardRequirements, plan.cardAspectLookup, plan.cardAspectTemplate, state.key);
-        planAspects(spaceRequirements, plan.spaceAspectLookup, plan.spaceAspectTemplate, state.key);
+        planAspects(globalRequirements, plan.globalAspectLookup, plan.globalAspectTemplate);
+        planAspects(playerRequirements, plan.playerAspectLookup, plan.playerAspectTemplate);
+        planAspects(cardRequirements, plan.cardAspectLookup, plan.cardAspectTemplate);
+        planAspects(spaceRequirements, plan.spaceAspectLookup, plan.spaceAspectTemplate);
 
         return plan;
     }
 
-    function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet, key:PtrKey):Void {
+    function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet):Void {
         var itr:Int = 1; // Index 0 is reserved for the aspects' ID
         for (id in requirements.keys().a2z()) {
             var prop:AspectProperty = requirements[id];
-            var ptr:AspectPtr = template.ptr(itr, key);
+            var ptr:AspectPtr = template.ptr(itr);
             lookup[prop.id] = ptr;
             template[ptr] = prop.initialValue;
             itr++;

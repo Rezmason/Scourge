@@ -30,7 +30,7 @@ class BoardUtils {
 
         var occupier_:AspectPtr = plan.spaceAspectLookup[OwnershipAspect.OCCUPIER.id];
         var isFilled_:AspectPtr = plan.spaceAspectLookup[OwnershipAspect.IS_FILLED.id];
-        var ident_:AspectPtr = Ptr.intToPointer(0, state.key);
+        var ident_:AspectPtr = Ptr.intToPointer(0);
 
         for (row in grid.walk(S)) {
             str += '\n';

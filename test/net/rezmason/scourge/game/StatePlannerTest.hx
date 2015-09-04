@@ -37,16 +37,14 @@ class StatePlannerTest {
     @Test
     public function configTest1():Void {
 
-        var key:PtrKey = new PtrKey();
-
         var history:StateHistory = new StateHistory();
-        var historyState:State = new State(key);
+        var historyState:State = new State();
         // make state config and generate state
         var planner:StatePlanner = new StatePlanner();
         var buildStateRule:BuildGlobalRule = new BuildGlobalRule({firstPlayer:0});
         var testRule:TestRule = new TestRule(null);
         var rules:Array<Rule> = [null, buildStateRule, testRule];
-        var state:State = new State(key);
+        var state:State = new State();
         var plan:StatePlan = planner.planState(state, rules);
         for (rule in rules) if (rule != null) rule.prime(state,  plan,  history,  historyState);
 

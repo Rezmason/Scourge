@@ -36,7 +36,7 @@ class ScourgeRuleTest
         history = stateHistorian.history;
         state = stateHistorian.state;
         historyState = stateHistorian.historyState;
-        identPtr = Ptr.intToPointer(0, state.key);
+        identPtr = Ptr.intToPointer(0);
     }
 
     @AfterClass

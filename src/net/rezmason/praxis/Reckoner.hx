@@ -38,12 +38,12 @@ using net.rezmason.utils.pointers.Pointers;
         this.state = state;
         this.plan = plan;
 
-        ident_ = Ptr.intToPointer(0, state.key);
+        ident_ = Ptr.intToPointer(0);
 
         var itr:Int = 1; // Index 0 is reserved for the aspects' ID
         for (id in extraAspectRequirements.keys().a2z()) {
             var prop:AspectProperty = extraAspectRequirements[id];
-            var ptr:AspectPtr = extraAspectTemplate.ptr(itr, state.key);
+            var ptr:AspectPtr = extraAspectTemplate.ptr(itr);
             extraAspectLookup[prop.id] = ptr;
             extraAspectTemplate[ptr] = prop.initialValue;
             itr++;

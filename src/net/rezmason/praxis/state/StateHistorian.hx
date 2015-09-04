@@ -10,14 +10,12 @@ class StateHistorian {
     public var state(default, null):State;
     public var historyState(default, null):State;
     public var history(default, null):StateHistory;
-    public var key(default, null):PtrKey;
 
     var aItr:AspectItr;
 
     public function new():Void {
-        key = new PtrKey();
-        state = new State(key);
-        historyState = new State(key);
+        state = new State();
+        historyState = new State();
         history = new StateHistory();
         aItr = new AspectItr();
     }
@@ -43,7 +41,6 @@ class StateHistorian {
     public function load(savedState:SavedState) {
         var oldState = state;
         state = Unserializer.run(savedState.data);
-        state.key = key;
         if (oldState != null) state.cells = oldState.cells.copy();
     }
 
@@ -54,7 +51,7 @@ class StateHistorian {
     }
 
     private inline function writeAspects(aspects:AspectSet, histAspects:AspectSet, aItr:AspectItr):Void {
-        for (ptr in aspects.ptrs(key, aItr)) history.write(histAspects[ptr], aspects[ptr]);
+        for (ptr in aspects.ptrs(aItr)) history.write(histAspects[ptr], aspects[ptr]);
     }
 
     private inline function writeAspectSets(aspectSets:Array<AspectSet>, histAspectSets:Array<AspectSet>):Void {
@@ -62,7 +59,7 @@ class StateHistorian {
     }
 
     private inline function readAspects(aspects:AspectSet, histAspects:AspectSet, itr:AspectItr):Void {
-        for (ptr in aspects.ptrs(key, aItr)) aspects[ptr] = history.read(histAspects[ptr]);
+        for (ptr in aspects.ptrs(aItr)) aspects[ptr] = history.read(histAspects[ptr]);
     }
 
     private inline function readAspectSets(aspectSets:Array<AspectSet>, histAspectSets:Array<AspectSet>):Void {

@@ -14,10 +14,8 @@ class State {
     public var spaces(default, null):Array<AspectSet>;
     public var cells(default, set):Grid<AspectSet>; // aka BoardGrid
     public var extras(default, null):Array<AspectSet>;
-    public var key(default, set):PtrKey;
-
-    public function new(key:PtrKey):Void {
-        this.key = key;
+    
+    public function new():Void {
         globals = [];
         players = [];
         cards   = [];
@@ -51,11 +49,6 @@ class State {
         spaces  = s.unserialize();
         extras  = s.unserialize();
         resolve();
-    }
-
-    public function set_key(val:PtrKey):PtrKey {
-        if (key == null) key = val;
-        return val;
     }
 
     public function set_cells(val:Grid<AspectSet>):Grid<AspectSet> {

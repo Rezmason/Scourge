@@ -61,10 +61,8 @@ class Game {
         if (savedState != null) {
             historian.load(savedState);
         } else {
-            historian.key.lock();
             var startAction = rules['start'];
             startAction.update();
-            historian.key.unlock();
             startAction.chooseMove();
         }
 
@@ -98,10 +96,8 @@ class Game {
 
     public function getMovesForAction(id:String):Array<Move> {
         if (actionIDs.indexOf(id) == -1) throw 'Action $id does not exist.';
-        historian.key.lock();
         rules[id].update();
         var moves:Array<Move> = rules[id].moves;
-        historian.key.unlock();
         return moves;
     }
 
@@ -133,9 +129,7 @@ class Game {
     }
 
     private function collectAllMoves():Void {
-        historian.key.lock();
         for (id in actionIDs) rules[id].collectMoves();
-        historian.key.unlock();
     }
 
     private function makeCacheRule(rule:Rule):Rule {
