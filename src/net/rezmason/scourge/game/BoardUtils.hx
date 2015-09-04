@@ -1,6 +1,7 @@
 package net.rezmason.scourge.game;
 
 import net.rezmason.praxis.aspect.Aspect.*;
+import net.rezmason.praxis.aspect.IdentityAspect;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.grid.GridDirection.*;
 import net.rezmason.grid.Cell;
@@ -30,7 +31,7 @@ class BoardUtils {
 
         var occupier_:AspectPtr = plan.spaceAspectLookup[OwnershipAspect.OCCUPIER.id];
         var isFilled_:AspectPtr = plan.spaceAspectLookup[OwnershipAspect.IS_FILLED.id];
-        var ident_:AspectPtr = Ptr.intToPointer(0);
+        var ident_:AspectPtr = plan.spaceAspectLookup[IdentityAspect.IDENTITY.id];
 
         for (row in grid.walk(S)) {
             str += '\n';

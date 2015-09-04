@@ -1,13 +1,11 @@
 package net.rezmason.utils.pointers;
 
-abstract Ptr<T>(Int) {
-    @:allow(net.rezmason.utils.pointers) inline function new(i) this = i;
-    public inline static function intToPointer<T>(i) return new Ptr(i);
-    @:to public inline function toInt() return this;
+@:allow(net.rezmason.utils.pointers)
+abstract Ptr<T>(Int) to Int {
+    inline function new(i) this = i;
 }
 
 abstract Pointable<T>(Array<T>) {
-
     public inline function new(a:Array<T> = null) this = (a == null) ? [] : a.copy();
     public inline function wipe():Void this.splice(0, this.length);
     public inline function copy():Pointable<T> return new Pointable(this);
@@ -22,37 +20,33 @@ abstract Pointable<T>(Array<T>) {
     inline function write(index:Int, value:T):T return this[index] = value;
 
     @:arrayAccess #if !cpp inline #end function ptrAccess(p:Ptr<T>):T { // Was inline; caused openFL issue
-        return this[p.toInt()];
+        return this[p];
     }
 
-    @:arrayAccess inline function ptrWrite(p:Ptr<T>, v:T):T {
-        return this[p.toInt()] = v;
-    }
+    @:arrayAccess inline function ptrWrite(p:Ptr<T>, v:T):T return this[p] = v;
 
-    @:allow(net.rezmason.utils.PtrIterator) public inline function size():Int return this.length;
-
-    public inline function ptr(i:Int):Ptr<T> return new Ptr(i);
     public inline function ptrs(pItr:PtrIterator<T> = null):PtrIterator<T> {
         if (pItr == null) pItr = new PtrIterator();
-        pItr.attach(new Pointable(this));
+        pItr.init(this.length);
         return pItr;
     }
 }
 
+@:allow(net.rezmason.utils.pointers)
 class PtrIterator<T> {
-
-    var a:Pointable<T>;
     var itr:Iterator<Int>;
+    public inline function new():Void itr = 0...0;
+    inline function init(l) itr = 0...l;
+    public inline function hasNext() return itr.hasNext();
+    public inline function next() return new Ptr(itr.next());
+}
 
-    public function new():Void {}
-
-    @:allow(net.rezmason.utils.pointers)
-    function attach(a:Pointable<T>):Void {
-        this.a = a;
-        itr = 0...a.size();
+abstract PointerSource<T>(Array<Ptr<T>>) {
+    public inline function new() this = [];
+    public inline function add() {
+        var ptr = new Ptr<T>(this.length);
+        this.push(ptr);
+        return ptr;
     }
-
-    public inline function hasNext():Bool return itr.hasNext();
-    public inline function next():Ptr<T> return a.ptr(itr.next());
-
+    public inline function count() return this.length;
 }

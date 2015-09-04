@@ -87,7 +87,7 @@ class Referee {
         var arr:Array<String> = [];
         for (key in lkp.keys()) {
             var ptr = lkp[key];
-            arr[ptr.toInt()] = '\t$key: ${ptr.toInt()}, ';
+            arr[ptr] = '\t$key: $ptr, ';
         }
         return str + arr.join('\n') + '\n';
     }

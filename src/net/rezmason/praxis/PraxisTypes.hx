@@ -22,6 +22,7 @@ typedef BoardSelection = Selection<AspectSet>;
 typedef AspectProperty = { var id(default, null):String; var initialValue(default, null):Atom; }; // The distinct possible properties of our state
 typedef AspectRequirements = Map<String, AspectProperty>;
 typedef AspectLookup = Map<String, AspectPtr>; // The indices of property types in the AspectSet of an element
+typedef AspectSource = PointerSource<Atom>;
 
 typedef Move = {id:Int, ?relatedID:Int, ?weight:Float};
 typedef SavedState = {data:String};

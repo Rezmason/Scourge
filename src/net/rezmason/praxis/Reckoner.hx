@@ -3,6 +3,8 @@ package net.rezmason.praxis;
 #if macro
 import haxe.macro.Context;
 import haxe.macro.Expr;
+#else
+import net.rezmason.praxis.aspect.IdentityAspect;
 #end
 
 import net.rezmason.praxis.PraxisTypes;
@@ -38,18 +40,19 @@ using net.rezmason.utils.pointers.Pointers;
         this.state = state;
         this.plan = plan;
 
-        ident_ = Ptr.intToPointer(0);
 
-        var itr:Int = 1; // Index 0 is reserved for the aspects' ID
+        var extraAspectSource:AspectSource = new AspectSource();
+        extraAspectSource.add();
+
         for (id in extraAspectRequirements.keys().a2z()) {
             var prop:AspectProperty = extraAspectRequirements[id];
-            var ptr:AspectPtr = extraAspectTemplate.ptr(itr);
+            var ptr:AspectPtr = extraAspectSource.add();
             extraAspectLookup[prop.id] = ptr;
             extraAspectTemplate[ptr] = prop.initialValue;
-            itr++;
         }
 
         __initPointers();
+        #if !macro ident_ = plan.globalAspectLookup[IdentityAspect.IDENTITY.id]; #end
     }
 
     @:final public function dismiss():Void {

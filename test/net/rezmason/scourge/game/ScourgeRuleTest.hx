@@ -4,6 +4,7 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.aspect.IdentityAspect;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StatePlan;
 import net.rezmason.praxis.state.StatePlanner;
@@ -36,7 +37,6 @@ class ScourgeRuleTest
         history = stateHistorian.history;
         state = stateHistorian.state;
         historyState = stateHistorian.historyState;
-        identPtr = Ptr.intToPointer(0);
     }
 
     @AfterClass
@@ -74,6 +74,7 @@ class ScourgeRuleTest
 
         plan = new StatePlanner().planState(state, rules);
         for (rule in rules) rule.prime(state, plan, history, historyState);
+        identPtr = plan.globalAspectLookup[IdentityAspect.IDENTITY.id];
     }
 
     private function testListLength(expectedLength:Int, first:AspectSet, next:AspectPtr, prev:AspectPtr):Int {

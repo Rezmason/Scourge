@@ -4,21 +4,17 @@ import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.rule.BaseRule;
 
-using Lambda;
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.pointers.Pointers;
 
 class ReplenishRule extends BaseRule<ReplenishParams> {
 
-    // state, extra for each replenishable
     @extra(ReplenishableAspect.REP_NEXT) var repNext_;
     @extra(ReplenishableAspect.REP_PREV) var repPrev_;
-
-    @extra(ReplenishableAspect.REP_PROP_LOOKUP) var repPropLookup_;
     @extra(ReplenishableAspect.REP_STEP) var repStep_;
 
-    @global(ReplenishableAspect.STATE_REP_FIRST) var stateRepFirst_;
+    @global(ReplenishableAspect.GLOBAL_REP_FIRST) var globalRepFirst_;
     @global(ReplenishableAspect.PLAYER_REP_FIRST) var playerRepFirst_;
     @global(ReplenishableAspect.CARD_REP_FIRST) var cardRepFirst_;
     @global(ReplenishableAspect.NODE_REP_FIRST) var spaceRepFirst_;
@@ -45,43 +41,47 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
 
         // As a meta-rule, ReplenishRule has a relatively complex init function.
 
-        var stateReps:Array<AspectSet> = [];
+        var globalReps:Array<AspectSet> = [];
         var playerReps:Array<AspectSet> = [];
         var cardReps:Array<AspectSet> = [];        
         var spaceReps:Array<AspectSet> = [];
 
         // Create the replenishables
         for (repProp in globalProperties) {
-            var replenishable:AspectSet = makeReplenishable(repProp, plan.globalAspectLookup);
+            var replenishable:AspectSet = addExtra();
             repProp.replenishableID = getID(replenishable);
-            stateReps.push(replenishable);
+            repProp.replenishablePtr = plan.globalAspectLookup[repProp.prop.id];
+            globalReps.push(replenishable);
         }
 
         for (repProp in playerProperties) {
-            var replenishable:AspectSet = makeReplenishable(repProp, plan.playerAspectLookup);
+            var replenishable:AspectSet = addExtra();
             repProp.replenishableID = getID(replenishable);
+            repProp.replenishablePtr = plan.playerAspectLookup[repProp.prop.id];
             playerReps.push(replenishable);
         }
 
         for (repProp in cardProperties) {
-            var replenishable:AspectSet = makeReplenishable(repProp, plan.cardAspectLookup);
+            var replenishable:AspectSet = addExtra();
             repProp.replenishableID = getID(replenishable);
+            repProp.replenishablePtr = plan.cardAspectLookup[repProp.prop.id];
             cardReps.push(replenishable);
         }
 
         for (repProp in spaceProperties) {
-            var replenishable:AspectSet = makeReplenishable(repProp, plan.spaceAspectLookup);
+            var replenishable:AspectSet = addExtra();
             repProp.replenishableID = getID(replenishable);
+            repProp.replenishablePtr = plan.spaceAspectLookup[repProp.prop.id];
             spaceReps.push(replenishable);
         }
 
         // List the replenishables
 
-        if (stateReps.length > 0) {
-            stateReps.chainByAspect(ident_, repNext_, repPrev_);
-            state.global[stateRepFirst_] = getID(stateReps[0]);
+        if (globalReps.length > 0) {
+            globalReps.chainByAspect(ident_, repNext_, repPrev_);
+            state.global[globalRepFirst_] = getID(globalReps[0]);
         } else {
-            state.global[stateRepFirst_] = NULL;
+            state.global[globalRepFirst_] = NULL;
         }
 
         if (playerReps.length > 0) {
@@ -114,17 +114,6 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
         signalChange();
     }
 
-    private function makeReplenishable(repProp:ReplenishableProperty, lookup:AspectLookup):AspectSet {
-
-        // A replenishable is really just an accumulator that performs an action
-        // on a value stored in a particular aspect set, at a specific index
-
-        // We represent replenishables as extras
-        var rep:AspectSet = addExtra();
-        rep[repPropLookup_] = lookup[repProp.prop.id].toInt();
-        return rep;
-    }
-
     private function updateReps(repProps:Array<ReplenishableProperty>, aspectSets:Array<AspectSet>):Void {
         // Each replenishable gets its iterator incremented
         for (repProp in repProps) {
@@ -134,7 +123,7 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
             if (step == repProp.period) {
                 // Time for action! Resolve the pointer and update values at that location
                 step = 0;
-                var ptr:AspectPtr = AspectPtr.intToPointer(replenishable[repPropLookup_]);
+                var ptr:AspectPtr = repProp.replenishablePtr;
                 for (aspectSet in aspectSets) {
                     var value:Int = aspectSet[ptr];
                     value += repProp.amount;

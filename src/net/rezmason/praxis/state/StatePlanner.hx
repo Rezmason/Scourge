@@ -5,6 +5,7 @@ import haxe.ds.ArraySort;
 import net.rezmason.grid.Cell;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.Aspect.*;
+import net.rezmason.praxis.aspect.IdentityAspect;
 
 using Lambda;
 using net.rezmason.grid.GridUtils;
@@ -45,13 +46,13 @@ class StatePlanner {
     }
 
     function planAspects(requirements:AspectRequirements, lookup:AspectLookup, template:AspectSet):Void {
-        var itr:Int = 1; // Index 0 is reserved for the aspects' ID
+        var source = new AspectSource();
+        lookup[IdentityAspect.IDENTITY.id] = source.add(); // Index 0 is reserved for the aspects' ID
         for (id in requirements.keys().a2z()) {
             var prop:AspectProperty = requirements[id];
-            var ptr:AspectPtr = template.ptr(itr);
+            var ptr:AspectPtr = source.add();
             lookup[prop.id] = ptr;
             template[ptr] = prop.initialValue;
-            itr++;
         }
     }
 }

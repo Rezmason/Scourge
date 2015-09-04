@@ -8,4 +8,5 @@ typedef ReplenishableProperty = {
     var period:Int;
     var maxAmount:Int;
     @:optional var replenishableID:Int;
+    @:optional var replenishablePtr:AspectPtr;
 }
