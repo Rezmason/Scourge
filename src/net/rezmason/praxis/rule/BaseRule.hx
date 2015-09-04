@@ -67,25 +67,25 @@ class BaseRule<Params> extends Reckoner {
     @:final inline function signalChange() if (changeSignal != null) changeSignal(id);
 
     @:final inline function addGlobal():AspectSet {
-        return addAspectSet(plan.globalAspectTemplate, state.globals, historyState.globals, 0);
+        return addAspectSet(plan.globalDefaults(), state.globals, historyState.globals, 0);
     }
 
     @:final inline function addPlayer():AspectSet {
-        return addAspectSet(plan.playerAspectTemplate, state.players, historyState.players, numPlayers());
+        return addAspectSet(plan.playerDefaults(), state.players, historyState.players, numPlayers());
     }
 
     @:final inline function addCard():AspectSet {
-        return addAspectSet(plan.cardAspectTemplate, state.cards, historyState.cards, numCards());
+        return addAspectSet(plan.cardDefaults(), state.cards, historyState.cards, numCards());
     }
 
     @:final inline function addSpace():AspectSet {
-        var space = addAspectSet(plan.spaceAspectTemplate, state.spaces, historyState.spaces, numSpaces());
+        var space = addAspectSet(plan.spaceDefaults(), state.spaces, historyState.spaces, numSpaces());
         state.cells.addCell(space);
         return space;
     }
 
     @:final inline function addExtra():AspectSet {
-        return addAspectSet(extraAspectTemplate, state.extras, historyState.extras, numExtras());
+        return addAspectSet(extraDefaults(), state.extras, historyState.extras, numExtras());
     }
 
     @:final inline function addAspectSet(template:AspectSet, list, histList, id):AspectSet {

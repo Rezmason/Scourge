@@ -29,9 +29,9 @@ class BoardUtils {
 
         var grid:BoardCell = state.cells.getCell(0).run(NW).run(W).run(N);
 
-        var occupier_:AspectPtr = plan.spaceAspectLookup[OwnershipAspect.OCCUPIER.id];
-        var isFilled_:AspectPtr = plan.spaceAspectLookup[OwnershipAspect.IS_FILLED.id];
-        var ident_:AspectPtr = plan.spaceAspectLookup[IdentityAspect.IDENTITY.id];
+        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var isFilled_:AspectPtr = plan.onSpace(OwnershipAspect.IS_FILLED);
+        var ident_:AspectPtr = plan.onSpace(IdentityAspect.IDENTITY);
 
         for (row in grid.walk(S)) {
             str += '\n';

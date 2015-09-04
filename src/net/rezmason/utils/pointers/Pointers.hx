@@ -12,23 +12,11 @@ abstract WritePtr<T>(Ptr<T>) to Ptr<T> {
 
 abstract Pointable<T>(Array<T>) {
     public inline function new(a:Array<T> = null) this = (a == null) ? [] : a.copy();
-    public inline function wipe():Void this.splice(0, this.length);
     public inline function copy():Pointable<T> return new Pointable(this);
-    public inline function copyTo(dest:Pointable<T>, offset:Int = 0):Void {
-        for (ike in 0...this.length) dest.write(ike + offset, this[ike]);
-    }
     public inline function map<U>(mapFunc:T->U):Pointable<U> return new Pointable(this.map(mapFunc));
-    public inline function mapTo<U>(mapFunc:T->U, dest:Pointable<U>, offset:Int):Void {
-        for (ike in 0...this.length) dest.write(ike + offset, mapFunc(this[ike]));
-    }
     public inline function size() return this.length;
 
-    inline function write(index:Int, value:T):T return this[index] = value;
-
-    @:arrayAccess #if !cpp inline #end function ptrAccess(p:Ptr<T>):T { // Was inline; caused openFL issue
-        return this[p];
-    }
-
+    @:arrayAccess #if !cpp inline #end function ptrAccess(p:Ptr<T>):T return this[p];
     @:arrayAccess inline function ptrWrite(p:WritePtr<T>, v:T):T return this[p] = v;
 
     public inline function ptrs(pItr:PtrIterator<T> = null):PtrIterator<T> {

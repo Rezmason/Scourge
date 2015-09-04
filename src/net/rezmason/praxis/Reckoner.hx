@@ -52,7 +52,7 @@ using net.rezmason.utils.pointers.Pointers;
         }
 
         __initPointers();
-        #if !macro ident_ = plan.globalAspectLookup[IdentityAspect.IDENTITY.id]; #end
+        #if !macro ident_ = plan.onGlobal(IdentityAspect.IDENTITY); #end
     }
 
     @:final public function dismiss():Void {
@@ -86,6 +86,9 @@ using net.rezmason.utils.pointers.Pointers;
     @:final inline function addPlayerAspectRequirement(req:AspectProperty):Void playerAspectRequirements [req.id] = req;
     @:final inline function addSpaceAspectRequirement(req:AspectProperty):Void spaceAspectRequirements [req.id] = req;
     @:final inline function addCardAspectRequirement(req:AspectProperty):Void cardAspectRequirements [req.id] = req;
+
+    @:final inline function onExtra(prop:AspectProperty) return extraAspectLookup[prop.id];
+    @:final inline function extraDefaults() return extraAspectTemplate.copy();
 
     #if macro
     private static var lkpSources:Map<String, String> = [
@@ -130,11 +133,11 @@ using net.rezmason.utils.pointers.Pointers;
                     }
                     metaTag.params = [];
 
-                    var kindLookup:String = '${kind}AspectLookup';
+                    var kindLookup:String = 'on' + kind.charAt(0).toUpperCase() + kind.substr(1);
                     var kindRequirements:String = '${kind}AspectRequirements';
 
                     declarations.push(macro $i{kindRequirements}.set($aspect.id, $aspect));
-                    assignments.push(macro $i{name} = $p{[lkpSources[kind], kindLookup]}[$aspect.id]);
+                    assignments.push(macro $i{name} = $p{[lkpSources[kind], kindLookup]}($aspect));
 
                     if (writable) field.kind = FVar(macro :net.rezmason.praxis.PraxisTypes.AspectWritePtr, null);
                     else field.kind = FVar(macro :net.rezmason.praxis.PraxisTypes.AspectPtr, null);

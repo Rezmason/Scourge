@@ -50,28 +50,28 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
         for (repProp in globalProperties) {
             var replenishable:AspectSet = addExtra();
             repProp.replenishableID = getID(replenishable);
-            repProp.replenishablePtr = plan.globalAspectLookup[repProp.prop.id];
+            repProp.replenishablePtr = plan.onGlobal(repProp.prop);
             globalReps.push(replenishable);
         }
 
         for (repProp in playerProperties) {
             var replenishable:AspectSet = addExtra();
             repProp.replenishableID = getID(replenishable);
-            repProp.replenishablePtr = plan.playerAspectLookup[repProp.prop.id];
+            repProp.replenishablePtr = plan.onPlayer(repProp.prop);
             playerReps.push(replenishable);
         }
 
         for (repProp in cardProperties) {
             var replenishable:AspectSet = addExtra();
             repProp.replenishableID = getID(replenishable);
-            repProp.replenishablePtr = plan.cardAspectLookup[repProp.prop.id];
+            repProp.replenishablePtr = plan.onCard(repProp.prop);
             cardReps.push(replenishable);
         }
 
         for (repProp in spaceProperties) {
             var replenishable:AspectSet = addExtra();
             repProp.replenishableID = getID(replenishable);
-            repProp.replenishablePtr = plan.spaceAspectLookup[repProp.prop.id];
+            repProp.replenishablePtr = plan.onSpace(repProp.prop);
             spaceReps.push(replenishable);
         }
 

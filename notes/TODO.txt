@@ -5,7 +5,6 @@ Pointers
         T is the value
         U is the context - global, player, space, etc
 
-Reckoners can still clobber other reckoners by mutating the state plan
 
 1: board cursor, arrow keys
 2: board cursor, mouse

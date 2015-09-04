@@ -74,7 +74,7 @@ class ScourgeRuleTest
 
         plan = new StatePlanner().planState(state, rules);
         for (rule in rules) rule.prime(state, plan, history, historyState);
-        identPtr = plan.globalAspectLookup[IdentityAspect.IDENTITY.id];
+        identPtr = plan.onGlobal(IdentityAspect.IDENTITY);
     }
 
     private function testListLength(expectedLength:Int, first:AspectSet, next:AspectPtr, prev:AspectPtr):Int {
