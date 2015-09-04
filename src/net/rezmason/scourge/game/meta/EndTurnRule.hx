@@ -8,7 +8,7 @@ import net.rezmason.scourge.game.body.BodyAspect;
 class EndTurnRule extends BaseRule<Dynamic> {
 
     @player(BodyAspect.HEAD) var head_;
-    @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @global(PlyAspect.CURRENT_PLAYER, true) var currentPlayer_;
 
     override private function _chooseMove(choice:Int):Void {
 

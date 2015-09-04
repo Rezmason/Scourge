@@ -97,9 +97,7 @@ class Sequencer extends Reckoner {
             var e = ecce.dispense([BoardSpaceState, BoardSpaceView]);
             var spaceState = e.get(BoardSpaceState);
             spaceState.values = space;
-            spaceState.lastValues = space.copy();
-            spaceState.lastValues[occupier_] = NULL;
-            spaceState.lastValues[isFilled_] = FALSE;
+            spaceState.lastValues = new AspectSet([for (ike in 0...space.size()) NULL]);
             cells[id] = new Cell(id, e);
             spaceState.cell = cells[id];
             spaceState.petriData = petriCells.getCell(id).value;

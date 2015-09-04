@@ -28,7 +28,7 @@ using net.rezmason.utils.pointers.Pointers;
 
     private var extraAspectTemplate:AspectSet = new AspectSet();
     private var extraAspectLookup:AspectLookup = new AspectLookup();
-    private var ident_:AspectPtr;
+    private var ident_:AspectWritePtr;
 
     function __initRequirements():Void {}
     function __initPointers():Void {}
@@ -46,7 +46,7 @@ using net.rezmason.utils.pointers.Pointers;
 
         for (id in extraAspectRequirements.keys().a2z()) {
             var prop:AspectProperty = extraAspectRequirements[id];
-            var ptr:AspectPtr = extraAspectSource.add();
+            var ptr:AspectWritePtr = extraAspectSource.add();
             extraAspectLookup[prop.id] = ptr;
             extraAspectTemplate[ptr] = prop.initialValue;
         }
@@ -121,6 +121,13 @@ using net.rezmason.utils.pointers.Pointers;
                     var kind:String = metaTag.name;
                     var name:String = field.name;
                     var aspect:Expr = metaTag.params[0];
+                    var writable:Bool = false;
+                    if (metaTag.params.length >= 2) {
+                        switch (metaTag.params[1].expr) {
+                            case EConst(CIdent(s)) if (s == 'true'): writable = true;
+                            case _:
+                        }
+                    }
                     metaTag.params = [];
 
                     var kindLookup:String = '${kind}AspectLookup';
@@ -129,7 +136,8 @@ using net.rezmason.utils.pointers.Pointers;
                     declarations.push(macro $i{kindRequirements}.set($aspect.id, $aspect));
                     assignments.push(macro $i{name} = $p{[lkpSources[kind], kindLookup]}[$aspect.id]);
 
-                    field.kind = FVar(macro :net.rezmason.praxis.PraxisTypes.AspectPtr, null);
+                    if (writable) field.kind = FVar(macro :net.rezmason.praxis.PraxisTypes.AspectWritePtr, null);
+                    else field.kind = FVar(macro :net.rezmason.praxis.PraxisTypes.AspectPtr, null);
                     field.access.remove(AStatic);
 
                     msg += kind.charAt(0);

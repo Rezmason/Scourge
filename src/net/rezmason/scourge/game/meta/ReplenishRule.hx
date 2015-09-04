@@ -10,14 +10,14 @@ using net.rezmason.utils.pointers.Pointers;
 
 class ReplenishRule extends BaseRule<ReplenishParams> {
 
-    @extra(ReplenishableAspect.REP_NEXT) var repNext_;
-    @extra(ReplenishableAspect.REP_PREV) var repPrev_;
-    @extra(ReplenishableAspect.REP_STEP) var repStep_;
+    @extra(ReplenishableAspect.REP_NEXT, true) var repNext_;
+    @extra(ReplenishableAspect.REP_PREV, true) var repPrev_;
+    @extra(ReplenishableAspect.REP_STEP, true) var repStep_;
 
-    @global(ReplenishableAspect.GLOBAL_REP_FIRST) var globalRepFirst_;
-    @global(ReplenishableAspect.PLAYER_REP_FIRST) var playerRepFirst_;
-    @global(ReplenishableAspect.CARD_REP_FIRST) var cardRepFirst_;
-    @global(ReplenishableAspect.NODE_REP_FIRST) var spaceRepFirst_;
+    @global(ReplenishableAspect.GLOBAL_REP_FIRST, true) var globalRepFirst_;
+    @global(ReplenishableAspect.PLAYER_REP_FIRST, true) var playerRepFirst_;
+    @global(ReplenishableAspect.CARD_REP_FIRST, true) var cardRepFirst_;
+    @global(ReplenishableAspect.NODE_REP_FIRST, true) var spaceRepFirst_;
 
     private var globalProperties:Array<ReplenishableProperty>;
     private var playerProperties:Array<ReplenishableProperty>;
@@ -123,7 +123,7 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
             if (step == repProp.period) {
                 // Time for action! Resolve the pointer and update values at that location
                 step = 0;
-                var ptr:AspectPtr = repProp.replenishablePtr;
+                var ptr:AspectWritePtr = repProp.replenishablePtr;
                 for (aspectSet in aspectSets) {
                     var value:Int = aspectSet[ptr];
                     value += repProp.amount;

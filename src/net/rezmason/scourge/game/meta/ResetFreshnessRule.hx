@@ -5,8 +5,8 @@ import net.rezmason.praxis.rule.BaseRule;
 
 class ResetFreshnessRule extends BaseRule<Dynamic> {
 
-    @space(FreshnessAspect.FRESHNESS) var freshness_;
-    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @space(FreshnessAspect.FRESHNESS, true) var freshness_;
+    @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
     
     override private function _chooseMove(choice:Int):Void {
         for (space in eachSpace()) space[freshness_] = NULL;

@@ -57,7 +57,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Get rid of player 4's head
 
-        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+        var head_:AspectWritePtr = plan.onPlayer(BodyAspect.HEAD);
         state.players[3][head_] = Aspect.NULL;
 
 
@@ -123,7 +123,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
         var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
-        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var occupier_:AspectWritePtr = plan.onSpace(OwnershipAspect.OCCUPIER);
         var isFilled_:AspectPtr = plan.onSpace(OwnershipAspect.IS_FILLED);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
 
@@ -155,8 +155,8 @@ class TurnRulesTest extends ScourgeRuleTest
         makeState([stalemateRule], 4);
 
         var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
-        var numConsecutiveSkips_:AspectPtr = plan.onPlayer(SkipAspect.NUM_CONSECUTIVE_SKIPS);
+        var totalArea_:AspectWritePtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var numConsecutiveSkips_:AspectWritePtr = plan.onPlayer(SkipAspect.NUM_CONSECUTIVE_SKIPS);
 
         // Have each player skip four times, then check for a winner
         for (ike in 0...state.players.length) {
@@ -190,7 +190,7 @@ class TurnRulesTest extends ScourgeRuleTest
         makeState([oneLivingPlayerRule], 4);
 
         var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
-        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+        var head_:AspectWritePtr = plan.onPlayer(BodyAspect.HEAD);
 
         // kill the first, third and fourth players
         for (ike in 0...state.players.length) {

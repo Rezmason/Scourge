@@ -12,9 +12,9 @@ using net.rezmason.utils.pointers.Pointers;
 
 class SwapPieceRule extends BaseRule<SwapPieceParams> {
 
-    @player(SwapAspect.NUM_SWAPS) var numSwaps_;
+    @player(SwapAspect.NUM_SWAPS, true) var numSwaps_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
-    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
+    @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
 
     override private function _prime():Void {
         for (player in eachPlayer()) player[numSwaps_] = params.startingSwaps;

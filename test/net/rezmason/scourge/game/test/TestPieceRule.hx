@@ -14,9 +14,9 @@ typedef TestPieceParams = {
 
 class TestPieceRule extends BaseRule<TestPieceParams> {
 
-    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_:AspectPtr;
-    @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_:AspectPtr;
-    @global(PieceAspect.PIECE_ROTATION) var pieceRotation_:AspectPtr;
+    @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_:AspectPtr;
+    @global(PieceAspect.PIECE_REFLECTION, true) var pieceReflection_:AspectPtr;
+    @global(PieceAspect.PIECE_ROTATION, true) var pieceRotation_:AspectPtr;
 
     override public function _prime():Void {
         state.global[pieceTableID_] = params.pieceTableID;

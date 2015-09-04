@@ -39,7 +39,7 @@ class BoardRuleTest extends ScourgeRuleTest {
 
         makeState(null, 4);
 
-        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var occupier_:AspectWritePtr = plan.onSpace(OwnershipAspect.OCCUPIER);
         var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
 
         for (player in state.players) {

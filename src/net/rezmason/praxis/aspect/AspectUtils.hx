@@ -25,7 +25,7 @@ class AspectUtils {
         return arr;
     }
 
-    public inline static function removeSet(me:AspectSet, list:Array<AspectSet>, next:AspectPtr, prev:AspectPtr):AspectSet {
+    public inline static function removeSet(me:AspectSet, list:Array<AspectSet>, next:AspectWritePtr, prev:AspectWritePtr):AspectSet {
         var nextSetID:Int = me[next];
         var prevSetID:Int = me[prev];
 
@@ -52,7 +52,7 @@ class AspectUtils {
         return nextSet;
     }
 
-    public inline static function addSet(you:AspectSet, me:AspectSet, list:Array<AspectSet>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):AspectSet {
+    public inline static function addSet(you:AspectSet, me:AspectSet, list:Array<AspectSet>, id:AspectPtr, next:AspectWritePtr, prev:AspectWritePtr):AspectSet {
         removeSet(me, list, next, prev);
 
         var prevSetID:Int = you[prev];
@@ -69,7 +69,7 @@ class AspectUtils {
         return me;
     }
 
-    public inline static function chainByAspect(list:Array<AspectSet>, id:AspectPtr, next:AspectPtr, prev:AspectPtr):Void {
+    public inline static function chainByAspect(list:Array<AspectSet>, id:AspectPtr, next:AspectWritePtr, prev:AspectWritePtr):Void {
 
         list = list.copy();
         while (list.remove(null)) {}

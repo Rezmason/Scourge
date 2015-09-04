@@ -10,7 +10,7 @@ using net.rezmason.utils.pointers.Pointers;
 class OneLivingPlayerRule extends BaseRule<Dynamic> {
 
     @player(BodyAspect.HEAD) var head_;
-    @global(WinAspect.WINNER) var winner_;
+    @global(WinAspect.WINNER, true) var winner_;
 
     // This rule discovers whether there is only one remaining player, and makes that player the winner
     override private function _chooseMove(choice:Int):Void {

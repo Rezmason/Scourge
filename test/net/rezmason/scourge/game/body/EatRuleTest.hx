@@ -46,7 +46,7 @@ class EatRuleTest extends ScourgeRuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.onSpace(FreshnessAspect.FRESHNESS);
+        var freshness_:AspectWritePtr = plan.onSpace(FreshnessAspect.FRESHNESS);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
@@ -90,7 +90,7 @@ class EatRuleTest extends ScourgeRuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.onSpace(FreshnessAspect.FRESHNESS);
+        var freshness_:AspectWritePtr = plan.onSpace(FreshnessAspect.FRESHNESS);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
@@ -131,7 +131,7 @@ class EatRuleTest extends ScourgeRuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.onSpace(FreshnessAspect.FRESHNESS);
+        var freshness_:AspectWritePtr = plan.onSpace(FreshnessAspect.FRESHNESS);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
@@ -168,7 +168,7 @@ class EatRuleTest extends ScourgeRuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.onSpace(FreshnessAspect.FRESHNESS);
+        var freshness_:AspectWritePtr = plan.onSpace(FreshnessAspect.FRESHNESS);
 
         state.grabXY(12, 6).value[freshness_] = 1;
 
@@ -203,7 +203,7 @@ class EatRuleTest extends ScourgeRuleTest
 
         // set up the board for the test
 
-        var freshness_:AspectPtr = plan.onSpace(FreshnessAspect.FRESHNESS);
+        var freshness_:AspectWritePtr = plan.onSpace(FreshnessAspect.FRESHNESS);
         var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
         var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
         var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);

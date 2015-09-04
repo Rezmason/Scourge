@@ -13,14 +13,14 @@ using net.rezmason.utils.pointers.Pointers;
 
 class KillHeadlessBodyRule extends BaseRule<Dynamic> {
 
-    @space(BodyAspect.BODY_NEXT) var bodyNext_;
-    @space(BodyAspect.BODY_PREV) var bodyPrev_;
-    @space(FreshnessAspect.FRESHNESS) var freshness_;
-    @space(OwnershipAspect.IS_FILLED) var isFilled_;
-    @space(OwnershipAspect.OCCUPIER) var occupier_;
-    @player(BodyAspect.BODY_FIRST) var bodyFirst_;
-    @player(BodyAspect.HEAD) var head_;
-    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
+    @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
+    @space(FreshnessAspect.FRESHNESS, true) var freshness_;
+    @space(OwnershipAspect.IS_FILLED, true) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER, true) var occupier_;
+    @player(BodyAspect.BODY_FIRST, true) var bodyFirst_;
+    @player(BodyAspect.HEAD, true) var head_;
+    @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
 
     override private function _chooseMove(choice:Int):Void {
 

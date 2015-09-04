@@ -50,7 +50,7 @@ class StatePlanner {
         lookup[IdentityAspect.IDENTITY.id] = source.add(); // Index 0 is reserved for the aspects' ID
         for (id in requirements.keys().a2z()) {
             var prop:AspectProperty = requirements[id];
-            var ptr:AspectPtr = source.add();
+            var ptr:AspectWritePtr = source.add();
             lookup[prop.id] = ptr;
             template[ptr] = prop.initialValue;
         }

@@ -13,16 +13,16 @@ using net.rezmason.utils.pointers.Pointers;
 class CavityRule extends BaseRule<Dynamic> {
 
     @space(BodyAspect.BODY_NEXT) var bodyNext_;
-    @space(BodyAspect.CAVITY_NEXT) var cavityNext_;
-    @space(BodyAspect.CAVITY_PREV) var cavityPrev_;
-    @space(FreshnessAspect.FRESHNESS) var freshness_;
-    @space(OwnershipAspect.IS_FILLED) var isFilled_;
-    @space(OwnershipAspect.OCCUPIER) var occupier_;
+    @space(BodyAspect.CAVITY_NEXT, true) var cavityNext_;
+    @space(BodyAspect.CAVITY_PREV, true) var cavityPrev_;
+    @space(FreshnessAspect.FRESHNESS, true) var freshness_;
+    @space(OwnershipAspect.IS_FILLED, true) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER, true) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
-    @player(BodyAspect.CAVITY_FIRST) var cavityFirst_;
+    @player(BodyAspect.CAVITY_FIRST, true) var cavityFirst_;
     @player(BodyAspect.HEAD) var head_;
-    @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @player(BodyAspect.TOTAL_AREA, true) var totalArea_;
+    @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
 
     var allEdges:Array<Int> = [];
     var groupFirstEdges:Array<Int> = [];

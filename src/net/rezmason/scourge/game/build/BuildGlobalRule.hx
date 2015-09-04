@@ -5,7 +5,7 @@ import net.rezmason.praxis.aspect.PlyAspect;
 
 class BuildGlobalRule extends BaseRule<BuildGlobalParams> {
 
-    @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
+    @global(PlyAspect.CURRENT_PLAYER, true) var currentPlayer_;
 
     override private function _prime():Void {
         addGlobal();

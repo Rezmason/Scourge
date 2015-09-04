@@ -22,16 +22,16 @@ typedef BiteMove = {>Move,
 
 class BiteRule extends BaseRule<BiteParams> {
 
-    @space(BodyAspect.BODY_NEXT) var bodyNext_;
-    @space(BodyAspect.BODY_PREV) var bodyPrev_;
-    @space(FreshnessAspect.FRESHNESS) var freshness_;
-    @space(OwnershipAspect.IS_FILLED) var isFilled_;
-    @space(OwnershipAspect.OCCUPIER) var occupier_;
-    @player(BiteAspect.NUM_BITES) var numBites_;
-    @player(BodyAspect.BODY_FIRST) var bodyFirst_;
+    @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
+    @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
+    @space(FreshnessAspect.FRESHNESS, true) var freshness_;
+    @space(OwnershipAspect.IS_FILLED, true) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER, true) var occupier_;
+    @player(BiteAspect.NUM_BITES, true) var numBites_;
+    @player(BodyAspect.BODY_FIRST, true) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var movePool:Array<BiteMove> = [];

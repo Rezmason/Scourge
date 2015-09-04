@@ -55,7 +55,7 @@ class BiteRuleTest extends ScourgeRuleTest
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
 
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var totalArea_:AspectWritePtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
         biteRule.update();
@@ -92,7 +92,7 @@ class BiteRuleTest extends ScourgeRuleTest
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
 
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var totalArea_:AspectWritePtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
         biteRule.update();
@@ -135,7 +135,7 @@ class BiteRuleTest extends ScourgeRuleTest
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
 
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var totalArea_:AspectWritePtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
         biteRule.update();
@@ -180,7 +180,7 @@ class BiteRuleTest extends ScourgeRuleTest
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
 
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var totalArea_:AspectWritePtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
         biteRule.update();
@@ -221,12 +221,12 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+        var head_:AspectWritePtr = plan.onPlayer(BodyAspect.HEAD);
         var enemyHeadID:Int = state.players[1][head_];
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
 
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var totalArea_:AspectWritePtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
         biteRule.update();
@@ -270,7 +270,7 @@ class BiteRuleTest extends ScourgeRuleTest
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
 
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var totalArea_:AspectWritePtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
         biteRule.update();
@@ -313,8 +313,8 @@ class BiteRuleTest extends ScourgeRuleTest
         var biteRule:BiteRule = new BiteRule(biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
-        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var head_:AspectWritePtr = plan.onPlayer(BodyAspect.HEAD);
+        var occupier_:AspectWritePtr = plan.onSpace(OwnershipAspect.OCCUPIER);
         var enemyHeadID:Int = state.players[1][head_];
         var enemyHead:BoardCell = state.cells.getCell(enemyHeadID);
         var cavity:BoardCell = enemyHead.s().s().e();
@@ -322,7 +322,7 @@ class BiteRuleTest extends ScourgeRuleTest
 
         VisualAssert.assert('two player bite with small cavity in player one', state.spitBoard(plan));
 
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var totalArea_:AspectWritePtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
         state.players[0][totalArea_] = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
 
         biteRule.update();
@@ -348,9 +348,9 @@ class BiteRuleTest extends ScourgeRuleTest
     }
 
     private function testEnemyBody(expectedSize:Int):Void {
-        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
+        var bodyFirst_:AspectWritePtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_:AspectWritePtr = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_:AspectWritePtr = plan.onSpace(BodyAspect.BODY_PREV);
         var bodySpace:AspectSet = state.spaces[state.players[1][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(expectedSize, bodySpace, bodyNext_, bodyPrev_));

@@ -72,8 +72,8 @@ class DecayRuleTest extends ScourgeRuleTest
         var head:BoardCell = state.cells.getCell(state.players[0][head_]);
         var bump:BoardCell = head.nw();
 
-        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
-        var isFilled_:AspectPtr = plan.onSpace(OwnershipAspect.IS_FILLED);
+        var occupier_:AspectWritePtr = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var isFilled_:AspectWritePtr = plan.onSpace(OwnershipAspect.IS_FILLED);
         bump.value[occupier_] = 0;
         bump.value[isFilled_] = Aspect.TRUE;
 

@@ -11,7 +11,7 @@ class StalemateRule extends BaseRule<StalemateParams> {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @player(SkipAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
-    @global(WinAspect.WINNER) var winner_;
+    @global(WinAspect.WINNER, true) var winner_;
 
     // This rule discovers whether there is only one remaining player, and makes that player the winner
     override private function _chooseMove(choice:Int):Void {

@@ -12,6 +12,7 @@ using net.rezmason.utils.pointers.Pointers;
 private typedef Atom = Null<Int>; // Our low-level value type
 
 typedef AspectPtr = Ptr<Atom>;
+typedef AspectWritePtr = WritePtr<Atom>;
 typedef AspectSet = Pointable<Atom>; // The properties of an element of the state
 typedef AspectItr = PtrIterator<Atom>;
 
@@ -21,7 +22,7 @@ typedef BoardSelection = Selection<AspectSet>;
 
 typedef AspectProperty = { var id(default, null):String; var initialValue(default, null):Atom; }; // The distinct possible properties of our state
 typedef AspectRequirements = Map<String, AspectProperty>;
-typedef AspectLookup = Map<String, AspectPtr>; // The indices of property types in the AspectSet of an element
+typedef AspectLookup = Map<String, AspectWritePtr>; // The indices of property types in the AspectSet of an element
 typedef AspectSource = PointerSource<Atom>;
 
 typedef Move = {id:Int, ?relatedID:Int, ?weight:Float};
