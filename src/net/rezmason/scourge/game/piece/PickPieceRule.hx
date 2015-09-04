@@ -29,7 +29,7 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
     @card(PieceAspect.PIECE_NEXT, true) var pieceNext_;
     @card(PieceAspect.PIECE_PREV, true) var piecePrev_;
 
-    @card(PieceAspect.PIECE_OPTION_ID, true) var pieceMoveID_;
+    @card(PieceAspect.PIECE_MOVE_ID, true) var pieceMoveID_;
 
     @global(PieceAspect.PIECES_PICKED, true) var piecesPicked_;
     @global(PieceAspect.PIECE_FIRST, true) var pieceFirst_;
