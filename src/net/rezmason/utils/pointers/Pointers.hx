@@ -14,6 +14,10 @@ abstract Pointable<T>(Array<T>) {
     public inline function new(a:Array<T> = null) this = (a == null) ? [] : a.copy();
     public inline function copy():Pointable<T> return new Pointable(this);
     public inline function map<U>(mapFunc:T->U):Pointable<U> return new Pointable(this.map(mapFunc));
+    public inline function copyTo(dest:Pointable<T>, offset:Int = 0):Void {
+        for (ike in 0...this.length) dest.write(ike + offset, this[ike]);
+    }
+    inline function write(index:Int, value:T):T return this[index] = value;
     public inline function size() return this.length;
 
     @:arrayAccess #if !cpp inline #end function ptrAccess(p:Ptr<T>):T return this[p];
