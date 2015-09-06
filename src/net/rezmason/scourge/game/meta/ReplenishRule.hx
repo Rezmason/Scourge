@@ -19,10 +19,10 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
     @global(ReplenishableAspect.CARD_REP_FIRST, true) var cardRepFirst_;
     @global(ReplenishableAspect.NODE_REP_FIRST, true) var spaceRepFirst_;
 
-    private var globalProperties:Array<ReplenishableProperty>;
-    private var playerProperties:Array<ReplenishableProperty>;
-    private var cardProperties:Array<ReplenishableProperty>;
-    private var spaceProperties:Array<ReplenishableProperty>;
+    private var globalProperties:Array<ReplenishableProperty<PGlobal>>;
+    private var playerProperties:Array<ReplenishableProperty<PPlayer>>;
+    private var cardProperties:Array<ReplenishableProperty<PCard>>;
+    private var spaceProperties:Array<ReplenishableProperty<PSpace>>;
     
     override public function _init():Void {
 
@@ -41,35 +41,35 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
 
         // As a meta-rule, ReplenishRule has a relatively complex init function.
 
-        var globalReps:Array<AspectSet> = [];
-        var playerReps:Array<AspectSet> = [];
-        var cardReps:Array<AspectSet> = [];        
-        var spaceReps:Array<AspectSet> = [];
+        var globalReps = [];
+        var playerReps = [];
+        var cardReps = [];        
+        var spaceReps = [];
 
         // Create the replenishables
         for (repProp in globalProperties) {
-            var replenishable:AspectSet = addExtra();
+            var replenishable = addExtra();
             repProp.replenishableID = getID(replenishable);
             repProp.replenishablePtr = plan.onGlobal(repProp.prop);
             globalReps.push(replenishable);
         }
 
         for (repProp in playerProperties) {
-            var replenishable:AspectSet = addExtra();
+            var replenishable = addExtra();
             repProp.replenishableID = getID(replenishable);
             repProp.replenishablePtr = plan.onPlayer(repProp.prop);
             playerReps.push(replenishable);
         }
 
         for (repProp in cardProperties) {
-            var replenishable:AspectSet = addExtra();
+            var replenishable = addExtra();
             repProp.replenishableID = getID(replenishable);
             repProp.replenishablePtr = plan.onCard(repProp.prop);
             cardReps.push(replenishable);
         }
 
         for (repProp in spaceProperties) {
-            var replenishable:AspectSet = addExtra();
+            var replenishable = addExtra();
             repProp.replenishableID = getID(replenishable);
             repProp.replenishablePtr = plan.onSpace(repProp.prop);
             spaceReps.push(replenishable);
@@ -78,28 +78,28 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
         // List the replenishables
 
         if (globalReps.length > 0) {
-            globalReps.chainByAspect(ident_, repNext_, repPrev_);
+            globalReps.chainByAspect(extraIdent_, repNext_, repPrev_);
             state.global[globalRepFirst_] = getID(globalReps[0]);
         } else {
             state.global[globalRepFirst_] = NULL;
         }
 
         if (playerReps.length > 0) {
-            playerReps.chainByAspect(ident_, repNext_, repPrev_);
+            playerReps.chainByAspect(extraIdent_, repNext_, repPrev_);
             state.global[playerRepFirst_] = getID(playerReps[0]);
         } else {
             state.global[playerRepFirst_] = NULL;
         }
 
         if (cardReps.length > 0) {
-            cardReps.chainByAspect(ident_, repNext_, repPrev_);
+            cardReps.chainByAspect(extraIdent_, repNext_, repPrev_);
             state.global[cardRepFirst_] = getID(cardReps[0]);
         } else {
             state.global[cardRepFirst_] = NULL;
         }
 
         if (spaceReps.length > 0) {
-            spaceReps.chainByAspect(ident_, repNext_, repPrev_);
+            spaceReps.chainByAspect(extraIdent_, repNext_, repPrev_);
             state.global[spaceRepFirst_] = getID(spaceReps[0]);
         } else {
             state.global[spaceRepFirst_] = NULL;
@@ -114,21 +114,21 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
         signalChange();
     }
 
-    private function updateReps(repProps:Array<ReplenishableProperty>, aspectSets:Array<AspectSet>):Void {
+    private function updateReps<T>(repProps:Array<ReplenishableProperty<T>>, aspectPointables:Array<AspectPointable<T>>):Void {
         // Each replenishable gets its iterator incremented
         for (repProp in repProps) {
-            var replenishable:AspectSet = getExtra(repProp.replenishableID);
-            var step:Int = replenishable[repStep_];
+            var replenishable = getExtra(repProp.replenishableID);
+            var step = replenishable[repStep_];
             step++;
             if (step == repProp.period) {
                 // Time for action! Resolve the pointer and update values at that location
                 step = 0;
-                var ptr:AspectWritePtr = repProp.replenishablePtr;
-                for (aspectSet in aspectSets) {
-                    var value:Int = aspectSet[ptr];
+                var ptr = repProp.replenishablePtr;
+                for (aspectPointable in aspectPointables) {
+                    var value = aspectPointable[ptr];
                     value += repProp.amount;
                     if (value > repProp.maxAmount) value = repProp.maxAmount;
-                    aspectSet[ptr] = value;
+                    aspectPointable[ptr] = value;
                 }
             }
             replenishable[repStep_] = step;

@@ -5,25 +5,25 @@ import net.rezmason.praxis.PraxisTypes;
 @:allow(net.rezmason.praxis.state.StatePlanner)
 class StatePlan {
 
-    var globalAspectTemplate(default, null):AspectSet = new AspectSet();
-    var playerAspectTemplate(default, null):AspectSet = new AspectSet();
-    var cardAspectTemplate(default, null):AspectSet = new AspectSet();
-    var spaceAspectTemplate(default, null):AspectSet = new AspectSet();
+    var globalAspectTemplate(default, null):Global = new AspectPointable();
+    var playerAspectTemplate(default, null):Player = new AspectPointable();
+    var cardAspectTemplate(default, null):Card = new AspectPointable();
+    var spaceAspectTemplate(default, null):Space = new AspectPointable();
 
-    var globalAspectLookup(default, null):AspectLookup = new AspectLookup();
-    var playerAspectLookup(default, null):AspectLookup = new AspectLookup();
-    var cardAspectLookup(default, null):AspectLookup = new AspectLookup();
-    var spaceAspectLookup(default, null):AspectLookup = new AspectLookup();
+    var globalAspectLookup(default, null):AspectLookup<PGlobal> = new AspectLookup();
+    var playerAspectLookup(default, null):AspectLookup<PPlayer> = new AspectLookup();
+    var cardAspectLookup(default, null):AspectLookup<PCard> = new AspectLookup();
+    var spaceAspectLookup(default, null):AspectLookup<PSpace> = new AspectLookup();
 
     public function new():Void {}
 
-    public inline function onGlobal(prop:AspectProperty) return globalAspectLookup[prop.id];
-    public inline function onPlayer(prop:AspectProperty) return playerAspectLookup[prop.id];
-    public inline function onCard(prop:AspectProperty) return cardAspectLookup[prop.id];
-    public inline function onSpace(prop:AspectProperty) return spaceAspectLookup[prop.id];
+    public inline function onGlobal(prop:AspectProperty<PGlobal>) return globalAspectLookup[prop.id];
+    public inline function onPlayer(prop:AspectProperty<PPlayer>) return playerAspectLookup[prop.id];
+    public inline function onCard(prop:AspectProperty<PCard>) return cardAspectLookup[prop.id];
+    public inline function onSpace(prop:AspectProperty<PSpace>) return spaceAspectLookup[prop.id];
 
-    public inline function globalDefaults():AspectSet return globalAspectTemplate.copy();
-    public inline function playerDefaults():AspectSet return playerAspectTemplate.copy();
-    public inline function cardDefaults():AspectSet return cardAspectTemplate.copy();
-    public inline function spaceDefaults():AspectSet return spaceAspectTemplate.copy();
+    public inline function globalDefaults():Global return globalAspectTemplate.copy();
+    public inline function playerDefaults():Player return playerAspectTemplate.copy();
+    public inline function cardDefaults():Card return cardAspectTemplate.copy();
+    public inline function spaceDefaults():Space return spaceAspectTemplate.copy();
 }

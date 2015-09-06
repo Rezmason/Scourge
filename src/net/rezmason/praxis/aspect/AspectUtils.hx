@@ -9,29 +9,29 @@ using net.rezmason.utils.pointers.Pointers;
 
 class AspectUtils {
 
-    public inline static function iterate(me:AspectSet, list:Array<AspectSet>, itrPtr:AspectPtr):AspectSetIterator {
-        return new AspectSetIterator(me, list, itrPtr);
+    public inline static function iterate<T>(me:AspectPointable<T>, list:Array<AspectPointable<T>>, itrPtr:AspectPointer<T>):AspectPointableIterator<T> {
+        return new AspectPointableIterator(me, list, itrPtr);
     }
 
-    public inline static function listToArray(me:AspectSet, list:Array<AspectSet>, itrPtr:AspectPtr):Array<AspectSet> {
-        var arr:Array<AspectSet> = [];
+    public inline static function listToArray<T>(me:AspectPointable<T>, list:Array<AspectPointable<T>>, itrPtr:AspectPointer<T>):Array<AspectPointable<T>> {
+        var arr = [];
         for (me in iterate(me, list, itrPtr)) arr.push(me);
         return arr;
     }
 
-    public inline static function listToAssocArray(me:AspectSet, list:Array<AspectSet>, itrPtr:AspectPtr, keyPtr:AspectPtr):Array<AspectSet> {
-        var arr:Array<AspectSet> = [];
+    public inline static function listToAssocArray<T>(me:AspectPointable<T>, list:Array<AspectPointable<T>>, itrPtr:AspectPointer<T>, keyPtr:AspectPointer<T>):Array<AspectPointable<T>> {
+        var arr = [];
         for (me in iterate(me, list, itrPtr)) arr[me[keyPtr]] = me;
         return arr;
     }
 
-    public inline static function removeSet(me:AspectSet, list:Array<AspectSet>, next:AspectWritePtr, prev:AspectWritePtr):AspectSet {
-        var nextSetID:Int = me[next];
-        var prevSetID:Int = me[prev];
+    public inline static function removeSet<T>(me:AspectPointable<T>, list:Array<AspectPointable<T>>, next:AspectWritePointer<T>, prev:AspectWritePointer<T>):AspectPointable<T> {
+        var nextSetID = me[next];
+        var prevSetID = me[prev];
 
-        var nextSet:AspectSet = null;
+        var nextSet = null;
 
-        var wasConnected:Bool = false;
+        var wasConnected = false;
 
         if (nextSetID != NULL) {
             wasConnected = true;
@@ -52,34 +52,28 @@ class AspectUtils {
         return nextSet;
     }
 
-    public inline static function addSet(you:AspectSet, me:AspectSet, list:Array<AspectSet>, id:AspectPtr, next:AspectWritePtr, prev:AspectWritePtr):AspectSet {
+    public inline static function addSet<T>(you:AspectPointable<T>, me:AspectPointable<T>, list:Array<AspectPointable<T>>, id:AspectPointer<T>, next:AspectWritePointer<T>, prev:AspectWritePointer<T>):AspectPointable<T> {
         removeSet(me, list, next, prev);
-
-        var prevSetID:Int = you[prev];
-        var myID:Int = me[id];
-
+        var prevSetID = you[prev];
+        var myID = me[id];
         me[next] = you[id];
         me[prev] = prevSetID;
         you[prev] = myID;
-        if (prevSetID != NULL) {
-            var prevSet:AspectSet = list[prevSetID];
-            prevSet[next] = myID;
-        }
-
+        if (prevSetID != NULL) list[prevSetID][next] = myID;
         return me;
     }
 
-    public inline static function chainByAspect(list:Array<AspectSet>, id:AspectPtr, next:AspectWritePtr, prev:AspectWritePtr):Void {
+    public inline static function chainByAspect<T>(list:Array<AspectPointable<T>>, id:AspectPointer<T>, next:AspectWritePointer<T>, prev:AspectWritePointer<T>):Void {
 
         list = list.copy();
         while (list.remove(null)) {}
 
         if (list.length > 0) {
 
-            var me:AspectSet = list[0];
+            var me = list[0];
 
             for (ike in 1...list.length) {
-                var nextSet:AspectSet = list[ike];
+                var nextSet = list[ike];
                 me[next] = nextSet[id];
                 nextSet[prev] = me[id];
                 me = nextSet;
@@ -92,25 +86,23 @@ class AspectUtils {
     }
 }
 
-class AspectSetIterator {
+class AspectPointableIterator<T> {
 
-    private var me:AspectSet;
-    private var list:Array<AspectSet>;
-    private var aspectPointer:AspectPtr;
+    private var me:AspectPointable<T>;
+    private var list:Array<AspectPointable<T>>;
+    private var aspectPointer:AspectPointer<T>;
 
-    public function new(_me:AspectSet, _list:Array<AspectSet>, _itrPtr:AspectPtr):Void {
+    public function new(_me:AspectPointable<T>, _list:Array<AspectPointable<T>>, _itrPtr:AspectPointer<T>):Void {
         me = _me;
         list = _list;
         aspectPointer = _itrPtr;
     }
 
-    public function hasNext():Bool {
-        return me != null;
-    }
+    public function hasNext() return me != null;
 
-    public function next():AspectSet {
-        var lastSet:AspectSet = me;
-        var meIndex:Int = me[aspectPointer];
+    public function next():AspectPointable<T> {
+        var lastSet:AspectPointable<T> = me;
+        var meIndex = me[aspectPointer];
         if (meIndex == NULL) me = null;
         else me = list[meIndex];
         return lastSet;

@@ -55,9 +55,9 @@ class BiteRule extends BaseRule<BiteParams> {
         if (player[numBites_] > 0) {
 
             var totalArea:Int = player[totalArea_];
-            var bodySpace:AspectSet = getSpace(player[bodyFirst_]);
-            var body:Array<AspectSet> = bodySpace.listToArray(state.spaces, bodyNext_);
-            var frontSpaces:Array<AspectSet> = body.filter(isFront.bind(headIDs));
+            var bodySpace:Space = getSpace(player[bodyFirst_]);
+            var body:Array<Space> = bodySpace.listToArray(state.spaces, bodyNext_);
+            var frontSpaces:Array<Space> = body.filter(isFront.bind(headIDs));
 
             // Grab the valid bites from immediate neighbors
 
@@ -159,18 +159,18 @@ class BiteRule extends BaseRule<BiteParams> {
 
             // Find the cells removed from each player
 
-            var bitSpacesByPlayer:Array<Array<AspectSet>> = [];
+            var bitSpacesByPlayer:Array<Array<Space>> = [];
             for (player in eachPlayer()) bitSpacesByPlayer.push([]);
 
             for (bitSpaceID in move.bitSpaces) {
-                var bitSpace:AspectSet = getSpace(bitSpaceID);
+                var bitSpace:Space = getSpace(bitSpaceID);
                 bitSpacesByPlayer[bitSpace[occupier_]].push(bitSpace);
             }
 
             // Remove the appropriate cells from each player
 
             for (player in eachPlayer()) {
-                var bitSpaces:Array<AspectSet> = bitSpacesByPlayer[getID(player)];
+                var bitSpaces:Array<Space> = bitSpacesByPlayer[getID(player)];
                 var bodyFirst:Int = player[bodyFirst_];
                 for (bitSpace in bitSpaces) bodyFirst = killCell(bitSpace, maxFreshness++, bodyFirst);
                 player[bodyFirst_] = bodyFirst;
@@ -187,12 +187,12 @@ class BiteRule extends BaseRule<BiteParams> {
 
     // "front" as in "battle front". Areas where the current player touches other players
     /*
-    inline function isFront(headIDs:Array<Int>, space:AspectSet):Bool {
+    inline function isFront(headIDs:Array<Int>, space:Space):Bool {
         return neighborsFor(getSpaceCell(space)).isNotNull(isValidEnemy.bind(headIDs, space[occupier_]));
     }
     */
 
-    inline function isFront(headIDs:Array<Int>, space:AspectSet):Bool {
+    inline function isFront(headIDs:Array<Int>, space:Space):Bool {
         var isNotNull:Bool = false;
 
         var occupier:Int = space[occupier_];
@@ -208,7 +208,7 @@ class BiteRule extends BaseRule<BiteParams> {
     }
 
     // Depending on the params, enemy spaces of different kinds can be bitten
-    inline function isValidEnemy(headIDs:Array<Int>, allegiance:Int, space:AspectSet):Bool {
+    inline function isValidEnemy(headIDs:Array<Int>, allegiance:Int, space:Space):Bool {
         var val:Bool = true;
         if (space[occupier_] == allegiance) val = false; // Can't be the current player
         else if (space[occupier_] == NULL) val = false; // Can't be the current player
@@ -246,9 +246,9 @@ class BiteRule extends BaseRule<BiteParams> {
         return val;
     }
 
-    inline function killCell(space:AspectSet, freshness:Int, firstIndex:Int):Int {
+    inline function killCell(space:Space, freshness:Int, firstIndex:Int):Int {
         if (space[isFilled_] == TRUE) {
-            var nextSpace:AspectSet = space.removeSet(state.spaces, bodyNext_, bodyPrev_);
+            var nextSpace:Space = space.removeSet(state.spaces, bodyNext_, bodyPrev_);
             if (firstIndex == getID(space)) firstIndex = nextSpace == null ? NULL : getID(nextSpace);
             space[isFilled_] = FALSE;
         }

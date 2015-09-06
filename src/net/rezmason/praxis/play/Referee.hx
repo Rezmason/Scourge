@@ -82,7 +82,7 @@ class Referee {
         return {state:game.save(), log:savedLog, floatsLog:savedFloats, timeSaved:UnixTime.now()};
     }
 
-    function spitAspectLookup(lkp:AspectLookup):String {
+    function spitAspectLookup<T>(lkp:AspectLookup<T>):String {
         var str:String = '';
         var arr:Array<String> = [];
         for (key in lkp.keys()) {

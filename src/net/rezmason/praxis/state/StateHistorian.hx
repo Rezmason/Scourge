@@ -11,27 +11,27 @@ class StateHistorian {
     public var historyState(default, null):State;
     public var history(default, null):StateHistory;
 
-    var aItr:AspectItr;
+    var aItr:AspectIterator<Dynamic>;
 
     public function new():Void {
         state = new State();
         historyState = new State();
         history = new StateHistory();
-        aItr = new AspectItr();
+        aItr = new AspectIterator();
     }
 
     public function write():Void {
-        writeAspectSets(state.globals, historyState.globals);
-        writeAspectSets(state.players, historyState.players);
-        writeAspectSets(state.spaces, historyState.spaces);
-        writeAspectSets(state.extras, historyState.extras);
+        writeAspectPointables(state.globals, historyState.globals, aItr);
+        writeAspectPointables(state.players, historyState.players, aItr);
+        writeAspectPointables(state.spaces, historyState.spaces, aItr);
+        writeAspectPointables(state.extras, historyState.extras, aItr);
     }
 
     public function read():Void {
-        readAspectSets(state.globals, historyState.globals);
-        readAspectSets(state.players, historyState.players);
-        readAspectSets(state.spaces, historyState.spaces);
-        readAspectSets(state.extras, historyState.extras);
+        readAspectPointables(state.globals, historyState.globals, aItr);
+        readAspectPointables(state.players, historyState.players, aItr);
+        readAspectPointables(state.spaces, historyState.spaces, aItr);
+        readAspectPointables(state.extras, historyState.extras, aItr);
     }
 
     public function save():SavedState {
@@ -50,20 +50,20 @@ class StateHistorian {
         history.wipe();
     }
 
-    private inline function writeAspects(aspects:AspectSet, histAspects:AspectSet, aItr:AspectItr):Void {
-        for (ptr in aspects.ptrs(aItr)) history.write(histAspects[ptr], aspects[ptr]);
+    private inline function writeAspects<T>(aspects:AspectPointable<T>, histAspects:AspectPointable<T>, aItr:AspectIterator<Dynamic>):Void {
+        for (ptr in aspects.ptrs(cast aItr)) history.write(histAspects[ptr], aspects[ptr]);
     }
 
-    private inline function writeAspectSets(aspectSets:Array<AspectSet>, histAspectSets:Array<AspectSet>):Void {
-        for (ike in 0...aspectSets.length) writeAspects(aspectSets[ike], histAspectSets[ike], aItr);
+    private inline function writeAspectPointables<T>(aspectPointables:Array<AspectPointable<T>>, histAspectPointables:Array<AspectPointable<T>>, aItr:AspectIterator<Dynamic>):Void {
+        for (ike in 0...aspectPointables.length) writeAspects(aspectPointables[ike], histAspectPointables[ike], aItr);
     }
 
-    private inline function readAspects(aspects:AspectSet, histAspects:AspectSet, itr:AspectItr):Void {
-        for (ptr in aspects.ptrs(aItr)) aspects[ptr] = history.read(histAspects[ptr]);
+    private inline function readAspects<T>(aspects:AspectPointable<T>, histAspects:AspectPointable<T>, aItr:AspectIterator<Dynamic>):Void {
+        for (ptr in aspects.ptrs(cast aItr)) aspects[cast ptr] = history.read(histAspects[cast ptr]);
     }
 
-    private inline function readAspectSets(aspectSets:Array<AspectSet>, histAspectSets:Array<AspectSet>):Void {
-        for (ike in 0...aspectSets.length) readAspects(aspectSets[ike], histAspectSets[ike], aItr);
+    private inline function readAspectPointables<T>(aspectPointables:Array<AspectPointable<T>>, histAspectPointables:Array<AspectPointable<T>>, aItr:AspectIterator<Dynamic>):Void {
+        for (ike in 0...aspectPointables.length) readAspects(aspectPointables[ike], histAspectPointables[ike], aItr);
     }
 }
 

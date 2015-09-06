@@ -62,17 +62,17 @@ class ReplenishRuleTest extends ScourgeRuleTest
 
         makeState([replenishRule], 1, TestBoards.emptyPetri);
 
-        var stateValue1_:AspectPtr = plan.onGlobal(TestAspect.VALUE_1);
-        var stateValue2_:AspectPtr = plan.onGlobal(TestAspect.VALUE_2);
-        var stateValue3_:AspectPtr = plan.onGlobal(TestAspect.VALUE_3);
+        var stateValue1_ = plan.onGlobal(TestAspect.VALUE_1);
+        var stateValue2_ = plan.onGlobal(TestAspect.VALUE_2);
+        var stateValue3_ = plan.onGlobal(TestAspect.VALUE_3);
 
-        var playerValue1_:AspectPtr = plan.onPlayer(TestAspect.VALUE_1);
-        var playerValue2_:AspectPtr = plan.onPlayer(TestAspect.VALUE_2);
-        var playerValue3_:AspectPtr = plan.onPlayer(TestAspect.VALUE_3);
+        var playerValue1_ = plan.onPlayer(TestAspect.VALUE_1);
+        var playerValue2_ = plan.onPlayer(TestAspect.VALUE_2);
+        var playerValue3_ = plan.onPlayer(TestAspect.VALUE_3);
 
-        var spaceValue1_:AspectPtr = plan.onSpace(TestAspect.VALUE_1);
-        var spaceValue2_:AspectPtr = plan.onSpace(TestAspect.VALUE_2);
-        var spaceValue3_:AspectPtr = plan.onSpace(TestAspect.VALUE_3);
+        var spaceValue1_ = plan.onSpace(TestAspect.VALUE_1);
+        var spaceValue2_ = plan.onSpace(TestAspect.VALUE_2);
+        var spaceValue3_ = plan.onSpace(TestAspect.VALUE_3);
 
         var expectedValues1:Array<Int> = [0,1,2,3,];
         var expectedValues2:Array<Int> = [0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,];

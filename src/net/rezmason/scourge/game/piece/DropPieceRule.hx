@@ -59,10 +59,10 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
         
         // get current player head
         var currentPlayer:Int = state.global[currentPlayer_];
-        var bodySpace:AspectSet = getSpace(getPlayer(currentPlayer)[bodyFirst_]);
+        var bodySpace = getSpace(getPlayer(currentPlayer)[bodyFirst_]);
 
         // Find edge spaces of current player
-        var edgeSpaces:Array<AspectSet> = bodySpace.listToArray(state.spaces, bodyNext_).filter(hasFreeEdge);
+        var edgeSpaces = bodySpace.listToArray(state.spaces, bodyNext_).filter(hasFreeEdge);
 
         var pieceReflection:Int = state.global[pieceReflection_];
         var pieceRotation:Int = state.global[pieceRotation_];
@@ -105,7 +105,7 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
                             var addedSpaces:Array<Int> = [];
 
                             for (coord in piece.cells) {
-                                var spaceAtCoord:AspectSet = walkCell(getSpaceCell(space), coord, homeCoord).value;
+                                var spaceAtCoord = walkCell(getSpaceCell(space), coord, homeCoord).value;
                                 addedSpaces.push(getID(spaceAtCoord));
                                 numAddedSpaces++;
                                 var occupier:Int = spaceAtCoord[occupier_];
@@ -173,11 +173,11 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
     override private function _chooseMove(choice:Int):Void {
         var move:DropPieceMove = cast moves[choice];
         var currentPlayer:Int = state.global[currentPlayer_];
-        var player:AspectSet = getPlayer(currentPlayer);
+        var player = getPlayer(currentPlayer);
 
         if (move.targetSpace != NULL) {
             var maxFreshness:Int = state.global[maxFreshness_];
-            var bodySpace:AspectSet = getSpace(getPlayer(currentPlayer)[bodyFirst_]);
+            var bodySpace = getSpace(getPlayer(currentPlayer)[bodyFirst_]);
             for (id in move.addedSpaces) bodySpace = fillAndOccupyCell(getSpace(id), currentPlayer, maxFreshness, bodySpace);
             player[bodyFirst_] = getID(bodySpace);
             state.global[maxFreshness_] = maxFreshness + 1;
@@ -192,16 +192,14 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
 
     override private function _collectMoves():Void movePool = allMoves.copy();
 
-    inline function hasFreeEdge(space:AspectSet):Bool {
-        var exists:Bool = false;
-
+    inline function hasFreeEdge(space) {
+        var exists = false;
         for (neighbor in neighborsFor(getSpaceCell(space), params.dropOrthoOnly)) {
             if (neighbor.value[isFilled_] == FALSE) {
                 exists = true;
                 break;
             }
         }
-
         return exists;
     }
 
@@ -224,11 +222,11 @@ class DropPieceRule extends BaseRule<FullDropPieceParams> {
         return val;
     }
 
-    inline function fillAndOccupyCell(me:AspectSet, currentPlayer:Int, maxFreshness, bodySpace:AspectSet):AspectSet {
+    inline function fillAndOccupyCell(me:Space, currentPlayer:Int, maxFreshness:Int, bodySpace:Space) {
         if (me[occupier_] != currentPlayer || me[isFilled_] == FALSE) me[freshness_] = maxFreshness;
         me[occupier_] = currentPlayer;
         me[isFilled_] = TRUE;
-        return bodySpace.addSet(me, state.spaces, ident_, bodyNext_, bodyPrev_);
+        return bodySpace.addSet(me, state.spaces, spaceIdent_, bodyNext_, bodyPrev_);
     }
 
     // A works-for-now function for translating piece coords into spaces accessible from a given starting point

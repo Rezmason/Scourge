@@ -48,7 +48,7 @@ class TurnRulesTest extends ScourgeRuleTest
         var endTurnRule:EndTurnRule = new EndTurnRule(null);
         makeState([endTurnRule], 4, TestBoards.emptySquareFourPlayerSkirmish);
 
-        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
+        var currentPlayer_ = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
 
         var expectedCurrentPlayer:Int = 0;
         var currentPlayer:Int = state.global[currentPlayer_];
@@ -57,7 +57,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Get rid of player 4's head
 
-        var head_:AspectWritePtr = plan.onPlayer(BodyAspect.HEAD);
+        var head_ = plan.onPlayer(BodyAspect.HEAD);
         state.players[3][head_] = Aspect.NULL;
 
 
@@ -82,14 +82,14 @@ class TurnRulesTest extends ScourgeRuleTest
         var forfeitRule:ForfeitRule = new ForfeitRule(null);
         makeState([forfeitRule], 4, TestBoards.oaf);
 
-        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
-        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
-        var isFilled_:AspectPtr = plan.onSpace(OwnershipAspect.IS_FILLED);
+        var head_ = plan.onPlayer(BodyAspect.HEAD);
+        var currentPlayer_ = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
+        var occupier_ = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var isFilled_ = plan.onSpace(OwnershipAspect.IS_FILLED);
 
         var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
-        var playerHead:AspectSet = state.spaces[head];
+        var playerHead = state.spaces[head];
 
         forfeitRule.update();
         var moves:Array<Move> = forfeitRule.moves;
@@ -121,15 +121,15 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Change occupier of current player\'s head
 
-        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
-        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
-        var occupier_:AspectWritePtr = plan.onSpace(OwnershipAspect.OCCUPIER);
-        var isFilled_:AspectPtr = plan.onSpace(OwnershipAspect.IS_FILLED);
-        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var head_ = plan.onPlayer(BodyAspect.HEAD);
+        var currentPlayer_ = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
+        var occupier_ = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var isFilled_ = plan.onSpace(OwnershipAspect.IS_FILLED);
+        var bodyFirst_ = plan.onPlayer(BodyAspect.BODY_FIRST);
 
         var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = state.players[currentPlayer][head_];
-        var playerHead:AspectSet = state.spaces[head];
+        var playerHead = state.spaces[head];
 
         playerHead[occupier_] = 1;
 
@@ -154,13 +154,13 @@ class TurnRulesTest extends ScourgeRuleTest
         var stalemateRule:StalemateRule = new StalemateRule({maxSkips:5});
         makeState([stalemateRule], 4);
 
-        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
-        var totalArea_:AspectWritePtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
-        var numConsecutiveSkips_:AspectWritePtr = plan.onPlayer(SkipAspect.NUM_CONSECUTIVE_SKIPS);
+        var winner_ = plan.onGlobal(WinAspect.WINNER);
+        var totalArea_ = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var numConsecutiveSkips_ = plan.onPlayer(SkipAspect.NUM_CONSECUTIVE_SKIPS);
 
         // Have each player skip four times, then check for a winner
         for (ike in 0...state.players.length) {
-            var player:AspectSet = state.players[ike];
+            var player = state.players[ike];
             player[numConsecutiveSkips_] = 4;
             player[totalArea_] = 4 - ike;
         }
@@ -172,7 +172,7 @@ class TurnRulesTest extends ScourgeRuleTest
         // Have each player skip one more time, then check for a winner
 
         for (ike in 0...state.players.length) {
-            var player:AspectSet = state.players[ike];
+            var player = state.players[ike];
             player[numConsecutiveSkips_] = 5;
             player[totalArea_] = 4 - ike;
         }
@@ -189,14 +189,14 @@ class TurnRulesTest extends ScourgeRuleTest
         var oneLivingPlayerRule:OneLivingPlayerRule = new OneLivingPlayerRule(null);
         makeState([oneLivingPlayerRule], 4);
 
-        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
-        var head_:AspectWritePtr = plan.onPlayer(BodyAspect.HEAD);
+        var winner_ = plan.onGlobal(WinAspect.WINNER);
+        var head_ = plan.onPlayer(BodyAspect.HEAD);
 
         // kill the first, third and fourth players
         for (ike in 0...state.players.length) {
             if (ike == 1) continue; // We\'re skipping player 2
 
-            var player:AspectSet = state.players[ike];
+            var player = state.players[ike];
             player[head_] = Aspect.NULL;
         }
 

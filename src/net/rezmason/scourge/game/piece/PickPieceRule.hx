@@ -56,8 +56,8 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
         } else if (state.global[pieceTableID_] == NULL) {
             // Iterate over the hat's contents and include the corresponding moves
             moves = [];
-            var firstHatPiece:AspectSet = getCard(state.global[pieceHatFirst_]);
-            var hatPieces:Array<AspectSet> = firstHatPiece.listToArray(state.cards, pieceHatNext_);
+            var firstHatPiece = getCard(state.global[pieceHatFirst_]);
+            var hatPieces = firstHatPiece.listToArray(state.cards, pieceHatNext_);
             for (piece in hatPieces) moves.push(allMoves[piece[pieceMoveID_]]);
         } else {
             moves = [];
@@ -118,15 +118,15 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
         }
 
         // Create a hat card for every move
-        var allPieces:Array<AspectSet> = [];
+        var allPieces = [];
         for (move in allMoves) {
             move.hatIndex = numCards();
-            var piece:AspectSet = addCard();
+            var piece = addCard();
             piece[pieceMoveID_] = move.id;
             allPieces.push(piece);
         }
 
-        allPieces.chainByAspect(ident_, pieceNext_, piecePrev_);
+        allPieces.chainByAspect(cardIdent_, pieceNext_, piecePrev_);
         state.global[pieceFirst_] = getID(allPieces[0]);
     }
 
@@ -151,11 +151,11 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
     }
 
     private function pickMoveFromHat(move:PickPieceMove):PickPieceMove {
-        var firstHatPiece:AspectSet = getCard(state.global[pieceHatFirst_]);
-        var pickedPiece:AspectSet = getCard(move.hatIndex);
+        var firstHatPiece = getCard(state.global[pieceHatFirst_]);
+        var pickedPiece = getCard(move.hatIndex);
         state.global[piecesPicked_] = state.global[piecesPicked_] + 1;
 
-        var nextPiece:AspectSet = pickedPiece.removeSet(state.cards, pieceHatNext_, pieceHatPrev_);
+        var nextPiece = pickedPiece.removeSet(state.cards, pieceHatNext_, pieceHatPrev_);
 
         if (pickedPiece == firstHatPiece) {
             firstHatPiece = nextPiece;
@@ -167,9 +167,9 @@ class PickPieceRule extends BaseRule<FullPickPieceParams> {
     }
 
     private function buildHat():Void {
-        var firstPiece:AspectSet = getCard(state.global[pieceFirst_]);
-        var allPieces:Array<AspectSet> = firstPiece.listToArray(state.cards, pieceNext_);
-        allPieces.chainByAspect(ident_, pieceHatNext_, pieceHatPrev_);
+        var firstPiece = getCard(state.global[pieceFirst_]);
+        var allPieces = firstPiece.listToArray(state.cards, pieceNext_);
+        allPieces.chainByAspect(cardIdent_, pieceHatNext_, pieceHatPrev_);
         state.global[pieceHatFirst_] = getID(firstPiece);
         state.global[piecesPicked_] = 0;
         state.global[pieceHatPlayer_] = state.global[currentPlayer_];

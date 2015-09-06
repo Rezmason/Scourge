@@ -30,7 +30,7 @@ class EatRule extends BaseRule<EatParams> {
 
         var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = getPlayer(currentPlayer)[head_];
-        var bodySpace:AspectSet = getSpace(getPlayer(currentPlayer)[bodyFirst_]);
+        var bodySpace:Space = getSpace(getPlayer(currentPlayer)[bodyFirst_]);
         var maxFreshness:Int = state.global[maxFreshness_];
 
         // List all the players' heads
@@ -40,24 +40,24 @@ class EatRule extends BaseRule<EatParams> {
 
         // Find all fresh body spaces of the current player
 
-        var newSpaces:ShitList<AspectSet> = new ShitList(bodySpace.listToArray(state.spaces, bodyNext_).filter(isFresh));
+        var newSpaces:ShitList<Space> = new ShitList(bodySpace.listToArray(state.spaces, bodyNext_).filter(isFresh));
 
-        var newSpacesByID:Array<AspectSet> = [];
+        var newSpacesByID:Array<Space> = [];
         for (space in newSpaces) newSpacesByID[getID(space)] = space;
 
-        var eatenSpaces:Array<AspectSet> = [];
-        var eatenSpaceGroups:Array<Array<AspectSet>> = [];
+        var eatenSpaces:Array<Space> = [];
+        var eatenSpaceGroups:Array<Array<Space>> = [];
 
         // We search space for uninterrupted regions of player cells that begin and end
         // with cells of the current player. We propagate these searches from cells
         // that have been freshly eaten, starting with the current player's fresh spaces
 
-        var space:AspectSet = newSpaces.pop();
+        var space:Space = newSpaces.pop();
         if (space != null) newSpacesByID[getID(space)] = null;
         while (space != null) {
             // search in all directions
             for (direction in directionsFor(params.eatOrthogonallyOnly)) {
-                var pendingSpaces:Array<AspectSet> = [];
+                var pendingSpaces:Array<Space> = [];
                 var cell:BoardCell = getSpaceCell(space);
                 for (scout in cell.walk(direction)) {
                     if (scout == cell) continue; // starting space
@@ -112,19 +112,19 @@ class EatRule extends BaseRule<EatParams> {
 
             var bodyFirst:Int = player[bodyFirst_];
             if (bodyFirst != NULL) {
-                var body:Array<AspectSet> = getSpace(bodyFirst).listToArray(state.spaces, bodyNext_);
-                var revisedBody:Array<AspectSet> = [];
+                var body:Array<Space> = getSpace(bodyFirst).listToArray(state.spaces, bodyNext_);
+                var revisedBody:Array<Space> = [];
                 for (space in body) {
                     if (space[isFilled_] == TRUE && space[occupier_] == playerID) revisedBody.push(space);
                 }
-                revisedBody.chainByAspect(ident_, bodyNext_, bodyPrev_);
+                revisedBody.chainByAspect(spaceIdent_, bodyNext_, bodyPrev_);
                 if (revisedBody.length > 0) player[bodyFirst_] = getID(revisedBody[0]);
                 else player[bodyFirst_] = NULL;
             }
 
             var head:Int = player[head_];
             if (head != NULL) {
-                var headSpace:AspectSet = getSpace(head);
+                var headSpace:Space = getSpace(head);
                 if (headSpace[occupier_] != playerID) player[head_] = NULL;
             }
         }
@@ -132,24 +132,24 @@ class EatRule extends BaseRule<EatParams> {
         // Add the filled eaten spaces to the current player body
         for (space in eatenSpaces) {
             if (space != null && space[isFilled_] == TRUE) {
-                bodySpace = bodySpace.addSet(space, state.spaces, ident_, bodyNext_, bodyPrev_);
+                bodySpace = bodySpace.addSet(space, state.spaces, spaceIdent_, bodyNext_, bodyPrev_);
             }
         }
         getPlayer(currentPlayer)[bodyFirst_] = getID(bodySpace);
         signalChange();
     }
 
-    function getBody(playerID:Int):Array<AspectSet> {
-        var bodySpace:AspectSet = getSpace(getPlayer(playerID)[bodyFirst_]);
+    function getBody(playerID:Int):Array<Space> {
+        var bodySpace:Space = getSpace(getPlayer(playerID)[bodyFirst_]);
         return bodySpace.listToArray(state.spaces, bodyNext_);
     }
 
-    function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
+    function isLivingBodyNeighbor(me:Space, you:Space):Bool {
         if (me[isFilled_] == FALSE) return false;
         return me[occupier_] == you[occupier_];
     }
 
-    function isFresh(space:AspectSet):Bool {
+    function isFresh(space:Space):Bool {
         return space[freshness_] != NULL;
     }
 

@@ -67,17 +67,17 @@ class DecayRule extends BaseRule<DecayParams> {
         signalChange();
     }
 
-    function isLivingBodyNeighbor(me:AspectSet, you:AspectSet):Bool {
+    function isLivingBodyNeighbor(me:Space, you:Space):Bool {
         if (me[isFilled_] == FALSE) return false;
         return me[occupier_] == you[occupier_];
     }
 
-    function killCell(space:AspectSet, freshness:Int, firstIndex:Int):Int {
+    function killCell(space:Space, freshness:Int, firstIndex:Int):Int {
         space[isFilled_] = FALSE;
         space[occupier_] = NULL;
         space[freshness_] = freshness;
 
-        var nextSpace:AspectSet = space.removeSet(state.spaces, bodyNext_, bodyPrev_);
+        var nextSpace = space.removeSet(state.spaces, bodyNext_, bodyPrev_);
         if (firstIndex == getID(space)) {
             firstIndex = (nextSpace == null) ? NULL : getID(nextSpace);
         }

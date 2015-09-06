@@ -123,11 +123,11 @@ class ScourgeGameConfigTest
         Assert.areEqual(20, num0Cells);
         Assert.areEqual(0, num1Cells);
 
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
-        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+        var totalArea_ = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var head_ = plan.onPlayer(BodyAspect.HEAD);
 
-        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
-        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
+        var winner_ = plan.onGlobal(WinAspect.WINNER);
+        var currentPlayer_ = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
 
         Assert.areEqual(36, state.players[0][totalArea_]);
         Assert.areEqual(Aspect.NULL, state.players[1][head_]);
@@ -147,9 +147,9 @@ class ScourgeGameConfigTest
 
         VisualAssert.assert('two player grab', state.spitBoard(plan));
 
-        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
-        var currentPlayer_:AspectPtr = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
+        var winner_ = plan.onGlobal(WinAspect.WINNER);
+        var totalArea_ = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var currentPlayer_ = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
 
         startAction.update();
         startAction.chooseMove();
@@ -205,8 +205,8 @@ class ScourgeGameConfigTest
         pickAction.update();
         pickAction.chooseMove();
 
-        var numSwaps_:AspectPtr = plan.onPlayer(SwapAspect.NUM_SWAPS);
-        var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
+        var numSwaps_ = plan.onPlayer(SwapAspect.NUM_SWAPS);
+        var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
         Assert.areEqual(config.pieceParams.startingSwaps, state.players[0][numSwaps_]);
 
@@ -245,7 +245,7 @@ class ScourgeGameConfigTest
         quitAction.update();
         quitAction.chooseMove(); // player 1 ragequits
 
-        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
+        var winner_ = plan.onGlobal(WinAspect.WINNER);
 
         Assert.areEqual(1, state.global[winner_]);
     }
@@ -277,7 +277,7 @@ class ScourgeGameConfigTest
         startAction.update();
         startAction.chooseMove();
 
-        var occupier_:AspectPtr = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var occupier_ = plan.onSpace(OwnershipAspect.OCCUPIER);
 
         VisualAssert.assert('two player grab', state.spitBoard(plan));
 
@@ -295,7 +295,7 @@ class ScourgeGameConfigTest
         dropAction.update();
         dropAction.chooseMove(); // skip
 
-        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+        var head_ = plan.onPlayer(BodyAspect.HEAD);
 
         pickAction.update();
         pickAction.chooseMove(); // pick
@@ -305,7 +305,7 @@ class ScourgeGameConfigTest
         
         VisualAssert.assert('player zero dropped another ---, ate player one\'s head and body; another cavity', state.spitBoard(plan));
 
-        var winner_:AspectPtr = plan.onGlobal(WinAspect.WINNER);
+        var winner_ = plan.onGlobal(WinAspect.WINNER);
         Assert.areEqual(0, state.global[winner_]);
     }
 

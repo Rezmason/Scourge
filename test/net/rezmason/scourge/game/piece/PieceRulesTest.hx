@@ -92,10 +92,10 @@ class PieceRulesTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1 + PIECE_SIZE, numCells); // 5 cells for player 0
 
-        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
-        var bodySpace:AspectSet = state.spaces[state.players[0][bodyFirst_]];
+        var bodyFirst_ = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_ = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_ = plan.onSpace(BodyAspect.BODY_PREV);
+        var bodySpace = state.spaces[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodySpace, bodyNext_, bodyPrev_));
     }
@@ -338,7 +338,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectWritePtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
+        var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
         pickPieceRule.update();
 
@@ -366,7 +366,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
+        var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
         pickPieceRule.update();
 
@@ -388,7 +388,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectPtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
+        var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
         pickPieceRule.update();
 
@@ -480,7 +480,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var swapPieceRule:SwapPieceRule = new SwapPieceRule(swapPieceParams);
         makeState([swapPieceRule], 1, TestBoards.emptyPetri);
 
-        var pieceTableID_:AspectWritePtr = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
+        var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
 
         state.global[pieceTableID_] =  0;
 

@@ -50,17 +50,17 @@ class StatePlannerTest {
 
         // Make sure there's the right aspects on the state
 
-        var stateTestValue_:AspectPtr = plan.onGlobal(TestAspect.VALUE_1);
+        var stateTestValue_ = plan.onGlobal(TestAspect.VALUE_1);
         Assert.isNotNull(state.global[stateTestValue_]);
 
         // Make sure there's the right aspects on each player
-        var playerTestValue_:AspectPtr = plan.onPlayer(TestAspect.VALUE_1);
+        var playerTestValue_ = plan.onPlayer(TestAspect.VALUE_1);
         for (ike in 0...state.players.length) {
             Assert.isNotNull(state.players[ike][playerTestValue_]);
         }
 
         // Make sure there's the right aspects on each space
-        var spaceTestValue_:AspectPtr = plan.onSpace(TestAspect.VALUE_1);
+        var spaceTestValue_ = plan.onSpace(TestAspect.VALUE_1);
         for (space in state.spaces) Assert.isNotNull(space[spaceTestValue_]);
     }
 }

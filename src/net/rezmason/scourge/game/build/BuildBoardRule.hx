@@ -25,7 +25,7 @@ class BuildBoardRule extends BaseRule<FullBuildBoardParams> {
     @player(BodyAspect.HEAD, true) var head_;
 
     override private function _prime():Void {
-        var bodySpacesByPlayer:Array<Array<AspectSet>> = [for (ike in 0...numPlayers()) []];
+        var bodySpacesByPlayer:Array<Array<Space>> = [for (ike in 0...numPlayers()) []];
         for (petriCell in params.cells) addSpace();
         for (petriCell in params.cells) {
             var petriDatum = petriCell.value;
@@ -51,7 +51,7 @@ class BuildBoardRule extends BaseRule<FullBuildBoardParams> {
             var body = bodySpacesByPlayer[getID(player)];
             if (body.length > 0) {
                 player[bodyFirst_] = getID(body[0]);
-                body.chainByAspect(ident_, bodyNext_, bodyPrev_);
+                body.chainByAspect(spaceIdent_, bodyNext_, bodyPrev_);
             }
         }
     }

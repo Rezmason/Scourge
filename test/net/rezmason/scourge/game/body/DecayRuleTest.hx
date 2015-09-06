@@ -50,14 +50,14 @@ class DecayRuleTest extends ScourgeRuleTest
         numCells = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
         Assert.areEqual(1, numCells); // only one cell for player 0
 
-        var bodyFirst_:AspectPtr = plan.onPlayer(BodyAspect.BODY_FIRST);
-        var bodyNext_:AspectPtr = plan.onSpace(BodyAspect.BODY_NEXT);
-        var bodyPrev_:AspectPtr = plan.onSpace(BodyAspect.BODY_PREV);
-        var bodySpace:AspectSet = state.spaces[state.players[0][bodyFirst_]];
+        var bodyFirst_ = plan.onPlayer(BodyAspect.BODY_FIRST);
+        var bodyNext_ = plan.onSpace(BodyAspect.BODY_NEXT);
+        var bodyPrev_ = plan.onSpace(BodyAspect.BODY_PREV);
+        var bodySpace = state.spaces[state.players[0][bodyFirst_]];
 
         Assert.areEqual(0, testListLength(numCells, bodySpace, bodyNext_, bodyPrev_));
 
-        var totalArea_:AspectPtr = plan.onPlayer(BodyAspect.TOTAL_AREA);
+        var totalArea_ = plan.onPlayer(BodyAspect.TOTAL_AREA);
         var totalArea:Int = state.players[0][totalArea_];
         Assert.areEqual(numCells, totalArea);
     }
@@ -68,12 +68,12 @@ class DecayRuleTest extends ScourgeRuleTest
         var decayRule:DecayRule = new DecayRule({decayOrthogonallyOnly:false,});
         makeState([decayRule], 1, TestBoards.loosePetri);
 
-        var head_:AspectPtr = plan.onPlayer(BodyAspect.HEAD);
+        var head_ = plan.onPlayer(BodyAspect.HEAD);
         var head:BoardCell = state.cells.getCell(state.players[0][head_]);
         var bump:BoardCell = head.nw();
 
-        var occupier_:AspectWritePtr = plan.onSpace(OwnershipAspect.OCCUPIER);
-        var isFilled_:AspectWritePtr = plan.onSpace(OwnershipAspect.IS_FILLED);
+        var occupier_ = plan.onSpace(OwnershipAspect.OCCUPIER);
+        var isFilled_ = plan.onSpace(OwnershipAspect.IS_FILLED);
         bump.value[occupier_] = 0;
         bump.value[isFilled_] = Aspect.TRUE;
 

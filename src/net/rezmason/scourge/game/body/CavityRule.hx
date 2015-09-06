@@ -27,7 +27,7 @@ class CavityRule extends BaseRule<Dynamic> {
     var allEdges:Array<Int> = [];
     var groupFirstEdges:Array<Int> = [];
     var groupAngles:Array<Int> = [];
-    var cavitySpaces:Array<AspectSet> = [];
+    var cavitySpaces:Array<Space> = [];
 
     override private function _chooseMove(choice:Int):Void {
         var maxFreshness:Int = state.global[maxFreshness_];
@@ -38,17 +38,17 @@ class CavityRule extends BaseRule<Dynamic> {
         signalChange();
     }
 
-    private function eraseCavities(player:AspectSet, maxFreshness):Bool {
+    private function eraseCavities(player:Player, maxFreshness):Bool {
         var cavityFirst:Int = player[cavityFirst_];
         if (cavityFirst != NULL) {
-            var oldCavitySpaces = getSpace(cavityFirst).listToAssocArray(state.spaces, cavityNext_, ident_);
+            var oldCavitySpaces = getSpace(cavityFirst).listToAssocArray(state.spaces, cavityNext_, spaceIdent_);
             for (space in oldCavitySpaces) if (space != null) clearCavityCell(space, maxFreshness);
             player[cavityFirst_] = NULL;
         }
         return cavityFirst != NULL;
     }
 
-    private function makeCavities(player:AspectSet, maxFreshness:Int):Bool {
+    private function makeCavities(player:Player, maxFreshness:Int):Bool {
 
         var edgeGroupIDs:Array<Null<Int>> = [];
         var numEdges:Int = 0;
@@ -57,7 +57,7 @@ class CavityRule extends BaseRule<Dynamic> {
         var currentEdge:Int = 0;
 
         // Find edge spaces of current player
-        var bodySpace:AspectSet = getSpace(player[bodyFirst_]);
+        var bodySpace:Space = getSpace(player[bodyFirst_]);
 
         if (bodySpace != null) {
             var occupier:Int = bodySpace[occupier_];
@@ -171,7 +171,7 @@ class CavityRule extends BaseRule<Dynamic> {
             var playerID:Int = getID(player);
             for (space in cavitySpaces) createCavity(playerID, maxFreshness, space);
 
-            cavitySpaces.chainByAspect(ident_, cavityNext_, cavityPrev_);
+            cavitySpaces.chainByAspect(spaceIdent_, cavityNext_, cavityPrev_);
             player[cavityFirst_] = getID(cavitySpaces[0]);
 
             // Cavities affect the player's total area:
@@ -186,15 +186,15 @@ class CavityRule extends BaseRule<Dynamic> {
     inline function getEdgeID(edge:Int):Int return edge >> 3;
     inline function getEdgeDirection(edge:Int):Int return edge & 7;
 
-    inline function isEmpty(me:AspectSet, you:AspectSet):Bool return me[isFilled_] == FALSE;
+    inline function isEmpty(me:Space, you:Space):Bool return me[isFilled_] == FALSE;
 
-    inline function createCavity(occupier:Int, maxFreshness:Int, space:AspectSet):Void {
+    inline function createCavity(occupier:Int, maxFreshness:Int, space:Space):Void {
         space[isFilled_] = FALSE;
         space[occupier_] = occupier;
         space[freshness_] = maxFreshness;
     }
 
-    inline function clearCavityCell(space:AspectSet, maxFreshness:Int):Void {
+    inline function clearCavityCell(space:Space, maxFreshness:Int):Void {
         if (space[isFilled_] == FALSE) space[occupier_] = NULL;
         space[freshness_] = maxFreshness;
         space.removeSet(state.spaces, cavityNext_, cavityPrev_);

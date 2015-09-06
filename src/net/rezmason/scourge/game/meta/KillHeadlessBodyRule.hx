@@ -37,13 +37,13 @@ class KillHeadlessBodyRule extends BaseRule<Dynamic> {
 
             if (head != NULL) {
                 var bodyFirst:Int = player[bodyFirst_];
-                var playerHead:AspectSet = getSpace(head);
+                var playerHead = getSpace(head);
                 if (playerHead[occupier_] != playerID || playerHead[isFilled_] == FALSE) {
 
                     // Destroy the head and body
 
                     player[head_] = NULL;
-                    var bodySpace:AspectSet = getSpace(bodyFirst);
+                    var bodySpace = getSpace(bodyFirst);
                     for (space in bodySpace.listToArray(state.spaces, bodyNext_)) killCell(space, maxFreshness);
                     player[bodyFirst_] = NULL;
                     maxFreshness++;
@@ -58,11 +58,10 @@ class KillHeadlessBodyRule extends BaseRule<Dynamic> {
         // trace('---');
     }
 
-    function killCell(space:AspectSet, maxFreshness:Int):Void {
+    function killCell(space:Space, maxFreshness:Int) {
         space[isFilled_] = FALSE;
         space[occupier_] = NULL;
         space[freshness_] = maxFreshness;
-
         space.removeSet(state.spaces, bodyNext_, bodyPrev_);
     }
 }

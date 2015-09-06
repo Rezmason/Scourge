@@ -20,74 +20,84 @@ using net.rezmason.utils.pointers.Pointers;
     var state:State;
     var plan:StatePlan;
 
-    public var globalAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
-    public var playerAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
-    public var cardAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
-    public var spaceAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
-    public var extraAspectRequirements(default, null):AspectRequirements = new AspectRequirements();
+    public var globalAspectRequirements(default, null):AspectRequirements<PGlobal> = new AspectRequirements();
+    public var playerAspectRequirements(default, null):AspectRequirements<PPlayer> = new AspectRequirements();
+    public var cardAspectRequirements(default, null):AspectRequirements<PCard> = new AspectRequirements();
+    public var spaceAspectRequirements(default, null):AspectRequirements<PSpace> = new AspectRequirements();
+    public var extraAspectRequirements(default, null):AspectRequirements<PExtra> = new AspectRequirements();
 
-    private var extraAspectTemplate:AspectSet = new AspectSet();
-    private var extraAspectLookup:AspectLookup = new AspectLookup();
-    private var ident_:AspectWritePtr;
+    private var extraAspectTemplate:Extra = new AspectPointable();
+    private var extraAspectLookup:AspectLookup<PExtra> = new AspectLookup();
+    
+    private var globalIdent_:AspectWritePointer<PGlobal>;
+    private var playerIdent_:AspectWritePointer<PPlayer>;
+    private var cardIdent_:AspectWritePointer<PCard>;
+    private var spaceIdent_:AspectWritePointer<PSpace>;
+    private var extraIdent_:AspectWritePointer<PExtra>;
 
-    function __initRequirements():Void {}
-    function __initPointers():Void {}
+    function __initRequirements() {}
+    function __initPointers() {}
     
     public function new() __initRequirements();
 
-    @:final public function primePointers(state, plan):Void {
+    @:final public function primePointers(state, plan) {
         if (this.state != null) throw 'Reckoner was already primed.';
         this.state = state;
         this.plan = plan;
 
+        #if !macro 
+            globalIdent_ = plan.onGlobal(IdentityAspect.IDENTITY);
+            playerIdent_ = plan.onPlayer(IdentityAspect.IDENTITY);
+            cardIdent_ = plan.onCard(IdentityAspect.IDENTITY);
+            spaceIdent_ = plan.onSpace(IdentityAspect.IDENTITY);
+        #end
 
-        var extraAspectSource:AspectSource = new AspectSource();
-        extraAspectSource.add();
+        var extraAspectSource:AspectSource<PExtra> = new AspectSource();
+        extraIdent_ = extraAspectSource.add();
 
         for (id in extraAspectRequirements.keys().a2z()) {
-            var prop:AspectProperty = extraAspectRequirements[id];
-            var ptr:AspectWritePtr = extraAspectSource.add();
+            var prop = extraAspectRequirements[id];
+            var ptr = extraAspectSource.add();
             extraAspectLookup[prop.id] = ptr;
             extraAspectTemplate[ptr] = prop.initialValue;
         }
 
         __initPointers();
-        #if !macro ident_ = plan.onGlobal(IdentityAspect.IDENTITY); #end
     }
 
-    @:final public function dismiss():Void {
+    @:final public function dismiss() {
         if (this.state == null) throw 'Reckoner was not yet primed.';
         this.state = null;
         this.plan = null;
     }
 
-    @:final inline function getID(aspectSet:AspectSet):Int return aspectSet[ident_];
-    @:final inline function getSpaceCell(space:AspectSet):BoardCell return getCell(getID(space));
+    @:final inline function getID<T>(aspectPointable:AspectPointable<T>):Int return aspectPointable[cast globalIdent_];
+    @:final inline function getSpaceCell(space) return getCell(getID(space));
 
-    @:final inline function getSpace(index:Int):AspectSet return state.spaces[index];
-    @:final inline function getCell(index:Int):BoardCell return state.cells.getCell(index);
-    @:final inline function getPlayer(index:Int):AspectSet return state.players[index];
-    @:final inline function getCard(index:Int):AspectSet return state.cards[index];
-    @:final inline function getExtra(index:Int):AspectSet return state.extras[index];
+    @:final inline function getSpace(index) return state.spaces[index];
+    @:final inline function getCell(index) return state.cells.getCell(index);
+    @:final inline function getPlayer(index) return state.players[index];
+    @:final inline function getCard(index) return state.cards[index];
+    @:final inline function getExtra(index) return state.extras[index];
 
-    @:final inline function eachSpace():Iterator<AspectSet> return state.spaces.iterator();
-    @:final inline function eachCell():Iterator<BoardCell> return state.cells.iterator();
-    @:final inline function eachPlayer():Iterator<AspectSet> return state.players.iterator();
-    @:final inline function eachCard():Iterator<AspectSet> return state.cards.iterator();
-    @:final inline function eachExtra():Iterator<AspectSet> return state.extras.iterator();
+    @:final inline function eachSpace() return state.spaces.iterator();
+    @:final inline function eachCell() return state.cells.iterator();
+    @:final inline function eachPlayer() return state.players.iterator();
+    @:final inline function eachCard() return state.cards.iterator();
+    @:final inline function eachExtra() return state.extras.iterator();
 
-    @:final inline function numSpaces():UInt return state.spaces.length;
-    @:final inline function numCells():UInt return state.cells.length; // should be the same as numSpaces though
-    @:final inline function numPlayers():UInt return state.players.length;
-    @:final inline function numCards():UInt return state.cards.length;
-    @:final inline function numExtras():UInt return state.extras.length;
+    @:final inline function numSpaces() return state.spaces.length;
+    @:final inline function numCells() return state.cells.length; // should be the same as numSpaces though
+    @:final inline function numPlayers() return state.players.length;
+    @:final inline function numCards() return state.cards.length;
+    @:final inline function numExtras() return state.extras.length;
 
-    @:final inline function addGlobalAspectRequirement(req:AspectProperty):Void globalAspectRequirements [req.id] = req;
-    @:final inline function addPlayerAspectRequirement(req:AspectProperty):Void playerAspectRequirements [req.id] = req;
-    @:final inline function addSpaceAspectRequirement(req:AspectProperty):Void spaceAspectRequirements [req.id] = req;
-    @:final inline function addCardAspectRequirement(req:AspectProperty):Void cardAspectRequirements [req.id] = req;
+    @:final inline function addGlobalAspectRequirement(prop:AspectProperty<PGlobal>) globalAspectRequirements [prop.id] = prop;
+    @:final inline function addPlayerAspectRequirement(prop:AspectProperty<PPlayer>) playerAspectRequirements [prop.id] = prop;
+    @:final inline function addSpaceAspectRequirement(prop:AspectProperty<PSpace>) spaceAspectRequirements [prop.id] = prop;
+    @:final inline function addCardAspectRequirement(prop:AspectProperty<PCard>) cardAspectRequirements [prop.id] = prop;
 
-    @:final inline function onExtra(prop:AspectProperty) return extraAspectLookup[prop.id];
+    @:final inline function onExtra(prop:AspectProperty<PExtra>) return extraAspectLookup[prop.id];
     @:final inline function extraDefaults() return extraAspectTemplate.copy();
 
     #if macro
@@ -97,6 +107,14 @@ using net.rezmason.utils.pointers.Pointers;
         'space'=>'plan',
         'card'=>'plan',
         'extra'=>'this',
+    ];
+
+    private static var ptrTypes:Map<String, ComplexType> = [
+        'global'=> macro :net.rezmason.praxis.PraxisTypes.PGlobal,
+        'player'=> macro :net.rezmason.praxis.PraxisTypes.PPlayer,
+        'space'=> macro :net.rezmason.praxis.PraxisTypes.PSpace,
+        'card'=> macro :net.rezmason.praxis.PraxisTypes.PCard,
+        'extra'=> macro :net.rezmason.praxis.PraxisTypes.PExtra,
     ];
 
     private static var restrictedFields:Map<String, Bool> = [ 
@@ -135,12 +153,16 @@ using net.rezmason.utils.pointers.Pointers;
 
                     var kindLookup:String = 'on' + kind.charAt(0).toUpperCase() + kind.substr(1);
                     var kindRequirements:String = '${kind}AspectRequirements';
+                    var ptrType = ptrTypes[kind];
 
                     declarations.push(macro $i{kindRequirements}.set($aspect.id, $aspect));
                     assignments.push(macro $i{name} = $p{[lkpSources[kind], kindLookup]}($aspect));
 
-                    if (writable) field.kind = FVar(macro :net.rezmason.praxis.PraxisTypes.AspectWritePtr, null);
-                    else field.kind = FVar(macro :net.rezmason.praxis.PraxisTypes.AspectPtr, null);
+                    if (writable) {
+                        field.kind = FVar(macro :net.rezmason.praxis.PraxisTypes.AspectWritePointer<$ptrType>, null);
+                    } else {
+                        field.kind = FVar(macro :net.rezmason.praxis.PraxisTypes.AspectPointer<$ptrType>, null);
+                    }
                     field.access.remove(AStatic);
 
                     msg += kind.charAt(0);

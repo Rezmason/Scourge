@@ -25,8 +25,8 @@ class Game {
     var rules:Map<String, Rule>;
     var historian:StateHistorian;
     var defaultActionIDs:Array<String>;
-    var winner_:AspectPtr;
-    var currentPlayer_:AspectPtr;
+    var winner_:AspectPointer<PGlobal>;
+    var currentPlayer_:AspectPointer<PGlobal>;
     var planner:StatePlanner;
     var cacheMoves:Bool;
     var invalidateSignal:Zig<Int->Void>;

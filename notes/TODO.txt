@@ -1,11 +1,3 @@
-Pointers
-    Separate Rules into MoveEnumerators and StateMutators
-        Maybe also make StateBuilders
-    Ptr<T,U>
-        T is the value
-        U is the context - global, player, space, etc
-
-
 1: board cursor, arrow keys
 2: board cursor, mouse
 3: board cursor, drag and drop
@@ -31,6 +23,11 @@ We can support more Bodies by making IDs dynamic
 
 Settings page
 Game config page
+
+Separate Rules into:
+    MoveEnumerators
+    StateMutators
+    StateBuilders
 
 Some Haxe stuff
     https://github.com/DanielUranga/openfl-harfbuzz

@@ -3,7 +3,7 @@ package net.rezmason.scourge.controller;
 import motion.easing.*;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
-import net.rezmason.praxis.PraxisTypes.AspectSet;
+import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
@@ -74,7 +74,7 @@ class RulePresenter extends Reckoner {
         return anim;
     }
 
-    @:final function populateGlyphs(topGlyph:Glyph, bottomGlyph:Glyph, values:AspectSet) {
+    @:final function populateGlyphs(topGlyph:Glyph, bottomGlyph:Glyph, values:Space) {
         var occupier = values[occupier_];
         var isFilled = values[isFilled_] == TRUE;
         

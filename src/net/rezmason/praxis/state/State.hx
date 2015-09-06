@@ -7,13 +7,13 @@ using net.rezmason.utils.pointers.Pointers;
 
 class State {
 
-    public var global(default, null):AspectSet;
-    public var globals(default, null):Array<AspectSet>;
-    public var players(default, null):Array<AspectSet>;
-    public var cards(default, null):Array<AspectSet>;
-    public var spaces(default, null):Array<AspectSet>;
-    public var cells(default, set):Grid<AspectSet>; // aka BoardGrid
-    public var extras(default, null):Array<AspectSet>;
+    public var global(default, null):Global;
+    public var globals(default, null):Array<Global>;
+    public var players(default, null):Array<Player>;
+    public var cards(default, null):Array<Card>;
+    public var spaces(default, null):Array<Space>;
+    public var cells(default, set):BoardGrid;
+    public var extras(default, null):Array<Extra>;
     
     public function new():Void {
         globals = [];
@@ -51,7 +51,7 @@ class State {
         resolve();
     }
 
-    public function set_cells(val:Grid<AspectSet>):Grid<AspectSet> {
+    public function set_cells(val:Grid<Space>):Grid<Space> {
         if (cells == null) cells = val;
         return val;
     }

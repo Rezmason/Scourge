@@ -4,6 +4,8 @@ import massive.munit.Assert;
 
 using net.rezmason.utils.pointers.Pointers;
 
+typedef PDerp = {};
+
 class PointersTest {
 
     #if TIME_TESTS
@@ -31,9 +33,9 @@ class PointersTest {
         var src3 = new PointerSource();
         var ptrs3 = [for (ike in 0...5) src3.add()];
 
-        var arr1:Pointable<String> = new Pointable(['a', 'b', 'c', 'd', 'e']);
-        var arr2:Pointable<WritePtr<String>> = new Pointable([ptrs1[4], ptrs1[3], ptrs1[2], ptrs1[1], ptrs1[0]]);
-        var arr3:Pointable<WritePtr<WritePtr<String>>> = new Pointable([ptrs2[0], ptrs2[2], ptrs2[4]]);
+        var arr1:Pointable<String, PDerp> = new Pointable(['a', 'b', 'c', 'd', 'e']);
+        var arr2:Pointable<WritePointer<String, PDerp>, PDerp> = new Pointable([ptrs1[4], ptrs1[3], ptrs1[2], ptrs1[1], ptrs1[0]]);
+        var arr3:Pointable<WritePointer<WritePointer<String, PDerp>, PDerp>, PDerp> = new Pointable([ptrs2[0], ptrs2[2], ptrs2[4]]);
 
         Assert.areEqual('e', arr1[arr2[arr3[ptrs3[0]]]]);
         

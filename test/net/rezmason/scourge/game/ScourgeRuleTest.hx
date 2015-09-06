@@ -25,7 +25,7 @@ class ScourgeRuleTest
     var state:State;
     var historyState:State;
     var plan:StatePlan;
-    var identPtr:AspectPtr;
+    var identPtr:AspectPointer<PGlobal>;
 
     public function new() {
 
@@ -77,9 +77,9 @@ class ScourgeRuleTest
         identPtr = plan.onGlobal(IdentityAspect.IDENTITY);
     }
 
-    private function testListLength(expectedLength:Int, first:AspectSet, next:AspectPtr, prev:AspectPtr):Int {
+    private function testListLength(expectedLength:Int, first:AspectPointable<PSpace>, next:AspectPointer<PSpace>, prev:AspectPointer<PSpace>):Int {
         var count:Int = 0;
-        var last:AspectSet = null;
+        var last = null;
 
         for (space in first.iterate(state.spaces, next)) {
             count++;
@@ -97,7 +97,7 @@ class ScourgeRuleTest
         return expectedLength - count;
     }
 
-    private function getID(aspectSet:AspectSet):Int {
-        return aspectSet[identPtr];
+    private function getID<T>(aspectPointable:AspectPointable<T>):Int {
+        return aspectPointable[cast identPtr];
     }
 }
