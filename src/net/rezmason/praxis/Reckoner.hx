@@ -125,7 +125,6 @@ using net.rezmason.utils.pointers.Pointers;
 
     macro public static function build():Array<Field> {
         var className:String = Context.getLocalClass().get().name;
-        var msg:String = 'Reckoner processing $className  ';
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
         var declarations:Array<Expr> = [macro super.__initRequirements()];
@@ -164,22 +163,13 @@ using net.rezmason.utils.pointers.Pointers;
                         field.kind = FVar(macro :net.rezmason.praxis.PraxisTypes.AspectPointer<$ptrType>, null);
                     }
                     field.access.remove(AStatic);
-
-                    msg += kind.charAt(0);
-
                     break;
                 }
             }
         }
 
-        msg += '\n';
-
         fields.push(overrider('__initRequirements', declarations, pos));
         fields.push(overrider('__initPointers', assignments, pos));
-
-        #if PRAXIS_MACRO_VERBOSE
-            Sys.print(msg);
-        #end
 
         return fields;
     }

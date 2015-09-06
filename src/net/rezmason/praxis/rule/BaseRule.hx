@@ -36,15 +36,10 @@ class BaseRule<Params> extends Reckoner {
         this.signalChange = changeHandler;
         primePointers(state, plan);
         primed = true;
-
-        #if PRAXIS_VERBOSE trace('${myName()} initializing'); #end
         _prime();
     }
 
-    @:final public function update():Void {
-        #if PRAXIS_VERBOSE trace('${myName()} updating'); #end
-        _update();
-    }
+    @:final public function update():Void _update();
 
     @:final public function chooseMove(choice:Int = -1):Void {
         var defaultChoice:Bool = choice == -1;
@@ -53,10 +48,6 @@ class BaseRule<Params> extends Reckoner {
         if (moves == null || moves.length < choice || moves[choice] == null) {
             throw 'Invalid choice index.';
         }
-        #if PRAXIS_VERBOSE
-            if (defaultChoice) trace('${myName()} choosing default move');
-            else trace('${myName()} choosing move $choice');
-        #end
         _chooseMove(choice);
     }
 

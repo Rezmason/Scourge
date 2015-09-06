@@ -14,9 +14,6 @@ import net.rezmason.praxis.PraxisTypes;
     macro public static function build():Array<Field> {
 
         var classType = Context.getLocalClass().get();
-
-        var msg:String = 'Aspect processing ${classType.name}  ';
-
         var pos:Position = Context.currentPos();
         var fields:Array<Field> = Context.getBuildFields();
 
@@ -39,19 +36,10 @@ import net.rezmason.praxis.PraxisTypes;
                     field.access = [AStatic, APublic];
                     field.kind = FVar(null, macro {id:$id, initialValue:$aspect});
 
-                    msg += metaTag.name.charAt(0);
-
                     break;
                 }
             }
         }
-
-        msg += '\n';
-
-        #if PRAXIS_MACRO_VERBOSE
-            Sys.print(msg);
-        #end
-
         return fields;
     }
 }

@@ -12,8 +12,6 @@
 #-D TIME_TESTS
 -D haxeJSON
 -D HEADLESS
-#-D PRAXIS_VERBOSE
-#-D PRAXIS_MACRO_VERBOSE
 
 -cp test
 -swf-version 11.4
@@ -34,8 +32,6 @@
 #-D TIME_TESTS
 -D haxeJSON
 -D HEADLESS
-#-D PRAXIS_VERBOSE
-#-D PRAXIS_MACRO_VERBOSE
 
 -cp test
 -js build/js_test.js
@@ -57,8 +53,6 @@
 #
 # -D haxeJSON
 # -D HEADLESS
-# #-D PRAXIS_VERBOSE
-# #-D PRAXIS_MACRO_VERBOSE
 
 # -cp test
 # -neko build/neko_test.n
@@ -79,8 +73,6 @@
 #-D TIME_TESTS
 -D haxeJSON
 -D HEADLESS
-#-D PRAXIS_VERBOSE
-#-D PRAXIS_MACRO_VERBOSE
 
 -cp test
 #-D HXCPP_M64
