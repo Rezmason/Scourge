@@ -10,7 +10,7 @@ import net.rezmason.praxis.play.GameEvent;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.scourge.game.piece.DropPieceRule.DropPieceMove;
+import net.rezmason.scourge.game.piece.DropPieceMove;
 import net.rezmason.scourge.game.piece.PieceAspect;
 import net.rezmason.scourge.game.BoardUtils;
 

@@ -13,13 +13,6 @@ using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-typedef BiteMove = {>Move,
-    var targetSpace:Int;
-    var bitSpaces:Array<Int>;
-    var thickness:Int;
-    var duplicate:Bool;
-}
-
 class BiteRule extends BaseRule<BiteParams> {
 
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;

@@ -19,16 +19,6 @@ using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-typedef DropPieceMove = {>Move,
-    var targetSpace:Int;
-    var numAddedSpaces:Int;
-    var addedSpaces:Array<Int>;
-    var rotation:Int;
-    var reflection:Int;
-    var coord:IntCoord;
-    var duplicate:Bool;
-}
-
 class DropPieceRule extends BaseRule<FullDropPieceParams> {
 
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;

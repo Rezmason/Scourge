@@ -10,13 +10,6 @@ import net.rezmason.praxis.aspect.PlyAspect;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-typedef PickPieceMove = {>Move,
-    var hatIndex:Int;
-    var pieceTableID:Int;
-    var rotation:Int;
-    var reflection:Int;
-}
-
 class PickPieceRule extends BaseRule<FullPickPieceParams> {
 
     private var allMoves:Array<PickPieceMove>;
