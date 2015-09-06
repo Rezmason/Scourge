@@ -32,7 +32,6 @@ class GameConfig<RP, MP> {
                 var randomCondition = randomConditionsByRuleID[ruleID];
                 var isRandom = randomCondition != null && randomCondition(ruleParams);
                 var rule = Type.createInstance(rulesByID[ruleID], [ruleParams, isRandom]);
-                rule.id = ruleID;
                 if (ruleMap != null) rule = ruleMap(rule);
                 rules[ruleID] = rule;
             }

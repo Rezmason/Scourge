@@ -48,6 +48,7 @@ class Game {
         actionIDs = config.actionIDs;
         defaultActionIDs = config.defaultActionIDs;
         plan = planner.planState(state, rules);
+        if (alertFunction == null) alertFunction = function(_) {};
         primeRule('build', alertFunction);
         for (id in rules.keys().a2z()) if (!rules[id].primed) primeRule(id, alertFunction);
 
@@ -73,7 +74,7 @@ class Game {
     }
 
     inline function primeRule(id:String, alertFunction:String->Void) {
-        rules[id].prime(state, plan, historian.history, historian.historyState, alertFunction);
+        rules[id].prime(state, plan, historian.history, historian.historyState, alertFunction.bind(id));
     }
 
     public function save():SavedState { return historian.save(); }

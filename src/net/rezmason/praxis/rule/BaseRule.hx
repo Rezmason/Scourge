@@ -19,8 +19,7 @@ class BaseRule<Params> extends Reckoner {
     private function _chooseMove(choice:Int):Void {}
     private function _collectMoves():Void {}
 
-    @:allow(net.rezmason.praxis.config.GameConfig) var id:String;
-    var changeSignal:String->Void;
+    var signalChange:Void->Void;
 
     public function new(params:Params, isRandom:Bool = false):Void {
         super();
@@ -30,10 +29,11 @@ class BaseRule<Params> extends Reckoner {
         primed = false;
     }
 
-    @:final public function prime(state, plan, history, historyState, changeSignal:String->Void = null):Void {
+    @:final public function prime(state, plan, history, historyState, changeHandler:Void->Void = null):Void {
         this.history = history;
         this.historyState = historyState;
-        this.changeSignal = changeSignal;
+        if (changeHandler == null) changeHandler = function() {};
+        this.signalChange = changeHandler;
         primePointers(state, plan);
         primed = true;
 
@@ -63,8 +63,6 @@ class BaseRule<Params> extends Reckoner {
     @:final public function collectMoves():Void {
         _collectMoves();
     }
-
-    @:final inline function signalChange() if (changeSignal != null) changeSignal(id);
 
     @:final inline function addGlobal():Global {
         return addAspectPointable(plan.globalDefaults(), globalIdent_, state.globals, historyState.globals, 0);
