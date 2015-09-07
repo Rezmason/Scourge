@@ -8,10 +8,6 @@ import net.rezmason.gl.GLSystem;
 
 import net.rezmason.utils.santa.Present;
 
-#if !flash
-    import net.rezmason.gl.BufferUsage;
-#end
-
 using net.rezmason.scourge.textview.core.GlyphUtils;
 
 class BodySegment {

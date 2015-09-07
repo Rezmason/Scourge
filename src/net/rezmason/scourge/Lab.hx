@@ -4,7 +4,6 @@ import lime.Assets.*;
 
 import net.rezmason.gl.*;
 import net.rezmason.gl.GLTypes;
-import net.rezmason.gl.GLTypes;
 
 import net.rezmason.scourge.waves.WavePool;
 import net.rezmason.scourge.waves.Ripple;
