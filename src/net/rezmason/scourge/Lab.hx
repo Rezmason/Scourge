@@ -62,8 +62,8 @@ class Lab {
             glSys.enableExtension("OES_standard_derivatives");
             extensions.push('#extension GL_OES_standard_derivatives : enable');
 
-            glSys.enableExtension("OES_float_linear");
-            extensions.push('#extension GL_OES_float_linear : enable');
+            glSys.enableExtension("OES_texture_float_linear");
+            extensions.push('#extension GL_OES_texture_float_linear : enable');
 
             str = '${extensions.join("\n")}\nprecision mediump float;';
         #end
@@ -335,7 +335,7 @@ class MetaballSystem extends LabSystem {
 
         time = 0;
 
-        glSys.enableExtension("OES_texture_float"); // THIS IS NEEDED for all textures to be floating point
+        Lab.makeExtensions(glSys); // THIS IS NEEDED for all textures to be floating point
         texture = glSys.createImageTexture(getImage('metaballs/metaball.png'));
 
         bodyTransform = new Matrix4();
