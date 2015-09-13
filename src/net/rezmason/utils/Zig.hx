@@ -2,7 +2,9 @@ package net.rezmason.utils;
 
 // You know what you doing.
 
-class Zig<T> {
+import haxe.Constraints.Function;
+
+class Zig<T:(Function)> {
 
     var subs:Array<T>;
 
