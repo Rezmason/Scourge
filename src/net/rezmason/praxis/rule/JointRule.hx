@@ -22,7 +22,7 @@ class JointRule extends BaseRule<Array<Rule>> {
     }
 
     override public function _prime():Void {
-        for (rule in params) if (!rule.primed) rule.prime(state, plan, history, historyState, signalChange);
+        for (rule in params) if (!rule.primed) rule.prime(state, plan, history, historyState, changeSignal);
     }
 
     override private function _chooseMove(choice:Int):Void {

@@ -27,7 +27,7 @@ class CacheRule extends BaseRule<CacheParams> {
         spaceAspectRequirements.absorb(rule.spaceAspectRequirements);
     }
 
-    override public function _prime():Void rule.prime(state, plan, history, historyState, signalChange);
+    override public function _prime():Void rule.prime(state, plan, history, historyState, changeSignal);
 
     override private function _update():Void {
         var rev:Int = params.revGetter();
