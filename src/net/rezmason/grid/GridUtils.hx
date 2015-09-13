@@ -52,14 +52,14 @@ class GridUtils {
     }
 
     // Shortcuts
-    public inline static function nw<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[cast NW]; }
-    public inline static function  n<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[cast N ]; }
-    public inline static function ne<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[cast NE]; }
-    public inline static function  e<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[cast E ]; }
-    public inline static function se<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[cast SE]; }
-    public inline static function  s<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[cast S ]; }
-    public inline static function sw<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[cast SW]; }
-    public inline static function  w<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[cast W ]; }
+    public inline static function nw<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[NW]; }
+    public inline static function  n<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[N ]; }
+    public inline static function ne<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[NE]; }
+    public inline static function  e<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[E ]; }
+    public inline static function se<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[SE]; }
+    public inline static function  s<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[S ]; }
+    public inline static function sw<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[SW]; }
+    public inline static function  w<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[W ]; }
 }
 
 class GridWalker<T> {

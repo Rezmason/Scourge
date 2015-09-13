@@ -5,13 +5,11 @@ package net.rezmason.gl;
 #end
 
 #if flash
-    @:enum abstract TextureFormat(String) {
-        @:to public inline function toString():String return cast this;
+    @:enum abstract TextureFormat(String) to String {
         var FLOAT = "rgbaHalfFloat"; // Context3DTextureFormat.RGBA_HALF_FLOAT
     }
 #else
-    @:enum abstract TextureFormat(Int) {
-        @:to public inline function toInt():Int return cast this;
+    @:enum abstract TextureFormat(Int) to Int {
         var FLOAT = GL.FLOAT;
         var UNSIGNED_BYTE = GL.UNSIGNED_BYTE;
     }

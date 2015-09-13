@@ -76,7 +76,7 @@ class BufferTexture extends Texture {
             #if flash
                 if (nativeTexture != null) nativeTexture.dispose();
                 // TODO: make this dependent on format?
-                nativeTexture = context.createRectangleTexture(width, height, cast "rgbaHalfFloat", true);
+                nativeTexture = context.createRectangleTexture(width, height, FLOAT, true);
             #else
                 GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
 
@@ -86,7 +86,7 @@ class BufferTexture extends Texture {
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
-                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, cast format, null);
+                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, format, null);
 
                 GL.bindRenderbuffer(GL.RENDERBUFFER, renderBuffer);
                 GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, width, height);

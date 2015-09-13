@@ -1,7 +1,6 @@
 package net.rezmason.polyform;
 
-@:enum abstract Ornament(String) {
-    @:to public inline function toString():String return cast this;
+@:enum abstract Ornament(String) to String {
     var EMPTY = ' ';
 
     var CELL = '•';

@@ -1,7 +1,6 @@
 package net.rezmason.grid;
 
-@:enum abstract GridDirection(Int) {
-    @:to public inline function toInt():Int return cast this;
+@:enum abstract GridDirection(Int) to Int {
     var  N = 0;
     var NE = 1;
     var  E = 2;
