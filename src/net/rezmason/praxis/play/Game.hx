@@ -5,6 +5,7 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.praxis.config.GameConfig;
+import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.praxis.state.*;
 import net.rezmason.utils.Zig;
 
@@ -22,7 +23,7 @@ class Game {
     public var hasBegun(get, null):Bool;
     public var checksum(get, null):Int;
 
-    var rules:Map<String, Rule>;
+    var rules:Map<String, BaseRule<Dynamic>>;
     var historian:StateHistorian;
     var defaultActionIDs:Array<String>;
     var winner_:AspectPointer<PGlobal>;
@@ -132,7 +133,7 @@ class Game {
         for (id in actionIDs) rules[id].collectMoves();
     }
 
-    private function makeCacheRule(rule:Rule):Rule {
+    private function makeCacheRule(rule:BaseRule<Dynamic>):CacheRule {
         var cacheRule = new CacheRule();
         cacheRule.init({rule:rule, invalidateSignal:invalidateSignal, revGetter:get_revision});
         return cacheRule;

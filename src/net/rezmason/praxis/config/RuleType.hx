@@ -1,9 +1,9 @@
 package net.rezmason.praxis.config;
 
-import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.rule.BaseRule;
 
-enum RuleType {
-    Simple(rule:Rule, presenter:Dynamic);
-    Builder(rule:Rule);
-    Action(rule:Rule, presenter:Dynamic, movePresenter:Dynamic, isRandom:Dynamic->Bool);
+enum RuleType<Params> {
+    Simple(rule:BaseRule<Params>, presenter:Dynamic);
+    Builder(rule:BaseRule<Params>);
+    Action(rule:BaseRule<Params>, presenter:Dynamic, movePresenter:Dynamic, isRandom:Dynamic->Bool);
 }

@@ -8,6 +8,7 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.praxis.aspect.WinAspect;
+import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.praxis.state.StatePlanner;
@@ -35,14 +36,14 @@ class ScourgeGameConfigTest
     var historyState:State;
     var plan:StatePlan;
     var config:ScourgeGameConfig;
-    var rules:Map<String, Rule>;
+    var rules:Map<String, BaseRule<Dynamic>>;
 
-    var startAction:Rule;
-    var biteAction:Rule;
-    var pickAction:Rule;
-    var swapAction:Rule;
-    var quitAction:Rule;
-    var dropAction:Rule;
+    var startAction:BaseRule<Dynamic>;
+    var biteAction:BaseRule<Dynamic>;
+    var pickAction:BaseRule<Dynamic>;
+    var swapAction:BaseRule<Dynamic>;
+    var quitAction:BaseRule<Dynamic>;
+    var dropAction:BaseRule<Dynamic>;
 
     public function new() {
 

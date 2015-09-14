@@ -3,9 +3,9 @@ PRAXIS refactor
         Create functions on GameConfig that match ScourgeGameConfig's use case
             addModule() 
                 Where Config becomes Module
-                    addSimpleRule
-                    addBuilder
-                    addAction
+                    addSimpleRule()
+                    addBuilder()
+                    addAction()
             joinRules()
     Create "allMoves" thingy
     Then, remove all rule state

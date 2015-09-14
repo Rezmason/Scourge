@@ -2,6 +2,7 @@ package net.rezmason.praxis.state;
 
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.IdentityAspect;
+import net.rezmason.praxis.rule.BaseRule;
 
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.MapUtils;
@@ -9,7 +10,7 @@ using net.rezmason.utils.MapUtils;
 class StatePlanner {
     public function new() {}
 
-    public function planState(state:State, rules:Iterable<Rule>):StatePlan {
+    public function planState(state:State, rules:Iterable<BaseRule<Dynamic>>):StatePlan {
         if (rules == null) return null;
 
         var plan = new StatePlan();

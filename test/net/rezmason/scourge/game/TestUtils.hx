@@ -1,9 +1,9 @@
 package net.rezmason.scourge.game;
 
-import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.rule.BaseRule;
 
 class TestUtils {
-    public static function makeRule<R:(Rule)>(def:Class<R>, params:Dynamic):R {
+    public static function makeRule<Params, R:(BaseRule<Params>)>(def:Class<R>, params:Params):R {
         var rule = Type.createInstance(def, []);
         rule.init(params);
         return rule;

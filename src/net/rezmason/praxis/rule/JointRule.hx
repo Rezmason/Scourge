@@ -1,10 +1,11 @@
 package net.rezmason.praxis.rule;
 
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.rule.BaseRule;
 
 using net.rezmason.utils.MapUtils;
 
-class JointRule extends BaseRule<Array<Rule>> {
+class JointRule extends BaseRule<Array<BaseRule<Dynamic>>> {
 
     override private function _init():Void {
         for (rule in params) {
@@ -30,7 +31,7 @@ class JointRule extends BaseRule<Array<Rule>> {
 
         params[0].chooseMove(choice);
         for (ike in 1...params.length) {
-            var rule:Rule = params[ike];
+            var rule:BaseRule<Dynamic> = params[ike];
             rule.update();
             rule.chooseMove();
         }

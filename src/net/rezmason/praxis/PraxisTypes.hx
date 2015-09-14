@@ -4,7 +4,6 @@ import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.grid.Cell;
 import net.rezmason.grid.Grid;
 import net.rezmason.grid.Selection;
-import net.rezmason.praxis.rule.BaseRule;
 
 using net.rezmason.utils.History;
 using net.rezmason.utils.pointers.Pointers;
@@ -24,7 +23,6 @@ typedef AspectSource<T> = PointerSource<Atom,T>;
 typedef Move = {id:Int, ?relatedID:Int, ?weight:Float};
 typedef SavedState = {data:String};
 typedef StateHistory = History<Atom>;
-typedef Rule = BaseRule<Dynamic>;
 
 abstract PGlobal({}) {}
 abstract PPlayer({}) {}

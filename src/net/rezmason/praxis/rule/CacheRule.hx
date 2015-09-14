@@ -6,14 +6,14 @@ import net.rezmason.praxis.PraxisTypes;
 using net.rezmason.utils.MapUtils;
 
 typedef CacheParams = {
-    var rule:Rule;
+    var rule:BaseRule<Dynamic>;
     var invalidateSignal:Zig<Int->Void>;
     var revGetter:Void->Int;
 };
 
 class CacheRule extends BaseRule<CacheParams> {
 
-    private var rule:Rule;
+    private var rule:BaseRule<Dynamic>;
     private var moveCache:Array<Array<Move>> = [];
 
     override public function _init():Void {

@@ -5,6 +5,7 @@ import VisualAssert;
 
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.IdentityAspect;
+import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StatePlan;
 import net.rezmason.praxis.state.StatePlanner;
@@ -50,7 +51,7 @@ class ScourgeRuleTest
         plan = null;
     }
 
-    private function makeState(rules:Array<Rule> = null, numPlayers:Int = 1, initGrid:String = null, circular:Bool = false):Void {
+    private function makeState(rules:Array<BaseRule<Dynamic>> = null, numPlayers:Int = 1, initGrid:String = null, circular:Bool = false):Void {
 
         history.wipe();
         historyState.wipe();

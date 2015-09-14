@@ -1,6 +1,7 @@
 package net.rezmason.praxis.config;
 
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.praxis.rule.JointRule;
 
 using net.rezmason.utils.Alphabetizer;
@@ -16,12 +17,12 @@ class GameConfig<RP, MP> {
     var configs:Map<String, Config<Dynamic>>;
     var jointRuleDefs:Array<JointRuleDef>;
     
-    var rulesByID:Map<String, Rule>;
+    var rulesByID:Map<String, BaseRule<Dynamic>>;
     var configIDsByRuleID:Map<String, String>;
     var inclusionConditionsByRuleID:Map<String, Dynamic->Bool>;
     var randomConditionsByRuleID:Map<String, Dynamic->Bool>;
 
-    public function makeRules(ruleMap:Rule->Rule = null):Map<String, Rule> {
+    public function makeRules(ruleMap:BaseRule<Dynamic>->BaseRule<Dynamic> = null):Map<String, BaseRule<Dynamic>> {
         var rules = new Map();
         for (ruleID in rulesByID.keys().a2z()) {
             var ruleParams = params[configIDsByRuleID[ruleID]];

@@ -4,6 +4,7 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.praxis.state.StatePlanner;
@@ -70,7 +71,7 @@ class StateHistorianTest {
         var eatRule:EatRule = TestUtils.makeRule(EatRule, cast config);
         var pickPieceRule:PickPieceRule = TestUtils.makeRule(PickPieceRule, cast config);
 
-        var rules:Array<Rule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];
+        var rules:Array<BaseRule<Dynamic>> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];
         var plan:StatePlan = new StatePlanner().planState(state, rules);
         for (rule in rules) rule.prime(state, plan, history, historyState);
         var freshness_ = plan.onSpace(FreshnessAspect.FRESHNESS);
