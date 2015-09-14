@@ -1,18 +1,19 @@
 package net.rezmason.scourge.game.meta;
 
-import net.rezmason.scourge.game.ConfigTypes;
+import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.RuleComposition;
 
-class MetaConfig extends ScourgeConfig<MetaParams> {
+class MetaConfig extends Config<MetaParams> {
 
-    override function get_composition():Map<String, ScourgeRuleComposition<MetaParams>> {
+    override function get_composition():Map<String, RuleComposition<MetaParams>> {
         return [
-            'endTurn'           => {def:new EndTurnRule(),            type:Simple,       presenter:null},
-            'forfeit'           => {def:new ForfeitRule(),            type:Action(null), presenter:null},
-            'killHeadlessBody'  => {def:new KillHeadlessBodyRule(),   type:Simple,       presenter:null},
-            'oneLivingPlayer'   => {def:new OneLivingPlayerRule(),    type:Simple,       presenter:null},
-            'replenish'         => {def:new ReplenishRule(),          type:Simple,       presenter:null},
-            'resetFreshness'    => {def:new ResetFreshnessRule(),     type:Simple,       presenter:null},
-            'stalemate'         => {def:new StalemateRule(),          type:Simple,       presenter:null, 
+            'endTurn'           => {type:Simple(new EndTurnRule(), null)},
+            'forfeit'           => {type:Action(new ForfeitRule(), null, null, null)},
+            'killHeadlessBody'  => {type:Simple(new KillHeadlessBodyRule(), null)},
+            'oneLivingPlayer'   => {type:Simple(new OneLivingPlayerRule(), null)},
+            'replenish'         => {type:Simple(new ReplenishRule(), null)},
+            'resetFreshness'    => {type:Simple(new ResetFreshnessRule(), null)},
+            'stalemate'         => {type:Simple(new StalemateRule(), null), 
                 isIncluded:function(p) return p.maxSkips > 0,
             },
         ];

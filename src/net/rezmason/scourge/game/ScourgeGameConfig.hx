@@ -5,12 +5,14 @@ import net.rezmason.praxis.config.GameConfig;
 import net.rezmason.scourge.game.bite.BiteAspect.*;
 import net.rezmason.scourge.game.piece.SwapAspect.*;
 
-import net.rezmason.scourge.game.ConfigTypes;
 import net.rezmason.scourge.game.bite.*;
 import net.rezmason.scourge.game.body.*;
 import net.rezmason.scourge.game.build.*;
 import net.rezmason.scourge.game.meta.*;
 import net.rezmason.scourge.game.piece.*;
+
+typedef RP = #if HEADLESS Dynamic #else net.rezmason.scourge.controller.RulePresenter #end;
+typedef MP = Dynamic;
 
 class ScourgeGameConfig extends GameConfig<RP, MP> {
 

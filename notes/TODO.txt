@@ -1,5 +1,12 @@
 PRAXIS refactor
-    Move rule instances into type enum
+    Now might be a good time to get rid of the declarative bullshit
+        Create functions on GameConfig that match ScourgeGameConfig's use case
+            addModule() 
+                Where Config becomes Module
+                    addSimpleRule
+                    addBuilder
+                    addAction
+            joinRules()
     Create "allMoves" thingy
     Then, remove all rule state
     Create IRule

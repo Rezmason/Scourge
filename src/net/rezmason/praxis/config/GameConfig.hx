@@ -13,7 +13,7 @@ class GameConfig<RP, MP> {
     public var defaultActionIDs(default, null):Array<String>;
     public var params:Map<String, Dynamic>;
 
-    var configs:Map<String, Config<Dynamic, RP, MP>>;
+    var configs:Map<String, Config<Dynamic>>;
     var jointRuleDefs:Array<JointRuleDef>;
     
     var rulesByID:Map<String, Rule>;
@@ -62,27 +62,31 @@ class GameConfig<RP, MP> {
         actionIDs = [];
 
         for (configKey in configs.keys().a2z()) {
-            var config:Config<Dynamic, RP, MP> = configs[configKey];
+            var config:Config<Dynamic> = configs[configKey];
             params[configKey] = config.defaultParams;
 
             var composition = config.composition;
             for (compKey in composition.keys().a2z()) {
                 var ruleComp = composition[compKey];
                 
-                rulePresenters[compKey] = ruleComp.presenter;
-
                 switch (ruleComp.type) {
-                    case Action(presenter): 
+                    case Builder(rule):
+                        rulesByID[compKey] = rule;
+                    case Simple(rule, rulePresenter):
+                        rulesByID[compKey] = rule;
+                        rulePresenters[compKey] = rulePresenter;
+                    case Action(rule, rulePresenter, movePresenter, isRandom):
                         actionIDs.push(compKey);
-                        movePresenters[compKey] = presenter;
+                        randomConditionsByRuleID[compKey] = isRandom;
+                        rulesByID[compKey] = rule;
+                        rulePresenters[compKey] = rulePresenter;
+                        movePresenters[compKey] = movePresenter;
                     case _:
 
                 }
 
-                rulesByID[compKey] = ruleComp.def;
                 configIDsByRuleID[compKey] = configKey;
                 inclusionConditionsByRuleID[compKey] = ruleComp.isIncluded;
-                randomConditionsByRuleID[compKey] = ruleComp.isRandom;
             }
         }
     }

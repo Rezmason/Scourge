@@ -1,14 +1,14 @@
 package net.rezmason.scourge.game.piece;
 
-import net.rezmason.scourge.game.ConfigTypes;
+import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.RuleComposition;
 import net.rezmason.utils.openfl.Resource;
-import net.rezmason.praxis.config.RuleType;
 
 #if !HEADLESS
     import net.rezmason.scourge.controller.DropPieceRulePresenter;
 #end
 
-class PieceConfig extends ScourgeConfig<PieceParams> {
+class PieceConfig extends Config<PieceParams> {
 
     var pieces:Pieces;
 
@@ -17,16 +17,15 @@ class PieceConfig extends ScourgeConfig<PieceParams> {
         pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
     }
 
-    override function get_composition():Map<String, ScourgeRuleComposition<PieceParams>> {
+    override function get_composition():Map<String, RuleComposition<PieceParams>> {
         return [
-            'swap' => {def:new SwapPieceRule(), type:Action(null), presenter:null, 
+            'swap' => {type:Action(new SwapPieceRule(), null, null, null), 
                 isIncluded:function(p) return !p.allowAllPieces && p.allowSwapping,
             },
-            'pick' => {def:new PickPieceRule(), type:Action(null), presenter:null, 
+            'pick' => {type:Action(new PickPieceRule(), null, null, function(p) return !p.allowPiecePick), 
                 isIncluded:function(p) return !p.allowAllPieces,
-                isRandom:function(p) return !p.allowPiecePick,
             },
-            'drop' => {def:new DropPieceRule(), type:Action(null), presenter:#if HEADLESS null #else new DropPieceRulePresenter() #end},
+            'drop' => {type:Action(new DropPieceRule(), #if HEADLESS null #else new DropPieceRulePresenter() #end, null, null)},
         ];
     }
 
