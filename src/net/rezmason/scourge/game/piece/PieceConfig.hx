@@ -19,14 +19,14 @@ class PieceConfig extends ScourgeConfig<PieceParams> {
 
     override function get_composition():Map<String, ScourgeRuleComposition<PieceParams>> {
         return [
-            'swap' => {def:SwapPieceRule, type:Action(null), presenter:null, 
+            'swap' => {def:new SwapPieceRule(), type:Action(null), presenter:null, 
                 isIncluded:function(p) return !p.allowAllPieces && p.allowSwapping,
             },
-            'pick' => {def:PickPieceRule, type:Action(null), presenter:null, 
+            'pick' => {def:new PickPieceRule(), type:Action(null), presenter:null, 
                 isIncluded:function(p) return !p.allowAllPieces,
                 isRandom:function(p) return !p.allowPiecePick,
             },
-            'drop' => {def:DropPieceRule, type:Action(null), presenter:#if HEADLESS null #else DropPieceRulePresenter #end},
+            'drop' => {def:new DropPieceRule(), type:Action(null), presenter:#if HEADLESS null #else new DropPieceRulePresenter() #end},
         ];
     }
 

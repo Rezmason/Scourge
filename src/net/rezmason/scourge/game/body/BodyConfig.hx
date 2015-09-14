@@ -12,11 +12,11 @@ class BodyConfig extends ScourgeConfig<BodyParams> {
 
     override function get_composition():Map<String, ScourgeRuleComposition<BodyParams>> {
         return [
-            'cavity'    => {def:CavityRule,     type:Simple, presenter:#if HEADLESS null #else CavityRulePresenter #end,
+            'cavity' => {def:new CavityRule(), type:Simple, presenter:#if HEADLESS null #else new CavityRulePresenter() #end,
                 isIncluded:function(p) return p.includeCavities
             },
-            'decay'     => {def:DecayRule,      type:Simple, presenter:#if HEADLESS null #else DecayRulePresenter #end},
-            'eat'  => {def:EatRule,   type:Simple, presenter:#if HEADLESS null #else EatRulePresenter #end},
+            'decay'  => {def:new DecayRule(),  type:Simple, presenter:#if HEADLESS null #else new DecayRulePresenter() #end},
+            'eat'    => {def:new EatRule(),    type:Simple, presenter:#if HEADLESS null #else new EatRulePresenter() #end},
         ];
     }
 

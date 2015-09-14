@@ -13,9 +13,9 @@ class BuildConfig extends ScourgeConfig<BuildParams> {
 
     override function get_composition():Map<String, ScourgeRuleComposition<BuildParams>> {
         return [
-            'buildGlobal'   => {def:BuildGlobalRule,    type:Builder, presenter:null},
-            'buildPlayers'  => {def:BuildPlayersRule,   type:Builder, presenter:null},
-            'buildBoard'    => {def:BuildBoardRule,     type:Builder, presenter:null},
+            'buildGlobal'   => {def:new BuildGlobalRule(),    type:Builder, presenter:null},
+            'buildPlayers'  => {def:new BuildPlayersRule(),   type:Builder, presenter:null},
+            'buildBoard'    => {def:new BuildBoardRule(),     type:Builder, presenter:null},
         ];
     }
 

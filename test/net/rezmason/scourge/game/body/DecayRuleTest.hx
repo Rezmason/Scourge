@@ -34,7 +34,7 @@ class DecayRuleTest extends ScourgeRuleTest
     @Test
     public function decayScourgeRuleTest():Void {
 
-        var decayRule:DecayRule = new DecayRule({decayOrthogonallyOnly:true,});
+        var decayRule:DecayRule = TestUtils.makeRule(DecayRule, {decayOrthogonallyOnly:true,});
         makeState([decayRule], 1, TestBoards.loosePetri);
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -65,7 +65,7 @@ class DecayRuleTest extends ScourgeRuleTest
     @Test
     public function decayDiagScourgeRuleTest():Void {
 
-        var decayRule:DecayRule = new DecayRule({decayOrthogonallyOnly:false,});
+        var decayRule:DecayRule = TestUtils.makeRule(DecayRule, {decayOrthogonallyOnly:false,});
         makeState([decayRule], 1, TestBoards.loosePetri);
 
         var head_ = plan.onPlayer(BodyAspect.HEAD);

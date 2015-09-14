@@ -1,3 +1,15 @@
+PRAXIS refactor
+    Move rule instances into type enum
+    Create "allMoves" thingy
+    Then, remove all rule state
+    Create IRule
+    Split BaseRule in half
+        MoveFinder
+        MoveMaker
+    BasicRule should initialize MoveFinder and MoveMaker
+    CacheRule stuff should be moved into BasicRule
+    Polish the turd till it shines!
+
 1: board cursor, arrow keys
 2: board cursor, mouse
 3: board cursor, drag and drop

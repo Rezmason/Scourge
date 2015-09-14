@@ -41,7 +41,6 @@ using net.rezmason.utils.pointers.Pointers;
     public function new() __initRequirements();
 
     @:final public function primePointers(state, plan) {
-        if (this.state != null) throw 'Reckoner was already primed.';
         this.state = state;
         this.plan = plan;
 

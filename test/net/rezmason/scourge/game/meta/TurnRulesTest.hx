@@ -45,7 +45,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Should go to the next player who is alive (has a head)
 
-        var endTurnRule:EndTurnRule = new EndTurnRule(null);
+        var endTurnRule:EndTurnRule = TestUtils.makeRule(EndTurnRule, null);
         makeState([endTurnRule], 4, TestBoards.emptySquareFourPlayerSkirmish);
 
         var currentPlayer_ = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
@@ -79,7 +79,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Should unassign head of current player
 
-        var forfeitRule:ForfeitRule = new ForfeitRule(null);
+        var forfeitRule:ForfeitRule = TestUtils.makeRule(ForfeitRule, null);
         makeState([forfeitRule], 4, TestBoards.oaf);
 
         var head_ = plan.onPlayer(BodyAspect.HEAD);
@@ -116,7 +116,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Should remove heads that are not occupied by their owner
 
-        var killHeadlessBodyRule:KillHeadlessBodyRule = new KillHeadlessBodyRule(null);
+        var killHeadlessBodyRule:KillHeadlessBodyRule = TestUtils.makeRule(KillHeadlessBodyRule, null);
         makeState([killHeadlessBodyRule], 4);
 
         // Change occupier of current player\'s head
@@ -151,7 +151,7 @@ class TurnRulesTest extends ScourgeRuleTest
     public function skipsExhaustedTest():Void {
 
         // Create a four-player game with a max skip of five times
-        var stalemateRule:StalemateRule = new StalemateRule({maxSkips:5});
+        var stalemateRule:StalemateRule = TestUtils.makeRule(StalemateRule, {maxSkips:5});
         makeState([stalemateRule], 4);
 
         var winner_ = plan.onGlobal(WinAspect.WINNER);
@@ -186,7 +186,7 @@ class TurnRulesTest extends ScourgeRuleTest
     public function onlyLivingPlayerTest():Void {
 
         // Create a four-player game
-        var oneLivingPlayerRule:OneLivingPlayerRule = new OneLivingPlayerRule(null);
+        var oneLivingPlayerRule:OneLivingPlayerRule = TestUtils.makeRule(OneLivingPlayerRule, null);
         makeState([oneLivingPlayerRule], 4);
 
         var winner_ = plan.onGlobal(WinAspect.WINNER);

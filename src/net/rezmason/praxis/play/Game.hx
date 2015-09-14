@@ -133,7 +133,9 @@ class Game {
     }
 
     private function makeCacheRule(rule:Rule):Rule {
-        return new CacheRule({rule:rule, invalidateSignal:invalidateSignal, revGetter:get_revision});
+        var cacheRule = new CacheRule();
+        cacheRule.init({rule:rule, invalidateSignal:invalidateSignal, revGetter:get_revision});
+        return cacheRule;
     }
 
     private function get_actionIDs():Array<String> { return actionIDs.copy(); }

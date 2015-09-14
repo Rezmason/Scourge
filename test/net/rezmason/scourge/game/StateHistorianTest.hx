@@ -64,11 +64,11 @@ class StateHistorianTest {
             pieces:new Pieces(Resource.getString('tables/pieces.json.txt'))
         }
 
-        var buildStateRule:BuildGlobalRule = new BuildGlobalRule(cast config);
-        var buildPlayersRule:BuildPlayersRule = new BuildPlayersRule(cast config);
-        var buildBoardRule:BuildBoardRule = new BuildBoardRule(cast config);
-        var eatRule:EatRule = new EatRule(cast config);
-        var pickPieceRule:PickPieceRule = new PickPieceRule(cast config);
+        var buildStateRule:BuildGlobalRule = TestUtils.makeRule(BuildGlobalRule, cast config);
+        var buildPlayersRule:BuildPlayersRule = TestUtils.makeRule(BuildPlayersRule, cast config);
+        var buildBoardRule:BuildBoardRule = TestUtils.makeRule(BuildBoardRule, cast config);
+        var eatRule:EatRule = TestUtils.makeRule(EatRule, cast config);
+        var pickPieceRule:PickPieceRule = TestUtils.makeRule(PickPieceRule, cast config);
 
         var rules:Array<Rule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];
         var plan:StatePlan = new StatePlanner().planState(state, rules);

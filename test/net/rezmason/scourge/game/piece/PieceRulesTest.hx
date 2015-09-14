@@ -59,7 +59,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceParams);
+        var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
         var dropParams:FullDropPieceParams = {
             dropOverlapsSelf:false,
@@ -72,7 +72,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
-        var dropRule:DropPieceRule = new DropPieceRule(dropParams);
+        var dropRule:DropPieceRule = TestUtils.makeRule(DropPieceRule, dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -109,7 +109,7 @@ class PieceRulesTest extends ScourgeRuleTest
             rotation:0,
         };
 
-        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceParams);
+        var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
         var dropParams:FullDropPieceParams = {
             dropOverlapsSelf:false,
@@ -122,7 +122,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
-        var dropRule:DropPieceRule = new DropPieceRule(dropParams);
+        var dropRule:DropPieceRule = TestUtils.makeRule(DropPieceRule, dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.frozenPetri);
 
         dropRule.update();
@@ -144,7 +144,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceParams);
+        var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
         var dropParams:FullDropPieceParams = {
             dropOverlapsSelf:false,
@@ -157,7 +157,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
-        var dropRule:DropPieceRule = new DropPieceRule(dropParams);
+        var dropRule:DropPieceRule = TestUtils.makeRule(DropPieceRule, dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -182,7 +182,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceParams);
+        var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
         var dropParams:FullDropPieceParams = {
             dropOverlapsSelf:false,
@@ -195,7 +195,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
-        var dropRule:DropPieceRule = new DropPieceRule(dropParams);
+        var dropRule:DropPieceRule = TestUtils.makeRule(DropPieceRule, dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -220,7 +220,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceParams);
+        var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
         var dropParams:FullDropPieceParams = {
             dropOverlapsSelf:false,
@@ -233,7 +233,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
-        var dropRule:DropPieceRule = new DropPieceRule(dropParams);
+        var dropRule:DropPieceRule = TestUtils.makeRule(DropPieceRule, dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -258,7 +258,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceParams);
+        var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
         var dropParams:FullDropPieceParams = {
             dropOverlapsSelf:true,
@@ -271,7 +271,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
-        var dropRule:DropPieceRule = new DropPieceRule(dropParams);
+        var dropRule:DropPieceRule = TestUtils.makeRule(DropPieceRule, dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -302,7 +302,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
-        var dropRule:DropPieceRule = new DropPieceRule(dropParams);
+        var dropRule:DropPieceRule = TestUtils.makeRule(DropPieceRule, dropParams);
         makeState([dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -335,7 +335,7 @@ class PieceRulesTest extends ScourgeRuleTest
             hatSize:hatSize,
             pieces:pieces,
         };
-        var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceParams);
+        var pickPieceRule:PickPieceRule = TestUtils.makeRule(PickPieceRule, pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -363,7 +363,7 @@ class PieceRulesTest extends ScourgeRuleTest
             hatSize:hatSize,
             pieces:pieces,
         };
-        var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceParams);
+        var pickPieceRule:PickPieceRule = TestUtils.makeRule(PickPieceRule, pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -385,7 +385,7 @@ class PieceRulesTest extends ScourgeRuleTest
             hatSize:hatSize,
             pieces:pieces,
         };
-        var pickPieceRule:PickPieceRule = new PickPieceRule(pickPieceParams);
+        var pickPieceRule:PickPieceRule = TestUtils.makeRule(PickPieceRule, pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -403,7 +403,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceParams);
+        var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
         var dropParams:FullDropPieceParams = {
             dropOverlapsSelf:false,
@@ -416,7 +416,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
-        var dropRule:DropPieceRule = new DropPieceRule(dropParams);
+        var dropRule:DropPieceRule = TestUtils.makeRule(DropPieceRule, dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.emptyPetri);
 
         dropRule.update();
@@ -442,7 +442,7 @@ class PieceRulesTest extends ScourgeRuleTest
             rotation:0,
         };
 
-        var testPieceRule:TestPieceRule = new TestPieceRule(testPieceParams);
+        var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
         var dropParams:FullDropPieceParams = {
             dropOverlapsSelf:false,
@@ -455,7 +455,7 @@ class PieceRulesTest extends ScourgeRuleTest
             pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
-        var dropRule:DropPieceRule = new DropPieceRule(dropParams);
+        var dropRule:DropPieceRule = TestUtils.makeRule(DropPieceRule, dropParams);
         makeState([testPieceRule, dropRule], 1, TestBoards.flowerPetri);
 
         dropRule.update();
@@ -477,7 +477,7 @@ class PieceRulesTest extends ScourgeRuleTest
         var swapPieceParams:SwapPieceParams = {
             startingSwaps:5,
         };
-        var swapPieceRule:SwapPieceRule = new SwapPieceRule(swapPieceParams);
+        var swapPieceRule:SwapPieceRule = TestUtils.makeRule(SwapPieceRule, swapPieceParams);
         makeState([swapPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);

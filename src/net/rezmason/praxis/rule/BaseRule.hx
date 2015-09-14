@@ -22,8 +22,7 @@ class BaseRule<Params> extends Reckoner {
     @:allow(net.rezmason.praxis.config.GameConfig) var id:String;
     var changeSignal:String->Void;
 
-    public function new(params:Params, isRandom:Bool = false):Void {
-        super();
+    public function init(params:Params, isRandom:Bool = false):Void {
         this.params = params;
         this.isRandom = isRandom;
         _init();

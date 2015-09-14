@@ -6,13 +6,13 @@ class MetaConfig extends ScourgeConfig<MetaParams> {
 
     override function get_composition():Map<String, ScourgeRuleComposition<MetaParams>> {
         return [
-            'endTurn'           => {def:EndTurnRule,            type:Simple,       presenter:null},
-            'forfeit'           => {def:ForfeitRule,            type:Action(null), presenter:null},
-            'killHeadlessBody'  => {def:KillHeadlessBodyRule,   type:Simple,       presenter:null},
-            'oneLivingPlayer'   => {def:OneLivingPlayerRule,    type:Simple,       presenter:null},
-            'replenish'         => {def:ReplenishRule,          type:Simple,       presenter:null},
-            'resetFreshness'    => {def:ResetFreshnessRule,     type:Simple,       presenter:null},
-            'stalemate'         => {def:StalemateRule,          type:Simple,       presenter:null, 
+            'endTurn'           => {def:new EndTurnRule(),            type:Simple,       presenter:null},
+            'forfeit'           => {def:new ForfeitRule(),            type:Action(null), presenter:null},
+            'killHeadlessBody'  => {def:new KillHeadlessBodyRule(),   type:Simple,       presenter:null},
+            'oneLivingPlayer'   => {def:new OneLivingPlayerRule(),    type:Simple,       presenter:null},
+            'replenish'         => {def:new ReplenishRule(),          type:Simple,       presenter:null},
+            'resetFreshness'    => {def:new ResetFreshnessRule(),     type:Simple,       presenter:null},
+            'stalemate'         => {def:new StalemateRule(),          type:Simple,       presenter:null, 
                 isIncluded:function(p) return p.maxSkips > 0,
             },
         ];

@@ -6,7 +6,7 @@ class BiteConfig extends ScourgeConfig<BiteParams> {
 
     override function get_composition():Map<String, ScourgeRuleComposition<BiteParams>> {
         return [
-            'bite' => {def:BiteRule, type:Action(null), presenter:null, isIncluded:function(p) return p.allowBiting},
+            'bite' => {def:new BiteRule(), type:Action(null), presenter:null, isIncluded:function(p) return p.allowBiting},
         ];
     }
 

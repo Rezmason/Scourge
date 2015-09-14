@@ -32,6 +32,7 @@ class Sequencer extends Reckoner {
     var lastMaxFreshness:Int;
     var waitingToProceed:Bool;
     var sequence:Array<Array<Array<Entity>>> = [];
+    var defaultRulePresenter:RulePresenter;
     var rulePresentersByCause:Map<String, RulePresenter>;
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
     public var gameEndSignal(default, null):Zig<Void->Void> = new Zig();
@@ -73,6 +74,8 @@ class Sequencer extends Reckoner {
         this.player = null;
         for (presenter in rulePresentersByCause) if (presenter != null) presenter.dismiss();
         rulePresentersByCause = null;
+        defaultRulePresenter.dismiss();
+        defaultRulePresenter = null;
         if (game.winner == -1) for (e in qAnimations) ecce.collect(e);
         dismiss();
         waitingToProceed = false;
@@ -86,10 +89,13 @@ class Sequencer extends Reckoner {
         var cells:Array<Cell<Entity>> = [];
         primePointers(game.state, game.plan);
 
-        rulePresentersByCause = [null => Type.createInstance(this.config.fallbackRP, [game, ecce])];
+        rulePresentersByCause = new Map();
+        defaultRulePresenter = new RulePresenter();
+        defaultRulePresenter.init(game, ecce);
         for (cause in this.config.rulePresenters.keys()) {
-            var rpClass = this.config.rulePresenters[cause];
-            if (rpClass != null) rulePresentersByCause[cause] = Type.createInstance(rpClass, [game, ecce]);
+            var rp = this.config.rulePresenters[cause];
+            rulePresentersByCause[cause] = rp;
+            if (rp != null) rp.init(game, ecce);
         }
 
         for (space in eachSpace()) {
@@ -111,7 +117,7 @@ class Sequencer extends Reckoner {
         }
 
         gameStartSignal.dispatch(game, ecce);
-        sequence[0] = [for (e in qBoardSpaceStates) rulePresentersByCause[null].presentBoardEffect(e)];
+        sequence[0] = [for (e in qBoardSpaceStates) defaultRulePresenter.presentBoardEffect(e)];
         processSequence();
         waitingToProceed = true;
         moveSequencedSignal.dispatch();
@@ -127,7 +133,7 @@ class Sequencer extends Reckoner {
 
     function onMoveStep(cause:String) {
         var presenter = rulePresentersByCause[cause];
-        if (presenter == null) presenter = rulePresentersByCause[null];
+        if (presenter == null) presenter = defaultRulePresenter;
         var maxFreshness:Int = state.global[maxFreshness_];
         if (maxFreshness > lastMaxFreshness) {
             for (e in qBoardSpaceStates) {

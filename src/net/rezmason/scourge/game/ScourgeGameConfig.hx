@@ -22,12 +22,12 @@ class ScourgeGameConfig extends GameConfig<RP, MP> {
     
     public function new() {
         
-        configDefs = [
-            'bite'  => BiteConfig,
-            'body'  => BodyConfig,
-            'build' => BuildConfig,
-            'meta'  => MetaConfig,
-            'piece' => PieceConfig,
+        configs = [
+            'bite'  => new BiteConfig(),
+            'body'  => new BodyConfig(),
+            'build' => new BuildConfig(),
+            'meta'  => new MetaConfig(),
+            'piece' => new PieceConfig(),
         ];
 
         jointRuleDefs = [
@@ -42,9 +42,6 @@ class ScourgeGameConfig extends GameConfig<RP, MP> {
         ];
 
         defaultActionIDs = ['drop', 'forfeit'];
-
-        fallbackRP = #if HEADLESS null #else RP #end;
-        fallbackMP = null;
 
         parseConfigDefs();
         metaParams.globalProperties[NUM_SWAPS.id] = { prop:NUM_SWAPS, amount:1, period:4, maxAmount:10 };

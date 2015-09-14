@@ -30,8 +30,7 @@ class RulePresenter extends Reckoner {
     @space(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.HEAD) var head_;
 
-    public function new(game:Game, ecce:Ecce) {
-        super();
+    public function init(game:Game, ecce:Ecce) {
         primePointers(game.state, game.plan);
         this.ecce = ecce;
         effectOverlap = 0;
