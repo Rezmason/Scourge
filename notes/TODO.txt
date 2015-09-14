@@ -1,12 +1,15 @@
 PRAXIS refactor
     Now might be a good time to get rid of the declarative bullshit
+        Add functions to Module
+            addSimpleRule()
+            addBuilder()
+            addAction()
         Create functions on GameConfig that match ScourgeGameConfig's use case
-            addModule() 
-                Where Config becomes Module
-                    addSimpleRule()
-                    addBuilder()
-                    addAction()
+            addModule()
+            getModuleParams()
             joinRules()
+        Replace ScourgeGameConfig with these things
+        Then get rid of ScourgeGameConfig
     Create "allMoves" thingy
     Then, remove all rule state
     Create IRule
@@ -15,6 +18,7 @@ PRAXIS refactor
         MoveMaker
     BasicRule should initialize MoveFinder and MoveMaker
     CacheRule stuff should be moved into BasicRule
+    Move ID stuff to Module, or GameConfig
     Polish the turd till it shines!
 
 1: board cursor, arrow keys

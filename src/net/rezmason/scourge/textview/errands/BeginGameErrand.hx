@@ -8,20 +8,20 @@ import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.praxis.play.Referee;
 import net.rezmason.scourge.controller.BasicSmarts;
 import net.rezmason.scourge.controller.Sequencer;
-import net.rezmason.scourge.game.ScourgeGameConfig;
+import net.rezmason.praxis.config.GameConfig;
 import net.rezmason.utils.Errand;
 import net.rezmason.utils.santa.Present;
 
 class BeginGameErrand extends Errand<Bool->String->Void> {
 
-    var config:ScourgeGameConfig;
+    var config:GameConfig<Dynamic, Dynamic>;
     var playerPattern:Array<String>;
     var thinkPeriod:Int;
     var animationLength:Float;
     var isReplay:Bool;
     var seed:UInt;
 
-    public function new(config:ScourgeGameConfig, playerPattern:Array<String>, thinkPeriod:Int, animationLength:Float, isReplay:Bool, seed:UInt):Void {
+    public function new(config:GameConfig<Dynamic, Dynamic>, playerPattern:Array<String>, thinkPeriod:Int, animationLength:Float, isReplay:Bool, seed:UInt):Void {
         this.config = config;
         this.playerPattern = playerPattern;
         this.thinkPeriod = thinkPeriod;
@@ -58,7 +58,7 @@ class BeginGameErrand extends Errand<Bool->String->Void> {
         }
 
         if (isReplay) {
-            config = cast referee.lastGameConfig;
+            config = referee.lastGameConfig;
             if (config == null) {
                 onComplete.dispatch(false, 'Referee has no last game to replay.');
                 return;

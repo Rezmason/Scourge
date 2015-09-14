@@ -1,6 +1,6 @@
 package net.rezmason.scourge.game.body;
 
-import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.Module;
 import net.rezmason.praxis.config.RuleComposition;
 
 #if !HEADLESS
@@ -9,7 +9,7 @@ import net.rezmason.praxis.config.RuleComposition;
     import net.rezmason.scourge.controller.EatRulePresenter;
 #end
 
-class BodyConfig extends Config<BodyParams> {
+class BodyModule extends Module<BodyParams> {
 
     override function get_composition():Map<String, RuleComposition<BodyParams>> {
         return [

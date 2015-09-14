@@ -24,12 +24,12 @@ class ScourgeGameConfig extends GameConfig<RP, MP> {
     
     public function new() {
         
-        configs = [
-            'bite'  => new BiteConfig(),
-            'body'  => new BodyConfig(),
-            'build' => new BuildConfig(),
-            'meta'  => new MetaConfig(),
-            'piece' => new PieceConfig(),
+        modules = [
+            'bite'  => new BiteModule(),
+            'body'  => new BodyModule(),
+            'build' => new BuildModule(),
+            'meta'  => new MetaModule(),
+            'piece' => new PieceModule(),
         ];
 
         jointRuleDefs = [
@@ -45,7 +45,7 @@ class ScourgeGameConfig extends GameConfig<RP, MP> {
 
         defaultActionIDs = ['drop', 'forfeit'];
 
-        parseConfigDefs();
+        parseModules();
         metaParams.globalProperties[NUM_SWAPS.id] = { prop:NUM_SWAPS, amount:1, period:4, maxAmount:10 };
         metaParams.globalProperties[NUM_BITES.id] = { prop:NUM_BITES, amount:1, period:3, maxAmount:10 };
     }

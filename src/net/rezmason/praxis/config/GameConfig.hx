@@ -14,18 +14,18 @@ class GameConfig<RP, MP> {
     public var defaultActionIDs(default, null):Array<String>;
     public var params:Map<String, Dynamic>;
 
-    var configs:Map<String, Config<Dynamic>>;
+    var modules:Map<String, Module<Dynamic>>;
     var jointRuleDefs:Array<JointRuleDef>;
     
     var rulesByID:Map<String, BaseRule<Dynamic>>;
-    var configIDsByRuleID:Map<String, String>;
+    var moduleIDsByRuleID:Map<String, String>;
     var inclusionConditionsByRuleID:Map<String, Dynamic->Bool>;
     var randomConditionsByRuleID:Map<String, Dynamic->Bool>;
 
     public function makeRules(ruleMap:BaseRule<Dynamic>->BaseRule<Dynamic> = null):Map<String, BaseRule<Dynamic>> {
         var rules = new Map();
         for (ruleID in rulesByID.keys().a2z()) {
-            var ruleParams = params[configIDsByRuleID[ruleID]];
+            var ruleParams = params[moduleIDsByRuleID[ruleID]];
             var inclusionCondition = inclusionConditionsByRuleID[ruleID];
             if (inclusionCondition == null || inclusionCondition(ruleParams)) {
                 var randomCondition = randomConditionsByRuleID[ruleID];
@@ -52,21 +52,21 @@ class GameConfig<RP, MP> {
         return rules;
     }
 
-    function parseConfigDefs() {
+    function parseModules() {
         params = new Map();
         rulePresenters = new Map();
         movePresenters = new Map();
         rulesByID = new Map();
-        configIDsByRuleID = new Map();
+        moduleIDsByRuleID = new Map();
         inclusionConditionsByRuleID = new Map();
         randomConditionsByRuleID = new Map();
         actionIDs = [];
 
-        for (configKey in configs.keys().a2z()) {
-            var config:Config<Dynamic> = configs[configKey];
-            params[configKey] = config.defaultParams;
+        for (moduleKey in modules.keys().a2z()) {
+            var module:Module<Dynamic> = modules[moduleKey];
+            params[moduleKey] = module.defaultParams;
 
-            var composition = config.composition;
+            var composition = module.composition;
             for (compKey in composition.keys().a2z()) {
                 var ruleComp = composition[compKey];
                 
@@ -86,24 +86,24 @@ class GameConfig<RP, MP> {
 
                 }
 
-                configIDsByRuleID[compKey] = configKey;
+                moduleIDsByRuleID[compKey] = moduleKey;
                 inclusionConditionsByRuleID[compKey] = ruleComp.isIncluded;
             }
         }
     }
 
     function hxSerialize(s:haxe.Serializer):Void {
-        s.serialize(configs);
+        s.serialize(modules);
         s.serialize(jointRuleDefs);
         s.serialize(defaultActionIDs);
         s.serialize(params);
     }
 
     function hxUnserialize(s:haxe.Unserializer):Void {
-        configs = s.unserialize();
+        modules = s.unserialize();
         jointRuleDefs = s.unserialize();
         defaultActionIDs = s.unserialize();
-        parseConfigDefs();
+        parseModules();
         params = s.unserialize();
     }
 }

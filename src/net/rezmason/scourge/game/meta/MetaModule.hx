@@ -1,9 +1,9 @@
 package net.rezmason.scourge.game.meta;
 
-import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.Module;
 import net.rezmason.praxis.config.RuleComposition;
 
-class MetaConfig extends Config<MetaParams> {
+class MetaModule extends Module<MetaParams> {
 
     override function get_composition():Map<String, RuleComposition<MetaParams>> {
         return [

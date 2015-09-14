@@ -1,6 +1,6 @@
 package net.rezmason.praxis.config;
 
-class Config<Params> {
+class Module<Params> {
     public var composition(get, null):Map<String, RuleComposition<Params>>;
     public var defaultParams(get, null):Null<Params>;
     public function new() {}

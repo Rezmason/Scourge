@@ -1,6 +1,6 @@
 package net.rezmason.scourge.game.piece;
 
-import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.Module;
 import net.rezmason.praxis.config.RuleComposition;
 import net.rezmason.utils.openfl.Resource;
 
@@ -8,7 +8,7 @@ import net.rezmason.utils.openfl.Resource;
     import net.rezmason.scourge.controller.DropPieceRulePresenter;
 #end
 
-class PieceConfig extends Config<PieceParams> {
+class PieceModule extends Module<PieceParams> {
 
     var pieces:Pieces;
 

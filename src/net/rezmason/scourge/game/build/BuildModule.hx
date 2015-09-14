@@ -1,9 +1,9 @@
 package net.rezmason.scourge.game.build;
 
-import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.Module;
 import net.rezmason.praxis.config.RuleComposition;
 
-class BuildConfig extends Config<BuildParams> {
+class BuildModule extends Module<BuildParams> {
 
     var initGrid:String;
 

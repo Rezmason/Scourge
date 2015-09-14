@@ -1,9 +1,9 @@
 package net.rezmason.scourge.game.bite;
 
-import net.rezmason.praxis.config.Config;
+import net.rezmason.praxis.config.Module;
 import net.rezmason.praxis.config.RuleComposition;
 
-class BiteConfig extends Config<BiteParams> {
+class BiteModule extends Module<BiteParams> {
 
     override function get_composition():Map<String, RuleComposition<BiteParams>> {
         return [
