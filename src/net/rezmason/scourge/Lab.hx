@@ -500,8 +500,8 @@ class MetaballSystem extends LabSystem {
         for (ike in 0...GRID_WIDTH) {
             for (jen in 0...GRID_WIDTH) {
                 if (phases[ike][jen] != null) {
-                    var size:Float = (pool.getHeightAtIndex(phases[ike][jen]) * 0.4 + 2.0);
-                    size += Math.sin(twitches[ike][jen] * time) * 0.25;
+                    var size:Float = (pool.getHeightAtIndex(phases[ike][jen]) * 1.0 + 1.9);
+                    size += Math.max(0, Math.sin(twitches[ike][jen] * time) * 0.3);
                     size /= GRID_WIDTH;
                     var vBall:Int = (ike * GRID_WIDTH + jen) * VpB;
                     for (ken in 0...VpB) vertices[(vBall + ken) * FpBV + 5] = size;
