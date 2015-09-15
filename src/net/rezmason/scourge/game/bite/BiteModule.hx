@@ -5,13 +5,13 @@ import net.rezmason.praxis.config.RuleComposition;
 
 class BiteModule extends Module<BiteParams> {
 
-    override function get_composition():Map<String, RuleComposition<BiteParams>> {
+    override public function composeRules():Map<String, RuleComposition<BiteParams>> {
         return [
             'bite' => {type:Action(new BiteRule(), null, null, null), isIncluded:function(p) return p.allowBiting},
         ];
     }
 
-    override function get_defaultParams() {
+    override public function makeDefaultParams() {
         return {
             minReach: 1,
             maxReach: 3,

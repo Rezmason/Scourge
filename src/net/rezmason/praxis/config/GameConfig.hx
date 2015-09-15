@@ -64,9 +64,9 @@ class GameConfig<RP, MP> {
 
         for (moduleKey in modules.keys().a2z()) {
             var module:Module<Dynamic> = modules[moduleKey];
-            params[moduleKey] = module.defaultParams;
+            params[moduleKey] = module.makeDefaultParams();
 
-            var composition = module.composition;
+            var composition = module.composeRules();
             for (compKey in composition.keys().a2z()) {
                 var ruleComp = composition[compKey];
                 

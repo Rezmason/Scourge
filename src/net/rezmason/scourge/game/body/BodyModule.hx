@@ -11,7 +11,7 @@ import net.rezmason.praxis.config.RuleComposition;
 
 class BodyModule extends Module<BodyParams> {
 
-    override function get_composition():Map<String, RuleComposition<BodyParams>> {
+    override public function composeRules():Map<String, RuleComposition<BodyParams>> {
         return [
             'cavity' => {type:Simple(new CavityRule(), #if HEADLESS null #else new CavityRulePresenter() #end),
                 isIncluded:function(p) return p.includeCavities
@@ -21,7 +21,7 @@ class BodyModule extends Module<BodyParams> {
         ];
     }
 
-    override function get_defaultParams() {
+    override public function makeDefaultParams() {
         return {
             eatRecursively:true,
             eatHeads:true,

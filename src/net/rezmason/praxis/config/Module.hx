@@ -1,17 +1,7 @@
 package net.rezmason.praxis.config;
 
 class Module<Params> {
-    public var composition(get, null):Map<String, RuleComposition<Params>>;
-    public var defaultParams(get, null):Null<Params>;
     public function new() {}
-    
-    function get_composition():Map<String, RuleComposition<Params>> {
-        throw 'Override'; 
-        return null;
-    }
-    
-    function get_defaultParams():Null<Params> {
-        throw 'Override'; 
-        return null;
-    }
+    public function composeRules():Map<String, RuleComposition<Params>> return null;
+    public function makeDefaultParams():Null<Params> return null;
 }

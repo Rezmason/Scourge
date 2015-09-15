@@ -17,7 +17,7 @@ class PieceModule extends Module<PieceParams> {
         pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
     }
 
-    override function get_composition():Map<String, RuleComposition<PieceParams>> {
+    override public function composeRules():Map<String, RuleComposition<PieceParams>> {
         return [
             'swap' => {type:Action(new SwapPieceRule(), null, null, null), 
                 isIncluded:function(p) return !p.allowAllPieces && p.allowSwapping,
@@ -29,7 +29,7 @@ class PieceModule extends Module<PieceParams> {
         ];
     }
 
-    override function get_defaultParams() {
+    override public function makeDefaultParams() {
         return {
             allowFlipping:false,
             allowRotating:true,

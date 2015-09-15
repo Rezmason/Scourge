@@ -12,7 +12,7 @@ class BuildModule extends Module<BuildParams> {
         initGrid = null;
     }
 
-    override function get_composition():Map<String, RuleComposition<BuildParams>> {
+    override public function composeRules():Map<String, RuleComposition<BuildParams>> {
         return [
             'buildGlobal'   => {type:Builder(new BuildGlobalRule())},
             'buildPlayers'  => {type:Builder(new BuildPlayersRule())},
@@ -20,7 +20,7 @@ class BuildModule extends Module<BuildParams> {
         ];
     }
 
-    override function get_defaultParams() {
+    override public function makeDefaultParams() {
         return {
             firstPlayer:0,
             numPlayers:4,

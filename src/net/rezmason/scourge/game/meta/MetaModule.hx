@@ -5,7 +5,7 @@ import net.rezmason.praxis.config.RuleComposition;
 
 class MetaModule extends Module<MetaParams> {
 
-    override function get_composition():Map<String, RuleComposition<MetaParams>> {
+    override public function composeRules():Map<String, RuleComposition<MetaParams>> {
         return [
             'endTurn'           => {type:Simple(new EndTurnRule(), null)},
             'forfeit'           => {type:Action(new ForfeitRule(), null, null, null)},
@@ -19,7 +19,7 @@ class MetaModule extends Module<MetaParams> {
         ];
     }
 
-    override function get_defaultParams() {
+    override public function makeDefaultParams() {
         return {
             maxSkips: 3,
             playerProperties: new Map(),

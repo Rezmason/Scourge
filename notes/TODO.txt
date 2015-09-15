@@ -1,9 +1,5 @@
 PRAXIS refactor
     Now might be a good time to get rid of the declarative bullshit
-        Add functions to Module
-            addSimpleRule()
-            addBuilder()
-            addAction()
         Create functions on GameConfig that match ScourgeGameConfig's use case
             addModule()
             getModuleParams()
