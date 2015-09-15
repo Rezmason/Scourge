@@ -13,7 +13,6 @@ import net.rezmason.scourge.game.piece.PickPieceRule;
 import net.rezmason.scourge.game.piece.SwapPieceRule;
 import net.rezmason.scourge.game.test.TestPieceRule;
 import net.rezmason.utils.openfl.Resource;
-import net.rezmason.scourge.game.TempParams;
 
 using net.rezmason.scourge.game.BoardUtils;
 using net.rezmason.praxis.state.StatePlan;
@@ -61,7 +60,7 @@ class PieceRulesTest extends ScourgeRuleTest
         };
         var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
-        var dropParams:FullDropPieceParams = {
+        var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
             allowFlipping:true,
             allowRotating:true,
@@ -111,7 +110,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
-        var dropParams:FullDropPieceParams = {
+        var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
             allowFlipping:true,
             allowRotating:true,
@@ -146,7 +145,7 @@ class PieceRulesTest extends ScourgeRuleTest
         };
         var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
-        var dropParams:FullDropPieceParams = {
+        var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
             allowFlipping:false,
             allowRotating:true,
@@ -184,7 +183,7 @@ class PieceRulesTest extends ScourgeRuleTest
         };
         var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
-        var dropParams:FullDropPieceParams = {
+        var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
             allowFlipping:true,
             allowRotating:false,
@@ -222,7 +221,7 @@ class PieceRulesTest extends ScourgeRuleTest
         };
         var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
-        var dropParams:FullDropPieceParams = {
+        var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
             allowFlipping:false,
             allowRotating:false,
@@ -260,7 +259,7 @@ class PieceRulesTest extends ScourgeRuleTest
         };
         var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
-        var dropParams:FullDropPieceParams = {
+        var dropParams:DropPieceParams = {
             dropOverlapsSelf:true,
             allowFlipping:false,
             allowRotating:false,
@@ -291,7 +290,7 @@ class PieceRulesTest extends ScourgeRuleTest
     @Test
     public function placePieceOrthoAllowNowhere():Void {
 
-        var dropParams:FullDropPieceParams = {
+        var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
             allowFlipping:false,
             allowRotating:false,
@@ -328,7 +327,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceParams:FullPickPieceParams = {
+        var pickPieceParams:PickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:true,
@@ -356,7 +355,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceParams:FullPickPieceParams = {
+        var pickPieceParams:PickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:false,
             allowRotating:true,
@@ -378,7 +377,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var hatSize:Int = 3;
         var pieceTableIDs:Array<Int> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        var pickPieceParams:FullPickPieceParams = {
+        var pickPieceParams:PickPieceParams = {
             pieceTableIDs:pieceTableIDs,
             allowFlipping:true,
             allowRotating:false,
@@ -405,7 +404,7 @@ class PieceRulesTest extends ScourgeRuleTest
         };
         var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
-        var dropParams:FullDropPieceParams = {
+        var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
             allowFlipping:true,
             allowRotating:true,
@@ -444,7 +443,7 @@ class PieceRulesTest extends ScourgeRuleTest
 
         var testPieceRule:TestPieceRule = TestUtils.makeRule(TestPieceRule, testPieceParams);
 
-        var dropParams:FullDropPieceParams = {
+        var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
             allowFlipping:false,
             allowRotating:false,

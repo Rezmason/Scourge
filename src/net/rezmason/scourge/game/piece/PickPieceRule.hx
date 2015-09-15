@@ -4,13 +4,12 @@ import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.PieceTypes;
-import net.rezmason.scourge.game.TempParams;
 import net.rezmason.praxis.aspect.PlyAspect;
 
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-class PickPieceRule extends BaseRule<FullPickPieceParams> {
+class PickPieceRule extends BaseRule<PickPieceParams> {
 
     private var allMoves:Array<PickPieceMove>;
 

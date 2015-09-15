@@ -6,7 +6,6 @@ import net.rezmason.grid.Cell;
 import net.rezmason.praxis.rule.BaseRule;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.PieceTypes;
-import net.rezmason.scourge.game.TempParams;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
@@ -19,7 +18,7 @@ using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-class DropPieceRule extends BaseRule<FullDropPieceParams> {
+class DropPieceRule extends BaseRule<DropPieceParams> {
 
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
     @space(BodyAspect.BODY_PREV, true) var bodyPrev_;

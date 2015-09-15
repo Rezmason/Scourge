@@ -1,11 +1,4 @@
 PRAXIS refactor
-    Now might be a good time to get rid of the declarative bullshit
-        Create functions on GameConfig that match ScourgeGameConfig's use case
-            addModule()
-            getModuleParams()
-            joinRules()
-        Replace ScourgeGameConfig with these things
-        Then get rid of ScourgeGameConfig
     Create "allMoves" thingy
     Then, remove all rule state
     Create IRule
