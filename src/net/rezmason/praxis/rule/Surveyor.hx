@@ -3,7 +3,7 @@ package net.rezmason.praxis.rule;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.state.State;
 
-class BaseRule<Params> extends Reckoner {
+class Surveyor<Params> extends Reckoner {
 
     var historyState:State;
     var history:StateHistory;
@@ -19,9 +19,6 @@ class BaseRule<Params> extends Reckoner {
     private function _chooseMove(choice:Int):Void {}
     private function _collectMoves():Void {}
 
-    @:allow(net.rezmason.praxis.config.GameConfig) var id:String;
-    var changeSignal:String->Void;
-
     public function init(params:Params, isRandom:Bool = false):Void {
         this.params = params;
         this.isRandom = isRandom;
@@ -29,10 +26,9 @@ class BaseRule<Params> extends Reckoner {
         primed = false;
     }
 
-    @:final public function prime(state, plan, history, historyState, changeSignal:String->Void = null):Void {
+    @:final public function prime(state, plan, history, historyState):Void {
         this.history = history;
         this.historyState = historyState;
-        this.changeSignal = changeSignal;
         primePointers(state, plan);
         primed = true;
         _prime();
@@ -53,8 +49,6 @@ class BaseRule<Params> extends Reckoner {
     @:final public function collectMoves():Void {
         _collectMoves();
     }
-
-    @:final inline function signalChange() if (changeSignal != null) changeSignal(id);
 
     @:final inline function addGlobal():Global {
         return addAspectPointable(plan.globalDefaults(), globalIdent_, state.globals, historyState.globals, 0);

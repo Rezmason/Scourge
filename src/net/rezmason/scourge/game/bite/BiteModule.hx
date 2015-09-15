@@ -7,7 +7,7 @@ class BiteModule extends Module<BiteParams> {
 
     override public function composeRules():Map<String, RuleComposition<BiteParams>> {
         return [
-            'bite' => {type:Action(new BiteRule(), null, null, null), isIncluded:function(p) return p.allowBiting},
+            'bite' => {type:Action(new BiteActor(), null, null, null), isIncluded:function(p) return p.allowBiting},
         ];
     }
 

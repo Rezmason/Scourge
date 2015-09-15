@@ -4,8 +4,8 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.scourge.game.meta.ReplenishActor;
 import net.rezmason.scourge.game.meta.ReplenishableAspect;
-import net.rezmason.scourge.game.meta.ReplenishRule;
 import net.rezmason.scourge.game.test.TestAspect;
 
 using net.rezmason.praxis.state.StatePlan;
@@ -58,7 +58,7 @@ class ReplenishRuleTest extends ScourgeRuleTest
             TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
-        var replenishRule:ReplenishRule = TestUtils.makeRule(ReplenishRule, params);
+        var replenishRule = TestUtils.makeRule(ReplenishActor, params);
 
         makeState([replenishRule], 1, TestBoards.emptyPetri);
 

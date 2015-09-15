@@ -3,7 +3,7 @@ package net.rezmason.scourge.game.piece;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.grid.GridDirection.*;
 import net.rezmason.grid.Cell;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.PieceTypes;
 import net.rezmason.scourge.game.body.BodyAspect;
@@ -18,7 +18,7 @@ using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-class DropPieceRule extends BaseRule<DropPieceParams> {
+class DropPieceActor extends Actor<DropPieceParams> {
 
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
     @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
@@ -159,15 +159,15 @@ class DropPieceRule extends BaseRule<DropPieceParams> {
         };
     }
 
-    override private function _chooseMove(choice:Int):Void {
-        var move:DropPieceMove = cast moves[choice];
+    override private function _chooseMove(move:Move):Void {
+        var dropPieceMove:DropPieceMove = cast move;
         var currentPlayer:Int = state.global[currentPlayer_];
         var player = getPlayer(currentPlayer);
 
-        if (move.targetSpace != NULL) {
+        if (dropPieceMove.targetSpace != NULL) {
             var maxFreshness:Int = state.global[maxFreshness_];
             var bodySpace = getSpace(getPlayer(currentPlayer)[bodyFirst_]);
-            for (id in move.addedSpaces) bodySpace = fillAndOccupyCell(getSpace(id), currentPlayer, maxFreshness, bodySpace);
+            for (id in dropPieceMove.addedSpaces) bodySpace = fillAndOccupyCell(getSpace(id), currentPlayer, maxFreshness, bodySpace);
             player[bodyFirst_] = getID(bodySpace);
             state.global[maxFreshness_] = maxFreshness + 1;
             player[numConsecutiveSkips_] = 0;

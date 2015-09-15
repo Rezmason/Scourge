@@ -13,11 +13,11 @@ class BodyModule extends Module<BodyParams> {
 
     override public function composeRules():Map<String, RuleComposition<BodyParams>> {
         return [
-            'cavity' => {type:Simple(new CavityRule(), #if HEADLESS null #else new CavityRulePresenter() #end),
+            'cavity' => {type:Simple(new CavityActor(), #if HEADLESS null #else new CavityRulePresenter() #end),
                 isIncluded:function(p) return p.includeCavities
             },
-            'decay'  => {type:Simple(new DecayRule(), #if HEADLESS null #else new DecayRulePresenter() #end)},
-            'eat'    => {type:Simple(new EatRule(), #if HEADLESS null #else new EatRulePresenter() #end)},
+            'decay'  => {type:Simple(new DecayActor(), #if HEADLESS null #else new DecayRulePresenter() #end)},
+            'eat'    => {type:Simple(new EatActor(), #if HEADLESS null #else new EatRulePresenter() #end)},
         ];
     }
 

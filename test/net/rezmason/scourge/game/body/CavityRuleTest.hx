@@ -3,13 +3,13 @@ package net.rezmason.scourge.game.body;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.praxis.aspect.Aspect;
-import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.grid.GridDirection.*;
 import net.rezmason.grid.Cell;
+import net.rezmason.grid.GridDirection.*;
+import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.scourge.game.body.BodyAspect;
+import net.rezmason.scourge.game.body.CavityActor;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.scourge.game.body.CavityRule;
 
 
 using net.rezmason.grid.GridUtils;
@@ -37,7 +37,7 @@ class CavityRuleTest extends ScourgeRuleTest
     @Test
     public function cavityScourgeRuleTest():Void {
 
-        var cavityRule:CavityRule = TestUtils.makeRule(CavityRule, null);
+        var cavityRule = TestUtils.makeRule(CavityActor, null);
         makeState([cavityRule], 1, TestBoards.cavityCity);
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -75,7 +75,7 @@ class CavityRuleTest extends ScourgeRuleTest
     @Test
     public function cavityScourgeRuleTest2():Void {
 
-        var cavityRule:CavityRule = TestUtils.makeRule(CavityRule, null);
+        var cavityRule = TestUtils.makeRule(CavityActor, null);
         makeState([cavityRule], 1, TestBoards.cavityCity);
 
         var head_ = plan.onPlayer(BodyAspect.HEAD);

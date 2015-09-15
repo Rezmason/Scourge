@@ -7,13 +7,13 @@ class MetaModule extends Module<MetaParams> {
 
     override public function composeRules():Map<String, RuleComposition<MetaParams>> {
         return [
-            'endTurn'           => {type:Simple(new EndTurnRule(), null)},
-            'forfeit'           => {type:Action(new ForfeitRule(), null, null, null)},
-            'killHeadlessBody'  => {type:Simple(new KillHeadlessBodyRule(), null)},
-            'oneLivingPlayer'   => {type:Simple(new OneLivingPlayerRule(), null)},
-            'replenish'         => {type:Simple(new ReplenishRule(), null)},
-            'resetFreshness'    => {type:Simple(new ResetFreshnessRule(), null)},
-            'stalemate'         => {type:Simple(new StalemateRule(), null), 
+            'endTurn'           => {type:Simple(new EndTurnActor(), null)},
+            'forfeit'           => {type:Action(new ForfeitActor(), null, null, null)},
+            'killHeadlessBody'  => {type:Simple(new KillHeadlessBodyActor(), null)},
+            'oneLivingPlayer'   => {type:Simple(new OneLivingPlayerActor(), null)},
+            'replenish'         => {type:Simple(new ReplenishActor(), null)},
+            'resetFreshness'    => {type:Simple(new ResetFreshnessActor(), null)},
+            'stalemate'         => {type:Simple(new StalemateActor(), null), 
                 isIncluded:function(p) return p.maxSkips > 0,
             },
         ];

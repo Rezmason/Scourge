@@ -3,10 +3,10 @@ package net.rezmason.scourge.game.bite;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.aspect.Aspect;
+import net.rezmason.scourge.game.bite.BiteActor;
 import net.rezmason.scourge.game.bite.BiteAspect;
-import net.rezmason.scourge.game.bite.BiteRule;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
@@ -50,7 +50,7 @@ class BiteRuleTest extends ScourgeRuleTest
             biteHeads:false,
             orthoOnly:true,
         };
-        var biteRule:BiteRule = TestUtils.makeRule(BiteRule, biteParams);
+        var biteRule = TestUtils.makeRule(BiteActor, biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
@@ -87,7 +87,7 @@ class BiteRuleTest extends ScourgeRuleTest
             biteHeads:false,
             orthoOnly:true,
         };
-        var biteRule:BiteRule = TestUtils.makeRule(BiteRule, biteParams);
+        var biteRule = TestUtils.makeRule(BiteActor, biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
@@ -130,7 +130,7 @@ class BiteRuleTest extends ScourgeRuleTest
             biteHeads:false,
             orthoOnly:false,
         };
-        var biteRule:BiteRule = TestUtils.makeRule(BiteRule, biteParams);
+        var biteRule = TestUtils.makeRule(BiteActor, biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
@@ -175,7 +175,7 @@ class BiteRuleTest extends ScourgeRuleTest
             biteHeads:false,
             orthoOnly:true,
         };
-        var biteRule:BiteRule = TestUtils.makeRule(BiteRule, biteParams);
+        var biteRule = TestUtils.makeRule(BiteActor, biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
@@ -218,7 +218,7 @@ class BiteRuleTest extends ScourgeRuleTest
             biteHeads:true,
             orthoOnly:true,
         };
-        var biteRule:BiteRule = TestUtils.makeRule(BiteRule, biteParams);
+        var biteRule = TestUtils.makeRule(BiteActor, biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         var head_ = plan.onPlayer(BodyAspect.HEAD);
@@ -265,7 +265,7 @@ class BiteRuleTest extends ScourgeRuleTest
             orthoOnly:true,
         };
 
-        var biteRule:BiteRule = TestUtils.makeRule(BiteRule, biteParams);
+        var biteRule = TestUtils.makeRule(BiteActor, biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         VisualAssert.assert('two player bite', state.spitBoard(plan));
@@ -310,7 +310,7 @@ class BiteRuleTest extends ScourgeRuleTest
             biteHeads:false,
             orthoOnly:true,
         };
-        var biteRule:BiteRule = TestUtils.makeRule(BiteRule, biteParams);
+        var biteRule = TestUtils.makeRule(BiteActor, biteParams);
         makeState([biteRule], 2, TestBoards.twoPlayerBite);
 
         var head_ = plan.onPlayer(BodyAspect.HEAD);

@@ -1,44 +1,43 @@
 package net.rezmason.praxis.rule;
 
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.BaseRule;
 
 using net.rezmason.utils.MapUtils;
 
-class JointRule extends BaseRule<Array<BaseRule<Dynamic>>> {
+class JointRule implements IRule {
+    public var isRandom(default, null):Bool;
+    public var moves(default, null):Array<Move> = [{id:0}];
+    public var primed(default, null):Bool;
+    public var reckoners:Array<Reckoner>;
 
-    override private function _init():Void {
-        for (rule in params) {
-            globalAspectRequirements.absorb(rule.globalAspectRequirements);
-            playerAspectRequirements.absorb(rule.playerAspectRequirements);
-            cardAspectRequirements.absorb(rule.cardAspectRequirements);
-            spaceAspectRequirements.absorb(rule.spaceAspectRequirements);
-        }
-        isRandom = params[0].isRandom;
+    var sequence:Array<IRule>;
+
+    public function new(sequence:Array<IRule>) {
+        this.sequence = sequence;
+        reckoners = [for (rule in sequence) for (reckoner in rule.reckoners) reckoner];
+        primed = false;
     }
 
-    override private function _update():Void {
-        params[0].update();
-        moves = params[0].moves;
+    public function prime(state, plan, history, historyState, changeSignal = null):Void {
+        for (rule in sequence) if (!rule.primed) rule.prime(state, plan, history, historyState, changeSignal);
+        primed = true;
     }
 
-    override public function _prime():Void {
-        for (rule in params) if (!rule.primed) rule.prime(state, plan, history, historyState, changeSignal);
+    public function update():Void {
+        sequence[0].update();
+        moves = sequence[0].moves;
     }
 
-    override private function _chooseMove(choice:Int):Void {
-        #if PRAXIS_VERBOSE trace('{'); #end
-
-        params[0].chooseMove(choice);
-        for (ike in 1...params.length) {
-            var rule:BaseRule<Dynamic> = params[ike];
-            rule.update();
-            rule.chooseMove();
-        }
-
-        #if PRAXIS_VERBOSE trace('}'); #end
+    public function chooseMove(index:Int = -1):Void {
+        sequence[0].chooseMove(index);
+        for (ike in 1...sequence.length) sequence[ike].chooseMove();
     }
 
-    override private function _collectMoves():Void params[0].collectMoves();
+    public function collectMoves():Void {
+        sequence[0].collectMoves();
+        moves = null;
+    }
+
+    public function cacheMoves(_, _) {}
 }
 

@@ -3,14 +3,14 @@ package net.rezmason.scourge.game.build;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.grid.Cell;
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.aspect.Aspect;
+import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.scourge.game.build.BuildBoardRule;
-import net.rezmason.scourge.game.build.BuildPlayersRule;
-import net.rezmason.praxis.aspect.PlyAspect;
+import net.rezmason.scourge.game.build.BuildBoardActor;
+import net.rezmason.scourge.game.build.BuildPlayersActor;
 
 using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;

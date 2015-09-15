@@ -2,7 +2,7 @@ package net.rezmason.praxis.state;
 
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.IdentityAspect;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.IRule;
 
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.utils.MapUtils;
@@ -10,7 +10,7 @@ using net.rezmason.utils.MapUtils;
 class StatePlanner {
     public function new() {}
 
-    public function planState(state:State, rules:Iterable<BaseRule<Dynamic>>):StatePlan {
+    public function planState(state:State, rules:Iterable<IRule>):StatePlan {
         if (rules == null) return null;
 
         var plan = new StatePlan();
@@ -22,11 +22,12 @@ class StatePlanner {
 
         for (rule in rules) {
             if (rule == null) continue;
-            globalRequirements.absorb(rule.globalAspectRequirements);
-            playerRequirements.absorb(rule.playerAspectRequirements);
-            cardRequirements.absorb(rule.cardAspectRequirements);
-            spaceRequirements.absorb(rule.spaceAspectRequirements);
-            // trace(Type.getClassName(Type.getClass(rule)));
+            for (reckoner in rule.reckoners) {
+                globalRequirements.absorb(reckoner.globalAspectRequirements);
+                playerRequirements.absorb(reckoner.playerAspectRequirements);
+                cardRequirements.absorb(reckoner.cardAspectRequirements);
+                spaceRequirements.absorb(reckoner.spaceAspectRequirements);
+            }
         }
 
         planAspects(globalRequirements, plan.globalAspectLookup, plan.globalAspectTemplate);

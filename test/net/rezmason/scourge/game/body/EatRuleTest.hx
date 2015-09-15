@@ -5,11 +5,11 @@ import VisualAssert;
 
 import net.rezmason.grid.Cell;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.scourge.game.body.BodyAspect;
-import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.scourge.game.body.EatRule;
-import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
+import net.rezmason.scourge.game.body.BodyAspect;
+import net.rezmason.scourge.game.body.EatActor;
+import net.rezmason.scourge.game.body.OwnershipAspect;
+import net.rezmason.scourge.game.meta.FreshnessAspect;
 
 using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;
@@ -41,7 +41,7 @@ class EatRuleTest extends ScourgeRuleTest
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:false
         };
-        var eatRule:EatRule = TestUtils.makeRule(EatRule, eatParams);
+        var eatRule = TestUtils.makeRule(EatActor, eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -85,7 +85,7 @@ class EatRuleTest extends ScourgeRuleTest
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:false
         };
-        var eatRule:EatRule = TestUtils.makeRule(EatRule, eatParams);
+        var eatRule = TestUtils.makeRule(EatActor, eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -126,7 +126,7 @@ class EatRuleTest extends ScourgeRuleTest
             takeBodiesFromEatenHeads:true, 
             eatOrthogonallyOnly:false
         };
-        var eatRule:EatRule = TestUtils.makeRule(EatRule, eatParams);
+        var eatRule = TestUtils.makeRule(EatActor, eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -163,7 +163,7 @@ class EatRuleTest extends ScourgeRuleTest
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:false
         };
-        var eatRule:EatRule = TestUtils.makeRule(EatRule, eatParams);
+        var eatRule = TestUtils.makeRule(EatActor, eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -198,7 +198,7 @@ class EatRuleTest extends ScourgeRuleTest
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:true
         };
-        var eatRule:EatRule = TestUtils.makeRule(EatRule, eatParams);
+        var eatRule = TestUtils.makeRule(EatActor, eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerN);
 
         // set up the board for the test

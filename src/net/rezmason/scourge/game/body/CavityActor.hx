@@ -2,7 +2,7 @@ package net.rezmason.scourge.game.body;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 
 using Lambda;
@@ -10,7 +10,7 @@ using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-class CavityRule extends BaseRule<Dynamic> {
+class CavityActor extends Actor<Dynamic> {
 
     @space(BodyAspect.BODY_NEXT) var bodyNext_;
     @space(BodyAspect.CAVITY_NEXT, true) var cavityNext_;
@@ -29,7 +29,7 @@ class CavityRule extends BaseRule<Dynamic> {
     var groupAngles:Array<Int> = [];
     var cavitySpaces:Array<Space> = [];
 
-    override private function _chooseMove(choice:Int):Void {
+    override private function _chooseMove(_):Void {
         var maxFreshness:Int = state.global[maxFreshness_];
         var boardChanged = false;
         for (player in eachPlayer()) boardChanged = eraseCavities(player, maxFreshness) || boardChanged;

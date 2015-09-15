@@ -1,8 +1,7 @@
 package net.rezmason.praxis.config;
 
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.BaseRule;
-import net.rezmason.praxis.rule.JointRule;
+import net.rezmason.praxis.rule.*;
 
 using net.rezmason.utils.Alphabetizer;
 
@@ -17,34 +16,28 @@ class GameConfig<RP, MP> {
     var modules:Map<String, Module<Dynamic>>;
     var jointRuleDefs:Array<JointRuleDef>;
     
-    var rulesByID:Map<String, BaseRule<Dynamic>>;
+    var actorsByID:Map<String, Actor<Dynamic>>;
     var moduleIDsByRuleID:Map<String, String>;
     var inclusionConditionsByRuleID:Map<String, Dynamic->Bool>;
     var randomConditionsByRuleID:Map<String, Dynamic->Bool>;
 
-    public function makeRules(ruleMap:BaseRule<Dynamic>->BaseRule<Dynamic> = null):Map<String, BaseRule<Dynamic>> {
-        var rules = new Map();
-        for (ruleID in rulesByID.keys().a2z()) {
+    public function makeRules():Map<String, IRule> {
+        var rules:Map<String, IRule> = new Map();
+        for (ruleID in actorsByID.keys().a2z()) {
             var ruleParams = params[moduleIDsByRuleID[ruleID]];
             var inclusionCondition = inclusionConditionsByRuleID[ruleID];
             if (inclusionCondition == null || inclusionCondition(ruleParams)) {
                 var randomCondition = randomConditionsByRuleID[ruleID];
                 var isRandom = randomCondition != null && randomCondition(ruleParams);
-                var rule = rulesByID[ruleID];
-                rule.init(ruleParams, isRandom);
-                rule.id = ruleID;
-                if (ruleMap != null) rule = ruleMap(rule);
-                rules[ruleID] = rule;
+                var actor = actorsByID[ruleID];
+                actor.init(ruleParams);
+                rules[ruleID] = new Rule(ruleID, null, actor, isRandom);
             }
         }
 
         for (def in jointRuleDefs) {
             var sequence = [for (id in def.sequence) if (rules[id] != null) rules[id]];
-            if (sequence.length > 0) {
-                var jointRule = new JointRule();
-                jointRule.init(sequence);
-                rules[def.id] = jointRule;
-            }
+            if (sequence.length > 0) rules[def.id] = new JointRule(sequence);
         }
 
         for (id in ['build', 'start', 'forfeit']) if (!rules.exists(id)) throw '"$id" rule not found.';
@@ -56,7 +49,7 @@ class GameConfig<RP, MP> {
         params = new Map();
         rulePresenters = new Map();
         movePresenters = new Map();
-        rulesByID = new Map();
+        actorsByID = new Map();
         moduleIDsByRuleID = new Map();
         inclusionConditionsByRuleID = new Map();
         randomConditionsByRuleID = new Map();
@@ -72,14 +65,14 @@ class GameConfig<RP, MP> {
                 
                 switch (ruleComp.type) {
                     case Builder(rule):
-                        rulesByID[compKey] = rule;
+                        actorsByID[compKey] = rule;
                     case Simple(rule, rulePresenter):
-                        rulesByID[compKey] = rule;
+                        actorsByID[compKey] = rule;
                         rulePresenters[compKey] = rulePresenter;
                     case Action(rule, rulePresenter, movePresenter, isRandom):
                         actionIDs.push(compKey);
                         randomConditionsByRuleID[compKey] = isRandom;
-                        rulesByID[compKey] = rule;
+                        actorsByID[compKey] = rule;
                         rulePresenters[compKey] = rulePresenter;
                         movePresenters[compKey] = movePresenter;
                     case _:

@@ -1,7 +1,7 @@
 package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.aspect.Aspect.*;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.PieceTypes;
 import net.rezmason.praxis.aspect.PlyAspect;
@@ -9,7 +9,7 @@ import net.rezmason.praxis.aspect.PlyAspect;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-class PickPieceRule extends BaseRule<PickPieceParams> {
+class PickPieceActor extends Actor<PickPieceParams> {
 
     private var allMoves:Array<PickPieceMove>;
 
@@ -56,11 +56,11 @@ class PickPieceRule extends BaseRule<PickPieceParams> {
         }
     }
 
-    override private function _chooseMove(choice:Int):Void {
-        var move:PickPieceMove = cast moves[choice];
+    override private function _chooseMove(move:Move):Void {
+        var pickPieceMove:PickPieceMove = cast move;
         if (remakeHat()) buildHat();
-        pickMoveFromHat(move);
-        setPiece(move.pieceTableID, move.reflection, move.rotation);
+        pickMoveFromHat(pickPieceMove);
+        setPiece(pickPieceMove.pieceTableID, pickPieceMove.reflection, pickPieceMove.rotation);
     }
 
     private function buildPieceMoves():Void {

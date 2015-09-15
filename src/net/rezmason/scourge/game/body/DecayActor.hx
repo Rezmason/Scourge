@@ -2,7 +2,7 @@ package net.rezmason.scourge.game.body;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 
 using Lambda;
@@ -12,7 +12,7 @@ using net.rezmason.grid.GridUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-class DecayRule extends BaseRule<DecayParams> {
+class DecayActor extends Actor<DecayParams> {
 
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
     @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
@@ -24,7 +24,7 @@ class DecayRule extends BaseRule<DecayParams> {
     @player(BodyAspect.TOTAL_AREA, true) var totalArea_;
     @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
 
-    override private function _chooseMove(choice:Int):Void {
+    override private function _chooseMove(_):Void {
 
         var maxFreshness:Int = state.global[maxFreshness_];
 

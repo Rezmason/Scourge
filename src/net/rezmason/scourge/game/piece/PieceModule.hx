@@ -19,13 +19,13 @@ class PieceModule extends Module<PieceParams> {
 
     override public function composeRules():Map<String, RuleComposition<PieceParams>> {
         return [
-            'swap' => {type:Action(new SwapPieceRule(), null, null, null), 
+            'swap' => {type:Action(new SwapPieceActor(), null, null, null), 
                 isIncluded:function(p) return !p.allowAllPieces && p.allowSwapping,
             },
-            'pick' => {type:Action(new PickPieceRule(), null, null, function(p) return !p.allowPiecePick), 
+            'pick' => {type:Action(new PickPieceActor(), null, null, function(p) return !p.allowPiecePick), 
                 isIncluded:function(p) return !p.allowAllPieces,
             },
-            'drop' => {type:Action(new DropPieceRule(), #if HEADLESS null #else new DropPieceRulePresenter() #end, null, null)},
+            'drop' => {type:Action(new DropPieceActor(), #if HEADLESS null #else new DropPieceRulePresenter() #end, null, null)},
         ];
     }
 

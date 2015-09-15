@@ -3,20 +3,20 @@ package net.rezmason.scourge.game.meta;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.aspect.Aspect;
+import net.rezmason.praxis.aspect.PlyAspect;
+import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.scourge.game.piece.DropPieceRule;
-import net.rezmason.praxis.aspect.PlyAspect;
+import net.rezmason.scourge.game.meta.EndTurnActor;
+import net.rezmason.scourge.game.meta.ForfeitActor;
+import net.rezmason.scourge.game.meta.KillHeadlessBodyActor;
+import net.rezmason.scourge.game.meta.OneLivingPlayerActor;
 import net.rezmason.scourge.game.meta.SkipAspect;
-import net.rezmason.praxis.aspect.WinAspect;
-import net.rezmason.scourge.game.meta.EndTurnRule;
-import net.rezmason.scourge.game.meta.ForfeitRule;
-import net.rezmason.scourge.game.meta.KillHeadlessBodyRule;
-import net.rezmason.scourge.game.meta.OneLivingPlayerRule;
-import net.rezmason.scourge.game.meta.StalemateRule;
-import net.rezmason.scourge.game.test.TestPieceRule;
+import net.rezmason.scourge.game.meta.StalemateActor;
+import net.rezmason.scourge.game.piece.DropPieceActor;
+import net.rezmason.scourge.game.test.TestPieceActor;
 
 // using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;
@@ -45,7 +45,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Should go to the next player who is alive (has a head)
 
-        var endTurnRule:EndTurnRule = TestUtils.makeRule(EndTurnRule, null);
+        var endTurnRule = TestUtils.makeRule(EndTurnActor, null);
         makeState([endTurnRule], 4, TestBoards.emptySquareFourPlayerSkirmish);
 
         var currentPlayer_ = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
@@ -79,7 +79,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Should unassign head of current player
 
-        var forfeitRule:ForfeitRule = TestUtils.makeRule(ForfeitRule, null);
+        var forfeitRule = TestUtils.makeRule(ForfeitActor, null);
         makeState([forfeitRule], 4, TestBoards.oaf);
 
         var head_ = plan.onPlayer(BodyAspect.HEAD);
@@ -116,7 +116,7 @@ class TurnRulesTest extends ScourgeRuleTest
 
         // Should remove heads that are not occupied by their owner
 
-        var killHeadlessBodyRule:KillHeadlessBodyRule = TestUtils.makeRule(KillHeadlessBodyRule, null);
+        var killHeadlessBodyRule = TestUtils.makeRule(KillHeadlessBodyActor, null);
         makeState([killHeadlessBodyRule], 4);
 
         // Change occupier of current player\'s head
@@ -151,7 +151,7 @@ class TurnRulesTest extends ScourgeRuleTest
     public function skipsExhaustedTest():Void {
 
         // Create a four-player game with a max skip of five times
-        var stalemateRule:StalemateRule = TestUtils.makeRule(StalemateRule, {maxSkips:5});
+        var stalemateRule = TestUtils.makeRule(StalemateActor, {maxSkips:5});
         makeState([stalemateRule], 4);
 
         var winner_ = plan.onGlobal(WinAspect.WINNER);
@@ -186,7 +186,7 @@ class TurnRulesTest extends ScourgeRuleTest
     public function onlyLivingPlayerTest():Void {
 
         // Create a four-player game
-        var oneLivingPlayerRule:OneLivingPlayerRule = TestUtils.makeRule(OneLivingPlayerRule, null);
+        var oneLivingPlayerRule = TestUtils.makeRule(OneLivingPlayerActor, null);
         makeState([oneLivingPlayerRule], 4);
 
         var winner_ = plan.onGlobal(WinAspect.WINNER);

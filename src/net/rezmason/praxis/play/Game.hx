@@ -1,11 +1,10 @@
 package net.rezmason.praxis.play;
 
-import net.rezmason.praxis.rule.CacheRule;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.praxis.config.GameConfig;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.IRule;
 import net.rezmason.praxis.state.*;
 import net.rezmason.utils.Zig;
 
@@ -23,20 +22,20 @@ class Game {
     public var hasBegun(get, null):Bool;
     public var checksum(get, null):Int;
 
-    var rules:Map<String, BaseRule<Dynamic>>;
+    var rules:Map<String, IRule>;
     var historian:StateHistorian;
     var defaultActionIDs:Array<String>;
     var winner_:AspectPointer<PGlobal>;
     var currentPlayer_:AspectPointer<PGlobal>;
     var planner:StatePlanner;
     var cacheMoves:Bool;
-    var invalidateSignal:Zig<Int->Void>;
+    var clearCacheSignal:Zig<Int->Void>;
 
     public function new(cacheMoves:Bool):Void {
         this.cacheMoves = cacheMoves;
         historian = new StateHistorian();
         planner = new StatePlanner();
-        invalidateSignal = new Zig();
+        clearCacheSignal = new Zig();
     }
 
     public function begin(config:GameConfig<Dynamic, Dynamic>, alertFunction:String->Void, savedState:SavedState = null):Int {
@@ -45,7 +44,8 @@ class Game {
             throw 'The game has already begun; it cannot begin again until you end it.';
         }
 
-        rules = config.makeRules(cacheMoves ? makeCacheRule : null);
+        rules = config.makeRules();
+        if (cacheMoves) for (rule in rules) rule.cacheMoves(clearCacheSignal, get_revision);
         actionIDs = config.actionIDs;
         defaultActionIDs = config.defaultActionIDs;
         plan = planner.planState(state, rules);
@@ -85,7 +85,7 @@ class Game {
             throw 'The game cannot end, because it hasn\'t begun.';
 
         historian.reset();
-        invalidateSignal.removeAll();
+        clearCacheSignal.removeAll();
         rules = null;
         actionIDs = null;
         defaultActionIDs = null;
@@ -113,7 +113,7 @@ class Game {
         pushHist();
         if (cleanUp) {
             collectAllMoves();
-            invalidateSignal.dispatch(revision);
+            clearCacheSignal.dispatch(revision);
         }
         return revision;
     }
@@ -121,7 +121,7 @@ class Game {
     public function rewind(revision:Int):Void {
         historian.history.revert(revision);
         historian.read();
-        invalidateSignal.dispatch(revision);
+        clearCacheSignal.dispatch(revision);
     }
 
     private function pushHist():Int {
@@ -131,12 +131,6 @@ class Game {
 
     private function collectAllMoves():Void {
         for (id in actionIDs) rules[id].collectMoves();
-    }
-
-    private function makeCacheRule(rule:BaseRule<Dynamic>):CacheRule {
-        var cacheRule = new CacheRule();
-        cacheRule.init({rule:rule, invalidateSignal:invalidateSignal, revGetter:get_revision});
-        return cacheRule;
     }
 
     private function get_actionIDs():Array<String> { return actionIDs.copy(); }

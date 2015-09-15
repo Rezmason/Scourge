@@ -1,7 +1,7 @@
 package net.rezmason.scourge.game.body;
 
 import net.rezmason.praxis.aspect.Aspect.*;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
@@ -14,7 +14,7 @@ using net.rezmason.utils.ArrayUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-class EatRule extends BaseRule<EatParams> {
+class EatActor extends Actor<EatParams> {
 
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
     @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
@@ -26,7 +26,7 @@ class EatRule extends BaseRule<EatParams> {
     @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
-    override private function _chooseMove(choice:Int):Void {
+    override private function _chooseMove(_):Void {
 
         var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = getPlayer(currentPlayer)[head_];

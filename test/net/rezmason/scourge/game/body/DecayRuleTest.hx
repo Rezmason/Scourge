@@ -3,10 +3,10 @@ package net.rezmason.scourge.game.body;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.scourge.game.body.BodyAspect;
-import net.rezmason.scourge.game.body.DecayRule;
+import net.rezmason.scourge.game.body.DecayActor;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 
 using net.rezmason.grid.GridUtils;
@@ -34,7 +34,7 @@ class DecayRuleTest extends ScourgeRuleTest
     @Test
     public function decayScourgeRuleTest():Void {
 
-        var decayRule:DecayRule = TestUtils.makeRule(DecayRule, {decayOrthogonallyOnly:true,});
+        var decayRule = TestUtils.makeRule(DecayActor, {decayOrthogonallyOnly:true,});
         makeState([decayRule], 1, TestBoards.loosePetri);
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -65,7 +65,7 @@ class DecayRuleTest extends ScourgeRuleTest
     @Test
     public function decayDiagScourgeRuleTest():Void {
 
-        var decayRule:DecayRule = TestUtils.makeRule(DecayRule, {decayOrthogonallyOnly:false,});
+        var decayRule = TestUtils.makeRule(DecayActor, {decayOrthogonallyOnly:false,});
         makeState([decayRule], 1, TestBoards.loosePetri);
 
         var head_ = plan.onPlayer(BodyAspect.HEAD);

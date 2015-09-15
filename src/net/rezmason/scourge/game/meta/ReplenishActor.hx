@@ -2,13 +2,13 @@ package net.rezmason.scourge.game.meta;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-class ReplenishRule extends BaseRule<ReplenishParams> {
+class ReplenishActor extends Actor<ReplenishParams> {
 
     @extra(ReplenishableAspect.REP_NEXT, true) var repNext_;
     @extra(ReplenishableAspect.REP_PREV, true) var repPrev_;
@@ -106,7 +106,7 @@ class ReplenishRule extends BaseRule<ReplenishParams> {
         }
     }
 
-    override private function _chooseMove(choice:Int):Void {
+    override private function _chooseMove(_):Void {
         updateReps(globalProperties, [state.global]);
         updateReps(playerProperties, state.players);
         updateReps(cardProperties, state.cards);

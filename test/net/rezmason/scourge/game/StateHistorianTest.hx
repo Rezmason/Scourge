@@ -4,17 +4,17 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.IRule;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.praxis.state.StatePlanner;
-import net.rezmason.scourge.game.meta.FreshnessAspect;
-import net.rezmason.scourge.game.body.EatRule;
-import net.rezmason.scourge.game.build.BuildBoardRule;
-import net.rezmason.scourge.game.build.BuildPlayersRule;
-import net.rezmason.scourge.game.build.BuildGlobalRule;
+import net.rezmason.scourge.game.body.EatActor;
+import net.rezmason.scourge.game.build.BuildBoardActor;
+import net.rezmason.scourge.game.build.BuildGlobalActor;
+import net.rezmason.scourge.game.build.BuildPlayersActor;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
-import net.rezmason.scourge.game.piece.PickPieceRule;
+import net.rezmason.scourge.game.meta.FreshnessAspect;
+import net.rezmason.scourge.game.piece.PickPieceActor;
 import net.rezmason.utils.openfl.Resource;
 
 using net.rezmason.utils.pointers.Pointers;
@@ -65,13 +65,13 @@ class StateHistorianTest {
             pieces:new Pieces(Resource.getString('tables/pieces.json.txt'))
         }
 
-        var buildStateRule:BuildGlobalRule = TestUtils.makeRule(BuildGlobalRule, cast config);
-        var buildPlayersRule:BuildPlayersRule = TestUtils.makeRule(BuildPlayersRule, cast config);
-        var buildBoardRule:BuildBoardRule = TestUtils.makeRule(BuildBoardRule, cast config);
-        var eatRule:EatRule = TestUtils.makeRule(EatRule, cast config);
-        var pickPieceRule:PickPieceRule = TestUtils.makeRule(PickPieceRule, cast config);
+        var buildStateRule = TestUtils.makeRule(BuildGlobalActor, cast config);
+        var buildPlayersRule = TestUtils.makeRule(BuildPlayersActor, cast config);
+        var buildBoardRule = TestUtils.makeRule(BuildBoardActor, cast config);
+        var eatRule = TestUtils.makeRule(EatActor, cast config);
+        var pickPieceRule = TestUtils.makeRule(PickPieceActor, cast config);
 
-        var rules:Array<BaseRule<Dynamic>> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];
+        var rules:Array<IRule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];
         var plan:StatePlan = new StatePlanner().planState(state, rules);
         for (rule in rules) rule.prime(state, plan, history, historyState);
         var freshness_ = plan.onSpace(FreshnessAspect.FRESHNESS);

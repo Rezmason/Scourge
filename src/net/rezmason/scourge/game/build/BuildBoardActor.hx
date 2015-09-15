@@ -4,7 +4,7 @@ import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.grid.GridDirection.*;
 import net.rezmason.grid.Cell;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 
@@ -15,7 +15,7 @@ using net.rezmason.utils.pointers.Pointers;
 
 typedef XY = {x:Float, y:Float};
 
-class BuildBoardRule extends BaseRule<BuildBoardParams> {
+class BuildBoardActor extends Actor<BuildBoardParams> {
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
     @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
     @space(OwnershipAspect.IS_FILLED, true) var isFilled_;

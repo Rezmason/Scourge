@@ -1,7 +1,7 @@
 package net.rezmason.scourge.game.test;
 
 //import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.piece.PieceAspect;
 
 using net.rezmason.utils.pointers.Pointers;
@@ -12,7 +12,7 @@ typedef TestPieceParams = {
     var rotation:Int;
 }
 
-class TestPieceRule extends BaseRule<TestPieceParams> {
+class TestPieceActor extends Actor<TestPieceParams> {
 
     @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_:AspectPointer;
     @global(PieceAspect.PIECE_REFLECTION, true) var pieceReflection_:AspectPointer;

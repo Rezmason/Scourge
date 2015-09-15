@@ -1,10 +1,10 @@
 package net.rezmason.scourge.game.test;
 
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.test.TestAspect;
 
-class TestRule extends BaseRule<Dynamic> {
+class TestActor extends Actor<Dynamic> {
 
     @extra(TestAspect.VALUE_1) var extraVal_:AspectPointer;
     @space(TestAspect.VALUE_1) var spaceVal_:AspectPointer;

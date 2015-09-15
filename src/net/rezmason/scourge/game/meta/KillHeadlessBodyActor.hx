@@ -2,7 +2,7 @@ package net.rezmason.scourge.game.meta;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 
@@ -11,7 +11,7 @@ using Lambda;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-class KillHeadlessBodyRule extends BaseRule<Dynamic> {
+class KillHeadlessBodyActor extends Actor<Dynamic> {
 
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
     @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
@@ -22,7 +22,7 @@ class KillHeadlessBodyRule extends BaseRule<Dynamic> {
     @player(BodyAspect.HEAD, true) var head_;
     @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
 
-    override private function _chooseMove(choice:Int):Void {
+    override private function _chooseMove(_):Void {
 
         // trace(state.spitBoard(plan));
 

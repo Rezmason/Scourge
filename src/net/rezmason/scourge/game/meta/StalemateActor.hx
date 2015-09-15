@@ -2,19 +2,19 @@ package net.rezmason.scourge.game.meta;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.aspect.WinAspect;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.body.BodyAspect;
 
 using net.rezmason.utils.pointers.Pointers;
 
-class StalemateRule extends BaseRule<StalemateParams> {
+class StalemateActor extends Actor<StalemateParams> {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @player(SkipAspect.NUM_CONSECUTIVE_SKIPS) var numConsecutiveSkips_;
     @global(WinAspect.WINNER, true) var winner_;
 
     // This rule discovers whether there is only one remaining player, and makes that player the winner
-    override private function _chooseMove(choice:Int):Void {
+    override private function _chooseMove(_):Void {
 
         var stalemate:Bool = true;
 

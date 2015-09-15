@@ -5,14 +5,14 @@ import VisualAssert;
 
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.IdentityAspect;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.IRule;
 import net.rezmason.praxis.state.State;
+import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.praxis.state.StatePlan;
 import net.rezmason.praxis.state.StatePlanner;
-import net.rezmason.praxis.state.StateHistorian;
-import net.rezmason.scourge.game.build.BuildBoardRule;
-import net.rezmason.scourge.game.build.BuildGlobalRule;
-import net.rezmason.scourge.game.build.BuildPlayersRule;
+import net.rezmason.scourge.game.build.BuildBoardActor;
+import net.rezmason.scourge.game.build.BuildGlobalActor;
+import net.rezmason.scourge.game.build.BuildPlayersActor;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
 
 using net.rezmason.praxis.aspect.AspectUtils;
@@ -51,7 +51,7 @@ class ScourgeRuleTest
         plan = null;
     }
 
-    private function makeState(rules:Array<BaseRule<Dynamic>> = null, numPlayers:Int = 1, initGrid:String = null, circular:Bool = false):Void {
+    private function makeState(rules:Array<IRule> = null, numPlayers:Int = 1, initGrid:String = null, circular:Bool = false):Void {
 
         history.wipe();
         historyState.wipe();
@@ -60,14 +60,14 @@ class ScourgeRuleTest
         if (rules == null) rules = [];
 
         // make state config and generate state
-        var buildStateRule:BuildGlobalRule = TestUtils.makeRule(BuildGlobalRule, {firstPlayer:0});
+        var buildStateRule = TestUtils.makeRule(BuildGlobalActor, {firstPlayer:0});
 
         // make player config and generate players
-        var buildPlayersRule:BuildPlayersRule = TestUtils.makeRule(BuildPlayersRule, {numPlayers:numPlayers});
+        var buildPlayersRule = TestUtils.makeRule(BuildPlayersActor, {numPlayers:numPlayers});
 
         // make board config and generate board
         var boardParams = {numPlayers:numPlayers, cells:PetriBoardFactory.create(numPlayers, circular, initGrid)};
-        var buildBoardRule:BuildBoardRule = TestUtils.makeRule(BuildBoardRule, boardParams);
+        var buildBoardRule = TestUtils.makeRule(BuildBoardActor, boardParams);
 
         rules.unshift(buildBoardRule);
         rules.unshift(buildPlayersRule);

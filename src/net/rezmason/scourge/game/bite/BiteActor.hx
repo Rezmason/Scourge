@@ -2,7 +2,7 @@ package net.rezmason.scourge.game.bite;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
@@ -13,7 +13,7 @@ using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.MapUtils;
 using net.rezmason.utils.pointers.Pointers;
 
-class BiteRule extends BaseRule<BiteParams> {
+class BiteActor extends Actor<BiteParams> {
 
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
     @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
@@ -137,11 +137,11 @@ class BiteRule extends BaseRule<BiteParams> {
         moves = cast biteMoves;
     }
 
-    override private function _chooseMove(choice:Int):Void {
+    override private function _chooseMove(move:Move):Void {
 
-        var move:BiteMove = cast moves[choice];
+        var biteMove:BiteMove = cast move;
 
-        if (move.targetSpace != NULL) {
+        if (biteMove.targetSpace != NULL) {
 
             // Grab data from the move
 
@@ -155,7 +155,7 @@ class BiteRule extends BaseRule<BiteParams> {
             var bitSpacesByPlayer:Array<Array<Space>> = [];
             for (player in eachPlayer()) bitSpacesByPlayer.push([]);
 
-            for (bitSpaceID in move.bitSpaces) {
+            for (bitSpaceID in biteMove.bitSpaces) {
                 var bitSpace:Space = getSpace(bitSpaceID);
                 bitSpacesByPlayer[bitSpace[occupier_]].push(bitSpace);
             }

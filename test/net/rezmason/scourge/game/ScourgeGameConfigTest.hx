@@ -8,7 +8,7 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.praxis.aspect.WinAspect;
-import net.rezmason.praxis.rule.BaseRule;
+import net.rezmason.praxis.rule.IRule;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.praxis.state.StatePlanner;
@@ -16,7 +16,7 @@ import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
-import net.rezmason.scourge.game.piece.DropPieceRule;
+import net.rezmason.scourge.game.piece.DropPieceActor;
 import net.rezmason.scourge.game.piece.PieceAspect;
 import net.rezmason.scourge.game.piece.SwapAspect;
 import net.rezmason.utils.SafeSerializer;
@@ -36,14 +36,14 @@ class ScourgeGameConfigTest
     var historyState:State;
     var plan:StatePlan;
     var config:ScourgeGameConfig;
-    var rules:Map<String, BaseRule<Dynamic>>;
+    var rules:Map<String, IRule>;
 
-    var startAction:BaseRule<Dynamic>;
-    var biteAction:BaseRule<Dynamic>;
-    var pickAction:BaseRule<Dynamic>;
-    var swapAction:BaseRule<Dynamic>;
-    var quitAction:BaseRule<Dynamic>;
-    var dropAction:BaseRule<Dynamic>;
+    var startAction:IRule;
+    var biteAction:IRule;
+    var pickAction:IRule;
+    var swapAction:IRule;
+    var quitAction:IRule;
+    var dropAction:IRule;
 
     public function new() {
 
