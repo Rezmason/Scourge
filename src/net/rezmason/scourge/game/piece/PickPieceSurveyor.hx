@@ -2,12 +2,10 @@ package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.rule.Surveyor;
-import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.PieceTypes;
 import net.rezmason.praxis.aspect.PlyAspect;
 
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.utils.pointers.Pointers;
 
 class PickPieceSurveyor extends Surveyor<PickPieceParams> {
 

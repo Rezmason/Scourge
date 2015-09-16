@@ -1,6 +1,5 @@
 package net.rezmason.praxis.config;
 
-import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.rule.*;
 
 using net.rezmason.utils.Alphabetizer;

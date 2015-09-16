@@ -5,8 +5,6 @@ import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.body.BodyAspect;
 
-using net.rezmason.utils.pointers.Pointers;
-
 class OneLivingPlayerActor extends Actor<Dynamic> {
 
     @player(BodyAspect.HEAD) var head_;

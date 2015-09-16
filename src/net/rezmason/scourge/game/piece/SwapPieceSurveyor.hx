@@ -6,10 +6,6 @@ import net.rezmason.praxis.rule.Surveyor;
 import net.rezmason.scourge.game.piece.PieceAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 
-using Lambda;
-
-using net.rezmason.utils.pointers.Pointers;
-
 class SwapPieceSurveyor extends Surveyor<SwapPieceParams> {
 
     @player(SwapAspect.NUM_SWAPS, true) var numSwaps_;

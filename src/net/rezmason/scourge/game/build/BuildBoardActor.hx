@@ -2,16 +2,12 @@ package net.rezmason.scourge.game.build;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.grid.GridDirection.*;
-import net.rezmason.grid.Cell;
 import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 
-using Lambda;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.grid.GridUtils;
-using net.rezmason.utils.pointers.Pointers;
 
 typedef XY = {x:Float, y:Float};
 

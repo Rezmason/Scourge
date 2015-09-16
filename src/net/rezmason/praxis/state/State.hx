@@ -2,8 +2,6 @@ package net.rezmason.praxis.state;
 
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.grid.Grid;
-using net.rezmason.grid.GridUtils;
-using net.rezmason.utils.pointers.Pointers;
 
 class State {
 

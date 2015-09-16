@@ -3,7 +3,6 @@ package net.rezmason.praxis.state;
 import haxe.Unserializer;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.utils.SafeSerializer;
-import net.rezmason.utils.pointers.Pointers;
 
 class StateHistorian {
 

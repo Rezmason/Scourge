@@ -3,7 +3,6 @@ package net.rezmason.praxis.aspect;
 #if macro
 import haxe.macro.Context;
 import haxe.macro.Expr;
-import net.rezmason.praxis.PraxisTypes;
 #end
 
 #if !macro @:autoBuild(net.rezmason.praxis.aspect.Aspect.build()) #end class Aspect {

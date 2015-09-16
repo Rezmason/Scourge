@@ -2,8 +2,6 @@ package net.rezmason.praxis.rule;
 
 import net.rezmason.praxis.PraxisTypes;
 
-using net.rezmason.utils.MapUtils;
-
 class JointRule implements IRule {
     public var isRandom(default, null):Bool;
     public var moves(default, null):Array<Move> = [{id:0}];

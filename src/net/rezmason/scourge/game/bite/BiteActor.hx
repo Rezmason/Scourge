@@ -8,10 +8,7 @@ import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 
-using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.utils.MapUtils;
-using net.rezmason.utils.pointers.Pointers;
 
 class BiteActor extends Actor<BiteParams> {
 

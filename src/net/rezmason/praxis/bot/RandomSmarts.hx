@@ -1,6 +1,5 @@
 package net.rezmason.praxis.bot;
 
-import net.rezmason.praxis.PraxisTypes.Move;
 import net.rezmason.praxis.play.GameEvent;
 
 class RandomSmarts extends Smarts {

@@ -2,7 +2,6 @@ package net.rezmason.scourge.game.meta;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.aspect.PlyAspect;
-import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.body.BodyAspect;
 

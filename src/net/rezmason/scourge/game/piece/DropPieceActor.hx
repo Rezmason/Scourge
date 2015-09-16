@@ -1,22 +1,15 @@
 package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.aspect.Aspect.*;
-import net.rezmason.grid.GridDirection.*;
-import net.rezmason.grid.Cell;
 import net.rezmason.praxis.rule.Actor;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.scourge.game.PieceTypes;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.scourge.game.meta.SkipAspect;
 
-using Lambda;
-using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.utils.MapUtils;
-using net.rezmason.utils.pointers.Pointers;
 
 class DropPieceActor extends Actor<DropPieceParams> {
 

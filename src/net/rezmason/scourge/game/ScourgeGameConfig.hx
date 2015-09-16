@@ -2,14 +2,19 @@ package net.rezmason.scourge.game;
 
 import net.rezmason.praxis.config.GameConfig;
 
-import net.rezmason.scourge.game.bite.BiteAspect.*;
-import net.rezmason.scourge.game.piece.SwapAspect.*;
+import net.rezmason.scourge.game.bite.BiteAspect;
+import net.rezmason.scourge.game.piece.SwapAspect;
 
-import net.rezmason.scourge.game.bite.*;
-import net.rezmason.scourge.game.body.*;
-import net.rezmason.scourge.game.build.*;
-import net.rezmason.scourge.game.meta.*;
-import net.rezmason.scourge.game.piece.*;
+import net.rezmason.scourge.game.bite.BiteModule;
+import net.rezmason.scourge.game.bite.BiteParams;
+import net.rezmason.scourge.game.body.BodyModule;
+import net.rezmason.scourge.game.body.BodyParams;
+import net.rezmason.scourge.game.build.BuildModule;
+import net.rezmason.scourge.game.build.BuildParams;
+import net.rezmason.scourge.game.meta.MetaModule;
+import net.rezmason.scourge.game.meta.MetaParams;
+import net.rezmason.scourge.game.piece.PieceModule;
+import net.rezmason.scourge.game.piece.PieceParams;
 
 typedef RP = #if HEADLESS Dynamic #else net.rezmason.scourge.controller.RulePresenter #end;
 typedef MP = Dynamic;
@@ -46,8 +51,8 @@ class ScourgeGameConfig extends GameConfig<RP, MP> {
         defaultActionIDs = ['drop', 'forfeit'];
 
         parseModules();
-        metaParams.globalProperties[NUM_SWAPS.id] = { prop:NUM_SWAPS, amount:1, period:4, maxAmount:10 };
-        metaParams.globalProperties[NUM_BITES.id] = { prop:NUM_BITES, amount:1, period:3, maxAmount:10 };
+        metaParams.globalProperties[SwapAspect.NUM_SWAPS.id] = { prop:SwapAspect.NUM_SWAPS, amount:1, period:4, maxAmount:10 };
+        metaParams.globalProperties[BiteAspect.NUM_BITES.id] = { prop:BiteAspect.NUM_BITES, amount:1, period:3, maxAmount:10 };
     }
 
     inline function get_biteParams():BiteParams return params['bite'];

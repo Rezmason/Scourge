@@ -5,8 +5,6 @@ import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.body.BodyAspect;
 
-using net.rezmason.utils.pointers.Pointers;
-
 class StalemateActor extends Actor<StalemateParams> {
 
     @player(BodyAspect.TOTAL_AREA) var totalArea_;

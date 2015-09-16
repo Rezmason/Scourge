@@ -7,7 +7,6 @@ import net.rezmason.scourge.game.PieceTypes;
 import net.rezmason.praxis.aspect.PlyAspect;
 
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.utils.pointers.Pointers;
 
 class PickPieceActor extends Actor<PickPieceParams> {
 

@@ -1,7 +1,6 @@
 package net.rezmason.praxis.rule;
 
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.utils.Zig;
 

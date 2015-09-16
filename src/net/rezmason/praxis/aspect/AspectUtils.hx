@@ -3,10 +3,6 @@ package net.rezmason.praxis.aspect;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
 
-using Lambda;
-using net.rezmason.grid.GridUtils;
-using net.rezmason.utils.pointers.Pointers;
-
 class AspectUtils {
 
     public inline static function iterate<T>(me:AspectPointable<T>, list:Array<AspectPointable<T>>, itrPtr:AspectPointer<T>):AspectPointableIterator<T> {

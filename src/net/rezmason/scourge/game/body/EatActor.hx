@@ -7,12 +7,9 @@ import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.ds.ShitList;
 
-using Lambda;
 using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.utils.ArrayUtils;
-using net.rezmason.utils.MapUtils;
-using net.rezmason.utils.pointers.Pointers;
 
 class EatActor extends Actor<EatParams> {
 

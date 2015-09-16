@@ -4,11 +4,9 @@ import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.aspect.IdentityAspect;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.grid.GridDirection.*;
-import net.rezmason.grid.Cell;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StatePlan;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.utils.pointers.Pointers;
 
 using net.rezmason.grid.GridUtils;
 

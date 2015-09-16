@@ -5,11 +5,13 @@ import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.praxis.aspect.WinAspect;
 import net.rezmason.praxis.config.GameConfig;
 import net.rezmason.praxis.rule.IRule;
-import net.rezmason.praxis.state.*;
+import net.rezmason.praxis.state.State;
+import net.rezmason.praxis.state.StatePlan;
+import net.rezmason.praxis.state.StatePlanner;
+import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.utils.Zig;
 
 using net.rezmason.utils.Alphabetizer;
-using net.rezmason.utils.pointers.Pointers;
 
 class Game {
 

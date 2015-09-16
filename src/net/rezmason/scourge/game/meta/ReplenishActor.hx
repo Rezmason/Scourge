@@ -6,7 +6,6 @@ import net.rezmason.praxis.rule.Actor;
 
 using net.rezmason.utils.Alphabetizer;
 using net.rezmason.praxis.aspect.AspectUtils;
-using net.rezmason.utils.pointers.Pointers;
 
 class ReplenishActor extends Actor<ReplenishParams> {
 

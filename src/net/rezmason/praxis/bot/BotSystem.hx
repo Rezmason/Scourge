@@ -4,7 +4,6 @@ import haxe.Timer;
 import net.rezmason.praxis.play.GameEvent;
 import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.praxis.play.PlayerSystem;
-import net.rezmason.utils.Zig;
 
 class BotSystem extends PlayerSystem {
 

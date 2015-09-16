@@ -1,10 +1,10 @@
 package net.rezmason.praxis;
 
 #if macro
-import haxe.macro.Context;
-import haxe.macro.Expr;
+    import haxe.macro.Context;
+    import haxe.macro.Expr;
 #else
-import net.rezmason.praxis.aspect.IdentityAspect;
+    import net.rezmason.praxis.aspect.IdentityAspect;
 #end
 
 import net.rezmason.praxis.PraxisTypes;
@@ -12,8 +12,6 @@ import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StatePlan;
 
 using net.rezmason.utils.Alphabetizer;
-using net.rezmason.utils.MapUtils;
-using net.rezmason.utils.pointers.Pointers;
 
 #if !macro @:autoBuild(net.rezmason.praxis.Reckoner.build()) #end class Reckoner {
 

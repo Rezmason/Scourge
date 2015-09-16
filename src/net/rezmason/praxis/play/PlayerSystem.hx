@@ -5,8 +5,6 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.config.GameConfig;
 import net.rezmason.utils.Zig;
 
-using Lambda;
-
 class PlayerSystem implements IPlayer {
 
     public var index(default, null):Int;

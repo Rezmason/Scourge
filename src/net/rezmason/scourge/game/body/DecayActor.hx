@@ -5,12 +5,8 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 
-using Lambda;
-
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.grid.GridUtils;
-using net.rezmason.utils.MapUtils;
-using net.rezmason.utils.pointers.Pointers;
 
 class DecayActor extends Actor<DecayParams> {
 

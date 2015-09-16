@@ -7,9 +7,6 @@ import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.config.GameConfig;
 import net.rezmason.utils.SafeSerializer;
 import net.rezmason.utils.UnixTime;
-import net.rezmason.utils.Zig;
-
-using Lambda;
 
 class Referee {
 
@@ -80,16 +77,6 @@ class Referee {
         var savedLog:Array<GameEvent> = log.copy();
         var savedFloats:Array<Float> = floatsLog.copy();
         return {state:game.save(), log:savedLog, floatsLog:savedFloats, timeSaved:UnixTime.now()};
-    }
-
-    function spitAspectLookup<T>(lkp:AspectLookup<T>):String {
-        var str:String = '';
-        var arr:Array<String> = [];
-        for (key in lkp.keys()) {
-            var ptr = lkp[key];
-            arr[ptr] = '\t$key: $ptr, ';
-        }
-        return str + arr.join('\n') + '\n';
     }
 
     private function handlePlaySignal(playerIndex:Int, event:GameEvent):Void {
