@@ -5,7 +5,6 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.rule.Surveyor;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 
 using net.rezmason.grid.GridUtils;
@@ -14,15 +13,12 @@ using net.rezmason.praxis.aspect.AspectUtils;
 class BiteSurveyor extends Surveyor<BiteParams> {
 
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
-    @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
-    @space(FreshnessAspect.FRESHNESS, true) var freshness_;
     @space(OwnershipAspect.IS_FILLED, true) var isFilled_;
     @space(OwnershipAspect.OCCUPIER, true) var occupier_;
     @player(BiteAspect.NUM_BITES, true) var numBites_;
     @player(BodyAspect.BODY_FIRST, true) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
-    @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var movePool:Array<BiteMove> = [];

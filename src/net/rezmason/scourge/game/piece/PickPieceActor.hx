@@ -20,8 +20,6 @@ class PickPieceActor extends Actor<PickPieceParams> {
     @card(PieceAspect.PIECE_NEXT, true) var pieceNext_;
     @card(PieceAspect.PIECE_PREV, true) var piecePrev_;
 
-    @card(PieceAspect.PIECE_MOVE_ID, true) var pieceMoveID_;
-
     @global(PieceAspect.PIECES_PICKED, true) var piecesPicked_;
     @global(PieceAspect.PIECE_FIRST, true) var pieceFirst_;
     @global(PieceAspect.PIECE_HAT_FIRST, true) var pieceHatFirst_;

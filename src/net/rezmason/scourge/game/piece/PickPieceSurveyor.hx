@@ -14,8 +14,7 @@ class PickPieceSurveyor extends Surveyor<PickPieceParams> {
     // This rule is surprisingly complex
 
     @card(PieceAspect.PIECE_HAT_NEXT, true) var pieceHatNext_;
-    @card(PieceAspect.PIECE_HAT_PREV, true) var pieceHatPrev_;
-
+    
     @card(PieceAspect.PIECE_NEXT, true) var pieceNext_;
     @card(PieceAspect.PIECE_PREV, true) var piecePrev_;
 
@@ -24,8 +23,6 @@ class PickPieceSurveyor extends Surveyor<PickPieceParams> {
     @global(PieceAspect.PIECES_PICKED, true) var piecesPicked_;
     @global(PieceAspect.PIECE_FIRST, true) var pieceFirst_;
     @global(PieceAspect.PIECE_HAT_FIRST, true) var pieceHatFirst_;
-    @global(PieceAspect.PIECE_REFLECTION, true) var pieceReflection_;
-    @global(PieceAspect.PIECE_ROTATION, true) var pieceRotation_;
     @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
 
     @global(PieceAspect.PIECE_HAT_PLAYER, true) var pieceHatPlayer_;

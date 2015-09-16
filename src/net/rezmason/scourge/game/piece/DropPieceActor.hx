@@ -22,8 +22,6 @@ class DropPieceActor extends Actor<DropPieceParams> {
     @player(SkipAspect.NUM_CONSECUTIVE_SKIPS, true) var numConsecutiveSkips_;
     @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
     @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
-    @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
-    @global(PieceAspect.PIECE_ROTATION) var pieceRotation_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     override private function _chooseMove(move:Move):Void {

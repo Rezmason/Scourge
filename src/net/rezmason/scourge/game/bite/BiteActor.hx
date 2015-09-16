@@ -19,8 +19,6 @@ class BiteActor extends Actor<BiteParams> {
     @space(OwnershipAspect.OCCUPIER, true) var occupier_;
     @player(BiteAspect.NUM_BITES, true) var numBites_;
     @player(BodyAspect.BODY_FIRST, true) var bodyFirst_;
-    @player(BodyAspect.HEAD) var head_;
-    @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 

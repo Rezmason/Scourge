@@ -18,7 +18,6 @@ class CavityActor extends Actor<Dynamic> {
     @space(OwnershipAspect.OCCUPIER, true) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.CAVITY_FIRST, true) var cavityFirst_;
-    @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA, true) var totalArea_;
     @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
 

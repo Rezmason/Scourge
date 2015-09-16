@@ -7,9 +7,7 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.PieceTypes;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
-import net.rezmason.scourge.game.meta.SkipAspect;
 
 using net.rezmason.grid.GridUtils;
 using net.rezmason.praxis.aspect.AspectUtils;
@@ -17,13 +15,9 @@ using net.rezmason.praxis.aspect.AspectUtils;
 class DropPieceSurveyor extends Surveyor<DropPieceParams> {
 
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
-    @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
-    @space(FreshnessAspect.FRESHNESS, true) var freshness_;
     @space(OwnershipAspect.IS_FILLED, true) var isFilled_;
     @space(OwnershipAspect.OCCUPIER, true) var occupier_;
     @player(BodyAspect.BODY_FIRST, true) var bodyFirst_;
-    @player(SkipAspect.NUM_CONSECUTIVE_SKIPS, true) var numConsecutiveSkips_;
-    @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
     @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
     @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
     @global(PieceAspect.PIECE_ROTATION) var pieceRotation_;
