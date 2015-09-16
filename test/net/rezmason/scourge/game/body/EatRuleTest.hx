@@ -41,7 +41,7 @@ class EatRuleTest extends ScourgeRuleTest
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:false
         };
-        var eatRule = TestUtils.makeRule(null, EatActor, eatParams);
+        var eatRule = TestUtils.makeRule(EatActor, eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -85,7 +85,7 @@ class EatRuleTest extends ScourgeRuleTest
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:false
         };
-        var eatRule = TestUtils.makeRule(null, EatActor, eatParams);
+        var eatRule = TestUtils.makeRule(EatActor, eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -126,7 +126,7 @@ class EatRuleTest extends ScourgeRuleTest
             takeBodiesFromEatenHeads:true, 
             eatOrthogonallyOnly:false
         };
-        var eatRule = TestUtils.makeRule(null, EatActor, eatParams);
+        var eatRule = TestUtils.makeRule(EatActor, eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -163,7 +163,7 @@ class EatRuleTest extends ScourgeRuleTest
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:false
         };
-        var eatRule = TestUtils.makeRule(null, EatActor, eatParams);
+        var eatRule = TestUtils.makeRule(EatActor, eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerGrab);
 
         // set up the board for the test
@@ -198,7 +198,7 @@ class EatRuleTest extends ScourgeRuleTest
             takeBodiesFromEatenHeads:false, 
             eatOrthogonallyOnly:true
         };
-        var eatRule = TestUtils.makeRule(null, EatActor, eatParams);
+        var eatRule = TestUtils.makeRule(EatActor, eatParams);
         makeState([eatRule], 2, TestBoards.twoPlayerN);
 
         // set up the board for the test

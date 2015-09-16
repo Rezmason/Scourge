@@ -2,7 +2,7 @@ package net.rezmason.scourge.game.build;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.praxis.rule.Actor;
+import net.rezmason.praxis.rule.Builder;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 
@@ -11,7 +11,7 @@ using net.rezmason.grid.GridUtils;
 
 typedef XY = {x:Float, y:Float};
 
-class BuildBoardActor extends Actor<BuildBoardParams> {
+class BoardBuilder extends Builder<BoardBuildParams> {
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
     @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
     @space(OwnershipAspect.IS_FILLED, true) var isFilled_;

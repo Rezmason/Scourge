@@ -1,5 +1,5 @@
 package net.rezmason.scourge.game.build;
 
-typedef BuildPlayersParams = { 
+typedef PlayerBuildParams = { 
     public var numPlayers:Int;     
 }

@@ -9,8 +9,8 @@ import net.rezmason.praxis.aspect.Aspect;
 import net.rezmason.praxis.aspect.PlyAspect;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.scourge.game.build.BuildBoardActor;
-import net.rezmason.scourge.game.build.BuildPlayersActor;
+import net.rezmason.scourge.game.build.BoardBuilder;
+import net.rezmason.scourge.game.build.PlayerBuilder;
 
 using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.game.BoardUtils;

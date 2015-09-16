@@ -4,6 +4,7 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.praxis.PraxisTypes;
+import net.rezmason.scourge.game.meta.ReplenishBuilder;
 import net.rezmason.scourge.game.meta.ReplenishActor;
 import net.rezmason.scourge.game.meta.ReplenishableAspect;
 import net.rezmason.scourge.game.test.TestAspect;
@@ -50,7 +51,11 @@ class ReplenishRuleTest extends ScourgeRuleTest
             TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
-        params.cardProperties = new Map();
+        params.cardProperties = [
+            TestAspect.VALUE_1.id => { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
+            TestAspect.VALUE_2.id => { prop:TestAspect.VALUE_2, amount:1, period:3, maxAmount:5, },
+            TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
+        ];
 
         params.spaceProperties = [
             TestAspect.VALUE_1.id => { prop:TestAspect.VALUE_1, amount:1, period:1, maxAmount:3, },
@@ -58,7 +63,7 @@ class ReplenishRuleTest extends ScourgeRuleTest
             TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
-        var replenishRule = TestUtils.makeRule(null, ReplenishActor, params);
+        var replenishRule = TestUtils.makeRule(ReplenishBuilder, ReplenishActor, params);
 
         makeState([replenishRule], 1, TestBoards.emptyPetri);
 
@@ -73,6 +78,10 @@ class ReplenishRuleTest extends ScourgeRuleTest
         var spaceValue1_ = plan.onSpace(TestAspect.VALUE_1);
         var spaceValue2_ = plan.onSpace(TestAspect.VALUE_2);
         var spaceValue3_ = plan.onSpace(TestAspect.VALUE_3);
+
+        var cardValue1_ = plan.onCard(TestAspect.VALUE_1);
+        var cardValue2_ = plan.onCard(TestAspect.VALUE_2);
+        var cardValue3_ = plan.onCard(TestAspect.VALUE_3);
 
         var expectedValues1:Array<Int> = [0,1,2,3,];
         var expectedValues2:Array<Int> = [0,0,0,1,1,1,2,2,2,3,3,3,4,4,4,5,5,5,];
@@ -98,6 +107,12 @@ class ReplenishRuleTest extends ScourgeRuleTest
                 Assert.areEqual(expectedValues1[index1], space[spaceValue1_]);
                 Assert.areEqual(expectedValues2[index2], space[spaceValue2_]);
                 Assert.areEqual(expectedValues3[index3], space[spaceValue3_]);
+            }
+
+            for (card in state.cards) {
+                Assert.areEqual(expectedValues1[index1], card[cardValue1_]);
+                Assert.areEqual(expectedValues2[index2], card[cardValue2_]);
+                Assert.areEqual(expectedValues3[index3], card[cardValue3_]);
             }
 
             replenishRule.chooseMove();

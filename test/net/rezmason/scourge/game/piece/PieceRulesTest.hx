@@ -58,7 +58,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule = TestUtils.makeRule(null, TestPieceActor, testPieceParams);
+        var testPieceRule = TestUtils.makeRule(TestPieceActor, testPieceParams);
 
         var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
@@ -108,7 +108,7 @@ class PieceRulesTest extends ScourgeRuleTest
             rotation:0,
         };
 
-        var testPieceRule = TestUtils.makeRule(null, TestPieceActor, testPieceParams);
+        var testPieceRule = TestUtils.makeRule(TestPieceActor, testPieceParams);
 
         var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
@@ -143,7 +143,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule = TestUtils.makeRule(null, TestPieceActor, testPieceParams);
+        var testPieceRule = TestUtils.makeRule(TestPieceActor, testPieceParams);
 
         var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
@@ -181,7 +181,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule = TestUtils.makeRule(null, TestPieceActor, testPieceParams);
+        var testPieceRule = TestUtils.makeRule(TestPieceActor, testPieceParams);
 
         var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
@@ -219,7 +219,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule = TestUtils.makeRule(null, TestPieceActor, testPieceParams);
+        var testPieceRule = TestUtils.makeRule(TestPieceActor, testPieceParams);
 
         var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
@@ -257,7 +257,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule = TestUtils.makeRule(null, TestPieceActor, testPieceParams);
+        var testPieceRule = TestUtils.makeRule(TestPieceActor, testPieceParams);
 
         var dropParams:DropPieceParams = {
             dropOverlapsSelf:true,
@@ -334,7 +334,7 @@ class PieceRulesTest extends ScourgeRuleTest
             hatSize:hatSize,
             pieces:pieces,
         };
-        var pickPieceRule = TestUtils.makeRule(PickPieceSurveyor, PickPieceActor, pickPieceParams);
+        var pickPieceRule = TestUtils.makeRule(PickPieceBuilder, PickPieceSurveyor, PickPieceActor, pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -362,7 +362,7 @@ class PieceRulesTest extends ScourgeRuleTest
             hatSize:hatSize,
             pieces:pieces,
         };
-        var pickPieceRule = TestUtils.makeRule(PickPieceSurveyor, PickPieceActor, pickPieceParams);
+        var pickPieceRule = TestUtils.makeRule(PickPieceBuilder, PickPieceSurveyor, PickPieceActor, pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -384,7 +384,7 @@ class PieceRulesTest extends ScourgeRuleTest
             hatSize:hatSize,
             pieces:pieces,
         };
-        var pickPieceRule = TestUtils.makeRule(PickPieceSurveyor, PickPieceActor, pickPieceParams);
+        var pickPieceRule = TestUtils.makeRule(PickPieceBuilder, PickPieceSurveyor, PickPieceActor, pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
 
         var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
@@ -402,7 +402,7 @@ class PieceRulesTest extends ScourgeRuleTest
             reflection:0,
             rotation:0,
         };
-        var testPieceRule = TestUtils.makeRule(null, TestPieceActor, testPieceParams);
+        var testPieceRule = TestUtils.makeRule(TestPieceActor, testPieceParams);
 
         var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,
@@ -441,7 +441,7 @@ class PieceRulesTest extends ScourgeRuleTest
             rotation:0,
         };
 
-        var testPieceRule = TestUtils.makeRule(null, TestPieceActor, testPieceParams);
+        var testPieceRule = TestUtils.makeRule(TestPieceActor, testPieceParams);
 
         var dropParams:DropPieceParams = {
             dropOverlapsSelf:false,

@@ -1,9 +1,9 @@
 package net.rezmason.scourge.game.build;
 
-import net.rezmason.praxis.rule.Actor;
+import net.rezmason.praxis.rule.Builder;
 import net.rezmason.praxis.aspect.PlyAspect;
 
-class BuildGlobalActor extends Actor<BuildGlobalParams> {
+class GlobalBuilder extends Builder<GlobalBuildParams> {
 
     @global(PlyAspect.CURRENT_PLAYER, true) var currentPlayer_;
 

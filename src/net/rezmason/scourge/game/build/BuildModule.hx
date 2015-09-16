@@ -14,9 +14,9 @@ class BuildModule extends Module<BuildParams> {
 
     override public function composeRules():Map<String, RuleComposition<BuildParams>> {
         return [
-            'buildGlobal'   => {type:Builder(new BuildGlobalActor())},
-            'buildPlayers'  => {type:Builder(new BuildPlayersActor())},
-            'buildBoard'    => {type:Builder(new BuildBoardActor())},
+            'buildGlobal'   => {type:Builder(new GlobalBuilder())},
+            'buildPlayers'  => {type:Builder(new PlayerBuilder())},
+            'buildBoard'    => {type:Builder(new BoardBuilder())},
         ];
     }
 

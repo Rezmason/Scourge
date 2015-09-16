@@ -15,6 +15,8 @@ class GameConfig<RP, MP> {
     var modules:Map<String, Module<Dynamic>>;
     var jointRuleDefs:Array<JointRuleDef>;
     
+    var ruleIDs:Array<String>;
+    var buildersByID:Map<String, Builder<Dynamic>>;
     var actorsByID:Map<String, Actor<Dynamic>>;
     var surveyorsByID:Map<String, Surveyor<Dynamic>>;
     var moduleIDsByRuleID:Map<String, String>;
@@ -23,17 +25,19 @@ class GameConfig<RP, MP> {
 
     public function makeRules():Map<String, IRule> {
         var rules:Map<String, IRule> = new Map();
-        for (ruleID in actorsByID.keys().a2z()) {
+        for (ruleID in ruleIDs.iterator().a2z()) {
             var ruleParams = params[moduleIDsByRuleID[ruleID]];
             var inclusionCondition = inclusionConditionsByRuleID[ruleID];
             if (inclusionCondition == null || inclusionCondition(ruleParams)) {
                 var randomCondition = randomConditionsByRuleID[ruleID];
                 var isRandom = randomCondition != null && randomCondition(ruleParams);
+                var builder = buildersByID[ruleID];
                 var actor = actorsByID[ruleID];
                 var surveyor = surveyorsByID[ruleID];
+                if (builder != null) builder.init(ruleParams);
                 if (surveyor != null) surveyor.init(ruleParams);
-                actor.init(ruleParams);
-                rules[ruleID] = new Rule(ruleID, surveyor, actor, isRandom);
+                if (actor != null) actor.init(ruleParams);
+                rules[ruleID] = new Rule(ruleID, builder, surveyor, actor, isRandom);
             }
         }
 
@@ -49,8 +53,10 @@ class GameConfig<RP, MP> {
 
     function parseModules() {
         params = new Map();
+        ruleIDs = [];
         rulePresenters = new Map();
         movePresenters = new Map();
+        buildersByID = new Map();
         actorsByID = new Map();
         surveyorsByID = new Map();
         moduleIDsByRuleID = new Map();
@@ -65,17 +71,18 @@ class GameConfig<RP, MP> {
             var composition = module.composeRules();
             for (compKey in composition.keys().a2z()) {
                 var ruleComp = composition[compKey];
-                
+                ruleIDs.push(compKey);
                 switch (ruleComp.type) {
-                    case Builder(actor):
-                        actorsByID[compKey] = actor;
+                    case Builder(builder):
+                        buildersByID[compKey] = builder;
                     case Simple(actor, rulePresenter):
                         actorsByID[compKey] = actor;
                         rulePresenters[compKey] = rulePresenter;
-                    case Action(surveyor, actor, rulePresenter, movePresenter, isRandom):
+                    case Action(builder, surveyor, actor, rulePresenter, movePresenter, isRandom):
                         actionIDs.push(compKey);
                         randomConditionsByRuleID[compKey] = isRandom;
                         actorsByID[compKey] = actor;
+                        buildersByID[compKey] = builder;
                         surveyorsByID[compKey] = surveyor;
                         rulePresenters[compKey] = rulePresenter;
                         movePresenters[compKey] = movePresenter;

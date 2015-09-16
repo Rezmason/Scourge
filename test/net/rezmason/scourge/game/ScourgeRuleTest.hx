@@ -10,9 +10,9 @@ import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StateHistorian;
 import net.rezmason.praxis.state.StatePlan;
 import net.rezmason.praxis.state.StatePlanner;
-import net.rezmason.scourge.game.build.BuildBoardActor;
-import net.rezmason.scourge.game.build.BuildGlobalActor;
-import net.rezmason.scourge.game.build.BuildPlayersActor;
+import net.rezmason.scourge.game.build.BoardBuilder;
+import net.rezmason.scourge.game.build.GlobalBuilder;
+import net.rezmason.scourge.game.build.PlayerBuilder;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
 
 using net.rezmason.praxis.aspect.AspectUtils;
@@ -60,14 +60,14 @@ class ScourgeRuleTest
         if (rules == null) rules = [];
 
         // make state config and generate state
-        var buildStateRule = TestUtils.makeRule(null, BuildGlobalActor, {firstPlayer:0});
+        var buildStateRule = TestUtils.makeRule(GlobalBuilder, {firstPlayer:0});
 
         // make player config and generate players
-        var buildPlayersRule = TestUtils.makeRule(null, BuildPlayersActor, {numPlayers:numPlayers});
+        var buildPlayersRule = TestUtils.makeRule(PlayerBuilder, {numPlayers:numPlayers});
 
         // make board config and generate board
         var boardParams = {numPlayers:numPlayers, cells:PetriBoardFactory.create(numPlayers, circular, initGrid)};
-        var buildBoardRule = TestUtils.makeRule(null, BuildBoardActor, boardParams);
+        var buildBoardRule = TestUtils.makeRule(BoardBuilder, boardParams);
 
         rules.unshift(buildBoardRule);
         rules.unshift(buildPlayersRule);

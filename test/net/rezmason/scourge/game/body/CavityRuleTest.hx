@@ -37,7 +37,7 @@ class CavityRuleTest extends ScourgeRuleTest
     @Test
     public function cavityScourgeRuleTest():Void {
 
-        var cavityRule = TestUtils.makeRule(null, CavityActor, null);
+        var cavityRule = TestUtils.makeRule(CavityActor, null);
         makeState([cavityRule], 1, TestBoards.cavityCity);
 
         var numCells:Int = ~/([^0])/g.replace(state.spitBoard(plan), '').length;
@@ -75,7 +75,7 @@ class CavityRuleTest extends ScourgeRuleTest
     @Test
     public function cavityScourgeRuleTest2():Void {
 
-        var cavityRule = TestUtils.makeRule(null, CavityActor, null);
+        var cavityRule = TestUtils.makeRule(CavityActor, null);
         makeState([cavityRule], 1, TestBoards.cavityCity);
 
         var head_ = plan.onPlayer(BodyAspect.HEAD);

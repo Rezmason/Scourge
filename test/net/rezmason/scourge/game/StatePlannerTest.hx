@@ -10,7 +10,7 @@ import net.rezmason.praxis.rule.IRule;
 import net.rezmason.praxis.state.State;
 import net.rezmason.praxis.state.StatePlanner;
 import net.rezmason.scourge.game.body.OwnershipAspect;
-import net.rezmason.scourge.game.build.BuildGlobalActor;
+import net.rezmason.scourge.game.build.GlobalBuilder;
 import net.rezmason.scourge.game.test.TestActor;
 import net.rezmason.scourge.game.test.TestAspect;
 
@@ -42,8 +42,8 @@ class StatePlannerTest {
         var historyState:State = new State();
         // make state config and generate state
         var planner:StatePlanner = new StatePlanner();
-        var buildStateRule = TestUtils.makeRule(null, BuildGlobalActor, {firstPlayer:0});
-        var testRule = TestUtils.makeRule(null, TestActor, null);
+        var buildStateRule = TestUtils.makeRule(GlobalBuilder, {firstPlayer:0});
+        var testRule = TestUtils.makeRule(TestActor, null);
         var rules:Array<IRule> = [null, buildStateRule, testRule];
         var state:State = new State();
         var plan:StatePlan = planner.planState(state, rules);

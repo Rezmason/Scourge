@@ -1,5 +1,5 @@
 package net.rezmason.scourge.game.build;
 
-typedef BuildGlobalParams = {
+typedef GlobalBuildParams = {
     public var firstPlayer:Int;
 }

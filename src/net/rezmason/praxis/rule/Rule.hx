@@ -10,31 +10,36 @@ class Rule<Params> implements IRule {
     public var moves(default, null):Array<Move> = [{id:0}];
     public var primed(default, null):Bool;
     public var reckoners(default, null):Array<Reckoner>;
-
+    public var id(default, null):String;
+    
+    var builder:Builder<Params>;
     var surveyor:Surveyor<Params>;
     var actor:Actor<Params>;
-    var id:String;
 
     var revGetter:Void->Int;
     var moveCache:Array<Array<Move>>;
     var caching:Bool;
     
-    public function new(id, ?surveyor, actor, isRandom) {
+    public function new(id, ?builder, ?surveyor, ?actor, isRandom:Bool) {
         this.id = id;
+        this.builder = builder;
         this.surveyor = surveyor;
         this.actor = actor;
         this.isRandom = isRandom;
-        reckoners = [actor];
+        reckoners = [];
+        if (builder != null) reckoners.push(builder);
         if (surveyor != null) reckoners.push(surveyor);
+        if (actor != null) reckoners.push(actor);
         primed = false;
         caching = false;
     }
 
     public function prime(state, plan, history, historyState, changeSignal:String->Void = null):Void {
         primed = true;
+        if (builder != null) builder.prime(state, plan, history, historyState);
         if (surveyor != null) surveyor.prime(state, plan, history, historyState);
         if (changeSignal == null) changeSignal = function(_) {};
-        actor.prime(state, plan, history, historyState, changeSignal.bind(id));
+        if (actor != null) actor.prime(state, plan, history, historyState, changeSignal.bind(id));
     }
 
     public function update():Void {
@@ -54,6 +59,7 @@ class Rule<Params> implements IRule {
     }
 
     public function chooseMove(index:Int = -1):Void {
+        if (actor == null) return;
         var defaultChoice:Bool = index == -1;
         if (defaultChoice) index = 0;
 
