@@ -1,7 +1,7 @@
 package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.aspect.Aspect.*;
-import net.rezmason.praxis.rule.Actor;
+import net.rezmason.praxis.rule.Surveyor;
 
 import net.rezmason.scourge.game.piece.PieceAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
@@ -10,7 +10,7 @@ using Lambda;
 
 using net.rezmason.utils.pointers.Pointers;
 
-class SwapPieceActor extends Actor<SwapPieceParams> {
+class SwapPieceSurveyor extends Surveyor<SwapPieceParams> {
 
     @player(SwapAspect.NUM_SWAPS, true) var numSwaps_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
@@ -20,12 +20,12 @@ class SwapPieceActor extends Actor<SwapPieceParams> {
         for (player in eachPlayer()) player[numSwaps_] = params.startingSwaps;
     }
 
-    override private function _chooseMove(_):Void {
+    // This rule basically zaps the current player's piece and takes away a swap.
+    override private function _update():Void {
+        moves = [];
         var currentPlayer:Int = state.global[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
-        getPlayer(currentPlayer)[numSwaps_] = numSwaps - 1;
-        state.global[pieceTableID_] = NULL;
-        signalChange();
+        if (numSwaps > 0 && state.global[pieceTableID_] != NULL) moves.push({id:0});
     }
 }
 

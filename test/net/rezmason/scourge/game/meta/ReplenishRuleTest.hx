@@ -58,7 +58,7 @@ class ReplenishRuleTest extends ScourgeRuleTest
             TestAspect.VALUE_3.id => { prop:TestAspect.VALUE_3, amount:2, period:3, maxAmount:10, },
         ];
 
-        var replenishRule = TestUtils.makeRule(ReplenishActor, params);
+        var replenishRule = TestUtils.makeRule(null, ReplenishActor, params);
 
         makeState([replenishRule], 1, TestBoards.emptyPetri);
 

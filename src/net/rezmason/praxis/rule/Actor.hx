@@ -9,21 +9,16 @@ class Actor<Params> extends Reckoner {
     var history:StateHistory;
     var params:Params;
 
-    public var isRandom(default, null):Bool;
-    public var moves(default, null):Array<Move> = [{id:0}];
     public var primed(default, null):Bool;
     
     private function _prime():Void {}
     private function _init():Void {}
-    private function _update():Void {}
     private function _chooseMove(move:Move):Void {}
-    private function _collectMoves():Void {}
 
     var signalChange:Void->Void;
 
-    public function init(params:Params, isRandom:Bool = false):Void {
+    public function init(params:Params):Void {
         this.params = params;
-        this.isRandom = isRandom;
         _init();
         primed = false;
     }
@@ -38,14 +33,8 @@ class Actor<Params> extends Reckoner {
         _prime();
     }
 
-    @:final public function update():Void _update();
-
     @:final public function chooseMove(move:Move):Void {
         _chooseMove(move);
-    }
-
-    @:final public function collectMoves():Void {
-        _collectMoves();
     }
 
     @:final inline function addGlobal():Global {

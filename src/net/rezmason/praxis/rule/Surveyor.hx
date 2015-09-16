@@ -9,19 +9,16 @@ class Surveyor<Params> extends Reckoner {
     var history:StateHistory;
     var params:Params;
 
-    public var isRandom(default, null):Bool;
     public var moves(default, null):Array<Move> = [{id:0}];
     public var primed(default, null):Bool;
     
     private function _prime():Void {}
     private function _init():Void {}
     private function _update():Void {}
-    private function _chooseMove(choice:Int):Void {}
     private function _collectMoves():Void {}
 
-    public function init(params:Params, isRandom:Bool = false):Void {
+    public function init(params:Params):Void {
         this.params = params;
-        this.isRandom = isRandom;
         _init();
         primed = false;
     }
@@ -35,16 +32,6 @@ class Surveyor<Params> extends Reckoner {
     }
 
     @:final public function update():Void _update();
-
-    @:final public function chooseMove(choice:Int = -1):Void {
-        var defaultChoice:Bool = choice == -1;
-        if (defaultChoice) choice = 0;
-
-        if (moves == null || moves.length < choice || moves[choice] == null) {
-            throw 'Invalid choice index.';
-        }
-        _chooseMove(choice);
-    }
 
     @:final public function collectMoves():Void {
         _collectMoves();

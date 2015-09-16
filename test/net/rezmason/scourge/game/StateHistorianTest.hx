@@ -15,6 +15,7 @@ import net.rezmason.scourge.game.build.BuildPlayersActor;
 import net.rezmason.scourge.game.build.PetriBoardFactory;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.scourge.game.piece.PickPieceActor;
+import net.rezmason.scourge.game.piece.PickPieceSurveyor;
 import net.rezmason.utils.openfl.Resource;
 
 using net.rezmason.utils.pointers.Pointers;
@@ -65,11 +66,11 @@ class StateHistorianTest {
             pieces:new Pieces(Resource.getString('tables/pieces.json.txt'))
         }
 
-        var buildStateRule = TestUtils.makeRule(BuildGlobalActor, cast config);
-        var buildPlayersRule = TestUtils.makeRule(BuildPlayersActor, cast config);
-        var buildBoardRule = TestUtils.makeRule(BuildBoardActor, cast config);
-        var eatRule = TestUtils.makeRule(EatActor, cast config);
-        var pickPieceRule = TestUtils.makeRule(PickPieceActor, cast config);
+        var buildStateRule = TestUtils.makeRule(null, BuildGlobalActor, cast config);
+        var buildPlayersRule = TestUtils.makeRule(null, BuildPlayersActor, cast config);
+        var buildBoardRule = TestUtils.makeRule(null, BuildBoardActor, cast config);
+        var eatRule = TestUtils.makeRule(null, EatActor, cast config);
+        var pickPieceRule = TestUtils.makeRule(PickPieceSurveyor, PickPieceActor, cast config);
 
         var rules:Array<IRule> = [buildStateRule, buildPlayersRule, buildBoardRule, eatRule, pickPieceRule];
         var plan:StatePlan = new StatePlanner().planState(state, rules);

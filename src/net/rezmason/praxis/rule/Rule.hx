@@ -39,17 +39,18 @@ class Rule<Params> implements IRule {
     }
 
     public function update():Void {
+        if (surveyor == null) return;
         if (caching) {
             var rev = revGetter();
             if (moveCache[rev] != null) {
                 moves = moveCache[rev];
             } else {
-                actor.update();
-                moveCache[rev] = moves = actor.moves;
+                surveyor.update();
+                moveCache[rev] = moves = surveyor.moves;
             }
         } else {
-            actor.update();
-            moves = actor.moves;
+            surveyor.update();
+            moves = surveyor.moves;
         }
     }
 
@@ -64,8 +65,10 @@ class Rule<Params> implements IRule {
     }
 
     public function collectMoves():Void {
+        if (surveyor == null) return;
         if (caching) clearCache(0);
-        actor.collectMoves();
+        surveyor.collectMoves();
+        moves = surveyor.moves;
     }
 
     public function cacheMoves(clearCacheSignal:Zig<Int->Void>, revGetter:Void->Int) {

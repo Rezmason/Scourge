@@ -1,8 +1,4 @@
 PRAXIS refactor
-    Split BaseRule in half
-        Divide Surveyors from Actors
-    CacheRule stuff should be moved into BasicRule
-    Move ID stuff to Module, or GameConfig
     Polish the turd till it shines!
 
 1: board cursor, arrow keys

@@ -17,6 +17,7 @@ class GameConfig<RP, MP> {
     var jointRuleDefs:Array<JointRuleDef>;
     
     var actorsByID:Map<String, Actor<Dynamic>>;
+    var surveyorsByID:Map<String, Surveyor<Dynamic>>;
     var moduleIDsByRuleID:Map<String, String>;
     var inclusionConditionsByRuleID:Map<String, Dynamic->Bool>;
     var randomConditionsByRuleID:Map<String, Dynamic->Bool>;
@@ -30,8 +31,10 @@ class GameConfig<RP, MP> {
                 var randomCondition = randomConditionsByRuleID[ruleID];
                 var isRandom = randomCondition != null && randomCondition(ruleParams);
                 var actor = actorsByID[ruleID];
+                var surveyor = surveyorsByID[ruleID];
+                if (surveyor != null) surveyor.init(ruleParams);
                 actor.init(ruleParams);
-                rules[ruleID] = new Rule(ruleID, null, actor, isRandom);
+                rules[ruleID] = new Rule(ruleID, surveyor, actor, isRandom);
             }
         }
 
@@ -50,6 +53,7 @@ class GameConfig<RP, MP> {
         rulePresenters = new Map();
         movePresenters = new Map();
         actorsByID = new Map();
+        surveyorsByID = new Map();
         moduleIDsByRuleID = new Map();
         inclusionConditionsByRuleID = new Map();
         randomConditionsByRuleID = new Map();
@@ -64,15 +68,16 @@ class GameConfig<RP, MP> {
                 var ruleComp = composition[compKey];
                 
                 switch (ruleComp.type) {
-                    case Builder(rule):
-                        actorsByID[compKey] = rule;
-                    case Simple(rule, rulePresenter):
-                        actorsByID[compKey] = rule;
+                    case Builder(actor):
+                        actorsByID[compKey] = actor;
+                    case Simple(actor, rulePresenter):
+                        actorsByID[compKey] = actor;
                         rulePresenters[compKey] = rulePresenter;
-                    case Action(rule, rulePresenter, movePresenter, isRandom):
+                    case Action(surveyor, actor, rulePresenter, movePresenter, isRandom):
                         actionIDs.push(compKey);
                         randomConditionsByRuleID[compKey] = isRandom;
-                        actorsByID[compKey] = rule;
+                        actorsByID[compKey] = actor;
+                        surveyorsByID[compKey] = surveyor;
                         rulePresenters[compKey] = rulePresenter;
                         movePresenters[compKey] = movePresenter;
                     case _:

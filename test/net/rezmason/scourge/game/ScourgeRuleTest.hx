@@ -60,14 +60,14 @@ class ScourgeRuleTest
         if (rules == null) rules = [];
 
         // make state config and generate state
-        var buildStateRule = TestUtils.makeRule(BuildGlobalActor, {firstPlayer:0});
+        var buildStateRule = TestUtils.makeRule(null, BuildGlobalActor, {firstPlayer:0});
 
         // make player config and generate players
-        var buildPlayersRule = TestUtils.makeRule(BuildPlayersActor, {numPlayers:numPlayers});
+        var buildPlayersRule = TestUtils.makeRule(null, BuildPlayersActor, {numPlayers:numPlayers});
 
         // make board config and generate board
         var boardParams = {numPlayers:numPlayers, cells:PetriBoardFactory.create(numPlayers, circular, initGrid)};
-        var buildBoardRule = TestUtils.makeRule(BuildBoardActor, boardParams);
+        var buildBoardRule = TestUtils.makeRule(null, BuildBoardActor, boardParams);
 
         rules.unshift(buildBoardRule);
         rules.unshift(buildPlayersRule);

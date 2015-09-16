@@ -8,7 +8,7 @@ class MetaModule extends Module<MetaParams> {
     override public function composeRules():Map<String, RuleComposition<MetaParams>> {
         return [
             'endTurn'           => {type:Simple(new EndTurnActor(), null)},
-            'forfeit'           => {type:Action(new ForfeitActor(), null, null, null)},
+            'forfeit'           => {type:Action(null, new ForfeitActor(), null, null, null)},
             'killHeadlessBody'  => {type:Simple(new KillHeadlessBodyActor(), null)},
             'oneLivingPlayer'   => {type:Simple(new OneLivingPlayerActor(), null)},
             'replenish'         => {type:Simple(new ReplenishActor(), null)},
