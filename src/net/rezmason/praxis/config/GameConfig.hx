@@ -16,26 +16,14 @@ class GameConfig<RP, MP> {
     var jointRuleDefs:Array<JointRuleDef>;
     
     var ruleIDs:Array<String>;
-    var buildersByID:Map<String, Builder<Dynamic>>;
-    var actorsByID:Map<String, Actor<Dynamic>>;
-    var surveyorsByID:Map<String, Surveyor<Dynamic>>;
     var moduleIDsByRuleID:Map<String, String>;
-    var inclusionConditionsByRuleID:Map<String, Dynamic->Bool>;
-    var randomConditionsByRuleID:Map<String, Dynamic->Bool>;
+    var ruleGeneratorsByID:Map<String, Dynamic->Rule<Dynamic>>;
 
     public function makeRules():Map<String, IRule> {
         var rules:Map<String, IRule> = new Map();
         for (ruleID in ruleIDs.iterator().a2z()) {
-            var ruleParams = params[moduleIDsByRuleID[ruleID]];
-            var inclusionCondition = inclusionConditionsByRuleID[ruleID];
-            if (inclusionCondition == null || inclusionCondition(ruleParams)) {
-                var randomCondition = randomConditionsByRuleID[ruleID];
-                var isRandom = randomCondition != null && randomCondition(ruleParams);
-                var builder = buildersByID[ruleID];
-                var actor = actorsByID[ruleID];
-                var surveyor = surveyorsByID[ruleID];
-                rules[ruleID] = new Rule(ruleID, ruleParams, builder, surveyor, actor, isRandom);
-            }
+            var rule = ruleGeneratorsByID[ruleID](params[moduleIDsByRuleID[ruleID]]);
+            if (rule != null) rules[ruleID] = rule;
         }
 
         for (def in jointRuleDefs) {
@@ -53,44 +41,48 @@ class GameConfig<RP, MP> {
         ruleIDs = [];
         rulePresenters = new Map();
         movePresenters = new Map();
-        buildersByID = new Map();
-        actorsByID = new Map();
-        surveyorsByID = new Map();
         moduleIDsByRuleID = new Map();
-        inclusionConditionsByRuleID = new Map();
-        randomConditionsByRuleID = new Map();
+        ruleGeneratorsByID = new Map();
         actionIDs = [];
 
         for (moduleKey in modules.keys().a2z()) {
             var module:Module<Dynamic> = modules[moduleKey];
             params[moduleKey] = module.makeDefaultParams();
-
             var composition = module.composeRules();
-            for (compKey in composition.keys().a2z()) {
-                var ruleComp = composition[compKey];
-                ruleIDs.push(compKey);
+            for (ruleID in composition.keys().a2z()) {
+                ruleIDs.push(ruleID);
+                moduleIDsByRuleID[ruleID] = moduleKey;
+                var ruleComp = composition[ruleID];
+                var compBuilder = null;
+                var compSurveyor = null;
+                var compActor = null;
+                var compIsRandom = null;
+                var compIsIncluded = ruleComp.isIncluded;
                 switch (ruleComp.type) {
                     case Builder(builder):
-                        buildersByID[compKey] = builder;
+                        compBuilder = builder;
                     case Simple(actor, rulePresenter):
-                        actorsByID[compKey] = actor;
-                        rulePresenters[compKey] = rulePresenter;
+                        compActor = actor;
+                        rulePresenters[ruleID] = rulePresenter;
                     case Action(builder, surveyor, actor, rulePresenter, movePresenter, isRandom):
-                        actionIDs.push(compKey);
-                        randomConditionsByRuleID[compKey] = isRandom;
-                        actorsByID[compKey] = actor;
-                        buildersByID[compKey] = builder;
-                        surveyorsByID[compKey] = surveyor;
-                        rulePresenters[compKey] = rulePresenter;
-                        movePresenters[compKey] = movePresenter;
+                        actionIDs.push(ruleID);
+                        compIsRandom = isRandom;
+                        compActor = actor;
+                        compBuilder = builder;
+                        compSurveyor = surveyor;
+                        rulePresenters[ruleID] = rulePresenter;
+                        movePresenters[ruleID] = movePresenter;
                     case _:
-
                 }
-
-                moduleIDsByRuleID[compKey] = moduleKey;
-                inclusionConditionsByRuleID[compKey] = ruleComp.isIncluded;
+                var rule = makeRule.bind(ruleID, compBuilder, compSurveyor, compActor, compIsRandom, compIsIncluded);
+                ruleGeneratorsByID[ruleID] = rule;
             }
         }
+    }
+
+    function makeRule(id, builder, surveyor, actor, isRandom, isIncluded, params) {
+        if (isIncluded != null && !isIncluded(params)) return null;
+        return new Rule(id, params, builder, surveyor, actor, isRandom != null && isRandom(params));
     }
 
     function hxSerialize(s:haxe.Serializer):Void {
