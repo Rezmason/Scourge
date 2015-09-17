@@ -1,10 +1,7 @@
 package net.rezmason.scourge.game.test;
 
-//import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.rule.Actor;
 import net.rezmason.scourge.game.piece.PieceAspect;
-
-using net.rezmason.utils.pointers.Pointers;
 
 typedef TestPieceParams = {
     var pieceTableID:Int;
@@ -18,7 +15,7 @@ class TestPieceActor extends Actor<TestPieceParams> {
     @global(PieceAspect.PIECE_REFLECTION, true) var pieceReflection_:AspectPointer;
     @global(PieceAspect.PIECE_ROTATION, true) var pieceRotation_:AspectPointer;
 
-    override public function _prime():Void {
+    override public function prime():Void {
         state.global[pieceTableID_] = params.pieceTableID;
         state.global[pieceReflection_] = params.reflection;
         state.global[pieceRotation_] = params.rotation;

@@ -10,7 +10,7 @@ class EndTurnActor extends Actor<Dynamic> {
     @player(BodyAspect.HEAD) var head_;
     @global(PlyAspect.CURRENT_PLAYER, true) var currentPlayer_;
 
-    override private function _chooseMove(_):Void {
+    override public function chooseMove(_):Void {
 
         // Get current player
 

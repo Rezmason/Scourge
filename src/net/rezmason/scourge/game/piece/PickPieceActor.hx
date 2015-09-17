@@ -32,11 +32,11 @@ class PickPieceActor extends Actor<PickPieceParams> {
 
     // All this for an overglorified random piece picker!
 
-    override private function _prime():Void {
+    override public function prime():Void {
         buildHat();
     }
 
-    override private function _chooseMove(move:Move):Void {
+    override public function chooseMove(move:Move):Void {
         var pickPieceMove:PickPieceMove = cast move;
         if (remakeHat()) buildHat();
         pickMoveFromHat(pickPieceMove);

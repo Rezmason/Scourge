@@ -7,7 +7,7 @@ class GlobalBuilder extends Builder<GlobalBuildParams> {
 
     @global(PlyAspect.CURRENT_PLAYER, true) var currentPlayer_;
 
-    override private function _prime():Void {
+    override public function prime():Void {
         addGlobal();
         state.global[currentPlayer_] = params.firstPlayer;
     }

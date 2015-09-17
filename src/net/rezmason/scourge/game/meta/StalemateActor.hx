@@ -12,7 +12,7 @@ class StalemateActor extends Actor<StalemateParams> {
     @global(WinAspect.WINNER, true) var winner_;
 
     // This rule discovers whether there is only one remaining player, and makes that player the winner
-    override private function _chooseMove(_):Void {
+    override public function chooseMove(_):Void {
 
         var stalemate:Bool = true;
 

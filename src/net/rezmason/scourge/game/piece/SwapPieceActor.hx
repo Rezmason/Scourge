@@ -12,11 +12,11 @@ class SwapPieceActor extends Actor<SwapPieceParams> {
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
     @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
 
-    override private function _prime():Void {
+    override public function prime():Void {
         for (player in eachPlayer()) player[numSwaps_] = params.startingSwaps;
     }
 
-    override private function _chooseMove(_):Void {
+    override public function chooseMove(_):Void {
         var currentPlayer:Int = state.global[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
         getPlayer(currentPlayer)[numSwaps_] = numSwaps - 1;

@@ -25,11 +25,11 @@ class BiteActor extends Actor<BiteParams> {
     private var movePool:Array<BiteMove> = [];
     private var allMoves:Array<BiteMove> = [];
 
-    override private function _prime():Void {
+    override public function prime():Void {
         for (player in eachPlayer()) player[numBites_] = params.startingBites;
     }
 
-    override private function _chooseMove(move:Move):Void {
+    override public function chooseMove(move:Move):Void {
 
         var biteMove:BiteMove = cast move;
 

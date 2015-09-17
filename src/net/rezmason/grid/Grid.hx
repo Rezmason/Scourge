@@ -5,6 +5,11 @@ import haxe.Unserializer;
 import net.rezmason.grid.GridUtils.allDirections;
 
 class Grid<T> {
+
+    static var ids = 0;
+
+    public var id = ids++;
+
     var cells:Array<Cell<T>>;
     public var length(get, null):UInt;
     public inline function new() cells = [];
@@ -15,11 +20,7 @@ class Grid<T> {
         return cell;
     }
     public inline function getCell(id:UInt):Cell<T> return cells[id];
-    public inline function copy() {
-        var other = new Grid();
-        other.cells = cells.copy();
-        return other;
-    }
+    public inline function copyFrom(other:Grid<T>) cells = other.cells.copy();
     public inline function iterator() return cells.iterator();
     inline function get_length() return cells.length;
 

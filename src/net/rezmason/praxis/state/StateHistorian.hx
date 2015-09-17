@@ -19,6 +19,17 @@ class StateHistorian {
         aItr = new AspectIterator();
     }
 
+    public function init() {
+        for (aspects in state.globals) historyState.globals.push(aspects.map(history.alloc));
+        for (aspects in state.players) historyState.players.push(aspects.map(history.alloc));
+        for (aspects in state.cards)   historyState.cards  .push(aspects.map(history.alloc));
+        for (aspects in state.spaces)  historyState.spaces .push(aspects.map(history.alloc));
+        for (aspects in state.extras)  historyState.extras .push(aspects.map(history.alloc));
+        
+        write();
+        history.forget();
+    }
+
     public function write():Void {
         writeAspectPointables(state.globals, historyState.globals, aItr);
         writeAspectPointables(state.players, historyState.players, aItr);
@@ -40,7 +51,7 @@ class StateHistorian {
     public function load(savedState:SavedState) {
         var oldState = state;
         state = Unserializer.run(savedState.data);
-        if (oldState != null) state.cells = oldState.cells.copy();
+        if (oldState != null) state.cells.copyFrom(oldState.cells);
     }
 
     public function reset():Void {

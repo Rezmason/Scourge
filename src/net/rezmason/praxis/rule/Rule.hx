@@ -20,26 +20,36 @@ class Rule<Params> implements IRule {
     var moveCache:Array<Array<Move>>;
     var caching:Bool;
     
-    public function new(id, ?builder, ?surveyor, ?actor, isRandom:Bool) {
+    public function new(id, params:Params, ?builder, ?surveyor, ?actor, isRandom:Bool) {
         this.id = id;
         this.builder = builder;
         this.surveyor = surveyor;
         this.actor = actor;
         this.isRandom = isRandom;
         reckoners = [];
-        if (builder != null) reckoners.push(builder);
-        if (surveyor != null) reckoners.push(surveyor);
-        if (actor != null) reckoners.push(actor);
+        for (element in [builder, surveyor, actor]) {
+            if (element != null) {
+                element.params = params;
+                element.init();
+                reckoners.push(element);
+            }
+        }
         primed = false;
         caching = false;
     }
 
-    public function prime(state, plan, history, historyState, changeSignal:String->Void = null):Void {
+    public function prime(state, plan, changeSignal:String->Void = null):Void {
         primed = true;
-        if (builder != null) builder.prime(state, plan, history, historyState);
-        if (surveyor != null) surveyor.prime(state, plan, history, historyState);
-        if (changeSignal == null) changeSignal = function(_) {};
-        if (actor != null) actor.prime(state, plan, history, historyState, changeSignal.bind(id));
+        if (actor != null) {
+            if (changeSignal == null) changeSignal = function(_) {};
+            actor.signalChange = changeSignal.bind(id);
+        }
+        for (element in [builder, surveyor, actor]) {
+            if (element != null) {
+                element.primePointers(state, plan);
+                element.prime();
+            }
+        }
     }
 
     public function update():Void {

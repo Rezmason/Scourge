@@ -7,7 +7,7 @@ class ReplenishActor extends Actor<ReplenishParams> {
 
     @extra(ReplenishableAspect.REP_STEP, true) var repStep_;
 
-    override private function _chooseMove(_):Void {
+    override public function chooseMove(_):Void {
         updateReps(params.globalProperties, [state.global]);
         updateReps(params.playerProperties, state.players);
         updateReps(params.cardProperties, state.cards);

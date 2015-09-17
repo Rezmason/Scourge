@@ -30,7 +30,7 @@ class PickPieceBuilder extends Builder<PickPieceParams> {
 
     // All this for an overglorified random piece picker!
 
-    override private function _prime():Void {
+    override public function prime():Void {
         if (params.hatSize > params.pieceTableIDs.length) params.hatSize = params.pieceTableIDs.length;
         
         // Every move has to be made before the game begins. These moves

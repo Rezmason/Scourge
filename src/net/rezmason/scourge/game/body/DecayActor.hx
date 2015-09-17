@@ -20,7 +20,7 @@ class DecayActor extends Actor<DecayParams> {
     @player(BodyAspect.TOTAL_AREA, true) var totalArea_;
     @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
 
-    override private function _chooseMove(_):Void {
+    override public function chooseMove(_):Void {
 
         var maxFreshness:Int = state.global[maxFreshness_];
 

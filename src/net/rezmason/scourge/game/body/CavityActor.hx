@@ -26,7 +26,7 @@ class CavityActor extends Actor<Dynamic> {
     var groupAngles:Array<Int> = [];
     var cavitySpaces:Array<Space> = [];
 
-    override private function _chooseMove(_):Void {
+    override public function chooseMove(_):Void {
         var maxFreshness:Int = state.global[maxFreshness_];
         var boardChanged = false;
         for (player in eachPlayer()) boardChanged = eraseCavities(player, maxFreshness) || boardChanged;

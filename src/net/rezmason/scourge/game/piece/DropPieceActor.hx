@@ -24,7 +24,7 @@ class DropPieceActor extends Actor<DropPieceParams> {
     @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
-    override private function _chooseMove(move:Move):Void {
+    override public function chooseMove(move:Move):Void {
         var dropPieceMove:DropPieceMove = cast move;
         var currentPlayer:Int = state.global[currentPlayer_];
         var player = getPlayer(currentPlayer);

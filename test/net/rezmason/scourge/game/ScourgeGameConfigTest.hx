@@ -317,12 +317,8 @@ class ScourgeGameConfigTest
         plan = new StatePlanner().planState(state, rules);
 
         // Prime the rules
-        rules['build'].prime(state, plan, history, historyState);
-        for (key in rules.keys().a2z()) {
-            if (!rules[key].primed) {
-                rules[key].prime(state, plan, history, historyState);
-            }
-        }
+        rules['build'].prime(state, plan);
+        for (key in rules.keys().a2z()) if (!rules[key].primed) rules[key].prime(state, plan);
 
         startAction = rules.get('start');
         biteAction = rules.get('bite');

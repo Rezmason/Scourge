@@ -11,23 +11,14 @@ class TestUtils {
     ):IRule {
 
         var builder:Builder<Dynamic> = null;
-        if (builderDef != null) {
-            builder = Type.createInstance(builderDef, []);
-            builder.init(params);
-        }
+        if (builderDef != null) builder = Type.createInstance(builderDef, []);
 
         var surveyor:Surveyor<Dynamic> = null;
-        if (surveyorDef != null) {
-            surveyor = Type.createInstance(surveyorDef, []);
-            surveyor.init(params);
-        }
+        if (surveyorDef != null) surveyor = Type.createInstance(surveyorDef, []);
 
         var actor:Actor<Dynamic> = null;
-        if (actorDef != null) {
-            actor = Type.createInstance(actorDef, []);
-            actor.init(params);
-        }
+        if (actorDef != null) actor = Type.createInstance(actorDef, []);
 
-        return new Rule(null, builder, surveyor, actor, false);
+        return new Rule(null, params, builder, surveyor, actor, false);
     }
 }

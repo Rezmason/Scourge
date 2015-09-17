@@ -12,7 +12,7 @@ interface IRule {
     public var primed(default, null):Bool;
     public var reckoners(default, null):Array<Reckoner>;
 
-    public function prime(state:State, plan:StatePlan, history:StateHistory, historyState:State, changeSignal:String->Void = null):Void;
+    public function prime(state:State, plan:StatePlan, changeSignal:String->Void = null):Void;
     public function update():Void;
     public function chooseMove(index:Int = -1):Void;
     public function collectMoves():Void;

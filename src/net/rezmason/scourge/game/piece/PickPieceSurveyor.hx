@@ -25,11 +25,11 @@ class PickPieceSurveyor extends Surveyor<PickPieceParams> {
 
     // All this for an overglorified random piece picker!
 
-    override private function _prime():Void {
+    override public function prime():Void {
         allMoves = params.pieceMoves;
     }
 
-    override private function _update():Void {
+    override public function update():Void {
         if (remakeHat()) {
             // The hat's been refilled; all piece moves are available as moves
             moves = cast allMoves.copy();

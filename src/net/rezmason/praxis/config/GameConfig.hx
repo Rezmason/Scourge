@@ -34,10 +34,7 @@ class GameConfig<RP, MP> {
                 var builder = buildersByID[ruleID];
                 var actor = actorsByID[ruleID];
                 var surveyor = surveyorsByID[ruleID];
-                if (builder != null) builder.init(ruleParams);
-                if (surveyor != null) surveyor.init(ruleParams);
-                if (actor != null) actor.init(ruleParams);
-                rules[ruleID] = new Rule(ruleID, builder, surveyor, actor, isRandom);
+                rules[ruleID] = new Rule(ruleID, ruleParams, builder, surveyor, actor, isRandom);
             }
         }
 

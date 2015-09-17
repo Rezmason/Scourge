@@ -23,7 +23,7 @@ class EatActor extends Actor<EatParams> {
     @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
-    override private function _chooseMove(_):Void {
+    override public function chooseMove(_):Void {
 
         var currentPlayer:Int = state.global[currentPlayer_];
         var head:Int = getPlayer(currentPlayer)[head_];

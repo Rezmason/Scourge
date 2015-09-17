@@ -74,7 +74,8 @@ class ScourgeRuleTest
         rules.unshift(buildStateRule);
 
         plan = new StatePlanner().planState(state, rules);
-        for (rule in rules) rule.prime(state, plan, history, historyState);
+        for (rule in rules) rule.prime(state, plan);
+        stateHistorian.init();
         identPtr = plan.onGlobal(IdentityAspect.IDENTITY);
     }
 

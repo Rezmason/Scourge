@@ -1,8 +1,9 @@
 PRAXIS refactor
-    Clean up actor, surveyor and builder class functions
     Rules could probably be made in Configs
         Oh. Or in the modules.
     Wait. Are we truly using prev pointers anywhere?!
+        If pointable linked lists get abstracted, we might not need to
+    State is directly manipulable...
     Polish the turd till it shines!
 
 1: board cursor, arrow keys

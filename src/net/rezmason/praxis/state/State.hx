@@ -5,12 +5,12 @@ import net.rezmason.grid.Grid;
 
 class State {
 
-    public var global(default, null):Global;
+    public var global(get, null):Global;
     public var globals(default, null):Array<Global>;
     public var players(default, null):Array<Player>;
     public var cards(default, null):Array<Card>;
     public var spaces(default, null):Array<Space>;
-    public var cells(default, set):BoardGrid;
+    public var cells(default, null):BoardGrid;
     public var extras(default, null):Array<Extra>;
     
     public function new():Void {
@@ -46,16 +46,8 @@ class State {
         cards   = s.unserialize();
         spaces  = s.unserialize();
         extras  = s.unserialize();
-        resolve();
-    }
-
-    public function set_cells(val:Grid<Space>):Grid<Space> {
-        if (cells == null) cells = val;
-        return val;
-    }
-
-    public function resolve() {
-        global = globals[0];
         cells = new Grid();
     }
+
+    inline function get_global() return globals[0];
 }

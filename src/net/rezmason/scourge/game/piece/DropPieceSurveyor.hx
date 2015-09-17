@@ -27,7 +27,7 @@ class DropPieceSurveyor extends Surveyor<DropPieceParams> {
     private var movePool:Array<DropPieceMove> = [];
     private var allMoves:Array<DropPieceMove> = [];
 
-    override private function _update():Void {
+    override public function update():Void {
 
         var dropMoves:Array<DropPieceMove> = [];
 
@@ -149,7 +149,7 @@ class DropPieceSurveyor extends Surveyor<DropPieceParams> {
         };
     }
 
-    override private function _collectMoves():Void movePool = allMoves.copy();
+    override public function collectMoves():Void movePool = allMoves.copy();
 
     inline function hasFreeEdge(space) {
         var exists = false;

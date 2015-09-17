@@ -12,12 +12,12 @@ class SwapPieceSurveyor extends Surveyor<SwapPieceParams> {
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
     @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
 
-    override private function _prime():Void {
+    override public function prime():Void {
         for (player in eachPlayer()) player[numSwaps_] = params.startingSwaps;
     }
 
     // This rule basically zaps the current player's piece and takes away a swap.
-    override private function _update():Void {
+    override public function update():Void {
         moves = [];
         var currentPlayer:Int = state.global[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];

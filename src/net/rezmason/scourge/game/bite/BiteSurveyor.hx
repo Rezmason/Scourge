@@ -24,11 +24,11 @@ class BiteSurveyor extends Surveyor<BiteParams> {
     private var movePool:Array<BiteMove> = [];
     private var allMoves:Array<BiteMove> = [];
 
-    override private function _prime():Void {
+    override public function prime():Void {
         for (player in eachPlayer()) player[numBites_] = params.startingBites;
     }
 
-    override private function _update():Void {
+    override public function update():Void {
 
         var biteMoves:Array<BiteMove> = [];
 
@@ -131,7 +131,7 @@ class BiteSurveyor extends Surveyor<BiteParams> {
         moves = cast biteMoves;
     }
 
-    override private function _collectMoves():Void movePool = allMoves.copy();
+    override public function collectMoves():Void movePool = allMoves.copy();
 
     // "front" as in "battle front". Areas where the current player touches other players
     /*

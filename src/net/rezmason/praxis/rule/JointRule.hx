@@ -16,8 +16,8 @@ class JointRule implements IRule {
         primed = false;
     }
 
-    public function prime(state, plan, history, historyState, changeSignal = null):Void {
-        for (rule in sequence) if (!rule.primed) rule.prime(state, plan, history, historyState, changeSignal);
+    public function prime(state, plan, changeSignal = null):Void {
+        for (rule in sequence) if (!rule.primed) rule.prime(state, plan, changeSignal);
         primed = true;
     }
 

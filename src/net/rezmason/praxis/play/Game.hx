@@ -51,8 +51,8 @@ class Game {
         actionIDs = config.actionIDs;
         defaultActionIDs = config.defaultActionIDs;
         plan = planner.planState(state, rules);
-        primeRule('build', alertFunction);
-        for (id in rules.keys().a2z()) if (!rules[id].primed) primeRule(id, alertFunction);
+        rules['build'].prime(state, plan, alertFunction);
+        for (id in rules.keys().a2z()) if (!rules[id].primed) rules[id].prime(state, plan, alertFunction);
 
         // Grab some aspect pointers so we can quickly evaluate the state
 
@@ -69,14 +69,9 @@ class Game {
             startAction.chooseMove();
         }
 
-        historian.write();
-        historian.history.forget();
+        historian.init();
 
         return historian.history.revision;
-    }
-
-    inline function primeRule(id:String, alertFunction:String->Void) {
-        rules[id].prime(state, plan, historian.history, historian.historyState, alertFunction);
     }
 
     public function save():SavedState { return historian.save(); }

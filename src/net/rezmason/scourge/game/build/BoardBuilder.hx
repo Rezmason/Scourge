@@ -9,8 +9,6 @@ import net.rezmason.scourge.game.body.OwnershipAspect;
 using net.rezmason.praxis.aspect.AspectUtils;
 using net.rezmason.grid.GridUtils;
 
-typedef XY = {x:Float, y:Float};
-
 class BoardBuilder extends Builder<BoardBuildParams> {
     @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
     @space(BodyAspect.BODY_PREV, true) var bodyPrev_;
@@ -19,9 +17,9 @@ class BoardBuilder extends Builder<BoardBuildParams> {
     @player(BodyAspect.BODY_FIRST, true) var bodyFirst_;
     @player(BodyAspect.HEAD, true) var head_;
 
-    override private function _prime():Void {
+    override public function prime():Void {
         var bodySpacesByPlayer:Array<Array<Space>> = [for (ike in 0...numPlayers()) []];
-        for (petriCell in params.cells) addSpace();
+        for (petriCell in params.cells) state.cells.addCell(addSpace());
         for (petriCell in params.cells) {
             var petriDatum = petriCell.value;
             var spaceCell = state.cells.getCell(petriCell.id);

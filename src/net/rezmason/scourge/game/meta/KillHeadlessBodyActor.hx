@@ -19,9 +19,7 @@ class KillHeadlessBodyActor extends Actor<Dynamic> {
     @player(BodyAspect.HEAD, true) var head_;
     @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
 
-    override private function _chooseMove(_):Void {
-
-        // trace(state.spitBoard(plan));
+    override public function chooseMove(_):Void {
 
         var maxFreshness:Int = state.global[maxFreshness_];
 
@@ -50,9 +48,6 @@ class KillHeadlessBodyActor extends Actor<Dynamic> {
         }
 
         state.global[maxFreshness_] = maxFreshness;
-
-        // trace(state.spitBoard(plan));
-        // trace('---');
     }
 
     function killCell(space:Space, maxFreshness:Int) {
