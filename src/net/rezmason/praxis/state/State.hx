@@ -3,6 +3,7 @@ package net.rezmason.praxis.state;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.grid.Grid;
 
+@:allow(net.rezmason.praxis.state)
 class State {
 
     public var global(get, null):Global;
@@ -22,7 +23,7 @@ class State {
         extras  = [];
     }
 
-    public function wipe():Void {
+    function wipe():Void {
         global = null;
         globals.splice(0, globals.length);
         players.splice(0, players.length);

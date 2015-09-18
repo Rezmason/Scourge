@@ -52,10 +52,7 @@ class ScourgeRuleTest
     }
 
     private function makeState(rules:Array<IRule> = null, numPlayers:Int = 1, initGrid:String = null, circular:Bool = false):Void {
-
-        history.wipe();
-        historyState.wipe();
-        state.wipe();
+        stateHistorian.reset();
 
         if (rules == null) rules = [];
 
