@@ -19,10 +19,10 @@ class BoardBuilder extends Builder<BoardBuildParams> {
 
     override public function prime():Void {
         var bodySpacesByPlayer:Array<Array<Space>> = [for (ike in 0...numPlayers()) []];
-        for (petriCell in params.cells) state.cells.addCell(addSpace());
+        for (petriCell in params.cells) addSpace();
         for (petriCell in params.cells) {
             var petriDatum = petriCell.value;
-            var spaceCell = state.cells.getCell(petriCell.id);
+            var spaceCell = state.getCell(petriCell.id);
             var space = spaceCell.value;
 
             if (petriDatum.isWall == true) {
@@ -36,7 +36,7 @@ class BoardBuilder extends Builder<BoardBuildParams> {
 
             for (direction in GridUtils.allDirections()) {
                 var neighbor = petriCell.neighbors[direction];
-                if (neighbor != null) spaceCell.attach(state.cells.getCell(neighbor.id), direction);
+                if (neighbor != null) spaceCell.attach(state.getCell(neighbor.id), direction);
             }
         }
 

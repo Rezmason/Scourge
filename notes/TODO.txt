@@ -1,6 +1,9 @@
 PRAXIS refactor
     Privatize state
+        Private arrays, public read-only array abstracts
     Polish the turd till it shines!
+
+Try putting in @:generic where it makes a difference
 
 1: board cursor, arrow keys
 2: board cursor, mouse

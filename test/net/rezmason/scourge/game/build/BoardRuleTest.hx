@@ -57,7 +57,7 @@ class BoardRuleTest extends ScourgeRuleTest {
         var currentPlayer_ = plan.onGlobal(PlyAspect.CURRENT_PLAYER);
         var currentPlayer:Int = state.global[currentPlayer_];
 
-        var playerHead:BoardCell = state.cells.getCell(state.players[currentPlayer][head_]);
+        var playerHead:BoardCell = state.getCell(state.players[currentPlayer][head_]);
 
         for (neighbor in playerHead.neighbors) {
             Assert.isNotNull(neighbor);

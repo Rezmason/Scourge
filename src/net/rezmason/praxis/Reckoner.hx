@@ -71,20 +71,21 @@ using net.rezmason.utils.Alphabetizer;
     @:final inline function getID<T>(aspectPointable:AspectPointable<T>):Int return aspectPointable[cast globalIdent_];
     @:final inline function getSpaceCell(space) return getCell(getID(space));
 
+    @:final inline function getCell(index) return state.getCell(index);
+    @:final inline function eachCell() return state.eachCell();
+    @:final inline function numCells() return state.numCells();
+
     @:final inline function getSpace(index) return state.spaces[index];
-    @:final inline function getCell(index) return state.cells.getCell(index);
     @:final inline function getPlayer(index) return state.players[index];
     @:final inline function getCard(index) return state.cards[index];
     @:final inline function getExtra(index) return state.extras[index];
 
     @:final inline function eachSpace() return state.spaces.iterator();
-    @:final inline function eachCell() return state.cells.iterator();
     @:final inline function eachPlayer() return state.players.iterator();
     @:final inline function eachCard() return state.cards.iterator();
     @:final inline function eachExtra() return state.extras.iterator();
 
     @:final inline function numSpaces() return state.spaces.length;
-    @:final inline function numCells() return state.cells.length; // should be the same as numSpaces though
     @:final inline function numPlayers() return state.players.length;
     @:final inline function numCards() return state.cards.length;
     @:final inline function numExtras() return state.extras.length;

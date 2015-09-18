@@ -316,7 +316,7 @@ class BiteRuleTest extends ScourgeRuleTest
         var head_ = plan.onPlayer(BodyAspect.HEAD);
         var occupier_ = plan.onSpace(OwnershipAspect.OCCUPIER);
         var enemyHeadID:Int = state.players[1][head_];
-        var enemyHead:BoardCell = state.cells.getCell(enemyHeadID);
+        var enemyHead:BoardCell = state.getCell(enemyHeadID);
         var cavity:BoardCell = enemyHead.s().s().e();
         cavity.value[occupier_] = 1;
 

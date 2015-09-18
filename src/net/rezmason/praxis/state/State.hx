@@ -7,12 +7,14 @@ import net.rezmason.grid.Grid;
 class State {
 
     public var global(get, null):Global;
+    
     public var globals(default, null):Array<Global>;
     public var players(default, null):Array<Player>;
     public var cards(default, null):Array<Card>;
     public var spaces(default, null):Array<Space>;
-    public var cells(default, null):BoardGrid;
     public var extras(default, null):Array<Extra>;
+    
+    var cells:BoardGrid;
     
     public function new():Void {
         globals = [];
@@ -51,4 +53,33 @@ class State {
     }
 
     inline function get_global() return globals[0];
+
+    public inline function getCell(index) return cells.getCell(index);
+    public inline function eachCell() return cells.iterator();
+    public inline function numCells() return cells.length; // should be the same as numSpaces though
+
+    @:allow(net.rezmason.praxis.rule.Builder)
+    inline function addGlobal(template, ident):Global return addAspectPointable(template, ident, globals);
+
+    @:allow(net.rezmason.praxis.rule.Builder)
+    inline function addPlayer(template, ident):Player return addAspectPointable(template, ident, players);
+
+    @:allow(net.rezmason.praxis.rule.Builder)
+    inline function addCard(template, ident):Card return addAspectPointable(template, ident, cards);
+
+    @:allow(net.rezmason.praxis.rule.Builder)
+    inline function addSpace(template, ident):Space {
+        var space = addAspectPointable(template, ident, spaces);
+        cells.addCell(space);
+        return space;
+    }
+
+    @:allow(net.rezmason.praxis.rule.Builder)
+    inline function addExtra(template, ident):Extra return addAspectPointable(template, ident, extras);
+
+    inline function addAspectPointable<T>(template:AspectPointable<T>, ident, list):AspectPointable<T> {
+        template[ident] = list.length;
+        list.push(template);
+        return template;
+    }
 }

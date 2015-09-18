@@ -17,15 +17,15 @@ class BoardUtils {
     private static var ADD_SPACES:EReg = ~/([^\n\t])/g;
 
     public inline static function grabXY(state:State, east:Int, south:Int):BoardCell {
-        return state.cells.getCell(0).run(NW).run(W).run(N).run(S, south).run(E, east);
+        return state.getCell(0).run(NW).run(W).run(N).run(S, south).run(E, east);
     }
 
     public static function spitBoard(state:State, plan:StatePlan, addSpaces:Bool = true, focus:Array<Int> = null):String {
-        if (state.cells.length == 0) return 'empty grid';
+        if (state.numCells() == 0) return 'empty grid';
 
         var str:String = '';
 
-        var grid:BoardCell = state.cells.getCell(0).run(NW).run(W).run(N);
+        var grid:BoardCell = state.getCell(0).run(NW).run(W).run(N);
 
         var occupier_ = plan.onSpace(OwnershipAspect.OCCUPIER);
         var isFilled_ = plan.onSpace(OwnershipAspect.IS_FILLED);
