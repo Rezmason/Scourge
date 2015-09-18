@@ -38,8 +38,8 @@ class CavityActor extends Actor<Dynamic> {
     private function eraseCavities(player:Player, maxFreshness):Bool {
         var cavityFirst:Int = player[cavityFirst_];
         if (cavityFirst != NULL) {
-            var oldCavitySpaces = getSpace(cavityFirst).listToAssocArray(state.spaces, cavityNext_, spaceIdent_);
-            for (space in oldCavitySpaces) if (space != null) clearCavityCell(space, maxFreshness);
+            var oldCavitySpaces = getSpace(cavityFirst).listToArray(state.spaces, cavityNext_);
+            for (space in oldCavitySpaces) clearCavityCell(space, maxFreshness);
             player[cavityFirst_] = NULL;
         }
         return cavityFirst != NULL;

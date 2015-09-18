@@ -15,12 +15,6 @@ class AspectUtils {
         return arr;
     }
 
-    public inline static function listToAssocArray<T>(me:AspectPointable<T>, list:Array<AspectPointable<T>>, itrPtr:AspectPointer<T>, keyPtr:AspectPointer<T>):Array<AspectPointable<T>> {
-        var arr = [];
-        for (me in iterate(me, list, itrPtr)) arr[me[keyPtr]] = me;
-        return arr;
-    }
-
     public inline static function removeSet<T>(me:AspectPointable<T>, list:Array<AspectPointable<T>>, next:AspectWritePointer<T>, prev:AspectWritePointer<T>):AspectPointable<T> {
         var nextSetID = me[next];
         var prevSetID = me[prev];

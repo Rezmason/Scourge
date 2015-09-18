@@ -1,7 +1,5 @@
 PRAXIS refactor
-    Wait. Are we truly using prev pointers anywhere?!
-        If pointable linked lists get abstracted, we might not need to
-    State is directly manipulable...
+    Privatize state
     Polish the turd till it shines!
 
 1: board cursor, arrow keys
