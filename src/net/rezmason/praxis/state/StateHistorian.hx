@@ -20,28 +20,28 @@ class StateHistorian {
     }
 
     public function init() {
-        for (aspects in state.globals) historyState.globals.push(aspects.map(history.alloc));
-        for (aspects in state.players) historyState.players.push(aspects.map(history.alloc));
-        for (aspects in state.cards)   historyState.cards  .push(aspects.map(history.alloc));
-        for (aspects in state.spaces)  historyState.spaces .push(aspects.map(history.alloc));
-        for (aspects in state.extras)  historyState.extras .push(aspects.map(history.alloc));
+        for (aspects in state._globals) historyState._globals.push(aspects.map(history.alloc));
+        for (aspects in state._players) historyState._players.push(aspects.map(history.alloc));
+        for (aspects in state._cards)   historyState._cards  .push(aspects.map(history.alloc));
+        for (aspects in state._spaces)  historyState._spaces .push(aspects.map(history.alloc));
+        for (aspects in state._extras)  historyState._extras .push(aspects.map(history.alloc));
         
         write();
         history.forget();
     }
 
     public function write():Void {
-        writeAspectPointables(state.globals, historyState.globals, aItr);
-        writeAspectPointables(state.players, historyState.players, aItr);
-        writeAspectPointables(state.spaces, historyState.spaces, aItr);
-        writeAspectPointables(state.extras, historyState.extras, aItr);
+        writeAspectPointables(state._globals, historyState._globals, aItr);
+        writeAspectPointables(state._players, historyState._players, aItr);
+        writeAspectPointables(state._spaces, historyState._spaces, aItr);
+        writeAspectPointables(state._extras, historyState._extras, aItr);
     }
 
     public function read():Void {
-        readAspectPointables(state.globals, historyState.globals, aItr);
-        readAspectPointables(state.players, historyState.players, aItr);
-        readAspectPointables(state.spaces, historyState.spaces, aItr);
-        readAspectPointables(state.extras, historyState.extras, aItr);
+        readAspectPointables(state._globals, historyState._globals, aItr);
+        readAspectPointables(state._players, historyState._players, aItr);
+        readAspectPointables(state._spaces, historyState._spaces, aItr);
+        readAspectPointables(state._extras, historyState._extras, aItr);
     }
 
     public function save():SavedState {

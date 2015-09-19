@@ -1,5 +1,6 @@
 package net.rezmason.scourge.game.meta;
 
+import net.rezmason.ds.ReadOnlyArray;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.rule.Actor;
 
@@ -8,14 +9,14 @@ class ReplenishActor extends Actor<ReplenishParams> {
     @extra(ReplenishableAspect.REP_STEP, true) var repStep_;
 
     override public function chooseMove(_):Void {
-        updateReps(params.globalProperties, [state.global]);
+        updateReps(params.globalProperties, state.globals);
         updateReps(params.playerProperties, state.players);
         updateReps(params.cardProperties, state.cards);
         updateReps(params.spaceProperties, state.spaces);
         signalChange();
     }
 
-    private function updateReps<T>(repProps:Map<String, ReplenishableProperty<T>>, aspectPointables:Array<AspectPointable<T>>):Void {
+    private function updateReps<T>(repProps:Map<String, ReplenishableProperty<T>>, aspectPointables:ReadOnlyArray<AspectPointable<T>>):Void {
         // Each replenishable gets its iterator incremented
         for (repProp in repProps) {
             var replenishable = getExtra(repProp.replenishableID);

@@ -86,7 +86,7 @@ class StateHistorianTest {
 
         function pushChange():Void {
             boards.push(state.spitBoard(plan));
-            extras.push(Std.string(state.extras));
+            extras.push(state.extras.join(","));
             historian.write();
             times.push(history.commit());
         }
@@ -121,7 +121,7 @@ class StateHistorianTest {
             history.revert(times.pop());
             historian.read();
             Assert.areEqual(boards.pop(), state.spitBoard(plan));
-            Assert.areEqual(extras.pop(), Std.string(state.extras));
+            Assert.areEqual(extras.pop(), state.extras.join(","));
         }
     }
 }

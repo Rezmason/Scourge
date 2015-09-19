@@ -1,21 +1,22 @@
 package net.rezmason.praxis.aspect;
 
+import net.rezmason.ds.ReadOnlyArray;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.PraxisTypes;
 
 class AspectUtils {
 
-    public inline static function iterate<T>(me:AspectPointable<T>, list:Array<AspectPointable<T>>, itrPtr:AspectPointer<T>):AspectPointableIterator<T> {
+    public inline static function iterate<T>(me:AspectPointable<T>, list:ReadOnlyArray<AspectPointable<T>>, itrPtr:AspectPointer<T>):AspectPointableIterator<T> {
         return new AspectPointableIterator(me, list, itrPtr);
     }
 
-    public inline static function listToArray<T>(me:AspectPointable<T>, list:Array<AspectPointable<T>>, itrPtr:AspectPointer<T>):Array<AspectPointable<T>> {
+    public inline static function listToArray<T>(me:AspectPointable<T>, list:ReadOnlyArray<AspectPointable<T>>, itrPtr:AspectPointer<T>):Array<AspectPointable<T>> {
         var arr = [];
         for (me in iterate(me, list, itrPtr)) arr.push(me);
         return arr;
     }
 
-    public inline static function removeSet<T>(me:AspectPointable<T>, list:Array<AspectPointable<T>>, next:AspectWritePointer<T>, prev:AspectWritePointer<T>):AspectPointable<T> {
+    public inline static function removeSet<T>(me:AspectPointable<T>, list:ReadOnlyArray<AspectPointable<T>>, next:AspectWritePointer<T>, prev:AspectWritePointer<T>):AspectPointable<T> {
         var nextSetID = me[next];
         var prevSetID = me[prev];
 
@@ -42,7 +43,7 @@ class AspectUtils {
         return nextSet;
     }
 
-    public inline static function addSet<T>(you:AspectPointable<T>, me:AspectPointable<T>, list:Array<AspectPointable<T>>, id:AspectPointer<T>, next:AspectWritePointer<T>, prev:AspectWritePointer<T>):AspectPointable<T> {
+    public inline static function addSet<T>(you:AspectPointable<T>, me:AspectPointable<T>, list:ReadOnlyArray<AspectPointable<T>>, id:AspectPointer<T>, next:AspectWritePointer<T>, prev:AspectWritePointer<T>):AspectPointable<T> {
         removeSet(me, list, next, prev);
         var prevSetID = you[prev];
         var myID = me[id];
@@ -53,13 +54,8 @@ class AspectUtils {
         return me;
     }
 
-    public inline static function chainByAspect<T>(list:Array<AspectPointable<T>>, id:AspectPointer<T>, next:AspectWritePointer<T>, prev:AspectWritePointer<T>):Void {
-
-        list = list.copy();
-        while (list.remove(null)) {}
-
+    public inline static function chainByAspect<T>(list:ReadOnlyArray<AspectPointable<T>>, id:AspectPointer<T>, next:AspectWritePointer<T>, prev:AspectWritePointer<T>):Void {
         if (list.length > 0) {
-
             var me = list[0];
 
             for (ike in 1...list.length) {
@@ -79,10 +75,10 @@ class AspectUtils {
 class AspectPointableIterator<T> {
 
     private var me:AspectPointable<T>;
-    private var list:Array<AspectPointable<T>>;
+    private var list:ReadOnlyArray<AspectPointable<T>>;
     private var aspectPointer:AspectPointer<T>;
 
-    public function new(_me:AspectPointable<T>, _list:Array<AspectPointable<T>>, _itrPtr:AspectPointer<T>):Void {
+    public function new(_me:AspectPointable<T>, _list:ReadOnlyArray<AspectPointable<T>>, _itrPtr:AspectPointer<T>):Void {
         me = _me;
         list = _list;
         aspectPointer = _itrPtr;
