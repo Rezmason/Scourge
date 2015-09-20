@@ -76,7 +76,7 @@ class BufferTexture extends Texture {
             #if flash
                 if (nativeTexture != null) nativeTexture.dispose();
                 // TODO: make this dependent on format?
-                nativeTexture = context.createRectangleTexture(width, height, FLOAT, true);
+                nativeTexture = context.createRectangleTexture(width, height, cast "rgbaHalfFloat", true);
             #else
                 GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
 
