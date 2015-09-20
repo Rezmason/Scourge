@@ -17,6 +17,7 @@ class IndexBuffer extends Artifact {
     function new(numIndices:Int, ?usage:BufferUsage):Void {
         super();
         this.numIndices = numIndices;
+        if (usage == null) usage = BufferUsage.STATIC_DRAW;
         this.usage = usage;
         #if !flash
             array = new IndexArray(numIndices);
@@ -26,7 +27,7 @@ class IndexBuffer extends Artifact {
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
         #if flash 
-            buf = context.createIndexBuffer(numIndices/*, usage*/);
+            buf = context.createIndexBuffer(numIndices, usage);
         #else
             buf = GL.createBuffer();
             GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);

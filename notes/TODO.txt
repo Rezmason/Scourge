@@ -36,10 +36,6 @@ Minified JS
             @:keep and @:keepSub
     --no-traces # remove all traces
 
-Flash 12 support
-    Context3DBufferUsage
-    Context3D::createVertexBuffer
-
 Try putting in @:generic where it makes a difference
 
 Smarten up the AI

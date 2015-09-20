@@ -32,7 +32,7 @@ class VertexBuffer extends Artifact {
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
         #if flash
-            buf = context.createVertexBuffer(numVertices, footprint/*, usage*/);
+            buf = context.createVertexBuffer(numVertices, footprint, usage);
         #else
             buf = GL.createBuffer();
             GL.bindBuffer(GL.ARRAY_BUFFER, buf);
