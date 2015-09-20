@@ -1,5 +1,3 @@
-Try putting in @:generic where it makes a difference
-
 1: board cursor, arrow keys
 2: board cursor, mouse
 3: board cursor, drag and drop
@@ -41,6 +39,8 @@ Minified JS
 Flash 12 support
     Context3DBufferUsage
     Context3D::createVertexBuffer
+
+Try putting in @:generic where it makes a difference
 
 Smarten up the AI
     Prune moves
