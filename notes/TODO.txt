@@ -1,3 +1,9 @@
+Tidy up sequence of events
+    Integrate board settling into sequence
+    Add interactive interruption where player choice would go
+        Show, hide the loupe
+        Listen for board interaction signal
+
 1: board cursor, arrow keys
 2: board cursor, mouse
 3: board cursor, drag and drop
@@ -23,6 +29,8 @@ We can support more Bodies by making IDs dynamic
 
 Settings page
 Game config page
+
+"MYCOTA" sounds like a nice name
 
 Some Haxe stuff
     https://github.com/DanielUranga/openfl-harfbuzz
