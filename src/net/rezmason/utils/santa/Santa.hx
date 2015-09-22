@@ -5,7 +5,7 @@ import haxe.ds.ObjectMap;
 // Gave you presents. It was your parents the whole time.
 
 enum InjectionType<T> {
-    Instance(classToInstantiate:Class<T>, constructorArgs:Array<Dynamic>);
+    Instance(inst:Void->T);
     Singleton(instance:T);
 }
 
@@ -36,7 +36,7 @@ class Santa {
         else if (idClassMap.exists(clazz)) type = idClassMap.get(clazz).get(id);
         switch (type) {
             case null: throw 'Santa can\'t give you a ${clazz}';
-            case Instance(classToInstantiate, args): result = Type.createInstance(classToInstantiate, args);
+            case Instance(inst): result = inst();
             case Singleton(instance): result = instance;
         }
         return result;
