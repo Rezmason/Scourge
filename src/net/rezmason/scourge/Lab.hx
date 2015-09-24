@@ -259,7 +259,7 @@ class PostSystem extends LabSystem {
     }
 
     override function update():Void {
-        time += 0.05;
+        time += 0.025;
 
         globMat.identity();
         globMat.appendTranslation(-0.5, -0.5, -0.0);
@@ -493,11 +493,11 @@ class MetaballSystem extends LabSystem {
     }
 
     override function update():Void {
-        time += 0.2;
+        time += 0.1;
         
         //bodyTransform.appendRotation(1, Vector4.Z_AXIS);
 
-        pool.update(0.2);
+        pool.update(0.1);
 
         /*
         var str:String = '';
