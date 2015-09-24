@@ -35,6 +35,9 @@ class BoardSettler extends Reckoner {
     @:final public function init(game:Game) primePointers(game.state, game.plan);
 
     public function run() {
+
+        var animationEntities = null;
+
         var affectedEntities:Map<Entity, Bool> = new Map();
 
         for (entity in qBoard) {
@@ -52,7 +55,11 @@ class BoardSettler extends Reckoner {
             
             var spaceState = entity.get(BoardSpaceState);
 
-            var anim = ecce.dispense([GlyphAnimation]).get(GlyphAnimation);
+            var animEntity = ecce.dispense([GlyphAnimation]);
+            if (animationEntities == null) animationEntities = [];
+            animationEntities.push(animEntity);
+
+            var anim = animEntity.get(GlyphAnimation);
             anim.subject = entity;
             if (anim.topFrom == null) anim.topFrom = GlyphUtils.createGlyph();
             if (anim.topTo == null) anim.topTo = GlyphUtils.createGlyph();
@@ -90,6 +97,8 @@ class BoardSettler extends Reckoner {
                 anim.topTo.SET({x:pos.x + x * 0.1, y:pos.y + y * 0.1, char:char});
             }
         }
+
+        return animationEntities;
     }
 
     static function makeNudgeArray():Array<Vec3> {

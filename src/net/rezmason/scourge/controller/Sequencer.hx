@@ -3,10 +3,10 @@ package net.rezmason.scourge.controller;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.ecce.Query;
+import net.rezmason.grid.Cell;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
-import net.rezmason.grid.Cell;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.components.*;
@@ -14,8 +14,9 @@ import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
-import net.rezmason.utils.pointers.Pointers;
+import net.rezmason.scourge.textview.board.BoardSettler;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.pointers.Pointers;
 import net.rezmason.utils.santa.Present;
 
 using net.rezmason.grid.GridUtils;
@@ -34,6 +35,7 @@ class Sequencer extends Reckoner {
     var sequence:Array<Array<Array<Entity>>> = [];
     var defaultRulePresenter:RulePresenter;
     var rulePresentersByCause:Map<String, RulePresenter>;
+    var boardSettler:BoardSettler;
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
     public var gameEndSignal(default, null):Zig<Void->Void> = new Zig();
     public var moveSequencedSignal(default, null):Zig<Void->Void> = new Zig();
@@ -49,6 +51,8 @@ class Sequencer extends Reckoner {
     public function new() {
         super();
         ecce = new Present(Ecce);
+        boardSettler = new BoardSettler();
+
         qBoardSpaceStates = ecce.query([BoardSpaceState]);
         qBoardViews = ecce.query([BoardSpaceView]);
         qAnimations = ecce.query([GlyphAnimation]);
@@ -76,6 +80,7 @@ class Sequencer extends Reckoner {
         rulePresentersByCause = null;
         defaultRulePresenter.dismiss();
         defaultRulePresenter = null;
+        boardSettler.dismiss();
         if (game.winner == -1) for (e in qAnimations) ecce.collect(e);
         dismiss();
         waitingToProceed = false;
@@ -97,6 +102,7 @@ class Sequencer extends Reckoner {
             rulePresentersByCause[cause] = rp;
             if (rp != null) rp.init(game, ecce);
         }
+        boardSettler.init(game);
 
         for (space in eachSpace()) {
             var id = getID(space);
@@ -159,6 +165,7 @@ class Sequencer extends Reckoner {
         if (waitingToProceed) {
             for (entity in qBoardViews) {
                 if (entity.get(BoardSpaceView).changed) {
+                    boardSettler.run();
                     moveSettlingSignal.dispatch();
                     processSequence();
                     return;
