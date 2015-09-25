@@ -9,7 +9,7 @@ using net.rezmason.praxis.aspect.AspectUtils;
 
 class ReplenishBuilder extends Builder<ReplenishParams> {
 
-    @extra(ReplenishableAspect.REP_STEP, true) var repStep_;
+    @extra(ReplenishableAspect.REP_STEP) var repStep_;
 
     override public function init():Void {
         for (key in params.globalProperties.keys().a2z() ) addGlobalAspectRequirement(params.globalProperties[key].prop);

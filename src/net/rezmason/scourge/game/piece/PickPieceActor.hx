@@ -12,14 +12,11 @@ class PickPieceActor extends Actor<PickPieceParams> {
 
     private var allMoves:Array<PickPieceMove>;
 
-    // This rule is surprisingly complex
-
     @card(PieceAspect.PIECE_HAT_NEXT, true) var pieceHatNext_;
     @card(PieceAspect.PIECE_HAT_PREV, true) var pieceHatPrev_;
 
-    @card(PieceAspect.PIECE_NEXT, true) var pieceNext_;
-    @card(PieceAspect.PIECE_PREV, true) var piecePrev_;
-
+    @card(PieceAspect.PIECE_NEXT) var pieceNext_;
+    
     @global(PieceAspect.PIECES_PICKED, true) var piecesPicked_;
     @global(PieceAspect.PIECE_FIRST, true) var pieceFirst_;
     @global(PieceAspect.PIECE_HAT_FIRST, true) var pieceHatFirst_;
@@ -30,15 +27,13 @@ class PickPieceActor extends Actor<PickPieceParams> {
     @global(PieceAspect.PIECE_HAT_PLAYER, true) var pieceHatPlayer_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
-    // All this for an overglorified random piece picker!
-
     override public function prime():Void {
         buildHat();
     }
 
     override public function chooseMove(move:Move):Void {
         var pickPieceMove:PickPieceMove = cast move;
-        if (remakeHat()) buildHat();
+        if (shouldRemakeHat()) buildHat();
         pickMoveFromHat(pickPieceMove);
         setPiece(pickPieceMove.pieceTableID, pickPieceMove.reflection, pickPieceMove.rotation);
     }
@@ -75,7 +70,7 @@ class PickPieceActor extends Actor<PickPieceParams> {
     }
 
     // We fill the hat up again if it's empty
-    private function remakeHat():Bool {
+    private function shouldRemakeHat():Bool {
         return state.global[pieceHatPlayer_] != state.global[currentPlayer_] ||
                 state.global[piecesPicked_] == params.hatSize;
     }

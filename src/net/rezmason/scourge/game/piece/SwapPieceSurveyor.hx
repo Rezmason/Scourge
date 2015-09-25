@@ -8,13 +8,9 @@ import net.rezmason.praxis.aspect.PlyAspect;
 
 class SwapPieceSurveyor extends Surveyor<SwapPieceParams> {
 
-    @player(SwapAspect.NUM_SWAPS, true) var numSwaps_;
+    @player(SwapAspect.NUM_SWAPS) var numSwaps_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
-    @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
-
-    override public function prime():Void {
-        for (player in eachPlayer()) player[numSwaps_] = params.startingSwaps;
-    }
+    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
 
     // This rule basically zaps the current player's piece and takes away a swap.
     override public function update():Void {

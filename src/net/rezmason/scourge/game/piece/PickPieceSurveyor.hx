@@ -11,8 +11,6 @@ class PickPieceSurveyor extends Surveyor<PickPieceParams> {
 
     private var allMoves:Array<PickPieceMove>;
 
-    // This rule is surprisingly complex
-
     @card(PieceAspect.PIECE_HAT_NEXT) var pieceHatNext_;
     @card(PieceAspect.PIECE_MOVE_ID) var pieceMoveID_;
 
@@ -23,14 +21,12 @@ class PickPieceSurveyor extends Surveyor<PickPieceParams> {
     @global(PieceAspect.PIECE_HAT_PLAYER) var pieceHatPlayer_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
-    // All this for an overglorified random piece picker!
-
     override public function prime():Void {
         allMoves = params.pieceMoves;
     }
 
     override public function update():Void {
-        if (remakeHat()) {
+        if (shouldRemakeHat()) {
             // The hat's been refilled; all piece moves are available as moves
             moves = cast allMoves.copy();
         } else if (state.global[pieceTableID_] == NULL) {
@@ -45,7 +41,7 @@ class PickPieceSurveyor extends Surveyor<PickPieceParams> {
     }
 
     // We fill the hat up again if it's empty
-    private function remakeHat():Bool {
+    private function shouldRemakeHat():Bool {
         return state.global[pieceHatPlayer_] != state.global[currentPlayer_] ||
                 state.global[piecesPicked_] == params.hatSize;
     }

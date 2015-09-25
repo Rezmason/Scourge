@@ -11,24 +11,10 @@ class PickPieceBuilder extends Builder<PickPieceParams> {
 
     var allMoves:Array<PickPieceMove>;
 
-    // This rule is surprisingly complex
-
-    @card(PieceAspect.PIECE_HAT_NEXT, true) var pieceHatNext_;
-    
     @card(PieceAspect.PIECE_NEXT, true) var pieceNext_;
     @card(PieceAspect.PIECE_PREV, true) var piecePrev_;
-
     @card(PieceAspect.PIECE_MOVE_ID, true) var pieceMoveID_;
-
-    @global(PieceAspect.PIECES_PICKED, true) var piecesPicked_;
     @global(PieceAspect.PIECE_FIRST, true) var pieceFirst_;
-    @global(PieceAspect.PIECE_HAT_FIRST, true) var pieceHatFirst_;
-    @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
-
-    @global(PieceAspect.PIECE_HAT_PLAYER, true) var pieceHatPlayer_;
-    @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
-
-    // All this for an overglorified random piece picker!
 
     override public function prime():Void {
         if (params.hatSize > params.pieceTableIDs.length) params.hatSize = params.pieceTableIDs.length;

@@ -12,21 +12,17 @@ using net.rezmason.praxis.aspect.AspectUtils;
 
 class BiteSurveyor extends Surveyor<BiteParams> {
 
-    @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
-    @space(OwnershipAspect.IS_FILLED, true) var isFilled_;
-    @space(OwnershipAspect.OCCUPIER, true) var occupier_;
-    @player(BiteAspect.NUM_BITES, true) var numBites_;
-    @player(BodyAspect.BODY_FIRST, true) var bodyFirst_;
+    @space(BodyAspect.BODY_NEXT) var bodyNext_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
+    @player(BiteAspect.NUM_BITES) var numBites_;
+    @player(BodyAspect.BODY_FIRST) var bodyFirst_;
     @player(BodyAspect.HEAD) var head_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     private var movePool:Array<BiteMove> = [];
     private var allMoves:Array<BiteMove> = [];
-
-    override public function prime():Void {
-        for (player in eachPlayer()) player[numBites_] = params.startingBites;
-    }
 
     override public function update():Void {
 

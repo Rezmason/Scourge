@@ -14,11 +14,11 @@ using net.rezmason.praxis.aspect.AspectUtils;
 
 class DropPieceSurveyor extends Surveyor<DropPieceParams> {
 
-    @space(BodyAspect.BODY_NEXT, true) var bodyNext_;
-    @space(OwnershipAspect.IS_FILLED, true) var isFilled_;
-    @space(OwnershipAspect.OCCUPIER, true) var occupier_;
-    @player(BodyAspect.BODY_FIRST, true) var bodyFirst_;
-    @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
+    @space(BodyAspect.BODY_NEXT) var bodyNext_;
+    @space(OwnershipAspect.IS_FILLED) var isFilled_;
+    @space(OwnershipAspect.OCCUPIER) var occupier_;
+    @player(BodyAspect.BODY_FIRST) var bodyFirst_;
+    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
     @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
     @global(PieceAspect.PIECE_ROTATION) var pieceRotation_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;

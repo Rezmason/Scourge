@@ -12,7 +12,6 @@ import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeGameConfig;
-import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
 import net.rezmason.scourge.textview.board.BoardSettler;
 import net.rezmason.utils.Zig;
@@ -43,8 +42,6 @@ class Sequencer extends Reckoner {
     public var boardChangeSignal(default, null):Zig<String->Null<Int>->Entity->Void> = new Zig();
     public var animationLength(default, set):Float;
 
-    @space(OwnershipAspect.IS_FILLED) var isFilled_;
-    @space(OwnershipAspect.OCCUPIER) var occupier_;
     @space(FreshnessAspect.FRESHNESS) var freshness_;
     @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
 
