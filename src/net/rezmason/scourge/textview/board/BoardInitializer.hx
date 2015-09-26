@@ -64,7 +64,7 @@ class BoardInitializer {
         board.transform.identity();
         var scale = 0.8 / Math.sqrt(maxDistSquared * 2);
         board.transform.appendScale(scale, scale, scale);
-        board.glyphScale = scale * 0.35;
+        board.glyphScale = scale * 0.7;
 
         // Second pass: populate views with glyphs, draw the walls (which don't change)
         var itr = 0;
