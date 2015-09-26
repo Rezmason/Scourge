@@ -7,4 +7,6 @@ class BoardSpaceView {
     public var top:Glyph;
     public var bottom:Glyph;
     public var changed:Bool;
+    public var lastTopTo:Glyph;
+    public var lastBottomTo:Glyph;
 }

@@ -1,5 +1,4 @@
 Tidy up sequence of events
-    Integrate board settling into sequence
     Add interactive interruption where player choice would go
         Show, hide the loupe
         Listen for board interaction signal

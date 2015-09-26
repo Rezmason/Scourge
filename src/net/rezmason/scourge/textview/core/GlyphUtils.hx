@@ -71,13 +71,14 @@ class GlyphUtils {
         return gl;
     }
 
-    public inline static function copyFrom(gl:Glyph, src:Glyph):Void {
+    public inline static function copyFrom(gl:Glyph, src:Glyph):Glyph {
         for (ike in 0...SHAPE_FLOATS_PER_GLYPH) gl.shape[gl.id * SHAPE_FLOATS_PER_GLYPH + ike] = src.shape[src.id * SHAPE_FLOATS_PER_GLYPH + ike];
         for (ike in 0...COLOR_FLOATS_PER_GLYPH) gl.color[gl.id * COLOR_FLOATS_PER_GLYPH + ike] = src.color[src.id * COLOR_FLOATS_PER_GLYPH + ike];
         for (ike in 0...PAINT_FLOATS_PER_GLYPH) gl.paint[gl.id * PAINT_FLOATS_PER_GLYPH + ike] = src.paint[src.id * PAINT_FLOATS_PER_GLYPH + ike];
         gl.paintHex = src.paintHex;
         gl.charCode = src.charCode;
         gl.font = src.font;
+        return gl;
     }
 
     // Shape

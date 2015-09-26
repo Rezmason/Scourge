@@ -38,7 +38,6 @@ class Sequencer extends Reckoner {
     public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
     public var gameEndSignal(default, null):Zig<Void->Void> = new Zig();
     public var moveSequencedSignal(default, null):Zig<Void->Void> = new Zig();
-    public var moveSettlingSignal(default, null):Zig<Void->Void> = new Zig();
     public var boardChangeSignal(default, null):Zig<String->Null<Int>->Entity->Void> = new Zig();
     public var animationLength(default, set):Float;
 
@@ -153,6 +152,7 @@ class Sequencer extends Reckoner {
     }
 
     function onMoveStop() {
+        sequence.push([boardSettler.run()]);
         processSequence();
         waitingToProceed = true;
         moveSequencedSignal.dispatch();
@@ -160,18 +160,8 @@ class Sequencer extends Reckoner {
 
     public function proceed() {
         if (waitingToProceed) {
-            for (entity in qBoardViews) {
-                if (entity.get(BoardSpaceView).changed) {
-                    boardSettler.run();
-                    moveSettlingSignal.dispatch();
-                    processSequence();
-                    return;
-                }
-            }
-            if (waitingToProceed) {
-                waitingToProceed = false;
-                player.proceed();
-            }
+            waitingToProceed = false;
+            player.proceed();
         }
     }
 

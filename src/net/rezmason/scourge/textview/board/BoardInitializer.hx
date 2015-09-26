@@ -95,6 +95,10 @@ class BoardInitializer {
                 bottom.SET({char:BOARD_CODE, color:BOARD_COLOR});
                 top.SET({char:-1, color:BLACK});
             }
+
+            view.lastTopTo = GlyphUtils.createGlyph().copyFrom(top);
+            view.lastBottomTo = GlyphUtils.createGlyph().copyFrom(bottom);
+
             itr += 3;
         }
     }

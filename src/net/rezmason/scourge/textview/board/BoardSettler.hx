@@ -51,7 +51,6 @@ class BoardSettler extends Reckoner {
         
         for (entity in affectedEntities.keys()) {
             var view = entity.get(BoardSpaceView);
-            view.changed = false;
             
             var spaceState = entity.get(BoardSpaceState);
 
@@ -69,11 +68,19 @@ class BoardSettler extends Reckoner {
             anim.duration = 0.3;
             anim.ease = Quad.easeInOut.calculate;
             
-            anim.topFrom.copyFrom(view.top);
-            anim.topTo.copyFrom(view.top);
-            anim.bottomFrom.copyFrom(view.bottom);
-            anim.bottomTo.copyFrom(view.bottom);
-
+            if (view.changed) {
+                view.changed = false;
+                anim.topFrom.copyFrom(view.lastTopTo);
+                anim.topTo.copyFrom(view.lastTopTo);
+                anim.bottomFrom.copyFrom(view.lastBottomTo);
+                anim.bottomTo.copyFrom(view.lastBottomTo);
+            } else {
+                anim.topFrom.copyFrom(view.top);
+                anim.topTo.copyFrom(view.top);
+                anim.bottomFrom.copyFrom(view.bottom);
+                anim.bottomTo.copyFrom(view.bottom);
+            }
+            
             anim.topTo.set_p(-0.01);
 
             var occupier = spaceState.values[occupier_];

@@ -24,7 +24,6 @@ class GameContext {
 
         var boardAnimator = new BoardAnimator();
         sequencer.moveSequencedSignal.add(boardAnimator.wake);
-        sequencer.moveSettlingSignal.add(boardAnimator.wake);
         boardAnimator.animCompleteSignal.add(sequencer.proceed);
     }
 }

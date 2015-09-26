@@ -44,7 +44,12 @@ class RulePresenter extends Reckoner {
         animateGlyphs();
         var entities = animationEntities;
         animationEntities = null;
-        if (entities != null) spaceView.changed = true;
+        if (entities != null) {
+            var lastAnim = entities[entities.length - 1].get(GlyphAnimation);
+            spaceView.changed = true;
+            spaceView.lastTopTo.copyFrom(lastAnim.topTo);
+            spaceView.lastBottomTo.copyFrom(lastAnim.bottomTo);
+        }
         return entities;
     }
 
