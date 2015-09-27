@@ -70,10 +70,10 @@ class RulePresenter extends Reckoner {
         anim.duration = 0.125;
         anim.ease = Quad.easeInOut.calculate;
 
-        anim.topFrom.copyFrom(spaceView.top);
-        anim.topTo.copyFrom(spaceView.top);
-        anim.bottomFrom.copyFrom(spaceView.bottom);
-        anim.bottomTo.copyFrom(spaceView.bottom);
+        anim.topFrom.copyFrom(spaceView.lastTopTo);
+        anim.topTo.copyFrom(spaceView.lastTopTo);
+        anim.bottomFrom.copyFrom(spaceView.lastBottomTo);
+        anim.bottomTo.copyFrom(spaceView.lastBottomTo);
 
         return anim;
     }

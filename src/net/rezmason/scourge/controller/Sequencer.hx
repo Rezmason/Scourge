@@ -13,7 +13,8 @@ import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.meta.FreshnessAspect;
-import net.rezmason.scourge.textview.board.BoardSettler;
+import net.rezmason.scourge.controller.board.BoardSettler;
+import net.rezmason.scourge.controller.board.BoardInitializer;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.pointers.Pointers;
 import net.rezmason.utils.santa.Present;
@@ -30,14 +31,15 @@ class Sequencer extends Reckoner {
     var qBoardViews:Query;
     var qAnimations:Query;
     var lastMaxFreshness:Int;
-    var waitingToProceed:Bool;
+    var animating:Bool;
     var sequence:Array<Array<Array<Entity>>> = [];
     var defaultRulePresenter:RulePresenter;
     var rulePresentersByCause:Map<String, RulePresenter>;
+    var boardInitializer = new BoardInitializer();
     var boardSettler:BoardSettler;
-    public var gameStartSignal(default, null):Zig<Game->Ecce->Void> = new Zig();
+    public var gameStartSignal(default, null):Zig<Void->Void> = new Zig();
     public var gameEndSignal(default, null):Zig<Void->Void> = new Zig();
-    public var moveSequencedSignal(default, null):Zig<Void->Void> = new Zig();
+    public var animationComposedSignal(default, null):Zig<Void->Void> = new Zig();
     public var boardChangeSignal(default, null):Zig<String->Null<Int>->Entity->Void> = new Zig();
     public var animationLength(default, set):Float;
 
@@ -52,7 +54,7 @@ class Sequencer extends Reckoner {
         qBoardSpaceStates = ecce.query([BoardSpaceState]);
         qBoardViews = ecce.query([BoardSpaceView]);
         qAnimations = ecce.query([GlyphAnimation]);
-        waitingToProceed = false;
+        animating = false;
         animationLength = 1;
     }
 
@@ -79,7 +81,7 @@ class Sequencer extends Reckoner {
         boardSettler.dismiss();
         if (game.winner == -1) for (e in qAnimations) ecce.collect(e);
         dismiss();
-        waitingToProceed = false;
+        animating = false;
         gameEndSignal.dispatch();
     }
 
@@ -118,11 +120,12 @@ class Sequencer extends Reckoner {
             }
         }
 
-        gameStartSignal.dispatch(game, ecce);
-        sequence[0] = [for (e in qBoardSpaceStates) defaultRulePresenter.presentBoardEffect(e)];
-        processSequence();
-        waitingToProceed = true;
-        moveSequencedSignal.dispatch();
+        gameStartSignal.dispatch();
+
+        boardInitializer.run();
+        sequence.push([for (e in qBoardSpaceStates) defaultRulePresenter.presentBoardEffect(e)]);
+        startAnimation();
+        animationComposedSignal.dispatch();
     }
 
     function onMoveStart(currentPlayer:Int, actionID:String, move:Int) {
@@ -153,19 +156,18 @@ class Sequencer extends Reckoner {
 
     function onMoveStop() {
         sequence.push([boardSettler.run()]);
-        processSequence();
-        waitingToProceed = true;
-        moveSequencedSignal.dispatch();
+        startAnimation();
+        animationComposedSignal.dispatch();
     }
 
-    public function proceed() {
-        if (waitingToProceed) {
-            waitingToProceed = false;
+    public function completeAnimation() {
+        if (animating) {
+            animating = false;
             player.proceed();
         }
     }
 
-    function processSequence():Void {
+    function startAnimation():Void {
         var animations = [];
         var startTime:Float = 0;
         for (step in sequence) { // steps correspond to freshness
@@ -198,6 +200,7 @@ class Sequencer extends Reckoner {
                 }
             }
         }
+        animating = true;
     }
 
     inline function set_animationLength(val:Float):Float {

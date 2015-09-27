@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.board;
+package net.rezmason.scourge.controller.board;
 
 import haxe.Utf8;
 
@@ -7,6 +7,7 @@ import net.rezmason.ecce.Query;
 import net.rezmason.scourge.Strings.*;
 import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.textview.ColorPalette.*;
+import net.rezmason.scourge.textview.View;
 import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;

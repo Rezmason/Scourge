@@ -1,4 +1,4 @@
-package net.rezmason.scourge.textview.board;
+package net.rezmason.scourge.controller.board;
 
 import haxe.Utf8;
 import net.rezmason.ecce.Ecce;
