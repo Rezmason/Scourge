@@ -27,6 +27,8 @@ abstract Vec3({r:Float, g:Float, b:Float}) {
     @:op(A + B) public inline function  addVec3(rhs:Vec3):Vec3 return new Vec3(this.r + rhs.r, this.g + rhs.g, this.b + rhs.b);
     @:op(A - B) public inline function  subVec3(rhs:Vec3):Vec3 return new Vec3(this.r - rhs.r, this.g - rhs.g, this.b - rhs.b);
 
+    @:op(-A) public inline static function inverse(v:Vec3) return new Vec3(-v.r, -v.g, -v.b);
+
     public inline static function fromHex(hex:Int):Vec3 {
         return new Vec3((hex >> 16 & 0xFF) / 0xFF, (hex >> 8  & 0xFF) / 0xFF, (hex >> 0  & 0xFF) / 0xFF);
     }

@@ -229,11 +229,12 @@ class PostSystem extends LabSystem {
         fragShader = Lab.makeExtensions(glSys) + fragShader;
 
         var vertices:VertexArray = new VertexArray(VpB * FpV);
+        var up = #if flash 1 #else 0 #end ;
         var vert = [
-            -1,-1,0,0,1,
-            -1, 1,0,0,0,
-             1, 1,0,1,0,
-             1,-1,0,1,1,
+            -1,-1,0,0,1 - up,
+            -1, 1,0,0,up,
+             1, 1,0,1,up,
+             1,-1,0,1,1 - up,
         ];
         for (ike in 0...VpB * FpV) vertices[ike] = vert[ike];
         vertBuffer = glSys.createVertexBuffer(VpB, FpV);
@@ -495,7 +496,7 @@ class MetaballSystem extends LabSystem {
     override function update():Void {
         time += 0.1;
         
-        //bodyTransform.appendRotation(1, Vector4.Z_AXIS);
+        bodyTransform.appendRotation(0.1, Vector4.Z_AXIS);
 
         pool.update(0.1);
 

@@ -34,6 +34,7 @@ class Engine extends Module {
     var bodiesByID:Map<Int, Body>;
     var scenes:Array<Scene>;
     
+    var postProcess:PostProcessor;
     var mouseSystem:MouseSystem;
     var keyboardSystem:KeyboardSystem;
     var mouseMethod:RenderMethod;
@@ -121,6 +122,8 @@ class Engine extends Module {
     }
 
     function initRenderMethods():Void {
+        postProcess = new PostProcessor();
+
         prettyMethod = new PrettyMethod();
         mouseMethod = new MouseMethod();
 
@@ -145,7 +148,10 @@ class Engine extends Module {
     }
 
     function onRender(width:Int, height:Int):Void {
-        if (active) drawFrame(prettyMethod, glSys.viewportOutputBuffer);
+        if (active) {
+            drawFrame(prettyMethod, postProcess.inputBuffer);
+            postProcess.draw();
+        }
     }
 
     function onDisconnect():Void {
@@ -181,7 +187,7 @@ class Engine extends Module {
         this.height = height;
         for (scene in scenes) scene.resize(width, height);
         mouseSystem.setSize(width, height);
-        glSys.viewportOutputBuffer.resize(width, height);
+        postProcess.setSize(width, height);
     }
 
     function activate():Void {
