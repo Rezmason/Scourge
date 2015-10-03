@@ -3,6 +3,7 @@ package net.rezmason.scourge.textview.errands;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.praxis.bot.BotSystem;
 import net.rezmason.praxis.bot.ReplaySmarts;
+import net.rezmason.praxis.human.HumanSystem;
 import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.praxis.play.Referee;
@@ -43,18 +44,19 @@ class BeginGameErrand extends Errand<Bool->String->Void> {
         var randGen:Void->Float = lgm(seed);
         var randBot:Void->Float = lgm(seed); // TODO: seed should only be given to *internal* bots
         var botSystem:BotSystem = null;
-        var watchedPlayer:PlayerSystem = null;
+        var humanSystem:HumanSystem = null;
+        var watchedPlayerSystem:PlayerSystem = null;
         var hasHumans:Bool = !isReplay && playerPattern.indexOf('h') != -1;
         var hasBots:Bool   =  isReplay || playerPattern.indexOf('b') != -1;
 
         if (hasHumans) {
-            // TODO: create HumanSystem
-            // TODO: watchedPlayer = humanSystem
+            humanSystem = new HumanSystem(); // TODO: recycle
+            watchedPlayerSystem = humanSystem;
         }
 
         if (hasBots) {
             botSystem = new BotSystem(!hasHumans, randBot); // TODO: recycle
-            if (watchedPlayer == null) watchedPlayer = botSystem;
+            if (watchedPlayerSystem == null) watchedPlayerSystem = botSystem;
         }
 
         if (isReplay) {
@@ -70,15 +72,16 @@ class BeginGameErrand extends Errand<Bool->String->Void> {
         var players:Array<IPlayer> = [];
         for (ike in 0...playerPattern.length) {
             switch (playerPattern[ike]) {
-                case 'h' if (hasHumans): throw 'Humans cannot play yet.';
-                default: 
+                case 'h':
+                    players.push(humanSystem.createPlayer(ike));
+                case 'b': 
                     var smarts = isReplay ? new ReplaySmarts(referee.lastGame.log) : new BasicSmarts();
                     players.push(botSystem.createPlayer(ike, smarts, thinkPeriod));
             }
         }
 
         sequencer.animationLength = animationLength;
-        sequencer.connect(watchedPlayer);
+        sequencer.connect(watchedPlayerSystem);
         referee.beginGame(players, randGen, config);
         onComplete.dispatch(true, null);
     }
