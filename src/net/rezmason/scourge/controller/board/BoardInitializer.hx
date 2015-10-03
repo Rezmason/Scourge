@@ -65,7 +65,7 @@ class BoardInitializer {
         board.transform.identity();
         var scale = 0.8 / Math.sqrt(maxDistSquared * 2);
         board.transform.appendScale(scale, scale, scale);
-        board.glyphScale = scale * 0.7;
+        board.glyphScale = scale * 0.5;
 
         // Second pass: populate views with glyphs, draw the walls (which don't change)
         var itr = 0;
@@ -92,9 +92,6 @@ class BoardInitializer {
                 var stretch = board.glyphTexture.font.glyphRatio;
                 bottom.SET({char:char, color:BOARD_COLOR, h:stretch});
                 top.SET({char:char, color:WALL_COLOR, h:stretch});
-            } else {
-                bottom.SET({char:BOARD_CODE, color:BOARD_COLOR});
-                top.SET({char:-1, color:BLACK});
             }
 
             view.lastTopTo = GlyphUtils.createGlyph().copyFrom(top);

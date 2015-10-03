@@ -124,6 +124,7 @@ class Sequencer extends Reckoner {
 
         boardInitializer.run();
         sequence.push([for (e in qBoardSpaceStates) defaultRulePresenter.presentBoardEffect(e)]);
+        sequence.push([boardSettler.run()]);
         startAnimation();
         animationComposedSignal.dispatch();
     }

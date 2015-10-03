@@ -11,6 +11,7 @@ import net.rezmason.scourge.Strings.*;
 import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
+import net.rezmason.scourge.game.build.PetriTypes;
 import net.rezmason.scourge.textview.ColorPalette.*;
 import net.rezmason.scourge.textview.core.Glyph;
 
@@ -78,18 +79,20 @@ class RulePresenter extends Reckoner {
         return anim;
     }
 
-    @:final function populateGlyphs(topGlyph:Glyph, bottomGlyph:Glyph, values:Space) {
+    @:final function populateGlyphs(topGlyph:Glyph, bottomGlyph:Glyph, values:Space, petriData:PetriData) {
         var occupier = values[occupier_];
         var isFilled = values[isFilled_] == TRUE;
         
         if (occupier != NULL) {
             var color = TEAM_COLORS[occupier];
             if (isFilled) {
-                var code = (getPlayer(occupier)[head_] == getID(values)) ? HEAD_CODE : BODY_CODE;
-                bottomGlyph.SET({char:code, color:color * 0.3, s:1.8});
-                topGlyph.SET({char:code, color:color, f:0.6});
+                var code = BODY_CODE;
+                if (getPlayer(occupier)[head_] == getID(values)) code = HEAD_CODE;
+                else if (petriData.isHead) code = EATEN_HEAD_CODE;
+                bottomGlyph.SET({char:code, color:color * 0.3, s:2.5});
+                topGlyph.SET({char:code, color:color, f:0.6, s:1.5});
             } else {
-                bottomGlyph.SET({char:BOARD_CODE, color:color * 0.3, s:1});
+                bottomGlyph.SET({char:BOARD_CODE, color:color * 0.3, s:1.5});
                 topGlyph.SET({char:BODY_CODE, color:BLACK});
             }
         } else {
@@ -104,8 +107,8 @@ class RulePresenter extends Reckoner {
 
     function animateGlyphs() {
         var anim = createAnimation();
-        populateGlyphs(anim.topFrom, anim.bottomFrom, spaceState.lastValues);
-        populateGlyphs(anim.topTo,   anim.bottomTo,   spaceState.values);
+        populateGlyphs(anim.topFrom, anim.bottomFrom, spaceState.lastValues, spaceState.petriData);
+        populateGlyphs(anim.topTo,   anim.bottomTo,   spaceState.values, spaceState.petriData);
 
         anim.bottomTo.set_pos(spaceState.petriData.pos);
         anim.topTo.set_pos(spaceState.petriData.pos);

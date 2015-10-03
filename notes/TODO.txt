@@ -1,7 +1,17 @@
 Tidy up sequence of events
-    Add interactive interruption where player choice would go
-        Show, hide the loupe
-        Listen for board interaction signal
+    Game begins; UI is visible
+        UI requests moves and displays them
+        UI is interactive if the current player is present human
+        Otherwise, UI puppet waits for move data
+    Move starts
+        If current player is not present human, sequencer passes move to UI puppet
+    Move ends
+        If current player is not present human, sequencer signals UI puppet to act
+    UI puppet completes animation, signals sequencer
+        Sequencer hides UI
+        Sequencer triggers board animation
+    Board animator completes animation, signals sequencer
+        Sequencer shows UI
 
 1: board cursor, arrow keys
 2: board cursor, mouse

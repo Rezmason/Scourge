@@ -55,7 +55,7 @@ class PlayGameAction extends UserAction {
         while (playerPattern.length < numPlayers) playerPattern.push('b');
 
         var thinkPeriodString:String = args.keyValuePairs['thinkPeriod'];
-        if (thinkPeriodString == null) thinkPeriodString = '10';
+        if (thinkPeriodString == null) thinkPeriodString = '1000';
         var thinkPeriod:Int = Std.parseInt(thinkPeriodString);
 
         var animationLengthString:String = args.keyValuePairs['animationLength'];

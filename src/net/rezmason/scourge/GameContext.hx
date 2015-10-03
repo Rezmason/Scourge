@@ -2,6 +2,7 @@ package net.rezmason.scourge;
 
 import net.rezmason.ecce.Ecce;
 import net.rezmason.praxis.play.Referee;
+import net.rezmason.scourge.controller.MoveMediator;
 import net.rezmason.scourge.controller.Sequencer;
 import net.rezmason.scourge.controller.board.BoardAnimator;
 import net.rezmason.scourge.textview.View;
@@ -21,7 +22,7 @@ class GameContext {
         sequencer.animationComposedSignal.add(boardAnimator.wake);
         boardAnimator.animCompleteSignal.add(sequencer.completeAnimation);
 
-        // var moveMediator = new MoveMediator();
-        // Santa.mapToClass(MoveMediator, Singleton(moveMediator));
+        var moveMediator = new MoveMediator();
+        Santa.mapToClass(MoveMediator, Singleton(moveMediator));
     }
 }

@@ -13,6 +13,7 @@ class View {
         body = new Body();
         board = new Body();
         loupe = new BorderBox();
+        loupe.glyphWidth = 0.05;
 
         body.addChild(board);
         body.addChild(loupe.body);
