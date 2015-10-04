@@ -33,19 +33,12 @@ class BotSystem extends PlayerSystem {
 
     override private function init(configData:String, saveData:String):Void {
         super.init(configData, saveData);
-        for (bot in botsByIndex) if (bot.smarts != null) bot.smarts.init(game, config, bot.index, random);
+        for (bot in botsByIndex) bot.smarts.init(game, config, bot.index, random);
     }
 
-    override private function play():Void beat(choose);
+    override private function play():Void beat(currentPlayer().choose);
+    
     override private function isMyTurn():Bool return game.hasBegun && game.winner < 0 && currentPlayer() != null;
-
-    private function choose():Void {
-        var player:BotPlayer = currentPlayer();
-        var playerSmarts:Smarts = player.smarts;
-        var event:GameEvent = playerSmarts.choose();
-        // trace('${game.currentPlayer} $event');
-        player.playSignal.dispatch(event);
-    }
 
     private function beat(cbk:Void->Void):Void {
         var period:Int = 10;

@@ -15,7 +15,7 @@ class HumanSystem extends PlayerSystem {
         numHumans = 0;
     }
 
-    public function createPlayer(index:Int):IPlayer {
+    public function createPlayer(index:Int):HumanPlayer {
         var human:HumanPlayer = new HumanPlayer(index);
         human.playSignal.add(onHumanSignal.bind(index));
         humansByIndex[index] = human;
@@ -23,13 +23,9 @@ class HumanSystem extends PlayerSystem {
         return human;
     }
 
-    private function onHumanSignal(senderIndex:Int, event:GameEvent):Void {
-        if (!game.hasBegun || senderIndex == game.currentPlayer) processGameEvent(event);
-    }
+    private function onHumanSignal(senderIndex:Int, event:GameEvent):Void processGameEvent(event);
 
     override private function play():Void currentPlayer().choose();
-
     override private function isMyTurn():Bool return game.hasBegun && game.winner < 0 && currentPlayer() != null;
-
     private inline function currentPlayer():HumanPlayer return humansByIndex[game.currentPlayer];
 }

@@ -21,12 +21,12 @@ import net.rezmason.utils.santa.Present;
 
 using net.rezmason.grid.GridUtils;
 
-class Sequencer extends Reckoner {
+class Sequencer {
 
     var ecce:Ecce = null;
     var config:ScourgeGameConfig = null;
     var game:Game = null;
-    var player:PlayerSystem = null;
+    var playerSystem:PlayerSystem = null;
     var qBoardSpaceStates:Query;
     var qBoardViews:Query;
     var qAnimations:Query;
@@ -43,11 +43,10 @@ class Sequencer extends Reckoner {
     public var boardChangeSignal(default, null):Zig<String->Null<Int>->Entity->Void> = new Zig();
     public var animationLength(default, set):Float;
 
-    @space(FreshnessAspect.FRESHNESS) var freshness_;
-    @global(FreshnessAspect.MAX_FRESHNESS) var maxFreshness_;
+    var freshness_:AspectPointer<PSpace>;
+    var maxFreshness_:AspectPointer<PGlobal>;
 
     public function new() {
-        super();
         ecce = new Present(Ecce);
         boardSettler = new BoardSettler();
 
@@ -58,29 +57,28 @@ class Sequencer extends Reckoner {
         animationLength = 1;
     }
 
-    public function connect(player:PlayerSystem):Void {
-        this.player = player;
-        player.gameBegunSignal.add(onGameBegun);
-        player.moveStartSignal.add(onMoveStart);
-        player.moveStepSignal.add(onMoveStep);
-        player.moveStopSignal.add(onMoveStop);
-        player.gameEndedSignal.add(onGameEnded);
+    public function connect(playerSystem:PlayerSystem):Void {
+        this.playerSystem = playerSystem;
+        playerSystem.gameBegunSignal.add(onGameBegun);
+        playerSystem.moveStartSignal.add(onMoveStart);
+        playerSystem.moveStepSignal.add(onMoveStep);
+        playerSystem.moveStopSignal.add(onMoveStop);
+        playerSystem.gameEndedSignal.add(onGameEnded);
     }
 
     function onGameEnded():Void {
-        player.gameBegunSignal.remove(onGameBegun);
-        player.moveStartSignal.remove(onMoveStart);
-        player.moveStepSignal.remove(onMoveStep);
-        player.moveStopSignal.remove(onMoveStop);
-        player.gameEndedSignal.remove(onGameEnded);
-        this.player = null;
+        playerSystem.gameBegunSignal.remove(onGameBegun);
+        playerSystem.moveStartSignal.remove(onMoveStart);
+        playerSystem.moveStepSignal.remove(onMoveStep);
+        playerSystem.moveStopSignal.remove(onMoveStop);
+        playerSystem.gameEndedSignal.remove(onGameEnded);
+        this.playerSystem = null;
         for (presenter in rulePresentersByCause) if (presenter != null) presenter.dismiss();
         rulePresentersByCause = null;
         defaultRulePresenter.dismiss();
         defaultRulePresenter = null;
         boardSettler.dismiss();
         if (game.winner == -1) for (e in qAnimations) ecce.collect(e);
-        dismiss();
         animating = false;
         gameEndSignal.dispatch();
     }
@@ -90,8 +88,9 @@ class Sequencer extends Reckoner {
         this.config = cast config;
         var petriCells = this.config.buildParams.cells;
         var cells:Array<Cell<Entity>> = [];
-        primePointers(game.state, game.plan);
-
+        freshness_ = game.plan.onSpace(FreshnessAspect.FRESHNESS);
+        maxFreshness_ = game.plan.onGlobal(FreshnessAspect.MAX_FRESHNESS);
+        
         rulePresentersByCause = new Map();
         defaultRulePresenter = new RulePresenter();
         defaultRulePresenter.init(game, ecce);
@@ -102,15 +101,15 @@ class Sequencer extends Reckoner {
         }
         boardSettler.init(game);
 
-        for (space in eachSpace()) {
-            var id = getID(space);
+        for (ike in 0...game.state.spaces.length) {
+            var space = game.state.spaces[ike];
             var e = ecce.dispense([BoardSpaceState, BoardSpaceView]);
             var spaceState = e.get(BoardSpaceState);
             spaceState.values = space;
             spaceState.lastValues = new AspectPointable([for (ike in 0...space.size()) NULL]);
-            cells[id] = new Cell(id, e);
-            spaceState.cell = cells[id];
-            spaceState.petriData = petriCells.getCell(id).value;
+            cells[ike] = new Cell(ike, e);
+            spaceState.cell = cells[ike];
+            spaceState.petriData = petriCells.getCell(ike).value;
         }
 
         for (ike in 0...cells.length) {
@@ -140,7 +139,7 @@ class Sequencer extends Reckoner {
     function onMoveStep(cause:String) {
         var presenter = rulePresentersByCause[cause];
         if (presenter == null) presenter = defaultRulePresenter;
-        var maxFreshness:Int = state.global[maxFreshness_];
+        var maxFreshness:Int = game.state.global[maxFreshness_];
         if (maxFreshness > lastMaxFreshness) {
             for (e in qBoardSpaceStates) {
                 var freshness:Int = e.get(BoardSpaceState).values[freshness_];
@@ -164,7 +163,7 @@ class Sequencer extends Reckoner {
     public function completeAnimation() {
         if (animating) {
             animating = false;
-            player.proceed();
+            playerSystem.proceed();
         }
     }
 

@@ -8,6 +8,7 @@ import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.praxis.play.Referee;
 import net.rezmason.scourge.controller.BasicSmarts;
+import net.rezmason.scourge.controller.MoveMediator;
 import net.rezmason.scourge.controller.Sequencer;
 import net.rezmason.praxis.config.GameConfig;
 import net.rezmason.utils.Errand;
@@ -36,9 +37,10 @@ class BeginGameErrand extends Errand<Bool->String->Void> {
         var referee:Referee = new Present(Referee);
         var ecce:Ecce = new Present(Ecce);
         var sequencer:Sequencer = new Present(Sequencer);
+        var moveMediator:MoveMediator = new Present(MoveMediator);
 
         if (referee.gameBegun) referee.endGame();
-        
+        moveMediator.moveChosenSignal.removeAll();
         for (e in ecce.get()) ecce.collect(e);
         
         var randGen:Void->Float = lgm(seed);
@@ -73,7 +75,10 @@ class BeginGameErrand extends Errand<Bool->String->Void> {
         for (ike in 0...playerPattern.length) {
             switch (playerPattern[ike]) {
                 case 'h':
-                    players.push(humanSystem.createPlayer(ike));
+                    var humanPlayer = humanSystem.createPlayer(ike);
+                    humanPlayer.chooseSignal.add(moveMediator.enableHumanMoves);
+                    moveMediator.moveChosenSignal.add(humanPlayer.submitMove);
+                    players.push(humanPlayer);
                 case 'b': 
                     var smarts = isReplay ? new ReplaySmarts(referee.lastGame.log) : new BasicSmarts();
                     players.push(botSystem.createPlayer(ike, smarts, thinkPeriod));
@@ -83,6 +88,7 @@ class BeginGameErrand extends Errand<Bool->String->Void> {
         sequencer.animationLength = animationLength;
         sequencer.connect(watchedPlayerSystem);
         referee.beginGame(players, randGen, config);
+        
         onComplete.dispatch(true, null);
     }
 

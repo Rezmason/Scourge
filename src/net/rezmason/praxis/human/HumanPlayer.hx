@@ -4,21 +4,13 @@ import net.rezmason.praxis.play.GameEvent;
 import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.utils.Zig;
 
-@:allow(net.rezmason.praxis.human.HumanSystem)
 class HumanPlayer implements IPlayer {
 
     public var index(default, null):Int;
+    public var playSignal(default, null):Zig<GameEvent->Void> = new Zig();
+    public var chooseSignal(default, null):Zig<Void->Void> = new Zig();
 
-    @:allow(net.rezmason.praxis.play.Referee)
-    private var playSignal:Zig<GameEvent->Void>;
-
-    private function new(index:Int):Void {
-        this.index = index;
-        playSignal = new Zig();
-    }
-
-    public function choose():Void {
-        // TODO: dispatch signal to enable UI
-    }
+    @:allow(net.rezmason.praxis.human.HumanSystem) private function new(index:Int):Void this.index = index;
+    public function choose():Void chooseSignal.dispatch();
+    public function submitMove(turn, action, move) playSignal.dispatch(SubmitMove(turn, action, move));
 }
-

@@ -5,7 +5,7 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.config.GameConfig;
 import net.rezmason.utils.Zig;
 
-class PlayerSystem implements IPlayer {
+class PlayerSystem {
 
     public var index(default, null):Int;
     public var gameBegunSignal(default, null):Zig<GameConfig<Dynamic, Dynamic>->Game->Void> = new Zig();
@@ -19,9 +19,6 @@ class PlayerSystem implements IPlayer {
     private var isGameUpdating:Bool = false;
     private var isWaitingToProceed:Bool = false;
     private var usesSignals:Bool;
-
-    @:allow(net.rezmason.praxis.play.Referee)
-    private var playSignal:Zig<GameEvent->Void>;
     
     function new(usesSignals:Bool, cacheMoves:Bool):Void {
         this.usesSignals = usesSignals;
@@ -31,7 +28,7 @@ class PlayerSystem implements IPlayer {
     public function proceed():Void {
         if (!isWaitingToProceed) throw 'Called PlayerSystem::proceed() out of sequence.';
         isWaitingToProceed = false;
-        takeTurn();
+        if (isMyTurn()) play();
     }
 
     private function processGameEvent(type:GameEvent):Void {
@@ -42,8 +39,8 @@ class PlayerSystem implements IPlayer {
                     if (usesSignals) {
                         isWaitingToProceed = true;
                         gameBegunSignal.dispatch(config, game);
-                    } else {
-                        takeTurn();
+                    } else if (isMyTurn()) {
+                        play();
                     }
                 }
             case RelayMove(turn, action, move):
@@ -55,16 +52,17 @@ class PlayerSystem implements IPlayer {
                     if (usesSignals) {
                         isWaitingToProceed = true;
                         moveStopSignal.dispatch();
-                    } else {
-                        takeTurn();
+                    } else if (isMyTurn()) {
+                        play();
                     }
                 }
             case End: 
                 if (game.hasBegun) {
                     if (usesSignals) gameEndedSignal.dispatch();
-                    end();
+                    game.end();
                 }
-            case _:
+            case SubmitMove(_, _, _):
+            case Time(_):
         }
     }
 
@@ -78,8 +76,6 @@ class PlayerSystem implements IPlayer {
         if (isGameUpdating && usesSignals) moveStepSignal.dispatch(cause);
     }
 
-    private function takeTurn():Void if (isMyTurn()) play();
-    private function end():Void game.end();
     private function updateGame(actionID:String, move:Int):Void game.chooseMove(actionID, move);
     private function play():Void throw "Override this.";
 

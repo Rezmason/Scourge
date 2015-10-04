@@ -58,8 +58,6 @@ class State {
         cells = new Grid();
     }
 
-    
-
     public inline function getCell(index) return cells.getCell(index);
     public inline function eachCell() return cells.iterator();
     public inline function numCells() return cells.length; // should be the same as numSpaces though
