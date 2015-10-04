@@ -22,7 +22,7 @@ class ReplaySmarts extends Smarts {
         while (moveActionID == null) {
             event = log.shift();
             switch (event) {
-                case RelayMove(_, actionID, index): 
+                case SubmitMove(_, actionID, index): 
                     moveActionID = actionID;
                     moveIndex = index;
                 case _:

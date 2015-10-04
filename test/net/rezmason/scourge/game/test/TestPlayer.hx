@@ -10,19 +10,17 @@ typedef TestProxy = Game->(Void->Void)->Void;
 
 class TestPlayer extends PlayerSystem {
 
+    private var index:Int;
     private var proxy:TestProxy;
     private var smarts:Smarts;
     private var random:Void->Float;
 
     public function new(index:Int, proxy:TestProxy, random:Void->Float):Void {
-        super(false, false);
+        super(false);
         this.index = index;
         this.proxy = proxy;
         this.random = random;
         smarts = new RandomSmarts();
-        
-        playSignal = new Zig();
-        playSignal.add(processGameEvent);
     }
 
     override private function init(configData:String, saveData:String):Void {

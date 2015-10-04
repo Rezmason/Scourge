@@ -4,7 +4,6 @@ import net.rezmason.ecce.Ecce;
 import net.rezmason.praxis.bot.BotSystem;
 import net.rezmason.praxis.bot.ReplaySmarts;
 import net.rezmason.praxis.human.HumanSystem;
-import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.praxis.play.PlayerSystem;
 import net.rezmason.praxis.play.Referee;
 import net.rezmason.scourge.controller.BasicSmarts;
@@ -40,27 +39,17 @@ class BeginGameErrand extends Errand<Bool->String->Void> {
         var moveMediator:MoveMediator = new Present(MoveMediator);
 
         if (referee.gameBegun) referee.endGame();
-        moveMediator.moveChosenSignal.removeAll();
         for (e in ecce.get()) ecce.collect(e);
+        moveMediator.moveChosenSignal.removeAll(); // TODO: move to MoveMediator
         
         var randGen:Void->Float = lgm(seed);
         var randBot:Void->Float = lgm(seed); // TODO: seed should only be given to *internal* bots
-        var botSystem:BotSystem = null;
-        var humanSystem:HumanSystem = null;
-        var watchedPlayerSystem:PlayerSystem = null;
-        var hasHumans:Bool = !isReplay && playerPattern.indexOf('h') != -1;
-        var hasBots:Bool   =  isReplay || playerPattern.indexOf('b') != -1;
+        var botSystem:BotSystem = new BotSystem(randBot); // TODO: recycle
+        var humanSystem:HumanSystem = new HumanSystem(); // TODO: recycle
 
-        if (hasHumans) {
-            humanSystem = new HumanSystem(); // TODO: recycle
-            watchedPlayerSystem = humanSystem;
-        }
-
-        if (hasBots) {
-            botSystem = new BotSystem(!hasHumans, randBot); // TODO: recycle
-            if (watchedPlayerSystem == null) watchedPlayerSystem = botSystem;
-        }
-
+        moveMediator.moveChosenSignal.add(humanSystem.submitMove);
+        humanSystem.enableUISignal.add(moveMediator.enableHumanMoves);
+        
         if (isReplay) {
             config = referee.lastGameConfig;
             if (config == null) {
@@ -71,23 +60,24 @@ class BeginGameErrand extends Errand<Bool->String->Void> {
             randGen = function() return floats.shift();
         }
 
-        var players:Array<IPlayer> = [];
         for (ike in 0...playerPattern.length) {
             switch (playerPattern[ike]) {
                 case 'h':
-                    var humanPlayer = humanSystem.createPlayer(ike);
-                    humanPlayer.chooseSignal.add(moveMediator.enableHumanMoves);
-                    moveMediator.moveChosenSignal.add(humanPlayer.submitMove);
-                    players.push(humanPlayer);
+                    humanSystem.createPlayer(ike);
                 case 'b': 
                     var smarts = isReplay ? new ReplaySmarts(referee.lastGame.log) : new BasicSmarts();
-                    players.push(botSystem.createPlayer(ike, smarts, thinkPeriod));
+                    botSystem.createPlayer(ike, smarts, thinkPeriod);
             }
         }
 
+        referee.gameEventSignal.add(botSystem.processGameEvent);
+        botSystem.playSignal.add(referee.submitMove);
+        referee.gameEventSignal.add(humanSystem.processGameEvent);
+        humanSystem.playSignal.add(referee.submitMove);
+
         sequencer.animationLength = animationLength;
-        sequencer.connect(watchedPlayerSystem);
-        referee.beginGame(players, randGen, config);
+        sequencer.connect(humanSystem);
+        referee.beginGame(randGen, config);
         
         onComplete.dispatch(true, null);
     }

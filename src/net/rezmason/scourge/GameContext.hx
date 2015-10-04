@@ -11,16 +11,18 @@ import net.rezmason.utils.santa.Santa;
 class GameContext {
 
     public function new():Void {
-        Santa.mapToClass(Referee, Singleton(new Referee()));
         Santa.mapToClass(Ecce, Singleton(new Ecce()));
         Santa.mapToClass(View, Singleton(new View()));
+        
+        var referee = new Referee();
+        Santa.mapToClass(Referee, Singleton(referee));
         
         var sequencer = new Sequencer();
         Santa.mapToClass(Sequencer, Singleton(sequencer));
 
         var boardAnimator = new BoardAnimator();
         sequencer.animationComposedSignal.add(boardAnimator.wake);
-        boardAnimator.animCompleteSignal.add(sequencer.completeAnimation);
+        boardAnimator.animCompleteSignal.add(referee.proceed);
 
         var moveMediator = new MoveMediator();
         Santa.mapToClass(MoveMediator, Singleton(moveMediator));

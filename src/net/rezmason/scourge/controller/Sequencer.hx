@@ -8,7 +8,7 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
-import net.rezmason.praxis.play.PlayerSystem;
+import net.rezmason.praxis.human.HumanSystem;
 import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeGameConfig;
@@ -26,12 +26,11 @@ class Sequencer {
     var ecce:Ecce = null;
     var config:ScourgeGameConfig = null;
     var game:Game = null;
-    var playerSystem:PlayerSystem = null;
+    var humanSystem:HumanSystem = null;
     var qBoardSpaceStates:Query;
     var qBoardViews:Query;
     var qAnimations:Query;
     var lastMaxFreshness:Int;
-    var animating:Bool;
     var sequence:Array<Array<Array<Entity>>> = [];
     var defaultRulePresenter:RulePresenter;
     var rulePresentersByCause:Map<String, RulePresenter>;
@@ -53,33 +52,31 @@ class Sequencer {
         qBoardSpaceStates = ecce.query([BoardSpaceState]);
         qBoardViews = ecce.query([BoardSpaceView]);
         qAnimations = ecce.query([GlyphAnimation]);
-        animating = false;
         animationLength = 1;
     }
 
-    public function connect(playerSystem:PlayerSystem):Void {
-        this.playerSystem = playerSystem;
-        playerSystem.gameBegunSignal.add(onGameBegun);
-        playerSystem.moveStartSignal.add(onMoveStart);
-        playerSystem.moveStepSignal.add(onMoveStep);
-        playerSystem.moveStopSignal.add(onMoveStop);
-        playerSystem.gameEndedSignal.add(onGameEnded);
+    public function connect(humanSystem:HumanSystem):Void {
+        this.humanSystem = humanSystem;
+        humanSystem.gameBegunSignal.add(onGameBegun);
+        humanSystem.moveStartSignal.add(onMoveStart);
+        humanSystem.moveStepSignal.add(onMoveStep);
+        humanSystem.moveStopSignal.add(onMoveStop);
+        humanSystem.gameEndedSignal.add(onGameEnded);
     }
 
     function onGameEnded():Void {
-        playerSystem.gameBegunSignal.remove(onGameBegun);
-        playerSystem.moveStartSignal.remove(onMoveStart);
-        playerSystem.moveStepSignal.remove(onMoveStep);
-        playerSystem.moveStopSignal.remove(onMoveStop);
-        playerSystem.gameEndedSignal.remove(onGameEnded);
-        this.playerSystem = null;
+        humanSystem.gameBegunSignal.remove(onGameBegun);
+        humanSystem.moveStartSignal.remove(onMoveStart);
+        humanSystem.moveStepSignal.remove(onMoveStep);
+        humanSystem.moveStopSignal.remove(onMoveStop);
+        humanSystem.gameEndedSignal.remove(onGameEnded);
+        this.humanSystem = null;
         for (presenter in rulePresentersByCause) if (presenter != null) presenter.dismiss();
         rulePresentersByCause = null;
         defaultRulePresenter.dismiss();
         defaultRulePresenter = null;
         boardSettler.dismiss();
         if (game.winner == -1) for (e in qAnimations) ecce.collect(e);
-        animating = false;
         gameEndSignal.dispatch();
     }
 
@@ -160,13 +157,6 @@ class Sequencer {
         animationComposedSignal.dispatch();
     }
 
-    public function completeAnimation() {
-        if (animating) {
-            animating = false;
-            playerSystem.proceed();
-        }
-    }
-
     function startAnimation():Void {
         var animations = [];
         var startTime:Float = 0;
@@ -200,7 +190,6 @@ class Sequencer {
                 }
             }
         }
-        animating = true;
     }
 
     inline function set_animationLength(val:Float):Float {

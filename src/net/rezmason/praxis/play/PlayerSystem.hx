@@ -7,61 +7,25 @@ import net.rezmason.utils.Zig;
 
 class PlayerSystem {
 
-    public var index(default, null):Int;
-    public var gameBegunSignal(default, null):Zig<GameConfig<Dynamic, Dynamic>->Game->Void> = new Zig();
-    public var gameEndedSignal(default, null):Zig<Void->Void> = new Zig();
-    public var moveStartSignal(default, null):Zig<Int->String->Int->Void> = new Zig();
-    public var moveStopSignal(default, null):Zig<Void->Void> = new Zig();
-    public var moveStepSignal(default, null):Zig<String->Void> = new Zig();
+    public var playSignal(default, null):Zig<GameEvent->Void> = new Zig();
 
     private var game:Game;
     private var config:GameConfig<Dynamic, Dynamic>;
     private var isGameUpdating:Bool = false;
-    private var isWaitingToProceed:Bool = false;
-    private var usesSignals:Bool;
     
-    function new(usesSignals:Bool, cacheMoves:Bool):Void {
-        this.usesSignals = usesSignals;
-        game = new Game(cacheMoves);
-    }
+    function new(cacheMoves:Bool):Void game = new Game(cacheMoves);
 
-    public function proceed():Void {
-        if (!isWaitingToProceed) throw 'Called PlayerSystem::proceed() out of sequence.';
-        isWaitingToProceed = false;
-        if (isMyTurn()) play();
-    }
-
-    private function processGameEvent(type:GameEvent):Void {
+    public function processGameEvent(type:GameEvent):Void {
         switch (type) {
-            case Init(configData, saveData): 
-                if (!game.hasBegun) {
-                    init(configData, saveData);
-                    if (usesSignals) {
-                        isWaitingToProceed = true;
-                        gameBegunSignal.dispatch(config, game);
-                    } else if (isMyTurn()) {
-                        play();
-                    }
-                }
-            case RelayMove(turn, action, move):
+            case SubmitMove(turn, action, move):
                 if (turn == game.revision) {
-                    if (usesSignals) moveStartSignal.dispatch(game.currentPlayer, action, move);
                     isGameUpdating = true;
                     if (game.hasBegun) updateGame(action, move);
                     isGameUpdating = false;
-                    if (usesSignals) {
-                        isWaitingToProceed = true;
-                        moveStopSignal.dispatch();
-                    } else if (isMyTurn()) {
-                        play();
-                    }
                 }
-            case End: 
-                if (game.hasBegun) {
-                    if (usesSignals) gameEndedSignal.dispatch();
-                    game.end();
-                }
-            case SubmitMove(_, _, _):
+            case Init(configData, saveData): if (!game.hasBegun) init(configData, saveData);
+            case Proceed(_): if (isMyTurn()) play();
+            case End: end();
             case Time(_):
         }
     }
@@ -72,11 +36,9 @@ class PlayerSystem {
         game.begin(config, onMoveStep, savedState);
     }
 
-    private inline function onMoveStep(cause:String):Void {
-        if (isGameUpdating && usesSignals) moveStepSignal.dispatch(cause);
-    }
-
+    private function onMoveStep(cause:String):Void {}
     private function updateGame(actionID:String, move:Int):Void game.chooseMove(actionID, move);
+    private function end():Void if (game.hasBegun) game.end();
     private function play():Void throw "Override this.";
 
     private function isMyTurn():Bool {

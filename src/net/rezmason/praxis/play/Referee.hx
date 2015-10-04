@@ -7,35 +7,29 @@ import net.rezmason.praxis.play.Game;
 import net.rezmason.praxis.config.GameConfig;
 import net.rezmason.utils.SafeSerializer;
 import net.rezmason.utils.UnixTime;
+import net.rezmason.utils.Zig;
 
 class Referee {
 
     var game:Game;
     var gameConfig:GameConfig<Dynamic, Dynamic>;
-    var players:Array<IPlayer>;
-    var playerListeners:Array<GameEvent->Void>;
     var gameTimer:Timer;
     var log:Array<GameEvent>;
     var floatsLog:Array<Float>;
     var randGen:Void->Float;
-    var busy:Bool;
+    var waitingToProceed:Bool;
+    public var gameEventSignal(default, null):Zig<GameEvent->Void> = new Zig();
 
     public var lastGame(default, null):SavedGame;
     public var lastGameConfig(default, null):GameConfig<Dynamic, Dynamic>;
     public var gameBegun(get, never):Bool;
-    public var numPlayers(get, never):Int;
 
     public function new():Void {
         game = new Game(false);
-        busy = false;
+        waitingToProceed = false;
     }
 
-    public function beginGame(players:Array<IPlayer>, randGen:Void->Float, gameConfig:GameConfig<Dynamic, Dynamic>, savedGame:SavedGame = null):Void {
-
-        if (players.length != gameConfig.params['build'].numPlayers) {
-            throw 'Player config has ${players.length} players: ' +
-                'game config requires ${gameConfig.params['build'].numPlayers}';
-        }
+    public function beginGame(randGen:Void->Float, gameConfig:GameConfig<Dynamic, Dynamic>, savedGame:SavedGame = null):Void {
 
         var serializedSavedGame:String = null;
         var savedGameState:SavedState = null;
@@ -52,14 +46,9 @@ class Referee {
 
         this.gameConfig = gameConfig;
         this.randGen = randGen;
-        this.players = players;
-        playerListeners = [];
-        for (ike in 0...numPlayers) {
-            playerListeners[ike] = handlePlaySignal.bind(ike);
-            players[ike].playSignal.add(playerListeners[ike]);
-        }
         
         game.begin(gameConfig, null, savedGameState);
+        waitingToProceed = true;
         broadcastAndLog(Init(SafeSerializer.run(gameConfig), serializedSavedGame));
     }
 
@@ -68,9 +57,7 @@ class Referee {
         lastGameConfig = gameConfig;
         game.end();
         broadcastAndLog(End);
-        for (ike in 0...numPlayers) players[ike].playSignal.remove(playerListeners[ike]);
-        playerListeners = null;
-        players = null;
+        gameEventSignal.removeAll();
     }
 
     public function saveGame():SavedGame {
@@ -79,30 +66,33 @@ class Referee {
         return {state:game.save(), log:savedLog, floatsLog:savedFloats, timeSaved:UnixTime.now()};
     }
 
-    private function handlePlaySignal(playerIndex:Int, event:GameEvent):Void {
+    public function submitMove(event:GameEvent):Void {
         switch (event) {
-            case SubmitMove(turn, action, move):
+            case SubmitMove(turn, actionID, move):
                 if (!gameBegun) throw 'Game has not begun!';
-                if (playerIndex == game.currentPlayer && turn == game.revision) {
-                    if (busy) throw 'Players must not submit moves synchronously!';
-                    if (game.isRuleRandom(action)) {
-                        move = Std.int(generateRandomFloat() * game.getMovesForAction(action).length);
-                    }
-                    game.chooseMove(action, move);
-                    broadcastAndLog(RelayMove(turn, action, move));
-                    if (game.winner >= 0) endGame(); // TEMPORARY
+                if (turn != game.revision) throw 'Move submitted out of turn.';
+                if (waitingToProceed) throw 'Players must wait until the game proceeds!';
+                if (game.isRuleRandom(actionID)) {
+                    move = Std.int(generateRandomFloat() * game.getMovesForAction(actionID).length);
                 }
+                game.chooseMove(actionID, move);
+                waitingToProceed = true;
+                broadcastAndLog(SubmitMove(turn, actionID, move));
+                if (game.winner >= 0) endGame(); // TEMPORARY
             case _:
+                throw 'Game event is not a SubmitMove.';
         }
+    }
+
+    public function proceed():Void {
+        waitingToProceed = false;
+        broadcastAndLog(Proceed(game.revision));
     }
 
     private function broadcastAndLog(event:GameEvent):Void {
         log.push(Time(UnixTime.now()));
         log.push(event);
-        var wasBusy:Bool = busy;
-        busy = true;
-        for (player in players) player.playSignal.dispatch(event);
-        busy = wasBusy;
+        gameEventSignal.dispatch(event);
     }
 
     private function generateRandomFloat():Float {
@@ -112,6 +102,4 @@ class Referee {
     }
 
     private inline function get_gameBegun():Bool return game.hasBegun;
-
-    private inline function get_numPlayers():Int return players == null ? -1 : players.length;
 }

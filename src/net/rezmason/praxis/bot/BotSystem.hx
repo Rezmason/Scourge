@@ -2,55 +2,46 @@ package net.rezmason.praxis.bot;
 
 import haxe.Timer;
 import net.rezmason.praxis.play.GameEvent;
-import net.rezmason.praxis.play.IPlayer;
 import net.rezmason.praxis.play.PlayerSystem;
+
+typedef Bot = {smarts:Smarts, period:Int};
 
 class BotSystem extends PlayerSystem {
 
-    private var botsByIndex:Map<Int, BotPlayer>;
-    private var numBots:Int;
-    private var random:Void->Float;
+    var botsByIndex:Map<Int, Bot> = new Map();
+    var random:Void->Float;
 
-    public function new(usesSignals:Bool, random:Void->Float):Void {
-        super(usesSignals, true);
-
-        botsByIndex = new Map();
-        numBots = 0;
+    public function new(random:Void->Float):Void {
+        super(true);
         this.random = random;
     }
 
-    public function createPlayer(index:Int, smarts:Smarts, period:Int):IPlayer {
-        var bot:BotPlayer = new BotPlayer(index, smarts, period);
-        bot.playSignal.add(onBotSignal.bind(index));
-        botsByIndex[index] = bot;
-        numBots++;
-        return bot;
+    public function createPlayer(index:Int, smarts:Smarts, period:Int) {
+        botsByIndex[index] = {smarts:smarts, period:period};
     }
 
-    private function onBotSignal(senderIndex:Int, event:GameEvent):Void {
-        if (!game.hasBegun || senderIndex == game.currentPlayer) processGameEvent(event);
-    }
-
-    override private function init(configData:String, saveData:String):Void {
+    override function init(configData:String, saveData:String):Void {
         super.init(configData, saveData);
-        for (bot in botsByIndex) bot.smarts.init(game, config, bot.index, random);
+        for (index in botsByIndex.keys()) botsByIndex[index].smarts.init(game, config, index, random);
     }
 
-    override private function play():Void beat(currentPlayer().choose);
+    override function play():Void beat(choose);
     
-    override private function isMyTurn():Bool return game.hasBegun && game.winner < 0 && currentPlayer() != null;
+    override function isMyTurn():Bool return game.hasBegun && game.winner < 0 && currentPlayer() != null;
 
-    private function beat(cbk:Void->Void):Void {
+    function choose() playSignal.dispatch(currentPlayer().smarts.choose());
+
+    function beat(cbk:Void->Void):Void {
         var period:Int = 10;
         if (game.hasBegun) period = currentPlayer().period;
         var timer:Timer = new Timer(period);
         timer.run = onBeat.bind(timer, cbk);
     }
 
-    private function onBeat(timer:Timer, cbk:Void->Void):Void {
+    function onBeat(timer:Timer, cbk:Void->Void):Void {
         timer.stop();
         if (game.hasBegun) cbk();
     }
 
-    private inline function currentPlayer():BotPlayer return botsByIndex[game.currentPlayer];
+    inline function currentPlayer():Bot return botsByIndex[game.currentPlayer];
 }
