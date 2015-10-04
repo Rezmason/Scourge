@@ -8,6 +8,7 @@ import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.core.GlyphTexture;
 
 using net.rezmason.scourge.textview.core.GlyphUtils;
+using net.rezmason.utils.CharCode;
 
 class EyeCandyDemo {
 
@@ -26,6 +27,9 @@ class EyeCandyDemo {
     var dragStartTransform:Matrix4;
     var rawTransform:Matrix4;
     var setBackTransform:Matrix4;
+
+    var brightGlyphs:Array<Glyph>;
+    var darkerGlyphs:Array<Glyph>;
 
     public function new(num:Int = 2400):Void {
 
@@ -49,15 +53,20 @@ class EyeCandyDemo {
     }
 
     inline function setSize(num:Int):Void {
-        body.growTo(num);
+        body.growTo(num * 2);
+
+        brightGlyphs = [for (ike in 0...num) body.getGlyphByID(ike * 2)];
+        darkerGlyphs = [for (ike in 0...num) body.getGlyphByID(ike * 2 + 1)];
 
         var dTheta:Float = Math.PI * (3 - Math.sqrt(5));
-        var dZ:Float = 2 / (body.numGlyphs + 1);
+        var dZ:Float = 2 / (num + 1);
         var theta:Float = 0;
         var _z:Float = 1 - dZ / 2;
 
-        for (glyph in body.eachGlyph()) {
-            var charCode:Int = CHARS.charCodeAt(glyph.id % CHARS.length);
+        var darkCharCode = '•'.code();
+
+        for (ike in 0...num) {
+            var charCode:Int = CHARS.charCodeAt(ike % CHARS.length);
 
             var rad:Float = Math.sqrt(1 - _z * _z);
             var x:Float = Math.cos(theta) * rad;
@@ -72,11 +81,18 @@ class EyeCandyDemo {
             var g:Float = ramp(y + 0.5);
             var b:Float = ramp(z + 0.5);
 
-            glyph.set_xyz(x, y, z);
-            glyph.set_rgb(r, g, b);
-            glyph.set_a(1);
-            glyph.set_char(charCode);
-            glyph.set_paint(glyph.id);
+            var brightGlyph = brightGlyphs[ike];
+            brightGlyph.SET({x:x, y:y, z:z, r:r, g:g, b:b, a:1, char:charCode, paint:brightGlyph.id});
+            
+            x *= 0.8;
+            y *= 0.8;
+            z *= 0.8;
+
+            r -= 1;
+            g -= 1;
+            b -= 1;
+            var darkerGlyph = darkerGlyphs[ike];
+            darkerGlyph.SET({x:x, y:y, z:z, r:r, g:g, b:b, a:1, char:darkCharCode, paint:darkerGlyph.id, s:10});
 
             _z -= dZ;
             theta += dTheta;
@@ -94,6 +110,9 @@ class EyeCandyDemo {
 
         for (glyph in body.eachGlyph()) {
             glyph.set_p(Math.cos(time * 4 + glyph.get_x() * 20) * 0.200 + 0.4);
+        }
+
+        for (glyph in brightGlyphs) {
             glyph.set_s(Math.cos(time * 4 + glyph.get_y() * 30) * 0.200 + 3.0);
             glyph.set_f(Math.cos(time * 8 + glyph.get_z() * 40) * 0.280 + 0.4);
         }
@@ -103,7 +122,6 @@ class EyeCandyDemo {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {
-                    // case CLICK: setGlobalColor(Math.random(), Math.random(), Math.random());
                     case MOUSE_DOWN: startDrag(x, y);
                     case MOUSE_UP, DROP: stopDrag();
                     case MOVE, ENTER, EXIT: if (dragging) updateDrag(x, y);
@@ -139,12 +157,8 @@ class EyeCandyDemo {
         dragging = false;
     }
 
-    inline function setGlobalColor(r:Float, g:Float, b:Float):Void {
-        for (ike in 0...body.numGlyphs) body.getGlyphByID(ike).set_rgb(r, g, b);
-    }
-
     inline function setGlobalChar(charCode:Int):Void {
-        for (ike in 0...body.numGlyphs) body.getGlyphByID(ike).set_char(charCode);
+        for (glyph in brightGlyphs) glyph.set_char(charCode);
     }
 
 }
