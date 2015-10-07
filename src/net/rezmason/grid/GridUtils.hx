@@ -67,9 +67,9 @@ class GridWalker<T> {
     var cell:Cell<T>;
     var direction:Int;
 
-    public function new(_cell:Cell<T>, _direction:Int):Void {
-        cell = _cell;
-        direction = _direction;
+    public function new(cell:Cell<T>, direction:Int):Void {
+        this.cell = cell;
+        this.direction = direction;
     }
 
     public function hasNext():Bool {

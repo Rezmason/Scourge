@@ -74,14 +74,14 @@ class AspectUtils {
 
 class AspectPointableIterator<T> {
 
-    private var me:AspectPointable<T>;
-    private var list:ReadOnlyArray<AspectPointable<T>>;
-    private var aspectPointer:AspectPointer<T>;
+    var me:AspectPointable<T>;
+    var list:ReadOnlyArray<AspectPointable<T>>;
+    var aspectPointer:AspectPointer<T>;
 
-    public function new(_me:AspectPointable<T>, _list:ReadOnlyArray<AspectPointable<T>>, _itrPtr:AspectPointer<T>):Void {
-        me = _me;
-        list = _list;
-        aspectPointer = _itrPtr;
+    public function new(me:AspectPointable<T>, list:ReadOnlyArray<AspectPointable<T>>, itrPtr:AspectPointer<T>):Void {
+        this.me = me;
+        this.list = list;
+        this.aspectPointer = itrPtr;
     }
 
     public function hasNext() return me != null;

@@ -34,10 +34,10 @@ class SDF {
         return {width:output.width, height:output.height, bytes:Bytes.ofData(output.getPixels(output.rect))};
     }
 
-    function new(_source:BitmapData, _cutoff:Int):Void {
+    function new(source:BitmapData, cutoff:Int):Void {
 
-        this.cutoff = _cutoff;
-        this.source = padBD(_source, _cutoff);
+        this.cutoff = cutoff;
+        this.source = padBD(source, cutoff);
 
         dataMatrix = new Vector();
         allData = new Vector();
