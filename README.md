@@ -4,11 +4,9 @@ Scourge
 
 [Quick link to the 2010 prototype](http://www.rezmason.net/scourge/?numPlayers=2)
 
-Scourge is a derivative of [Fungus](http://www.info-mac.org/viewtopic.php?t=4644), a game produced by [Ryan Koopmans](http://www.e-brains.com/) with [Jason Whong](http://jason.whong.org/) in 1992. Its core game mechanics are reminiscent of the rules of Go, Reversi, Tetris and Blokus. It is a fun and ruthless game that builds players' resolve and strains their friendships.
+Scourge is a derivative of [Fungus](http://www.info-mac.org/viewtopic.php?t=4644), a game produced by [Ryan Koopmans](http://web.archive.org/web/20020927014841/http://www.e-brains.com/) with [Jason Whong](https://twitter.com/jbwhong) in 1992. Its core game mechanics are reminiscent of the rules of Go, Reversi, Tetris and Blokus. It is a fun and ruthless game that builds players' resolve and strains their friendships.
 
 Scourge is written in [Haxe](http://www.haxe.org/), a highly versatile language that can compile to many, many platforms.
-
-**NOTE: Scourge is currently built with Haxe 3 RC and Git-hosted haxelibs. Consequently it may be difficult to configure your build environment to build both Scourge and Haxe 2 projects easily.**
 
 Scourge is written on top of a framework called Praxis, which I'm developing simultaneously. While Praxis primarily must support Scourge, it is designed to support the development of all sorts of turn-based games. At some point after Scourge is up and running, Praxis will receive the attention it needs to stand alone as a separate project.
 
