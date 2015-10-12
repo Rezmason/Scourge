@@ -8,11 +8,16 @@ typedef Bot = {smarts:Smarts, period:Int};
 
 class BotSystem extends PlayerSystem {
 
-    var botsByIndex:Map<Int, Bot> = new Map();
+    var botsByIndex:Map<Int, Bot>;
     var random:Void->Float;
+    var beatTimer:Timer;
 
-    public function new(random:Void->Float):Void {
-        super(true);
+    public function new() super(true);
+
+    public function reset(random:Void->Float):Void {
+        if (beatTimer != null) beatTimer.stop();
+        beatTimer = null;
+        botsByIndex = new Map();
         this.random = random;
     }
 
@@ -34,12 +39,13 @@ class BotSystem extends PlayerSystem {
     function beat(cbk:Void->Void):Void {
         var period:Int = 10;
         if (game.hasBegun) period = currentPlayer().period;
-        var timer:Timer = new Timer(period);
-        timer.run = onBeat.bind(timer, cbk);
+        if (beatTimer != null) beatTimer.stop();
+        beatTimer = new Timer(period);
+        beatTimer.run = onBeat.bind(cbk);
     }
 
-    function onBeat(timer:Timer, cbk:Void->Void):Void {
-        timer.stop();
+    function onBeat(cbk:Void->Void):Void {
+        beatTimer.stop();
         if (game.hasBegun) cbk();
     }
 

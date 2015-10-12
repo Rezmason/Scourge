@@ -8,7 +8,6 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
-import net.rezmason.praxis.human.HumanSystem;
 import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.controller.RulePresenter;
 import net.rezmason.scourge.game.ScourgeGameConfig;
@@ -26,7 +25,6 @@ class Sequencer {
     var ecce:Ecce = null;
     var config:ScourgeGameConfig = null;
     var game:Game = null;
-    var humanSystem:HumanSystem = null;
     var qBoardSpaceStates:Query;
     var qBoardViews:Query;
     var qAnimations:Query;
@@ -55,22 +53,7 @@ class Sequencer {
         animationLength = 1;
     }
 
-    public function connect(humanSystem:HumanSystem):Void {
-        this.humanSystem = humanSystem;
-        humanSystem.gameBegunSignal.add(onGameBegun);
-        humanSystem.moveStartSignal.add(onMoveStart);
-        humanSystem.moveStepSignal.add(onMoveStep);
-        humanSystem.moveStopSignal.add(onMoveStop);
-        humanSystem.gameEndedSignal.add(onGameEnded);
-    }
-
-    function onGameEnded():Void {
-        humanSystem.gameBegunSignal.remove(onGameBegun);
-        humanSystem.moveStartSignal.remove(onMoveStart);
-        humanSystem.moveStepSignal.remove(onMoveStep);
-        humanSystem.moveStopSignal.remove(onMoveStop);
-        humanSystem.gameEndedSignal.remove(onGameEnded);
-        this.humanSystem = null;
+    public function endGame():Void {
         for (presenter in rulePresentersByCause) if (presenter != null) presenter.dismiss();
         rulePresentersByCause = null;
         defaultRulePresenter.dismiss();
@@ -80,7 +63,7 @@ class Sequencer {
         gameEndSignal.dispatch();
     }
 
-    function onGameBegun(config, game) {
+    public function beginGame(config, game) {
         this.game = game;
         this.config = cast config;
         var petriCells = this.config.buildParams.cells;
@@ -125,7 +108,7 @@ class Sequencer {
         animationComposedSignal.dispatch();
     }
 
-    function onMoveStart(currentPlayer:Int, actionID:String, move:Int) {
+    public function beginMove(currentPlayer:Int, actionID:String, move:Int) {
         lastMaxFreshness = 0;
         for (e in qBoardSpaceStates) {
             var spaceState = e.get(BoardSpaceState);
@@ -133,7 +116,7 @@ class Sequencer {
         }
     }
 
-    function onMoveStep(cause:String) {
+    public function stepMove(cause:String) {
         var presenter = rulePresentersByCause[cause];
         if (presenter == null) presenter = defaultRulePresenter;
         var maxFreshness:Int = game.state.global[maxFreshness_];
@@ -151,7 +134,7 @@ class Sequencer {
         }
     }
 
-    function onMoveStop() {
+    public function endMove() {
         sequence.push([boardSettler.run()]);
         startAnimation();
         animationComposedSignal.dispatch();

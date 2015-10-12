@@ -37,19 +37,17 @@ class BeginGameErrand extends Errand<Bool->String->Void> {
         var ecce:Ecce = new Present(Ecce);
         var sequencer:Sequencer = new Present(Sequencer);
         var moveMediator:MoveMediator = new Present(MoveMediator);
-
+        var humanSystem:HumanSystem = new Present(HumanSystem);
+        var botSystem:BotSystem = new Present(BotSystem);
+        
         if (referee.gameBegun) referee.endGame();
         for (e in ecce.get()) ecce.collect(e);
-        moveMediator.moveChosenSignal.removeAll(); // TODO: move to MoveMediator
         
         var randGen:Void->Float = lgm(seed);
-        var randBot:Void->Float = lgm(seed); // TODO: seed should only be given to *internal* bots
-        var botSystem:BotSystem = new BotSystem(randBot); // TODO: recycle
-        var humanSystem:HumanSystem = new HumanSystem(); // TODO: recycle
+        var randBot:Void->Float = lgm(seed);
+        botSystem.reset(randBot);
+        humanSystem.reset();
 
-        moveMediator.moveChosenSignal.add(humanSystem.submitMove);
-        humanSystem.enableUISignal.add(moveMediator.enableHumanMoves);
-        
         if (isReplay) {
             config = referee.lastGameConfig;
             if (config == null) {
@@ -70,13 +68,7 @@ class BeginGameErrand extends Errand<Bool->String->Void> {
             }
         }
 
-        referee.gameEventSignal.add(botSystem.processGameEvent);
-        botSystem.playSignal.add(referee.submitMove);
-        referee.gameEventSignal.add(humanSystem.processGameEvent);
-        humanSystem.playSignal.add(referee.submitMove);
-
         sequencer.animationLength = animationLength;
-        sequencer.connect(humanSystem);
         referee.beginGame(randGen, config);
         
         onComplete.dispatch(true, null);

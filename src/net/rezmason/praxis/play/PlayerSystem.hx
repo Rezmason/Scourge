@@ -38,7 +38,10 @@ class PlayerSystem {
 
     private function onMoveStep(cause:String):Void {}
     private function updateGame(actionID:String, move:Int):Void game.chooseMove(actionID, move);
-    private function end():Void if (game.hasBegun) game.end();
+    private function end():Void {
+        if (game.hasBegun) game.end();
+        isGameUpdating = false;
+    }
     private function play():Void throw "Override this.";
 
     private function isMyTurn():Bool {

@@ -57,7 +57,6 @@ class Referee {
         lastGameConfig = gameConfig;
         game.end();
         broadcastAndLog(End);
-        gameEventSignal.removeAll();
     }
 
     public function saveGame():SavedGame {

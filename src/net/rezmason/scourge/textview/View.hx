@@ -8,6 +8,7 @@ class View {
     public var body(default, null):Body;
     public var board(default, null):Body;
     public var loupe(default, null):BorderBox;
+    public var piece(default, null):Body;
 
     public function new():Void {
         body = new Body();
@@ -17,5 +18,6 @@ class View {
 
         body.addChild(board);
         body.addChild(loupe.body);
+        body.addChild(piece);
     }
 }

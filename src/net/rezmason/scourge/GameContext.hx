@@ -1,6 +1,8 @@
 package net.rezmason.scourge;
 
 import net.rezmason.ecce.Ecce;
+import net.rezmason.praxis.bot.BotSystem;
+import net.rezmason.praxis.human.HumanSystem;
 import net.rezmason.praxis.play.Referee;
 import net.rezmason.scourge.controller.MoveMediator;
 import net.rezmason.scourge.controller.Sequencer;
@@ -16,6 +18,11 @@ class GameContext {
         
         var referee = new Referee();
         Santa.mapToClass(Referee, Singleton(referee));
+
+        var botSystem:BotSystem = new BotSystem();
+        Santa.mapToClass(BotSystem, Singleton(botSystem));
+        referee.gameEventSignal.add(botSystem.processGameEvent);
+        botSystem.playSignal.add(referee.submitMove);
         
         var sequencer = new Sequencer();
         Santa.mapToClass(Sequencer, Singleton(sequencer));
@@ -28,5 +35,18 @@ class GameContext {
         Santa.mapToClass(MoveMediator, Singleton(moveMediator));
         sequencer.gameStartSignal.add(moveMediator.acceptBoardSpaces);
         sequencer.gameEndSignal.add(moveMediator.ejectBoardSpaces);
+
+        var humanSystem:HumanSystem = new HumanSystem();
+        Santa.mapToClass(HumanSystem, Singleton(humanSystem));
+        moveMediator.moveChosenSignal.add(humanSystem.submitMove);
+        humanSystem.enableUISignal.add(moveMediator.enableHumanMoves);
+        referee.gameEventSignal.add(humanSystem.processGameEvent);
+        humanSystem.playSignal.add(referee.submitMove);
+
+        humanSystem.gameBegunSignal.add(sequencer.beginGame);
+        humanSystem.moveStartSignal.add(sequencer.beginMove);
+        humanSystem.moveStepSignal.add(sequencer.stepMove);
+        humanSystem.moveStopSignal.add(sequencer.endMove);
+        humanSystem.gameEndedSignal.add(sequencer.endGame);
     }
 }

@@ -10,7 +10,7 @@ typedef Human = {};
 
 class HumanSystem extends PlayerSystem {
 
-    var humansByIndex:Map<Int, Human> = new Map();
+    var humansByIndex:Map<Int, Human>;
     
     public var gameBegunSignal(default, null):Zig<GameConfig<Dynamic, Dynamic>->Game->Void> = new Zig();
     public var gameEndedSignal(default, null):Zig<Void->Void> = new Zig();
@@ -21,6 +21,7 @@ class HumanSystem extends PlayerSystem {
     public var enableUISignal(default, null):Zig<Void->Void> = new Zig();
 
     public function new():Void super(false);
+    public function reset() humansByIndex = new Map();
     public function createPlayer(index:Int) humansByIndex[index] = {};
     
     public function submitMove(turn, actionID, move):Void {
