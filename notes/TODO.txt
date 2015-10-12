@@ -1,3 +1,9 @@
+Represent piece with separate body
+Draw the current piece
+Rotate key - space
+Shift key - flip
+Enter key - Drop
+
 Tidy up sequence of events
     Game begins; UI is visible
         UI requests moves and displays them
@@ -13,12 +19,6 @@ Tidy up sequence of events
     Board animator completes animation, signals sequencer
         Sequencer shows UI
 
-1: board cursor, arrow keys
-2: board cursor, mouse
-3: board cursor, drag and drop
-4: snapping
-5: "attach" loupe to board cursor's glyphs
-
 Add UIElement to Loupe that "encases" content
 Make the border box grow to surround the UIElement, not just the board glyphs
 
@@ -28,8 +28,6 @@ Add loupe sequencing to game presentation
 Shelf
 
 Try replacing Reflect-on-Dynamic with DynamicAccess
-
-Make the bots "use" the SwipeView
 
 There could be WAY more symbols than spaces, and it might look nicer
 

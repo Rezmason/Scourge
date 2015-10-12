@@ -109,4 +109,10 @@ class Utf8Utils {
         if (length(input) > 0) while (charAt(input, length(input) - 1) == char) input = sub(input, 0, length(input) - 1);
         return input;
     }
+
+    public inline static function fromCharCode(code:Int):String {
+        var u = new Utf8();
+        u.addChar(code);
+        return u.toString();
+    }
 }

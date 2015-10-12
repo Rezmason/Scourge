@@ -26,5 +26,7 @@ class GameContext {
 
         var moveMediator = new MoveMediator();
         Santa.mapToClass(MoveMediator, Singleton(moveMediator));
+        sequencer.gameStartSignal.add(moveMediator.acceptBoardSpaces);
+        sequencer.gameEndSignal.add(moveMediator.ejectBoardSpaces);
     }
 }

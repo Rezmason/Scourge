@@ -92,6 +92,10 @@ class BoardInitializer {
                 var stretch = board.glyphTexture.font.glyphRatio;
                 bottom.SET({char:char, color:BOARD_COLOR, h:stretch});
                 top.SET({char:char, color:WALL_COLOR, h:stretch});
+            } else {
+                over.SET({char:UI_CODE, color:UI_COLOR, s:0, paint:spaceState.cell.id});
+                top.set_paint(spaceState.cell.id);
+                bottom.set_paint(spaceState.cell.id);
             }
 
             view.lastTopTo = GlyphUtils.createGlyph().copyFrom(top);

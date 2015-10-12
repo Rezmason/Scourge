@@ -19,6 +19,7 @@ class Body extends SceneNode<Body> {
     public var glyphScale(default, set):Float;
     public var glyphTexture(default, set):GlyphTexture;
     public var scene(default, null):Scene;
+    public var mouseEnabled:Bool = true;
     
     public var fontChangedSignal(default, null):Zig<Void->Void>;
     public var interactionSignal(default, null):Zig<Int->Interaction->Void>;

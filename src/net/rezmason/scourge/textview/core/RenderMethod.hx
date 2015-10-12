@@ -52,7 +52,7 @@ class RenderMethod {
     function deactivate():Void {}
     function setBody(body:Body):Void { }
 
-    public inline function drawBody(body:Body):Void {
+    public function drawBody(body:Body):Void {
         setBody(body);
         for (segment in body.segments) {
             setSegment(segment);
