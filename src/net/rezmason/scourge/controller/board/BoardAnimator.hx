@@ -50,6 +50,7 @@ class BoardAnimator {
                 if (percent >= 1) {
                     view.top.copyFrom(anim.topTo);
                     view.bottom.copyFrom(anim.bottomTo);
+                    anim.subject = null;
                     ecce.collect(e);
                     count--;
                 } else {
