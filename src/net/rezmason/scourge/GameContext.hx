@@ -44,9 +44,13 @@ class GameContext {
         humanSystem.playSignal.add(referee.submitMove);
 
         humanSystem.gameBegunSignal.add(sequencer.beginGame);
+        humanSystem.gameBegunSignal.add(moveMediator.beginGame);
+
         humanSystem.moveStartSignal.add(sequencer.beginMove);
         humanSystem.moveStepSignal.add(sequencer.stepMove);
         humanSystem.moveStopSignal.add(sequencer.endMove);
+        
         humanSystem.gameEndedSignal.add(sequencer.endGame);
+        humanSystem.gameEndedSignal.add(moveMediator.endGame);
     }
 }

@@ -12,47 +12,33 @@ class Body extends SceneNode<Body> {
 
     static var _ids:Int = 0;
 
-    public var numGlyphs(default, null):Int;
-    public var id(default, null):Int;
-    public var transform(default, null):Matrix4;
+    public var numGlyphs(default, null):Int = 0;
+    public var id(default, null):Int = ++_ids;
+    public var transform(default, null):Matrix4 = new Matrix4();
     public var concatenatedTransform(get, null):Matrix4;
     public var glyphScale(default, set):Float;
     public var glyphTexture(default, set):GlyphTexture;
     public var scene(default, null):Scene;
     public var mouseEnabled:Bool = true;
     
-    public var fontChangedSignal(default, null):Zig<Void->Void>;
-    public var interactionSignal(default, null):Zig<Int->Interaction->Void>;
-    public var updateSignal(default, null):Zig<Float->Void>;
-    public var sceneSetSignal(default, null):Zig<Void->Void>;
+    public var fontChangedSignal(default, null):Zig<Void->Void> = new Zig();
+    public var interactionSignal(default, null):Zig<Int->Interaction->Void> = new Zig();
+    public var updateSignal(default, null):Zig<Float->Void> = new Zig();
+    public var sceneSetSignal(default, null):Zig<Void->Void> = new Zig();
+    public var drawSignal(default, null):Zig<Void->Void> = new Zig();
 
-    @:allow(net.rezmason.scourge.textview.core) var segments(default, null):Array<BodySegment>;
+    @:allow(net.rezmason.scourge.textview.core) var segments(default, null):Array<BodySegment> = [];
     @:allow(net.rezmason.scourge.textview.core) var params(default, null):Array<Float>;
     
-    var trueNumGlyphs:Int;
-    var concatMat:Matrix4;
-    var glyphs:Array<Glyph>;
+    var trueNumGlyphs:Int = 0;
+    var concatMat:Matrix4 = new Matrix4();
+    var glyphs:Array<Glyph> = [];
 
     public function new():Void {
         super();
-        fontChangedSignal = new Zig();
-        interactionSignal = new Zig();
-        updateSignal = new Zig();
-        sceneSetSignal = new Zig();
-        id = ++_ids;
-        glyphs = [];
         var fontManager:FontManager = new Present(FontManager);
         fontManager.onFontChange.add(updateGlyphTexture);
         glyphTexture = fontManager.defaultFont;
-
-        numGlyphs = 0;
-        trueNumGlyphs = 0;
-
-        segments = [];
-        glyphs = [];
-
-        transform = new Matrix4();
-        concatMat = new Matrix4();
         params = [0, 0, 0, 0];
         params[2] = id / 0xFF;
         glyphScale = 1;

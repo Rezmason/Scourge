@@ -3,9 +3,15 @@ package net.rezmason.scourge.controller;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.ecce.Query;
+import net.rezmason.gl.GLTypes;
+import net.rezmason.praxis.play.Game;
 import net.rezmason.scourge.components.BoardSpaceState;
 import net.rezmason.scourge.components.BoardSpaceView;
+import net.rezmason.scourge.game.Pieces;
+import net.rezmason.scourge.game.ScourgeGameConfig;
+import net.rezmason.scourge.textview.ColorPalette.*;
 import net.rezmason.scourge.textview.View;
+import net.rezmason.scourge.textview.core.Body;
 import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.ui.BorderBox;
 import net.rezmason.utils.Zig;
@@ -17,12 +23,15 @@ using net.rezmason.scourge.textview.core.GlyphUtils;
 class MoveMediator {
 
     public var moveChosenSignal(default, null):Zig<Int->String->Int->Void> = new Zig();
-    var num:Float = 0;
-    var loupe:BorderBox;
     var ecce:Ecce;
+    var config:ScourgeGameConfig;
+    var game:Game;
+    var loupe:BorderBox;
     var qBoard:Query;
     var boardSpacesByID:Map<Int, Entity>;
     var selectedSpace:Entity;
+    var piece:Body;
+    var pieces:Pieces;
 
     public function new() {
         var view:View = new Present(View);
@@ -32,17 +41,37 @@ class MoveMediator {
         qBoard = ecce.query([BoardSpaceView, BoardSpaceState]);
         selectedSpace = null;
 
+        piece = view.piece;
         loupe = view.loupe;
         loupe.body.mouseEnabled = false;
-        loupe.body.updateSignal.add(onUpdate);    
+        // loupe.body.updateSignal.add(onUpdate); 
     }
 
+    public function beginGame(config, game) {
+        this.config = cast config;
+        this.game = game;
+
+        pieces = this.config.pieceParams.pieces;
+        var numPieceGlyphsNeeded = pieces.maxSize();
+        if (piece.numGlyphs < numPieceGlyphsNeeded) piece.growTo(numPieceGlyphsNeeded);
+        for (id in 0...piece.numGlyphs) {
+            var glyph = piece.getGlyphByID(id);
+            glyph.SET({color:WHITE, x:id, char:Strings.UI_CODE, s:2});
+        }
+    }
+
+    public function endGame() {
+        game = null;
+    }
+
+    /*
     function onUpdate(delta) {
         num += delta;
         loupe.width  = (Math.sin(num * 2) * 0.5 + 0.5) * 0.5;
         loupe.height = (Math.sin(num * 3) * 0.5 + 0.5) * 0.5;
         loupe.redraw();
     }
+    */
 
     public function enableHumanMoves() {
         trace('ENABLE HUMAN MOVES');
