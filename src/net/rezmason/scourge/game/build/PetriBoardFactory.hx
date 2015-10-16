@@ -80,7 +80,7 @@ class PetriBoardFactory {
             var pos = cell.value.pos;
             pos.x = pos.x - outerRadius;
             pos.y = outerRadius - pos.y;
-            pos.z = (pos.x * pos.x + pos.y * pos.y) * -0.02;
+            pos.z = (1 - (pos.x * pos.x + pos.y * pos.y) / (outerRadius * outerRadius)) * -2;
         }
 
         return grid;

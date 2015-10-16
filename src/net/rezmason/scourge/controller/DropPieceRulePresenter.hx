@@ -11,6 +11,7 @@ class DropPieceRulePresenter extends RulePresenter {
         populateGlyphs(slam.topFrom, slam.bottomFrom, spaceState.lastValues, spaceState.petriData);
         slam.topFrom.SET({color:BLACK, s:1.2, f:0.7, char:BODY_CODE, p:-0.5});
         populateGlyphs(slam.topTo, slam.bottomTo, spaceState.values, spaceState.petriData);
+        slam.bottomTo.SET({r:slam.topTo.get_r(), g:slam.topTo.get_g(), b:slam.topTo.get_b()});
         slam.topTo.SET({color:WHITE, char:slam.topFrom.get_char(), s:1.2, f:0.7, p:-0.05});
         
         slam.duration = 0.125;
@@ -24,7 +25,8 @@ class DropPieceRulePresenter extends RulePresenter {
         cool.topTo.set_pos(spaceState.petriData.pos);
         cool.topTo.set_p(-0.03);
 
+        cool.ease = Quad.easeIn.calculate;
         cool.startTime = slam.duration;
-        cool.duration = 0.25;
+        cool.duration = 0.5;
     }
 }

@@ -13,6 +13,6 @@ class EatRulePresenter extends RulePresenter {
         anim.topFrom.set_char(oldChar);
         populateGlyphs(anim.topTo,   anim.bottomTo,   spaceState.values, spaceState.petriData);
         anim.topTo.set_char(oldChar);
-        anim.topTo.set_p(-0.03);
+        anim.topTo.set_p(-0.05);
     }
 }
