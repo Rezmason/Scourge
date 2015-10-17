@@ -1,4 +1,3 @@
-Represent piece with separate body
 Draw the current piece
 Rotate key - space
 Shift key - flip

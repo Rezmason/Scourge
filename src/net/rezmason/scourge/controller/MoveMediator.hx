@@ -30,21 +30,24 @@ class MoveMediator {
     var qBoard:Query;
     var boardSpacesByID:Map<Int, Entity>;
     var selectedSpace:Entity;
+    var board:Body;
     var piece:Body;
     var pieces:Pieces;
 
     public function new() {
         var view:View = new Present(View);
-        view.board.interactionSignal.add(handleBoardInteraction);
 
         ecce = new Present(Ecce);
         qBoard = ecce.query([BoardSpaceView, BoardSpaceState]);
         selectedSpace = null;
 
+        board = view.board;
         piece = view.piece;
         loupe = view.loupe;
         loupe.body.mouseEnabled = false;
         // loupe.body.updateSignal.add(onUpdate); 
+        
+        board.interactionSignal.add(handleBoardInteraction);
     }
 
     public function beginGame(config, game) {
@@ -56,7 +59,7 @@ class MoveMediator {
         if (piece.numGlyphs < numPieceGlyphsNeeded) piece.growTo(numPieceGlyphsNeeded);
         for (id in 0...piece.numGlyphs) {
             var glyph = piece.getGlyphByID(id);
-            glyph.SET({color:WHITE, x:id, char:Strings.UI_CODE, s:2});
+            glyph.SET({color:WHITE, x:id, char:Strings.UI_CODE, s:2, p:-0.03});
         }
     }
 
@@ -107,14 +110,22 @@ class MoveMediator {
                     if (nextSpace.get(BoardSpaceState).petriData.isWall) return;
                     selectedSpace.get(BoardSpaceView).over.set_s(0);
                     selectedSpace = nextSpace;
-                    selectedSpace.get(BoardSpaceView).over.set_s(2);
+                    var selectedGlyph = selectedSpace.get(BoardSpaceView).over;
+                    selectedGlyph.set_s(2);
+                    piece.transform.identity();
+                    piece.transform.appendTranslation(selectedGlyph.get_x(), selectedGlyph.get_y(), selectedGlyph.get_z());
+                    piece.transform.append(board.transform);
                 }
             case MOUSE(type, x, y): 
                 switch (type) {
                     case CLICK:
                         if (selectedSpace != null) selectedSpace.get(BoardSpaceView).over.set_s(0);
                         selectedSpace = boardSpacesByID[glyphID];
-                        selectedSpace.get(BoardSpaceView).over.set_s(2);
+                        var selectedGlyph = selectedSpace.get(BoardSpaceView).over;
+                        selectedGlyph.set_s(2);
+                        piece.transform.identity();
+                        piece.transform.appendTranslation(selectedGlyph.get_x(), selectedGlyph.get_y(), selectedGlyph.get_z());
+                        piece.transform.append(board.transform);
                     case MOUSE_DOWN:
                     case MOUSE_UP:
                     case MOVE:
