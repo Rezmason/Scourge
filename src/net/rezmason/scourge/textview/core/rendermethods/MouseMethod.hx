@@ -35,6 +35,7 @@ class MouseMethod extends RenderMethod {
         program.setVertexBufferAt('aPos',    shapeBuffer, 0, 3);
         program.setVertexBufferAt('aCorner', shapeBuffer, 3, 2);
         program.setVertexBufferAt('aPaint',  paintBuffer, 0, 2);
+        program.setVertexBufferAt('aHitbox', paintBuffer, 2, 2);
     }
 
     override public function drawBody(body:Body) if (body.mouseEnabled) super.drawBody(body);

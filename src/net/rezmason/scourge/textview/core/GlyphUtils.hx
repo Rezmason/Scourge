@@ -71,7 +71,7 @@ class GlyphUtils {
         return gl;
     }
 
-    public inline static function copyFrom(gl:Glyph, src:Glyph):Glyph {
+    public static function copyFrom(gl:Glyph, src:Glyph):Glyph {
         for (ike in 0...SHAPE_FLOATS_PER_GLYPH) gl.shape[gl.id * SHAPE_FLOATS_PER_GLYPH + ike] = src.shape[src.id * SHAPE_FLOATS_PER_GLYPH + ike];
         for (ike in 0...COLOR_FLOATS_PER_GLYPH) gl.color[gl.id * COLOR_FLOATS_PER_GLYPH + ike] = src.color[src.id * COLOR_FLOATS_PER_GLYPH + ike];
         for (ike in 0...PAINT_FLOATS_PER_GLYPH) gl.paint[gl.id * PAINT_FLOATS_PER_GLYPH + ike] = src.paint[src.id * PAINT_FLOATS_PER_GLYPH + ike];
@@ -178,14 +178,20 @@ class GlyphUtils {
             var paintG = ((val >>  0) & 0xFF) / 0xFF;
             var glyphOffset:Int = gl.id * PAINT_FLOATS_PER_GLYPH;
 
-            pop4(gl.paint, glyphOffset, PR_OFFSET, PAINT_FLOATS_PER_VERTEX, paintR);
-            pop4(gl.paint, glyphOffset, PG_OFFSET, PAINT_FLOATS_PER_VERTEX, paintG);
+            pop4(gl.paint, glyphOffset, PAINT_R_OFFSET, PAINT_FLOATS_PER_VERTEX, paintR);
+            pop4(gl.paint, glyphOffset, PAINT_G_OFFSET, PAINT_FLOATS_PER_VERTEX, paintG);
 
             gl.paintHex = val;
         }
 
         return gl.paintHex;
     }
+
+    public inline static function get_paint_s(gl:Glyph) return gl.paint[gl.id * PAINT_FLOATS_PER_GLYPH + PAINT_S_OFFSET];
+    public inline static function set_paint_s(gl:Glyph, v) return pop4(gl.paint, gl.id * PAINT_FLOATS_PER_GLYPH, PAINT_S_OFFSET, PAINT_FLOATS_PER_VERTEX, v);
+
+    public inline static function get_paint_h(gl:Glyph) return gl.paint[gl.id * PAINT_FLOATS_PER_GLYPH + PAINT_H_OFFSET];
+    public inline static function set_paint_h(gl:Glyph, v) return pop4(gl.paint, gl.id * PAINT_FLOATS_PER_GLYPH, PAINT_H_OFFSET, PAINT_FLOATS_PER_VERTEX, v);
 
     public inline static function init(gl:Glyph):Void {
         // corner H
@@ -201,6 +207,9 @@ class GlyphUtils {
         pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, -1);
 
         set_paint(gl, 0);
+        set_paint_h(gl, 1);
+        set_paint_s(gl, 1);
+
         reset(gl);
     }
 
@@ -211,6 +220,7 @@ class GlyphUtils {
         set_fx(gl, 0, 0.5, 0); // i, f, a
         // We don't reset the font.
         set_char(gl, -1);
+        // We don't reset the paint.
         return gl;
     }
 

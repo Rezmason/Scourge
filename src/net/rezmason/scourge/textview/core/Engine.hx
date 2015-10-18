@@ -39,6 +39,7 @@ class Engine extends Module {
     var keyboardSystem:KeyboardSystem;
     var mouseMethod:RenderMethod;
     var prettyMethod:RenderMethod;
+    var presentationMethod:RenderMethod;
 
     public function new(glFlow:GLFlowControl):Void {
         super();
@@ -126,6 +127,7 @@ class Engine extends Module {
 
         prettyMethod = new PrettyMethod();
         mouseMethod = new MouseMethod();
+        presentationMethod = prettyMethod;
 
         prettyMethod.loadedSignal.add(onMethodLoaded);
         mouseMethod.loadedSignal.add(onMethodLoaded);
@@ -149,7 +151,7 @@ class Engine extends Module {
 
     function onRender(width:Int, height:Int):Void {
         if (active) {
-            drawFrame(prettyMethod, postProcess.inputBuffer);
+            drawFrame(presentationMethod, postProcess.inputBuffer);
             postProcess.draw();
         }
     }
@@ -254,6 +256,8 @@ class Engine extends Module {
                     var nY:Float = (oY / height - rect.y) / rect.height;
                     interaction = MOUSE(type, nX, nY);
                 }
+            case KEYBOARD(type, code, modifier) if (code == SPACE && modifier.altKey):
+                presentationMethod = type != KEY_UP ? mouseMethod : prettyMethod;
             case _:
         }
 

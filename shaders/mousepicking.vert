@@ -1,6 +1,7 @@
 attribute vec3 aPos;
 attribute vec2 aCorner;
 attribute vec2 aPaint;
+attribute vec2 aHitbox;
 
 uniform vec4 uBodyParams;
 uniform mat4 uCameraMat;
@@ -13,7 +14,8 @@ void main(void) {
     vPaint = vec4(uBodyParams.b, aPaint, 1.0);
 
     vec4 pos = uCameraMat * (uBodyMat * vec4(aPos, 1.0));
-    pos.xy += uBodyParams.xy * aCorner;
+    pos.x += uBodyParams.x * aCorner.x * aHitbox.y * aHitbox.x;
+    pos.y += uBodyParams.y * aCorner.y * aHitbox.y;
 
     gl_Position = pos;
 }
