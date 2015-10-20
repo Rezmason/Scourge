@@ -1,7 +1,5 @@
-Draw the current piece
-Rotate key - space
-Shift key - flip
-Enter key - Drop
+Drop moves
+    Proceed needs to happen
 
 Tidy up sequence of events
     Game begins; UI is visible

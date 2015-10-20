@@ -1,7 +1,6 @@
 package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.aspect.Aspect.*;
-import net.rezmason.grid.GridDirection.*;
 import net.rezmason.praxis.rule.Surveyor;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.scourge.game.PieceTypes;
@@ -84,7 +83,10 @@ class DropPieceSurveyor extends Surveyor<DropPieceParams> {
                             var addedSpaces:Array<Int> = [];
 
                             for (coord in piece.cells) {
-                                var spaceAtCoord = walkCell(getSpaceCell(space), coord, homeCoord).value;
+                                var dx = coord.x - homeCoord.x;
+                                var dy = coord.y - homeCoord.y;
+                                var spaceAtCoord = getSpaceCell(space).runEuclidean(dx, dy).value;
+
                                 addedSpaces.push(getID(spaceAtCoord));
                                 numAddedSpaces++;
                                 var occupier:Int = spaceAtCoord[occupier_];
@@ -179,26 +181,6 @@ class DropPieceSurveyor extends Surveyor<DropPieceParams> {
             }
         }
         return val;
-    }
-
-    // A works-for-now function for translating piece coords into spaces accessible from a given starting point
-    inline function walkCell(cell:BoardCell, fromCoord:IntCoord, toCoord:IntCoord):BoardCell {
-        var dn:Int = 0;
-        var dw:Int = 0;
-        var de:Int = toCoord.x - fromCoord.x;
-        var ds:Int = toCoord.y - fromCoord.y;
-
-        if (de < 0) {
-            dw = -de;
-            de = 0;
-        }
-
-        if (ds < 0) {
-            dn = -ds;
-            ds = 0;
-        }
-
-        return cell.run(N, dn).run(S, ds).run(E, de).run(W, dw);
     }
 
     inline function neighborsFor(cell:BoardCell, ortho:Bool):Array<BoardCell> {

@@ -51,6 +51,29 @@ class GridUtils {
         return selection;
     }
 
+    public inline static function runEuclidean<T>(cell:Cell<T>, dx:Int, dy:Int):Cell<T> {
+        var dn:Int = 0;
+        var dw:Int = 0;
+        var de:Int = -dx; // TODO: fix tests so these can be made positive
+        var ds:Int = -dy;
+
+        if (de < 0) {
+            dw = -de;
+            de = 0;
+        }
+
+        if (ds < 0) {
+            dn = -ds;
+            ds = 0;
+        }
+        cell = run(cell, N, dn);
+        cell = run(cell, S, ds);
+        cell = run(cell, E, de);
+        cell = run(cell, W, dw);
+        return cell;
+    }
+
+
     // Shortcuts
     public inline static function nw<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[NW]; }
     public inline static function  n<T> (cell:Cell<T>):Cell<T> { return cell.neighbors[N ]; }
