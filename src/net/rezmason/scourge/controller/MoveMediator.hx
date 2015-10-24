@@ -73,7 +73,6 @@ class MoveMediator {
         pieces = this.config.pieceParams.pieces;
         allowFlipping = this.config.pieceParams.allowFlipping;
         allowRotating = this.config.pieceParams.allowRotating;
-        trace('$allowFlipping $allowRotating');
         var numPieceGlyphsNeeded = pieces.maxSize();
         if (piece.numGlyphs < numPieceGlyphsNeeded) piece.growTo(numPieceGlyphsNeeded);
         for (id in 0...piece.numGlyphs) {
@@ -86,6 +85,7 @@ class MoveMediator {
     }
 
     public function endGame() {
+        movesEnabled = false;
         game = null;
         dropMovesByKey = null;
     }
@@ -183,14 +183,14 @@ class MoveMediator {
                         }
                     case RETURN: 
                         if (movesEnabled && dropMove != null) {
+                            movesEnabled = false;
                             moveChosenSignal.dispatch(game.revision, 'drop', dropMove.id);
                             dropMove = null;
-                            movesEnabled = false;
                         }
                     case TAB:
                         if (movesEnabled && game.getMovesForAction('swap').length > 0) {
-                            moveChosenSignal.dispatch(game.revision, 'swap', 0);
                             movesEnabled = false;
+                            moveChosenSignal.dispatch(game.revision, 'swap', 0);
                         }
                     case _:
                 }

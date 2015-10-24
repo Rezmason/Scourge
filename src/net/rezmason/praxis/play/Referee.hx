@@ -30,7 +30,7 @@ class Referee {
     }
 
     public function beginGame(randGen:Void->Float, gameConfig:GameConfig<Dynamic, Dynamic>, savedGame:SavedGame = null):Void {
-
+        waitingToProceed = false;
         var serializedSavedGame:String = null;
         var savedGameState:SavedState = null;
 
@@ -53,6 +53,7 @@ class Referee {
     }
 
     public function endGame():Void {
+        waitingToProceed = false;
         lastGame = saveGame();
         lastGameConfig = gameConfig;
         game.end();
