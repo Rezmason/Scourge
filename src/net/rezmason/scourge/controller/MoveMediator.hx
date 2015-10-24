@@ -49,6 +49,7 @@ class MoveMediator {
     var dropMove:DropPieceMove;
     var allowFlipping:Bool;
     var allowRotating:Bool;
+    var allowSkipping:Bool;
 
     public function new() {
         var view:View = new Present(View);
@@ -73,6 +74,7 @@ class MoveMediator {
         pieces = this.config.pieceParams.pieces;
         allowFlipping = this.config.pieceParams.allowFlipping;
         allowRotating = this.config.pieceParams.allowRotating;
+        allowSkipping = this.config.pieceParams.allowSkipping;
         var numPieceGlyphsNeeded = pieces.maxSize();
         if (piece.numGlyphs < numPieceGlyphsNeeded) piece.growTo(numPieceGlyphsNeeded);
         for (id in 0...piece.numGlyphs) {
@@ -191,6 +193,16 @@ class MoveMediator {
                         if (movesEnabled && game.getMovesForAction('swap').length > 0) {
                             movesEnabled = false;
                             moveChosenSignal.dispatch(game.revision, 'swap', 0);
+                        }
+                    case ESCAPE:
+                        if (movesEnabled && game.getMovesForAction('forfeit').length > 0) {
+                            movesEnabled = false;
+                            moveChosenSignal.dispatch(game.revision, 'forfeit', 0);
+                        }
+                    case S:
+                        if (movesEnabled && allowSkipping) {
+                            movesEnabled = false;
+                            moveChosenSignal.dispatch(game.revision, 'drop', 0);
                         }
                     case _:
                 }
