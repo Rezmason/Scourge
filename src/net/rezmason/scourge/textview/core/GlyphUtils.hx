@@ -232,7 +232,9 @@ class GlyphUtils {
     }
 
     private inline static function pop4(vec:VertexArray, glyphOffset:Int, propOffset:Int, step:Int, val:Float):Float {
-        #if debug
+        #if (debug && cpp)
+            if (Math.isNaN(val)) throw "NaN value.";
+        #elseif debug
             if (!(val == val)) throw "NaN value.";
         #end
 
