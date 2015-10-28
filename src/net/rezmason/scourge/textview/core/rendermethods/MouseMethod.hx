@@ -38,6 +38,6 @@ class MouseMethod extends RenderMethod {
         program.setVertexBufferAt('aHitbox', paintBuffer, 2, 2);
     }
 
-    override public function drawBody(body:Body) if (body.mouseEnabled) super.drawBody(body);
+    override public function drawBody(body:Body) if (body.mouseEnabled && body.visible) super.drawBody(body);
 }
 

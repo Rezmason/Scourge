@@ -50,7 +50,7 @@ class GameContext {
         humanSystem.moveStepSignal.add(sequencer.stepMove);
         humanSystem.moveStopSignal.add(sequencer.endMove);
 
-        humanSystem.moveStopSignal.add(moveMediator.updatePiece);
+        humanSystem.moveStopSignal.add(moveMediator.endMove);
         
         humanSystem.gameEndedSignal.add(sequencer.endGame);
         humanSystem.gameEndedSignal.add(moveMediator.endGame);

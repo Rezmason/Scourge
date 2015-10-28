@@ -12,6 +12,7 @@ import net.rezmason.scourge.components.BoardSpaceView;
 import net.rezmason.scourge.game.PieceTypes;
 import net.rezmason.scourge.game.Pieces;
 import net.rezmason.scourge.game.ScourgeGameConfig;
+import net.rezmason.scourge.game.bite.BiteMove;
 import net.rezmason.scourge.game.piece.DropPieceMove;
 import net.rezmason.scourge.game.piece.PieceAspect;
 import net.rezmason.scourge.textview.ColorPalette.*;
@@ -37,6 +38,7 @@ class MoveMediator {
     var selectedSpace:Entity;
     var board:Body;
     var piece:Body;
+    var bite:Body;
     var pieces:Pieces;
     var pieceTableID_:AspectPointer<PGlobal>;
     var pieceReflection_:AspectPointer<PGlobal>;
@@ -47,9 +49,15 @@ class MoveMediator {
     var movesEnabled:Bool = false;
     var dropMovesByKey:Map<String, DropPieceMove>;
     var dropMove:DropPieceMove;
+    var biteMovesByKey:Map<String, BiteMove>;
+    var biteTargetIDs:Map<Int, Bool>;
+    var biteMove:BiteMove;
     var allowFlipping:Bool;
     var allowRotating:Bool;
     var allowSkipping:Bool;
+    var isBiting:Bool;
+    var biteTargetSpace:Entity;
+    var bitSpacesByID:Map<Int, Entity>;
 
     public function new() {
         var view:View = new Present(View);
@@ -60,9 +68,11 @@ class MoveMediator {
 
         board = view.board;
         piece = view.piece;
+        bite = view.bite;
         loupe = view.loupe;
         loupe.body.mouseEnabled = false;
         // loupe.body.updateSignal.add(onUpdate); 
+        loupe.body.visible = false;
         
         board.interactionSignal.add(handleBoardInteraction);
     }
@@ -75,12 +85,17 @@ class MoveMediator {
         allowFlipping = this.config.pieceParams.allowFlipping;
         allowRotating = this.config.pieceParams.allowRotating;
         allowSkipping = this.config.pieceParams.allowSkipping;
-        var numPieceGlyphsNeeded = pieces.maxSize();
-        if (piece.numGlyphs < numPieceGlyphsNeeded) piece.growTo(numPieceGlyphsNeeded);
+        piece.growTo(pieces.maxSize());
         for (id in 0...piece.numGlyphs) {
             var glyph = piece.getGlyphByID(id);
             glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0});
         }
+        bite.growTo(this.config.biteParams.maxReach + 1);
+        for (id in 0...bite.numGlyphs) {
+            var glyph = bite.getGlyphByID(id);
+            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0});
+        }
+        bite.getGlyphByID(0).set_color(new Vec3(1, 0, 0));
         pieceTableID_ = game.plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
         pieceReflection_ = game.plan.onGlobal(PieceAspect.PIECE_REFLECTION);
         pieceRotation_ = game.plan.onGlobal(PieceAspect.PIECE_ROTATION);
@@ -88,14 +103,76 @@ class MoveMediator {
 
     public function endGame() {
         movesEnabled = false;
+        isBiting = false;
         game = null;
         dropMovesByKey = null;
+        biteMovesByKey = null;
+        biteTargetIDs = null;
+        dropMove = null;
+        biteMove = null;
+        selectedSpace = null;
+        biteTargetSpace = null;
+        bitSpacesByID = null;
     }
 
-    public function updatePiece() {
-        var pieceID = game.state.global[pieceTableID_];
+    function updateBite() {
+        for (glyph in bite.eachGlyph()) glyph.set_s(0);
+        if (!isBiting || selectedSpace == null) return;
+
+        var selectedCell = selectedSpace.get(BoardSpaceState).cell;
+        var selectedGlyph = selectedSpace.get(BoardSpaceView).over;
+        var biteSelectionGlyph = bite.getGlyphByID(0);
+        biteSelectionGlyph.SET({s:2, g:0, b:0, x:selectedGlyph.get_x(), y:selectedGlyph.get_y(), z:selectedGlyph.get_z()});
+
+        var selectedChar = -1;
+
+        if (biteTargetSpace == null) {
+            selectedChar = biteTargetIDs.exists(selectedCell.id) ? Strings.BODY_CODE : Strings.ILLEGAL_BODY_CODE;
+        } else {
+            if (biteTargetSpace == selectedSpace) {
+                selectedChar = Strings.LEGAL_BITE_TARGET_CODE;
+            } else {
+                var biteTargetSpaceGlyph = biteTargetSpace.get(BoardSpaceView).over;
+                var biteTargetGlyph = bite.getGlyphByID(1);
+                biteTargetGlyph.SET({s:2, x:biteTargetSpaceGlyph.get_x(), y:biteTargetSpaceGlyph.get_y(), z:biteTargetSpaceGlyph.get_z()});
+                biteTargetGlyph.set_char(Strings.LEGAL_BITE_TARGET_CODE);
+
+                var ike = 2;
+                for (bitSpace in bitSpacesByID) {
+                    if (bitSpace == selectedSpace) {
+                        selectedChar = Strings.BITE_CODE;
+                    } else {
+                        var bitSpaceGlyph = bitSpace.get(BoardSpaceView).over;
+                        var bitGlyph = bite.getGlyphByID(ike++);
+                        bitGlyph.SET({s:2, x:bitSpaceGlyph.get_x(), y:bitSpaceGlyph.get_y(), z:bitSpaceGlyph.get_z()});
+                        bitGlyph.set_char(Strings.BITE_CODE);
+                    }
+                }
+
+                if (!bitSpacesByID.exists(selectedCell.id)) {
+                    var sortedBitSpaceIDs = [for (key in bitSpacesByID.keys()) key];
+                    sortedBitSpaceIDs.push(selectedCell.id);
+                    sortedBitSpaceIDs.sort(lesserID);
+                    var targetID = biteTargetSpace.get(BoardSpaceState).cell.id;
+                    var key = '${targetID}_{$sortedBitSpaceIDs.join("_")}';
+                    if (biteMovesByKey.exists(key)) {
+                        selectedChar = Strings.BITE_CODE;
+                    } else if (biteTargetIDs.exists(selectedCell.id)) {
+                        selectedChar = Strings.BODY_CODE;
+                    } else {
+                        selectedChar = Strings.ILLEGAL_BITE_CODE;
+                    }
+                }
+            }
+        }
         
+        biteSelectionGlyph.set_char(selectedChar);
+    }
+
+    function updatePiece() {
         for (glyph in piece.eachGlyph()) glyph.set_s(0);
+        if (isBiting) return;
+        var pieceID = game.state.global[pieceTableID_];
         if (pieceID == NULL) {
             if (movesEnabled && game.getMovesForAction('pick').length > 0) {
                 moveChosenSignal.dispatch(game.revision, 'pick', 0);
@@ -121,7 +198,7 @@ class MoveMediator {
             }
             var key = ids.join('_');
             if (dropMovesByKey != null) dropMove = dropMovesByKey[key];
-            var char = dropMove == null ? Strings.EATEN_HEAD_CODE : Strings.UI_CODE;
+            var char = dropMove == null ? Strings.ILLEGAL_BODY_CODE : Strings.BODY_CODE;
             for (glyph in piece.eachGlyph()) glyph.set_char(char);
         }
     }
@@ -139,16 +216,33 @@ class MoveMediator {
         if (movesEnabled) {
             var dropMoves:Array<DropPieceMove> = cast game.getMovesForAction('drop');
             dropMovesByKey = new Map();
-            for (move in dropMoves) {
-                var key = move.addedSpaces.join('_');
-                dropMovesByKey[key] = move;
+            for (move in dropMoves) dropMovesByKey[move.addedSpaces.join('_')] = move;
+        }
+    }
+
+    function updateBiteMoves() {
+        if (movesEnabled) {
+            var biteMoves:Array<BiteMove> = cast game.getMovesForAction('bite');
+            biteMovesByKey = new Map();
+            biteTargetIDs = new Map();
+            for (move in biteMoves) {
+                var sortedBitSpaceIDs = move.bitSpaces.copy();
+                sortedBitSpaceIDs.sort(lesserID);
+                biteMovesByKey['${move.targetSpace}_{$sortedBitSpaceIDs.join("_")}'] = move;
+                biteTargetIDs[move.targetSpace] = true;
             }
         }
     }
+
+    function lesserID(id1, id2) return id1 - id2;
+
     public function enableHumanMoves() {
         movesEnabled = true;
+        isBiting = false;
         updateDropMoves();
+        updateBiteMoves();
         updatePiece();
+        updateBite();
     }
 
     public function acceptBoardSpaces() {
@@ -163,31 +257,80 @@ class MoveMediator {
         boardSpacesByID = null;
     }
 
+    public function endMove() {
+        updatePiece();
+        updateBite();
+    }
+
     function handleBoardInteraction(glyphID, interaction) {
         switch (interaction) {
-            case KEYBOARD(type, keyCode, modifier) if (type == KEY_DOWN && selectedSpace != null): 
-                var cell = selectedSpace.get(BoardSpaceState).cell;
+            case KEYBOARD(type, keyCode, modifier) if (type == KEY_DOWN): 
+                var cell = (selectedSpace == null) ? null : selectedSpace.get(BoardSpaceState).cell;
                 var nextCell = null;
                 switch (keyCode) {
-                    case UP: nextCell = cell.n();
-                    case DOWN: nextCell = cell.s();
-                    case LEFT: nextCell = cell.w();
-                    case RIGHT: nextCell = cell.e();
-                    case SPACE: 
-                        if (allowRotating) {
+                    case UP if (cell != null): nextCell = cell.n();
+                    case DOWN if (cell != null): nextCell = cell.s();
+                    case LEFT if (cell != null): nextCell = cell.w();
+                    case RIGHT if (cell != null): nextCell = cell.e();
+                    case SPACE if (cell != null): 
+                        if (!isBiting && allowRotating) {
                             rotation = (rotation + 1) % 4;
                             updatePiece();
+                        } else if (isBiting) {
+                            if (selectedSpace == biteTargetSpace) {
+                                biteMove = null;
+                                biteTargetSpace = null;
+                                bitSpacesByID = new Map();
+                            } else if (bitSpacesByID.exists(cell.id)) {
+                                bitSpacesByID.remove(cell.id);
+                                var sortedBitSpaceIDs = [for (key in bitSpacesByID.keys()) key];
+                                sortedBitSpaceIDs.sort(lesserID);
+                                var targetID = biteTargetSpace.get(BoardSpaceState).cell.id;
+                                var key = '${targetID}_{$sortedBitSpaceIDs.join("_")}';
+                                biteMove = biteMovesByKey[key];
+                            } else if (biteTargetIDs.exists(cell.id)) {
+                                biteMove = null;
+                                biteTargetSpace = selectedSpace;
+                                bitSpacesByID = new Map();
+                            } else if (biteTargetSpace != null) {
+                                var sortedBitSpaceIDs = [for (key in bitSpacesByID.keys()) key];
+                                sortedBitSpaceIDs.push(cell.id);
+                                sortedBitSpaceIDs.sort(lesserID);
+                                var targetID = biteTargetSpace.get(BoardSpaceState).cell.id;
+                                var key = '${targetID}_{$sortedBitSpaceIDs.join("_")}';
+                                if (biteMovesByKey[key] != null) {
+                                    bitSpacesByID[cell.id] = selectedSpace;
+                                    biteMove = biteMovesByKey[key];
+                                }
+                            }
+                            updateBite();
                         }
-                    case SLASH: 
+                    case SLASH if (selectedSpace != null): 
                         if (allowFlipping) {
                             reflection = (reflection + 1) % 4;
                             updatePiece();
                         }
                     case RETURN: 
-                        if (movesEnabled && dropMove != null) {
-                            movesEnabled = false;
-                            moveChosenSignal.dispatch(game.revision, 'drop', dropMove.id);
-                            dropMove = null;
+                        if (movesEnabled) {
+                            if (!isBiting && dropMove != null) {
+                                movesEnabled = false;
+                                var moveID = dropMove.id;
+                                dropMove = null;
+                                selectedSpace = null;
+                                updatePiece();
+                                updateBite();
+                                moveChosenSignal.dispatch(game.revision, 'drop', moveID);
+                            } else if (isBiting && biteMove != null) {
+                                movesEnabled = false;
+                                var moveID = biteMove.id;
+                                biteMove = null;
+                                selectedSpace = null;
+                                biteTargetSpace = null;
+                                bitSpacesByID = null;
+                                updatePiece();
+                                updateBite();
+                                moveChosenSignal.dispatch(game.revision, 'bite', moveID);
+                            }
                         }
                     case TAB:
                         if (movesEnabled && game.getMovesForAction('swap').length > 0) {
@@ -204,31 +347,39 @@ class MoveMediator {
                             movesEnabled = false;
                             moveChosenSignal.dispatch(game.revision, 'drop', 0);
                         }
+                    case B:
+                        if (movesEnabled && (isBiting || game.getMovesForAction('bite').length > 0)) {
+                            isBiting = !isBiting;
+                            selectedSpace = null;
+                            biteTargetSpace = null;
+                            bitSpacesByID = new Map();
+                            biteMove = null;
+                            updatePiece();
+                            updateBite();
+                        }
                     case _:
                 }
                 if (nextCell != null) {
                     var nextSpace = boardSpacesByID[nextCell.id];
                     if (nextSpace.get(BoardSpaceState).petriData.isWall) return;
-                    //selectedSpace.get(BoardSpaceView).over.set_s(0);
                     selectedSpace = nextSpace;
                     var selectedGlyph = selectedSpace.get(BoardSpaceView).over;
-                    //selectedGlyph.set_s(2);
                     piece.transform.identity();
                     piece.transform.appendTranslation(selectedGlyph.get_x(), selectedGlyph.get_y(), selectedGlyph.get_z());
                     piece.transform.append(board.transform);
                     updatePiece();
+                    updateBite();
                 }
             case MOUSE(type, x, y): 
                 switch (type) {
-                    case CLICK:
-                        //if (selectedSpace != null) selectedSpace.get(BoardSpaceView).over.set_s(0);
+                    case CLICK if (boardSpacesByID.exists(glyphID)):
                         selectedSpace = boardSpacesByID[glyphID];
                         var selectedGlyph = selectedSpace.get(BoardSpaceView).over;
-                        //selectedGlyph.set_s(2);
                         piece.transform.identity();
                         piece.transform.appendTranslation(selectedGlyph.get_x(), selectedGlyph.get_y(), selectedGlyph.get_z());
                         piece.transform.append(board.transform);
                         updatePiece();
+                        updateBite();
                     case MOUSE_DOWN:
                     case MOUSE_UP:
                     case MOVE:

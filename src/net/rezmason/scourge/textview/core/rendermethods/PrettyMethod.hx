@@ -70,5 +70,7 @@ class PrettyMethod extends RenderMethod {
         program.setVertexBufferAt('aUV',      colorBuffer, 3, 2); // aUV contains u,v
         program.setVertexBufferAt('aFX',      colorBuffer, 5, 3); // aFX contains i,f,a
     }
+
+    override public function drawBody(body:Body) if (body.visible) super.drawBody(body);
 }
 

@@ -9,6 +9,7 @@ class View {
     public var board(default, null):Body;
     public var loupe(default, null):BorderBox;
     public var piece(default, null):Body;
+    public var bite(default, null):Body;
 
     public function new():Void {
         body = new Body();
@@ -16,9 +17,11 @@ class View {
         loupe = new BorderBox();
         loupe.glyphWidth = 0.05;
         piece = new Body();
+        bite = new Body();
 
         body.addChild(board);
         body.addChild(loupe.body);
         body.addChild(piece);
+        body.addChild(bite);
     }
 }

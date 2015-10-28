@@ -1,25 +1,10 @@
-Tidy up sequence of events
-    Game begins; UI is visible
-        UI requests moves and displays them
-        UI is interactive if the current player is present human
-        Otherwise, UI puppet waits for move data
-    Move starts
-        If current player is not present human, sequencer passes move to UI puppet
-    Move ends
-        If current player is not present human, sequencer signals UI puppet to act
-    UI puppet completes animation, signals sequencer
-        Sequencer hides UI
-        Sequencer triggers board animation
-    Board animator completes animation, signals sequencer
-        Sequencer shows UI
-
+Center the pieces
+Quasi-gestural input
+Integrate into loupe
+Shelf of tools, and, like, you drag 'em
 Add UIElement to Loupe that "encases" content
 Make the border box grow to surround the UIElement, not just the board glyphs
-
-Add loupe sequencing to game presentation
-    Display the current piece in the loupe
-
-Shelf
+Create puppet
 
 Try replacing Reflect-on-Dynamic with DynamicAccess
 
