@@ -64,7 +64,7 @@ class StateHistorianTest {
             allowRotating:true,
             allowAll:false,
             hatSize:1,
-            pieces:new Pieces(Resource.getString('tables/pieces.json.txt'))
+            pieceLib:new PieceLibrary(Resource.getString('tables/pieces.json.txt'))
         }
 
         var buildStateRule = TestUtils.makeRule(GlobalBuilder, config);

@@ -4,7 +4,7 @@ import net.rezmason.scourge.game.PieceTypes;
 
 using haxe.Json;
 
-class Pieces {
+class PieceLibrary {
 
     private var freePiecesBySize:Array<Array<FreePiece>>;
     private var freePiecesById:Array<FreePiece>;

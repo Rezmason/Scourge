@@ -38,7 +38,7 @@ class PickPieceBuilder extends Builder<PickPieceParams> {
             var freq:Null<Int> = pieceFrequencies[pieceTableID];
             if (freq == 0 || freq == null) continue;
 
-            var freePiece:FreePiece = params.pieces.getPieceById(pieceTableID);
+            var freePiece:FreePiece = params.pieceLib.getPieceById(pieceTableID);
             var numRotations = freePiece.numRotations;
 
             // A piece that can't be flipped or rotated has its multiple symmetries

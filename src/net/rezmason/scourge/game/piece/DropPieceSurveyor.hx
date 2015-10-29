@@ -49,7 +49,7 @@ class DropPieceSurveyor extends Surveyor<DropPieceParams> {
 
         if (pieceID != NULL) {
 
-            var freePiece:FreePiece = params.pieces.getPieceById(pieceID);
+            var freePiece:FreePiece = params.pieceLib.getPieceById(pieceID);
 
             // For each allowed reflection,
             var allowedReflectionIndex:Int = pieceReflection % freePiece.numReflections;

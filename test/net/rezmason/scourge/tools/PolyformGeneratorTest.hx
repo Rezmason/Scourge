@@ -4,7 +4,7 @@ import massive.munit.Assert;
 import VisualAssert;
 
 import net.rezmason.scourge.game.PieceTypes;
-import net.rezmason.scourge.game.Pieces;
+import net.rezmason.scourge.game.PieceLibrary;
 import net.rezmason.polyform.PolyformGenerator;
 import net.rezmason.utils.openfl.Resource;
 
@@ -31,15 +31,15 @@ class PolyformGeneratorTest {
     public function jsonTest():Void {
 
         var json:String = Resource.getString('tables/pieces.json.txt');
-        var pieces:Pieces = new Pieces(json);
+        var pieceLib:PieceLibrary = new PieceLibrary(json);
 
         var str:String = '\n';
 
-        for (size in 0...pieces.maxSize()) {
+        for (size in 0...pieceLib.maxSize()) {
 
             str += '$size\n__\n';
 
-            var freePieces:Array<FreePiece> = pieces.getAllPiecesOfSize(size);
+            var freePieces:Array<FreePiece> = pieceLib.getAllPiecesOfSize(size);
 
             for (freePiece in freePieces) {
                 for (ike in 0...freePiece.numRotations) {

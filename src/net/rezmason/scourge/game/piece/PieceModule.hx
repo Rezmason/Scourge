@@ -10,11 +10,11 @@ import net.rezmason.utils.openfl.Resource;
 
 class PieceModule extends Module<PieceParams> {
 
-    var pieces:Pieces;
+    var pieceLib:PieceLibrary;
 
     public function new() {
         super();
-        pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
+        pieceLib = new PieceLibrary(Resource.getString('tables/pieces.json.txt'));
     }
 
     override public function composeRules():Map<String, RuleComposition<PieceParams>> {
@@ -33,8 +33,8 @@ class PieceModule extends Module<PieceParams> {
         return {
             allowFlipping:false,
             allowRotating:true,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
-            pieces:pieces,
+            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
+            pieceLib:pieceLib,
 
             hatSize:5,
 

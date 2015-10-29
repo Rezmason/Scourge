@@ -25,14 +25,14 @@ class PieceRulesTest extends ScourgeRuleTest
     #if TIME_TESTS
     var time:Float;
     #end
-    var pieces:Pieces;
+    var pieceLib:PieceLibrary;
 
     @Before
     public function setup():Void {
         #if TIME_TESTS
         time = massive.munit.util.Timer.stamp();
         #end
-        pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
+        pieceLib = new PieceLibrary(Resource.getString('tables/pieces.json.txt'));
     }
 
     @After
@@ -54,7 +54,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceOrtho():Void {
 
         var testPieceParams:TestPieceParams = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
+            pieceTableID:pieceLib.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -67,8 +67,8 @@ class PieceRulesTest extends ScourgeRuleTest
             allowSkipping:false,
             dropOrthoOnly:true,
             dropDiagOnly:false,
-            pieces:pieces,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            pieceLib:pieceLib,
+            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
         var dropRule = TestUtils.makeRule(DropPieceSurveyor, DropPieceActor, dropParams);
@@ -103,7 +103,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceOrthoNoSpace():Void {
 
         var testPieceParams:TestPieceParams = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 4), // 'I block'
+            pieceTableID:pieceLib.getPieceIdBySizeAndIndex(PIECE_SIZE, 4), // 'I block'
             reflection:0,
             rotation:0,
         };
@@ -117,8 +117,8 @@ class PieceRulesTest extends ScourgeRuleTest
             allowSkipping:false,
             dropOrthoOnly:true,
             dropDiagOnly:false,
-            pieces:pieces,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            pieceLib:pieceLib,
+            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
         var dropRule = TestUtils.makeRule(DropPieceSurveyor, DropPieceActor, dropParams);
@@ -139,7 +139,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceOrthoNoFlipping():Void {
 
         var testPieceParams:TestPieceParams = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
+            pieceTableID:pieceLib.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -152,8 +152,8 @@ class PieceRulesTest extends ScourgeRuleTest
             allowSkipping:false,
             dropOrthoOnly:true,
             dropDiagOnly:false,
-            pieces:pieces,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            pieceLib:pieceLib,
+            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
         var dropRule = TestUtils.makeRule(DropPieceSurveyor, DropPieceActor, dropParams);
@@ -177,7 +177,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceOrthoNoSpinning():Void {
 
         var testPieceParams:TestPieceParams = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
+            pieceTableID:pieceLib.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -190,8 +190,8 @@ class PieceRulesTest extends ScourgeRuleTest
             allowSkipping:false,
             dropOrthoOnly:true,
             dropDiagOnly:false,
-            pieces:pieces,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            pieceLib:pieceLib,
+            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
         var dropRule = TestUtils.makeRule(DropPieceSurveyor, DropPieceActor, dropParams);
@@ -215,7 +215,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceOrthoNoSpinningOrFlipping():Void {
 
         var testPieceParams:TestPieceParams = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
+            pieceTableID:pieceLib.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -228,8 +228,8 @@ class PieceRulesTest extends ScourgeRuleTest
             allowSkipping:false,
             dropOrthoOnly:true,
             dropDiagOnly:false,
-            pieces:pieces,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            pieceLib:pieceLib,
+            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
         var dropRule = TestUtils.makeRule(DropPieceSurveyor, DropPieceActor, dropParams);
@@ -253,7 +253,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceOrthoSelf():Void {
 
         var testPieceParams:TestPieceParams = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
+            pieceTableID:pieceLib.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -266,8 +266,8 @@ class PieceRulesTest extends ScourgeRuleTest
             allowSkipping:false,
             dropOrthoOnly:true,
             dropDiagOnly:false,
-            pieces:pieces,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            pieceLib:pieceLib,
+            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
         var dropRule = TestUtils.makeRule(DropPieceSurveyor, DropPieceActor, dropParams);
@@ -297,8 +297,8 @@ class PieceRulesTest extends ScourgeRuleTest
             allowSkipping:true,
             dropOrthoOnly:true,
             dropDiagOnly:false,
-            pieces:pieces,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            pieceLib:pieceLib,
+            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
         var dropRule = TestUtils.makeRule(DropPieceSurveyor, DropPieceActor, dropParams);
@@ -332,7 +332,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowFlipping:true,
             allowRotating:true,
             hatSize:hatSize,
-            pieces:pieces,
+            pieceLib:pieceLib,
         };
         var pickPieceRule = TestUtils.makeRule(PickPieceBuilder, PickPieceSurveyor, PickPieceActor, pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
@@ -360,7 +360,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowFlipping:false,
             allowRotating:true,
             hatSize:hatSize,
-            pieces:pieces,
+            pieceLib:pieceLib,
         };
         var pickPieceRule = TestUtils.makeRule(PickPieceBuilder, PickPieceSurveyor, PickPieceActor, pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
@@ -382,7 +382,7 @@ class PieceRulesTest extends ScourgeRuleTest
             allowFlipping:true,
             allowRotating:false,
             hatSize:hatSize,
-            pieces:pieces,
+            pieceLib:pieceLib,
         };
         var pickPieceRule = TestUtils.makeRule(PickPieceBuilder, PickPieceSurveyor, PickPieceActor, pickPieceParams);
         makeState([pickPieceRule], 1, TestBoards.emptyPetri);
@@ -398,7 +398,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceDiag():Void {
 
         var testPieceParams:TestPieceParams = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
+            pieceTableID:pieceLib.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -411,8 +411,8 @@ class PieceRulesTest extends ScourgeRuleTest
             allowSkipping:false,
             dropOrthoOnly:false,
             dropDiagOnly:true,
-            pieces:pieces,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            pieceLib:pieceLib,
+            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
         var dropRule = TestUtils.makeRule(DropPieceSurveyor, DropPieceActor, dropParams);
@@ -436,7 +436,7 @@ class PieceRulesTest extends ScourgeRuleTest
     public function placePieceOrthoDiag():Void {
 
         var testPieceParams:TestPieceParams = {
-            pieceTableID:pieces.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
+            pieceTableID:pieceLib.getPieceIdBySizeAndIndex(PIECE_SIZE, 0), // 'L/J block'
             reflection:0,
             rotation:0,
         };
@@ -450,8 +450,8 @@ class PieceRulesTest extends ScourgeRuleTest
             allowSkipping:false,
             dropOrthoOnly:false,
             dropDiagOnly:false,
-            pieces:pieces,
-            pieceTableIDs:pieces.getAllPieceIDsOfSize(4),
+            pieceLib:pieceLib,
+            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
             allowPiecePick:false,
         };
         var dropRule = TestUtils.makeRule(DropPieceSurveyor, DropPieceActor, dropParams);

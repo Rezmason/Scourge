@@ -10,7 +10,7 @@ import net.rezmason.praxis.play.Game;
 import net.rezmason.scourge.components.BoardSpaceState;
 import net.rezmason.scourge.components.BoardSpaceView;
 import net.rezmason.scourge.game.PieceTypes;
-import net.rezmason.scourge.game.Pieces;
+import net.rezmason.scourge.game.PieceLibrary;
 import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.bite.BiteMove;
 import net.rezmason.scourge.game.piece.DropPieceMove;
@@ -39,7 +39,7 @@ class MoveMediator {
     var board:Body;
     var piece:Body;
     var bite:Body;
-    var pieces:Pieces;
+    var pieceLib:PieceLibrary;
     var pieceTableID_:AspectPointer<PGlobal>;
     var pieceReflection_:AspectPointer<PGlobal>;
     var pieceRotation_:AspectPointer<PGlobal>;
@@ -81,11 +81,11 @@ class MoveMediator {
         this.config = cast config;
         this.game = game;
 
-        pieces = this.config.pieceParams.pieces;
+        pieceLib = this.config.pieceParams.pieceLib;
         allowFlipping = this.config.pieceParams.allowFlipping;
         allowRotating = this.config.pieceParams.allowRotating;
         allowSkipping = this.config.pieceParams.allowSkipping;
-        piece.growTo(pieces.maxSize());
+        piece.growTo(pieceLib.maxSize());
         for (id in 0...piece.numGlyphs) {
             var glyph = piece.getGlyphByID(id);
             glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0});
@@ -178,7 +178,7 @@ class MoveMediator {
                 moveChosenSignal.dispatch(game.revision, 'pick', 0);
             }
         } else if (selectedSpace != null) {
-            var freePiece = pieces.getPieceById(pieceID);
+            var freePiece = pieceLib.getPieceById(pieceID);
             rotation %= freePiece.numRotations;
             reflection %= freePiece.numReflections;
             if (!allowFlipping) reflection = game.state.global[pieceReflection_];

@@ -267,13 +267,13 @@ class ScourgeGameConfigTest
         }
         /**/
         
-        var pieces:Pieces = new Pieces(Resource.getString('tables/pieces.json.txt'));
+        var pieceLib:PieceLibrary = new PieceLibrary(Resource.getString('tables/pieces.json.txt'));
 
         // dropPiece, eat, decay, cavity, killHeadlessPlayer, oneLivingPlayer, endTurn, replenish, pickPiece, skipsExhausted
 
         config.buildParams.numPlayers = 2;
         config.buildParams.cells = PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab);
-        config.pieceParams.pieceTableIDs = [pieces.getPieceIdBySizeAndIndex(3, 1)]; // '--- block'
+        config.pieceParams.pieceTableIDs = [pieceLib.getPieceIdBySizeAndIndex(3, 1)]; // '--- block'
         makeState();
         startAction.update();
         startAction.chooseMove();

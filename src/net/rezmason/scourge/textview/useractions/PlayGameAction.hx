@@ -67,8 +67,8 @@ class PlayGameAction extends UserAction {
         var cfg:ScourgeGameConfig = new ScourgeGameConfig();
 
         var pieceTableIDs:Array<Int> = [];
-        var pieces = cfg.pieceParams.pieces;
-        for (ike in 0...4) pieceTableIDs = pieceTableIDs.concat(pieces.getAllPieceIDsOfSize(ike + 1));
+        var pieceLib = cfg.pieceParams.pieceLib;
+        for (ike in 0...4) pieceTableIDs = pieceTableIDs.concat(pieceLib.getAllPieceIDsOfSize(ike + 1));
 
         cfg.buildParams.numPlayers = numPlayers;
         cfg.buildParams.cells = PetriBoardFactory.create(numPlayers, circular);
