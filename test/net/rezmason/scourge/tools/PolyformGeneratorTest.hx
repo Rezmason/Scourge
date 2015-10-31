@@ -8,7 +8,7 @@ import net.rezmason.scourge.game.PieceLibrary;
 import net.rezmason.polyform.PolyformGenerator;
 import net.rezmason.utils.openfl.Resource;
 
-import haxe.Json;
+using haxe.Json;
 
 class PolyformGeneratorTest {
 
@@ -71,7 +71,25 @@ class PolyformGeneratorTest {
         ];
 
         var polyominoes = PolyformGenerator.generate(4, true);
-        Assert.areEqual(Std.string(Json.parse(Resource.getString('tables/pieces.json.txt'))), Std.string(polyominoes));
+
+        var json:String = Resource.getString('tables/pieces.json.txt');
+        var data:Array<Array<Dynamic>> = json.parse();
+        for (ike in 0...data.length) {
+            for (jen in 0...data[ike].length) {
+                var tablePiece = new FreePiece(data[ike][jen]);
+                var generatedPiece = new FreePiece(polyominoes[ike][jen]);
+                Assert.areEqual(tablePiece.numReflections, generatedPiece.numReflections);
+                Assert.areEqual(tablePiece.numRotations, generatedPiece.numRotations);
+                for (ref in 0...tablePiece.numReflections) {
+                    for (rot in 0...tablePiece.numRotations) {
+                        var tableFixedPiece = tablePiece.getPiece(ref, rot);
+                        var generatedFixedPiece = tablePiece.getPiece(ref, rot);
+                        Assert.areEqual(Std.string(tableFixedPiece.cells), Std.string(generatedFixedPiece.cells));
+                    }
+                }
+            }
+        }
+
         var freePiecesBySize = [for (series in polyominoes) [for (datum in series) new FreePiece(datum)]];
         for (size in 0...polyominoes.length) {
             var series = freePiecesBySize[size];
@@ -87,6 +105,11 @@ class PolyformGeneratorTest {
             Assert.areEqual(expectedCounts[0][size], series.length);
             Assert.areEqual(expectedCounts[1][size], count);
         }
+    }
+
+    function sortCoords(c1, c2) {
+        if (c1.x != c2.x) return c1.x - c2.x;
+        return c1.y - c2.y;
     }
 
     private function spitPiece(piece:Piece):String {

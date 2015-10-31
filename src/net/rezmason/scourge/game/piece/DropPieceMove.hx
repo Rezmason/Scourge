@@ -9,6 +9,6 @@ typedef DropPieceMove = {>Move,
     var addedSpaces:Array<Int>;
     var rotation:Int;
     var reflection:Int;
-    var coord:IntCoord;
+    var coord:Coord<Int>;
     var duplicate:Bool;
 }

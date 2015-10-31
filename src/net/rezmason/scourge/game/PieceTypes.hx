@@ -1,29 +1,30 @@
 package net.rezmason.scourge.game;
 
-abstract IntCoord(Array<Int>) {
-    public inline function new(data) this = data;
-    public var x(get, never):Int; inline function get_x() return this[0];
-    public var y(get, never):Int; inline function get_y() return this[1];
+typedef Coord<T:(Float)> = {
+    var x(default, null):T;
+    var y(default, null):T;
 }
 
-abstract Piece(Array<Array<IntCoord>>) {
-    public inline function new(data:Array<Array<Dynamic>>) {
-        this = [for (series in data) [for (datum in series) new IntCoord(datum)]];
-    }
-    public var cells(get, never):Array<IntCoord>; inline function get_cells() return this[0];
-    public var edges(get, never):Array<IntCoord>; inline function get_edges() return this[1];
-    public var corners(get, never):Array<IntCoord>; inline function get_corners() return this[2];
+private typedef _Piece = {
+    public var cells(default, null):Array<Coord<Int>>;
+    public var corners(default, null):Array<Coord<Int>>;
+    public var edges(default, null):Array<Coord<Int>>;
+    public var center(default, null):Coord<Float>;
+}
+
+@:forward abstract Piece(_Piece) {
+    public inline function new(data:_Piece) this = data;
     public inline function footprint(includeCells, includeEdges, includeCorners) {
         var footprint = [];
-        if (includeCells) footprint = footprint.concat(cells);
-        if (includeEdges) footprint = footprint.concat(edges);
-        if (includeCorners) footprint = footprint.concat(corners);
+        if (includeCells) footprint = footprint.concat(this.cells);
+        if (includeEdges) footprint = footprint.concat(this.edges);
+        if (includeCorners) footprint = footprint.concat(this.corners);
         return footprint;
     }
 }
 
 abstract FreePiece(Array<Array<Piece>>) {
-    public inline function new(data:Array<Array<Dynamic>>) {
+    public inline function new(data:Array<Array<_Piece>>) {
         this = [for (reflection in data) [for (datum in reflection) new Piece(datum)]];
     }
     public inline function getPiece(reflection, rotation):Piece return this[reflection][rotation];

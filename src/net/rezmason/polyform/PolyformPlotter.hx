@@ -79,17 +79,21 @@ class PolyformPlotter {
         var cells = [];
         var edges = [];
         var corners = [];
+        var cx = 0;
+        var cy = 0;
+        var count = 0;
         for (row in 0...compactDiagram.length) {
             for (col in 0...compactDiagram[0].length) {
                 switch (compactDiagram[row][col]) {
-                    case CELL: cells.push([col, row]);
-                    case EDGE: edges.push([col, row]);
-                    case CORNER: corners.push([col, row]);
+                    case CELL: cells.push({x:col, y:row});
+                    case EDGE: edges.push({x:col, y:row});
+                    case CORNER: corners.push({x:col, y:row});
                     case _:
                 }
             }
         }
-        return [cells, edges, corners];
+        var center = count == 0 ? {x:0, y:0} : {x:cx / count, y:cy / count};
+        return {cells:cells, edges:edges, corners:corners, center:center};
     }
 
     public inline static function print(diagram:Array<Array<Ornament>>) {
