@@ -59,7 +59,7 @@ class StateHistorianTest {
             eatHeads:true,
             takeBodiesFromHeads:false,
 
-            pieceTableIDs:[0, 1, 2, 3, 4],
+            pieceIDs:['2222'],
             allowFlipping:true,
             allowRotating:true,
             allowAll:false,

@@ -207,7 +207,7 @@ class ScourgeGameConfigTest
         pickAction.chooseMove();
 
         var numSwaps_ = plan.onPlayer(SwapAspect.NUM_SWAPS);
-        var pieceTableID_ = plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
+        var pieceTableIndex_ = plan.onGlobal(PieceAspect.PIECE_TABLE_INDEX);
 
         Assert.areEqual(config.pieceParams.startingSwaps, state.players[0][numSwaps_]);
 
@@ -220,9 +220,9 @@ class ScourgeGameConfigTest
             pickAction.update();
             pickAction.chooseMove();
 
-            var piece:Int = state.global[pieceTableID_];
+            var piece:Int = state.global[pieceTableIndex_];
 
-            Assert.areEqual(config.pieceParams.pieceTableIDs[(ike + 1) % config.pieceParams.hatSize], state.global[pieceTableID_]);
+            Assert.areEqual((ike + 1) % config.pieceParams.hatSize, state.global[pieceTableIndex_]);
 
             var index:Int = ike % config.pieceParams.hatSize;
             if (pickedPieces[index] == null) pickedPieces[index] = piece;
@@ -273,7 +273,7 @@ class ScourgeGameConfigTest
 
         config.buildParams.numPlayers = 2;
         config.buildParams.cells = PetriBoardFactory.create(2, false, TestBoards.twoPlayerGrab);
-        config.pieceParams.pieceTableIDs = [pieceLib.getPieceIdBySizeAndIndex(3, 1)]; // '--- block'
+        config.pieceParams.pieceIDs = ['11221122']; // '--- block'
         makeState();
         startAction.update();
         startAction.chooseMove();

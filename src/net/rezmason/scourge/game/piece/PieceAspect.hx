@@ -12,7 +12,7 @@ class PieceAspect extends Aspect {
     @aspect(null) var PIECE_HAT_NEXT;
     @aspect(null) var PIECE_HAT_PREV;
 
-    @aspect(null) var PIECE_TABLE_ID;
+    @aspect(null) var PIECE_TABLE_INDEX;
     @aspect(0) var PIECE_REFLECTION;
     @aspect(0) var PIECE_ROTATION;
     @aspect(null) var PIECE_MOVE_ID;

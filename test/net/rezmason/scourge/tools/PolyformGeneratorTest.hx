@@ -3,12 +3,13 @@ package net.rezmason.scourge.tools;
 import massive.munit.Assert;
 import VisualAssert;
 
-import net.rezmason.scourge.game.PieceTypes;
+import net.rezmason.scourge.game.Piece;
 import net.rezmason.scourge.game.PieceLibrary;
 import net.rezmason.polyform.PolyformGenerator;
 import net.rezmason.utils.openfl.Resource;
 
 using haxe.Json;
+using net.rezmason.polyform.PolyformPlotter;
 
 class PolyformGeneratorTest {
 
@@ -39,15 +40,15 @@ class PolyformGeneratorTest {
 
             str += '$size\n__\n';
 
-            var freePieces:Array<FreePiece> = pieceLib.getAllPiecesOfSize(size);
+            var freePieces:Array<Piece> = pieceLib.getPiecesOfSize(size);
 
             for (freePiece in freePieces) {
                 for (ike in 0...freePiece.numRotations) {
-                    var piece = freePiece.getPiece(0, ike);
+                    var piece = freePiece.getVariant(0, ike);
                     Assert.areEqual(size, piece.cells.length);
                     str += '\n' + spitPiece(piece);
                     if (freePiece.numReflections > 1) {
-                        var mirrorPiece = freePiece.getPiece(1, ike);
+                        var mirrorPiece = freePiece.getVariant(1, ike);
                         Assert.areEqual(size, mirrorPiece.cells.length);
                         Assert.areNotEqual(Std.string(piece.cells), Std.string(mirrorPiece.cells));
                         str += '\n' + spitPiece(mirrorPiece);
@@ -70,40 +71,29 @@ class PolyformGeneratorTest {
             [ 1, 1, 2, 6, 19, 63, 216, 756, 2684, 9638, ], // https://oeis.org/A006724
         ];
 
-        var polyominoes = PolyformGenerator.generate(4, true);
+        var polyominoes = PolyformGenerator.generate(4);
 
         var json:String = Resource.getString('tables/pieces.json.txt');
         var data:Array<Array<Dynamic>> = json.parse();
         for (ike in 0...data.length) {
-            for (jen in 0...data[ike].length) {
-                var tablePiece = new FreePiece(data[ike][jen]);
-                var generatedPiece = new FreePiece(polyominoes[ike][jen]);
-                Assert.areEqual(tablePiece.numReflections, generatedPiece.numReflections);
-                Assert.areEqual(tablePiece.numRotations, generatedPiece.numRotations);
-                for (ref in 0...tablePiece.numReflections) {
-                    for (rot in 0...tablePiece.numRotations) {
-                        var tableFixedPiece = tablePiece.getPiece(ref, rot);
-                        var generatedFixedPiece = tablePiece.getPiece(ref, rot);
-                        Assert.areEqual(Std.string(tableFixedPiece.cells), Std.string(generatedFixedPiece.cells));
-                    }
-                }
-            }
-        }
-
-        var freePiecesBySize = [for (series in polyominoes) [for (datum in series) new FreePiece(datum)]];
-        for (size in 0...polyominoes.length) {
-            var series = freePiecesBySize[size];
             var count = 0;
-            for (freePiece in series) {
-                count += freePiece.numReflections * freePiece.numRotations;
-                for (reflection in 0...freePiece.numReflections) {
-                    for (rotation in 0...freePiece.numRotations) {
-                        Assert.areEqual(freePiece.getPiece(reflection, rotation).cells.length, size);
+            for (jen in 0...data[ike].length) {
+                var freePiece = new Piece(data[ike][jen]);
+                var poly = polyominoes[ike][jen];
+                count += poly.numReflections() * poly.numRotations();
+                Assert.areEqual(freePiece.numReflections, poly.numReflections());
+                Assert.areEqual(freePiece.numRotations, poly.numRotations());
+                for (ref in 0...freePiece.numReflections) {
+                    for (rot in 0...freePiece.numRotations) {
+                        var piece = freePiece.getVariant(ref, rot);
+                        var fixedPoly = freePiece.getVariant(ref, rot);
+                        Assert.areEqual(Std.string(piece.cells), Std.string(fixedPoly.cells));
+                        Assert.areEqual(piece.cells.length, ike);
                     }
                 }
             }
-            Assert.areEqual(expectedCounts[0][size], series.length);
-            Assert.areEqual(expectedCounts[1][size], count);
+            Assert.areEqual(expectedCounts[0][ike], data[ike].length);
+            Assert.areEqual(expectedCounts[1][ike], count);
         }
     }
 

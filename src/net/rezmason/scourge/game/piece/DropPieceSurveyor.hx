@@ -3,7 +3,7 @@ package net.rezmason.scourge.game.piece;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.rule.Surveyor;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.scourge.game.PieceTypes;
+import net.rezmason.scourge.game.Piece;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.praxis.aspect.PlyAspect;
@@ -17,7 +17,7 @@ class DropPieceSurveyor extends Surveyor<DropPieceParams> {
     @space(OwnershipAspect.IS_FILLED) var isFilled_;
     @space(OwnershipAspect.OCCUPIER) var occupier_;
     @player(BodyAspect.BODY_FIRST) var bodyFirst_;
-    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
+    @global(PieceAspect.PIECE_TABLE_INDEX) var pieceTableIndex_;
     @global(PieceAspect.PIECE_REFLECTION) var pieceReflection_;
     @global(PieceAspect.PIECE_ROTATION) var pieceRotation_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
@@ -45,11 +45,11 @@ class DropPieceSurveyor extends Surveyor<DropPieceParams> {
         var pieceReflection:Int = state.global[pieceReflection_];
         var pieceRotation:Int = state.global[pieceRotation_];
         
-        var pieceID:Int = state.global[pieceTableID_];
+        var pieceTableIndex:Int = state.global[pieceTableIndex_];
 
-        if (pieceID != NULL) {
+        if (pieceTableIndex != NULL) {
 
-            var freePiece:FreePiece = params.pieceLib.getPieceById(pieceID);
+            var freePiece:Piece = params.pieceLib.getPieceByID(params.pieceIDs[pieceTableIndex]);
 
             // For each allowed reflection,
             var allowedReflectionIndex:Int = pieceReflection % freePiece.numReflections;
@@ -63,7 +63,7 @@ class DropPieceSurveyor extends Surveyor<DropPieceParams> {
                 for (rotationIndex in 0...freePiece.numRotations) {
 
                     if (!params.allowRotating && rotationIndex != allowedRotationIndex) continue;
-                    var piece:Piece = freePiece.getPiece(reflectionIndex, rotationIndex);
+                    var piece:Piece = freePiece.getVariant(reflectionIndex, rotationIndex);
 
                     // For each edge space,
                     for (space in edgeSpaces) {

@@ -33,7 +33,7 @@ class PieceModule extends Module<PieceParams> {
         return {
             allowFlipping:false,
             allowRotating:true,
-            pieceTableIDs:pieceLib.getAllPieceIDsOfSize(4),
+            pieceIDs:[for (piece in pieceLib.getPiecesOfSize(4)) piece.id],
             pieceLib:pieceLib,
 
             hatSize:5,

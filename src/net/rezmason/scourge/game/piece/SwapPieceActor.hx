@@ -10,7 +10,7 @@ class SwapPieceActor extends Actor<SwapPieceParams> {
 
     @player(SwapAspect.NUM_SWAPS, true) var numSwaps_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
-    @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
+    @global(PieceAspect.PIECE_TABLE_INDEX, true) var pieceTableIndex_;
 
     override public function prime():Void {
         for (player in eachPlayer()) player[numSwaps_] = params.startingSwaps;
@@ -20,7 +20,7 @@ class SwapPieceActor extends Actor<SwapPieceParams> {
         var currentPlayer:Int = state.global[currentPlayer_];
         var numSwaps:Int = getPlayer(currentPlayer)[numSwaps_];
         getPlayer(currentPlayer)[numSwaps_] = numSwaps - 1;
-        state.global[pieceTableID_] = NULL;
+        state.global[pieceTableIndex_] = NULL;
         signalChange();
     }
 }

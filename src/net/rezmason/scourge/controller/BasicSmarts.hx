@@ -26,7 +26,7 @@ class BasicSmarts extends Smarts {
 
     private var canSkip:Bool;
 
-    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
+    @global(PieceAspect.PIECE_TABLE_INDEX) var pieceTableIndex_;
     @player(BodyAspect.TOTAL_AREA) var totalArea_;
     @space(OwnershipAspect.IS_FILLED) var isFilled_;
     @space(OwnershipAspect.OCCUPIER) var occupier_;
@@ -47,7 +47,7 @@ class BasicSmarts extends Smarts {
         var choice:Int = 0;
         var numSkipMoves:Int = canSkip ? 1 : 0;
 
-        if (state.global[pieceTableID_] == NULL) {
+        if (state.global[pieceTableIndex_] == NULL) {
             type = SubmitMove(rev, pickActionID, choice);
         }
         

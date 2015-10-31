@@ -3,7 +3,7 @@ package net.rezmason.scourge.game.piece;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.rule.Actor;
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.scourge.game.PieceTypes;
+import net.rezmason.scourge.game.Piece;
 import net.rezmason.praxis.aspect.PlyAspect;
 
 using net.rezmason.praxis.aspect.AspectUtils;
@@ -22,7 +22,7 @@ class PickPieceActor extends Actor<PickPieceParams> {
     @global(PieceAspect.PIECE_HAT_FIRST, true) var pieceHatFirst_;
     @global(PieceAspect.PIECE_REFLECTION, true) var pieceReflection_;
     @global(PieceAspect.PIECE_ROTATION, true) var pieceRotation_;
-    @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
+    @global(PieceAspect.PIECE_TABLE_INDEX, true) var pieceTableIndex_;
 
     @global(PieceAspect.PIECE_HAT_PLAYER, true) var pieceHatPlayer_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
@@ -35,11 +35,11 @@ class PickPieceActor extends Actor<PickPieceParams> {
         var pickPieceMove:PickPieceMove = cast move;
         if (shouldRemakeHat()) buildHat();
         pickMoveFromHat(pickPieceMove);
-        setPiece(pickPieceMove.pieceTableID, pickPieceMove.reflection, pickPieceMove.rotation);
+        setPiece(pickPieceMove.pieceTableIndex, pickPieceMove.reflection, pickPieceMove.rotation);
     }
 
-    private function setPiece(pieceTableID:Int, reflection:Int, rotation:Int):Void {
-        state.global[pieceTableID_] = pieceTableID;
+    private function setPiece(pieceTableIndex:Int, reflection:Int, rotation:Int):Void {
+        state.global[pieceTableIndex_] = pieceTableIndex;
         state.global[pieceReflection_] = reflection;
         state.global[pieceRotation_] = rotation;
     }

@@ -2,7 +2,7 @@ package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.rule.Surveyor;
-import net.rezmason.scourge.game.PieceTypes;
+import net.rezmason.scourge.game.Piece;
 import net.rezmason.praxis.aspect.PlyAspect;
 
 using net.rezmason.praxis.aspect.AspectUtils;
@@ -16,7 +16,7 @@ class PickPieceSurveyor extends Surveyor<PickPieceParams> {
 
     @global(PieceAspect.PIECES_PICKED) var piecesPicked_;
     @global(PieceAspect.PIECE_HAT_FIRST) var pieceHatFirst_;
-    @global(PieceAspect.PIECE_TABLE_ID) var pieceTableID_;
+    @global(PieceAspect.PIECE_TABLE_INDEX) var pieceTableIndex_;
 
     @global(PieceAspect.PIECE_HAT_PLAYER) var pieceHatPlayer_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
@@ -29,7 +29,7 @@ class PickPieceSurveyor extends Surveyor<PickPieceParams> {
         if (shouldRemakeHat()) {
             // The hat's been refilled; all piece moves are available as moves
             moves = cast allMoves.copy();
-        } else if (state.global[pieceTableID_] == NULL) {
+        } else if (state.global[pieceTableIndex_] == NULL) {
             // Iterate over the hat's contents and include the corresponding moves
             moves = [];
             var firstHatPiece = getCard(state.global[pieceHatFirst_]);

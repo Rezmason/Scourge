@@ -4,7 +4,7 @@ import net.rezmason.praxis.PraxisTypes;
 
 typedef PickPieceMove = {>Move,
     var hatIndex:Int;
-    var pieceTableID:Int;
+    var pieceTableIndex:Int;
     var rotation:Int;
     var reflection:Int;
 }

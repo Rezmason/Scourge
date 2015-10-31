@@ -1,7 +1,7 @@
 package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.PraxisTypes;
-import net.rezmason.scourge.game.PieceTypes;
+import net.rezmason.scourge.game.Piece;
 
 typedef DropPieceMove = {>Move,
     var targetSpace:Int;

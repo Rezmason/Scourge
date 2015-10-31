@@ -21,7 +21,7 @@ class DropPieceActor extends Actor<DropPieceParams> {
     @player(BodyAspect.BODY_FIRST, true) var bodyFirst_;
     @player(SkipAspect.NUM_CONSECUTIVE_SKIPS, true) var numConsecutiveSkips_;
     @global(FreshnessAspect.MAX_FRESHNESS, true) var maxFreshness_;
-    @global(PieceAspect.PIECE_TABLE_ID, true) var pieceTableID_;
+    @global(PieceAspect.PIECE_TABLE_INDEX, true) var pieceTableIndex_;
     @global(PlyAspect.CURRENT_PLAYER) var currentPlayer_;
 
     override public function chooseMove(move:Move):Void {
@@ -40,7 +40,7 @@ class DropPieceActor extends Actor<DropPieceParams> {
             player[numConsecutiveSkips_] = player[numConsecutiveSkips_] + 1;
         }
 
-        state.global[pieceTableID_] = NULL;
+        state.global[pieceTableIndex_] = NULL;
         signalChange();
     }
 

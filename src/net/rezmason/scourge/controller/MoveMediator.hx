@@ -9,8 +9,7 @@ import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.scourge.components.BoardSpaceState;
 import net.rezmason.scourge.components.BoardSpaceView;
-import net.rezmason.scourge.game.PieceTypes;
-import net.rezmason.scourge.game.PieceLibrary;
+import net.rezmason.scourge.game.Piece;
 import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.bite.BiteMove;
 import net.rezmason.scourge.game.piece.DropPieceMove;
@@ -39,8 +38,8 @@ class MoveMediator {
     var board:Body;
     var piece:Body;
     var bite:Body;
-    var pieceLib:PieceLibrary;
-    var pieceTableID_:AspectPointer<PGlobal>;
+    var pieces:Array<Piece>;
+    var pieceTableIndex_:AspectPointer<PGlobal>;
     var pieceReflection_:AspectPointer<PGlobal>;
     var pieceRotation_:AspectPointer<PGlobal>;
     var rotation:Int = 0;
@@ -81,7 +80,8 @@ class MoveMediator {
         this.config = cast config;
         this.game = game;
 
-        pieceLib = this.config.pieceParams.pieceLib;
+        var pieceLib = this.config.pieceParams.pieceLib;
+        pieces = [for (id in this.config.pieceParams.pieceIDs) pieceLib.getPieceByID(id)];
         allowFlipping = this.config.pieceParams.allowFlipping;
         allowRotating = this.config.pieceParams.allowRotating;
         allowSkipping = this.config.pieceParams.allowSkipping;
@@ -96,7 +96,7 @@ class MoveMediator {
             glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0});
         }
         bite.getGlyphByID(0).set_color(new Vec3(1, 0, 0));
-        pieceTableID_ = game.plan.onGlobal(PieceAspect.PIECE_TABLE_ID);
+        pieceTableIndex_ = game.plan.onGlobal(PieceAspect.PIECE_TABLE_INDEX);
         pieceReflection_ = game.plan.onGlobal(PieceAspect.PIECE_REFLECTION);
         pieceRotation_ = game.plan.onGlobal(PieceAspect.PIECE_ROTATION);
     }
@@ -172,18 +172,18 @@ class MoveMediator {
     function updatePiece() {
         for (glyph in piece.eachGlyph()) glyph.set_s(0);
         if (isBiting) return;
-        var pieceID = game.state.global[pieceTableID_];
-        if (pieceID == NULL) {
+        var pieceIndex = game.state.global[pieceTableIndex_];
+        if (pieceIndex == NULL) {
             if (movesEnabled && game.getMovesForAction('pick').length > 0) {
                 moveChosenSignal.dispatch(game.revision, 'pick', 0);
             }
         } else if (selectedSpace != null) {
-            var freePiece = pieceLib.getPieceById(pieceID);
+            var freePiece = pieces[pieceIndex];
             rotation %= freePiece.numRotations;
             reflection %= freePiece.numReflections;
             if (!allowFlipping) reflection = game.state.global[pieceReflection_];
             if (!allowRotating) rotation = game.state.global[pieceRotation_];
-            fixedPiece = freePiece.getPiece(reflection, rotation);
+            fixedPiece = freePiece.getVariant(reflection, rotation);
             var cells = fixedPiece.cells;
             var homeCell = cells[0];
             var ids = [];

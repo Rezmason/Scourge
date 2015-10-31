@@ -2,7 +2,7 @@ package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.rule.Builder;
-import net.rezmason.scourge.game.PieceTypes;
+import net.rezmason.scourge.game.Piece;
 import net.rezmason.praxis.aspect.PlyAspect;
 
 using net.rezmason.praxis.aspect.AspectUtils;
@@ -17,7 +17,9 @@ class PickPieceBuilder extends Builder<PickPieceParams> {
     @global(PieceAspect.PIECE_FIRST, true) var pieceFirst_;
 
     override public function prime():Void {
-        if (params.hatSize > params.pieceTableIDs.length) params.hatSize = params.pieceTableIDs.length;
+
+        var numPieceIDs = params.pieceIDs.length;
+        if (params.hatSize > numPieceIDs) params.hatSize = numPieceIDs;
         
         // Every move has to be made before the game begins. These moves
         // are reused throughout the game to represent the hat's contents.
@@ -27,18 +29,17 @@ class PickPieceBuilder extends Builder<PickPieceParams> {
         // We create the table of piece frequencies from the params
 
         var pieceFrequencies:Array<Null<Int>> = [];
-        for (pieceTableID in params.pieceTableIDs) {
-            if (pieceFrequencies[pieceTableID] == null) pieceFrequencies[pieceTableID] = 0;
-            pieceFrequencies[pieceTableID]++;
+        for (ike in 0...numPieceIDs) {
+            if (pieceFrequencies[ike] == null) pieceFrequencies[ike] = 0;
+            pieceFrequencies[ike]++;
         }
 
         // Create an move for every element being picked randomly
 
-        for (pieceTableID in 0...pieceFrequencies.length) {
-            var freq:Null<Int> = pieceFrequencies[pieceTableID];
+        for (ike in 0...numPieceIDs) {
+            var freq:Null<Int> = pieceFrequencies[ike];
             if (freq == 0 || freq == null) continue;
-
-            var freePiece:FreePiece = params.pieceLib.getPieceById(pieceTableID);
+            var freePiece:Piece = params.pieceLib.getPieceByID(params.pieceIDs[ike]);
             var numRotations = freePiece.numRotations;
 
             // A piece that can't be flipped or rotated has its multiple symmetries
@@ -46,18 +47,18 @@ class PickPieceBuilder extends Builder<PickPieceParams> {
 
             if (params.allowFlipping) {
                 if (params.allowRotating) {
-                    generateMove(pieceTableID, 0, 0, freq);
+                    generateMove(ike, 0, 0, freq);
                 } else {
                     var spinWeight:Int = Std.int(numRotations / 4);
-                    for (rotation in 0...numRotations) generateMove(pieceTableID, 0, rotation, freq * spinWeight);
+                    for (rotation in 0...numRotations) generateMove(ike, 0, rotation, freq * spinWeight);
                 }
             } else {
                 for (flip in 0...freePiece.numReflections) {
                     if (params.allowRotating) {
-                        generateMove(pieceTableID, flip, 0, freq);
+                        generateMove(ike, flip, 0, freq);
                     } else {
                         var spinWeight:Int = Std.int(numRotations / 4);
-                        for (rotation in 0...numRotations) generateMove(pieceTableID, flip, rotation, freq * spinWeight);
+                        for (rotation in 0...numRotations) generateMove(ike, flip, rotation, freq * spinWeight);
                     }
                 }
             }
@@ -77,9 +78,9 @@ class PickPieceBuilder extends Builder<PickPieceParams> {
         params.pieceMoves = allMoves;
     }
 
-    private function generateMove(pieceTableID:Int, reflection:Int, rotation:Int, weight:Int):PickPieceMove {
+    private function generateMove(pieceTableIndex:Int, reflection:Int, rotation:Int, weight:Int):PickPieceMove {
         var move:PickPieceMove = {
-            pieceTableID:pieceTableID,
+            pieceTableIndex:pieceTableIndex,
             rotation:rotation,
             reflection:reflection,
             weight:weight,

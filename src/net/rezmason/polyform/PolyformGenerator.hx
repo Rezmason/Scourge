@@ -7,14 +7,13 @@ class PolyformGenerator {
     #if !(js || flash)
     static function main() {
         var args = Sys.args();
-        if (args.length > 0) {
-            println(generate(Std.parseInt(args[0]), args[1] == 'true', true));
-        }
-        else println(generate(5, false, true));
+        var polyominoes = null;
+        if (args.length > 0) polyominoes = generate(Std.parseInt(args[0]));
+        else polyominoes = generate(5, true);
     }
     #end
 
-    public static function generate(limit:Int, generateFixed:Bool, ?verbose:Bool) {
+    public static function generate(limit:Int, ?verbose:Bool) {
         var rules = [
             [R, R] => [S, R, R, S],
             [S, R] => [L, R, R, S],
@@ -42,41 +41,22 @@ class PolyformGenerator {
                 }
             }
             matches.sort(Polyform.sortFunction);
-            if (verbose) printPolyforms(ike, matches, generateFixed);
-            polyominoes.push([for (poly in matches) generateData(poly, generateFixed)]);
+            if (verbose) printPolyforms(ike, matches);
+            polyominoes.push(matches.copy());
             lastMatches = matches;
         }
+
         return polyominoes;
     }
 
-    inline static function generateData(poly:Polyform, generateFixed:Bool) {
-        return 
-        [ for (flip in 0...(generateFixed ? poly.numReflections() : 1)) 
-            [ for (rot in 0...(generateFixed ? poly.numRotations() : 1)) 
-                (flip == 1 ? poly.reflect() : poly).rotate(rot).render().compact().toData()
-            ]
-        ];
-    }
-
-    inline static function printPolyforms(size:Int, polys:Array<Polyform>, generateFixed:Bool) {
+    inline static function printPolyforms(size:Int, polys:Array<Polyform>) {
         var freeCount = 0;
         var fixedCount = 0;
         for (poly in polys) {
             freeCount++;
             fixedCount += poly.numReflections() * poly.numRotations();
-            println('$size $freeCount $poly(${poly.numReflections()},${poly.numRotations()})');
-            if (generateFixed) {
-                var numRot = poly.numRotations();
-                for (flip in 0...poly.numReflections()) {
-                    var flippedPoly = (flip == 1 ? poly.reflect() : poly);
-                    for (rot in 0...numRot) {
-                        var transformedPoly = flippedPoly.rotate(rot);
-                        println('$flip,$rot\n${transformedPoly.render().compact().print()}');
-                    }
-                }
-            } else {
-                println(poly.render().print());
-            }
+            println('<$poly> (${poly.numReflections()},${poly.numRotations()})');
+            println(poly.render().print());
         }
         println('There are $freeCount free polyominoes of size $size with no holes.');
         println('There are $fixedCount fixed polyominoes of size $size with no holes.');
