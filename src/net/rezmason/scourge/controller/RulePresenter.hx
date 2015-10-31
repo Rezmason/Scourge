@@ -88,7 +88,6 @@ class RulePresenter extends Reckoner {
             if (isFilled) {
                 var code = BODY_CODE;
                 if (getPlayer(occupier)[head_] == getID(values)) code = HEAD_CODE;
-                else if (petriData.isHead) code = EATEN_HEAD_CODE;
                 bottomGlyph.SET({char:code, color:color * 0.3, s:2.5});
                 topGlyph.SET({char:code, color:color, f:0.6, s:1.5});
             } else {
