@@ -27,12 +27,36 @@ abstract Polyform(String) {
     }
 
     inline function minRot() {
+        /*
         var lowestString = this;
         for (ike in 1...length()) {
             var candidate = this.substr(length() - ike) + this;
             if (candidate < lowestString) lowestString = candidate;
         }
         return new Polyform(lowestString.substr(0, length()));
+        /**/
+
+        // Slightly faster
+        //*
+        var minValueIndices = [];
+        var minVal = cast R;
+        for (ike in 0...length()) {
+            var val = this.charAt(ike);
+            if (minVal > val) {
+                minVal = val;
+                minValueIndices.splice(0, minValueIndices.length);
+            }
+            if (minVal == val) minValueIndices.push(ike);
+        }
+
+        var lowestString = null;
+        for (index in minValueIndices) {
+            var candidate = this.substr(index) + this;
+            if (lowestString == null || candidate < lowestString) lowestString = candidate;
+        }
+        return new Polyform(lowestString.substr(0, length()));
+        /**/
+
     }
 
     public inline function reflect() {
@@ -56,8 +80,8 @@ abstract Polyform(String) {
 
     public inline function numRotations() {
         return
-            if      (this.substr(Std.int(this.length / 4)) + this.substr(0, Std.int(this.length / 4)) == this) 1
-            else if (this.substr(Std.int(this.length / 2)) + this.substr(0, Std.int(this.length / 2)) == this) 2
+            if      (this.substr(this.length >> 2) + this.substr(0, this.length >> 2) == this) 1
+            else if (this.substr(this.length >> 1) + this.substr(0, this.length >> 1) == this) 2
             else    4;
     }
 

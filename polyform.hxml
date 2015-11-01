@@ -1,0 +1,4 @@
+-cpp ./polyform-bin
+-cp src 
+-dce full 
+-main net.rezmason.polyform.PolyformGenerator

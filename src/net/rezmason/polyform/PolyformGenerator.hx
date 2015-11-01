@@ -4,14 +4,15 @@ import net.rezmason.polyform.Step.*;
 using net.rezmason.polyform.PolyformPlotter;
 
 class PolyformGenerator {
-    #if !(js || flash)
+    
     static function main() {
-        var args = Sys.args();
-        var polyominoes = null;
-        if (args.length > 0) polyominoes = generate(Std.parseInt(args[0]));
-        else polyominoes = generate(5, true);
+        var limit = 5;
+        #if !(js || flash)
+            var args = Sys.args();
+            if (args.length > 0) limit = Std.parseInt(args[0]);
+        #end
+        generate(limit, true);
     }
-    #end
 
     public static function generate(limit:Int, ?verbose:Bool) {
         var rules = [
@@ -37,7 +38,8 @@ class PolyformGenerator {
                 for (poly in lastMatches) for (expansion in poly.expand(stringRules)) matchMap[expansion] = expansion;
                 for (poly in matchMap) {
                     if (poly.winding() != 4) throw 'Invalid: $poly'; // This actually tests the rules, not the pieces.
-                    if (ike < 7 || !hasCoincidentPerimeter(poly)) matches.push(poly);
+                    if (ike >= 7 && hasCoincidentPerimeter(poly)) continue;
+                    matches.push(poly);
                 }
             }
             matches.sort(Polyform.sortFunction);
