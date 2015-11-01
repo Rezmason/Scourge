@@ -36,12 +36,6 @@ class Ecce {
         }
     }
 
-    public function clone(e1:Entity) {
-        var e2 = dispense([for (type in e1.comps.keys()) type]);
-        e2.copyFrom(e1);
-        return e2;
-    }
-
     public function get(types:Array<Class<Dynamic>> = null) return getByBitfield(getBitfieldForTypes(types));
 
     public function query(types:Array<Class<Dynamic>>) {
@@ -79,7 +73,6 @@ class Ecce {
         initComponentPool(type);
         var comp = componentPools.get(type).pop();
         if (comp == null) comp = Type.createInstance(type, []);
-        if (Reflect.hasField(comp, "copyFrom")) comp.copyFrom(componentBases.get(type));
         else copyComp(comp, componentBases.get(type));
         return comp;
     }

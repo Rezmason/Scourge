@@ -29,7 +29,7 @@ class Entity {
     public inline function copyFrom(src:Entity) {
         for (type in comps.keys()) {
             var comp = comps.get(type);
-            if (Reflect.hasField(comp, "copyFrom")) comp.copyFrom(src.comps.get(type));
+            if (comp.copyFrom != null) comp.copyFrom(src.comps.get(type));
             else Ecce.copyComp(comp, src.comps.get(type));
         }
     }
