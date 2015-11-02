@@ -11,6 +11,7 @@ class Piece {
     public var numRotations(default, null):Int;
     public var rotation(default, null):Int;
     public var reflection(default, null):Int;
+    public var closestCellToCenter(default, null):Coord<Int>;
 
     public var origin(default, null):Piece;
     var variations:Array<Array<Piece>>;
@@ -28,17 +29,30 @@ class Piece {
             rotation = data.rotation;
             reflection = data.reflection;
             this.origin = origin;
+            
+            closestCellToCenter = cells[origin.cells.indexOf(origin.closestCellToCenter)];
         } else {
             rotation = 0;
             reflection = 0;
+
+            var minDistSquared = Math.POSITIVE_INFINITY;
+            for (cell in cells) {
+                var cx = cell.x - center.x;
+                var cy = cell.y - center.y;
+                var distSquared = cx * cx + cy * cy;
+                if (closestCellToCenter == null || minDistSquared > distSquared) {
+                    minDistSquared = distSquared;
+                    closestCellToCenter = cell;
+                }
+            }
+            
             variations = [[new Piece(data, this)]];
         }
+
     }
 
     public inline function getVariant(reflection:Int = 0, rotation:Int = 0):Piece {
         if (variations == null) throw 'Cannot get variant of non-free piece';
-        reflection = reflection % numReflections;
-        rotation = rotation % numRotations;
         if (variations[reflection] == null) variations[reflection] = [];
         if (variations[reflection][rotation] == null) {
             var variationData:PieceData = {

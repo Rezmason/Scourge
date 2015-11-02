@@ -88,12 +88,12 @@ class MoveMediator {
         piece.growTo(pieceLib.maxSize());
         for (id in 0...piece.numGlyphs) {
             var glyph = piece.getGlyphByID(id);
-            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0});
+            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0, a:0.5});
         }
         bite.growTo(this.config.biteParams.maxReach + 1);
         for (id in 0...bite.numGlyphs) {
             var glyph = bite.getGlyphByID(id);
-            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0});
+            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0, a:0.5});
         }
         bite.getGlyphByID(0).set_color(new Vec3(1, 0, 0));
         pieceTableIndex_ = game.plan.onGlobal(PieceAspect.PIECE_TABLE_INDEX);
@@ -179,25 +179,20 @@ class MoveMediator {
             }
         } else if (selectedSpace != null) {
             var freePiece = pieces[pieceIndex];
-            rotation %= freePiece.numRotations;
-            reflection %= freePiece.numReflections;
             if (!allowFlipping) reflection = game.state.global[pieceReflection_];
             if (!allowRotating) rotation = game.state.global[pieceRotation_];
             fixedPiece = freePiece.getVariant(reflection, rotation);
-            var cells = fixedPiece.cells;
-            var homeCell = cells[0];
             var ids = [];
             var selectedCell = selectedSpace.get(BoardSpaceState).cell;
-            for (ike in 0...cells.length) {
-                var x = cells[ike].x - homeCell.x;
-                var y = cells[ike].y - homeCell.y;
+            for (ike in 0...fixedPiece.cells.length) {
+                var x = fixedPiece.cells[ike].x - fixedPiece.closestCellToCenter.x;
+                var y = fixedPiece.cells[ike].y - fixedPiece.closestCellToCenter.y;
                 var cell = selectedCell.runEuclidean(x, y);
                 ids.push(cell.id);
-                var nr = ike == 0 ? 0 : 1;
+                var nr = fixedPiece.cells[ike] == fixedPiece.closestCellToCenter ? 0 : 1;
                 piece.getGlyphByID(ike).SET({s:2, x:-x, y:y, g:nr, b:nr});
             }
-            var key = ids.join('_');
-            if (dropMovesByKey != null) dropMove = dropMovesByKey[key];
+            if (dropMovesByKey != null) dropMove = dropMovesByKey[getDropMoveKey(ids)];
             var char = dropMove == null ? Strings.ILLEGAL_BODY_CODE : Strings.BODY_CODE;
             for (glyph in piece.eachGlyph()) glyph.set_char(char);
         }
@@ -216,9 +211,19 @@ class MoveMediator {
         if (movesEnabled) {
             var dropMoves:Array<DropPieceMove> = cast game.getMovesForAction('drop');
             dropMovesByKey = new Map();
-            for (move in dropMoves) dropMovesByKey[move.addedSpaces.join('_')] = move;
+            for (move in dropMoves) {
+                dropMovesByKey[getDropMoveKey(move.addedSpaces)] = move;
+            }
         }
     }
+
+    inline function getDropMoveKey(ids:Array<Int>) {
+        ids = ids.copy();
+        ids.sort(lowerInt);
+        return ids.join('_');
+    }
+
+    function lowerInt(i1:Int, i2:Int) return i1 - i2;
 
     function updateBiteMoves() {
         if (movesEnabled) {

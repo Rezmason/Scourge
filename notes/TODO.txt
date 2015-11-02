@@ -1,4 +1,3 @@
-Center the pieces
 Quasi-gestural input
 Integrate into loupe
 Shelf of tools, and, like, you drag 'em
