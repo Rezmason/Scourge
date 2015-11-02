@@ -25,18 +25,20 @@ class GenerateTables {
         var corners = [];
         var cx = 0;
         var cy = 0;
-        var count = 0;
         for (row in 0...compactDiagram.length) {
             for (col in 0...compactDiagram[0].length) {
                 switch (compactDiagram[row][col]) {
-                    case CELL: cells.push({x:col, y:row});
+                    case CELL: 
+                        cells.push({x:col, y:row});
+                        cx += col;
+                        cy += row;
                     case EDGE: edges.push({x:col, y:row});
                     case CORNER: corners.push({x:col, y:row});
                     case _:
                 }
             }
         }
-        var center = count == 0 ? {x:0, y:0} : {x:cx / count, y:cy / count};
+        var center = cells.length == 0 ? {x:0, y:0} : {x:cx / cells.length, y:cy / cells.length};
         return {
             cells:cells,
             edges:edges,

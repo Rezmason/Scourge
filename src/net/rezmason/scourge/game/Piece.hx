@@ -58,34 +58,16 @@ class Piece {
     }
 
     inline function transformCoord(coord, reflection, rotation):Coord<Int> {
-        var oldX:Float = reflection == 1 ? -coord.x : coord.x;
-        var oldY:Float = coord.y;
+        var oldX = reflection == 1 ? -coord.x : coord.x;
+        var oldY = coord.y;
 
-        oldX -= center.x;
-        oldY -= center.y;
-
-        var newX:Float = 0;
-        var newY:Float = 0;
-
-        switch (rotation) {
-            case 0: 
-                newX =  oldX;
-                newY =  oldY;
-            case 1:
-                newX =  oldY;
-                newY = -oldX;
-            case 2:
-                newX = -oldX;
-                newY = -oldY;
-            case 3:
-                newX = -oldY;
-                newY =  oldX;
+        return switch (rotation) {
+            case 0: {x:  oldX, y:  oldY};
+            case 1: {x:  oldY, y: -oldX};
+            case 2: {x: -oldX, y: -oldY};
+            case 3: {x: -oldY, y:  oldX};
+            case _: null;
         }
-
-        newX += center.x;
-        newY += center.y;
-
-        return {x:Std.int(newX), y:Std.int(newY)};
     }
 
     public inline function footprint(includeCells, includeEdges, includeCorners) {
