@@ -49,11 +49,12 @@ abstract Polyform(String) {
             if (minVal == val) minValueIndices.push(ike);
         }
 
-        var lowestString = null;
+        var lowestString:String = this;
         for (index in minValueIndices) {
             var candidate = this.substr(index) + this;
-            if (lowestString == null || candidate < lowestString) lowestString = candidate;
+            if (candidate < lowestString) lowestString = candidate;
         }
+
         return new Polyform(lowestString.substr(0, length()));
         /**/
 
