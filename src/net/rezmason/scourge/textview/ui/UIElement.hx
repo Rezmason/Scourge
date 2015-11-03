@@ -17,6 +17,8 @@ class UIElement {
     inline static var glideEase:Float = 0.6;
     inline static var NATIVE_DPI:Float = 96;
     inline static var DEFAULT_GLYPH_HEIGHT_IN_POINTS:Float = 18;
+    inline static var POST_DRAG_FRICTION:Float = 0.925;
+    inline static var POST_DRAG_MIN_VY:Float = 0.0001;
 
     public var body(default, null):Body;
     public var scene(default, null):Scene;
@@ -45,7 +47,11 @@ class UIElement {
     var caretGlyphGuide:Glyph;
     
     var dragging:Bool;
+    var postDragging:Bool;
     var dragStartY:Float;
+    var dragLastY:Float;
+    var dragY:Float;
+    var dragPostVY:Float;
     var dragStartPos:Float;
 
     var numRows:Int;
@@ -70,6 +76,8 @@ class UIElement {
         body.updateSignal.add(update);
         scrollBar = null;
         hasScrollBar = false;
+        dragging = false;
+        postDragging = false;
         
         spaceCode = ' '.charCodeAt(0);
 
@@ -122,15 +130,24 @@ class UIElement {
 
     function update(delta:Float):Void {
 
-        if (!dragging && uiMediator.isDirty) {
+        if (!(dragging || postDragging) && uiMediator.isDirty) {
             uiMediator.updateDirtyText();
             if (Math.isNaN(currentScrollPos)) setScrollPos(uiMediator.bottomPos());
             glideTextToPos(uiMediator.bottomPos());
             scene.redrawHitSignal.dispatch();
         }
 
+        if (dragging) {
+            dragLastY = dragY;
+        } else if (postDragging) {
+            dragY += dragPostVY;
+            postDragging = Math.abs(dragPostVY) > POST_DRAG_MIN_VY;
+            glideTextToPos(dragStartPos + (dragStartY - dragY) * (numRows - 1));
+            dragPostVY *= POST_DRAG_FRICTION;
+        }
+
         updateGlide(delta);
-        uiMediator.updateSpans(delta, dragging);
+        uiMediator.updateSpans(delta, dragging || postDragging);
         findAndPositionCaret();
         taperScrollEdges();
         if (hasScrollBar) scrollBar.updateFade(delta);
@@ -144,7 +161,8 @@ class UIElement {
 
     function glideTextToPos(pos:Float):Void {
         gliding = true;
-        glideGoal = Math.round(Math.max(0, Math.min(uiMediator.bottomPos(), pos)));
+        // glideGoal = Math.round(Math.max(0, Math.min(uiMediator.bottomPos(), pos)));
+        glideGoal = Math.max(0, Math.min(uiMediator.bottomPos(), pos));
     }
 
     function receiveInteraction(id:Int, interaction:Interaction):Void {
@@ -152,11 +170,19 @@ class UIElement {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {
-                    case DROP, CLICK if (dragging): dragging = false;
-                    case ENTER, EXIT, MOVE if (dragging): glideTextToPos(dragStartPos + (dragStartY - y) * (numRows - 1));
+                    case DROP, CLICK if (dragging): 
+                        dragging = false;
+                        dragPostVY = dragY - dragLastY;
+                        postDragging = dragPostVY != 0;
+                    case ENTER, EXIT, MOVE if (dragging): 
+                        dragY = y;
+                        glideTextToPos(dragStartPos + (dragStartY - y) * (numRows - 1));
                     case MOUSE_DOWN if (id <= 0): 
                         dragging = true;
+                        postDragging = false;
                         dragStartY = y;
+                        dragLastY = dragStartY;
+                        dragY = y;
                         dragStartPos = currentScrollPos;
                     
                     case ENTER if (hasScrollBar): scrollBar.visible = true;
