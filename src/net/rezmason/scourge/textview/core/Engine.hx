@@ -256,8 +256,8 @@ class Engine extends Module {
                     var nY:Float = (oY / height - rect.y) / rect.height;
                     interaction = MOUSE(type, nX, nY);
                 }
-            case KEYBOARD(type, code, modifier) if (code == SPACE && modifier.altKey):
-                presentationMethod = type != KEY_UP ? mouseMethod : prettyMethod;
+            case KEYBOARD(type, code, modifier) if (code == SPACE):
+                presentationMethod = (modifier.altKey && type != KEY_UP) ? mouseMethod : prettyMethod;
             case _:
         }
 
