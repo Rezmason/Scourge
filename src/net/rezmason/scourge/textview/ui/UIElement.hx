@@ -17,6 +17,7 @@ class UIElement {
     inline static var glideEase:Float = 0.6;
     inline static var NATIVE_DPI:Float = 96;
     inline static var DEFAULT_GLYPH_HEIGHT_IN_POINTS:Float = 18;
+    static var UNIT_RECT:Rectangle = new Rectangle(0, 0, 1, 1);
     
     public var body(default, null):Body;
     public var scene(default, null):Scene;
@@ -103,9 +104,11 @@ class UIElement {
 
     public function setLayout(x:Float, y:Float, width:Float, height:Float):Bool {
         var worked = false;
-        if (x >= 0 && x <= 1 && y >= 0 && y <= 1 && width >= 0 && width <= 1 && height >= 0 && height <= 1) {
-            scene.camera.rect = new Rectangle(x, y, width, height);
+        var rect = new Rectangle(x, y, width, height);
+        if (UNIT_RECT.containsRect(rect) && rect.width * rect.height > 0) {
+            scene.camera.rect = rect;
             resize();
+            worked = true;
         }
         return worked;
     }
