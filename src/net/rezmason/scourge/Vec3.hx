@@ -8,6 +8,8 @@ abstract Vec3({r:Float, g:Float, b:Float}) {
     public var y(get, set):Float;
     public var z(get, set):Float;
 
+    public inline function copy() return new Vec3(this.r, this.g, this.b);
+
     inline function get_x() return this.r;
     inline function set_x(val) return this.r = val;
 

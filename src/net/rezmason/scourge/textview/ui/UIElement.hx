@@ -124,7 +124,7 @@ class UIElement {
 
         if (dragBehavior.active) {
             dragBehavior.update(delta);
-            glideTextToPos(dragStartPos - dragBehavior.dy * (numRows - 1));
+            glideTextToPos(dragStartPos - dragBehavior.displacement.y * (numRows - 1));
         } else if (uiMediator.isDirty) {
             uiMediator.updateDirtyText();
             if (Math.isNaN(currentScrollPos)) setScrollPos(uiMediator.bottomPos());
@@ -159,7 +159,7 @@ class UIElement {
                     case DROP, CLICK if (dragBehavior.dragging): dragBehavior.stopDrag();
                     case ENTER, EXIT, MOVE if (dragBehavior.dragging): 
                         dragBehavior.updateDrag(x, y);
-                        glideTextToPos(dragStartPos - dragBehavior.dy * (numRows - 1));
+                        glideTextToPos(dragStartPos - dragBehavior.displacement.y * (numRows - 1));
                     case MOUSE_DOWN if (id <= 0): 
                         dragBehavior.startDrag(x, y);
                         dragStartPos = currentScrollPos;
