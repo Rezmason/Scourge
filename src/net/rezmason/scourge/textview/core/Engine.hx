@@ -251,9 +251,12 @@ class Engine extends Module {
                 if (type == CLICK) keyboardSystem.focusBodyID = bodyID;
 
                 if (target != null) {
-                    var rect:Rectangle = target.scene.camera.rect;
+                    var camera = target.scene.camera;
+                    var rect:Rectangle = camera.rect;
                     var nX:Float = (oX / width  - rect.x) / rect.width;
                     var nY:Float = (oY / height - rect.y) / rect.height;
+                    nX /= camera.scaleX;
+                    nY /= camera.scaleY;
                     interaction = MOUSE(type, nX, nY);
                 }
             case KEYBOARD(type, code, modifier) if (code == SPACE):

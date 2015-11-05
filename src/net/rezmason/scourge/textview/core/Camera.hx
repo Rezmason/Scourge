@@ -13,8 +13,8 @@ class Camera {
     public var rect(default, set):Rectangle;
     public var glyphScale(default, null):Float;
 
-    var scaleX:Float;
-    var scaleY:Float;
+    public var scaleX(default, null):Float;
+    public var scaleY(default, null):Float;
     
     var vanishingPoint:Vector2;
 
