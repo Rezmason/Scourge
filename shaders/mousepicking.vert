@@ -16,6 +16,6 @@ void main(void) {
     vec4 pos = uCameraMat * (uBodyMat * vec4(aPos, 1.0));
     pos.x += uBodyParams.x * aCorner.x * aHitbox.y * aHitbox.x;
     pos.y += uBodyParams.y * aCorner.y * aHitbox.y;
-
+    pos.z = clamp(pos.z, 0.0, 1.0);
     gl_Position = pos;
 }

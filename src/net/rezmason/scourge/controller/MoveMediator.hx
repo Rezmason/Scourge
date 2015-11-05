@@ -185,7 +185,7 @@ class MoveMediator {
             if (!allowFlipping) reflection = game.state.global[pieceReflection_];
             if (!allowRotating) rotation = game.state.global[pieceRotation_];
             fixedPiece = freePiece.getVariant(reflection, rotation);
-            var ids = [];
+            var ids:Array<Int> = [];
             var selectedCell = selectedSpace.get(BoardSpaceState).cell;
             for (ike in 0...fixedPiece.cells.length) {
                 var x = fixedPiece.cells[ike].x - fixedPiece.closestCellToCenter.x;
