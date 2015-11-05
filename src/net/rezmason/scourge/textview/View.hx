@@ -11,6 +11,8 @@ class View {
     public var piece(default, null):Body;
     public var bite(default, null):Body;
 
+    public var boardScale:Float;
+
     public function new():Void {
         body = new Body();
         board = new Body();
@@ -18,6 +20,7 @@ class View {
         loupe.glyphWidth = 0.05;
         piece = new Body();
         bite = new Body();
+        boardScale = 1;
 
         body.addChild(board);
         body.addChild(loupe.body);
@@ -25,3 +28,4 @@ class View {
         body.addChild(bite);
     }
 }
+    
