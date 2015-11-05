@@ -71,9 +71,11 @@ class BorderBox {
             body.getGlyphByID(itr++).SET({s:s, h:stretch / s, x: left, y:y, char:VERTICAL.code()});
             body.getGlyphByID(itr++).SET({s:s, h:stretch / s, x:-left, y:y, char:VERTICAL.code()});
         }
+
+        for (glyph in body.eachGlyph()) glyph.set_color(color);
     }
     
-    inline function set_color(color) return this.color = (color == null) ? ColorPalette.WHITE : color;
+    inline function set_color(color) return this.color = color;
     inline function set_width(width:Float) return this.width = (width < 0 || Math.isNaN(width)) ? 0 : width;
     inline function set_height(height:Float) return this.height = (height < 0 || Math.isNaN(height)) ? 0 : height;
     inline function set_glyphWidth(glyphWidth:Float) return this.glyphWidth = (glyphWidth < 0 || Math.isNaN(glyphWidth)) ? 0 : glyphWidth;
