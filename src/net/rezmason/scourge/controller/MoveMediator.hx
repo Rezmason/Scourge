@@ -3,7 +3,6 @@ package net.rezmason.scourge.controller;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.ecce.Query;
-import net.rezmason.gl.GLTypes;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
@@ -21,6 +20,7 @@ import net.rezmason.scourge.textview.core.Interaction;
 import net.rezmason.scourge.textview.ui.BorderBox;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
+import net.rezmason.scourge.textview.ui.DragBehavior;
 
 using net.rezmason.grid.GridUtils;
 using net.rezmason.scourge.textview.core.GlyphUtils;
@@ -35,6 +35,7 @@ class MoveMediator {
     var qBoard:Query;
     var boardSpacesByID:Map<Int, Entity>;
     var selectedSpace:Entity;
+    var boardScale:Float;
     var board:Body;
     var piece:Body;
     var bite:Body;
@@ -57,6 +58,7 @@ class MoveMediator {
     var isBiting:Bool;
     var biteTargetSpace:Entity;
     var bitSpacesByID:Map<Int, Entity>;
+    var pieceDragBehavior:DragBehavior;
 
     public function new() {
         var view:View = new Present(View);
@@ -65,15 +67,16 @@ class MoveMediator {
         qBoard = ecce.query([BoardSpaceView, BoardSpaceState]);
         selectedSpace = null;
 
+        boardScale = view.boardScale;
         board = view.board;
         piece = view.piece;
         bite = view.bite;
         loupe = view.loupe;
         loupe.body.mouseEnabled = false;
         // loupe.body.updateSignal.add(onUpdate); 
-        loupe.body.visible = false;
-        
+        pieceDragBehavior = new DragBehavior();
         board.interactionSignal.add(handleBoardInteraction);
+        board.updateSignal.add(update);
     }
 
     public function beginGame(config, game) {
@@ -267,6 +270,19 @@ class MoveMediator {
         updateBite();
     }
 
+    function update(delta) {
+        if (pieceDragBehavior.active) {
+            pieceDragBehavior.update(delta);
+            // trace(pieceDragBehavior.displacement);
+            loupe.body.transform.identity();
+            loupe.body.transform.appendTranslation(
+                pieceDragBehavior.displacement.x / boardScale,
+                -pieceDragBehavior.displacement.y / boardScale,
+                0
+            );
+        }
+    }
+
     function handleBoardInteraction(glyphID, interaction) {
         switch (interaction) {
             case KEYBOARD(type, keyCode, modifier) if (type == KEY_DOWN): 
@@ -377,7 +393,7 @@ class MoveMediator {
                 }
             case MOUSE(type, x, y): 
                 switch (type) {
-                    case CLICK if (boardSpacesByID.exists(glyphID)):
+                    case CLICK if (!pieceDragBehavior.dragging && boardSpacesByID.exists(glyphID)):
                         selectedSpace = boardSpacesByID[glyphID];
                         var selectedGlyph = selectedSpace.get(BoardSpaceView).over;
                         piece.transform.identity();
@@ -385,9 +401,19 @@ class MoveMediator {
                         piece.transform.append(board.transform);
                         updatePiece();
                         updateBite();
-                    case MOUSE_DOWN:
-                    case MOUSE_UP:
-                    case MOVE:
+                    case DROP, CLICK if (pieceDragBehavior.dragging): pieceDragBehavior.stopDrag();
+                    case ENTER, EXIT, MOVE if (pieceDragBehavior.dragging): 
+                        pieceDragBehavior.updateDrag(x, y);
+                        // trace(pieceDragBehavior.displacement);
+                        loupe.body.transform.identity();
+                        loupe.body.transform.appendTranslation(
+                            pieceDragBehavior.displacement.x / boardScale,
+                            -pieceDragBehavior.displacement.y / boardScale,
+                            0
+                        );
+                    case MOUSE_DOWN if (selectedSpace != null):
+                        pieceDragBehavior.startDrag(x, y);
+                        // trace('!');
                     case _:
                 }
             case _:

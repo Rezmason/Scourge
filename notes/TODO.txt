@@ -1,4 +1,7 @@
 Quasi-gestural input
+    Transform mouse position into body space properly
+        Likely involves transforming the mouse coords with the camera and body transforms
+    Nail down the precise user story of this mode of interaction
 Integrate into loupe
 Shelf of tools, and, like, you drag 'em
 Add UIElement to Loupe that "encases" content
