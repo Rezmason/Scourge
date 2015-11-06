@@ -1,5 +1,33 @@
 Quasi-gestural input
     Nail down the precise user story of this mode of interaction
+    My first idea:
+        User controls the position of a 2D drag behavior with frictional settling
+        The logical location of the loupe is determined by responding to changes in the rounded drag position
+            Depending on the change, the board is traversed in some discrete direction
+        The difference b/w drag position and the logical location of the loupe is
+            clamped, 
+            eased, 
+            then added to the loupe's visual location.
+            
+            The clamping prevents the edges from being too wonky
+        Problem: Edges are problematic, and can be literally anywhere.
+    Second idea:
+        The logical location of the loupe at any given time is:
+            the closest logical location of a board space,
+                within the traversible neighborhood of the current logical location, including the current location:
+                    • • •
+                    • x •
+                    • • •
+        The loupe has a physical position
+            The loupe's visual position is directly connected to its physical position
+        A loose physical spring connects the loupe's physical position to its logical position
+        Friction also acts on the loupe's physical position
+        User controls the position of a 2D drag behavior with no settling
+        During the drag, a taut physical spring connects the loupe's physical position to the drag position
+
+
+If nothing specifies a settling function, remove that functionality from DragBehavior
+
 Integrate into loupe
 Shelf of tools, and, like, you drag 'em
 Add UIElement to Loupe that "encases" content
