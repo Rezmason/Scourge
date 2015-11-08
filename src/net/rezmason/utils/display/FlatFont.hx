@@ -14,7 +14,6 @@ typedef FlatFontJSON = {
     var glyphHeight:Int;
     var glyphRatio:Float;
     var charCoords:Dynamic;
-    var missingChars:Dynamic;
 };
 
 @:allow(net.rezmason.utils.display.FlatFontGenerator)
@@ -22,7 +21,6 @@ class FlatFont {
 
     var image:Image;
     var charCoords:Map<Int, CharCoord>;
-    var missingChars:Array<Int>;
     var defaultCharCoord:CharCoord;
     var jsonString:String;
     var charUVs:Map<Int, Array<UV>>;
@@ -43,7 +41,6 @@ class FlatFont {
 
         this.jsonString = jsonString;
         charCoords = new Map();
-        missingChars = [];
         charUVs = new Map();
 
         var expandedJSON:FlatFontJSON = jsonString.parse();
@@ -57,8 +54,6 @@ class FlatFont {
             var code:Int = Std.parseInt(field.substr(1));
             charCoords[code] = cast Reflect.field(expandedJSON.charCoords, field);
         }
-
-        missingChars = expandedJSON.missingChars;
 
         defaultCharCoord = {x:0, y:0};
     }

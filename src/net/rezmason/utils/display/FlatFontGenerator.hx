@@ -1,32 +1,25 @@
 package net.rezmason.utils.display;
 
-// import flash.display.BitmapData;
-// import flash.geom.Matrix;
-
-import lime.graphics.Image;
-
 import haxe.Utf8;
-import haxe.io.Bytes;
-
-// import flash.display.BlendMode;
-// import flash.geom.Rectangle;
-// import flash.text.engine.ElementFormat;
-// import flash.text.engine.FontDescription;
-// import flash.text.engine.TextBlock;
-// import flash.text.engine.TextElement;
-// import flash.text.engine.TextLine;
-// import flash.text.Font;
-// import flash.utils.ByteArray;
-
+import lime.Assets;
+import lime.graphics.Image;
+import lime.math.Rectangle;
+import lime.math.Vector2;
 import net.rezmason.utils.display.FlatFont;
-// import net.rezmason.utils.display.SDFTypes;
-import net.rezmason.utils.workers.TempAgency;
-import net.rezmason.utils.workers.Golem;
-
+import net.rezmason.utils.display.SDF;
 using haxe.Json;
-
-using Lambda;
 using net.rezmason.utils.Alphabetizer;
+
+typedef PendingGlyph = {
+    var char:String;
+    var fontID:String;
+    var glyph:Int;
+    var image:Image;
+    var width:Int;
+    var height:Int;
+    var offsetX:Int;
+    var offsetY:Int;
+};
 
 typedef CharacterSet = {
     var fontID:String;
@@ -34,155 +27,125 @@ typedef CharacterSet = {
     var size:Int;
     var size2:Int;
 }
-/*
+
 class FlatFontGenerator {
 
-    static var sdfAgency:TempAgency<{source:SerializedBitmap, cutoff:Int}, SerializedBitmap>;
+    public static function flatten(characterSets:Array<CharacterSet>, glyphWidth, glyphHeight, spacing, leeway, cutoff, cbk) {
 
-    public static function flatten(sets:Array<CharacterSet>, glyphWidth:UInt, glyphHeight:UInt, spacing:UInt, cutoff:Int, cbk:FlatFont->Void):Void {
+        var renderedGlyphs:Map<String, Image> = new Map();
+        var numChars = 0;
+        var includeSpace = false;
+        var glyphRatio:Float = 1;
 
-        if (sdfAgency == null) {
-            sdfAgency = new TempAgency(Golem.rise('SDFWorker.hxml'), 10);
-            sdfAgency.onDone = sdfAgency.die;
-            sdfAgency.onError = function(_) trace(_);
-        }
+        for (ike in 0...characterSets.length) {
+            var characterSet = characterSets[ike];
+            var fontID = characterSet.fontID;
+            var chars = characterSet.chars;
+            var fontSize = characterSet.size;
+            var fontSize2 = characterSet.size2;
+            var maxWidth = 0;
+            var maxHeight = 0;
+            var font = Assets.getFont(fontID);
+            var pendingGlyphs:Map<String, PendingGlyph> = new Map();
 
-        if (glyphWidth  == 0) glyphWidth  = 1;
-        if (glyphHeight == 0) glyphHeight = 1;
-        
-        var charCoordJSON:Dynamic = {};
-        var missingChars:Array<Int> = [];
-        var requiredChars:Map<String, Null<Int>> = new Map();
-        var numChars:Int = 0;
-
-        for (ike in 0...sets.length) {
-            for (char in sets[ike].chars.split('')) {
-                if (!requiredChars.exists(char)) {
-                    numChars++;
-                    requiredChars[char] = null;
+            for (jen in 0...Utf8.length(chars)) {
+                var char = Utf8.sub(chars, jen, 1);
+                if (char == ' ') {
+                    if (!includeSpace) {
+                        includeSpace = true;
+                        numChars++;
+                    }
+                    continue;
                 }
+                var glyph = font.getGlyph(char);
+                if (glyph == 0) continue;
+                var renderedGlyph = font.renderGlyph(glyph, fontSize);
+                if (renderedGlyph == null) continue;
+                if (renderedGlyphs.exists(char)) continue;
+                
+                var renderedGlyphWidth = renderedGlyph.width;
+                var renderedGlyphHeight = renderedGlyph.height;
+                var metrics = font.getGlyphMetrics(glyph);
+                var unit = renderedGlyphHeight / metrics.height;
+                var offsetX = Std.int(metrics.horizontalBearing.x * unit);
+                var offsetY = Std.int(fontSize2 - metrics.horizontalBearing.y * unit);
+                var properWidth = Std.int(metrics.advance.x * unit);
+                var properHeight = Std.int(metrics.advance.y * unit);
+                if (properWidth  < offsetX + renderedGlyphWidth ) properWidth  = offsetX + renderedGlyphWidth;
+                if (properHeight < offsetY + renderedGlyphHeight) properHeight = offsetY + renderedGlyphHeight;
 
-                if (requiredChars[char] == null && sets[ike].font.hasGlyphs(char)) {
-                    requiredChars[char] = ike;
+                pendingGlyphs[char] = {
+                    char:char,
+                    fontID:fontID,
+                    glyph:glyph,
+                    image:renderedGlyph,
+                    width:properWidth,
+                    height:properHeight,
+                    offsetX:offsetX,
+                    offsetY:offsetY
+                };
+                
+                if (maxWidth  < properWidth)  maxWidth  = properWidth;
+                if (maxHeight < properHeight) maxHeight = properHeight;
+            }
+
+            maxWidth += 2 * leeway;
+            maxHeight += 2 * leeway;
+
+            if (ike == 0) glyphRatio = maxHeight / maxWidth;
+
+            for (char in pendingGlyphs.keys().a2z()) {
+                var pendingGlyph = pendingGlyphs[char];
+                var properGlyphImage = new Image(null, 0, 0, maxWidth, maxHeight, 0x000000FF);
+                var data = pendingGlyph.image.data;
+                for (y in 0...pendingGlyph.image.height) {
+                    for (x in 0...pendingGlyph.image.width) {
+                        var val:UInt = data[(y * pendingGlyph.image.width + x) * 1];
+                        properGlyphImage.setPixel32(
+                            x + pendingGlyph.offsetX + leeway, 
+                            y + pendingGlyph.offsetY + leeway, 
+                            val == 0 ? 0x000000FF : 0xFFFFFFFF
+                        );
+                    }
                 }
+                properGlyphImage = new SDF(properGlyphImage, cutoff).output.clone();
+                properGlyphImage.resize(glyphWidth, glyphHeight);
+                numChars++;
+                renderedGlyphs[char] = properGlyphImage;
+                trace(char);
             }
         }
 
+        if (includeSpace) renderedGlyphs[' '] = new Image(null, 0, 0, glyphWidth, glyphHeight, 0x0000FFFF);
         var numColumns:Int = Std.int(Math.sqrt(numChars)) + 1;
         var numRows:Int = Std.int(numChars / numColumns) + 1;
-
-        var chars:Array<String> = [];
-        for (char in requiredChars.keys().a2z()) {
-            chars.push(char);
-            if (requiredChars[char] == null) missingChars.push(char.charCodeAt(0));
-        }
-
-        var glyphs:Array<TextLine> = [];
-        var bds:Array<BitmapData> = [];
-
-        var glyphBounds:Rectangle = null;
-        var imageBounds:Rectangle = null;
-        var sdfBounds:Rectangle = null;
-
-        var formats:Array<ElementFormat> = [];
-        for (ike in 0...sets.length) {
-            var format:ElementFormat = new ElementFormat(new FontDescription(sets[ike].font.fontName));
-            format.fontSize = sets[ike].size;
-            format.color = 0xFFFFFF;
-            formats.push(format);
-        }
-        var textBlock:TextBlock = new TextBlock();
-        var glyphBounds:Rectangle = null;
-
-        for (char in chars) {
-            textBlock.content = new TextElement(char, formats[requiredChars[char]]);
-            var textLine:TextLine = textBlock.createTextLine(null);
-            glyphs.push(textLine);
-            var bounds:Rectangle = textLine.getBounds(textLine);
-            if (glyphBounds == null) glyphBounds = bounds;
-            else glyphBounds = glyphBounds.union(bounds);
-        }
-
-        imageBounds = glyphBounds.clone();
-        imageBounds.inflate(spacing * 2, spacing * 2);
-
-        imageBounds.left   = Math.floor(imageBounds.left  );
-        imageBounds.right  = Math.ceil (imageBounds.right );
-        imageBounds.top    = Math.floor(imageBounds.top   );
-        imageBounds.bottom = Math.ceil (imageBounds.bottom);
-
-        sdfBounds = imageBounds.clone();
-        sdfBounds.inflate(cutoff, cutoff);
-
-        var glyphBD:BitmapData = new BitmapData(Std.int(imageBounds.width), Std.int(imageBounds.height), true, 0xFF000000);
-        var glyphMat:Matrix = new Matrix();
-        glyphMat.tx = -imageBounds.left;
-        glyphMat.ty = -imageBounds.top;
-
-        var numSDFs:Int = 0;
-
-        function proceed():Void {
-
-            var width :Int = Std.int(Math.ceil(glyphWidth  * numColumns));
-            var height:Int = Std.int(Math.ceil(glyphHeight * numRows   ));
-            
-            var bitmapData:BitmapData = new BitmapData(width, width, true, 0xFF0000FF);
-
-            var x:Int = 0;
-            var y:Int = 0;
-            var outputMat:Matrix = new Matrix();
-            outputMat.scale(glyphWidth / sdfBounds.width, glyphHeight / sdfBounds.height);
-
-            for (ike in 0...numChars) {
-                outputMat.tx = x * glyphWidth;
-                outputMat.ty = y * glyphHeight;
-
-                bitmapData.draw(bds[ike], outputMat, null, BlendMode.NORMAL, null, true);
-
-                Reflect.setField(charCoordJSON, '_' + chars[ike].charCodeAt(0), {x: outputMat.tx, y: outputMat.ty});
-
-                x++;
-                if (x >= numColumns) {
-                    x = 0;
-                    y++;
-                }
+        var finalWidth  = numColumns * (glyphWidth  + spacing) - spacing;
+        var finalHeight = numRows    * (glyphHeight + spacing) - spacing;
+        var output = new Image(null, 0, 0, finalWidth, finalHeight, 0x0000FFFF);
+        var row = 0;
+        var col = 0;
+        var dest = new Vector2();
+        var charCoordJSON:Dynamic = {};
+        for (char in renderedGlyphs.keys().a2z()) {
+            var renderedGlyph = renderedGlyphs[char];
+            dest.x = col * (glyphWidth  + spacing);
+            dest.y = row * (glyphHeight + spacing);
+            output.copyPixels(renderedGlyph, renderedGlyph.rect, dest);
+            Reflect.setField(charCoordJSON, '_' + Utf8.charCodeAt(char, 0), {x: dest.x, y: dest.y});
+            col++;
+            if (col >= numColumns) {
+                col = 0;
+                row++;
             }
-
-            var glyphRatio:Float = imageBounds.height / imageBounds.width;
-
-            var json:FlatFontJSON = {
-                glyphWidth:glyphWidth,
-                glyphHeight:glyphHeight,
-                glyphRatio:glyphRatio,
-                charCoords:charCoordJSON,
-                missingChars:missingChars
-            };
-
-            cbk (new FlatFont(Image.fromBitmapData(bitmapData), json.stringify()));
         }
 
-        function addSDF(index:Int, sdf:SerializedBitmap):Void {
-            numSDFs++;
+        var json:FlatFontJSON = {
+            glyphWidth:glyphWidth,
+            glyphHeight:glyphHeight,
+            glyphRatio:glyphRatio,
+            charCoords:charCoordJSON,
+        };
 
-            var ba = sdf.bytes.getData();
-            ba.endian = flash.utils.Endian.BIG_ENDIAN;
-            ba.position = 0;
-            
-            var bd:BitmapData = new BitmapData(sdf.width, sdf.height, true, 0x0);
-            bd.setPixels(bd.rect, ba);
-
-            bds[index] = bd;
-            trace('$index: $numSDFs / $numChars');
-            if (numSDFs == numChars) proceed();
-        }
-
-        for (ike in 0...numChars) {
-            var bd:BitmapData = glyphBD.clone();
-            bd.draw(glyphs[ike], glyphMat, null, BlendMode.NORMAL, null, true);
-            var sb:SerializedBitmap = {width:bd.width, height:bd.height, bytes:Bytes.ofData(bd.getPixels(bd.rect))};
-            // addSDF(ike, SDF.process({source:sb, cutoff:cutoff}));
-            sdfAgency.addWork({source:sb, cutoff:cutoff}, addSDF.bind(ike));
-        }
+        cbk(new FlatFont(output, json.stringify()));
     }
 }
-*/

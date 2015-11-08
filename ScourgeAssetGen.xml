@@ -11,7 +11,6 @@
     <classpath name="src"/>
 
     <haxelib name="format"/>
-    <haxelib name="golems"/>
     <haxelib name="lime"/>
 
     <assets path="assets/fonts/ProFontX.ttf" rename="ProFont"/>

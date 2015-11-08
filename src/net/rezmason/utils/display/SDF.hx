@@ -1,8 +1,5 @@
 package net.rezmason.utils.display;
 
-import Math.*;
-import Std.int;
-import haxe.io.Bytes;
 import lime.graphics.Image;
 
 class Datum {
@@ -61,7 +58,7 @@ class SDF {
                     pendingData.push(datum);
                     innerData.push(datum);
                 } else {
-                    datum.pop(row, col, NaN, NaN, NaN, false, 1);
+                    datum.pop(row, col, Math.NaN, Math.NaN, Math.NaN, false, 1);
                 }
                 dataMatrix[row][col] = datum;
                 allData.push(datum);
@@ -83,9 +80,9 @@ class SDF {
 
         // ...and then remove their distances
         for (datum in innerData) {
-            datum.rad2 = NaN;
-            datum.dx = NaN;
-            datum.dy = NaN;
+            datum.rad2 = Math.NaN;
+            datum.dx = Math.NaN;
+            datum.dy = Math.NaN;
         }
 
         // ...and recompute them.
@@ -95,8 +92,8 @@ class SDF {
 
         for (datum in allData) {
             var distance:Float = datum.side;
-            if (!isNaN(datum.rad2)) distance *= sqrt(datum.rad2) / cutoff;
-            var val:Int = int(distance * 0x80 + 0x7F);
+            if (!Math.isNaN(datum.rad2)) distance *= Math.sqrt(datum.rad2) / cutoff;
+            var val:Int = Std.int(distance * 0x80 + 0x7F);
             if (val < 0x00) val = 0x00;
             if (val > 0xFF) val = 0xFF;
             output.setPixel32(datum.col, datum.row, 0xFF | (val << 8));
@@ -138,13 +135,13 @@ class SDF {
             var newNeighbors:Array<Datum> = new Array();
 
             for (neighbor in neighborsFor(datum)) {
-                if (isNaN(neighbor.rad2) && !neighbor.pending) {
+                if (Math.isNaN(neighbor.rad2) && !neighbor.pending) {
                     newNeighbors.push(neighbor);
                 } else {
                     var dx:Float = neighbor.dx + (neighbor.col - col);
                     var dy:Float = neighbor.dy + (neighbor.row - row);
                     var rad2:Float = dx * dx + dy * dy;
-                    if (isNaN(datum.rad2) || rad2 < datum.rad2) {
+                    if (Math.isNaN(datum.rad2) || rad2 < datum.rad2) {
                         datum.dx = dx;
                         datum.dy = dy;
                         datum.rad2 = rad2;
