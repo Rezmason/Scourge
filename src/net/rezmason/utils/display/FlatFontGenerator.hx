@@ -1,22 +1,22 @@
 package net.rezmason.utils.display;
 
-import flash.display.BitmapData;
-import flash.geom.Matrix;
+// import flash.display.BitmapData;
+// import flash.geom.Matrix;
 
 import lime.graphics.Image;
 
 import haxe.Utf8;
 import haxe.io.Bytes;
 
-import flash.display.BlendMode;
-import flash.geom.Rectangle;
-import flash.text.engine.ElementFormat;
-import flash.text.engine.FontDescription;
-import flash.text.engine.TextBlock;
-import flash.text.engine.TextElement;
-import flash.text.engine.TextLine;
-import flash.text.Font;
-import flash.utils.ByteArray;
+// import flash.display.BlendMode;
+// import flash.geom.Rectangle;
+// import flash.text.engine.ElementFormat;
+// import flash.text.engine.FontDescription;
+// import flash.text.engine.TextBlock;
+// import flash.text.engine.TextElement;
+// import flash.text.engine.TextLine;
+// import flash.text.Font;
+// import flash.utils.ByteArray;
 
 import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.display.SDFTypes;
@@ -29,11 +29,12 @@ using Lambda;
 using net.rezmason.utils.Alphabetizer;
 
 typedef CharacterSet = {
-    var font:Font;
+    var fontID:String;
     var chars:String;
-    var size:Float;
+    var size:Int;
+    var size2:Int;
 }
-
+/*
 class FlatFontGenerator {
 
     static var sdfAgency:TempAgency<{source:SerializedBitmap, cutoff:Int}, SerializedBitmap>;
@@ -184,3 +185,4 @@ class FlatFontGenerator {
         }
     }
 }
+*/
