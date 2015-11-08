@@ -19,7 +19,7 @@ import haxe.io.Bytes;
 // import flash.utils.ByteArray;
 
 import net.rezmason.utils.display.FlatFont;
-import net.rezmason.utils.display.SDFTypes;
+// import net.rezmason.utils.display.SDFTypes;
 import net.rezmason.utils.workers.TempAgency;
 import net.rezmason.utils.workers.Golem;
 

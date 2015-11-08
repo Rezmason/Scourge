@@ -12,6 +12,9 @@ import lime.math.Vector2;
 
 import format.png.Tools;
 import format.png.Writer;
+
+import net.rezmason.utils.display.SDF;
+
 // import flash.Lib;
 // import flash.display.Bitmap;
 // import flash.display.BitmapData;
@@ -77,7 +80,7 @@ class ScourgeAssetGen extends Application {
         GlobTextureGenerator.makeTexture(512, deployImage.bind(_, "glob"));
         */
 
-        flatten(characterSets, 500 /*72*/, 500 /*72*/, 1, 20, 20, deployFont.bind(_, 'full'));
+        flatten(characterSets, 72, 72, 1, 20, 20, deployFont.bind(_, 'full'));
 
         Sys.exit(0);
     }
@@ -112,7 +115,7 @@ class ScourgeAssetGen extends Application {
                 var renderedGlyph = font.renderGlyph(glyph, fontSize);
                 if (renderedGlyph == null) continue;
                 if (renderedGlyphs.exists(char)) continue;
-
+                
                 var renderedGlyphWidth = renderedGlyph.width;
                 var renderedGlyphHeight = renderedGlyph.height;
                 var metrics = font.getGlyphMetrics(glyph);
@@ -134,7 +137,7 @@ class ScourgeAssetGen extends Application {
                     offsetX:offsetX,
                     offsetY:offsetY
                 };
-
+                
                 if (maxWidth  < properWidth)  maxWidth  = properWidth;
                 if (maxHeight < properHeight) maxHeight = properHeight;
             }
@@ -142,7 +145,7 @@ class ScourgeAssetGen extends Application {
             maxWidth += 2 * leeway;
             maxHeight += 2 * leeway;
 
-            for (char in pendingGlyphs.keys()) {
+            for (char in pendingGlyphs.keys().a2z()) {
                 var pendingGlyph = pendingGlyphs[char];
                 var properGlyphImage = new Image(null, 0, 0, maxWidth, maxHeight, 0x000000FF);
                 var data = pendingGlyph.image.data;
@@ -156,18 +159,20 @@ class ScourgeAssetGen extends Application {
                         );
                     }
                 }
-
+                properGlyphImage = new SDF(properGlyphImage, cutoff).output.clone();
+                properGlyphImage.resize(glyphWidth, glyphHeight);
                 numChars++;
                 renderedGlyphs[char] = properGlyphImage;
+                trace(char);
             }
         }
 
-        if (includeSpace) renderedGlyphs[' '] = new Image(null, 0, 0, glyphWidth, glyphHeight, 0x000000FF);
+        if (includeSpace) renderedGlyphs[' '] = new Image(null, 0, 0, glyphWidth, glyphHeight, 0x0000FFFF);
         var numColumns:Int = Std.int(Math.sqrt(numChars)) + 1;
         var numRows:Int = Std.int(numChars / numColumns) + 1;
         var finalWidth  = numColumns * (glyphWidth  + spacing) - spacing;
         var finalHeight = numRows    * (glyphHeight + spacing) - spacing;
-        var output = new Image(null, 0, 0, finalWidth, finalHeight, 0x000000FF);
+        var output = new Image(null, 0, 0, finalWidth, finalHeight, 0x0000FFFF);
         var row = 0;
         var col = 0;
         var dest = new Vector2();
@@ -175,7 +180,6 @@ class ScourgeAssetGen extends Application {
             var renderedGlyph = renderedGlyphs[char];
             dest.x = col * (glyphWidth  + spacing);
             dest.y = row * (glyphHeight + spacing);
-            output.fillRect(new Rectangle(dest.x, dest.y, glyphWidth, glyphHeight), 0xFFFFFFFF);
             output.copyPixels(renderedGlyph, renderedGlyph.rect, dest);
             col++;
             if (col >= numColumns) {

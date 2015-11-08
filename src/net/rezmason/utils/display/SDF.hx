@@ -2,57 +2,61 @@ package net.rezmason.utils.display;
 
 import Math.*;
 import Std.int;
-import flash.Vector;
-import flash.display.BitmapData;
-import flash.geom.Point;
 import haxe.io.Bytes;
-import net.rezmason.utils.display.SDFTypes;
+import lime.graphics.Image;
+
+class Datum {
+    public var dx:Float;
+    public var dy:Float;
+    public var rad2:Float;
+    public var row:Int;
+    public var col:Int;
+    public var pending:Bool;
+    public var side:Int;
+
+    public function new():Void {}
+
+    public function pop(row, col, dx, dy, rad2, pending, side):Void {
+        this.dx = dx;
+        this.dy = dy;
+        this.rad2 = rad2;
+        this.row = row;
+        this.col = col;
+        this.pending = pending;
+        this.side = side;
+    }
+}
 
 class SDF {
 
-    var pendingData:Vector<Datum>;
-    var dataMatrix:Vector<Vector<Datum>>;
-    var innerData:Vector<Datum>;
-    var allData:Vector<Datum>;
-    var source:BitmapData;
+    var pendingData:Array<Datum>;
+    var dataMatrix:Array<Array<Datum>>;
+    var innerData:Array<Datum>;
+    var allData:Array<Datum>;
+    var source:Image;
     var w:Int;
     var h:Int;
     var cutoff:Int;
-    var output:BitmapData;
+    public var output(default, null):Image;
 
-    public static function process(input:Work):SerializedBitmap {
-        
-        var bd:BitmapData = new BitmapData(input.source.width, input.source.height, true, 0x0);
-
-        var ba = input.source.bytes.getData();
-        ba.endian = flash.utils.Endian.BIG_ENDIAN;
-        ba.position = 0;
-        bd.setPixels(bd.rect, ba);
-
-        var output:BitmapData = (new SDF(bd, input.cutoff)).output;
-        
-        return {width:output.width, height:output.height, bytes:Bytes.ofData(output.getPixels(output.rect))};
-    }
-
-    function new(source:BitmapData, cutoff:Int):Void {
+    public function new(source:Image, cutoff:Int):Void {
 
         this.cutoff = cutoff;
-        this.source = padBD(source, cutoff);
 
-        dataMatrix = new Vector();
-        allData = new Vector();
-        innerData = new Vector();
-        pendingData = new Vector();
+        dataMatrix = [];
+        allData = [];
+        innerData = [];
+        pendingData = [];
 
         w = source.width;
         h = source.height;
 
         // Build the matrix and initialize the propagation algo
         for (row in 0...h) {
-            dataMatrix[row] = new Vector();
+            dataMatrix[row] = new Array();
             for (col in 0...w) {
                 var datum:Datum = new Datum();
-                if (source.getPixel32(col, row) & 0xFF > 0xF0) {
+                if (source.getPixel32(col, row) & 0xFF00 > 0xF000) {
                     datum.pop(row, col, 0, 0, 0, true, -1);
                     pendingData.push(datum);
                     innerData.push(datum);
@@ -87,20 +91,20 @@ class SDF {
         // ...and recompute them.
         findPendingDistances();
 
-        output = new BitmapData(w, h, true, 0x0);
+        output = new Image(null, 0, 0, w, h, 0xFF);
 
         for (datum in allData) {
             var distance:Float = datum.side;
-            if (!_isNaN(datum.rad2)) distance *= sqrt(datum.rad2) / cutoff;
+            if (!isNaN(datum.rad2)) distance *= sqrt(datum.rad2) / cutoff;
             var val:Int = int(distance * 0x80 + 0x7F);
             if (val < 0x00) val = 0x00;
             if (val > 0xFF) val = 0xFF;
-            output.setPixel32(datum.col, datum.row, 0xFF000000 | val);
+            output.setPixel32(datum.col, datum.row, 0xFF | (val << 8));
         }
     }
 
-    function neighborsFor(datum:Datum):Vector<Datum> {
-        var neighbors:Vector<Datum> = new Vector();
+    function neighborsFor(datum:Datum):Array<Datum> {
+        var neighbors:Array<Datum> = new Array();
 
         var row:Int = datum.row;
         var col:Int = datum.col;
@@ -131,16 +135,16 @@ class SDF {
             var row:Int = datum.row;
             var col:Int = datum.col;
 
-            var newNeighbors:Vector<Datum> = new Vector();
+            var newNeighbors:Array<Datum> = new Array();
 
             for (neighbor in neighborsFor(datum)) {
-                if (_isNaN(neighbor.rad2) && !neighbor.pending) {
+                if (isNaN(neighbor.rad2) && !neighbor.pending) {
                     newNeighbors.push(neighbor);
                 } else {
                     var dx:Float = neighbor.dx + (neighbor.col - col);
                     var dy:Float = neighbor.dy + (neighbor.row - row);
                     var rad2:Float = dx * dx + dy * dy;
-                    if (_isNaN(datum.rad2) || rad2 < datum.rad2) {
+                    if (isNaN(datum.rad2) || rad2 < datum.rad2) {
                         datum.dx = dx;
                         datum.dy = dy;
                         datum.rad2 = rad2;
@@ -156,12 +160,4 @@ class SDF {
             }
         }
     }
-
-    function padBD(src:BitmapData, padding:Int):BitmapData {
-        var dest:BitmapData = new BitmapData(src.width + 2 * padding, src.height + 2 * padding, true, 0x0);
-        dest.copyPixels(src, src.rect, new Point(padding, padding), null, null, true);
-        return dest;
-    }
-
-    inline function _isNaN(i:Float):Bool return untyped __global__["isNaN"](i);
 }
