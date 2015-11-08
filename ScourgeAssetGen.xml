@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
-    <meta title="Scourge Asset Generator" description="" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net"/>
-    <app title="Scourge Asset Generator" file="ScourgeAssetGen" main="ScourgeAssetGen" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="12.0"/>
-
-    <window width="800" height="600" fps="30" orientation="portrait" background="#000000" resizable="true"/>
-    <window width="0" height="0" if="fullscreen"/>
-
+    <meta title="Scourge Asset Generator" description="" package="net.rezmason.scourge" version="2.0.0" company="Rezmason.net"/>
+    <app title="Scourge Asset Generator" file="ScourgeAssetGen" main="ScourgeAssetGen" package="net.rezmason.scourge" version="2.0.0" company="Rezmason.net"/>
+    
+    <window width="0" height="0"/>
     <set name="BUILD_DIR" value="Export/ScourgeAssetGen"/>
-
     <classpath name="src"/>
-
-    <haxelib name="format"/>
     <haxelib name="lime"/>
 
     <assets path="assets/fonts/ProFontX.ttf" rename="ProFont"/>
