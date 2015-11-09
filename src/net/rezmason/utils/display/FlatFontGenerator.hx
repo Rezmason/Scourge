@@ -63,6 +63,8 @@ class FlatFontGenerator {
                 if (renderedGlyph == null) continue;
                 if (renderedGlyphs.exists(char)) continue;
                 
+                // Based on explanation at http://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html
+
                 var renderedGlyphWidth = renderedGlyph.width;
                 var renderedGlyphHeight = renderedGlyph.height;
                 var metrics = font.getGlyphMetrics(glyph);
