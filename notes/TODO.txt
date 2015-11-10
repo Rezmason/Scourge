@@ -1,3 +1,8 @@
+Add an ImageTexture to PostProcessor
+    Draw it as a quad up on top
+Create a Cairo surface
+Attach it to the PostProcessor's top quad image texture
+
 Quasi-gestural input
     Nail down the precise user story of this mode of interaction
     My first idea:
@@ -24,7 +29,8 @@ Quasi-gestural input
         Friction also acts on the loupe's physical position
         User controls the position of a 2D drag behavior with no settling
         During the drag, a taut physical spring connects the loupe's physical position to the drag position
-
+        Except non-Euclidean boards obviously need some intermediary between physical and visual position...
+            Well! That all should be rewritten.
 
 If nothing specifies a settling function, remove that functionality from DragBehavior
 

@@ -1,6 +1,7 @@
 package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
+import net.rezmason.gl.TextureFormat;
 
 #if !flash
     import lime.graphics.opengl.GL;
@@ -75,8 +76,7 @@ class BufferTexture extends Texture {
         if (isConnectedToContext()) {
             #if flash
                 if (nativeTexture != null) nativeTexture.dispose();
-                // TODO: make this dependent on format?
-                nativeTexture = context.createRectangleTexture(width, height, cast "rgbaHalfFloat", true);
+                nativeTexture = context.createRectangleTexture(width, height, cast TextureFormat.FLOAT, true);
             #else
                 GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
 

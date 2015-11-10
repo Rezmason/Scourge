@@ -11,6 +11,8 @@ import net.rezmason.gl.TextureFormat;
 class ImageTexture extends Texture {
 
     public var image(default, null):Image;
+    var width:Int = -1;
+    var height:Int = -1;
     var nativeTexture:NativeTexture;
 
     public function new(image:Image):Void {
@@ -20,21 +22,28 @@ class ImageTexture extends Texture {
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-        #if flash
-            nativeTexture = context.createRectangleTexture(image.width, image.height, cast TextureFormat.FLOAT, false);
-        #else
+        #if !flash
             nativeTexture = GL.createTexture();
         #end
         update();
     }
 
     public inline function update():Void {
+        var sizeChanged = nativeTexture == null || width != image.width || height != image.height;
+        width = image.width;
+        height = image.height;
         if (isConnectedToContext()) {
             #if flash
+                if (sizeChanged) {
+                    if (nativeTexture != null) nativeTexture.dispose();
+                    nativeTexture = context.createRectangleTexture(width, height, cast TextureFormat.FLOAT, false);
+                }
                 var bmd = @:privateAccess image.buffer.__srcBitmapData;
                 (cast nativeTexture).uploadFromBitmapData(bmd);
             #else
                 GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
+                // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+                // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
                 
@@ -56,6 +65,8 @@ class ImageTexture extends Texture {
         super.disconnectFromContext();
         #if flash nativeTexture.dispose(); #end
         nativeTexture = null;
+        width = -1;
+        height = -1;
     }
 
     override function setAtProgLocation(prog:NativeProgram, location:UniformLocation, index:Int):Void {
