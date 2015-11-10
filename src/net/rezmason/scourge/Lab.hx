@@ -310,7 +310,7 @@ class MetaballSystem extends LabSystem {
     inline static var IpB:Int = 6; // indices per ball
     inline static var TpB:Int = 2; // triangles per ball
 
-    var texture:Texture;
+    var metaballTexture:ImageTexture;
     var program:Program;
 
     var bodyTransform:Matrix4;
@@ -339,7 +339,7 @@ class MetaballSystem extends LabSystem {
         time = 0;
 
         Lab.makeExtensions(glSys); // THIS IS NEEDED for all textures to be floating point
-        texture = glSys.createImageTexture(getImage('metaballs/metaball.png'));
+        metaballTexture = glSys.createImageTexture(getImage('metaballs/metaball.png'));
 
         bodyTransform = new Matrix4();
         cameraTransform = new Matrix4();
@@ -495,6 +495,9 @@ class MetaballSystem extends LabSystem {
 
     override function update():Void {
         time += 0.1;
+
+        // metaballTexture.image.setPixel(Std.random(metaballTexture.image.width), Std.random(metaballTexture.image.height), 0x0);
+        // metaballTexture.update();
         
         bodyTransform.appendRotation(0.1, Vector4.Z_AXIS);
 
@@ -545,7 +548,7 @@ class MetaballSystem extends LabSystem {
         program.setProgramConstantsFromMatrix('uBodyMat', bodyTransform); // uBodyMat contains the body's matrix
         program.setProgramConstantsFromMatrix('uCameraMat', cameraTransform); // uCameraMat contains the camera matrix
         
-        program.setTextureAt('uSampler', texture); // uSampler contains our texture
+        program.setTextureAt('uSampler', metaballTexture); // uSampler contains our metaballTexture
         
         program.setVertexBufferAt('aPos',     vertBuffer, 0, 3); // aPos contains x,y,z
         program.setVertexBufferAt('aCorner',  vertBuffer, 3, 2); // aCorner contains h,v
@@ -562,6 +565,6 @@ class MetaballSystem extends LabSystem {
         program.setVertexBufferAt('aScale',   null, 5, 1);
         program.setVertexBufferAt('aCav',     null, 6, 1);
 
-        program.setTextureAt('uSampler', null); // uSampler contains our texture
+        program.setTextureAt('uSampler', null);
     }
 }
