@@ -1,7 +1,7 @@
 package net.rezmason.scourge.textview.core;
 
 import lime.Assets.getText;
-
+import lime.graphics.Image;
 import net.rezmason.gl.BlendFactor;
 import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.*;
@@ -16,6 +16,9 @@ class PostProcessor {
 
     public var inputBuffer(default, null):OutputBuffer;
     var inputTexture:Texture;
+    #if (debug && mac) 
+        var debugTexture:ImageTexture;
+    #end
     var viewportBuffer:ViewportOutputBuffer;
     var glSys:GLSystem;
     var program:Program;
@@ -32,6 +35,8 @@ class PostProcessor {
         inputTexture = textureOutputBuffer.texture;
         inputBuffer = textureOutputBuffer;
         viewportBuffer = glSys.viewportOutputBuffer;
+
+        #if (debug && mac) debugTexture = glSys.createImageTexture(new Image(null, 0, 0, 1, 1, 0xFF0000FF)); #end
 
         // inputBuffer = viewportBuffer;
 
@@ -69,6 +74,7 @@ class PostProcessor {
 
     public function setSize(width, height) {
         inputBuffer.resize(width, height);
+        #if (debug && mac) debugTexture.image.resize(width, height); #end
         viewportBuffer.resize(width, height);
     }
 
@@ -84,6 +90,15 @@ class PostProcessor {
         glSys.start(viewportBuffer);
         glSys.clear(1, 0, 1);
         glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
+        #if (debug && mac)
+            glSys.setDepthTest(false);
+            glSys.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE_MINUS_SOURCE_ALPHA);  
+            debugTexture.update();
+            program.setTextureAt('uTexture', debugTexture);
+            glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
+            glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);  
+            glSys.setDepthTest(true);
+        #end
         glSys.finish();
 
         program.setTextureAt('uTexture', null);
