@@ -1,5 +1,3 @@
-Expose debug graphics through engine-->context-->Santa to the rest of the game
-
 Quasi-gestural input
     Nail down the precise user story of this mode of interaction
     My first idea:

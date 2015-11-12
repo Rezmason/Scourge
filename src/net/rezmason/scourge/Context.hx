@@ -8,6 +8,7 @@ import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.FontManager;
 import net.rezmason.scourge.textview.errands.BeginNavErrand;
 import net.rezmason.utils.santa.Santa;
+#if debug_graphics import net.rezmason.scourge.textview.core.DebugGraphics; #end
 
 class Context {
 
@@ -34,5 +35,7 @@ class Context {
         var beginNavErrand = new BeginNavErrand(engine);
         if (engine.ready) beginNavErrand.run();
         else engine.readySignal.add(beginNavErrand.run);
+
+        #if debug_graphics Santa.mapToClass(DebugGraphics, Singleton(engine.debugGraphics)); #end
     }
 }

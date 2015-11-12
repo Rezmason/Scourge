@@ -13,6 +13,8 @@
     <classpath name="src"/>
     <classpath name="test"/>
     
+    <haxedef name="debug_graphics" if="mac" unless="release"/>
+
     <haxedef name="advanced-telemetry" if="debug"/>
     <haxedef name="glsl2agal" if="flash"/>
     <haxedef name="stage3d" if="flash"/>

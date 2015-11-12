@@ -40,6 +40,7 @@ class Engine extends Module {
     var mouseMethod:RenderMethod;
     var prettyMethod:RenderMethod;
     var presentationMethod:RenderMethod;
+    #if debug_graphics public var debugGraphics(get, null):DebugGraphics; #end
 
     public function new(glFlow:GLFlowControl):Void {
         super();
@@ -272,4 +273,6 @@ class Engine extends Module {
     }
 
     #if debug inline function assertReady():Void if (!ready) throw "Engine hasn't initialized yet."; #end
+
+    #if debug_graphics inline function get_debugGraphics() return postProcess.debugGraphics; #end
 }

@@ -2,10 +2,7 @@ package net.rezmason.scourge.textview.core;
 
 import lime.Assets.getText;
 import lime.graphics.Image;
-#if (debug && mac)
-    import lime.graphics.cairo.CairoImageSurface;
-    import lime.graphics.cairo.Cairo;
-#end
+#if debug_graphics import lime.graphics.cairo.CairoImageSurface; #end
 import net.rezmason.gl.BlendFactor;
 import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.*;
@@ -20,10 +17,10 @@ class PostProcessor {
 
     public var inputBuffer(default, null):OutputBuffer;
     var inputTexture:Texture;
-    #if (debug && mac) 
+    #if debug_graphics 
         var debugTexture:ImageTexture;
         var debugSurface:CairoImageSurface;
-        public var cairo(default, null):Cairo;
+        public var debugGraphics(default, null):DebugGraphics;
     #end
     var viewportBuffer:ViewportOutputBuffer;
     var glSys:GLSystem;
@@ -42,10 +39,10 @@ class PostProcessor {
         inputBuffer = textureOutputBuffer;
         viewportBuffer = glSys.viewportOutputBuffer;
 
-        #if (debug && mac) 
+        #if debug_graphics 
             debugTexture = glSys.createImageTexture(new Image(null, 0, 0, 1, 1, 0x00000000));
             debugSurface = CairoImageSurface.fromImage(debugTexture.image);
-            cairo = new Cairo(debugSurface);
+            debugGraphics = new DebugGraphics(debugSurface);
         #end
 
         // inputBuffer = viewportBuffer;
@@ -84,10 +81,10 @@ class PostProcessor {
 
     public function setSize(width, height) {
         inputBuffer.resize(width, height);
-        #if (debug && mac) 
+        #if debug_graphics 
             debugTexture.image.resize(width, height);
             debugSurface = CairoImageSurface.fromImage(debugTexture.image);
-            cairo = new Cairo(debugSurface);
+            @:privateAccess debugGraphics.recreate(debugSurface);
         #end
         viewportBuffer.resize(width, height);
     }
@@ -104,7 +101,17 @@ class PostProcessor {
         glSys.start(viewportBuffer);
         glSys.clear(1, 0, 1);
         glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
-        #if (debug && mac)
+        #if debug_graphics
+            //*
+            debugTexture.image.fillRect(debugTexture.image.rect, 0x0);
+            debugGraphics.setSourceRGB(Math.random(), Math.random(), Math.random());
+            debugGraphics.moveTo(debugSurface.width / 2, debugSurface.height / 2);
+            for (ike in 0...100) {
+                debugGraphics.lineTo(Math.random() * debugSurface.width, Math.random() * debugSurface.height);
+            }
+            debugGraphics.stroke();
+            /**/
+
             glSys.setDepthTest(false);
             glSys.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE_MINUS_SOURCE_ALPHA);  
             debugTexture.update();
