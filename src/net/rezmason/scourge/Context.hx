@@ -2,13 +2,11 @@ package net.rezmason.scourge;
 
 import lime.app.Application;
 
-import net.rezmason.scourge.textview.NavSystem;
-import net.rezmason.scourge.textview.ScourgeNavPageAddresses;
+import net.rezmason.gl.GLFlowControl;
+import net.rezmason.gl.GLSystem;
 import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.scourge.textview.core.FontManager;
-import net.rezmason.scourge.textview.pages.*;
-import net.rezmason.gl.GLSystem;
-import net.rezmason.gl.GLFlowControl;
+import net.rezmason.scourge.textview.errands.BeginNavErrand;
 import net.rezmason.utils.santa.Santa;
 
 class Context {
@@ -33,10 +31,8 @@ class Context {
 
         new GameContext();
         
-        var navSystem:NavSystem = new NavSystem(engine);
-        navSystem.addPage(ScourgeNavPageAddresses.SPLASH, new SplashPage());
-        navSystem.addPage(ScourgeNavPageAddresses.ABOUT, new AboutPage());
-        navSystem.addPage(ScourgeNavPageAddresses.GAME, new GamePage());
-        navSystem.goto(Page(ScourgeNavPageAddresses.SPLASH));
+        var beginNavErrand = new BeginNavErrand(engine);
+        if (engine.ready) beginNavErrand.run();
+        else engine.readySignal.add(beginNavErrand.run);
     }
 }

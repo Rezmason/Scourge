@@ -1,7 +1,6 @@
 package net.rezmason.scourge.textview;
 
 import net.rezmason.scourge.textview.core.Scene;
-import net.rezmason.scourge.textview.core.Engine;
 import net.rezmason.utils.Zig;
 
 class NavSystem {
@@ -9,13 +8,13 @@ class NavSystem {
     var pages:Map<String, NavPage>;
     var pageHistory:Array<NavPage>;
     var currentPage:NavPage;
-    var engine:Engine;
 
-    public function new(engine:Engine):Void {
+    public var addSceneSignal(default, null):Zig<Scene->Void> = new Zig();
+    public var removeSceneSignal(default, null):Zig<Scene->Void> = new Zig();
+
+    public function new():Void {
         pages = new Map();
         pageHistory = [];
-        this.engine = engine;
-        engine.readySignal.add(onEngineReady);
     }
 
     public function addPage(name:String, page:NavPage):Void {
@@ -52,12 +51,8 @@ class NavSystem {
     }
 
     private function setPageTo(page:NavPage):Void {
-        if (engine.ready && currentPage != null) for (scene in currentPage.eachScene()) engine.removeScene(scene);
+        if (currentPage != null) for (scene in currentPage.eachScene()) removeSceneSignal.dispatch(scene);
         currentPage = page;
-        if (engine.ready && currentPage != null) for (scene in currentPage.eachScene()) engine.addScene(scene);
-    }
-
-    private function onEngineReady() {
-        if (currentPage != null) for (scene in currentPage.eachScene()) engine.addScene(scene);
+        if (currentPage != null) for (scene in currentPage.eachScene()) addSceneSignal.dispatch(scene);
     }
 }

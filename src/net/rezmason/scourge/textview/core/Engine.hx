@@ -55,8 +55,6 @@ class Engine extends Module {
         bodiesByID = new Map();
         scenes = [];
 
-        readySignal.add(onReady);
-        
         initInteractionSystems();
         initRenderMethods();
         addListeners();
@@ -65,7 +63,7 @@ class Engine extends Module {
     public function set_timestep(f:Float):Float return timestep = (f >= 0 ? f : 0);
 
     public function addScene(scene:Scene):Void {
-        #if debug readyCheck(); #end
+        #if debug assertReady(); #end
         if (!scenes.has(scene)) {
             scenes.push(scene);
             scene.redrawHitSignal.add(updateMouseSystem);
@@ -76,7 +74,7 @@ class Engine extends Module {
     }
 
     public function removeScene(scene:Scene):Void {
-        #if debug readyCheck(); #end
+        #if debug assertReady(); #end
         if (scenes.has(scene)) {
             scenes.remove(scene);
             scene.redrawHitSignal.remove(updateMouseSystem);
@@ -86,7 +84,7 @@ class Engine extends Module {
     }
 
     public function setKeyboardFocus(body:Body):Void {
-        #if debug readyCheck(); #end
+        #if debug assertReady(); #end
         fetchBodies();
         if (bodiesByID[body.id] == body) keyboardSystem.focusBodyID = body.id;
     }
@@ -106,13 +104,6 @@ class Engine extends Module {
     // override public function onRenderContextRestored(_) {}
     // override public function onTextInput(text) {}
 
-    function onReady():Void {
-        #if flash flash.Lib.current.stage.dispatchEvent(new flash.events.Event('resize')); #end
-        var window = Application.current.window;
-        setSize(window.width, window.height);
-        activate();
-    }
-
     function initInteractionSystems():Void {
         mouseSystem = new MouseSystem();
         mouseSystem.refreshSignal.add(renderMouse);
@@ -129,16 +120,20 @@ class Engine extends Module {
         mouseMethod = new MouseMethod();
         presentationMethod = prettyMethod;
 
-        prettyMethod.loadedSignal.add(onMethodLoaded);
-        mouseMethod.loadedSignal.add(onMethodLoaded);
+        prettyMethod.loadedSignal.add(checkReadiness);
+        mouseMethod.loadedSignal.add(checkReadiness);
 
         prettyMethod.load();
         mouseMethod.load();
     }
 
-    function onMethodLoaded():Void {
+    function checkReadiness():Void {
         if (!ready && prettyMethod.programLoaded && mouseMethod.programLoaded) {
             ready = true;
+            #if flash flash.Lib.current.stage.dispatchEvent(new flash.events.Event('resize')); #end
+            var window = Application.current.window;
+            setSize(window.width, window.height);
+            activate();
             readySignal.dispatch();
         }
     }
@@ -184,7 +179,7 @@ class Engine extends Module {
     }
 
     function setSize(width:Int, height:Int):Void {
-        #if debug readyCheck(); #end
+        #if debug assertReady(); #end
         this.width = width;
         this.height = height;
         for (scene in scenes) scene.resize(width, height);
@@ -193,7 +188,7 @@ class Engine extends Module {
     }
 
     function activate():Void {
-        #if debug readyCheck(); #end
+        #if debug assertReady(); #end
         if (active) return;
         active = true;
 
@@ -206,7 +201,7 @@ class Engine extends Module {
     }
 
     function deactivate():Void {
-        #if debug readyCheck(); #end
+        #if debug assertReady(); #end
         if (!active) return;
         active = false;
         updateTimer.stop();
@@ -276,5 +271,5 @@ class Engine extends Module {
         }
     }
 
-    #if debug inline function readyCheck():Void if (!ready) throw "Engine hasn't initialized yet."; #end
+    #if debug inline function assertReady():Void if (!ready) throw "Engine hasn't initialized yet."; #end
 }
