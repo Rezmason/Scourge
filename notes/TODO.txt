@@ -1,7 +1,4 @@
-Add an ImageTexture to PostProcessor
-    Draw it as a quad up on top
-Create a Cairo surface
-Attach it to the PostProcessor's top quad image texture
+Expose debug graphics through engine-->context-->Santa to the rest of the game
 
 Quasi-gestural input
     Nail down the precise user story of this mode of interaction

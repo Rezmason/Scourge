@@ -2,6 +2,10 @@ package net.rezmason.scourge.textview.core;
 
 import lime.Assets.getText;
 import lime.graphics.Image;
+#if (debug && mac)
+    import lime.graphics.cairo.CairoImageSurface;
+    import lime.graphics.cairo.Cairo;
+#end
 import net.rezmason.gl.BlendFactor;
 import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.*;
@@ -18,6 +22,8 @@ class PostProcessor {
     var inputTexture:Texture;
     #if (debug && mac) 
         var debugTexture:ImageTexture;
+        var debugSurface:CairoImageSurface;
+        public var cairo(default, null):Cairo;
     #end
     var viewportBuffer:ViewportOutputBuffer;
     var glSys:GLSystem;
@@ -36,7 +42,11 @@ class PostProcessor {
         inputBuffer = textureOutputBuffer;
         viewportBuffer = glSys.viewportOutputBuffer;
 
-        #if (debug && mac) debugTexture = glSys.createImageTexture(new Image(null, 0, 0, 1, 1, 0xFF0000FF)); #end
+        #if (debug && mac) 
+            debugTexture = glSys.createImageTexture(new Image(null, 0, 0, 1, 1, 0x00000000));
+            debugSurface = CairoImageSurface.fromImage(debugTexture.image);
+            cairo = new Cairo(debugSurface);
+        #end
 
         // inputBuffer = viewportBuffer;
 
@@ -74,7 +84,11 @@ class PostProcessor {
 
     public function setSize(width, height) {
         inputBuffer.resize(width, height);
-        #if (debug && mac) debugTexture.image.resize(width, height); #end
+        #if (debug && mac) 
+            debugTexture.image.resize(width, height);
+            debugSurface = CairoImageSurface.fromImage(debugTexture.image);
+            cairo = new Cairo(debugSurface);
+        #end
         viewportBuffer.resize(width, height);
     }
 
