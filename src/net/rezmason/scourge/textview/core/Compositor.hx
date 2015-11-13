@@ -8,7 +8,7 @@ import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.*;
 import net.rezmason.utils.santa.Present;
 
-class PostProcessor {
+class Compositor {
 
     inline static var FLOATS_PER_VERTEX:Int = 2 + 2;
     inline static var TOTAL_VERTICES:Int = 4;
@@ -85,6 +85,14 @@ class PostProcessor {
             debugTexture.image.resize(width, height);
             debugSurface = CairoImageSurface.fromImage(debugTexture.image);
             @:privateAccess debugGraphics.recreate(debugSurface);
+            debugGraphics.identityMatrix();
+            if (width > height) {
+                debugGraphics.translate((width - height) / 2, 0);
+                debugGraphics.scale(height, height);
+            } else {
+                debugGraphics.translate(0, (height - width) / 2);
+                debugGraphics.scale(width, width);
+            }
         #end
         viewportBuffer.resize(width, height);
     }
@@ -101,17 +109,8 @@ class PostProcessor {
         glSys.start(viewportBuffer);
         glSys.clear(1, 0, 1);
         glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
+        /*
         #if debug_graphics
-            //*
-            debugTexture.image.fillRect(debugTexture.image.rect, 0x0);
-            debugGraphics.setSourceRGB(Math.random(), Math.random(), Math.random());
-            debugGraphics.moveTo(debugSurface.width / 2, debugSurface.height / 2);
-            for (ike in 0...100) {
-                debugGraphics.lineTo(Math.random() * debugSurface.width, Math.random() * debugSurface.height);
-            }
-            debugGraphics.stroke();
-            /**/
-
             glSys.setDepthTest(false);
             glSys.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE_MINUS_SOURCE_ALPHA);  
             debugTexture.update();
@@ -120,6 +119,7 @@ class PostProcessor {
             glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);  
             glSys.setDepthTest(true);
         #end
+        */
         glSys.finish();
 
         program.setTextureAt('uTexture', null);

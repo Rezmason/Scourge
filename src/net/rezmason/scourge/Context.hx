@@ -29,13 +29,12 @@ class Context {
 
         var engine = new Engine(glFlow);
         Application.current.addModule(engine);
-
+        #if debug_graphics Santa.mapToClass(DebugGraphics, Singleton(engine.debugGraphics)); #end
+        
         new GameContext();
         
         var beginNavErrand = new BeginNavErrand(engine);
         if (engine.ready) beginNavErrand.run();
         else engine.readySignal.add(beginNavErrand.run);
-
-        #if debug_graphics Santa.mapToClass(DebugGraphics, Singleton(engine.debugGraphics)); #end
     }
 }

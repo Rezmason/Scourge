@@ -10,6 +10,11 @@ import net.rezmason.scourge.controller.board.BoardAnimator;
 import net.rezmason.scourge.textview.View;
 import net.rezmason.utils.santa.Santa;
 
+#if debug_graphics
+    import net.rezmason.scourge.textview.core.DebugGraphics;
+    import net.rezmason.utils.santa.Present;
+#end
+
 class GameContext {
 
     public function new():Void {
@@ -54,5 +59,30 @@ class GameContext {
         
         humanSystem.gameEndedSignal.add(sequencer.endGame);
         humanSystem.gameEndedSignal.add(moveMediator.endGame);
+
+        #if debug_graphics
+            /*
+            var timer:haxe.Timer = new haxe.Timer(50);
+            var dg:DebugGraphics = new Present(DebugGraphics);
+            
+            function f() {
+                dg.save();
+                dg.setSourceRGBA(0, 0, 0, 0);
+                dg.operator = lime.graphics.cairo.CairoOperator.SOURCE;
+                dg.paint();
+                dg.restore();
+
+                dg.lineWidth = 0.005;
+                dg.setSourceRGB(Math.random(), Math.random(), Math.random());
+                dg.moveTo(0, 0);
+                dg.lineTo(1, 1);
+                dg.moveTo(0, 1);
+                dg.lineTo(1, 0);
+                dg.rectangle(0, 0, 1, 1);
+                dg.stroke();
+            }
+            timer.run = f;
+            */
+        #end
     }
 }

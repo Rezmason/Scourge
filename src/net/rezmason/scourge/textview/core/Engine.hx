@@ -34,7 +34,7 @@ class Engine extends Module {
     var bodiesByID:Map<Int, Body>;
     var scenes:Array<Scene>;
     
-    var postProcess:PostProcessor;
+    var compositor:Compositor;
     var mouseSystem:MouseSystem;
     var keyboardSystem:KeyboardSystem;
     var mouseMethod:RenderMethod;
@@ -115,7 +115,7 @@ class Engine extends Module {
     }
 
     function initRenderMethods():Void {
-        postProcess = new PostProcessor();
+        compositor = new Compositor();
 
         prettyMethod = new PrettyMethod();
         mouseMethod = new MouseMethod();
@@ -133,7 +133,8 @@ class Engine extends Module {
             ready = true;
             #if flash flash.Lib.current.stage.dispatchEvent(new flash.events.Event('resize')); #end
             var window = Application.current.window;
-            setSize(window.width, window.height);
+            this.width = window.width;
+            this.height = window.height;
             activate();
             readySignal.dispatch();
         }
@@ -147,8 +148,8 @@ class Engine extends Module {
 
     function onRender(width:Int, height:Int):Void {
         if (active) {
-            drawFrame(presentationMethod, postProcess.inputBuffer);
-            postProcess.draw();
+            drawFrame(presentationMethod, compositor.inputBuffer);
+            compositor.draw();
         }
     }
 
@@ -185,7 +186,7 @@ class Engine extends Module {
         this.height = height;
         for (scene in scenes) scene.resize(width, height);
         mouseSystem.setSize(width, height);
-        postProcess.setSize(width, height);
+        compositor.setSize(width, height);
     }
 
     function activate():Void {
@@ -274,5 +275,5 @@ class Engine extends Module {
 
     #if debug inline function assertReady():Void if (!ready) throw "Engine hasn't initialized yet."; #end
 
-    #if debug_graphics inline function get_debugGraphics() return postProcess.debugGraphics; #end
+    #if debug_graphics inline function get_debugGraphics() return compositor.debugGraphics; #end
 }
