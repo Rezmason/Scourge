@@ -9,7 +9,7 @@ import net.rezmason.scourge.textview.core.FontManager;
 import net.rezmason.scourge.textview.errands.BeginNavErrand;
 import net.rezmason.utils.santa.Santa;
 #if debug_graphics import net.rezmason.scourge.textview.core.DebugGraphics; #end
-
+#if hxtelemetry  import hxtelemetry.HxTelemetry; #end
 class Context {
 
     var glSys:GLSystem;
@@ -23,6 +23,19 @@ class Context {
     }
 
     function onGLConnect():Void {
+        #if hxtelemetry
+            var config = new Config();
+            config.allocations = true;
+            config.host = 'localhost';
+            config.app_name = 'Scourge';
+            config.activity_descriptors = [ 
+                { name: '.update', description: "Updating", color: 0xFFC800},
+                { name: '.render', description: "Rendering", color:0xFF0090}
+            ];
+            var telemetry = new HxTelemetry(config);
+            Santa.mapToClass(HxTelemetry, Singleton(telemetry));
+        #end
+
         glFlow.onConnect = null;
         Santa.mapToClass(GLSystem, Singleton(glSys));
         Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));

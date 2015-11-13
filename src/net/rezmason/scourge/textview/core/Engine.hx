@@ -14,6 +14,7 @@ import net.rezmason.gl.GLSystem;
 import net.rezmason.scourge.textview.core.rendermethods.*;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
+#if hxtelemetry import hxtelemetry.HxTelemetry; #end
 
 using Lambda;
 
@@ -41,8 +42,10 @@ class Engine extends Module {
     var prettyMethod:RenderMethod;
     var presentationMethod:RenderMethod;
     #if debug_graphics public var debugGraphics(get, null):DebugGraphics; #end
+    #if hxtelemetry var telemetry:HxTelemetry; #end
 
     public function new(glFlow:GLFlowControl):Void {
+        #if hxtelemetry telemetry = new Present(HxTelemetry); #end
         super();
         this.glFlow = glFlow;
         active = false;
@@ -148,8 +151,17 @@ class Engine extends Module {
 
     function onRender(width:Int, height:Int):Void {
         if (active) {
+            #if hxtelemetry
+                var stack = telemetry.unwind_stack();
+                telemetry.start_timing('.render');
+            #end
             drawFrame(presentationMethod, compositor.inputBuffer);
             compositor.draw();
+            #if hxtelemetry
+                telemetry.end_timing('.render');
+                telemetry.rewind_stack(stack);
+                telemetry.advance_frame();
+            #end
         }
     }
 
@@ -217,11 +229,19 @@ class Engine extends Module {
     }
 
     function onTimer():Void {
+        #if hxtelemetry
+            var stack = telemetry.unwind_stack();
+            telemetry.start_timing('.update');
+        #end
         var timeStamp:Float = Timer.stamp();
         var delta:Float = timeStamp - lastTimeStamp;
         fetchBodies();
         for (body in bodiesByID) body.update(delta);
         lastTimeStamp = timeStamp;
+        #if hxtelemetry
+            telemetry.end_timing('.update');
+            telemetry.rewind_stack(stack);
+        #end
     }
 
     function updateMouseSystem():Void {
