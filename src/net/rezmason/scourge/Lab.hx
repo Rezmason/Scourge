@@ -228,7 +228,7 @@ class PostSystem extends LabSystem {
 
         fragShader = Lab.makeExtensions(glSys) + fragShader;
 
-        var vertices:VertexArray = new VertexArray(VpB * FpV);
+        vertBuffer = glSys.createVertexBuffer(VpB, FpV);
         var up = #if flash 1 #else 0 #end ;
         var vert = [
             -1,-1,0,0,1 - up,
@@ -236,18 +236,16 @@ class PostSystem extends LabSystem {
              1, 1,0,1,up,
              1,-1,0,1,1 - up,
         ];
-        for (ike in 0...VpB * FpV) vertices[ike] = vert[ike];
-        vertBuffer = glSys.createVertexBuffer(VpB, FpV);
-        vertBuffer.uploadFromVector(vertices, 0, VpB);
+        for (ike in 0...VpB * FpV) vertBuffer.mod(ike, vert[ike]);
+        vertBuffer.upload();
 
-        var indices:IndexArray = new IndexArray(6);
+        indexBuffer = glSys.createIndexBuffer(6);
         var ind = [
             0, 1, 2,
             0, 2, 3,
         ];
-        for (ike in 0...6) indices[ike] = ind[ike];
-        indexBuffer = glSys.createIndexBuffer(6);
-        indexBuffer.uploadFromVector(indices, 0, 6);
+        for (ike in 0...6) indexBuffer.mod(ike, ind[ike]);
+        indexBuffer.upload();
 
         program = glSys.createProgram(vertShader, fragShader);
         if (program.loaded) onProgramLoaded();
@@ -322,9 +320,7 @@ class MetaballSystem extends LabSystem {
     var cavity:Array<Array<Null<Int>>>;
     var twitches:Array<Array<Null<Float>>>;
 
-    var vertices:VertexArray;
     var vertBuffer:VertexBuffer;
-    var indices:IndexArray;
     var indexBuffer:IndexBuffer;
 
     var time:Float;
@@ -394,8 +390,9 @@ class MetaballSystem extends LabSystem {
             phases.push([]);
             twitches.push([]);
         }
-        vertices = new VertexArray(NUM_BALLS * VpB * FpBV);
-        indices = new IndexArray(NUM_BALLS * IpB);
+        
+        vertBuffer = glSys.createVertexBuffer(NUM_BALLS * VpB, FpBV);
+        indexBuffer = glSys.createIndexBuffer(NUM_BALLS * IpB);
 
         var drunkX:Int = Std.int(GRID_WIDTH / 2);
         var drunkY:Int = Std.int(GRID_WIDTH / 2);
@@ -452,7 +449,7 @@ class MetaballSystem extends LabSystem {
         for (ike in 0...NUM_BALLS) {
             var vBall:Int = ike * VpB * FpBV;
             for (jen in 0...FpBV * VpB) {
-                vertices[vBall + jen] = ballVertTemplate[jen];
+                vertBuffer.mod(vBall + jen, ballVertTemplate[jen]);
             }
         }
 
@@ -466,22 +463,19 @@ class MetaballSystem extends LabSystem {
             
             // set up vertices
             for (jen in 0...VpB) {
-                vertices[(vBall + jen) * FpBV + 0] = x * 0.8;
-                vertices[(vBall + jen) * FpBV + 1] = y * 0.8;
-                vertices[(vBall + jen) * FpBV + 2] = z;
+                vertBuffer.mod((vBall + jen) * FpBV + 0, x * 0.8);
+                vertBuffer.mod((vBall + jen) * FpBV + 1, y * 0.8);
+                vertBuffer.mod((vBall + jen) * FpBV + 2, z);
             }
 
             // set up indices
-            indices[ike * IpB + 0] = ike * VpB + 0;
-            indices[ike * IpB + 1] = ike * VpB + 1;
-            indices[ike * IpB + 2] = ike * VpB + 2;
-            indices[ike * IpB + 3] = ike * VpB + 0;
-            indices[ike * IpB + 4] = ike * VpB + 2;
-            indices[ike * IpB + 5] = ike * VpB + 3;
+            indexBuffer.mod(ike * IpB + 0, ike * VpB + 0);
+            indexBuffer.mod(ike * IpB + 1, ike * VpB + 1);
+            indexBuffer.mod(ike * IpB + 2, ike * VpB + 2);
+            indexBuffer.mod(ike * IpB + 3, ike * VpB + 0);
+            indexBuffer.mod(ike * IpB + 4, ike * VpB + 2);
+            indexBuffer.mod(ike * IpB + 5, ike * VpB + 3);
         }
-
-        vertBuffer = glSys.createVertexBuffer(NUM_BALLS * VpB, FpBV);
-        indexBuffer = glSys.createIndexBuffer(NUM_BALLS * IpB);
 
         program = glSys.createProgram(vertShader, fragShader);
         if (program.loaded) onProgramLoaded();
@@ -521,8 +515,8 @@ class MetaballSystem extends LabSystem {
                     var size:Float = 2 / GRID_WIDTH;
                     var vBall:Int = (ike * GRID_WIDTH + jen) * VpB;
                     for (ken in 0...VpB) {
-                        vertices[(vBall + ken) * FpBV + 5] = size;
-                        vertices[(vBall + ken) * FpBV + 6] = 1;
+                        vertBuffer.mod((vBall + ken) * FpBV + 5, size);
+                        vertBuffer.mod((vBall + ken) * FpBV + 6, 1);
                     }
                 } else if (phases[ike][jen] != null) {
                     var size:Float = (pool.getHeightAtIndex(phases[ike][jen]) * 1.0 + 1.9);
@@ -530,14 +524,14 @@ class MetaballSystem extends LabSystem {
                     size /= GRID_WIDTH;
                     var vBall:Int = (ike * GRID_WIDTH + jen) * VpB;
                     for (ken in 0...VpB) {
-                        vertices[(vBall + ken) * FpBV + 5] = size;
+                        vertBuffer.mod((vBall + ken) * FpBV + 5, size);
                     }
                 }
             }
         }
 
-        vertBuffer.uploadFromVector(vertices, 0, NUM_BALLS * VpB);
-        indexBuffer.uploadFromVector(indices, 0, NUM_BALLS * IpB);
+        vertBuffer.upload();
+        indexBuffer.upload();
     }
 
     override function draw():Void {

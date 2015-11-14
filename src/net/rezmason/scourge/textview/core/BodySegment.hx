@@ -19,11 +19,6 @@ class BodySegment {
     public var paintBuffer(default, null):VertexBuffer;
     public var indexBuffer(default, null):IndexBuffer;
 
-    public var colorVertices(default, null):VertexArray;
-    public var shapeVertices(default, null):VertexArray;
-    public var paintVertices(default, null):VertexArray;
-    public var indices(default, null):IndexArray;
-
     public var numGlyphs(default, set):Int;
     public var glyphs(get, null):Array<Glyph>;
 
@@ -48,11 +43,6 @@ class BodySegment {
         colorBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX, bufferUsage);
         paintBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.PAINT_FLOATS_PER_VERTEX, bufferUsage);
         indexBuffer = glSys.createIndexBuffer(numGlyphIndices, bufferUsage);
-
-        shapeVertices = new VertexArray(numGlyphVertices * Almanac.SHAPE_FLOATS_PER_VERTEX);
-        colorVertices = new VertexArray(numGlyphVertices * Almanac.COLOR_FLOATS_PER_VERTEX);
-        paintVertices = new VertexArray(numGlyphVertices * Almanac.PAINT_FLOATS_PER_VERTEX);
-        indices = new IndexArray(numGlyphIndices);
     }
 
     inline function createGlyphs(numGlyphs:Int, donor:BodySegment):Void {
@@ -61,9 +51,9 @@ class BodySegment {
             var glyph:Glyph = null;
             if (donor != null) glyph = donor._trueGlyphs[ike];
             if (glyph == null) glyph = new Glyph(ike);
-            glyph.shape = shapeVertices;
-            glyph.color = colorVertices;
-            glyph.paint = paintVertices;
+            glyph.shape = shapeBuffer;
+            glyph.color = colorBuffer;
+            glyph.paint = paintBuffer;
             glyph.init();
             _trueGlyphs.push(glyph);
         }
@@ -72,19 +62,16 @@ class BodySegment {
         for (glyph in _trueGlyphs) {
             var indexAddress:Int = glyph.id * Almanac.INDICES_PER_GLYPH;
             var firstVertIndex:Int = glyph.id * Almanac.VERTICES_PER_GLYPH;
-            for (ike in 0...order.length) indices[indexAddress + ike] = firstVertIndex + order[ike];
+            for (ike in 0...order.length) indexBuffer.mod(indexAddress + ike, firstVertIndex + order[ike]);
         }
     }
 
     public function update():Void {
         if (numGlyphs > 0 && shapeBuffer.isConnectedToContext()) {
-            var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
-            var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
-
-            shapeBuffer.uploadFromVector(shapeVertices, 0, numGlyphVertices);
-            colorBuffer.uploadFromVector(colorVertices, 0, numGlyphVertices);
-            paintBuffer.uploadFromVector(paintVertices, 0, numGlyphVertices);
-            indexBuffer.uploadFromVector(indices, 0, numGlyphIndices);
+            shapeBuffer.upload();
+            colorBuffer.upload();
+            paintBuffer.upload();
+            indexBuffer.upload();
         }
     }
 
@@ -104,10 +91,10 @@ class BodySegment {
         paintBuffer.dispose();
         indexBuffer.dispose();
 
-        colorVertices = null;
-        shapeVertices = null;
-        paintVertices = null;
-        indices = null;
+        colorBuffer = null;
+        shapeBuffer = null;
+        paintBuffer = null;
+        indexBuffer = null;
         numGlyphs = -1;
         _trueGlyphs = null;
         _glyphs = null;

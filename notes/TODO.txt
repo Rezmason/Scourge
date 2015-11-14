@@ -1,7 +1,3 @@
-Try hxScout
-    OMG
-        VertexBuffer::uploadFromVector is *sloooow*
-
 Quasi-gestural input
     Nail down the precise user story of this mode of interaction
     My first idea:

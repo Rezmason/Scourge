@@ -1,6 +1,6 @@
 package net.rezmason.scourge.textview.core;
 
-import net.rezmason.gl.GLTypes;
+import net.rezmason.gl.VertexBuffer;
 import net.rezmason.utils.display.FlatFont;
 
 @:allow(net.rezmason.scourge.textview.core.BodySegment)
@@ -9,9 +9,9 @@ class Glyph {
 
     public var id(default, null):Int;
 
-    var shape:VertexArray;
-    var color:VertexArray;
-    var paint:VertexArray;
+    var shape:VertexBuffer;
+    var color:VertexBuffer;
+    var paint:VertexBuffer;
 
     var paintHex:Int;
     var charCode:Int;

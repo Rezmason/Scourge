@@ -2,11 +2,19 @@ package net.rezmason.scourge.textview.core;
 
 import lime.Assets.getText;
 import lime.graphics.Image;
-#if debug_graphics import lime.graphics.cairo.CairoImageSurface; #end
 import net.rezmason.gl.BlendFactor;
-import net.rezmason.gl.GLTypes;
-import net.rezmason.gl.*;
+import net.rezmason.gl.GLSystem;
+import net.rezmason.gl.IndexBuffer;
+import net.rezmason.gl.OutputBuffer;
+import net.rezmason.gl.Program;
+import net.rezmason.gl.Texture;
+import net.rezmason.gl.VertexBuffer;
+import net.rezmason.gl.ViewportOutputBuffer;
 import net.rezmason.utils.santa.Present;
+#if debug_graphics 
+    import lime.graphics.cairo.CairoImageSurface;
+    import net.rezmason.gl.ImageTexture;
+#end
 
 class Compositor {
 
@@ -47,7 +55,8 @@ class Compositor {
 
         // inputBuffer = viewportBuffer;
 
-        var vertices:VertexArray = new VertexArray(TOTAL_VERTICES * FLOATS_PER_VERTEX);
+        // var vertices:VertexArray = new VertexArray(TOTAL_VERTICES * FLOATS_PER_VERTEX);
+        vertexBuffer = glSys.createVertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
         var up = #if flash 1 #else 0 #end ;
         var verts = [
             -1, -1, 0, up, 
@@ -55,15 +64,13 @@ class Compositor {
              1, -1, 1, up, 
              1,  1, 1, 1 - up, 
         ];
-        for (ike in 0...verts.length) vertices[ike] = verts[ike];
-        vertexBuffer = glSys.createVertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
-        vertexBuffer.uploadFromVector(vertices, 0, TOTAL_VERTICES);
+        for (ike in 0...verts.length) vertexBuffer.mod(ike, verts[ike]);
+        vertexBuffer.upload();
 
-        var indices:IndexArray = new IndexArray(6);
-        var ind = [0, 1, 2, 1, 2, 3,];
-        for (ike in 0...TOTAL_INDICES) indices[ike] = ind[ike];
         indexBuffer = glSys.createIndexBuffer(TOTAL_INDICES);
-        indexBuffer.uploadFromVector(indices, 0, TOTAL_INDICES);
+        var ind = [0, 1, 2, 1, 2, 3,];
+        for (ike in 0...TOTAL_INDICES) indexBuffer.mod(ike, ind[ike]);
+        indexBuffer.upload();
 
         var extensions = '';
         #if js 

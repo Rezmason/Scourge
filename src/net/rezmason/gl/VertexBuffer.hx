@@ -2,20 +2,17 @@ package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.BufferUsage;
-import net.rezmason.gl.GLTypes;
+#if !flash import lime.graphics.opengl.GL; #end
 
-#if !flash
-    import lime.graphics.opengl.GL;
-#end
+typedef VertexArray = #if flash flash.Vector<Float> #else lime.utils.Float32Array #end ;
 
 @:allow(net.rezmason.gl)
 class VertexBuffer extends Artifact {
+
     var buf:NativeVertexBuffer;
     public var footprint(default, null):Int;
     public var numVertices(default, null):Int;
-    #if !flash
-        var array:VertexArray;
-    #end
+    var data:VertexArray;
     var usage:BufferUsage;
 
     public function new(numVertices:Int, footprint:Int, ?usage:BufferUsage):Void {
@@ -24,9 +21,7 @@ class VertexBuffer extends Artifact {
         this.numVertices = numVertices;
         if (usage == null) usage = BufferUsage.STATIC_DRAW;
         this.usage = usage;
-        #if !flash
-            array = new VertexArray(footprint * numVertices);
-        #end
+        data = new VertexArray(footprint * numVertices);
     }
 
     override function connectToContext(context:Context):Void {
@@ -36,51 +31,39 @@ class VertexBuffer extends Artifact {
         #else
             buf = GL.createBuffer();
             GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-            GL.bufferData(GL.ARRAY_BUFFER, array, usage);
+            GL.bufferData(GL.ARRAY_BUFFER, data, usage);
         #end
     }
 
     override function disconnectFromContext():Void {
         super.disconnectFromContext();
-        #if flash
-            if (buf != null) buf.dispose();
-        #end
+        #if flash if (buf != null) buf.dispose(); #end
         buf = null;
     }
 
-    public inline function uploadFromVector(data:VertexArray, offset:Int, num:Int):Void {
-        if (offset < 0 || offset > numVertices) {
-
-        } else {
-            if (offset + num > numVertices) num = numVertices - offset;
-
-            #if flash
-                buf.uploadFromVector(data, offset, num);
-            #elseif js
-                if (num * footprint < data.length) data = data.subarray(0, num * footprint);
-                array.set(data, offset);
-                GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-                GL.bufferData(GL.ARRAY_BUFFER, array, usage);
-            #else
-                for (ike in 0...num * footprint) {
-                    array[ike + offset * footprint] = data[ike];
-                }
-                GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-                GL.bufferData(GL.ARRAY_BUFFER, array, usage);
-            #end
-        }
+    public inline function upload():Void {
+        #if flash
+            buf.uploadFromVector(data, 0, numVertices);
+        #else
+            GL.bindBuffer(GL.ARRAY_BUFFER, buf);
+            GL.bufferData(GL.ARRAY_BUFFER, data, usage);
+        #end
     }
 
     override public function dispose():Void {
         super.dispose();
-        #if flash 
-            if (buf != null) buf.dispose(); 
-        #else
-            array = null;
-        #end
-        
+        #if flash if (buf != null) buf.dispose(); #end
+        data = null;
         buf = null;
         footprint = -1;
         numVertices = -1;
+    }
+
+    public inline function acc(index:UInt) return data[index];
+
+    public inline function mod(index:UInt, val:Float):Float {
+        data[index] = val;
+        // TODO: dirty, min-max
+        return val;
     }
 }
