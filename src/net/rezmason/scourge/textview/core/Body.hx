@@ -115,10 +115,10 @@ class Body extends SceneNode<Body> {
     }
 
     @:allow(net.rezmason.scourge.textview.core)
-    function update(delta:Float):Void {
-        updateSignal.dispatch(delta);
-        if (scene != null) for (segment in segments) segment.update();
-    }
+    function update(delta:Float):Void updateSignal.dispatch(delta);
+
+    @:allow(net.rezmason.scourge.textview.core)
+    function upload():Void for (segment in segments) segment.upload();
 
     @:allow(net.rezmason.scourge.textview.core)
     function setScene(scene:Scene):Void {
@@ -127,7 +127,6 @@ class Body extends SceneNode<Body> {
         this.scene = scene;
         updateGlyphTransform();
         if (this.scene != null) this.scene.resizeSignal.add(updateGlyphTransform);
-        if (lastScene == null) for (segment in segments) segment.update();
         for (child in children()) child.setScene(scene);
         sceneSetSignal.dispatch();
     }

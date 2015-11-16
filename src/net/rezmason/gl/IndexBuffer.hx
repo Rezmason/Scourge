@@ -1,6 +1,7 @@
 package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
+
 #if !flash import lime.graphics.opengl.GL; #end
 
 typedef IndexArray = #if flash flash.Vector<UInt> #else lime.utils.Int16Array #end ;
@@ -11,10 +12,13 @@ class IndexBuffer extends Artifact {
     var buf:NativeIndexBuffer;
     var data:IndexArray;
     var usage:BufferUsage;
+    var invalid:Bool;
     public var numIndices(default, null):Int;
+
 
     function new(numIndices:Int, ?usage:BufferUsage):Void {
         super();
+        
         this.numIndices = numIndices;
         if (usage == null) usage = BufferUsage.STATIC_DRAW;
         this.usage = usage;
@@ -30,6 +34,8 @@ class IndexBuffer extends Artifact {
             GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
             GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
         #end
+        invalidate();
+        upload();
     }
 
     override function disconnectFromContext():Void {
@@ -38,13 +44,18 @@ class IndexBuffer extends Artifact {
         buf = null;
     }
 
+    public inline function invalidate():Void invalid = true;
+
     public inline function upload():Void {
-        #if flash
-            buf.uploadFromVector(data, 0, numIndices);
-        #else
-            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
-            GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
-        #end
+        if (invalid && isConnectedToContext()) {
+            #if flash
+                buf.uploadFromVector(data, 0, numIndices);
+            #else
+                GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
+                GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
+            #end
+            invalid = false;
+        }
     }
 
     override public function dispose():Void {
@@ -53,13 +64,14 @@ class IndexBuffer extends Artifact {
         buf = null;
         data = null;
         numIndices = -1;
+
     }
 
     public inline function acc(index:UInt) return data[index];
 
     public inline function mod(index:UInt, val:UInt):UInt {
         data[index] = val;
-        // TODO: dirty, min-max
+        invalidate();
         return val;
     }
 }

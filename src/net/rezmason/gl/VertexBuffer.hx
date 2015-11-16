@@ -10,10 +10,11 @@ typedef VertexArray = #if flash flash.Vector<Float> #else lime.utils.Float32Arra
 class VertexBuffer extends Artifact {
 
     var buf:NativeVertexBuffer;
-    public var footprint(default, null):Int;
-    public var numVertices(default, null):Int;
     var data:VertexArray;
     var usage:BufferUsage;
+    var invalid:Bool;
+    public var numVertices(default, null):Int;
+    public var footprint(default, null):Int;
 
     public function new(numVertices:Int, footprint:Int, ?usage:BufferUsage):Void {
         super();
@@ -33,6 +34,8 @@ class VertexBuffer extends Artifact {
             GL.bindBuffer(GL.ARRAY_BUFFER, buf);
             GL.bufferData(GL.ARRAY_BUFFER, data, usage);
         #end
+        invalidate();
+        upload();
     }
 
     override function disconnectFromContext():Void {
@@ -41,13 +44,18 @@ class VertexBuffer extends Artifact {
         buf = null;
     }
 
+    public inline function invalidate():Void invalid = true;
+
     public inline function upload():Void {
-        #if flash
-            buf.uploadFromVector(data, 0, numVertices);
-        #else
-            GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-            GL.bufferData(GL.ARRAY_BUFFER, data, usage);
-        #end
+        if (invalid && isConnectedToContext()) {
+            #if flash
+                buf.uploadFromVector(data, 0, numVertices);
+            #else
+                GL.bindBuffer(GL.ARRAY_BUFFER, buf);
+                GL.bufferData(GL.ARRAY_BUFFER, data, usage);
+            #end
+            invalid = false;
+        }
     }
 
     override public function dispose():Void {
@@ -63,7 +71,7 @@ class VertexBuffer extends Artifact {
 
     public inline function mod(index:UInt, val:Float):Float {
         data[index] = val;
-        // TODO: dirty, min-max
+        invalidate();
         return val;
     }
 }

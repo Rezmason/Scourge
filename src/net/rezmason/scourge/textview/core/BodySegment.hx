@@ -31,7 +31,7 @@ class BodySegment {
         createBuffersAndVectors(numGlyphs, new Present(GLSystem));
         createGlyphs(numGlyphs, donor);
         this.numGlyphs = numGlyphs;
-        update();
+        upload();
     }
 
     inline function createBuffersAndVectors(numGlyphs:Int, glSys:GLSystem):Void {
@@ -66,8 +66,17 @@ class BodySegment {
         }
     }
 
-    public function update():Void {
-        if (numGlyphs > 0 && shapeBuffer.isConnectedToContext()) {
+    public inline function invalidate():Void {
+        if (numGlyphs > 0) {
+            shapeBuffer.invalidate();
+            colorBuffer.invalidate();
+            paintBuffer.invalidate();
+            indexBuffer.invalidate();
+        }
+    }
+
+    public inline function upload():Void {
+        if (numGlyphs > 0) {
             shapeBuffer.upload();
             colorBuffer.upload();
             paintBuffer.upload();

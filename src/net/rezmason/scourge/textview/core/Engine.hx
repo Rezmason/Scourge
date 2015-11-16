@@ -185,7 +185,10 @@ class Engine extends Module {
             } else {
                 method.start(outputBuffer);
                 for (scene in scenes) {
-                    for (body in scene.bodies) if (body.numGlyphs > 0) method.drawBody(body);
+                    for (body in scene.bodies) {
+                        body.upload();
+                        if (body.numGlyphs > 0) method.drawBody(body);
+                    }
                 }
                 method.finish();
             }
