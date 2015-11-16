@@ -17,23 +17,23 @@ class GlyphUtils {
     // Color
 
     #if !macro
-    public inline static function get_r(gl:Glyph) return gl.color.acc(gl.id * COLOR_FLOATS_PER_GLYPH + R_OFFSET);
-    public inline static function set_r(gl:Glyph, v) return pop4(gl.color, gl.id * COLOR_FLOATS_PER_GLYPH, R_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
+    public inline static function get_r(gl:Glyph) return gl.colorBuf.acc(gl.id * COLOR_FLOATS_PER_GLYPH + R_OFFSET);
+    public inline static function set_r(gl:Glyph, v) return pop4(gl.colorBuf, gl.id * COLOR_FLOATS_PER_GLYPH, R_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_g(gl:Glyph) return gl.color.acc(gl.id * COLOR_FLOATS_PER_GLYPH + G_OFFSET);
-    public inline static function set_g(gl:Glyph, v) return pop4(gl.color, gl.id * COLOR_FLOATS_PER_GLYPH, G_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
+    public inline static function get_g(gl:Glyph) return gl.colorBuf.acc(gl.id * COLOR_FLOATS_PER_GLYPH + G_OFFSET);
+    public inline static function set_g(gl:Glyph, v) return pop4(gl.colorBuf, gl.id * COLOR_FLOATS_PER_GLYPH, G_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_b(gl:Glyph) return gl.color.acc(gl.id * COLOR_FLOATS_PER_GLYPH + B_OFFSET);
-    public inline static function set_b(gl:Glyph, v) return pop4(gl.color, gl.id * COLOR_FLOATS_PER_GLYPH, B_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
+    public inline static function get_b(gl:Glyph) return gl.colorBuf.acc(gl.id * COLOR_FLOATS_PER_GLYPH + B_OFFSET);
+    public inline static function set_b(gl:Glyph, v) return pop4(gl.colorBuf, gl.id * COLOR_FLOATS_PER_GLYPH, B_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_i(gl:Glyph) return gl.color.acc(gl.id * COLOR_FLOATS_PER_GLYPH + I_OFFSET);
-    public inline static function set_i(gl:Glyph, v) return pop4(gl.color, gl.id * COLOR_FLOATS_PER_GLYPH, I_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
+    public inline static function get_i(gl:Glyph) return gl.colorBuf.acc(gl.id * COLOR_FLOATS_PER_GLYPH + I_OFFSET);
+    public inline static function set_i(gl:Glyph, v) return pop4(gl.colorBuf, gl.id * COLOR_FLOATS_PER_GLYPH, I_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_f(gl:Glyph) return gl.color.acc(gl.id * COLOR_FLOATS_PER_GLYPH + F_OFFSET);
-    public inline static function set_f(gl:Glyph, v) return pop4(gl.color, gl.id * COLOR_FLOATS_PER_GLYPH, F_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
+    public inline static function get_f(gl:Glyph) return gl.colorBuf.acc(gl.id * COLOR_FLOATS_PER_GLYPH + F_OFFSET);
+    public inline static function set_f(gl:Glyph, v) return pop4(gl.colorBuf, gl.id * COLOR_FLOATS_PER_GLYPH, F_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_a(gl:Glyph) return gl.color.acc(gl.id * COLOR_FLOATS_PER_GLYPH + A_OFFSET);
-    public inline static function set_a(gl:Glyph, v) return pop4(gl.color, gl.id * COLOR_FLOATS_PER_GLYPH, A_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
+    public inline static function get_a(gl:Glyph) return gl.colorBuf.acc(gl.id * COLOR_FLOATS_PER_GLYPH + A_OFFSET);
+    public inline static function set_a(gl:Glyph, v) return pop4(gl.colorBuf, gl.id * COLOR_FLOATS_PER_GLYPH, A_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
 
     public inline static function set_rgb(gl:Glyph, r, g, b) {
         set_r(gl, r);
@@ -41,12 +41,30 @@ class GlyphUtils {
         set_b(gl, b);
     }
 
-    public inline static function get_color(gl:Glyph):Vec3 return new Vec3(get_r(gl), get_g(gl), get_b(gl));
+    public inline static function get_color(gl:Glyph):Vec3 {
+        if (gl.color == null) gl.color = new Vec3(0, 0, 0);
+        gl.color.r = get_r(gl);
+        gl.color.g = get_g(gl);
+        gl.color.b = get_b(gl);
+        return gl.color;
+    }
 
     public inline static function set_color(gl:Glyph, color:Vec3) {
         set_r(gl, color.r);
         set_g(gl, color.g);
         set_b(gl, color.b);
+    }
+
+    public inline static function add_color(gl:Glyph, val:Float) {
+        set_r(gl, get_r(gl) + val);
+        set_g(gl, get_g(gl) + val);
+        set_b(gl, get_b(gl) + val);
+    }
+
+    public inline static function mult_color(gl:Glyph, val:Float) {
+        set_r(gl, get_r(gl) * val);
+        set_g(gl, get_g(gl) * val);
+        set_b(gl, get_b(gl) * val);
     }
 
     public inline static function set_fx(gl:Glyph, i, f, a) {
@@ -57,9 +75,9 @@ class GlyphUtils {
 
     public inline static function createGlyph():Glyph {
         var gl = new Glyph();
-        gl.shape = new VertexBuffer(VERTICES_PER_GLYPH, SHAPE_FLOATS_PER_VERTEX);
-        gl.color = new VertexBuffer(VERTICES_PER_GLYPH, COLOR_FLOATS_PER_VERTEX);
-        gl.paint = new VertexBuffer(VERTICES_PER_GLYPH, PAINT_FLOATS_PER_VERTEX);
+        gl.shapeBuf = new VertexBuffer(VERTICES_PER_GLYPH, SHAPE_FLOATS_PER_VERTEX);
+        gl.colorBuf = new VertexBuffer(VERTICES_PER_GLYPH, COLOR_FLOATS_PER_VERTEX);
+        gl.paintBuf = new VertexBuffer(VERTICES_PER_GLYPH, PAINT_FLOATS_PER_VERTEX);
         init(gl);
         return gl;
     }
@@ -71,9 +89,15 @@ class GlyphUtils {
     }
 
     public static function copyFrom(gl:Glyph, src:Glyph):Glyph {
-        for (ike in 0...SHAPE_FLOATS_PER_GLYPH) gl.shape.mod(gl.id * SHAPE_FLOATS_PER_GLYPH + ike, src.shape.acc(src.id * SHAPE_FLOATS_PER_GLYPH + ike));
-        for (ike in 0...COLOR_FLOATS_PER_GLYPH) gl.color.mod(gl.id * COLOR_FLOATS_PER_GLYPH + ike, src.color.acc(src.id * COLOR_FLOATS_PER_GLYPH + ike));
-        for (ike in 0...PAINT_FLOATS_PER_GLYPH) gl.paint.mod(gl.id * PAINT_FLOATS_PER_GLYPH + ike, src.paint.acc(src.id * PAINT_FLOATS_PER_GLYPH + ike));
+        var shapeAddress = gl.id * SHAPE_FLOATS_PER_GLYPH;
+        var colorAddress = gl.id * COLOR_FLOATS_PER_GLYPH;
+        var paintAddress = gl.id * PAINT_FLOATS_PER_GLYPH;
+        var srcShapeAddress = src.id * SHAPE_FLOATS_PER_GLYPH;
+        var srcColorAddress = src.id * COLOR_FLOATS_PER_GLYPH;
+        var srcPaintAddress = src.id * PAINT_FLOATS_PER_GLYPH;
+        for (ike in 0...SHAPE_FLOATS_PER_GLYPH) gl.shapeBuf.mod(shapeAddress + ike, src.shapeBuf.acc(srcShapeAddress + ike));
+        for (ike in 0...COLOR_FLOATS_PER_GLYPH) gl.colorBuf.mod(colorAddress + ike, src.colorBuf.acc(srcColorAddress + ike));
+        for (ike in 0...PAINT_FLOATS_PER_GLYPH) gl.paintBuf.mod(paintAddress + ike, src.paintBuf.acc(srcPaintAddress + ike));
         gl.paintHex = src.paintHex;
         gl.charCode = src.charCode;
         gl.font = src.font;
@@ -82,21 +106,21 @@ class GlyphUtils {
 
     // Shape
 
-    public inline static function get_x(gl:Glyph) return gl.shape.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + X_OFFSET);
-    public inline static function set_x(gl:Glyph, v) return pop4(gl.shape, gl.id * SHAPE_FLOATS_PER_GLYPH, X_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
-    public inline static function get_y(gl:Glyph) return gl.shape.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + Y_OFFSET);
-    public inline static function set_y(gl:Glyph, v) return pop4(gl.shape, gl.id * SHAPE_FLOATS_PER_GLYPH, Y_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
-    public inline static function get_z(gl:Glyph) return gl.shape.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + Z_OFFSET);
-    public inline static function set_z(gl:Glyph, v) return pop4(gl.shape, gl.id * SHAPE_FLOATS_PER_GLYPH, Z_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
+    public inline static function get_x(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + X_OFFSET);
+    public inline static function set_x(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, X_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
+    public inline static function get_y(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + Y_OFFSET);
+    public inline static function set_y(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, Y_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
+    public inline static function get_z(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + Z_OFFSET);
+    public inline static function set_z(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, Z_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_s(gl:Glyph) return gl.shape.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + S_OFFSET);
-    public inline static function set_s(gl:Glyph, v) return pop4(gl.shape, gl.id * SHAPE_FLOATS_PER_GLYPH, S_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
+    public inline static function get_s(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + S_OFFSET);
+    public inline static function set_s(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, S_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_p(gl:Glyph) return gl.shape.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + P_OFFSET);
-    public inline static function set_p(gl:Glyph, v) return pop4(gl.shape, gl.id * SHAPE_FLOATS_PER_GLYPH, P_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
+    public inline static function get_p(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + P_OFFSET);
+    public inline static function set_p(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, P_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_h(gl:Glyph) return gl.shape.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + H_OFFSET);
-    public inline static function set_h(gl:Glyph, v) return pop4(gl.shape, gl.id * SHAPE_FLOATS_PER_GLYPH, H_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
+    public inline static function get_h(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + H_OFFSET);
+    public inline static function set_h(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, H_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
 
     public inline static function set_xyz(gl:Glyph, x, y, z) {
         set_x(gl, x);
@@ -139,25 +163,25 @@ class GlyphUtils {
             var glyphOffset:Int = gl.id * COLOR_FLOATS_PER_GLYPH;
 
             if (code == -1) {
-                pop4(gl.color, glyphOffset, U_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
-                pop4(gl.color, glyphOffset, V_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
+                pop4(gl.colorBuf, glyphOffset, U_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
+                pop4(gl.colorBuf, glyphOffset, V_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
                 gl.charCode = -1;
             } else {
                 if (gl.font != null) {
                     var charUVs:Array<UV> = gl.font.getCharCodeUVs(code);
 
-                    pop1(gl.color, glyphOffset, U_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[3].u);
-                    pop1(gl.color, glyphOffset, U_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[0].u);
-                    pop1(gl.color, glyphOffset, U_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[1].u);
-                    pop1(gl.color, glyphOffset, U_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[2].u);
+                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[3].u);
+                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[0].u);
+                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[1].u);
+                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[2].u);
 
-                    pop1(gl.color, glyphOffset, V_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[3].v);
-                    pop1(gl.color, glyphOffset, V_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[0].v);
-                    pop1(gl.color, glyphOffset, V_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[1].v);
-                    pop1(gl.color, glyphOffset, V_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[2].v);
+                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[3].v);
+                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[0].v);
+                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[1].v);
+                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[2].v);
                 } else {
-                    pop4(gl.color, glyphOffset, U_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
-                    pop4(gl.color, glyphOffset, V_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
+                    pop4(gl.colorBuf, glyphOffset, U_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
+                    pop4(gl.colorBuf, glyphOffset, V_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
                 }
                 gl.charCode = code;
             }
@@ -177,8 +201,8 @@ class GlyphUtils {
             var paintG = ((val >>  0) & 0xFF) / 0xFF;
             var glyphOffset:Int = gl.id * PAINT_FLOATS_PER_GLYPH;
 
-            pop4(gl.paint, glyphOffset, PAINT_R_OFFSET, PAINT_FLOATS_PER_VERTEX, paintR);
-            pop4(gl.paint, glyphOffset, PAINT_G_OFFSET, PAINT_FLOATS_PER_VERTEX, paintG);
+            pop4(gl.paintBuf, glyphOffset, PAINT_R_OFFSET, PAINT_FLOATS_PER_VERTEX, paintR);
+            pop4(gl.paintBuf, glyphOffset, PAINT_G_OFFSET, PAINT_FLOATS_PER_VERTEX, paintG);
 
             gl.paintHex = val;
         }
@@ -186,24 +210,24 @@ class GlyphUtils {
         return gl.paintHex;
     }
 
-    public inline static function get_paint_s(gl:Glyph) return gl.paint.acc(gl.id * PAINT_FLOATS_PER_GLYPH + PAINT_S_OFFSET);
-    public inline static function set_paint_s(gl:Glyph, v) return pop4(gl.paint, gl.id * PAINT_FLOATS_PER_GLYPH, PAINT_S_OFFSET, PAINT_FLOATS_PER_VERTEX, v);
+    public inline static function get_paint_s(gl:Glyph) return gl.paintBuf.acc(gl.id * PAINT_FLOATS_PER_GLYPH + PAINT_S_OFFSET);
+    public inline static function set_paint_s(gl:Glyph, v) return pop4(gl.paintBuf, gl.id * PAINT_FLOATS_PER_GLYPH, PAINT_S_OFFSET, PAINT_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_paint_h(gl:Glyph) return gl.paint.acc(gl.id * PAINT_FLOATS_PER_GLYPH + PAINT_H_OFFSET);
-    public inline static function set_paint_h(gl:Glyph, v) return pop4(gl.paint, gl.id * PAINT_FLOATS_PER_GLYPH, PAINT_H_OFFSET, PAINT_FLOATS_PER_VERTEX, v);
+    public inline static function get_paint_h(gl:Glyph) return gl.paintBuf.acc(gl.id * PAINT_FLOATS_PER_GLYPH + PAINT_H_OFFSET);
+    public inline static function set_paint_h(gl:Glyph, v) return pop4(gl.paintBuf, gl.id * PAINT_FLOATS_PER_GLYPH, PAINT_H_OFFSET, PAINT_FLOATS_PER_VERTEX, v);
 
     public inline static function init(gl:Glyph):Void {
         // corner H
         var glyphOffset:Int = gl.id * SHAPE_FLOATS_PER_GLYPH;
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX, -1);
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shape, glyphOffset, CORNER_H_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX,  1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX, -1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX,  1);
         // corner V
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shape, glyphOffset, CORNER_V_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, -1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX,  1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, -1);
 
         set_paint(gl, 0);
         set_paint_h(gl, 1);

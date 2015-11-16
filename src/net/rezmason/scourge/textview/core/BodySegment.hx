@@ -51,9 +51,9 @@ class BodySegment {
             var glyph:Glyph = null;
             if (donor != null) glyph = donor._trueGlyphs[ike];
             if (glyph == null) glyph = new Glyph(ike);
-            glyph.shape = shapeBuffer;
-            glyph.color = colorBuffer;
-            glyph.paint = paintBuffer;
+            glyph.shapeBuf = shapeBuffer;
+            glyph.colorBuf = colorBuffer;
+            glyph.paintBuf = paintBuffer;
             glyph.init();
             _trueGlyphs.push(glyph);
         }
