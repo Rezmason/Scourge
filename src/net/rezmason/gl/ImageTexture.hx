@@ -41,18 +41,15 @@ class ImageTexture extends Texture {
                 var bmd = @:privateAccess image.buffer.__srcBitmapData;
                 (cast nativeTexture).uploadFromBitmapData(bmd);
             #else
+                image.data;
                 GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
                 // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
                 // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
                 
-                // TODO: should this be done once, during instance construction?
-                var tempImage = image.clone();
-                tempImage.format = PixelFormat.RGBA32;
-                var pixelData = tempImage.data;
-
-                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, image.width, image.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pixelData);
+                image.format = PixelFormat.RGBA32;
+                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, image.width, image.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, image.data);
                 
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);

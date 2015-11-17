@@ -116,7 +116,6 @@ class Compositor {
         glSys.start(viewportBuffer);
         glSys.clear(1, 0, 1);
         glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
-        /*
         #if debug_graphics
             glSys.setDepthTest(false);
             glSys.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE_MINUS_SOURCE_ALPHA);  
@@ -126,7 +125,6 @@ class Compositor {
             glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);  
             glSys.setDepthTest(true);
         #end
-        */
         glSys.finish();
 
         program.setTextureAt('uTexture', null);
