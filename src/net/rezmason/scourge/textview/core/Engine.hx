@@ -1,7 +1,5 @@
 package net.rezmason.scourge.textview.core;
 
-import haxe.Timer;
-
 import lime.app.Application;
 import lime.app.Module;
 import lime.ui.KeyCode;
@@ -21,14 +19,10 @@ using Lambda;
 class Engine extends Module {
 
     var active:Bool;
-    public var timestep(default, set):Float;
     public var width(default, null):Int;
     public var height(default, null):Int;
     public var ready(default, null):Bool;
     public var readySignal(default, null):Zig<Void->Void>;
-
-    var updateTimer:Timer;
-    var lastTimeStamp:Float;
 
     var glSys:GLSystem;
     var glFlow:GLFlowControl;
@@ -55,7 +49,6 @@ class Engine extends Module {
         
         width = 1;
         height = 1;
-        timestep = 1000 / 60;
         bodiesByID = new Map();
         scenes = [];
 
@@ -63,8 +56,6 @@ class Engine extends Module {
         initRenderMethods();
         addListeners();
     }
-
-    public function set_timestep(f:Float):Float return timestep = (f >= 0 ? f : 0);
 
     public function addScene(scene:Scene):Void {
         #if debug assertReady(); #end
@@ -103,6 +94,7 @@ class Engine extends Module {
     override public function onWindowEnter(_) activate();
     override public function onWindowLeave(_) deactivate();
     override public function onWindowResize(_, width, height) setSize(width, height);
+    override public function update(milliseconds):Void onTimer(milliseconds / 1000);
 
     // override public function onRenderContextLost() {}
     // override public function onRenderContextRestored(_) {}
@@ -208,12 +200,7 @@ class Engine extends Module {
         #if debug assertReady(); #end
         if (active) return;
         active = true;
-
-        updateTimer = new Timer(Std.int(timestep));
-        updateTimer.run = onTimer;
-        lastTimeStamp = Timer.stamp();
         setSize(width, height);
-        onTimer();
         regulateUserInput();
     }
 
@@ -221,8 +208,6 @@ class Engine extends Module {
         #if debug assertReady(); #end
         if (!active) return;
         active = false;
-        updateTimer.stop();
-        updateTimer = null;
         regulateUserInput();
     }
 
@@ -231,16 +216,14 @@ class Engine extends Module {
         mouseSystem.active = active && glSys.connected;
     }
 
-    function onTimer():Void {
+    function onTimer(delta:Float):Void {
+        if (!active) return;
         #if hxtelemetry
             var stack = telemetry.unwind_stack();
             telemetry.start_timing('.update');
         #end
-        var timeStamp:Float = Timer.stamp();
-        var delta:Float = timeStamp - lastTimeStamp;
         fetchBodies();
         for (body in bodiesByID) body.update(delta);
-        lastTimeStamp = timeStamp;
         #if hxtelemetry
             telemetry.end_timing('.update');
             telemetry.rewind_stack(stack);
@@ -258,7 +241,7 @@ class Engine extends Module {
     function testDisconnect(mils:UInt):Void {
         if (glSys.connected) {
             glFlow.disconnect();
-            Timer.delay(glFlow.connect, mils);
+            haxe.Timer.delay(glFlow.connect, mils);
         }
     }
 
