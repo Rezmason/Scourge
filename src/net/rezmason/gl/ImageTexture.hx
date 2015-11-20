@@ -50,6 +50,7 @@ class ImageTexture extends Texture {
                 
                 image.format = PixelFormat.RGBA32;
                 GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, image.width, image.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, image.data);
+                image.format = PixelFormat.BGRA32;
                 
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);

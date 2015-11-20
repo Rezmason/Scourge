@@ -7,8 +7,7 @@ import net.rezmason.gl.GLTypes;
     import flash.display3D.Context3DVertexBufferFormat;
 #else
     import lime.graphics.opengl.GL;
-    import lime.graphics.opengl.GLShader;
-    import lime.utils.Float32Array;
+    import lime.utils.GLUtils;
 #end
 
 @:allow(net.rezmason.gl)
@@ -64,28 +63,7 @@ class Program extends Artifact {
         #if flash
             prog.connectToContext(context);
         #else
-            prog = GL.createProgram();
-
-            function createShader(source:String, type:Int):GLShader {
-                var shader:GLShader = GL.createShader(type);
-                GL.shaderSource(shader, source);
-                GL.compileShader(shader);
-                if (GL.getShaderParameter(shader, GL.COMPILE_STATUS) == 0) {
-                    trace('--- ERR ---\n$source');
-                    var err:String = GL.getShaderInfoLog(shader);
-                    if (err != '') throw err;
-                }
-                return shader;
-            }
-
-            GL.attachShader(prog, createShader(vertSource, GL.VERTEX_SHADER));
-            GL.attachShader(prog, createShader(fragSource, GL.FRAGMENT_SHADER));
-            GL.linkProgram(prog);
-
-            if (GL.getProgramParameter(prog, GL.LINK_STATUS) == 0) {
-                var result:String = GL.getProgramInfoLog(prog);
-                if (result != '') throw result;
-            }
+            prog = GLUtils.createProgram(vertSource, fragSource);
         #end
     }
 
