@@ -4,16 +4,12 @@ import net.rezmason.gl.GLTypes;
 
 #if flash
     import flash.Lib;
-    import flash.display.BitmapData;
-    import flash.display.Stage;
     import flash.display3D.Context3DCompareMode;
     import flash.display3D.Context3DProfile;
     import flash.display3D.Context3DRenderMode;
     import flash.display3D.Context3DTextureFormat;
     import flash.events.Event;
-    import flash.geom.Rectangle;
 #else
-    import lime.app.Application;
     import lime.graphics.Renderer;
     import lime.graphics.opengl.GL;
 #end
@@ -21,13 +17,6 @@ import net.rezmason.gl.GLTypes;
 class GLSystem {
 
     public var connected(default, null):Bool;
-
-    #if flash
-        var stage:Stage;
-        var stageRect:Rectangle;
-    #else
-        var renderer:Renderer;
-    #end
 
     var context:Context;
     var flowControl:GLFlowControl;
@@ -50,7 +39,7 @@ class GLSystem {
 
     function init():Void {
         #if flash
-            stage = Lib.current.stage;
+            var stage = Lib.current.stage;
             var stage3D = stage.stage3Ds[0];
             if (stage3D.context3D != null) {
                 context = stage3D.context3D;
@@ -69,7 +58,7 @@ class GLSystem {
                 stage3D.requestContext3D(cast Context3DRenderMode.AUTO, cast "standard"); // Context3DProfile.STANDARD
             }
         #else
-            renderer = Application.current.renderer;
+            // renderer = Application.current.renderer;
             context = GL;
             initialized = true;
             onConnect();
@@ -91,7 +80,6 @@ class GLSystem {
 
         floRelinquish = function() {
             if (flo != null) {
-                flo.onRender = null;
                 flo.onConnect = null;
                 flo.onDisconnect = null;
                 flo = null;
@@ -105,7 +93,6 @@ class GLSystem {
         }
 
         flo = {
-            onRender:null,
             onConnect:null,
             onDisconnect:null,
 
@@ -121,13 +108,6 @@ class GLSystem {
     var b:Bool = false;
 
     function onConnect():Void {
-        #if flash
-            stageRect = new Rectangle(0, 0, 1, 1);
-            stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-            stage.addEventListener(Event.RESIZE, onResize);
-        #else
-            renderer.onRender.add(function() onRender(new Rectangle(0, 0, renderer.window.width, renderer.window.height)));
-        #end
         for (artifact in artifacts) {
             if (artifact.isDisposed) artifacts.remove(artifact);
             else artifact.connectToContext(context);
@@ -136,17 +116,6 @@ class GLSystem {
         if (flowControl != null && flowControl.onConnect != null) flowControl.onConnect();
     }
 
-    #if flash
-        function onEnterFrame(event:Event):Void {
-            onRender(stageRect);
-        }
-
-        function onResize(event:Event):Void {
-            stageRect.width = stage.stageWidth;
-            stageRect.height = stage.stageHeight;
-        }
-    #end
-
     function onDisconnect():Void {
         connected = false;
         for (artifact in artifacts) {
@@ -154,12 +123,6 @@ class GLSystem {
             else artifact.disconnectFromContext();
         }
         if (flowControl != null && flowControl.onDisconnect != null) flowControl.onDisconnect();
-    }
-
-    function onRender(rect:Rectangle):Void {
-        if (connected && flowControl != null && flowControl.onRender != null) {
-            flowControl.onRender(Std.int(rect.width), Std.int(rect.height));
-        }
     }
 
     inline function registerArtifact<T:(Artifact)>(artifact:T):T {

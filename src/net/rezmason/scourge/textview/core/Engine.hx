@@ -94,7 +94,8 @@ class Engine extends Module {
     override public function onWindowEnter(_) activate();
     override public function onWindowLeave(_) deactivate();
     override public function onWindowResize(_, width, height) setSize(width, height);
-    override public function update(milliseconds):Void onTimer(milliseconds / 1000);
+    override public function update(milliseconds) onTimer(milliseconds / 1000);
+    override public function render(_) onRender();
 
     // override public function onRenderContextLost() {}
     // override public function onRenderContextRestored(_) {}
@@ -136,19 +137,18 @@ class Engine extends Module {
     }
 
     function addListeners():Void {
-        glFlow.onRender = onRender;
         glFlow.onDisconnect = onDisconnect;
         glFlow.onConnect = onConnect;
     }
 
-    function onRender(width:Int, height:Int):Void {
+    function onRender():Void {
         if (active) {
             #if hxtelemetry
                 var stack = telemetry.unwind_stack();
                 telemetry.start_timing('.render');
             #end
             drawFrame(presentationMethod, compositor.inputBuffer);
-            compositor.draw();
+            if (glSys.connected) compositor.draw();
             #if hxtelemetry
                 telemetry.end_timing('.render');
                 telemetry.rewind_stack(stack);
@@ -262,8 +262,12 @@ class Engine extends Module {
                     nY /= camera.scaleY;
                     interaction = MOUSE(type, nX, nY);
                 }
-            case KEYBOARD(type, code, modifier) if (code == SPACE):
-                presentationMethod = (modifier.altKey && type != KEY_UP) ? mouseMethod : prettyMethod;
+            case KEYBOARD(type, code, modifier):
+                switch (code) {
+                    case SPACE: presentationMethod = (modifier.ctrlKey && type == KEY_DOWN) ? mouseMethod : prettyMethod;
+                    case D: if (modifier.ctrlKey && type == KEY_UP) testDisconnect(1000);
+                    case _:
+                }
             case _:
         }
 

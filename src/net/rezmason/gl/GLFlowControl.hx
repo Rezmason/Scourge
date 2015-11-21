@@ -1,7 +1,6 @@
 package net.rezmason.gl;
 
 typedef GLFlowControl = {
-    var onRender:Int->Int->Void;
     var onConnect:Void->Void;
     var onDisconnect:Void->Void;
 
