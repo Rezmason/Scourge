@@ -91,8 +91,10 @@ class EyeCandyDemo {
             r -= 1;
             g -= 1;
             b -= 1;
+
             var darkerGlyph = darkerGlyphs[ike];
             darkerGlyph.SET({x:x, y:y, z:z, r:r, g:g, b:b, a:1, char:darkCharCode, paint:darkerGlyph.id, s:10});
+            darkerGlyph.set_s(0);
 
             _z -= dZ;
             theta += dTheta;
