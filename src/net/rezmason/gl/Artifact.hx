@@ -4,7 +4,8 @@ import net.rezmason.gl.GLTypes;
 
 @:allow(net.rezmason.gl.GLSystem)
 class Artifact {
-
+    static var _ids:Int = 0;
+    public var id(default, null):Int = ++_ids;
     var context:Context;
     public var isDisposed(default, null):Bool;
     function new():Void isDisposed = false;

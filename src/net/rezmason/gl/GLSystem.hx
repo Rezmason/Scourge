@@ -20,14 +20,14 @@ class GLSystem {
     public var onConnected:Void->Void;
 
     var context:Context;
-    var artifacts:Array<Artifact>;
+    var artifacts:Map<UInt, Artifact>;
 
     public var currentOutputBuffer(default, null):OutputBuffer;
     public var viewportOutputBuffer(get, null):ViewportOutputBuffer;
     
     public function new():Void {
         connected = false;
-        artifacts = [];
+        artifacts = new Map();
     }
 
     public function connect():Void {
@@ -59,7 +59,7 @@ class GLSystem {
 
     function onInit():Void {
         for (artifact in artifacts) {
-            if (artifact.isDisposed) artifacts.remove(artifact);
+            if (artifact.isDisposed) artifacts.remove(artifact.id);
             else artifact.connectToContext(context);
         }
         connected = true;
@@ -72,14 +72,14 @@ class GLSystem {
 
         connected = false;
         for (artifact in artifacts) {
-            if (artifact.isDisposed) artifacts.remove(artifact);
+            if (artifact.isDisposed) artifacts.remove(artifact.id);
             else artifact.disconnectFromContext();
         }
     }
 
     inline function registerArtifact<T:(Artifact)>(artifact:T):T {
-        if (artifacts.indexOf(artifact) == -1) {
-            artifacts.push(artifact);
+        if (!artifacts.exists(artifact.id)) {
+            artifacts.set(artifact.id, artifact);
             if (connected) artifact.connectToContext(context);
         }
         return artifact;
