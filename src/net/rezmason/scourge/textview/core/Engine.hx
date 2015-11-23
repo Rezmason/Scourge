@@ -2,12 +2,9 @@ package net.rezmason.scourge.textview.core;
 
 import lime.app.Application;
 import lime.app.Module;
-import lime.ui.KeyCode;
-import lime.ui.KeyModifier;
 
 import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.OutputBuffer;
-import net.rezmason.gl.GLFlowControl;
 import net.rezmason.gl.GLSystem;
 import net.rezmason.scourge.textview.core.rendermethods.*;
 import net.rezmason.utils.Zig;
@@ -25,7 +22,6 @@ class Engine extends Module {
     public var readySignal(default, null):Zig<Void->Void>;
 
     var glSys:GLSystem;
-    var glFlow:GLFlowControl;
     var bodiesByID:Map<Int, Body>;
     var scenes:Array<Scene>;
     
@@ -38,14 +34,14 @@ class Engine extends Module {
     #if debug_graphics public var debugGraphics(get, null):DebugGraphics; #end
     #if hxtelemetry var telemetry:HxTelemetry; #end
 
-    public function new(glFlow:GLFlowControl):Void {
+    public function new():Void {
         #if hxtelemetry telemetry = new Present(HxTelemetry); #end
         super();
-        this.glFlow = glFlow;
         active = false;
         ready = false;
         readySignal = new Zig();
         glSys = new Present(GLSystem);
+        glSys.connect();
         
         width = 1;
         height = 1;
@@ -54,7 +50,6 @@ class Engine extends Module {
 
         initInteractionSystems();
         initRenderMethods();
-        addListeners();
     }
 
     public function addScene(scene:Scene):Void {
@@ -94,11 +89,53 @@ class Engine extends Module {
     override public function onWindowEnter(_) activate();
     override public function onWindowLeave(_) deactivate();
     override public function onWindowResize(_, width, height) setSize(width, height);
-    override public function update(milliseconds) onTimer(milliseconds / 1000);
-    override public function render(_) onRender();
 
-    // override public function onRenderContextLost() {}
-    // override public function onRenderContextRestored(_) {}
+    override public function update(milliseconds) {
+        if (!active) return;
+        
+        #if hxtelemetry
+            var stack = telemetry.unwind_stack();
+            telemetry.start_timing('.update');
+        #end
+
+        fetchBodies();
+        var delta = milliseconds / 1000;
+        for (body in bodiesByID) body.update(delta);
+        
+        #if hxtelemetry
+            telemetry.end_timing('.update');
+            telemetry.rewind_stack(stack);
+        #end
+    }
+
+    override public function render(_) {
+        if (!active) return;
+            
+        #if hxtelemetry
+            var stack = telemetry.unwind_stack();
+            telemetry.start_timing('.render');
+        #end
+
+        drawFrame(presentationMethod, compositor.inputBuffer);
+        if (glSys.connected) compositor.draw();
+
+        #if hxtelemetry
+            telemetry.end_timing('.render');
+            telemetry.rewind_stack(stack);
+            telemetry.advance_frame();
+        #end
+    }
+
+    override public function onRenderContextLost(_) {
+        glSys.disconnect();
+        regulateUserInput();
+    }
+
+    override public function onRenderContextRestored(_, _) {
+        glSys.connect();
+        regulateUserInput();
+    }
+
     // override public function onTextInput(text) {}
 
     function initInteractionSystems():Void {
@@ -134,35 +171,6 @@ class Engine extends Module {
             activate();
             readySignal.dispatch();
         }
-    }
-
-    function addListeners():Void {
-        glFlow.onDisconnect = onDisconnect;
-        glFlow.onConnect = onConnect;
-    }
-
-    function onRender():Void {
-        if (active) {
-            #if hxtelemetry
-                var stack = telemetry.unwind_stack();
-                telemetry.start_timing('.render');
-            #end
-            drawFrame(presentationMethod, compositor.inputBuffer);
-            if (glSys.connected) compositor.draw();
-            #if hxtelemetry
-                telemetry.end_timing('.render');
-                telemetry.rewind_stack(stack);
-                telemetry.advance_frame();
-            #end
-        }
-    }
-
-    function onDisconnect():Void {
-        regulateUserInput();
-    }
-
-    function onConnect():Void {
-        regulateUserInput();
     }
 
     function renderMouse():Void {
@@ -216,20 +224,6 @@ class Engine extends Module {
         mouseSystem.active = active && glSys.connected;
     }
 
-    function onTimer(delta:Float):Void {
-        if (!active) return;
-        #if hxtelemetry
-            var stack = telemetry.unwind_stack();
-            telemetry.start_timing('.update');
-        #end
-        fetchBodies();
-        for (body in bodiesByID) body.update(delta);
-        #if hxtelemetry
-            telemetry.end_timing('.update');
-            telemetry.rewind_stack(stack);
-        #end
-    }
-
     function updateMouseSystem():Void {
         fetchBodies();
         var rectsByBodyID:Map<Int, Rectangle> = new Map();
@@ -240,8 +234,8 @@ class Engine extends Module {
 
     function testDisconnect(mils:UInt):Void {
         if (glSys.connected) {
-            glFlow.disconnect();
-            haxe.Timer.delay(glFlow.connect, mils);
+            glSys.disconnect();
+            haxe.Timer.delay(glSys.connect, mils);
         }
     }
 

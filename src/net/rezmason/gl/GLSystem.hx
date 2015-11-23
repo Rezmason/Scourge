@@ -17,24 +17,22 @@ import net.rezmason.gl.GLTypes;
 class GLSystem {
 
     public var connected(default, null):Bool;
+    public var onConnected:Void->Void;
 
     var context:Context;
-    var flowControl:GLFlowControl;
     var artifacts:Array<Artifact>;
-    var initialized:Bool;
 
     public var currentOutputBuffer(default, null):OutputBuffer;
     public var viewportOutputBuffer(get, null):ViewportOutputBuffer;
     
     public function new():Void {
         connected = false;
-        initialized = false;
         artifacts = [];
     }
 
-    function connect():Void {
-        if (!initialized) init();
-        else onConnect();
+    public function connect():Void {
+        if (!connected) init();
+        else onInit();
     }
 
     function init():Void {
@@ -43,86 +41,40 @@ class GLSystem {
             var stage3D = stage.stage3Ds[0];
             if (stage3D.context3D != null) {
                 context = stage3D.context3D;
-                initialized = true;
-                onConnect();
+                onInit();
             } else {
-
                 function onCreate(event:Event):Void {
                     event.target.removeEventListener(Event.CONTEXT3D_CREATE, onCreate);
                     context = stage.stage3Ds[0].context3D;
-                    initialized = true;
-                    onConnect();
+                    onInit();
                 }
-
                 stage3D.addEventListener(Event.CONTEXT3D_CREATE, onCreate);
-                stage3D.requestContext3D(cast Context3DRenderMode.AUTO, cast "standard"); // Context3DProfile.STANDARD
+                stage3D.requestContext3D(cast Context3DRenderMode.AUTO, cast 'standard'); // Context3DProfile.STANDARD
             }
         #else
-            // renderer = Application.current.renderer;
             context = GL;
-            initialized = true;
-            onConnect();
+            onInit();
         #end
     }
 
-    function disconnect():Void {
-        // Destroy all the stuff in connect
-        onDisconnect();
-    }
-
-    public function getFlowControl():GLFlowControl {
-        if (flowControl != null) return null;
-        
-        var flo:GLFlowControl = null;
-        var floConnect = connect;
-        var floDisconnect = disconnect;
-        var floRelinquish = null;
-
-        floRelinquish = function() {
-            if (flo != null) {
-                flo.onConnect = null;
-                flo.onDisconnect = null;
-                flo = null;
-
-                floConnect = null;
-                floDisconnect = null;
-                floRelinquish = null;
-
-                flowControl = null;
-            }
-        }
-
-        flo = {
-            onConnect:null,
-            onDisconnect:null,
-
-            connect: function() floConnect(),
-            disconnect: function() floDisconnect(),
-            relinquish: floRelinquish,
-        };
-
-        flowControl = flo;
-        return flo;
-    }
-
-    var b:Bool = false;
-
-    function onConnect():Void {
+    function onInit():Void {
         for (artifact in artifacts) {
             if (artifact.isDisposed) artifacts.remove(artifact);
             else artifact.connectToContext(context);
         }
         connected = true;
-        if (flowControl != null && flowControl.onConnect != null) flowControl.onConnect();
+        if (onConnected != null) onConnected();
     }
 
-    function onDisconnect():Void {
+    public function disconnect():Void {
+        #if flash context.dispose(); #end
+        context = null;
+
         connected = false;
         for (artifact in artifacts) {
             if (artifact.isDisposed) artifacts.remove(artifact);
             else artifact.disconnectFromContext();
         }
-        if (flowControl != null && flowControl.onDisconnect != null) flowControl.onDisconnect();
     }
 
     inline function registerArtifact<T:(Artifact)>(artifact:T):T {
