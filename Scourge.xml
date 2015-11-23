@@ -22,6 +22,7 @@
     <haxelib name="actuate"/>
     <haxelib name="golems"/>
     <haxelib name="lime"/>
+    <haxelib name="box2d"/>
     
     <assets path="tables" include="*.txt"/>
     <assets path="shaders" include="*.vert|*.frag"/>

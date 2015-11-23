@@ -60,6 +60,8 @@ class MoveMediator {
     var bitSpacesByID:Map<Int, Entity>;
     var pieceDragBehavior:DragBehavior;
 
+    var boardManipulator:BoardManipulator;
+
     public function new() {
         var view:View = new Present(View);
 
@@ -77,6 +79,8 @@ class MoveMediator {
         pieceDragBehavior = new DragBehavior();
         board.interactionSignal.add(handleBoardInteraction);
         board.updateSignal.add(update);
+
+        boardManipulator = new BoardManipulator();
     }
 
     public function beginGame(config, game) {
@@ -271,6 +275,9 @@ class MoveMediator {
     }
 
     function update(delta) {
+
+        boardManipulator.update(delta);
+
         if (pieceDragBehavior.active) {
             pieceDragBehavior.update(delta);
             // trace(pieceDragBehavior.displacement);
