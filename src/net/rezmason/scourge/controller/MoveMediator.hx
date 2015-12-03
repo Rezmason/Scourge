@@ -296,6 +296,8 @@ class MoveMediator {
                 var cell = (selectedSpace == null) ? null : selectedSpace.get(BoardSpaceState).cell;
                 var nextCell = null;
                 switch (keyCode) {
+                    case K: boardManipulator.kickMarble();
+                    case W: boardManipulator.scrambleWalls();
                     case UP if (cell != null): nextCell = cell.n();
                     case DOWN if (cell != null): nextCell = cell.s();
                     case LEFT if (cell != null): nextCell = cell.w();
