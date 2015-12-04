@@ -100,6 +100,7 @@ class Compositor {
                 debugGraphics.translate(0, (height - width) / 2);
                 debugGraphics.scale(width, width);
             }
+            debugGraphics.translate(0.5, 0.5);
         #end
         viewportBuffer.resize(width, height);
     }

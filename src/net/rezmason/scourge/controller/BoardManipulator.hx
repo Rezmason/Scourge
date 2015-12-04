@@ -5,7 +5,6 @@ import box2D.collision.shapes.B2PolygonShape;
 import box2D.common.math.B2Vec2;
 import box2D.dynamics.B2Body;
 import box2D.dynamics.B2BodyDef;
-import box2D.dynamics.B2CairoDebugDraw;
 import box2D.dynamics.B2DebugDrawFlag;
 import box2D.dynamics.B2FixtureDef;
 import box2D.dynamics.B2World;
@@ -14,6 +13,10 @@ import box2D.dynamics.joints.B2DistanceJoint;
 
 import net.rezmason.scourge.textview.core.DebugGraphics;
 import net.rezmason.utils.santa.Present;
+
+#if debug_graphics
+    import box2D.dynamics.B2CairoDebugDraw;
+#end
 
 class BoardManipulator {
 
@@ -40,12 +43,12 @@ class BoardManipulator {
 
         var fixtureDef = new B2FixtureDef();
         var bodyDef = new B2BodyDef();
+        var origin = new B2Vec2();
 
         // Marble
         bodyDef.type = DYNAMIC_BODY;
         fixtureDef.shape = new B2CircleShape(0.05);
         fixtureDef.density = 50;
-        bodyDef.position.set(0.5, 0.5);
         marble = world.createBody(bodyDef);
         marble.createFixture(fixtureDef);
         marble.setLinearDamping(4);
@@ -59,7 +62,7 @@ class BoardManipulator {
 
         // Spring
         var djd = new B2DistanceJointDef();
-        djd.initialize(marble, thumb, new B2Vec2(0.5, 0.5), new B2Vec2(0.5, 0.5));
+        djd.initialize(marble, thumb, origin, origin);
         djd.dampingRatio = 0.2;
         djd.frequencyHz = 1;
         spring = cast world.createJoint(djd);
@@ -76,10 +79,10 @@ class BoardManipulator {
             wall.setActive(false);
             return wall;
         }
-        northWall = makeWall(0.5, 0.1, 0.50, 0.05);
-        southWall = makeWall(0.5, 0.9, 0.50, 0.05);
-        westWall  = makeWall(0.1, 0.5, 0.05, 0.50);
-        eastWall  = makeWall(0.9, 0.5, 0.05, 0.50);
+        northWall = makeWall( 0.0, -0.4, 0.50, 0.05);
+        southWall = makeWall( 0.0,  0.4, 0.50, 0.05);
+        westWall  = makeWall(-0.4,  0.0, 0.05, 0.50);
+        eastWall  = makeWall( 0.4,  0.0, 0.05, 0.50);
     }
 
     public function update(delta) {
@@ -94,22 +97,22 @@ class BoardManipulator {
 
             var marblePosition = marble.getPosition();
             var thumbPosition = thumb.getPosition();
-            while (marblePosition.x > 1) {
+            while (marblePosition.x > 0.5) {
                 marblePosition.x--;
                 thumbPosition.x--;
                 horizontal++;
             }
-            while (marblePosition.x < 0) {
+            while (marblePosition.x < -0.5) {
                 marblePosition.x++;
                 thumbPosition.x++;
                 horizontal--;
             }
-            while (marblePosition.y > 1) {
+            while (marblePosition.y > 0.5) {
                 marblePosition.y--;
                 thumbPosition.y--;
                 vertical++;
             }
-            while (marblePosition.y < 0) {
+            while (marblePosition.y < -0.5) {
                 marblePosition.y++;
                 thumbPosition.y++;
                 vertical--;
@@ -121,8 +124,8 @@ class BoardManipulator {
             thumb.setPosition(thumbPosition);
 
             // Apply field force to marble
-            var piX = Math.PI * (marblePosition.x - 0.5);
-            var piY = Math.PI * (marblePosition.y - 0.5);
+            var piX = Math.PI * marblePosition.x;
+            var piY = Math.PI * marblePosition.y;
             var forceX = getFieldXSlope(piX, piY) * 5;
             var forceY = getFieldYSlope(piX, piY) * 5;
             marble.applyForce(new B2Vec2(forceX, forceY), marble.getPosition());
