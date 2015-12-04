@@ -2,10 +2,7 @@ package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
 
-#if flash
-    import flash.display.BitmapData;
-    import flash.display3D.Context3DTextureFormat;
-#else
+#if !flash
     import lime.graphics.opengl.GL;
 #end
 

@@ -16,7 +16,6 @@ class Lab {
     var width:Int;
     var height:Int;
     var glSys:GLSystem;
-    var glFlow:GLFlowControl;
     var metaballSystem:MetaballSystem;
     var postSystem:PostSystem;
 
@@ -24,31 +23,22 @@ class Lab {
         this.width = width;
         this.height = height;
         glSys = new GLSystem();
-        glFlow = glSys.getFlowControl();
-        glFlow.onConnect = onConnect;
-        glFlow.connect();
+        glSys.onConnected = onConnect;
+        glSys.connect();
     }
 
     function onConnect():Void {
         metaballSystem = new MetaballSystem(glSys, width, height);
-        metaballSystem.loadSig.add(onLoaded);
-        
         postSystem = new PostSystem(glSys, width, height, metaballSystem);
-        postSystem.loadSig.add(onLoaded);
-        
         metaballSystem.init();
         postSystem.init();
     }
 
-    function onLoaded():Void {
-        if (metaballSystem.ready && postSystem.ready) {
-            glFlow.onRender = onRender;
+    public function render():Void {
+        if (glSys.connected && metaballSystem.ready && postSystem.ready) {
+            metaballSystem.render();
+            postSystem.render();
         }
-    }
-
-    function onRender(w:Int, h:Int):Void {
-        metaballSystem.render();
-        postSystem.render();
     }
 
     public static function makeExtensions(glSys:GLSystem):String {
