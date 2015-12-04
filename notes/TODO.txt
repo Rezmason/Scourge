@@ -15,8 +15,6 @@ Quasi-gestural input
     Apply a magnetic field to the unit square
         Maybe adjust this field's properties, rather than place walls
 
-If nothing specifies a settling function, remove that functionality from DragBehavior
-
 Integrate into loupe
 Shelf of tools, and, like, you drag 'em
 Add UIElement to Loupe that "encases" content

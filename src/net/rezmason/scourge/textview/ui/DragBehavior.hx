@@ -12,26 +12,18 @@ class DragBehavior {
     var pos:Vec3;
     var startPos:Vec3;
     var lastPos:Vec3;
-    var lastDelta:Float;
+    var delta:Float;
     var settleVel:Vec3;
-    var settlingFunction:Vec3->Vec3;
 
-    public inline function new(settlingFunction:Vec3->Vec3 = null) {
-        this.settlingFunction = settlingFunction;
-    }
+    public function new() {}
 
     public inline function update(delta:Float) {
         if (dragging) {
-            lastPos = pos.copy();
-            lastDelta = delta;
+            this.delta += delta;
         } else if (settling) {
             pos += settleVel * delta;
-            if (settlingFunction != null) {
-                settleVel = settlingFunction(pos);
-            } else {
-                settleVel *= delta + SETTLE_FRICTION * (1 - delta);
-                settling = Math.abs(settleVel.x) > SETTLE_MIN_SPEED || Math.abs(settleVel.y) > SETTLE_MIN_SPEED;
-            }
+            settleVel *= delta + SETTLE_FRICTION * (1 - delta);
+            settling = Math.abs(settleVel.x) > SETTLE_MIN_SPEED || Math.abs(settleVel.y) > SETTLE_MIN_SPEED;
         }
     }
 
@@ -42,21 +34,24 @@ class DragBehavior {
             pos = new Vec3(x, y, 0);
             lastPos = pos.copy();
             startPos = pos.copy();
+            delta = 0;
         }
     }
 
     public inline function updateDrag(x, y) {
         if (dragging) {
+            lastPos = pos.copy();
             pos.x = x;
             pos.y = y;
+            delta = 0;
         }
     }
 
     public inline function stopDrag() {
         if (dragging) {
             dragging = false;
-            if (settlingFunction != null) settleVel = settlingFunction(pos);
-            else settleVel = (pos - lastPos) / lastDelta;
+            if (delta != 0) settleVel = (pos - lastPos) / delta;
+            else settleVel = pos * 0;
             settling = settleVel.x != 0 || settleVel.y != 0;
         }
     }
