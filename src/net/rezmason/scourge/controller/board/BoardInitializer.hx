@@ -83,7 +83,7 @@ class BoardInitializer {
             
             var bottom = view.bottom = board.getGlyphByID(itr + 0).reset().SET({pos:pos, paint_s:0});
             var top    = view.top =    board.getGlyphByID(itr + 1).reset().SET({pos:pos, paint_s:0, p:-0.01});
-            var over   = view.over =   board.getGlyphByID(itr + 2).reset().SET({pos:pos, paint_h:stretch, p:-0.03});
+            var over   = view.over =   board.getGlyphByID(itr + 2).reset().SET({pos:pos, paint_s:1.5, paint_h:stretch, p:-0.03});
 
             if (spaceState.petriData.isWall) {
                 var numNeighbors:Int = 0;

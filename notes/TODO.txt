@@ -1,21 +1,6 @@
-Quasi-gestural input
-    Map logical system to physical system
-        If a logical traversal is not allowed, block it with a wall
-        Interpret physical motion as cardinal logical traversal
-            At every step,
-                Update the walls
-                Update the physics
-                Move the loupe by the rounded displacement of the marble position
-                Wrap the marble position to unit square
-                Wrap the drag position to be closest to marble position
-    Derive visual position from logical and marble positions
-        Use marble displacement to interpolate visual coordinates of logical position and surrounding positions
-    Associate drag position with mouse position
-        drag object (static) and marble object (dynamic) are connected via a taut soft distance joint when mouse is down
-    Apply a magnetic field to the unit square
-        Maybe adjust this field's properties, rather than place walls
+Board wall bugs
 
-Integrate into loupe
+Wrap interactive board UI in loupe
 Shelf of tools, and, like, you drag 'em
 Add UIElement to Loupe that "encases" content
 Make the border box grow to surround the UIElement, not just the board glyphs

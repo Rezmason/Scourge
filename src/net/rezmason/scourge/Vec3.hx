@@ -10,6 +10,12 @@ abstract Vec3({r:Float, g:Float, b:Float}) {
 
     public inline function copy() return new Vec3(this.r, this.g, this.b);
 
+    public inline function copyFrom(other:Vec3) {
+        set_x(other.x);
+        set_y(other.y);
+        set_z(other.z);
+    }
+
     inline function get_x() return this.r;
     inline function set_x(val) return this.r = val;
 

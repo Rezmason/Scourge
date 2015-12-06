@@ -15,9 +15,11 @@ class GridUtils {
     public inline static function orthoDirections():Iterator<Int> { return new SkipIterator(0, 8, 2); }
 
     // Returns the furthest reachable cell from the given cell in the specified direction
-    public inline static function run<T> (cell:Cell<T>, direction:Int, maxDist:Int = -1):Cell<T> {
+    public inline static function run<T> (cell:Cell<T>, direction:Int, maxDist:Int = -1, validator:Cell<T>->Bool = null):Cell<T> {
         var distance:Int = 0;
-        while (cell.neighbors[direction] != null && distance != maxDist) {
+        while (distance != maxDist) {
+            if (cell.neighbors[direction] == null) break;
+            if (validator != null && !validator(cell.neighbors[direction])) break;
             cell = cell.neighbors[direction];
             distance++;
         }

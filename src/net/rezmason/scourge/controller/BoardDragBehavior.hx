@@ -12,16 +12,24 @@ import box2D.dynamics.joints.B2DistanceJointDef;
 import box2D.dynamics.joints.B2DistanceJoint;
 
 import net.rezmason.scourge.textview.core.DebugGraphics;
+import net.rezmason.scourge.textview.ui.DragBehavior;
 import net.rezmason.utils.santa.Present;
 
+import net.rezmason.utils.Zig;
+/*
 #if debug_graphics
     import box2D.dynamics.B2CairoDebugDraw;
 #end
+*/
 
-class BoardManipulator {
+class BoardDragBehavior extends DragBehavior {
+
+    public var horizontalWrapSignal(default, null):Zig<Int->Void> = new Zig();
+    public var verticalWrapSignal(default, null):Zig<Int->Void> = new Zig();
 
     var world:B2World;
     var marble:B2Body;
+    var marblePos:Vec3;
     var thumb:B2Body;
     var spring:B2DistanceJoint;
     var northWall:B2Body;
@@ -30,7 +38,9 @@ class BoardManipulator {
     var westWall:B2Body;
     
     public function new() {
+        super();
         world = new B2World(new B2Vec2(0, 0), true);
+        /*
         #if debug_graphics
             var debugDraw = new B2CairoDebugDraw();
             var cairo:DebugGraphics = new Present(DebugGraphics);
@@ -40,6 +50,7 @@ class BoardManipulator {
             world.setDebugDraw(debugDraw);
             debugDraw.setFlags(Shapes | Joints);
         #end
+        */
 
         var fixtureDef = new B2FixtureDef();
         var bodyDef = new B2BodyDef();
@@ -52,6 +63,7 @@ class BoardManipulator {
         marble = world.createBody(bodyDef);
         marble.createFixture(fixtureDef);
         marble.setLinearDamping(4);
+        marblePos = new Vec3(0, 0, 0);
 
         // Thumb
         bodyDef.type = KINEMATIC_BODY;
@@ -85,41 +97,25 @@ class BoardManipulator {
         eastWall  = makeWall( 0.4,  0.0, 0.05, 0.50);
     }
 
-    public function update(delta) {
+    override public function update(delta) {
         world.step(delta, 10, 10);
         world.clearForces();
 
+        settling = !dragging && marble.isAwake();
+        
         if (marble.isAwake()) {
-            // Loop marble's position
-
-            var horizontal:Int = 0;
-            var vertical:Int = 0;
-
-            var marblePosition = marble.getPosition();
+            
             var thumbPosition = thumb.getPosition();
-            while (marblePosition.x > 0.5) {
-                marblePosition.x--;
-                thumbPosition.x--;
-                horizontal++;
-            }
-            while (marblePosition.x < -0.5) {
-                marblePosition.x++;
-                thumbPosition.x++;
-                horizontal--;
-            }
-            while (marblePosition.y > 0.5) {
-                marblePosition.y--;
-                thumbPosition.y--;
-                vertical++;
-            }
-            while (marblePosition.y < -0.5) {
-                marblePosition.y++;
-                thumbPosition.y++;
-                vertical--;
-            }
+            var marblePosition = marble.getPosition();
+            var marbleLinearVelocity = marble.getLinearVelocity();
 
-            if (horizontal != 0 || vertical != 0) trace('NUDGE $horizontal $vertical');
-
+            // Wrap marble's position
+            var horizontalWrap:Int = Std.int(Math.floor(marblePosition.x + 0.5));
+            var verticalWrap:Int   = Std.int(Math.floor(marblePosition.y + 0.5));
+            marblePosition.x -= horizontalWrap;
+            thumbPosition.x -= horizontalWrap;
+            marblePosition.y -= verticalWrap;
+            thumbPosition.y -= verticalWrap;
             marble.setPosition(marblePosition);
             thumb.setPosition(thumbPosition);
 
@@ -129,32 +125,69 @@ class BoardManipulator {
             var forceX = getFieldXSlope(piX, piY) * 5;
             var forceY = getFieldYSlope(piX, piY) * 5;
             marble.applyForce(new B2Vec2(forceX, forceY), marble.getPosition());
+
+            // Update behavior properties
+            var marblePosition = marble.getPosition();
+            marblePos.x = marblePosition.x;
+            marblePos.y = marblePosition.y;
+
+            // Broadcast wrap events
+            if (marbleLinearVelocity.x > marbleLinearVelocity.y) {
+                if (horizontalWrap != 0) horizontalWrapSignal.dispatch(horizontalWrap);
+                if (verticalWrap   != 0) verticalWrapSignal.dispatch(verticalWrap);
+            } else {
+                if (verticalWrap   != 0) verticalWrapSignal.dispatch(verticalWrap);
+                if (horizontalWrap != 0) horizontalWrapSignal.dispatch(horizontalWrap);
+            }
         }
 
-        #if debug_graphics world.drawDebugData(); #end
+        // #if debug_graphics world.drawDebugData(); #end
+    }
+
+    override public function startDrag(x, y) {
+        if (!dragging) {
+            super.startDrag(x, y);
+            thumb.setActive(true);
+            var thumbPosition = thumb.getPosition();
+            var marblePosition = marble.getPosition();
+            thumbPosition.x = marblePosition.x;
+            thumbPosition.y = marblePosition.y;
+            thumb.setPosition(thumbPosition);
+            thumb.setAwake(true);
+            marble.setAwake(true);
+        }
+    }
+
+    override public function updateDrag(x, y) {
+        if (dragging) {
+            super.updateDrag(x, y);
+            var thumbPosition = thumb.getPosition();
+            thumbPosition.x += pos.x - lastPos.x;
+            thumbPosition.y += pos.y - lastPos.y;
+            thumb.setPosition(thumbPosition);
+            thumb.setAwake(true);
+            marble.setAwake(true);
+        }
+    }
+
+    override public function stopDrag() {
+        if (dragging) {
+            dragging = false;
+            thumb.setActive(false);
+            settling = marble.isAwake();
+        }
     }
 
     inline function getFieldHeight(piX:Float, piY:Float) return Math.pow(Math.cos(piX) * Math.cos(piY), 2);
     inline function getFieldXSlope(piX:Float, piY:Float) return -Math.sin(2 * piX) * Math.pow(Math.cos(piY), 2);
     inline function getFieldYSlope(piX:Float, piY:Float) return getFieldXSlope(piY, piX);
 
-    public function kickMarble() {
-        thumb.setActive(!thumb.isActive());
-        if (thumb.isActive()) {
-            thumb.setPosition(marble.getPosition());
-            thumb.setLinearVelocity(new B2Vec2(
-                (Math.random() * 2 - 1) * 10, 
-                (Math.random() * 2 - 1) * 10
-            ));
-            thumb.setAwake(true);
-            marble.setAwake(true);
-        }
+    public function setWalls(north, south, east, west) {
+        northWall.setActive(north);
+        southWall.setActive(south);
+        eastWall.setActive(east);
+        westWall.setActive(west);
     }
 
-    public function scrambleWalls() {
-        northWall.setActive(Math.random() > 0.5);
-        southWall.setActive(Math.random() > 0.5);
-        eastWall.setActive(Math.random() > 0.5);
-        westWall.setActive(Math.random() > 0.5);
-    }
+    override function get_displacement() return marblePos;
 }

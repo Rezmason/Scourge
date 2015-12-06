@@ -9,15 +9,15 @@ class DragBehavior {
     public var active(get, null):Bool;
     public var displacement(get, null):Vec3;
     
-    var pos:Vec3;
-    var startPos:Vec3;
-    var lastPos:Vec3;
+    var pos:Vec3 = new Vec3(0, 0, 0);
+    var startPos:Vec3 = new Vec3(0, 0, 0);
+    var lastPos:Vec3 = new Vec3(0, 0, 0);
     var delta:Float;
-    var settleVel:Vec3;
+    var settleVel:Vec3 = new Vec3(0, 0, 0);
 
     public function new() {}
 
-    public inline function update(delta:Float) {
+    public function update(delta:Float) {
         if (dragging) {
             this.delta += delta;
         } else if (settling) {
@@ -27,35 +27,40 @@ class DragBehavior {
         }
     }
 
-    public inline function startDrag(x, y) {
+    public function startDrag(x, y) {
         if (!dragging) {
             dragging = true;
             settling = false;
-            pos = new Vec3(x, y, 0);
-            lastPos = pos.copy();
-            startPos = pos.copy();
+            pos.x = x;
+            pos.y = y;
+            lastPos.copyFrom(pos);
+            startPos.copyFrom(pos);
             delta = 0;
         }
     }
 
-    public inline function updateDrag(x, y) {
+    public function updateDrag(x, y) {
         if (dragging) {
-            lastPos = pos.copy();
+            lastPos.copyFrom(pos);
             pos.x = x;
             pos.y = y;
             delta = 0;
         }
     }
 
-    public inline function stopDrag() {
+    public function stopDrag() {
         if (dragging) {
             dragging = false;
-            if (delta != 0) settleVel = (pos - lastPos) / delta;
-            else settleVel = pos * 0;
+            if (delta != 0) {
+                settleVel = (pos - lastPos) / delta;
+            } else {
+                settleVel.x = 0;
+                settleVel.y = 0;
+            }
             settling = settleVel.x != 0 || settleVel.y != 0;
         }
     }
 
-    inline function get_displacement() return pos - startPos;
-    public inline function get_active() return dragging || settling;
+    function get_displacement() return pos - startPos;
+    public function get_active() return dragging || settling;
 }
