@@ -258,7 +258,7 @@ class Engine extends Module {
                 }
             case KEYBOARD(type, code, modifier):
                 switch (code) {
-                    case SPACE: presentationMethod = (modifier.ctrlKey && type == KEY_DOWN) ? mouseMethod : prettyMethod;
+                    case SPACE: presentationMethod = (modifier.ctrlKey && type != KEY_UP) ? mouseMethod : prettyMethod;
                     case D: if (modifier.ctrlKey && type == KEY_UP) testDisconnect(1000);
                     case _:
                 }
