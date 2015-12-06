@@ -1,4 +1,4 @@
-Board wall bugs
+Improve feel of roll
 
 Wrap interactive board UI in loupe
 Shelf of tools, and, like, you drag 'em

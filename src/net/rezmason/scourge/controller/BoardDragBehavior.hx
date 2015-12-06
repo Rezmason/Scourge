@@ -91,8 +91,8 @@ class BoardDragBehavior extends DragBehavior {
             wall.setActive(false);
             return wall;
         }
-        northWall = makeWall( 0.0, -0.4, 0.50, 0.05);
-        southWall = makeWall( 0.0,  0.4, 0.50, 0.05);
+        southWall = makeWall( 0.0, -0.4, 0.50, 0.05);
+        northWall = makeWall( 0.0,  0.4, 0.50, 0.05);
         westWall  = makeWall(-0.4,  0.0, 0.05, 0.50);
         eastWall  = makeWall( 0.4,  0.0, 0.05, 0.50);
     }
