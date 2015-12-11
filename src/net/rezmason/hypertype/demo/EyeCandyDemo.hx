@@ -1,21 +1,15 @@
 package net.rezmason.hypertype.demo;
 
 import net.rezmason.gl.GLTypes;
-
 import net.rezmason.hypertype.core.Body;
-import net.rezmason.hypertype.core.Glyph;
 import net.rezmason.hypertype.core.Interaction;
-import net.rezmason.hypertype.core.GlyphTexture;
 
 using net.rezmason.hypertype.core.GlyphUtils;
-using net.rezmason.utils.CharCode;
 
 class EyeCandyDemo {
 
-    inline static var COLOR_RANGE:Int = 6;
-    inline static var CHARS:String =
-        Strings.ALPHANUMERICS +
-    '';
+    static var CHARS = Strings.ALPHANUMERICS;
+    static var NUM_CHARS = CHARS.length;
 
     public var body(default, null):Body;
 
@@ -57,10 +51,8 @@ class EyeCandyDemo {
         var theta:Float = 0;
         var _z:Float = 1 - dZ / 2;
 
-        var darkCharCode = '•'.code();
-
         for (ike in 0...num) {
-            var charCode:Int = CHARS.charCodeAt(ike % CHARS.length);
+            var charCode:Int = CHARS.charCodeAt(ike % NUM_CHARS);
 
             var rad:Float = Math.sqrt(1 - _z * _z);
             var x:Float = Math.cos(theta) * rad;
