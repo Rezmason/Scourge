@@ -4,10 +4,10 @@ import net.rezmason.ecce.Ecce;
 import net.rezmason.praxis.bot.BotSystem;
 import net.rezmason.praxis.human.HumanSystem;
 import net.rezmason.praxis.play.Referee;
+import net.rezmason.scourge.View;
 import net.rezmason.scourge.controller.MoveMediator;
 import net.rezmason.scourge.controller.Sequencer;
 import net.rezmason.scourge.controller.board.BoardAnimator;
-import net.rezmason.scourge.textview.View;
 import net.rezmason.utils.santa.Santa;
 
 class GameContext {

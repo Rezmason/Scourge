@@ -1,10 +1,10 @@
 package;
 
 import lime.app.Application;
+import lime.graphics.Image;
+import net.rezmason.hypertype.Strings;
 import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.display.FlatFontGenerator;
-import net.rezmason.scourge.Strings;
-import lime.graphics.Image;
 
 class ScourgeAssetGen extends Application {
 

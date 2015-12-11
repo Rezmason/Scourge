@@ -8,14 +8,13 @@ import box2D.dynamics.B2BodyDef;
 import box2D.dynamics.B2DebugDrawFlag;
 import box2D.dynamics.B2FixtureDef;
 import box2D.dynamics.B2World;
-import box2D.dynamics.joints.B2DistanceJointDef;
 import box2D.dynamics.joints.B2DistanceJoint;
-
-import net.rezmason.scourge.textview.core.DebugGraphics;
-import net.rezmason.scourge.textview.ui.DragBehavior;
-import net.rezmason.utils.santa.Present;
-
+import box2D.dynamics.joints.B2DistanceJointDef;
+import net.rezmason.math.Vec3;
+import net.rezmason.hypertype.core.DebugGraphics;
+import net.rezmason.hypertype.ui.DragBehavior;
 import net.rezmason.utils.Zig;
+import net.rezmason.utils.santa.Present;
 /*
 #if debug_graphics
     import box2D.dynamics.B2CairoDebugDraw;

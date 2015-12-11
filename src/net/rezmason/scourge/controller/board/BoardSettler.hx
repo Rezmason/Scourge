@@ -4,16 +4,18 @@ import haxe.Utf8;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.ecce.Query;
+import net.rezmason.math.Vec3;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
 import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.game.body.OwnershipAspect;
+import net.rezmason.scourge.ScourgeStrings.*;
 import net.rezmason.utils.santa.Present;
 
 import motion.easing.*;
 
-using net.rezmason.scourge.textview.core.GlyphUtils;
+using net.rezmason.hypertype.core.GlyphUtils;
 using net.rezmason.grid.GridUtils;
 
 class BoardSettler extends Reckoner {
@@ -100,7 +102,7 @@ class BoardSettler extends Reckoner {
                 var nudge = nudgeArray[bitfield];
                 var x = nudge == null ? Math.random() * 0.4 - 0.2 : nudge.x;
                 var y = nudge == null ? Math.random() * 0.4 - 0.2 : nudge.y;
-                var char = Utf8.charCodeAt(Strings.BODY_GLYPHS, bitfield);
+                var char = Utf8.charCodeAt(ScourgeStrings.BODY_GLYPHS, bitfield);
                 anim.topTo.SET({x:pos.x + x * 0.2, y:pos.y + y * 0.2, char:char});
                 view.lastTopTo.copyFrom(anim.topTo);
             }

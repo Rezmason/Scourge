@@ -2,14 +2,14 @@ package net.rezmason.scourge.controller.board;
 
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Query;
+import net.rezmason.scourge.View;
 import net.rezmason.scourge.components.*;
-import net.rezmason.scourge.textview.View;
-import net.rezmason.scourge.textview.core.Body;
-import net.rezmason.scourge.textview.core.Glyph;
+import net.rezmason.hypertype.core.Body;
+import net.rezmason.hypertype.core.Glyph;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
-using net.rezmason.scourge.textview.core.GlyphUtils;
+using net.rezmason.hypertype.core.GlyphUtils;
 
 class BoardAnimator {
 

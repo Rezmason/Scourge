@@ -7,15 +7,15 @@ import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
-import net.rezmason.scourge.Strings.*;
+import net.rezmason.scourge.ScourgeStrings.*;
 import net.rezmason.scourge.components.*;
 import net.rezmason.scourge.game.body.BodyAspect;
 import net.rezmason.scourge.game.body.OwnershipAspect;
 import net.rezmason.scourge.game.build.PetriTypes;
-import net.rezmason.scourge.textview.ColorPalette.*;
-import net.rezmason.scourge.textview.core.Glyph;
+import net.rezmason.scourge.ScourgeColorPalette.*;
+import net.rezmason.hypertype.core.Glyph;
 
-using net.rezmason.scourge.textview.core.GlyphUtils;
+using net.rezmason.hypertype.core.GlyphUtils;
 
 class RulePresenter extends Reckoner {
 

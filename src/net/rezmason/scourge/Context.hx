@@ -1,13 +1,10 @@
 package net.rezmason.scourge;
 
-import lime.app.Application;
-
-import net.rezmason.gl.GLSystem;
-import net.rezmason.scourge.textview.core.Engine;
-import net.rezmason.scourge.textview.core.FontManager;
-import net.rezmason.scourge.textview.errands.BeginNavErrand;
+import net.rezmason.scourge.errands.BeginNavErrand;
+import net.rezmason.hypertype.HypertypeContext;
 import net.rezmason.utils.santa.Santa;
-#if debug_graphics import net.rezmason.scourge.textview.core.DebugGraphics; #end
+
+#if debug_graphics import net.rezmason.hypertype.core.DebugGraphics; #end
 #if hxtelemetry  import hxtelemetry.HxTelemetry; #end
 
 class Context {
@@ -26,15 +23,11 @@ class Context {
             Santa.mapToClass(HxTelemetry, Singleton(telemetry));
         #end
 
-        Santa.mapToClass(GLSystem, Singleton(new GLSystem()));
-        Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));
-
-        var engine = new Engine();
-        Application.current.addModule(engine);
-        #if debug_graphics Santa.mapToClass(DebugGraphics, Singleton(engine.debugGraphics)); #end
+        var engineContext = new HypertypeContext();
         
         new GameContext();
         
+        var engine = engineContext.engine;
         var beginNavErrand = new BeginNavErrand(engine);
         if (engine.ready) beginNavErrand.run();
         else engine.readySignal.add(beginNavErrand.run);

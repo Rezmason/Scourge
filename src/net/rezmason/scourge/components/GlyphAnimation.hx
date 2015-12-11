@@ -1,9 +1,9 @@
 package net.rezmason.scourge.components;
 
 import net.rezmason.ecce.Entity;
-import net.rezmason.scourge.textview.core.Glyph;
+import net.rezmason.hypertype.core.Glyph;
 
-using net.rezmason.scourge.textview.core.GlyphUtils;
+using net.rezmason.hypertype.core.GlyphUtils;
 
 class GlyphAnimation {
     public var duration:Float;

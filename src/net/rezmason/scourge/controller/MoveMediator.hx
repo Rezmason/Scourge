@@ -4,9 +4,13 @@ import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.ecce.Query;
 import net.rezmason.grid.GridDirection;
+import net.rezmason.math.Vec3;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
+import net.rezmason.scourge.ScourgeColorPalette.*;
+import net.rezmason.scourge.ScourgeStrings;
+import net.rezmason.scourge.View;
 import net.rezmason.scourge.components.BoardSpaceState;
 import net.rezmason.scourge.components.BoardSpaceView;
 import net.rezmason.scourge.game.Piece;
@@ -14,17 +18,15 @@ import net.rezmason.scourge.game.ScourgeGameConfig;
 import net.rezmason.scourge.game.bite.BiteMove;
 import net.rezmason.scourge.game.piece.DropPieceMove;
 import net.rezmason.scourge.game.piece.PieceAspect;
-import net.rezmason.scourge.textview.ColorPalette.*;
-import net.rezmason.scourge.textview.View;
-import net.rezmason.scourge.textview.core.Body;
-import net.rezmason.scourge.textview.core.Interaction;
-import net.rezmason.scourge.textview.ui.BorderBox;
-import net.rezmason.scourge.textview.ui.DragBehavior;
+import net.rezmason.hypertype.core.Body;
+import net.rezmason.hypertype.core.Interaction;
+import net.rezmason.hypertype.ui.BorderBox;
+import net.rezmason.hypertype.ui.DragBehavior;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
 using net.rezmason.grid.GridUtils;
-using net.rezmason.scourge.textview.core.GlyphUtils;
+using net.rezmason.hypertype.core.GlyphUtils;
 
 class MoveMediator {
 
@@ -135,25 +137,25 @@ class MoveMediator {
         var selectedChar = -1;
 
         if (biteTargetSpace == null) {
-            selectedChar = biteTargetIDs.exists(selectedCell.id) ? Strings.BODY_CODE : Strings.ILLEGAL_BODY_CODE;
+            selectedChar = biteTargetIDs.exists(selectedCell.id) ? ScourgeStrings.BODY_CODE : ScourgeStrings.ILLEGAL_BODY_CODE;
         } else {
             if (biteTargetSpace == selectedSpace) {
-                selectedChar = Strings.LEGAL_BITE_TARGET_CODE;
+                selectedChar = ScourgeStrings.LEGAL_BITE_TARGET_CODE;
             } else {
                 var biteTargetSpaceGlyph = biteTargetSpace.get(BoardSpaceView).over;
                 var biteTargetGlyph = bite.getGlyphByID(1);
                 biteTargetGlyph.SET({s:2, x:biteTargetSpaceGlyph.get_x(), y:biteTargetSpaceGlyph.get_y(), z:biteTargetSpaceGlyph.get_z()});
-                biteTargetGlyph.set_char(Strings.LEGAL_BITE_TARGET_CODE);
+                biteTargetGlyph.set_char(ScourgeStrings.LEGAL_BITE_TARGET_CODE);
 
                 var ike = 2;
                 for (bitSpace in bitSpacesByID) {
                     if (bitSpace == selectedSpace) {
-                        selectedChar = Strings.BITE_CODE;
+                        selectedChar = ScourgeStrings.BITE_CODE;
                     } else {
                         var bitSpaceGlyph = bitSpace.get(BoardSpaceView).over;
                         var bitGlyph = bite.getGlyphByID(ike++);
                         bitGlyph.SET({s:2, x:bitSpaceGlyph.get_x(), y:bitSpaceGlyph.get_y(), z:bitSpaceGlyph.get_z()});
-                        bitGlyph.set_char(Strings.BITE_CODE);
+                        bitGlyph.set_char(ScourgeStrings.BITE_CODE);
                     }
                 }
 
@@ -164,11 +166,11 @@ class MoveMediator {
                     var targetID = biteTargetSpace.get(BoardSpaceState).cell.id;
                     var key = '${targetID}_{$sortedBitSpaceIDs.join("_")}';
                     if (biteMovesByKey.exists(key)) {
-                        selectedChar = Strings.BITE_CODE;
+                        selectedChar = ScourgeStrings.BITE_CODE;
                     } else if (biteTargetIDs.exists(selectedCell.id)) {
-                        selectedChar = Strings.BODY_CODE;
+                        selectedChar = ScourgeStrings.BODY_CODE;
                     } else {
-                        selectedChar = Strings.ILLEGAL_BITE_CODE;
+                        selectedChar = ScourgeStrings.ILLEGAL_BITE_CODE;
                     }
                 }
             }
@@ -201,7 +203,7 @@ class MoveMediator {
                 piece.getGlyphByID(ike).SET({s:2, x:-x, y:y, g:nr, b:nr});
             }
             if (dropMovesByKey != null) dropMove = dropMovesByKey[getDropMoveKey(ids)];
-            var char = dropMove == null ? Strings.ILLEGAL_BODY_CODE : Strings.BODY_CODE;
+            var char = dropMove == null ? ScourgeStrings.ILLEGAL_BODY_CODE : ScourgeStrings.BODY_CODE;
             for (glyph in piece.eachGlyph()) glyph.set_char(char);
         }
     }

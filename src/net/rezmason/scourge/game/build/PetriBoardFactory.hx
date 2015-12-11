@@ -1,7 +1,7 @@
 package net.rezmason.scourge.game.build;
 
 import net.rezmason.grid.GridDirection.*;
-import net.rezmason.scourge.Vec3;
+import net.rezmason.math.Vec3;
 import net.rezmason.scourge.game.build.PetriTypes;
 
 using net.rezmason.grid.GridUtils;

@@ -1,8 +1,8 @@
 package net.rezmason.scourge.controller;
 
-import net.rezmason.scourge.textview.ColorPalette.*;
+import net.rezmason.scourge.ScourgeColorPalette.*;
 import motion.easing.*;
-using net.rezmason.scourge.textview.core.GlyphUtils;
+using net.rezmason.hypertype.core.GlyphUtils;
 
 class DecayRulePresenter extends RulePresenter {
 

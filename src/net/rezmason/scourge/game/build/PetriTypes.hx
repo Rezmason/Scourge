@@ -2,6 +2,7 @@ package net.rezmason.scourge.game.build;
 
 import net.rezmason.grid.Cell;
 import net.rezmason.grid.Grid;
+import net.rezmason.math.Vec3;
 
 typedef PetriData = {
     var pos:Vec3;

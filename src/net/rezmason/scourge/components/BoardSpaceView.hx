@@ -1,6 +1,6 @@
 package net.rezmason.scourge.components;
 
-import net.rezmason.scourge.textview.core.Glyph;
+import net.rezmason.hypertype.core.Glyph;
 
 class BoardSpaceView {
     public var over:Glyph;

@@ -1,6 +1,6 @@
 package net.rezmason.scourge.controller;
 
-using net.rezmason.scourge.textview.core.GlyphUtils;
+using net.rezmason.hypertype.core.GlyphUtils;
 
 class CavityRulePresenter extends RulePresenter {
 

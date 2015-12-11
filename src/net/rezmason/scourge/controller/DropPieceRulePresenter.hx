@@ -1,9 +1,9 @@
 package net.rezmason.scourge.controller;
 
-import net.rezmason.scourge.textview.ColorPalette.*;
+import net.rezmason.scourge.ScourgeColorPalette.*;
 import motion.easing.*;
-import net.rezmason.scourge.Strings.*;
-using net.rezmason.scourge.textview.core.GlyphUtils;
+import net.rezmason.scourge.ScourgeStrings.*;
+using net.rezmason.hypertype.core.GlyphUtils;
 
 class DropPieceRulePresenter extends RulePresenter {
     override function animateGlyphs() {
