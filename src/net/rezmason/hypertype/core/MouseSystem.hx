@@ -144,15 +144,22 @@ class MouseSystem {
         #if flash
             // Ignore any edge pixels. Deals with antialiasing.
             // After all, if a hit area is important, it'll be big, and its edge pixels won't matter.
+            var failed = false;
             for (row in rectTop - 1...rectTop + 2) {
                 if (row < 0 || row >= height) continue; // Skip edges
                 for (col in rectLeft - 1...rectLeft + 2) {
                     if (col < 0 || col >= width) continue; // Skip edges
 
                     // Blurry edge test
-                    if (getRawIDFromIndex((row * width + col) * 4 + offset) != rawID) return NULL_HIT;
+                    if (getRawIDFromIndex((row * width + col) * 4 + offset) != rawID) {
+                        failed = true;
+                        break;
+                    }
                 }
+                if (failed) break;
             }
+
+            if (failed) rawID = 0xFFFFFF;
         #end
 
         var bodyID:Null<Int> = null;
