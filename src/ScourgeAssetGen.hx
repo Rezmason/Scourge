@@ -17,11 +17,17 @@ class ScourgeAssetGen extends Application {
             Strings.WEIRD_SYMBOLS,
         ].join("");
 
+        var matrixChars:String = '012345678ABCDEFGHIJKLMNOPQRTabcdefghijklmnopqrstuvwxyz';
+
         var characterSets:Array<CharacterSet> = [
             {chars:profontChars, size:300, size2:300, fontID:'ProFont'},
             {chars:Strings.SMALL_CYRILLICS, size:400, size2:300, fontID:'ProFont_Cy'},
             {chars:Strings.BOX_SYMBOLS, size:300, size2:300, fontID:'SourceProFont'},
         ];
+        FlatFontGenerator.flatten(characterSets, 72, 72, 1, 20, 20, deployFont.bind(_, 'full'));
+
+        characterSets = [{chars:matrixChars, size:218, size2:218, fontID:'MatrixCode'}];
+        FlatFontGenerator.flatten(characterSets, 72, 72, 1, 20, 20, deployFont.bind(_, 'matrix'));
 
         /*
         var current:Sprite = Lib.current;
@@ -38,7 +44,6 @@ class ScourgeAssetGen extends Application {
         GlobTextureGenerator.makeTexture(512, deployImage.bind(_, "glob"));
         */
 
-        FlatFontGenerator.flatten(characterSets, 72, 72, 1, 20, 20, deployFont.bind(_, 'full'));
 
         Sys.exit(0);
     }

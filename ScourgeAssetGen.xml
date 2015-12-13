@@ -11,4 +11,5 @@
     <assets path="assets/fonts/ProFontX.ttf" rename="ProFont"/>
     <assets path="assets/fonts/werf - Profont Cyrillic/werfProFont.ttf" rename="ProFont_Cy"/>
     <assets path="assets/fonts/SourceCodePro_FontsOnly-1.013/TTF/SourceCodePro-Semibold.ttf" rename="SourceProFont"/>
+    <assets path="assets/fonts/mCode15_improved.ttf" rename="MatrixCode"/>
 </project>
