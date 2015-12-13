@@ -11,7 +11,7 @@ class HypertypeContext {
     public var engine(default, null):Engine;
     public function new():Void {
         Santa.mapToClass(GLSystem, Singleton(new GLSystem()));
-        Santa.mapToClass(FontManager, Singleton(new FontManager(['full'])));
+        Santa.mapToClass(FontManager, Singleton(new FontManager(['full', 'matrix'])));
 
         engine = new Engine();
         Application.current.addModule(engine);

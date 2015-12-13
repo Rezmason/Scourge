@@ -1,3 +1,8 @@
+MATRIX CODE
+    Always starts from the top
+    Start with one layer, which is a grid actually
+        Then make a second one of those in the background
+
 Improve feel of roll
 
 Wrap interactive board UI in loupe

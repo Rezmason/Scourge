@@ -29,7 +29,20 @@ class Context {
         
         var engine = engineContext.engine;
         var beginNavErrand = new BeginNavErrand(engine);
-        if (engine.ready) beginNavErrand.run();
-        else engine.readySignal.add(beginNavErrand.run);
+        
+        // if (engine.ready) beginNavErrand.run();
+        // else engine.readySignal.add(beginNavErrand.run);
+
+        if (engine.ready) makeMatrix(engine);
+        else engine.readySignal.add(makeMatrix.bind(engine));
+    }
+
+    function makeMatrix(engine) {
+        var demo = new net.rezmason.hypertype.demo.MatrixDemo();
+        var scene = new net.rezmason.hypertype.core.Scene();
+        scene.camera.scaleMode = net.rezmason.hypertype.core.CameraScaleMode.NO_BORDER;
+        scene.root.addChild(demo.body);
+        scene.focus = demo.body;
+        engine.addScene(scene);
     }
 }
