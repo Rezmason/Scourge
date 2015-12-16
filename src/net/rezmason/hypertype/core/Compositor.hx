@@ -57,7 +57,7 @@ class Compositor {
 
         // var vertices:VertexArray = new VertexArray(TOTAL_VERTICES * FLOATS_PER_VERTEX);
         vertexBuffer = glSys.createVertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
-        var up = #if flash 1 #else 0 #end ;
+        var up = #if flash 1 #else 0 #end ; // Theory: this difference is related to rendering to texture
         var verts = [
             -1, -1, 0, up, 
             -1,  1, 0, 1 - up, 

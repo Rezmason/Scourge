@@ -18,6 +18,7 @@ class Lab {
     var glSys:GLSystem;
     var metaballSystem:MetaballSystem;
     var postSystem:PostSystem;
+    var dataSystem:DataSystem;
 
     public function new(width:Int, height:Int):Void {
         this.width = width;
@@ -32,13 +33,22 @@ class Lab {
         postSystem = new PostSystem(glSys, width, height, metaballSystem);
         metaballSystem.init();
         postSystem.init();
+        dataSystem = new DataSystem(glSys, width, height);
+        dataSystem.init();
     }
 
     public function render():Void {
+        //*
         if (glSys.connected && metaballSystem.ready && postSystem.ready) {
             metaballSystem.render();
             postSystem.render();
         }
+        /**/
+        /*
+        if (glSys.connected && dataSystem.ready) {
+            dataSystem.render();
+        }
+        /**/
     }
 
     public static function makeExtensions(glSys:GLSystem):String {
@@ -101,9 +111,9 @@ class PostSystem extends LabSystem {
     var globTexture:Texture;
     var program:Program;
 
-    public var buffer:OutputBuffer;
+    var buffer:OutputBuffer;
 
-    var vertBuffer:VertexBuffer;
+    var vertexBuffer:VertexBuffer;
     var indexBuffer:IndexBuffer;
 
     var color:Array<Float>;
@@ -218,16 +228,16 @@ class PostSystem extends LabSystem {
 
         fragShader = Lab.makeExtensions(glSys) + fragShader;
 
-        vertBuffer = glSys.createVertexBuffer(VpB, FpV);
-        var up = #if flash 1 #else 0 #end ;
+        vertexBuffer = glSys.createVertexBuffer(VpB, FpV);
+        var up = #if flash 1 #else 0 #end ; // Theory: this difference is related to rendering to texture
         var vert = [
             -1,-1,0,0,1 - up,
             -1, 1,0,0,up,
              1, 1,0,1,up,
              1,-1,0,1,1 - up,
         ];
-        for (ike in 0...VpB * FpV) vertBuffer.mod(ike, vert[ike]);
-        vertBuffer.upload();
+        for (ike in 0...VpB * FpV) vertexBuffer.mod(ike, vert[ike]);
+        vertexBuffer.upload();
 
         indexBuffer = glSys.createIndexBuffer(6);
         var ind = [
@@ -272,8 +282,8 @@ class PostSystem extends LabSystem {
         program.setFourProgramConstants('uLight', light);
         program.setProgramConstantsFromMatrix('uGlobMat', globMat);
         
-        program.setVertexBufferAt('aPos',     vertBuffer, 0, 3); // aPos contains x,y,z
-        program.setVertexBufferAt('aUV',      vertBuffer, 3, 2); // aUV contains u,v
+        program.setVertexBufferAt('aPos',     vertexBuffer, 0, 3); // aPos contains x,y,z
+        program.setVertexBufferAt('aUV',      vertexBuffer, 3, 2); // aUV contains u,v
 
         glSys.start(buffer);
         glSys.clear(0, 0, 0);
@@ -310,7 +320,7 @@ class MetaballSystem extends LabSystem {
     var cavity:Array<Array<Null<Int>>>;
     var twitches:Array<Array<Null<Float>>>;
 
-    var vertBuffer:VertexBuffer;
+    var vertexBuffer:VertexBuffer;
     var indexBuffer:IndexBuffer;
 
     var time:Float;
@@ -381,7 +391,7 @@ class MetaballSystem extends LabSystem {
             twitches.push([]);
         }
         
-        vertBuffer = glSys.createVertexBuffer(NUM_BALLS * VpB, FpBV);
+        vertexBuffer = glSys.createVertexBuffer(NUM_BALLS * VpB, FpBV);
         indexBuffer = glSys.createIndexBuffer(NUM_BALLS * IpB);
 
         var drunkX:Int = Std.int(GRID_WIDTH / 2);
@@ -439,7 +449,7 @@ class MetaballSystem extends LabSystem {
         for (ike in 0...NUM_BALLS) {
             var vBall:Int = ike * VpB * FpBV;
             for (jen in 0...FpBV * VpB) {
-                vertBuffer.mod(vBall + jen, ballVertTemplate[jen]);
+                vertexBuffer.mod(vBall + jen, ballVertTemplate[jen]);
             }
         }
 
@@ -453,9 +463,9 @@ class MetaballSystem extends LabSystem {
             
             // set up vertices
             for (jen in 0...VpB) {
-                vertBuffer.mod((vBall + jen) * FpBV + 0, x * 0.8);
-                vertBuffer.mod((vBall + jen) * FpBV + 1, y * 0.8);
-                vertBuffer.mod((vBall + jen) * FpBV + 2, z);
+                vertexBuffer.mod((vBall + jen) * FpBV + 0, x * 0.8);
+                vertexBuffer.mod((vBall + jen) * FpBV + 1, y * 0.8);
+                vertexBuffer.mod((vBall + jen) * FpBV + 2, z);
             }
 
             // set up indices
@@ -505,8 +515,8 @@ class MetaballSystem extends LabSystem {
                     var size:Float = 2 / GRID_WIDTH;
                     var vBall:Int = (ike * GRID_WIDTH + jen) * VpB;
                     for (ken in 0...VpB) {
-                        vertBuffer.mod((vBall + ken) * FpBV + 5, size);
-                        vertBuffer.mod((vBall + ken) * FpBV + 6, 1);
+                        vertexBuffer.mod((vBall + ken) * FpBV + 5, size);
+                        vertexBuffer.mod((vBall + ken) * FpBV + 6, 1);
                     }
                 } else if (phases[ike][jen] != null) {
                     var size:Float = (pool.getHeightAtIndex(phases[ike][jen]) * 1.0 + 1.9);
@@ -514,13 +524,13 @@ class MetaballSystem extends LabSystem {
                     size /= GRID_WIDTH;
                     var vBall:Int = (ike * GRID_WIDTH + jen) * VpB;
                     for (ken in 0...VpB) {
-                        vertBuffer.mod((vBall + ken) * FpBV + 5, size);
+                        vertexBuffer.mod((vBall + ken) * FpBV + 5, size);
                     }
                 }
             }
         }
 
-        vertBuffer.upload();
+        vertexBuffer.upload();
         indexBuffer.upload();
     }
 
@@ -534,10 +544,10 @@ class MetaballSystem extends LabSystem {
         
         program.setTextureAt('uSampler', metaballTexture); // uSampler contains our metaballTexture
         
-        program.setVertexBufferAt('aPos',     vertBuffer, 0, 3); // aPos contains x,y,z
-        program.setVertexBufferAt('aCorner',  vertBuffer, 3, 2); // aCorner contains h,v
-        program.setVertexBufferAt('aScale',   vertBuffer, 5, 1); // aScale contains s
-        program.setVertexBufferAt('aCav',     vertBuffer, 6, 1); // aCav contains c
+        program.setVertexBufferAt('aPos',     vertexBuffer, 0, 3); // aPos contains x,y,z
+        program.setVertexBufferAt('aCorner',  vertexBuffer, 3, 2); // aCorner contains h,v
+        program.setVertexBufferAt('aScale',   vertexBuffer, 5, 1); // aScale contains s
+        program.setVertexBufferAt('aCav',     vertexBuffer, 6, 1); // aCav contains c
 
         glSys.start(buffer);
         glSys.clear(0, 0, 0);
@@ -550,5 +560,111 @@ class MetaballSystem extends LabSystem {
         program.setVertexBufferAt('aCav',     null, 6, 1);
 
         program.setTextureAt('uSampler', null);
+    }
+}
+
+class DataSystem extends LabSystem {
+
+    inline static var FLOATS_PER_VERTEX:Int = 2 + 2;
+    inline static var TOTAL_VERTICES:Int = 4;
+    inline static var TOTAL_TRIANGLES:Int = 2;
+    inline static var TOTAL_INDICES:Int = TOTAL_TRIANGLES * 3;
+    
+    var dataTexture:Texture;
+    var program:Program;
+
+    var buffer:OutputBuffer;
+
+    var vertexBuffer:VertexBuffer;
+    var indexBuffer:IndexBuffer;
+
+    override public function init():Void {
+
+        var arr:Array<Float> = [];
+        for (ike in 0...width) {
+            for (jen in 0...height) {
+                var pos = (ike * width + jen) * 4;
+                var x = ike / (width  - 1);
+                var y = jen / (height - 1);
+                arr[pos + 0] = x; // Red
+                arr[pos + 1] = y; // Green
+                arr[pos + 2] = 0; // Blue
+                arr[pos + 3] = 1; // Alpha
+            }
+        }
+
+        dataTexture = glSys.createHDRTexture(width, height, arr);
+
+        buffer = glSys.viewportOutputBuffer;
+        buffer.resize(width, height);
+
+        vertexBuffer = glSys.createVertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
+        var vertices = [
+            -1, -1,  0,  0, 
+            -1,  1,  0,  1, 
+             1, -1,  1,  0, 
+             1,  1,  1,  1, 
+        ];
+        for (ike in 0...vertices.length) vertexBuffer.mod(ike, vertices[ike]);
+        vertexBuffer.upload();
+
+        indexBuffer = glSys.createIndexBuffer(TOTAL_INDICES);
+        var ind = [0, 1, 2, 1, 2, 3,];
+        for (ike in 0...TOTAL_INDICES) indexBuffer.mod(ike, ind[ike]);
+        indexBuffer.upload();
+
+        var extensions = Lab.makeExtensions(glSys);
+        
+        var vertShader = extensions + '
+            attribute vec2 aPos;
+            attribute vec2 aUV;
+            varying vec2 vUV;
+
+            void main(void) {
+                vUV = aUV;
+                gl_Position = vec4(aPos, 0., 1.0);
+            }
+
+            '
+            ;
+        
+        var fragShader = extensions + '
+            varying vec2 vUV;
+            uniform sampler2D uDataSampler;
+
+            void main(void) {
+                gl_FragColor = texture2D(uDataSampler, vUV);
+            }
+            ';
+
+        program = glSys.createProgram(vertShader, fragShader);
+        if (program.loaded) onProgramLoaded();
+        else program.onLoad = onProgramLoaded;
+    }
+
+    function onProgramLoaded():Void {
+        ready = true;
+        loadSig.dispatch();
+    }
+
+    override function update():Void {}
+
+    override function draw():Void {
+        glSys.setProgram(program);
+        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        glSys.setDepthTest(false);
+
+        program.setTextureAt('uDataSampler', dataTexture, 1); // uDataSampler contains our data texture
+        program.setVertexBufferAt('aPos', vertexBuffer, 0, 2);
+        program.setVertexBufferAt('aUV',  vertexBuffer, 2, 2);
+
+        glSys.start(buffer);
+        glSys.clear(0, 0, 0);
+        glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
+        glSys.finish();
+        
+        program.setTextureAt('uDataSampler', null, 1);
+        program.setVertexBufferAt('aPos', null, 0, 2);
+        program.setVertexBufferAt('aUV',  null, 2, 2);
     }
 }

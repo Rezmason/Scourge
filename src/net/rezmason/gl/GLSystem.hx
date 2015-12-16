@@ -109,6 +109,14 @@ class GLSystem {
         return registerArtifact(new ImageTexture(img));
     }
 
+    public inline function createDataTexture(width:Int, height:Int, format:TextureFormat, data:Data):DataTexture {
+        return registerArtifact(new DataTexture(width, height, format, data));
+    }
+
+    public inline function createHDRTexture(width:Int, height:Int, floats:Array<Float>):HDRTexture {
+        return registerArtifact(new HDRTexture(width, height, floats));
+    }
+
     public inline function setProgram(program:Program):Void {
         #if flash 
             program.prog.attach();

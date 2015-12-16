@@ -1,7 +1,15 @@
+Better Glow
+    The flat font format and usage will need to change slightly
+        Convert flat fonts to using floating point
+        Glyph width and height will represent the bounds at thickness offset zero
+        Glyph shader will expand those bounds by max(thickness, glow)
+
 MATRIX CODE
-    Always starts from the top
-    Start with one layer, which is a grid actually
-        Then make a second one of those in the background
+    Two layers– a large grid in front, a smaller grid in back
+    Glyphs never actually move
+        Each column in the grid is styled according to a timed signal
+        Signal always starts from the top
+    Then make a second one of those in the background
 
 Improve feel of roll
 

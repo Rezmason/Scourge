@@ -8,16 +8,20 @@ import net.rezmason.gl.TextureFormat;
     import lime.graphics.PixelFormat;
 #end
 
-class ImageTexture extends Texture {
+class DataTexture extends Texture {
 
-    public var image(default, null):Image;
-    var width:Int = -1;
-    var height:Int = -1;
+    public var data(default, null):Data;
+    public var width:Int = -1;
+    public var height:Int = -1;
     var nativeTexture:NativeTexture;
+    var format:TextureFormat;
 
-    public function new(image:Image):Void {
+    public function new(width:Int, height:Int, format:TextureFormat, data:Data):Void {
         super();
-        this.image = image;
+        this.width = width;
+        this.height = height;
+        this.format = format;
+        this.data = data;
     }
 
     override function connectToContext(context:Context):Void {
@@ -28,18 +32,15 @@ class ImageTexture extends Texture {
         update();
     }
 
-    public inline function update():Void {
-        var sizeChanged = nativeTexture == null || width != image.width || height != image.height;
-        width = image.width;
-        height = image.height;
+    inline function update():Void {
+        var sizeChanged = nativeTexture == null;
         if (isConnectedToContext()) {
             #if flash
                 if (sizeChanged) {
                     if (nativeTexture != null) nativeTexture.dispose();
                     nativeTexture = context.createRectangleTexture(width, height, cast TextureFormat.FLOAT, false);
                 }
-                var bmd = @:privateAccess image.buffer.__srcBitmapData;
-                (cast nativeTexture).uploadFromBitmapData(bmd);
+                (cast nativeTexture).uploadFromByteArray(data.getData(), 0);
             #else
                 GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
                 // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
@@ -47,9 +48,7 @@ class ImageTexture extends Texture {
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
                 
-                image.format = PixelFormat.RGBA32;
-                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, image.width, image.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, image.data);
-                image.format = PixelFormat.BGRA32;
+                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, format, data);
                 
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
@@ -62,8 +61,6 @@ class ImageTexture extends Texture {
         super.disconnectFromContext();
         #if flash nativeTexture.dispose(); #end
         nativeTexture = null;
-        width = -1;
-        height = -1;
     }
 
     override function setAtProgLocation(prog:NativeProgram, location:UniformLocation, index:Int):Void {
