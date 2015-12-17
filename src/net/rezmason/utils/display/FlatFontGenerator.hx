@@ -50,6 +50,7 @@ class FlatFontGenerator {
 
             for (jen in 0...Utf8.length(chars)) {
                 var char = Utf8.sub(chars, jen, 1);
+                if (renderedGlyphs.exists(char)) continue;
                 if (char == ' ') {
                     if (!includeSpace) {
                         includeSpace = true;
@@ -57,11 +58,11 @@ class FlatFontGenerator {
                     }
                     continue;
                 }
+                
                 var glyph = font.getGlyph(char);
                 if (glyph == 0) continue;
                 var renderedGlyph = font.renderGlyph(glyph, fontSize);
                 if (renderedGlyph == null) continue;
-                if (renderedGlyphs.exists(char)) continue;
                 
                 // Based on explanation at http://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html
 
