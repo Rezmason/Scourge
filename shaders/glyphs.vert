@@ -10,7 +10,7 @@ uniform mat4 uCameraMat;
 uniform mat4 uBodyMat;
 
 varying vec3 vColor;
-varying vec2 vUV;
+varying vec3 vUV;
 varying vec3 vFX;
 
 void main(void) {
@@ -20,7 +20,7 @@ void main(void) {
     pos.xy += uBodyParams.xy * vec2(aCorner.x * aDistort.x, aCorner.y) * aDistort.y;
 
     vColor = aColor * clamp(2.0 - pos.z, 0.0, 1.0);
-    vUV = aUV;
+    vUV = vec3(aUV, uBodyParams.z);
     vFX = aFX;
 
     pos.z = clamp(pos.z, 0.0, 1.0);

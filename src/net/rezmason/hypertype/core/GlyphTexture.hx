@@ -16,6 +16,6 @@ class GlyphTexture {
         this.name = name;
         this.font = font;
         var glSys:GLSystem = new Present(GLSystem);
-        texture = glSys.createImageTexture(font.getImageClone());
+        texture = glSys.createHDRTexture(font.width, font.height, font.getData());
     }
 }

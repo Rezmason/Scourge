@@ -68,6 +68,7 @@ class GlyphDemo {
 
         var val:Float = tweens[currentPhase](percent);
         val = tweenData[currentPhase][0] * (1 - val) + tweenData[currentPhase][1] * val;
+
         glyph.set_f(val * 0.5);
         glyph.set_color(COLORS[currentColor] * (val * (1 + FADE_AMT) - FADE_AMT));
     }

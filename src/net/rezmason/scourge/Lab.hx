@@ -11,6 +11,8 @@ import net.rezmason.scourge.waves.WaveFunctions;
 
 import net.rezmason.utils.Zig;
 
+import net.rezmason.math.FelzenszwalbSDF;
+
 class Lab {
 
     var width:Int;
@@ -580,15 +582,52 @@ class DataSystem extends LabSystem {
 
     override public function init():Void {
 
+        //*
+        function traceData(data:Array<Float>, width, height) {
+            var max = 1.;
+            for (float in data) {
+                // if (float == Math.POSITIVE_INFINITY || float == Math.NEGATIVE_INFINITY) continue;
+                if (max < float) max = float;
+            }
+            var str = '\n';
+            for (ike in 0...height) {
+                for (jen in 0...width) {
+                    var float = data[width * ike + jen];
+                    str += String.fromCharCode(97 + Std.int(float * 25 / max));
+                    // str += float == 0 ? ' ' : '•';
+                }
+                str += '\n';
+            }
+            trace(str);
+        }
+        /**/
+
+        var data:Array<Float> = [for (ike in 0...width * height) 0];
+        //*
+        for (ike in 0...height) {
+            for (jen in 0...width) {
+                var x = ike / (height - 1);
+                var y = jen / (width - 1);
+                var circ1 = Math.sqrt(Math.pow(x - 0.3, 2) + Math.pow(y - 0.3, 2)) < 0.15;
+                var circ2 = Math.sqrt(Math.pow(x - 0.7, 2) + Math.pow(y - 0.7, 2)) < 0.15;
+                data[ike * width + jen] = circ1 || circ2 ? 1 : 0;
+            }
+        }
+        /**/
+
+        data = FelzenszwalbSDF.computeSignedDistanceField(width, height, data);
+        // traceData(data, width, height);
+
         var arr:Array<Float> = [];
         for (ike in 0...width) {
             for (jen in 0...height) {
                 var pos = (ike * width + jen) * 4;
-                var x = ike / (width  - 1);
-                var y = jen / (height - 1);
-                arr[pos + 0] = x; // Red
-                arr[pos + 1] = y; // Green
-                arr[pos + 2] = 0; // Blue
+                // var x = ike / (width  - 1);
+                // var y = jen / (height - 1);
+                var val = data[ike * width + jen] / 500;
+                arr[pos + 0] = val; // Red
+                arr[pos + 1] = -val; // Green
+                arr[pos + 2] = -val; // Blue
                 arr[pos + 3] = 1; // Alpha
             }
         }

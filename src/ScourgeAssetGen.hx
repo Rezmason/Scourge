@@ -1,10 +1,11 @@
 package;
 
+import haxe.io.Bytes;
 import lime.app.Application;
 import lime.graphics.Image;
 import net.rezmason.hypertype.Strings;
-import net.rezmason.utils.display.FlatFont;
 import net.rezmason.utils.display.FlatFontGenerator;
+import sys.io.File;
 
 class ScourgeAssetGen extends Application {
 
@@ -24,10 +25,10 @@ class ScourgeAssetGen extends Application {
             {chars:Strings.SMALL_CYRILLICS, size:400, size2:300, fontID:'ProFont_Cy'},
             {chars:Strings.BOX_SYMBOLS, size:300, size2:300, fontID:'SourceProFont'},
         ];
-        FlatFontGenerator.flatten(characterSets, 72, 72, 1, 20, 20, deployFont.bind(_, 'full'));
+        FlatFontGenerator.flatten(characterSets, 72, 72, 1, 20, 20, deployFont.bind('full'));
 
         characterSets = [{chars:matrixChars, size:218, size2:218, fontID:'MatrixCode'}];
-        FlatFontGenerator.flatten(characterSets, 72, 72, 1, 20, 20, deployFont.bind(_, 'matrix'));
+        FlatFontGenerator.flatten(characterSets, 72, 72, 1, 20, 20, deployFont.bind('matrix'));
 
         /*
         var current:Sprite = Lib.current;
@@ -48,15 +49,15 @@ class ScourgeAssetGen extends Application {
         Sys.exit(0);
     }
 
-    static function deployFont(font:FlatFont, id:String):Void {
-        var path = '../../../../../../../../assets/';
-        sys.io.File.saveContent('${path}/flatfonts/${id}_flat.png', font.getImageClone().encode().toString());
-        sys.io.File.saveContent('${path}/flatfonts/${id}_flat.json', font.exportJSON());
+    static function deployFont(id:String, htf:Bytes, image:Image):Void {
+        var path = '../../../../../../../../assets/flatfonts/';
+        File.saveBytes('$path${id}.htf', htf);
+        File.saveContent('${path}${id}.png', image.encode().toString());
     }
 
     static function deployImage(image:Image, id:String):Void {
         var path = '../../../../../../../../assets/';
-        sys.io.File.saveContent('${path}${id}.png', image.encode().toString());
+        File.saveContent('${path}${id}.png', image.encode().toString());
         /*
         var sprite:Sprite = new Sprite();
         sprite.addChild(new Bitmap(image));

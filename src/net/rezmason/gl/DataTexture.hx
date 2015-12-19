@@ -28,6 +28,8 @@ class DataTexture extends Texture {
         super.connectToContext(context);
         #if !flash
             nativeTexture = GL.createTexture();
+            GL.getExtension('OES_texture_float');
+            GL.getExtension('OES_texture_float_linear');
         #end
         update();
     }

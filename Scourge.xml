@@ -27,7 +27,7 @@
     <assets path="tables" include="*.txt"/>
     <assets path="shaders" include="*.vert|*.frag"/>
 
-    <assets path="assets/flatfonts" rename="flatfonts"/>
+    <assets path="assets/flatfonts" include="*.htf" rename="flatfonts"/>
     <assets path="assets/metaballs" rename="metaballs"/>
     <assets path="assets/exampletext" rename="exampletext"/>
     <assets path="assets/text" rename="text"/>

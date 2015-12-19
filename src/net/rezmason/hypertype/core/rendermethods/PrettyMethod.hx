@@ -14,11 +14,11 @@ class PrettyMethod extends RenderMethod {
 
     inline static var DERIV_MULT:Float =
     #if flash
-        0.3
+        0.6
     #elseif js
-        80
+        160
     #else
-        80
+        160
     #end
     ;
 
@@ -46,8 +46,15 @@ class PrettyMethod extends RenderMethod {
         #if flash
             fragShader = getText('shaders/glyphs_flash.frag');
         #elseif js
-            glSys.enableExtension("OES_standard_derivatives");
-            fragShader = '#extension GL_OES_standard_derivatives : enable \n precision mediump float;' + frag;
+            glSys.enableExtension('OES_standard_derivatives');
+            glSys.enableExtension('OES_texture_float');
+            glSys.enableExtension('OES_texture_float_linear');
+            fragShader = '
+            #extension GL_OES_standard_derivatives : enable
+            #extension GL_OES_texture_float : enable
+            #extension GL_OES_texture_float_linear : enable
+            precision mediump float;
+            ' + frag;
         #else
             fragShader = frag;
         #end

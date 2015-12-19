@@ -11,7 +11,7 @@ varying vec4 vPaint;
 
 void main(void) {
 
-    vPaint = vec4(uBodyParams.b, aPaint, 1.0);
+    vPaint = vec4(uBodyParams.a, aPaint, 1.0);
 
     vec4 pos = uCameraMat * (uBodyMat * vec4(aPos, 1.0));
     pos.x += uBodyParams.x * aCorner.x * aHitbox.y * aHitbox.x;

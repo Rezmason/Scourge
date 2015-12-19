@@ -1,77 +1,45 @@
 package net.rezmason.utils.display;
 
-import lime.graphics.Image;
-
 import haxe.Utf8;
-
-using haxe.Json;
+import haxe.io.Bytes;
+import haxe.io.BytesInput;
 
 typedef CharCoord = {x:Int, y:Int};
 typedef UV = {u:Float, v:Float};
 
-typedef FlatFontJSON = {
-    var glyphWidth:Int;
-    var glyphHeight:Int;
-    var glyphRatio:Float;
-    var charCoords:Dynamic;
-};
-
-@:allow(net.rezmason.utils.display.FlatFontGenerator)
 class FlatFont {
 
-    var image:Image;
-    var charCoords:Map<Int, CharCoord>;
+    var data:Array<Float>;
+    var charCoords:Map<UInt, CharCoord>;
     var defaultCharCoord:CharCoord;
-    var jsonString:String;
-    var charUVs:Map<Int, Array<UV>>;
+    var charUVs:Map<UInt, Array<UV>>;
 
-    public var glyphWidth(default, null):Int;
-    public var glyphHeight(default, null):Int;
+    public var glyphWidth(default, null):UInt;
+    public var glyphHeight(default, null):UInt;
+    public var width(default, null):UInt;
+    public var height(default, null):UInt;
+    public var range(default, null):Float;
     public var glyphRatio(default, null):Float;
-    public var bdWidth(default, null):Int;
-    public var bdHeight(default, null):Int;
     public var rowFraction(default, null):Float;
     public var columnFraction(default, null):Float;
 
-    public function new(image:Image, jsonString:String):Void {
-
-        this.image = image;
-        bdWidth = image.width;
-        bdHeight = image.height;
-
-        this.jsonString = jsonString;
+    public function new(htf:Bytes):Void {
+        var input = new BytesInput(htf);
+        width = input.readUInt16();
+        height = input.readUInt16();
+        glyphWidth = input.readUInt16();
+        glyphHeight = input.readUInt16();
+        glyphRatio = input.readFloat();
+        range = input.readFloat();
         charCoords = new Map();
+        for (ike in 0...input.readUInt16()) charCoords[input.readUInt16()] = {x:input.readUInt16(), y:input.readUInt16()};
+        rowFraction = glyphHeight / height;
+        columnFraction = glyphWidth / width;
+        data = [for (ike in 0...width * height * 4) (ike % 4 == 2) ? input.readFloat() : 1];
         charUVs = new Map();
-
-        var expandedJSON:FlatFontJSON = jsonString.parse();
-        glyphWidth = expandedJSON.glyphWidth;
-        glyphHeight = expandedJSON.glyphHeight;
-        glyphRatio = expandedJSON.glyphRatio;
-        rowFraction = glyphHeight / image.height;
-        columnFraction = glyphWidth / image.width;
-
-        for (field in Reflect.fields(expandedJSON.charCoords)) {
-            var code:Int = Std.parseInt(field.substr(1));
-            charCoords[code] = cast Reflect.field(expandedJSON.charCoords, field);
-        }
-
         defaultCharCoord = {x:0, y:0};
     }
-    /*
-    public inline function getCharMatrix(char:String):Matrix {
-        return getCharCodeMatrix(Utf8.charCodeAt(char, 0));
-    }
 
-    public inline function getCharCodeMatrix(code:Int):Matrix {
-        var charCoord:CharCoord = charCoords[code];
-        var mat:Matrix = new Matrix();
-        if (charCoord != null) {
-            mat.tx = -charCoord.x;
-            mat.ty = -charCoord.y;
-        }
-        return mat;
-    }
-    */
     public inline function getCharUVs(char:String):Array<UV> {
         return getCharCodeUVs(Utf8.charCodeAt(char, 0));
     }
@@ -83,11 +51,11 @@ class FlatFont {
             var charCoord:CharCoord = charCoords[code];
             if (charCoord == null) charCoord = defaultCharCoord;
 
-            var bumpU:Float = 0.5 / bdWidth;
-            var bumpV:Float = 0.5 / bdHeight;
+            var bumpU:Float = 0.5 / width;
+            var bumpV:Float = 0.5 / height;
 
-            var u:Float = charCoord.x / bdWidth;
-            var v:Float = charCoord.y / bdHeight;
+            var u:Float = charCoord.x / width;
+            var v:Float = charCoord.y / height;
 
             uvs.push({u:u                  + bumpU, v:v               + bumpV});
             uvs.push({u:u + columnFraction - bumpU, v:v               + bumpV});
@@ -98,7 +66,5 @@ class FlatFont {
         return uvs;
     }
 
-    public inline function getImageClone():Image { return image.clone(); }
-
-    public inline function exportJSON():String { return jsonString; }
+    public inline function getData() return data.copy();
 }

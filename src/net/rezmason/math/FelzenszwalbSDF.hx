@@ -75,7 +75,7 @@ class FelzenszwalbSDF {
         // transform along rows
         for (y in 0...height) {
             for (x in 0...width) f[x] = output[y * width + x];
-            computeDT(f, height, d, v, z);
+            computeDT(f, width, d, v, z);
             for (x in 0...width) output[y * width + x] = d[x];
         }
 
