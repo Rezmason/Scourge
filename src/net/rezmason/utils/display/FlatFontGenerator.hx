@@ -156,8 +156,18 @@ class FlatFontGenerator {
                 row++;
             }
         }
-        // for (float in table) output.writeFloat(float);
+
         for (float in table) output.writeUInt16(HalfFloatUtil.floatToHalfFloat(float));
+        /*
+        var halfFloats:Map<UInt, Bool> = new Map();
+        var count = 0;
+        for (float in table) {
+            var halfFloat = HalfFloatUtil.floatToHalfFloat(float);
+            if (!halfFloats.exists(halfFloat)) count++;
+            halfFloats[halfFloat] = true;
+        }
+        trace(count);
+        */
 
         var image = makeGlyphImage(tableWidth, tableHeight, table);
 

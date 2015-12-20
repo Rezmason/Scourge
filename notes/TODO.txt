@@ -1,9 +1,8 @@
 Better Glow
     The flat font format and usage will need to change slightly
-        Convert flat fonts to using floating point
-            TOO BIG; compress them
         Glyph width and height will represent the bounds at thickness offset zero
         Glyph shader will expand those bounds by max(thickness, glow)
+    Compress the HTFs
 
 MATRIX CODE
     Two layers– a large grid in front, a smaller grid in back
