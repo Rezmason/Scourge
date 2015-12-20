@@ -7,7 +7,7 @@ uniform vec4 uDerivMult;
 
 void main(void) {
 
-    float texture = texture2D(uSampler, vUV.xy).r * vUV.z + 0.5;
+    float texture = texture2D(uSampler, vUV.xy).r * vUV.z;
     
       float deriv = uDerivMult.x * min(dFdx(vUV.x), -dFdy(vUV.y));
     //float deriv = uDerivMult.x;

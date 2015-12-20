@@ -1,7 +1,5 @@
 Better Glow
-    The flat font format and usage will need to change slightly
-        Glyph width and height will represent the bounds at thickness offset zero
-        Glyph shader will expand those bounds by max(thickness, glow)
+    Shader should expand pos and UVs
     Compress the HTFs
 
 MATRIX CODE

@@ -91,7 +91,7 @@ class BoardAnimator {
 
         var fromChar = from.get_char();
         var toChar = to.get_char();
-        if (fromChar != toChar) glyph.set_f(Math.abs(frac - 0.5));
+        if (fromChar != toChar) glyph.set_f(Math.abs(frac - 0.5) - 0.5);
         glyph.set_char(frac < 0.5 ? fromChar : toChar);
     }
 }

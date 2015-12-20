@@ -24,26 +24,18 @@ class GlyphDemo {
     static var tweens:Array<Float->Float> = [Quint.easeOut.calculate, Linear.easeNone.calculate, Quint.easeIn.calculate];
     inline static var CHARS:String = 'ΩSCOURGE';
 
-    public var body(default, null):Body;
-    var currentCharIndex:Int;
-    var phaseTime:Float;
-    var currentPhase:Int;
-    var currentColor:Int;
-    var mouseIsDown:Bool;
+    public var body(default, null):Body = new Body();
     var glyph:Glyph;
+    var currentCharIndex = 0;
+    var time:Float = 0;
+    var currentPhase = 1;
+    var currentColor = 0;
+    var mouseIsDown = false;
 
     public function new():Void {
-
-        currentCharIndex = 0;
-        currentPhase = 1;
-        phaseTime = 0;
-        currentColor = 0;
-        mouseIsDown = false;
-
-        body = new Body();
         body.interactionSignal.add(receiveInteraction);
         body.updateSignal.add(update);
-        body.glyphScale = 0.4;
+        body.glyphScale = 0.6;
         body.growTo(1);
 
         glyph = body.getGlyphByID(0);
@@ -52,10 +44,10 @@ class GlyphDemo {
     }
 
     function update(delta:Float):Void {
-        phaseTime += delta * (mouseIsDown ? 0.2 : 1);
+        time += delta * (mouseIsDown ? 0.2 : 1);
 
-        if (phaseTime > periods[currentPhase]) {
-            phaseTime -= periods[currentPhase];
+        if (time > periods[currentPhase]) {
+            time -= periods[currentPhase];
             currentPhase = (currentPhase + 1) % NUM_PHASES;
             if (currentPhase == 0) {
                 currentCharIndex = (currentCharIndex + 1) % Utf8.length(CHARS);
@@ -64,12 +56,12 @@ class GlyphDemo {
             }
         }
 
-        var percent:Float = phaseTime / periods[currentPhase];
+        var percent:Float = time / periods[currentPhase];
 
         var val:Float = tweens[currentPhase](percent);
         val = tweenData[currentPhase][0] * (1 - val) + tweenData[currentPhase][1] * val;
 
-        glyph.set_f(val * 0.5);
+        glyph.set_f(val - 0.75);
         glyph.set_color(COLORS[currentColor] * (val * (1 + FADE_AMT) - FADE_AMT));
     }
 

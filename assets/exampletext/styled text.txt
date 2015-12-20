@@ -4,11 +4,11 @@ This is another §{test2}test§{}.
 §{name:whatever3g:1,  p:0.05               , basis:test}This is a third test!§{}
 
 
-§{name:merp1, p: 0.00, r:0, f:0.5}UP§{}
+§{name:merp1, p: 0.00, r:0, f:0.}UP§{}
 
-§{name:merp2, p:-0.01, g:0, f:0.6}OVER§{}
+§{name:merp2, p:-0.01, g:0, f:0.1}OVER§{}
 
-§{name:merp3, p: 0.01, b:0, f:0.4}DOWN§{}
+§{name:merp3, p: 0.01, b:0, f:-0.1}DOWN§{}
 
 ∂{name:animation, period:1, frames:[merp1, merp2, merp3]}DANCE, DAMN IT§{}
 µ{name:button, up:merp1, over:merp2, down:merp3, period:0.2, i:1, id:button1}  BUTTON TIME  §{}

@@ -241,7 +241,7 @@ class GlyphUtils {
         set_distort(gl, 1, 1, 0); // h, s, p
         set_xyz(gl, 0, 0, 0); // x, y, z
         set_rgb(gl, 1, 1, 1); // r, g, b
-        set_fx(gl, 0, 0.5, 0); // i, f, a
+        set_fx(gl, 0, 0, 0); // i, f, a
         // We don't reset the font.
         set_char(gl, -1);
         // We don't reset the paint.

@@ -30,11 +30,11 @@ class Context {
         var engine = engineContext.engine;
         var beginNavErrand = new BeginNavErrand(engine);
         
-        // if (engine.ready) beginNavErrand.run();
-        // else engine.readySignal.add(beginNavErrand.run);
+        if (engine.ready) beginNavErrand.run();
+        else engine.readySignal.add(beginNavErrand.run);
 
-        if (engine.ready) makeMatrix(engine);
-        else engine.readySignal.add(makeMatrix.bind(engine));
+        // if (engine.ready) makeMatrix(engine);
+        // else engine.readySignal.add(makeMatrix.bind(engine));
     }
 
     function makeMatrix(engine) {
