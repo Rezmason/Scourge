@@ -9,15 +9,10 @@ import net.rezmason.math.FelzenszwalbSDF;
 
 using net.rezmason.utils.Alphabetizer;
 
-typedef PendingGlyph = {
-    var char:String;
-    var fontID:String;
-    var glyph:Int;
+typedef RenderedGlyph = {
     var image:Image;
-    var width:Int;
-    var height:Int;
-    var offsetX:Int;
-    var offsetY:Int;
+    var x:UInt;
+    var y:UInt;
 };
 
 typedef CharacterSet = {
@@ -31,94 +26,65 @@ class FlatFontGenerator {
 
     public static function flatten(characterSets:Array<CharacterSet>, glyphWidth, glyphHeight, spacing, range, cutoff, cbk) {
 
+        var maxWidth = 0;
+        var maxHeight = 0;
+        var pendingGlyphs:Map<String, RenderedGlyph> = new Map();
         var computedGlyphs:Map<String, Array<Float>> = new Map();
-        var numChars = 0;
-        var includeSpace = false;
-        var glyphRatio:Float = 1;
 
-        for (ike in 0...characterSets.length) {
-            var characterSet = characterSets[ike];
-            var fontID = characterSet.fontID;
-            var chars = characterSet.chars;
-            var fontSize = characterSet.size;
-            var fontSize2 = characterSet.size2;
-            var maxWidth = 0;
-            var maxHeight = 0;
-            var font = Assets.getFont(fontID);
-            var pendingGlyphs:Map<String, PendingGlyph> = new Map();
-
-            for (jen in 0...Utf8.length(chars)) {
-                var char = Utf8.sub(chars, jen, 1);
-                if (computedGlyphs.exists(char)) continue;
-                if (char == ' ') {
-                    if (!includeSpace) {
-                        includeSpace = true;
-                        numChars++;
-                    }
-                    continue;
-                }
-                
+        for (characterSet in characterSets) {
+            var font = Assets.getFont(characterSet.fontID);
+            for (index in 0...Utf8.length(characterSet.chars)) {
+                var char = Utf8.sub(characterSet.chars, index, 1);
+                if (pendingGlyphs.exists(char)) continue;
                 var glyph = font.getGlyph(char);
                 if (glyph == 0) continue;
-                var renderedGlyph = font.renderGlyph(glyph, fontSize);
+                var renderedGlyph = font.renderGlyph(glyph, characterSet.size);
                 if (renderedGlyph == null) continue;
-                
-                // Based on explanation at http://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html
 
+                // Based on explanation at http://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html
                 var renderedGlyphWidth = renderedGlyph.width;
                 var renderedGlyphHeight = renderedGlyph.height;
                 var metrics = font.getGlyphMetrics(glyph);
                 var unit = renderedGlyphHeight / metrics.height;
                 var offsetX = Std.int(metrics.horizontalBearing.x * unit);
-                var offsetY = Std.int(fontSize2 - metrics.horizontalBearing.y * unit);
+                var offsetY = Std.int(characterSet.size2 - metrics.horizontalBearing.y * unit);
+
+                pendingGlyphs[char] = {image:renderedGlyph, x:offsetX, y:offsetY};
                 var properWidth = Std.int(metrics.advance.x * unit);
                 var properHeight = Std.int(metrics.advance.y * unit);
                 if (properWidth  < offsetX + renderedGlyphWidth ) properWidth  = offsetX + renderedGlyphWidth;
                 if (properHeight < offsetY + renderedGlyphHeight) properHeight = offsetY + renderedGlyphHeight;
-
-                pendingGlyphs[char] = {
-                    char:char,
-                    fontID:fontID,
-                    glyph:glyph,
-                    image:renderedGlyph,
-                    width:properWidth,
-                    height:properHeight,
-                    offsetX:offsetX,
-                    offsetY:offsetY
-                };
-                
                 if (maxWidth  < properWidth)  maxWidth  = properWidth;
                 if (maxHeight < properHeight) maxHeight = properHeight;
             }
-
-            maxWidth += 2 * range;
-            maxHeight += 2 * range;
-
-            if (ike == 0) glyphRatio = maxHeight / maxWidth;
-
-            for (char in pendingGlyphs.keys().a2z()) {
-                var pendingGlyph = pendingGlyphs[char];
-                var data = pendingGlyph.image.data;
-                var sdfInput = [for (ike in 0...maxWidth * maxHeight) 0.];
-                for (y in 0...pendingGlyph.image.height) {
-                    for (x in 0...pendingGlyph.image.width) {
-                        var val:UInt = data[(y * pendingGlyph.image.width + x) * 1];
-                        var outputX = x + pendingGlyph.offsetX + range;
-                        var outputY = y + pendingGlyph.offsetY + range;
-                        sdfInput[outputY * maxWidth + outputX] = val == 0 ? 0 : 1;
-                    }
-                }
-
-                var sdfOutput = FelzenszwalbSDF.computeSignedDistanceField(maxWidth, maxHeight, sdfInput);
-                sdfOutput = resize(maxWidth, maxHeight, sdfOutput, glyphWidth, glyphHeight);
-                
-                numChars++;
-                computedGlyphs[char] = sdfOutput;
-                trace(char);
-            }
         }
 
-        if (includeSpace) computedGlyphs[' '] = [for (ike in 0...glyphWidth * glyphHeight) cast range];
+        var glyphRatio = maxHeight / maxWidth;
+        var sdfWidth  = maxWidth + 2 * range;
+        var sdfHeight = maxHeight + 2 * range;
+        var numChars = 1;
+        computedGlyphs[' '] = [for (ike in 0...glyphWidth * glyphHeight) cast range];
+        for (char in pendingGlyphs.keys().a2z()) {
+            var pendingGlyph = pendingGlyphs[char];
+            var data = pendingGlyph.image.data;
+            var sdfInput = [for (ike in 0...sdfWidth * sdfHeight) 0.];
+            for (y in 0...pendingGlyph.image.height) {
+                for (x in 0...pendingGlyph.image.width) {
+                    var val:UInt = data[(y * pendingGlyph.image.width + x) * 1];
+                    var outputX = x + pendingGlyph.x + range;
+                    var outputY = y + pendingGlyph.y + range;
+                    sdfInput[outputY * sdfWidth + outputX] = val == 0 ? 0 : 1;
+                }
+            }
+
+            var sdfOutput = FelzenszwalbSDF.computeSignedDistanceField(sdfWidth, sdfHeight, sdfInput);
+            sdfOutput = resize(sdfWidth, sdfHeight, sdfOutput, glyphWidth, glyphHeight);
+            
+            numChars++;
+            computedGlyphs[char] = sdfOutput;
+            Sys.print(char);
+        }
+
         var numColumns:Int = Std.int(Math.sqrt(numChars)) + 1;
         var numRows:Int = Std.int(numChars / numColumns) + 1;
         var tableWidth  = numColumns * (glyphWidth  + spacing) - spacing;
@@ -126,7 +92,6 @@ class FlatFontGenerator {
         var table = [for (ike in 0...tableWidth * tableHeight) Math.POSITIVE_INFINITY];
         var row = 0;
         var col = 0;
-        
         var output:BytesOutput = new BytesOutput();
         output.writeUInt16(tableWidth);
         output.writeUInt16(tableHeight);
@@ -168,6 +133,7 @@ class FlatFontGenerator {
         }
         trace(count);
         */
+        Sys.print('\n');
 
         var image = makeGlyphImage(tableWidth, tableHeight, table);
 

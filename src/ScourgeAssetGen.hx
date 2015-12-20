@@ -12,11 +12,12 @@ class ScourgeAssetGen extends Application {
     override public function onPreloadComplete():Void {
         
         var profontChars:String = [
+            ' ',
             Strings.ALPHANUMERICS,
             Strings.PUNCTUATION,
             Strings.SYMBOLS,
             Strings.WEIRD_SYMBOLS,
-        ].join("");
+        ].join('');
 
         var matrixChars:String = '012345678ABCDEFGHIJKLMNOPQRTabcdefghijklmnopqrstuvwxyz';
 
@@ -25,10 +26,10 @@ class ScourgeAssetGen extends Application {
             {chars:Strings.SMALL_CYRILLICS, size:400, size2:300, fontID:'ProFont_Cy'},
             {chars:Strings.BOX_SYMBOLS, size:300, size2:300, fontID:'SourceProFont'},
         ];
-        FlatFontGenerator.flatten(characterSets, 36, 36, 1, 20, 20, deployFont.bind('full'));
+        FlatFontGenerator.flatten(characterSets, 54, 54, 1, 20, 20, deployFont.bind('full'));
 
         characterSets = [{chars:matrixChars, size:218, size2:218, fontID:'MatrixCode'}];
-        FlatFontGenerator.flatten(characterSets, 36, 36, 1, 20, 20, deployFont.bind('matrix'));
+        FlatFontGenerator.flatten(characterSets, 54, 54, 1, 20, 20, deployFont.bind('matrix'));
 
         /*
         var current:Sprite = Lib.current;
