@@ -1,6 +1,5 @@
 package net.rezmason.hypertype.core;
 
-import haxe.io.Bytes;
 import lime.Assets;
 import net.rezmason.hypertype.core.GlyphTexture;
 import net.rezmason.utils.Zig;
@@ -14,17 +13,7 @@ class FontManager {
     public function new(fontNames:Array<String>):Void {
         fontTextures = new Map();
         for (name in fontNames) {
-            var byteArray = Assets.getBytes('flatfonts/${name}.htf');
-            var bytes = null;
-            #if flash
-                bytes = Bytes.ofData(byteArray);
-            #elseif js
-                bytes = Bytes.ofData(byteArray.__getBuffer());
-            #else
-                bytes = byteArray;
-            #end
-            var font:FlatFont = new FlatFont(bytes);
-            fontTextures[name] = cast new GlyphTexture(name, font);
+            fontTextures[name] = cast new GlyphTexture(name, new FlatFont(Assets.getBytes('flatfonts/${name}.htf')));
         }
 
         onFontChange = new Zig();

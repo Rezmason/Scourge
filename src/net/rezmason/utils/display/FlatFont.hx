@@ -9,11 +9,11 @@ typedef UV = {u:Float, v:Float};
 
 class FlatFont {
 
-    var data:Array<Float>;
     var charCoords:Map<UInt, CharCoord>;
     var defaultCharCoord:CharCoord;
     var charUVs:Map<UInt, Array<UV>>;
-
+    
+    public var data(default, null):Bytes;
     public var glyphWidth(default, null):UInt;
     public var glyphHeight(default, null):UInt;
     public var width(default, null):UInt;
@@ -24,7 +24,7 @@ class FlatFont {
     public var columnFraction(default, null):Float;
 
     public function new(htf:Bytes):Void {
-        var input = new BytesInput(htf);
+        var input:BytesInput = new BytesInput(htf);
         width = input.readUInt16();
         height = input.readUInt16();
         glyphWidth = input.readUInt16();
@@ -35,7 +35,7 @@ class FlatFont {
         for (ike in 0...input.readUInt16()) charCoords[input.readUInt16()] = {x:input.readUInt16(), y:input.readUInt16()};
         rowFraction = glyphHeight / height;
         columnFraction = glyphWidth / width;
-        data = [for (ike in 0...width * height * 4) (ike % 4 == 2) ? input.readFloat() : 1];
+        data = htf.sub(input.position, htf.length - input.position);
         charUVs = new Map();
         defaultCharCoord = {x:0, y:0};
     }
@@ -65,6 +65,4 @@ class FlatFont {
         }
         return uvs;
     }
-
-    public inline function getData() return data.copy();
 }

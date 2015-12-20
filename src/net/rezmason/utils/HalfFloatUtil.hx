@@ -17,13 +17,15 @@ class HalfFloatUtil {
     public inline static function floatToHalfFloat(float:Float):Int {
         floatBytes.setFloat(0, float);
         var floatRep:Int = floatBytes.getInt32(0);
-        return baseTable[(floatRep >> 23) & 0x1FF] + ((floatRep & 0x007FFFFF) >> shiftTable[(floatRep >> 23) & 0x1FF]);
+        var halfFloatRep:Int = baseTable[(floatRep >> 23) & 0x1FF] + ((floatRep & 0x007FFFFF) >> shiftTable[(floatRep >> 23) & 0x1FF]);
+        return halfFloatRep;
     }
 
-    public static function createHalfFloatBytes(floats:Array<Float>) {
-        var halfFloatBytes = Bytes.alloc(floats.length * 2);
-        for (ike in 0...floats.length) halfFloatBytes.setUInt16(ike * 2, floatToHalfFloat(floats[ike]));
-        return halfFloatBytes;
+    public inline static function halfFloatToFloat(halfFloatRep:Int):Float {
+        var floatRep:Int = ((halfFloatRep & 0x8000) << 16) | (((halfFloatRep & 0x7c00) + 0x1C000) << 13) | ((halfFloatRep & 0x03FF) << 13);
+        floatBytes.setInt32(0, floatRep);
+        var float:Float = floatBytes.getFloat(0);
+        return float;
     }
 
     static function generateTables() {

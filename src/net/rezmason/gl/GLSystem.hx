@@ -1,5 +1,6 @@
 package net.rezmason.gl;
 
+import haxe.io.Bytes;
 import net.rezmason.gl.GLTypes;
 
 #if flash
@@ -113,8 +114,8 @@ class GLSystem {
         return registerArtifact(new DataTexture(width, height, format, data));
     }
 
-    public inline function createHDRTexture(width:Int, height:Int, floats:Array<Float>):HDRTexture {
-        return registerArtifact(new HDRTexture(width, height, floats));
+    public inline function createHalfFloatTexture(width:Int, height:Int, bytes:Bytes, ?singleChannel:Bool):HalfFloatTexture {
+        return registerArtifact(new HalfFloatTexture(width, height, bytes, singleChannel));
     }
 
     public inline function setProgram(program:Program):Void {

@@ -9,13 +9,12 @@ class GlyphTexture {
 
     public var texture(default, null):Texture;
     public var font(default, null):FlatFont;
-    public var aspectRatio(default, null):Float;
     public var name(default, null):String;
 
     public function new(name:String, font:FlatFont):Void {
         this.name = name;
         this.font = font;
         var glSys:GLSystem = new Present(GLSystem);
-        texture = glSys.createHDRTexture(font.width, font.height, font.getData());
+        texture = glSys.createHalfFloatTexture(font.width, font.height, font.data, true);
     }
 }

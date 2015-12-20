@@ -1,17 +1,15 @@
 package net.rezmason.scourge;
 
+import haxe.io.BytesOutput;
 import lime.Assets.*;
-
 import net.rezmason.gl.*;
 import net.rezmason.gl.GLTypes;
-
-import net.rezmason.scourge.waves.WavePool;
+import net.rezmason.math.FelzenszwalbSDF;
 import net.rezmason.scourge.waves.Ripple;
 import net.rezmason.scourge.waves.WaveFunctions;
-
+import net.rezmason.scourge.waves.WavePool;
+import net.rezmason.utils.HalfFloatUtil;
 import net.rezmason.utils.Zig;
-
-import net.rezmason.math.FelzenszwalbSDF;
 
 class Lab {
 
@@ -40,13 +38,13 @@ class Lab {
     }
 
     public function render():Void {
-        //*
+        /*
         if (glSys.connected && metaballSystem.ready && postSystem.ready) {
             metaballSystem.render();
             postSystem.render();
         }
         /**/
-        /*
+        //*
         if (glSys.connected && dataSystem.ready) {
             dataSystem.render();
         }
@@ -618,21 +616,18 @@ class DataSystem extends LabSystem {
         data = FelzenszwalbSDF.computeSignedDistanceField(width, height, data);
         // traceData(data, width, height);
 
-        var arr:Array<Float> = [];
+        var output:BytesOutput = new BytesOutput();
         for (ike in 0...width) {
             for (jen in 0...height) {
-                var pos = (ike * width + jen) * 4;
-                // var x = ike / (width  - 1);
-                // var y = jen / (height - 1);
                 var val = data[ike * width + jen] / 500;
-                arr[pos + 0] = val; // Red
-                arr[pos + 1] = -val; // Green
-                arr[pos + 2] = -val; // Blue
-                arr[pos + 3] = 1; // Alpha
+                output.writeUInt16(HalfFloatUtil.floatToHalfFloat( val)); // Red
+                output.writeUInt16(HalfFloatUtil.floatToHalfFloat(-val)); // Green
+                output.writeUInt16(HalfFloatUtil.floatToHalfFloat(-val)); // Blue
+                output.writeUInt16(HalfFloatUtil.floatToHalfFloat(   1)); // Alpha
             }
         }
 
-        dataTexture = glSys.createHDRTexture(width, height, arr);
+        dataTexture = glSys.createHalfFloatTexture(width, height, output.getBytes());
 
         buffer = glSys.viewportOutputBuffer;
         buffer.resize(width, height);

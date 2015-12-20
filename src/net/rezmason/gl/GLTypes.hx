@@ -13,7 +13,7 @@ typedef NativeTexture = #if flash flash.display3D.textures.TextureBase #else lim
 typedef Context = #if flash flash.display3D.Context3D #else Class<lime.graphics.opengl.GL> #end ;
 typedef Rectangle = lime.math.Rectangle;
 typedef Image = lime.graphics.Image;
-typedef Data = #if flash haxe.io.Bytes #else lime.utils.ArrayBufferView #end ;
+typedef Data = lime.utils.ArrayBufferView;
 typedef Vector4 = #if flash flash.geom.Vector3D #else lime.math.Vector4 #end ;
 private typedef _Matrix4 = #if flash flash.geom.Matrix3D #else lime.math.Matrix4 #end ;
 

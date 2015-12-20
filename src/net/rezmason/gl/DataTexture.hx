@@ -42,7 +42,7 @@ class DataTexture extends Texture {
                     if (nativeTexture != null) nativeTexture.dispose();
                     nativeTexture = context.createRectangleTexture(width, height, cast TextureFormat.FLOAT, false);
                 }
-                (cast nativeTexture).uploadFromByteArray(data.getData(), 0);
+                (cast nativeTexture).uploadFromByteArray(data.buffer.getData(), 0);
             #else
                 GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
                 // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
