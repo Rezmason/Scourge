@@ -13,11 +13,8 @@ void main(void) {
     //float deriv = uDerivMult.x;
     float glyph = 1. - smoothstep(vFX.y - deriv, vFX.y + deriv, texture);
 
-    if (vFX.z > 0.0) glyph = min(1., max(glyph, (1. - texture) * 2. * vFX.y * vFX.z));
-
+    if (vFX.z > 0.0) glyph = clamp((1. + vFX.y - texture) * vFX.z, glyph, 1.);
     glyph = clamp(glyph, 0., 1.);
-    
     if (vFX.x >= 0.3) glyph *= -1.0;
-
     gl_FragColor = vec4(vColor * (glyph + vFX.x), 1.0);
 }

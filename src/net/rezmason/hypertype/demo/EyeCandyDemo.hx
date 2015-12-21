@@ -67,7 +67,7 @@ class EyeCandyDemo {
             var g:Float = ramp(y + 0.5);
             var b:Float = ramp(z + 0.5);
 
-            body.getGlyphByID(ike).SET({x:x, y:y, z:z, r:r, g:g, b:b, a:1, char:charCode, paint:ike});
+            body.getGlyphByID(ike).SET({x:x, y:y, z:z, r:r, g:g, b:b, char:charCode, paint:ike});
             
             _z -= dZ;
             theta += dTheta;
@@ -86,7 +86,7 @@ class EyeCandyDemo {
         for (glyph in body.eachGlyph()) {
             glyph.set_p(Math.cos(time * 4 + glyph.get_x() * 20) * 0.200 + 0.4);
             glyph.set_s(Math.cos(time * 4 + glyph.get_y() * 30) * 0.200 + 3.0);
-            glyph.set_f(Math.cos(time * 8 + glyph.get_z() * 40) * 0.280 - 0.1);
+            glyph.set_f(Math.cos(time * 8 + glyph.get_z() * 40) * 0.280 + 0.1);
         }
     }
 

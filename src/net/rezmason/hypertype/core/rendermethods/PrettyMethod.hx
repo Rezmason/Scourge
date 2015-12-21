@@ -14,11 +14,11 @@ class PrettyMethod extends RenderMethod {
 
     inline static var DERIV_MULT:Float =
     #if flash
-        0.6
+        0.3
     #elseif js
-        160
+        80
     #else
-        160
+        80
     #end
     ;
 
