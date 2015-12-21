@@ -1,6 +1,5 @@
 Better Glow
-    FlatFontGenerator provides UVs for default fat
-        Padding seems to be a big issue
+    Range should be absolute, not relative
     Shader should expand pos and UVs
     Compress the HTFs
 
