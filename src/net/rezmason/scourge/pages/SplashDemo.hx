@@ -12,17 +12,6 @@ using net.rezmason.hypertype.core.GlyphUtils;
 
 class SplashDemo {
 
-    /*
-        {r:1.00, g:0.00, b:0.56}
-        {r:1.00, g:0.78, b:0.00}
-        {r:0.18, g:1.00, b:0.00}
-        {r:0.00, g:0.75, b:1.00}
-        {r:1.00, g:0.37, b:0.00}
-        {r:0.75, g:0.00, b:1.00}
-        {r:0.00, g:0.18, b:1.00}
-        {r:0.37, g:0.37, b:0.37}
-    */
-
     static var SPLASH_COLORS = [
         'S' => new Vec3(1.00, 0.00, 0.56),
         'C' => new Vec3(1.00, 0.78, 0.00),

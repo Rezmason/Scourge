@@ -171,15 +171,15 @@ class GlyphUtils {
                 if (gl.font != null) {
                     var charUVs:Array<UV> = gl.font.getCharCodeUVs(code);
 
-                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[3].u);
-                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[0].u);
-                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[1].u);
-                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[2].u);
+                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[0].u);
+                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[1].u);
+                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[2].u);
+                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[3].u);
 
-                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[3].v);
-                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[0].v);
-                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[1].v);
-                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[2].v);
+                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[0].v);
+                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[1].v);
+                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[2].v);
+                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[3].v);
                 } else {
                     pop4(gl.colorBuf, glyphOffset, U_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
                     pop4(gl.colorBuf, glyphOffset, V_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
@@ -221,13 +221,13 @@ class GlyphUtils {
         // corner H
         var glyphOffset:Int = gl.id * SHAPE_FLOATS_PER_GLYPH;
         pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
-        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX, -1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX,  1);
         pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX,  1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, -1);
         // corner V
-        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX,  1);
         pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
+        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX, -1);
         pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, -1);
 
         set_paint(gl, 0);

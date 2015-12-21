@@ -85,6 +85,11 @@ class FlatFontGenerator {
             Sys.print(char);
         }
 
+        // var marginX = range * sdfWidth / glyphWidth;
+        // var marginY = range * sdfHeight / glyphHeight;
+        var marginX = 0;
+        var marginY = 0;
+
         var numColumns:Int = Std.int(Math.sqrt(numChars)) + 1;
         var numRows:Int = Std.int(numChars / numColumns) + 1;
         var tableWidth  = numColumns * (glyphWidth  + spacing) - spacing;
@@ -112,8 +117,11 @@ class FlatFontGenerator {
             }
 
             output.writeUInt16(Utf8.charCodeAt(char, 0));
-            output.writeUInt16(xOffset);
-            output.writeUInt16(yOffset);
+
+            output.writeFloat((xOffset +               marginX) / tableWidth );
+            output.writeFloat((xOffset + glyphWidth  - marginX) / tableWidth );
+            output.writeFloat((yOffset +               marginY) / tableHeight);
+            output.writeFloat((yOffset + glyphHeight - marginY) / tableHeight);
             
             col++;
             if (col >= numColumns) {

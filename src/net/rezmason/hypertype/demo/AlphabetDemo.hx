@@ -22,7 +22,7 @@ class AlphabetDemo {
 
     public function new():Void {
 
-        var totalChars:Int = CHARS.length;
+        var totalChars:Int = Utf8.length(CHARS);
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));
         var numCols:Int = Std.int(Math.ceil(totalChars / numRows));
         var white = new Vec3(1, 1, 1);
