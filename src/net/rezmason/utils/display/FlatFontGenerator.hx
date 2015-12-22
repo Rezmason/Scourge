@@ -23,7 +23,7 @@ typedef CharacterSet = {
 
 class FlatFontGenerator {
 
-    public static function flatten(characterSets:Array<CharacterSet>, glyphWidth, glyphHeight, spacing, range, cutoff, cbk) {
+    public static function flatten(characterSets:Array<CharacterSet>, glyphWidth, glyphHeight, spacing, range, cbk) {
 
         var pendingGlyphs:Map<String, GlyphData> = new Map();
         var computedGlyphs:Map<String, Array<Float>> = new Map();
@@ -91,13 +91,18 @@ class FlatFontGenerator {
             Sys.print(char);
         }
 
-        var marginX = range * glyphWidth  / sdfWidth;
-        var marginY = range * glyphHeight / sdfHeight;
-
         var numColumns:Int = Std.int(Math.sqrt(numChars)) + 1;
         var numRows:Int = Std.int(numChars / numColumns) + 1;
         var tableWidth  = numColumns * (glyphWidth  + spacing) - spacing;
         var tableHeight = numRows    * (glyphHeight + spacing) - spacing;
+        
+        var marginX = range * glyphWidth  / sdfWidth;
+        var marginY = range * glyphHeight / sdfHeight;
+        var left   = marginX / tableWidth;
+        var right  = (glyphWidth  - marginX) / tableWidth;
+        var top    = marginY / tableHeight;
+        var bottom = (glyphHeight - marginY) / tableHeight;
+
         var table = [for (ike in 0...tableWidth * tableHeight) Math.POSITIVE_INFINITY];
         var row = 0;
         var col = 0;
@@ -122,10 +127,10 @@ class FlatFontGenerator {
 
             output.writeUInt16(Utf8.charCodeAt(char, 0));
 
-            output.writeFloat((xOffset +               marginX) / tableWidth );
-            output.writeFloat((xOffset + glyphWidth  - marginX) / tableWidth );
-            output.writeFloat((yOffset +               marginY) / tableHeight);
-            output.writeFloat((yOffset + glyphHeight - marginY) / tableHeight);
+            output.writeFloat(xOffset / tableWidth  + left  );
+            output.writeFloat(xOffset / tableWidth  + right );
+            output.writeFloat(yOffset / tableHeight + top   );
+            output.writeFloat(yOffset / tableHeight + bottom);
             
             col++;
             if (col >= numColumns) {
