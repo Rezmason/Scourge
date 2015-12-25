@@ -37,37 +37,33 @@ class Converter extends BasicWorker<GLSLInput, AGALOutput> {
         var nativeShader = null;
         var json = null;
         var jsonString = null;
-        var error = null;
+        var assemblerError = null;
 
-        try {
-            if (!cModuleInitialized) {
-                untyped __global__["com.adobe.glsl2agal.CModule"].startAsync();
-                cModuleInitialized = true;
-            }
-
-            jsonString = untyped __global__["com.adobe.glsl2agal.compileShader"](
-                input.source, 
-                isFrag, 
-                optimize, 
-                usegles
-            );
-
-            if (assembler == null) assembler = new AGALMiniAssembler();
-
-            json = Json.parse(jsonString);
-
-            var asm = json.agalasm;
-            if (input.texParam != null) {
-                asm = ~/<linear mipdisable repeat 2d>/g.replace(asm, input.texParam);
-            }
-
-            assembler.assemble(cast input.type, asm, AGAL_VERSION);
-            nativeShader = Bytes.ofData(assembler.agalcode);
-            if (nativeShader.length == 0) error = assembler.error;
+        if (!cModuleInitialized) {
+            untyped __global__["com.adobe.glsl2agal.CModule"].startAsync();
+            cModuleInitialized = true;
         }
-        catch (e:Dynamic) {
-            error = e;
+
+        jsonString = untyped __global__["com.adobe.glsl2agal.compileShader"](
+            input.source, 
+            isFrag, 
+            optimize, 
+            usegles
+        );
+
+        if (assembler == null) assembler = new AGALMiniAssembler();
+
+        json = Json.parse(jsonString);
+
+        var asm = json.agalasm;
+        if (input.texParam != null) {
+            asm = ~/<linear mipdisable repeat 2d>/g.replace(asm, input.texParam);
         }
-        return {type:input.type, json:json, nativeShader:nativeShader, error:error};
+
+        assembler.assemble(cast input.type, asm, AGAL_VERSION);
+        nativeShader = Bytes.ofData(assembler.agalcode);
+        if (assembler.error != null && assembler.error.length > 0) assemblerError = assembler.error;
+
+        return {type:input.type, json:json, nativeShader:nativeShader, assemblerError:assemblerError};
     }
 }

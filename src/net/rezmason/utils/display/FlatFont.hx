@@ -3,21 +3,27 @@ package net.rezmason.utils.display;
 import haxe.Utf8;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
+import net.rezmason.gl.GLTypes;
 
 typedef CharCoord = {x:Int, y:Int};
 typedef UV = {u:Float, v:Float};
 
 class FlatFont {
 
-    var charUVs:Map<UInt, Array<UV>>;
+    var charCenterUVs:Map<UInt, UV>;
     
-    public var data(default, null):Bytes;
+    public var textureData(default, null):Bytes;
     public var glyphWidth(default, null):UInt;
     public var glyphHeight(default, null):UInt;
     public var width(default, null):UInt;
     public var height(default, null):UInt;
-    public var range(default, null):Float;
+    public var sdfRange(default, null):Float;
+    public var sdfCoreWidth(default, null):Float;
+    public var sdfCoreHeight(default, null):Float;
     public var glyphRatio(default, null):Float;
+
+    public var glyphData(default, null):Array<Float>;
+    public var sdfData(default, null):Array<Float>;
 
     public function new(htf:Bytes):Void {
         var input:BytesInput = new BytesInput(htf);
@@ -25,20 +31,19 @@ class FlatFont {
         height = input.readUInt16();
         glyphWidth = input.readUInt16();
         glyphHeight = input.readUInt16();
-        glyphRatio = input.readFloat();
-        range = input.readFloat();
-        charUVs = new Map();
-        for (ike in 0...input.readUInt16()) {
-            var code = input.readUInt16();
-            var left:Float   = input.readFloat();
-            var right:Float  = input.readFloat();
-            var top:Float    = input.readFloat();
-            var bottom:Float = input.readFloat();
-            charUVs[code] = [{u:left, v:top}, {u:right, v:top}, {u:right, v:bottom}, {u:left, v:bottom}];
-        }
-        data = htf.sub(input.position, htf.length - input.position);
+        sdfCoreWidth = input.readUInt16();
+        sdfCoreHeight = input.readUInt16();
+        glyphRatio = sdfCoreHeight / sdfCoreWidth;
+        sdfRange = input.readFloat();
+        charCenterUVs = new Map();
+        for (ike in 0...input.readUInt16()) charCenterUVs[input.readUInt16()] = {u:input.readFloat(), v:input.readFloat()};
+        textureData = htf.sub(input.position, htf.length - input.position);
+        glyphData = [width, height, glyphWidth, glyphHeight];
+        var sdfWidthScale  = sdfCoreWidth  / (sdfCoreWidth  + 2 * sdfRange);
+        var sdfHeightScale = sdfCoreHeight / (sdfCoreHeight + 2 * sdfRange);
+        sdfData = [sdfWidthScale, sdfHeightScale, sdfRange, glyphRatio];
     }
 
-    public inline function getCharUVs(char:String):Array<UV> return getCharCodeUVs(Utf8.charCodeAt(char, 0));
-    public inline function getCharCodeUVs(code:UInt):Array<UV> return charUVs[code];
+    public inline function getCharCenterUV(char:String):UV return getCharCodeCenterUV(Utf8.charCodeAt(char, 0));
+    public inline function getCharCodeCenterUV(code:UInt):UV return charCenterUVs[code];
 }

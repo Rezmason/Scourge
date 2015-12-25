@@ -160,32 +160,18 @@ class GlyphUtils {
 
     public inline static function set_char(gl:Glyph, code:Int) {
         if (get_char(gl) != code) {
-
-            var glyphOffset:Int = gl.id * COLOR_FLOATS_PER_GLYPH;
-
-            if (code == -1) {
-                pop4(gl.colorBuf, glyphOffset, U_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
-                pop4(gl.colorBuf, glyphOffset, V_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
-                gl.charCode = -1;
-            } else {
-                if (gl.font != null) {
-                    var charUVs:Array<UV> = gl.font.getCharCodeUVs(code);
-
-                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[0].u);
-                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[1].u);
-                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[2].u);
-                    pop1(gl.colorBuf, glyphOffset, U_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[3].u);
-
-                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 0 * COLOR_FLOATS_PER_VERTEX, charUVs[0].v);
-                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 1 * COLOR_FLOATS_PER_VERTEX, charUVs[1].v);
-                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 2 * COLOR_FLOATS_PER_VERTEX, charUVs[2].v);
-                    pop1(gl.colorBuf, glyphOffset, V_OFFSET + 3 * COLOR_FLOATS_PER_VERTEX, charUVs[3].v);
-                } else {
-                    pop4(gl.colorBuf, glyphOffset, U_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
-                    pop4(gl.colorBuf, glyphOffset, V_OFFSET, COLOR_FLOATS_PER_VERTEX, 0);
-                }
-                gl.charCode = code;
+            gl.charCode = code;
+            var u = 0.;
+            var v = 0.;
+            if (code != -1 && gl.font != null) {
+                var charCenterUV = gl.font.getCharCodeCenterUV(code);
+                u = charCenterUV.u;
+                v = charCenterUV.v;
             }
+            
+            var glyphOffset:Int = gl.id * COLOR_FLOATS_PER_GLYPH;
+            pop4(gl.colorBuf, glyphOffset, U_OFFSET, COLOR_FLOATS_PER_VERTEX, u);
+            pop4(gl.colorBuf, glyphOffset, V_OFFSET, COLOR_FLOATS_PER_VERTEX, v);
         }
         return code;
     }

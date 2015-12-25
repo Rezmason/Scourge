@@ -49,6 +49,7 @@ class Program {
 
         if (agency == null) {
             agency = new TempAgency(Golem.rise('glsl2agal.hxml'), 2);
+            agency.onError = onError;
             // agency.onDone = agency.die;
         }
 
@@ -56,7 +57,7 @@ class Program {
         fragmentShader = null;
 
         function onWorkDone(agal:AGALOutput):Void {
-            if (agal.error != null) {
+            if (agal.assemblerError != null) {
                 throw agal.stringify(null, '\t');
             } else {
                 var shader:Shader = new Shader(agal);
@@ -145,4 +146,6 @@ class Program {
     inline function makeLoc(index:Int, flag:Int):Int return ((flag & 0xFF) << 24) | (index & 0x00FFFFFF);
     inline function getLocFlag(loc:Int):Int return (loc >> 24) & 0xFF;
     inline function getLocIndex(loc:Int):Int return loc & 0x00FFFFFF;
+
+    static function onError(error:Dynamic) throw error;
 }

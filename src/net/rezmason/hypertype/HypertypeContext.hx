@@ -14,7 +14,13 @@ class HypertypeContext {
         Santa.mapToClass(FontManager, Singleton(new FontManager(['full', 'matrix'])));
 
         engine = new Engine();
-        Application.current.addModule(engine);
+        if (engine.ready) addEngineModule();
+        else engine.readySignal.add(addEngineModule);
         #if debug_graphics Santa.mapToClass(DebugGraphics, Singleton(engine.debugGraphics)); #end
+    }
+
+    function addEngineModule() {
+        engine.readySignal.remove(addEngineModule);
+        Application.current.addModule(engine);
     }
 }

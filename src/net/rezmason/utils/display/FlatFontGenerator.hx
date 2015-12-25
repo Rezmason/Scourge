@@ -64,7 +64,6 @@ class FlatFontGenerator {
         var offsetX = Std.int(-totalBounds.x);
         var offsetY = Std.int(-totalBounds.y);
 
-        var glyphRatio = totalHeight / totalWidth;
         var sdfWidth  = totalWidth + 2 * range;
         var sdfHeight = totalHeight + 2 * range;
         var numChars = 1;
@@ -96,13 +95,6 @@ class FlatFontGenerator {
         var tableWidth  = numColumns * (glyphWidth  + spacing) - spacing;
         var tableHeight = numRows    * (glyphHeight + spacing) - spacing;
         
-        var marginX = range * glyphWidth  / sdfWidth;
-        var marginY = range * glyphHeight / sdfHeight;
-        var left   = marginX / tableWidth;
-        var right  = (glyphWidth  - marginX) / tableWidth;
-        var top    = marginY / tableHeight;
-        var bottom = (glyphHeight - marginY) / tableHeight;
-
         var table = [for (ike in 0...tableWidth * tableHeight) Math.POSITIVE_INFINITY];
         var row = 0;
         var col = 0;
@@ -111,7 +103,8 @@ class FlatFontGenerator {
         output.writeUInt16(tableHeight);
         output.writeUInt16(glyphWidth);
         output.writeUInt16(glyphHeight);
-        output.writeFloat(glyphRatio);
+        output.writeUInt16(totalWidth);
+        output.writeUInt16(totalHeight);
         output.writeFloat(range);
         output.writeUInt16(numChars);
         for (char in computedGlyphs.keys().a2z()) {
@@ -126,12 +119,8 @@ class FlatFontGenerator {
             }
 
             output.writeUInt16(Utf8.charCodeAt(char, 0));
-
-            output.writeFloat(xOffset / tableWidth  + left  );
-            output.writeFloat(xOffset / tableWidth  + right );
-            output.writeFloat(yOffset / tableHeight + top   );
-            output.writeFloat(yOffset / tableHeight + bottom);
-            
+            output.writeFloat(xOffset / tableWidth);
+            output.writeFloat(yOffset / tableHeight);
             col++;
             if (col >= numColumns) {
                 col = 0;

@@ -61,21 +61,23 @@ class PrettyMethod extends RenderMethod {
     }
 
     override function setBody(body:Body):Void {
-        program.setProgramConstantsFromMatrix('uCameraMat', body.scene.camera.transform); // uCameraMat contains the camera matrix
-        program.setProgramConstantsFromMatrix('uBodyMat', body.concatenatedTransform); // uBodyMat contains the body's matrix
-        program.setFourProgramConstants('uBodyParams', body.params); // uBodyParams contains the glyph transform and body paint
-        program.setTextureAt('uSampler', body.glyphTexture.texture); // uSampler contains our texture
+        program.setProgramConstantsFromMatrix('uCameraMat', body.scene.camera.transform);
+        program.setProgramConstantsFromMatrix('uBodyMat', body.concatenatedTransform);
+        program.setFourProgramConstants('uFontGlyphData', body.glyphTexture.font.glyphData);
+        program.setFourProgramConstants('uFontSDFData', body.glyphTexture.font.sdfData);
+        program.setFourProgramConstants('uBodyParams', body.params);
+        program.setTextureAt('uSampler', body.glyphTexture.texture);
     }
 
     override public function setSegment(segment:BodySegment):Void {
         var shapeBuffer:VertexBuffer = (segment == null) ? null : segment.shapeBuffer;
         var colorBuffer:VertexBuffer = (segment == null) ? null : segment.colorBuffer;
-        program.setVertexBufferAt('aPos',     shapeBuffer, 0, 3); // aPos contains x,y,z
-        program.setVertexBufferAt('aCorner',  shapeBuffer, 3, 2); // aCorner contains h,v
-        program.setVertexBufferAt('aDistort', shapeBuffer, 5, 3); // aScale contains h,s,p
-        program.setVertexBufferAt('aColor',   colorBuffer, 0, 3); // aColor contains r,g,b
-        program.setVertexBufferAt('aUV',      colorBuffer, 3, 2); // aUV contains u,v
-        program.setVertexBufferAt('aFX',      colorBuffer, 5, 3); // aFX contains i,f,a
+        program.setVertexBufferAt('aPos',     shapeBuffer, 0, 3); // aPos : [x,y,z]
+        program.setVertexBufferAt('aCorner',  shapeBuffer, 3, 2); // aCorner : [ch,hv]
+        program.setVertexBufferAt('aDistort', shapeBuffer, 5, 3); // aScale : [h,s,p]
+        program.setVertexBufferAt('aColor',   colorBuffer, 0, 3); // aColor : [r,g,b]
+        program.setVertexBufferAt('aUV',      colorBuffer, 3, 2); // aUV : [u,v]
+        program.setVertexBufferAt('aFX',      colorBuffer, 5, 3); // aFX : [i,f,a]
     }
 
     override public function drawBody(body:Body) if (body.visible) super.drawBody(body);

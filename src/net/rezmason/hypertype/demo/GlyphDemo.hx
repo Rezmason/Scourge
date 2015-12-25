@@ -42,11 +42,13 @@ class GlyphDemo {
         glyph.set_char(Utf8.charCodeAt(CHARS, currentCharIndex));
         glyph.set_color(COLORS[currentColor]);
         glyph.set_a(1);
+        glyph.set_i(1);
     }
 
     function update(delta:Float):Void {
         time += delta * (mouseIsDown ? 0.2 : 1);
 
+        /*
         if (time > periods[currentPhase]) {
             time -= periods[currentPhase];
             currentPhase = (currentPhase + 1) % NUM_PHASES;
@@ -64,6 +66,9 @@ class GlyphDemo {
 
         glyph.set_f(val * 0.1 + (1 - val) * -0.25);
         glyph.set_color(COLORS[currentColor] * Quad.easeIn.calculate(val));
+        */
+
+        glyph.set_f(Math.cos(time) * 0.5 + 0.5);
     }
 
     function receiveInteraction(id:Int, interaction:Interaction):Void {

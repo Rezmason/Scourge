@@ -15,6 +15,6 @@ class GlyphTexture {
         this.name = name;
         this.font = font;
         var glSys:GLSystem = new Present(GLSystem);
-        texture = glSys.createHalfFloatTexture(font.width, font.height, font.data, true);
+        texture = glSys.createHalfFloatTexture(font.width, font.height, font.textureData, true);
     }
 }

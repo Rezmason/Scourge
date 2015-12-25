@@ -1,6 +1,5 @@
 Better Glow
-    Range should be absolute, not relative
-    Shader should expand pos and UVs
+    Limit inverse video effect to core glyph dimensions
     Compress the HTFs
 
 MATRIX CODE
