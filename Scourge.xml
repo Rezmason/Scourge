@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
     <meta title="Scourge" description="An early first playable version of Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net"/>
-    <app title="Scourge" file="Scourge" main="Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net" swf-version="12.0"/>
+    <app title="Scourge" file="Scourge" main="Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net"/>
     
     <set name="fullscreen" unless="mac"/>
     <window width="0" height="0" fps="60" vsync="true" orientation="portrait" background="#000000" resizable="true" unless="mac"/>
@@ -11,16 +11,13 @@
     <set name="BUILD_DIR" value="Export/Scourge/debug" if="debug"/>
     
     <classpath name="src"/>
-    <classpath name="test"/>
+    
+    <haxedef name="ogl"/>
     
     <haxedef name="debug_graphics" if="mac" unless="release"/>
     <haxelib name="hxtelemetry" if="mac" unless="release"/>
 
-    <haxedef name="advanced-telemetry" if="debug"/>
-    <haxedef name="glsl2agal" if="flash"/>
-    <haxedef name="stage3d" if="flash"/>
     <haxelib name="actuate"/>
-    <haxelib name="golems"/>
     <haxelib name="lime"/>
     <haxelib name="box2d"/>
     

@@ -1,8 +1,6 @@
 package net.rezmason.gl;
 
-#if flash
-    typedef BlendFactor = flash.display3D.Context3DBlendFactor;
-#else
+#if ogl
     import lime.graphics.opengl.GL;
     @:enum abstract BlendFactor(Int) to Int {
         var ZERO                        = GL.ZERO;

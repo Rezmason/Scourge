@@ -2,8 +2,7 @@ package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
 
+@:allow(net.rezmason.gl) 
 class Texture extends Artifact {
-    
-    @:allow(net.rezmason.gl)
-    function setAtProgLocation(prog:NativeProgram, location:UniformLocation, index:Int):Void {}
+    var nativeTexture:NativeTexture;
 }

@@ -136,32 +136,9 @@ class MouseSystem {
         if (y >= height) y = height - 1;
 
         var rectLeft:Int = Std.int(x);
-        var rectTop:Int = Std.int(#if !flash height - 1 - #end y);
-        var offset:Int = #if flash 1 #else 0 #end;
-
-        var rawID:Int = getRawIDFromIndex((rectTop * width + rectLeft) * 4 + offset);
-
-        #if flash
-            // Ignore any edge pixels. Deals with antialiasing.
-            // After all, if a hit area is important, it'll be big, and its edge pixels won't matter.
-            var failed = false;
-            for (row in rectTop - 1...rectTop + 2) {
-                if (row < 0 || row >= height) continue; // Skip edges
-                for (col in rectLeft - 1...rectLeft + 2) {
-                    if (col < 0 || col >= width) continue; // Skip edges
-
-                    // Blurry edge test
-                    if (getRawIDFromIndex((row * width + col) * 4 + offset) != rawID) {
-                        failed = true;
-                        break;
-                    }
-                }
-                if (failed) break;
-            }
-
-            if (failed) rawID = 0xFFFFFF;
-        #end
-
+        var rectTop:Int = Std.int(#if ogl height - 1 - #end y);
+        
+        var rawID:Int = getRawIDFromIndex((rectTop * width + rectLeft) * 4);
         var bodyID:Null<Int> = null;
         var glyphID:Null<Int> = null;
 

@@ -3,14 +3,7 @@ package net.rezmason.gl;
 import haxe.io.Bytes;
 import net.rezmason.gl.GLTypes;
 
-#if flash
-    import flash.Lib;
-    import flash.display3D.Context3DCompareMode;
-    import flash.display3D.Context3DProfile;
-    import flash.display3D.Context3DRenderMode;
-    import flash.display3D.Context3DTextureFormat;
-    import flash.events.Event;
-#else
+#if ogl
     import lime.graphics.Renderer;
     import lime.graphics.opengl.GL;
 #end
@@ -37,22 +30,7 @@ class GLSystem {
     }
 
     function init():Void {
-        #if flash
-            var stage = Lib.current.stage;
-            var stage3D = stage.stage3Ds[0];
-            if (stage3D.context3D != null) {
-                context = stage3D.context3D;
-                onInit();
-            } else {
-                function onCreate(event:Event):Void {
-                    event.target.removeEventListener(Event.CONTEXT3D_CREATE, onCreate);
-                    context = stage.stage3Ds[0].context3D;
-                    onInit();
-                }
-                stage3D.addEventListener(Event.CONTEXT3D_CREATE, onCreate);
-                stage3D.requestContext3D(cast Context3DRenderMode.AUTO, cast 'standard'); // Context3DProfile.STANDARD
-            }
-        #else
+        #if ogl
             context = GL;
             onInit();
         #end
@@ -68,7 +46,6 @@ class GLSystem {
     }
 
     public function disconnect():Void {
-        #if flash context.dispose(); #end
         context = null;
 
         connected = false;
@@ -119,50 +96,40 @@ class GLSystem {
     }
 
     public inline function setProgram(program:Program):Void {
-        #if flash 
-            program.prog.attach();
-        #else 
+        #if ogl 
             GL.useProgram(program.prog);
         #end
     }
 
     public inline function setBlendFactors(sourceFactor:BlendFactor, destinationFactor:BlendFactor):Void {
-        #if flash
-            context.setBlendFactors(sourceFactor, destinationFactor);
-        #else
+        #if ogl
             GL.enable(GL.BLEND);
             GL.blendFunc(sourceFactor, destinationFactor);
         #end
     }
 
     public inline function setDepthTest(enabled:Bool):Void {
-        #if flash
-            context.setDepthTest(enabled, Context3DCompareMode.LESS);
-        #else
+        #if ogl
             if (enabled) GL.enable(GL.DEPTH_TEST);
             else GL.disable(GL.DEPTH_TEST);
         #end
     }
 
     public inline function enableExtension(extName:String):Void {
-        #if !flash
+        #if ogl
             GL.getExtension(extName);
         #end
     }
 
     public inline function clear(red:Float, green:Float, blue:Float, alpha:Float = 1):Void {
-        #if flash
-            context.clear(red, green, blue, alpha);
-        #else
+        #if ogl
             GL.clearColor(red, green, blue, alpha);
             GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
         #end
     }
 
     public inline function draw(indexBuffer:IndexBuffer, firstIndex:UInt = 0, numTriangles:UInt = 0):Void {
-        #if flash
-            context.drawTriangles(indexBuffer.buf, firstIndex, numTriangles);
-        #else
+        #if ogl
             GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buf);
             GL.drawElements(GL.TRIANGLES, numTriangles * 3, GL.UNSIGNED_SHORT, firstIndex);
             GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);

@@ -2,10 +2,7 @@ package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
 
-#if flash
-    import flash.Vector;
-    import flash.display3D.Context3DVertexBufferFormat;
-#else
+#if ogl
     import lime.graphics.opengl.GL;
     import lime.utils.GLUtils;
 #end
@@ -13,8 +10,6 @@ import net.rezmason.gl.GLTypes;
 @:allow(net.rezmason.gl)
 class Program extends Artifact {
 
-    public var loaded(default, null):Bool;
-    public var onLoad:Void->Void;
     var prog:NativeProgram;
     var vertSource:String;
     var fragSource:String;
@@ -22,56 +17,24 @@ class Program extends Artifact {
     var uniformLocations:Map<String, UniformLocation>;
     var attribsLocations:Map<String, AttribsLocation>;
     
-    #if flash
-        static var formats:Array<Context3DVertexBufferFormat> = [
-            BYTES_4,
-            FLOAT_1,
-            FLOAT_2,
-            FLOAT_3,
-            FLOAT_4,
-        ];
-
-        static var vec:Vector<Float> = new Vector();
-    #else
-        
-    #end
-
     function new(vertSource:String, fragSource:String):Void {
         super();
         this.vertSource = vertSource;
         this.fragSource = fragSource;
-
-        function handleLoad():Void {
-            loaded = true;
-            if (onLoad != null) onLoad();
-        }
-
-        #if flash
-            loaded = false;
-            prog = new NativeProgram();
-            prog.onLoad = handleLoad;
-            prog.load(vertSource, fragSource);
-        #else
-            handleLoad();
-        #end
     }
 
     override function connectToContext(context:Context):Void {
         uniformLocations = new Map();
         attribsLocations = new Map();
         super.connectToContext(context);
-        #if flash
-            prog.connectToContext(context);
-        #else
+        #if ogl
             prog = GLUtils.createProgram(vertSource, fragSource);
         #end
     }
 
     override function disconnectFromContext():Void {
         super.disconnectFromContext();
-        #if flash
-            prog.disconnectFromContext();
-        #else
+        #if ogl
             prog = null;
         #end
 
@@ -82,9 +45,7 @@ class Program extends Artifact {
     public inline function setProgramConstantsFromMatrix(uName:String, matrix:Matrix4):Void {
         var location = getUniformLocation(uName);
         if (location != null) {
-            #if flash
-                prog.setUniformFromMatrix(location, matrix, true);
-            #else
+            #if ogl
                 GL.uniformMatrix4fv(location, false, matrix);
             #end
         }
@@ -93,13 +54,7 @@ class Program extends Artifact {
     public inline function setFourProgramConstants(uName:String, vals:Array<Float>):Void {
         var location = getUniformLocation(uName);
         if (location != null) {
-            #if flash
-                for (i in 0...4) vec[i] = vals == null ? 0 : vals[i];
-            #end
-
-            #if flash
-                prog.setUniformFromVector(location, vec, 1);
-            #else
+            #if ogl
                 if (vals == null) GL.uniform4f(location, 0, 0, 0, 0);
                 else GL.uniform4f(location, vals[0], vals[1], vals[2], vals[3]);
             #end
@@ -108,35 +63,27 @@ class Program extends Artifact {
 
     public inline function setTextureAt(uName:String, texture:Texture, index:Int = 0):Void {
         var location = getUniformLocation(uName);
-        if (location != null) {
-            if (texture == null) {
-                #if flash
-                    prog.setTextureAt(location, null);
-                #else
-                #end
-            } else {
-                texture.setAtProgLocation(prog, location, index);
-            }
+        if (location != null && texture != null) {
+            #if ogl
+                GL.activeTexture(GL.TEXTURE0 + index);
+                GL.bindTexture (GL.TEXTURE_2D, texture.nativeTexture);
+                GL.uniform1i(location, index);
+            #end
         }
     }
 
-    public inline function setVertexBufferAt(aName:String, buffer:VertexBuffer, offset:Int = 0, size:Int = -1, ?normalized:Bool):Void {
+    public inline function setVertexBufferAt(aName:String, buffer:VertexBuffer, offset:UInt, size:UInt):Void {
         var location = getAttribsLocation(aName);
         if (location != null) {
             if (size < 0) size = buffer.footprint;
             if (buffer != null) {
-                #if flash
-                    prog.setVertexBufferAt(location, buffer.buf, offset, formats[size]);
-                #else
+                #if ogl
                     GL.bindBuffer(GL.ARRAY_BUFFER, buffer.buf);
-                    GL.vertexAttribPointer(location, size, GL.FLOAT, normalized, 4 * buffer.footprint, 4 * offset);
-
+                    GL.vertexAttribPointer(location, size, GL.FLOAT, false, 4 * buffer.footprint, 4 * offset);
                     GL.enableVertexAttribArray(location);
                 #end
             } else {
-                #if flash
-                    prog.setVertexBufferAt(location, null, offset, formats[size]);
-                #else
+                #if ogl
                     GL.disableVertexAttribArray(location);
                 #end
             }
@@ -145,9 +92,7 @@ class Program extends Artifact {
 
     inline function getUniformLocation(name:String):Null<UniformLocation> {
         if (!uniformLocations.exists(name)) {
-            #if flash
-                uniformLocations[name] = prog.getUniformLocation(name);
-            #else
+            #if ogl
                 uniformLocations[name] = GL.getUniformLocation(prog, name);
             #end
         }
@@ -156,9 +101,7 @@ class Program extends Artifact {
 
     inline function getAttribsLocation(name:String):Null<AttribsLocation> {
         if (!attribsLocations.exists(name)) {
-            #if flash
-                attribsLocations[name] = prog.getAttribLocation(name);
-            #else
+            #if ogl
                 attribsLocations[name] = GL.getAttribLocation(prog, name);
             #end
         }

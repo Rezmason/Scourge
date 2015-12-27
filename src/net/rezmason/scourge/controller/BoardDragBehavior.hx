@@ -15,11 +15,10 @@ import net.rezmason.hypertype.core.DebugGraphics;
 import net.rezmason.hypertype.ui.DragBehavior;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
-/*
+
 #if debug_graphics
     import box2D.dynamics.B2CairoDebugDraw;
 #end
-*/
 
 class BoardDragBehavior extends DragBehavior {
 
@@ -39,7 +38,7 @@ class BoardDragBehavior extends DragBehavior {
     public function new() {
         super();
         world = new B2World(new B2Vec2(0, 0), true);
-        /*
+        
         #if debug_graphics
             var debugDraw = new B2CairoDebugDraw();
             var cairo:DebugGraphics = new Present(DebugGraphics);
@@ -49,7 +48,6 @@ class BoardDragBehavior extends DragBehavior {
             world.setDebugDraw(debugDraw);
             debugDraw.setFlags(Shapes | Joints);
         #end
-        */
 
         var fixtureDef = new B2FixtureDef();
         var bodyDef = new B2BodyDef();
@@ -140,7 +138,7 @@ class BoardDragBehavior extends DragBehavior {
             }
         }
 
-        // #if debug_graphics world.drawDebugData(); #end
+        #if debug_graphics world.drawDebugData(); #end
     }
 
     override public function startDrag(x, y) {

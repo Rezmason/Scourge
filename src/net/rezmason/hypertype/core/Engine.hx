@@ -18,8 +18,6 @@ class Engine extends Module {
     var active:Bool;
     public var width(default, null):Int;
     public var height(default, null):Int;
-    public var ready(default, null):Bool;
-    public var readySignal(default, null):Zig<Void->Void>;
 
     var glSys:GLSystem;
     var bodiesByID:Map<Int, Body>;
@@ -38,8 +36,6 @@ class Engine extends Module {
         #if hxtelemetry telemetry = new Present(HxTelemetry); #end
         super();
         active = false;
-        ready = false;
-        readySignal = new Zig();
         glSys = new Present(GLSystem);
         glSys.connect();
         
@@ -53,7 +49,6 @@ class Engine extends Module {
     }
 
     public function addScene(scene:Scene):Void {
-        #if debug assertReady(); #end
         if (!scenes.has(scene)) {
             scenes.push(scene);
             scene.redrawHitSignal.add(updateMouseSystem);
@@ -65,7 +60,6 @@ class Engine extends Module {
     }
 
     public function removeScene(scene:Scene):Void {
-        #if debug assertReady(); #end
         if (scenes.has(scene)) {
             scenes.remove(scene);
             scene.redrawHitSignal.remove(updateMouseSystem);
@@ -76,7 +70,6 @@ class Engine extends Module {
     }
 
     public function setKeyboardFocus(body:Body):Void {
-        #if debug assertReady(); #end
         fetchBodies();
         if (bodiesByID[body.id] == body) keyboardSystem.focusBodyID = body.id;
     }
@@ -156,23 +149,10 @@ class Engine extends Module {
         mouseMethod = new MouseMethod();
         presentationMethod = prettyMethod;
 
-        prettyMethod.loadedSignal.add(checkReadiness);
-        mouseMethod.loadedSignal.add(checkReadiness);
-
-        prettyMethod.load();
-        mouseMethod.load();
-    }
-
-    function checkReadiness():Void {
-        if (!ready && prettyMethod.programLoaded && mouseMethod.programLoaded) {
-            ready = true;
-            #if flash flash.Lib.current.stage.dispatchEvent(new flash.events.Event('resize')); #end
-            var window = Application.current.window;
-            this.width = window.width;
-            this.height = window.height;
-            activate();
-            readySignal.dispatch();
-        }
+        var window = Application.current.window;
+        this.width = window.width;
+        this.height = window.height;
+        activate();
     }
 
     function renderMouse():Void {
@@ -198,7 +178,6 @@ class Engine extends Module {
     }
 
     function setSize(width:Int, height:Int):Void {
-        #if debug assertReady(); #end
         this.width = width;
         this.height = height;
         for (scene in scenes) scene.resize(width, height);
@@ -207,7 +186,6 @@ class Engine extends Module {
     }
 
     function activate():Void {
-        #if debug assertReady(); #end
         if (active) return;
         active = true;
         setSize(width, height);
@@ -215,7 +193,6 @@ class Engine extends Module {
     }
 
     function deactivate():Void {
-        #if debug assertReady(); #end
         if (!active) return;
         active = false;
         regulateUserInput();
@@ -278,8 +255,6 @@ class Engine extends Module {
             for (scene in scenes) for (body in scene.bodies) bodiesByID[body.id] = body;
         }
     }
-
-    #if debug inline function assertReady():Void if (!ready) throw "Engine hasn't initialized yet."; #end
 
     #if debug_graphics inline function get_debugGraphics() return compositor.debugGraphics; #end
 }

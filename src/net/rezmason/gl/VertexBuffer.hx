@@ -2,9 +2,11 @@ package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.BufferUsage;
-#if !flash import lime.graphics.opengl.GL; #end
+#if ogl 
+    import lime.graphics.opengl.GL;
+#end
 
-typedef VertexArray = #if flash flash.Vector<Float> #else lime.utils.Float32Array #end ;
+typedef VertexArray = #if ogl lime.utils.Float32Array #end ;
 
 @:allow(net.rezmason.gl)
 class VertexBuffer extends Artifact {
@@ -27,9 +29,7 @@ class VertexBuffer extends Artifact {
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-        #if flash
-            buf = context.createVertexBuffer(numVertices, footprint, usage);
-        #else
+        #if ogl
             buf = GL.createBuffer();
             GL.bindBuffer(GL.ARRAY_BUFFER, buf);
             GL.bufferData(GL.ARRAY_BUFFER, data, usage);
@@ -40,7 +40,6 @@ class VertexBuffer extends Artifact {
 
     override function disconnectFromContext():Void {
         super.disconnectFromContext();
-        #if flash if (buf != null) buf.dispose(); #end
         buf = null;
     }
 
@@ -48,9 +47,7 @@ class VertexBuffer extends Artifact {
 
     public inline function upload():Void {
         if (invalid && isConnectedToContext()) {
-            #if flash
-                buf.uploadFromVector(data, 0, numVertices);
-            #else
+            #if ogl
                 GL.bindBuffer(GL.ARRAY_BUFFER, buf);
                 GL.bufferData(GL.ARRAY_BUFFER, data, usage);
             #end
@@ -60,7 +57,6 @@ class VertexBuffer extends Artifact {
 
     override public function dispose():Void {
         super.dispose();
-        #if flash if (buf != null) buf.dispose(); #end
         data = null;
         buf = null;
         footprint = -1;

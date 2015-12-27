@@ -4,33 +4,22 @@ import net.rezmason.gl.GLSystem;
 import net.rezmason.gl.OutputBuffer;
 import net.rezmason.gl.Program;
 import net.rezmason.math.Vec3;
-import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
 class RenderMethod {
 
     public var program(default, null):Program;
-    public var programLoaded(get, null):Bool;
     public var backgroundColor(default, null):Vec3;
-    public var loadedSignal(default, null):Zig<Void->Void>;
     var glSys:GLSystem;
     var vertShader:String;
     var fragShader:String;
 
     function new():Void {
-        loadedSignal = new Zig();
         backgroundColor = new Vec3(0, 0, 0);
         composeShaders();
         glSys = new Present(GLSystem);
+        program = glSys.createProgram(vertShader, fragShader);
     }
-
-    public function load():Void {
-        if (program == null) program = glSys.createProgram(vertShader, fragShader);
-        if (program.loaded) onProgramLoaded();
-        else program.onLoad = onProgramLoaded;
-    }
-
-    function onProgramLoaded():Void loadedSignal.dispatch();
 
     public inline function start(outputBuffer:OutputBuffer):Void {
         activate();
@@ -61,7 +50,5 @@ class RenderMethod {
     function composeShaders():Void { }
     function makeVertexShader():String { return ''; }
     function makeFragmentShader():String { return ''; }
-
-    inline function get_programLoaded():Bool return program != null && program.loaded;
 }
 

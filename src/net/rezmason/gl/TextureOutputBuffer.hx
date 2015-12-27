@@ -2,7 +2,7 @@ package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
 
-#if !flash
+#if ogl
     import lime.graphics.opengl.GL;
 #end
 
@@ -31,11 +31,8 @@ class TextureOutputBuffer extends OutputBuffer {
         return true;
     }
 
-    @:allow(net.rezmason.gl)
     override function activate():Void {
-        #if flash
-            context.setRenderToTexture(texture.nativeTexture);
-        #else
+        #if ogl
             GL.bindFramebuffer(GL.FRAMEBUFFER, texture.frameBuffer);
         #end
     }

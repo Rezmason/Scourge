@@ -13,7 +13,6 @@ class DataTexture extends Texture {
     public var data(default, null):Data;
     public var width:Int = -1;
     public var height:Int = -1;
-    var nativeTexture:NativeTexture;
     var format:TextureFormat;
 
     public function new(width:Int, height:Int, format:TextureFormat, data:Data):Void {
@@ -63,17 +62,5 @@ class DataTexture extends Texture {
         super.disconnectFromContext();
         #if flash nativeTexture.dispose(); #end
         nativeTexture = null;
-    }
-
-    override function setAtProgLocation(prog:NativeProgram, location:UniformLocation, index:Int):Void {
-        if (index != -1) {
-            #if flash
-                prog.setTextureAt(location, nativeTexture);
-            #else
-                GL.activeTexture(GL.TEXTURE0 + index);
-                GL.uniform1i(location, index);
-                GL.bindTexture (GL.TEXTURE_2D, nativeTexture);
-            #end
-        }
     }
 }

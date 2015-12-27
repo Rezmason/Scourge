@@ -12,15 +12,7 @@ import net.rezmason.gl.VertexBuffer;
 
 class PrettyMethod extends RenderMethod {
 
-    inline static var DERIV_MULT:Float =
-    #if flash
-        0.3
-    #elseif js
-        80
-    #else
-        80
-    #end
-    ;
+    inline static var DERIV_MULT:Float = 80;
 
     public function new():Void super();
 
@@ -43,9 +35,7 @@ class PrettyMethod extends RenderMethod {
 
         var frag:String = getText('shaders/glyphs.frag');
 
-        #if flash
-            fragShader = getText('shaders/glyphs_flash.frag');
-        #elseif js
+        #if js
             glSys.enableExtension('OES_standard_derivatives');
             glSys.enableExtension('OES_texture_float');
             glSys.enableExtension('OES_texture_float_linear');
