@@ -57,12 +57,11 @@ class Compositor {
 
         // var vertices:VertexArray = new VertexArray(TOTAL_VERTICES * FLOATS_PER_VERTEX);
         vertexBuffer = glSys.createVertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
-        var up = #if flash 1 #else 0 #end ;
         var verts = [
-            -1, -1, 0, up, 
-            -1,  1, 0, 1 - up, 
-             1, -1, 1, up, 
-             1,  1, 1, 1 - up, 
+            -1, -1, 0, 0,
+            -1,  1, 0, 1,
+             1, -1, 1, 0,
+             1,  1, 1, 1,
         ];
         for (ike in 0...verts.length) vertexBuffer.mod(ike, verts[ike]);
         vertexBuffer.upload();
@@ -106,8 +105,6 @@ class Compositor {
     }
 
     public function draw() {
-        if (!program.loaded) return;
-
         glSys.setProgram(program);
 
         program.setTextureAt('uTexture', inputTexture);

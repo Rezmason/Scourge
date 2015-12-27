@@ -3,7 +3,7 @@ package net.rezmason.gl;
 import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.TextureFormat;
 
-#if !flash
+#if ogl
     import lime.graphics.opengl.GL;
     import lime.graphics.opengl.GLFramebuffer;
     import lime.graphics.opengl.GLRenderbuffer;
@@ -13,10 +13,9 @@ import net.rezmason.gl.TextureFormat;
 class BufferTexture extends Texture {
 
     var format:TextureFormat;
-    var nativeTexture:NativeTexture;
     var width:Int;
     var height:Int;
-    #if !flash
+    #if ogl
         var frameBuffer:GLFramebuffer;
         var renderBuffer:GLRenderbuffer;
     #end
@@ -30,7 +29,7 @@ class BufferTexture extends Texture {
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-        #if !flash
+        #if ogl
             nativeTexture = GL.createTexture();
             frameBuffer = GL.createFramebuffer();
             renderBuffer = GL.createRenderbuffer();
@@ -41,31 +40,12 @@ class BufferTexture extends Texture {
 
     override function disconnectFromContext():Void {
         super.disconnectFromContext();
-        #if flash
-            nativeTexture.dispose();
-        #else
+        #if ogl
             frameBuffer = null;
             renderBuffer = null;
         #end
         
         nativeTexture = null;
-    }
-
-    @:allow(net.rezmason.gl)
-    override function setAtProgLocation(prog:NativeProgram, location:UniformLocation, index:Int):Void {
-        if (index != -1) {
-            #if flash
-                prog.setTextureAt(location, nativeTexture);
-            #else
-                GL.activeTexture(GL.TEXTURE0 + index);
-                GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-                GL.uniform1i(location, index);
-            #end
-        }
     }
 
     function resize(width:Int, height:Int):Void {
@@ -74,10 +54,7 @@ class BufferTexture extends Texture {
         this.width = width;
         this.height = height;
         if (isConnectedToContext()) {
-            #if flash
-                if (nativeTexture != null) nativeTexture.dispose();
-                nativeTexture = context.createRectangleTexture(width, height, cast TextureFormat.FLOAT, true);
-            #else
+            #if ogl
                 GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
 
                 GL.bindTexture(GL.TEXTURE_2D, nativeTexture);

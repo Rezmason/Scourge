@@ -9,7 +9,6 @@ class ScourgeLab extends Application {
 
     override public function onPreloadComplete() {
         super.onPreloadComplete();
-        #if flash flash.Lib.redirectTraces(); #end
         lab = new Lab(window.width, window.height);
     }
 

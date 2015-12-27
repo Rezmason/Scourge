@@ -12,9 +12,6 @@ class BeginNavErrand extends Errand<Void->Void> {
     public function new(engine:Engine):Void this.engine = engine;
 
     override public function run():Void {
-
-        engine.readySignal.remove(run);
-
         var navSystem = new NavSystem();
 
         navSystem.addSceneSignal.add(engine.addScene);

@@ -29,7 +29,6 @@ class Context {
         
         var engine = engineContext.engine;
         var beginNavErrand = new BeginNavErrand(engine);
-        if (engine.ready) beginNavErrand.run();
-        else engine.readySignal.add(beginNavErrand.run);
+        beginNavErrand.run();
     }
 }

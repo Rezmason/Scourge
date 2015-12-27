@@ -9,8 +9,6 @@ import net.rezmason.scourge.waves.WavePool;
 import net.rezmason.scourge.waves.Ripple;
 import net.rezmason.scourge.waves.WaveFunctions;
 
-import net.rezmason.utils.Zig;
-
 class Lab {
 
     var width:Int;
@@ -62,7 +60,6 @@ class Lab {
 }
 
 class LabSystem {
-    public var loadSig:Zig<Void->Void>;
     public var ready:Bool;
     var glSys:GLSystem;
     var width:Int;
@@ -71,7 +68,6 @@ class LabSystem {
         this.glSys = glSys;
         this.width = width;
         this.height = height;
-        loadSig = new Zig();
         ready = false;
     }
 
@@ -219,12 +215,11 @@ class PostSystem extends LabSystem {
         fragShader = Lab.makeExtensions(glSys) + fragShader;
 
         vertBuffer = glSys.createVertexBuffer(VpB, FpV);
-        var up = #if flash 1 #else 0 #end ;
         var vert = [
-            -1,-1,0,0,1 - up,
-            -1, 1,0,0,up,
-             1, 1,0,1,up,
-             1,-1,0,1,1 - up,
+            -1, -1, 0, 0, 1,
+            -1,  1, 0, 0, 0,
+             1,  1, 0, 1, 0,
+             1, -1, 0, 1, 1,
         ];
         for (ike in 0...VpB * FpV) vertBuffer.mod(ike, vert[ike]);
         vertBuffer.upload();
@@ -238,13 +233,7 @@ class PostSystem extends LabSystem {
         indexBuffer.upload();
 
         program = glSys.createProgram(vertShader, fragShader);
-        if (program.loaded) onProgramLoaded();
-        else program.onLoad = onProgramLoaded;
-    }
-
-    function onProgramLoaded():Void {
         ready = true;
-        loadSig.dispatch();
     }
 
     override function update():Void {
@@ -468,13 +457,7 @@ class MetaballSystem extends LabSystem {
         }
 
         program = glSys.createProgram(vertShader, fragShader);
-        if (program.loaded) onProgramLoaded();
-        else program.onLoad = onProgramLoaded;
-    }
-
-    function onProgramLoaded():Void {
         ready = true;
-        loadSig.dispatch();
     }
 
     override function update():Void {
