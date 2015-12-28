@@ -2,7 +2,7 @@ package net.rezmason.hypertype.console;
 
 class ConsoleStrings {
 
-    public inline static var CARET_STYLE:String = '§{name:_c1,f:0.2}§{name:_c2,f:0}∂{name:caret,period:1,frames:[_c1,_c2],s:1.5,a:1,ease:Quart_easeOut}';
+    public inline static var CARET_STYLE:String = '§{name:_c1,f:0.4}§{name:_c2,f:0}∂{name:caret,period:1,frames:[_c1,_c2],s:1.5,a:0.5,ease:Quart_easeOut}';
     public inline static var CARET_STYLENAME:String = 'caret';
     public inline static var WAIT_STYLES:String =
         '§{name:_w1,s:1.5}§{name:_w2,s:1}' +

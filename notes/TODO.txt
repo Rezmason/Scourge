@@ -1,5 +1,4 @@
 Better Glow
-    Limit inverse video effect to core glyph dimensions
     Compress the HTFs
 
 MATRIX CODE

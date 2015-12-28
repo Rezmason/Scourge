@@ -46,7 +46,7 @@ class SplashDemo {
         var glyphID:Int = 0;
         for (row in 0...numRows) {
 
-            var thickness:Int = (row == numRows - 1) ? 2 : 3;
+            var thickness:Int = 2;
 
             for (col in 0...numCols) {
 
@@ -62,14 +62,16 @@ class SplashDemo {
                 if (color == null) color = WHITE;
 
                 var s:Float = 1;
+                var a:Float = 0;
 
                 var glyphTower:Array<Glyph> = [];
 
                 for (ike in 0...thickness) {
                     var glyph:Glyph = body.getGlyphByID(glyphID);
                     glyphTower.push(glyph);
-                    glyph.SET({x:x, y:y, z:z, color:color, i:0, char:charCode, paint:glyph.id});
+                    glyph.SET({x:x, y:y, z:z, a:a, color:color, i:0, char:charCode, paint:glyph.id});
                     z += 0.01;
+                    a += 0.5;
                     color = color * 0.2;
                     glyphID++;
                 }
@@ -96,7 +98,7 @@ class SplashDemo {
 
             for (glyph in glyphTower) {
                 glyph.set_f(f);
-                glyph.set_s(s * (glyph.get_z() + 1));
+                glyph.set_s(s * (2 * glyph.get_z() + 1));
                 s *= 2;
             }
         }

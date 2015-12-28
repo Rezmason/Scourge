@@ -98,12 +98,12 @@ class MoveMediator {
         piece.growTo(pieceLib.maxSize());
         for (id in 0...piece.numGlyphs) {
             var glyph = piece.getGlyphByID(id);
-            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0, a:0.5});
+            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0, a:0.2});
         }
         bite.growTo(this.config.biteParams.maxReach + 1);
         for (id in 0...bite.numGlyphs) {
             var glyph = bite.getGlyphByID(id);
-            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0, a:0.5});
+            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, paint_s:0, a:0.2});
         }
         bite.getGlyphByID(0).set_color(new Vec3(1, 0, 0));
         pieceTableIndex_ = game.plan.onGlobal(PieceAspect.PIECE_TABLE_INDEX);
