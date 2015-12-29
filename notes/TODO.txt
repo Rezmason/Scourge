@@ -1,11 +1,11 @@
-Better Glow
-    Compress the HTFs
-
 MATRIX CODE
     Two layers– a large grid in front, a smaller grid in back
     Glyphs never actually move
         Each column in the grid is styled according to a timed signal
         Signal always starts from the top
+        Signal always ends at the bottom
+    ALL glyphs change at a constant frequency, about three times per second
+    They all change in a specific order
     Then make a second one of those in the background
 
 Improve feel of roll
@@ -25,6 +25,8 @@ Settings page
 Game config page
 
 "MYCOTA" sounds like a nice name
+
+Compress the HTFs
 
 Some Haxe stuff
     https://github.com/DanielUranga/openfl-harfbuzz

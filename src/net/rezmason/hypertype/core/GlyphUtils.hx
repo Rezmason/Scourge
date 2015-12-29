@@ -165,8 +165,13 @@ class GlyphUtils {
             var v = 0.;
             if (code != -1 && gl.font != null) {
                 var charCenterUV = gl.font.getCharCodeCenterUV(code);
-                u = charCenterUV.u;
-                v = charCenterUV.v;
+                if (charCenterUV != null) {
+                    u = charCenterUV.u;
+                    v = charCenterUV.v;
+                }
+                #if debug
+                    else trace('Unsupported character $code');
+                #end
             }
             
             var glyphOffset:Int = gl.id * COLOR_FLOATS_PER_GLYPH;

@@ -19,7 +19,7 @@ class ScourgeAssetGen extends Application {
             Strings.WEIRD_SYMBOLS,
         ].join('');
 
-        var matrixChars:String = '012345678ABCDEFGHIJKLMNOPQRTabcdefghijklmnopqrstuvwxyz';
+        var matrixChars:String = Strings.MATRIX_CHARS + Strings.MATRIX_UNUSED_CHARS;
 
         var characterSets:Array<CharacterSet> = [
             {chars:profontChars, size:300, size2:300, fontID:'ProFont'},

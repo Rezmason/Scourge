@@ -28,11 +28,10 @@ class Context {
         new GameContext();
         
         var engine = engineContext.engine;
-        var beginNavErrand = new BeginNavErrand(engine);
-        
-        beginNavErrand.run();
+        // var beginNavErrand = new BeginNavErrand(engine);
+        // beginNavErrand.run();
 
-        // makeMatrix(engine);
+        makeMatrix(engine);
     }
 
     function makeMatrix(engine) {
