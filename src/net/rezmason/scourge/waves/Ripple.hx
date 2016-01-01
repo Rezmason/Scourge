@@ -18,12 +18,12 @@ class Ripple {
         this.dMag = dMag;
         this.dX = dX;
         this.repeats = repeats;
-        done = false;
     }
 
     public inline function init():Void {
         x = -p;
         mag = a;
+        done = false;
     }
 
     public inline function update(delta:Float, poolSize:Float):Void {

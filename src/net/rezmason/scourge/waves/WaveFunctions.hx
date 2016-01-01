@@ -8,8 +8,15 @@ class WaveFunctions {
     }
 
     public inline static function bolus(x:Float):Float {
-        x *= Math.PI;
-        return (Math.cos(x) + 1) * 0.5;
+        return (Math.cos(x * Math.PI) + 1) * 0.5;
+    }
+
+    public inline static function sineTooth(x:Float):Float {
+        return (Math.sin(x * Math.PI / 2) + 1) * 0.5;
+    }
+
+    public inline static function sawTooth(x:Float):Float {
+        return (x + 1) * 0.5;
     }
 
     public inline static function photocopy(func:Float->Float, rez:Int):Float->Float {
