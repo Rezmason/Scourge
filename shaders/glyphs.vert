@@ -11,6 +11,7 @@ uniform vec4 uBodyParams;
 uniform vec4 uFontGlyphData;
 uniform vec4 uFontSDFData;
 
+varying float vRange;
 varying vec2 vInnerUVBounds;
 varying vec2 vUVCenter;
 varying vec2 vUVOffset;
@@ -35,6 +36,7 @@ void main(void) {
     vUVCenter = aUV + 0.5 * glyphSize;
     vUVOffset = vec2(1., -1.) * aCorner * uvInflate * glyphSize;
     vFX = aFX;
+    vRange = uFontSDFData.z;
 
     pos.z = clamp(pos.z, 0.0, 1.0);
     gl_Position = pos;

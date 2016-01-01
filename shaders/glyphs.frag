@@ -1,7 +1,7 @@
 uniform sampler2D uSampler;
 uniform vec4 uDerivMult;
-uniform vec4 uFontSDFData;
 
+varying float vRange;
 varying vec2 vInnerUVBounds;
 varying vec2 vUVCenter;
 varying vec2 vUVOffset;
@@ -11,8 +11,7 @@ varying vec3 vFX;
 void main(void) {
 
     vec2 uv = vUVCenter + 0.5 * vUVOffset;
-    float range = uFontSDFData.z;
-    float heightPercent = texture2D(uSampler, uv).r / range;
+    float heightPercent = texture2D(uSampler, uv).r / vRange;
     float deriv = uDerivMult.x * min(dFdx(uv.x), -dFdy(uv.y));
     float fat = vFX.y;
     float brightness = 1.0 - smoothstep(fat - deriv, fat + deriv, heightPercent);
