@@ -1,12 +1,11 @@
 MATRIX CODE
-    Two layers– a large grid in front, a smaller grid in back
-    Glyphs never actually move
-        Each column in the grid is styled according to a timed signal
-        Signal always starts from the top
-        Signal always ends at the bottom
-    ALL glyphs change at a constant frequency, about three times per second
-    They all change in a specific order
-    Then make a second one of those in the background
+    Composed of two sheets of non-moving glyphs
+        Each column in the sheet has a wave pool, and its glyphs are styled in response to its amplitude:
+            Aura
+            Color
+            Cycle speed
+        Sheet gives ripples to columns, and collect ripples that are done
+            TODO: figure out behavior of ripple emitter
 
 Improve feel of roll
 
