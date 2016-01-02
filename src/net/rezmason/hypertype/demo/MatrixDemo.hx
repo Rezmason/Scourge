@@ -56,30 +56,21 @@ class MatrixSheet {
         body.glyphTexture = font;
 
         columns = [];
-
-        var numLayers:UInt = isBackground ? 1 : 2;
         var glowCode = Utf8.charCodeAt('U', 0);
 
-        body.growTo(numRows * numColumns * numLayers);
+        body.growTo(numRows * numColumns);
         for (column in 0...numColumns) {
-            var frontGlyphs = [];
-            var backGlyphs = [];
+            var glyphs = [];
             for (row in 0...numRows) {
                 var index = column * numRows + row;
-                var frontGlyph = body.getGlyphByID(index * numLayers);
+                var glyph = body.getGlyphByID(index);
                 var glyphX = column / (numColumns - 1) - 0.5;
                 var glyphY = row / (numRows - 1) - 0.5;
-                frontGlyph.SET({x:glyphX, y:glyphY});
-                frontGlyphs.push(frontGlyph);
-                if (!isBackground) {
-                    var backGlyph = body.getGlyphByID(index * numLayers + 1);
-                    backGlyph.SET({x:glyphX, y:glyphY, s:6, a:1, w:-0.5, char:glowCode});
-                    backGlyphs.push(backGlyph);
-                }
+                glyph.SET({x:glyphX, y:glyphY});
+                glyphs.push(glyph);
             }
-            frontGlyphs.reverse();
-            backGlyphs.reverse();
-            columns.push(new MatrixColumn(charCodes, frontGlyphs, backGlyphs, isBackground ? 0.3 : 1.0));
+            glyphs.reverse();
+            columns.push(new MatrixColumn(charCodes, glyphs, isBackground ? 0.3 : 1.0));
         }
 
         var middleIndex = Std.int(columns.length * (0.5 + 0.3 * (Math.random() - 0.5)));
@@ -98,8 +89,7 @@ class MatrixSheet {
 
 class MatrixColumn {
 
-    var frontGlyphs:Array<Glyph>;
-    var backGlyphs:Array<Glyph>;
+    var glyphs:Array<Glyph>;
     var numGlyphs:UInt;
     var cycles:Array<Float>;
     var charCodes:Array<UInt>;
@@ -110,12 +100,11 @@ class MatrixColumn {
     var decay:Float;
     var speed:Float;
 
-    public function new(charCodes, frontGlyphs, backGlyphs, brightness) {
+    public function new(charCodes, glyphs, brightness) {
         this.charCodes = charCodes;
         this.numChars = this.charCodes.length;
-        this.frontGlyphs = frontGlyphs;
-        this.backGlyphs = backGlyphs;
-        numGlyphs = frontGlyphs.length;
+        this.glyphs = glyphs;
+        numGlyphs = glyphs.length;
         this.brightness = brightness;
         cycles = [for (ike in 0...numGlyphs) Math.random()];
         
@@ -142,21 +131,13 @@ class MatrixColumn {
             cycles[ike] = (cycles[ike] + delta * 0.06 * (1 - vitality * 0.5)) % 1;
             var index = Std.int(numChars * cycles[ike]);
             
-            var frontGlyph = frontGlyphs[ike];
-            frontGlyph.set_char(charCodes[index]);
+            var glyph = glyphs[ike];
+            glyph.set_char(charCodes[index]);
 
-            frontGlyph.set_r(brightness * 0.4 * sting * sting);
-            frontGlyph.set_g(brightness * vitality);
-            frontGlyph.set_b(brightness * 0.4 * sting);
-            frontGlyph.set_a((val - 0.5) * 0.5);
-
-            var backGlyph = backGlyphs[ike];
-            if (backGlyph != null) {
-                backGlyph.set_a(sting);
-                backGlyph.set_r(0.06 * brightness * 0.4 * sting * sting);
-                backGlyph.set_g(0.06 * brightness * vitality);
-                backGlyph.set_b(0.06 * brightness * 0.4 * sting);
-            }
+            glyph.set_r(brightness * 0.4 * sting * sting);
+            glyph.set_g(brightness * vitality);
+            glyph.set_b(brightness * 0.4 * sting);
+            glyph.set_a((val - 0.5) * 0.5);
         }
     }
 }
