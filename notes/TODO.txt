@@ -1,9 +1,5 @@
-Cleanup
-    Figure out focus
-    Figure out bloom
-
-
 MATRIX CODE
+    Figure out bloom
     Composed of two sheets of non-moving glyphs
         Each column in the sheet has a wave pool, and its glyphs are styled in response to its amplitude:
             Aura
