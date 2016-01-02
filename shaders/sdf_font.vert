@@ -20,7 +20,7 @@ varying vec3 vFX;
 
 void main(void) {
 
-    float inflation = (aFX.z != 0.0) ? 1.0 : max(0.0, aFX.y);
+    float inflation = max(0.0, aFX.y);
 
     vec4 pos = uBodyMat * vec4(aPos, 1.0);
     pos.z += aDistort.z;

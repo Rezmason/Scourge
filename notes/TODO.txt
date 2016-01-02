@@ -1,7 +1,7 @@
 Cleanup
-    Remove aura effect
-    Expand body ID
     Move fonts to new vertex buffer
+    Rename f to w
+        Start with the styles
     Rename uniforms in hitbox
     Rename variables in hitbox
     Rename uniforms in sdf

@@ -16,9 +16,6 @@ void main(void) {
     float fat = vFX.y;
     float brightness = 1.0 - smoothstep(fat - deriv, fat + deriv, heightPercent);
 
-    float aura = vFX.z;
-    if (aura > 0.0) brightness = clamp((1.0 - heightPercent) * aura, brightness, 1.);
-    
     brightness = clamp(brightness, 0.0, 1.0);
 
     float inverseVideo = vFX.x;
