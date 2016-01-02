@@ -1,5 +1,4 @@
 Cleanup
-    Dial down SDF range
     Figure out focus
     Figure out bloom
 

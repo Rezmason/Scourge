@@ -12,7 +12,7 @@ import net.rezmason.gl.VertexBuffer;
 
 class SDFFontMethod extends RenderMethod {
 
-    inline static var EPSILON:Float = 80;
+    inline static var EPSILON:Float = 160;
 
     public function new():Void super();
 

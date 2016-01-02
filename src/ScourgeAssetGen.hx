@@ -26,10 +26,10 @@ class ScourgeAssetGen extends Application {
             {chars:Strings.SMALL_CYRILLICS, size:400, size2:300, fontID:'ProFont_Cy'},
             {chars:Strings.BOX_SYMBOLS, size:300, size2:300, fontID:'SourceProFont'},
         ];
-        SDFFontGenerator.generate(characterSets, 72, 72, 1, 50, deployFont.bind('full'));
+        SDFFontGenerator.generate(characterSets, 72, 72, 1, 20, deployFont.bind('full'));
 
         characterSets = [{chars:matrixChars, size:218, size2:218, fontID:'MatrixCode'}];
-        SDFFontGenerator.generate(characterSets, 72, 72, 1, 50, deployFont.bind('matrix'));
+        SDFFontGenerator.generate(characterSets, 72, 72, 1, 20, deployFont.bind('matrix'));
 
         // MetaballTextureGenerator.makeTexture(30, 0.62, 20, deployImage.bind(_, "metaball"));
         // GlobTextureGenerator.makeTexture(512, deployImage.bind(_, "glob"));
