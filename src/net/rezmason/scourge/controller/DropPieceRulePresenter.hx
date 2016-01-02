@@ -9,10 +9,10 @@ class DropPieceRulePresenter extends RulePresenter {
     override function animateGlyphs() {
         var slam = createAnimation();
         populateGlyphs(slam.topFrom, slam.bottomFrom, spaceState.lastValues, spaceState.petriData);
-        slam.topFrom.SET({color:BLACK, s:1.2, f:0.2, char:BODY_CODE, p:-0.5});
+        slam.topFrom.SET({color:BLACK, s:1.2, w:0.2, char:BODY_CODE, p:-0.5});
         populateGlyphs(slam.topTo, slam.bottomTo, spaceState.values, spaceState.petriData);
         slam.bottomTo.SET({r:slam.topTo.get_r(), g:slam.topTo.get_g(), b:slam.topTo.get_b()});
-        slam.topTo.SET({color:WHITE, char:slam.topFrom.get_char(), s:1.2, f:0.2, p:-0.05});
+        slam.topTo.SET({color:WHITE, char:slam.topFrom.get_char(), s:1.2, w:0.2, p:-0.05});
         
         slam.duration = 0.125;
         slam.ease = Linear.easeNone.calculate;

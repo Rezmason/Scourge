@@ -313,6 +313,6 @@ class Parser {
         return tag;
     }
 
-    inline static function defaultStyleTag():Dynamic return {name:'', r:1, g:1, b:1, i:0, f:0, a:0, h:1, s:1, p:0};
+    inline static function defaultStyleTag():Dynamic return {name:'', r:1, g:1, b:1, i:0, w:0, a:0, h:1, s:1, p:0};
     inline static function defaultParagraphStyleTag():Dynamic return {name:'', align:'left'};
 }

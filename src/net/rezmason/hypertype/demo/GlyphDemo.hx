@@ -61,7 +61,7 @@ class GlyphDemo {
         var val:Float = tweens[currentPhase](percent);
         val = tweenData[currentPhase][0] * (1 - val) + tweenData[currentPhase][1] * val;
 
-        glyph.set_f(val * 0.1 + (1 - val) * -0.25);
+        glyph.set_w(val * 0.1 + (1 - val) * -0.25);
         glyph.set_color(COLORS[currentColor] * Quad.easeIn.calculate(val));
     }
 

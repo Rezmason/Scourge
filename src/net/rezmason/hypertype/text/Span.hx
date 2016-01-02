@@ -44,23 +44,23 @@ class Span {
     }
 
     public inline function addGlyph(glyph:Glyph):Void {
-        paintGlyph(glyph, isInteractive ? mouseID : 0);
+        hitboxGlyph(glyph, isInteractive ? mouseID : 0);
         glyphs.push(glyph);
     }
 
     public inline function setMouseID(mouseID:Int):Void {
         this.mouseID = mouseID & 0x00FFFF;
-        if (isInteractive) for (glyph in glyphs) paintGlyph(glyph, mouseID);
+        if (isInteractive) for (glyph in glyphs) hitboxGlyph(glyph, mouseID);
     }
 
     public inline function setInteractive(val:Bool):Void {
         if (isInteractive != val) {
             isInteractive = val;
-            for (glyph in glyphs) paintGlyph(glyph, isInteractive ? mouseID : 0);
+            for (glyph in glyphs) hitboxGlyph(glyph, isInteractive ? mouseID : 0);
         }
     }
 
-    inline function paintGlyph(glyph:Glyph, val:Int):Void glyph.set_paint(val);
+    inline function hitboxGlyph(glyph:Glyph, val:Int):Void glyph.set_hitboxID(val);
 
     public inline function connect():Void style.connectSpan(this);
     public inline function removeAllGlyphs():Void glyphs = [];

@@ -24,19 +24,20 @@ class HitboxMethod extends RenderMethod {
     }
 
     override function setBody(body:Body):Void {
-        program.setProgramConstantsFromMatrix('uCameraMat', body.scene.camera.transform);
-        program.setProgramConstantsFromMatrix('uBodyMat', body.concatenatedTransform);
+        program.setProgramConstantsFromMatrix('uCameraTransform', body.scene.camera.transform);
+        program.setProgramConstantsFromMatrix('uBodyTransform', body.concatenatedTransform);
         program.setFourProgramConstants('uFontSDFData', body.glyphTexture.font.sdfData);
-        program.setFourProgramConstants('uBodyParams', body.params); // uBodyParams contains the glyph transform and body paint
+        program.setFourProgramConstants('uBodyParams', body.params);
     }
 
     override public function setSegment(segment:BodySegment):Void {
         var geometryBuffer:VertexBuffer = (segment == null) ? null : segment.geometryBuffer;
-        var paintBuffer:VertexBuffer = (segment == null) ? null : segment.paintBuffer;
-        program.setVertexBufferAt('aPos',    geometryBuffer, 0, 3); // aPos : [x,y,z]
-        program.setVertexBufferAt('aCorner', geometryBuffer, 3, 2); // aCorner : [ch,hv]
-        program.setVertexBufferAt('aPaint',  paintBuffer, 0, 2); // aPaint : [paint_r,paint_g]
-        program.setVertexBufferAt('aHitbox', paintBuffer, 2, 2); // aHitbox : [paint_h,paint_s]
+        var hitboxBuffer:VertexBuffer = (segment == null) ? null : segment.hitboxBuffer;
+        program.setVertexBufferAt('aPosition',    geometryBuffer, 0, 3);
+        program.setVertexBufferAt('aCorner', geometryBuffer, 3, 2);
+        program.setVertexBufferAt('aGlyphID',  hitboxBuffer, 0, 2);
+        program.setVertexBufferAt('aHorizontalStretch', hitboxBuffer, 2, 1);
+        program.setVertexBufferAt('aScale', hitboxBuffer, 3, 1);
     }
 
     override public function drawBody(body:Body) if (body.mouseEnabled && body.visible) super.drawBody(body);

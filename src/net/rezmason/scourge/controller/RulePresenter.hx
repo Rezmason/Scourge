@@ -89,7 +89,7 @@ class RulePresenter extends Reckoner {
                 var code = BODY_CODE;
                 if (getPlayer(occupier)[head_] == getID(values)) code = HEAD_CODE;
                 bottomGlyph.SET({char:code, color:color * 0.3, s:2.5});
-                topGlyph.SET({char:code, color:color, f:0.1, s:1.5});
+                topGlyph.SET({char:code, color:color, w:0.1, s:1.5});
             } else {
                 bottomGlyph.SET({char:BOARD_CODE, color:color * 0.3, s:1.5});
                 topGlyph.SET({char:BODY_CODE, color:BLACK});

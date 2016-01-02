@@ -73,7 +73,7 @@ class MatrixSheet {
                 frontGlyphs.push(frontGlyph);
                 if (!isBackground) {
                     var backGlyph = body.getGlyphByID(index * numLayers + 1);
-                    backGlyph.SET({x:glyphX, y:glyphY, s:6, a:1, f:-0.5, char:glowCode});
+                    backGlyph.SET({x:glyphX, y:glyphY, s:6, a:1, w:-0.5, char:glowCode});
                     backGlyphs.push(backGlyph);
                 }
             }

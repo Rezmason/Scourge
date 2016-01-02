@@ -17,7 +17,7 @@ class BodySegment {
     public var colorBuffer(default, null):VertexBuffer;
     public var fontBuffer(default, null):VertexBuffer;
     public var geometryBuffer(default, null):VertexBuffer;
-    public var paintBuffer(default, null):VertexBuffer;
+    public var hitboxBuffer(default, null):VertexBuffer;
     public var indexBuffer(default, null):IndexBuffer;
 
     public var numGlyphs(default, set):Int;
@@ -43,7 +43,7 @@ class BodySegment {
         geometryBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.GEOMETRY_FLOATS_PER_VERTEX, bufferUsage);
         colorBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX, bufferUsage);
         fontBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.FONT_FLOATS_PER_VERTEX, bufferUsage);
-        paintBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.PAINT_FLOATS_PER_VERTEX, bufferUsage);
+        hitboxBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.HITBOX_FLOATS_PER_VERTEX, bufferUsage);
         indexBuffer = glSys.createIndexBuffer(numGlyphIndices, bufferUsage);
     }
 
@@ -56,7 +56,7 @@ class BodySegment {
             glyph.geometryBuf = geometryBuffer;
             glyph.fontBuf = fontBuffer;
             glyph.colorBuf = colorBuffer;
-            glyph.paintBuf = paintBuffer;
+            glyph.hitboxBuf = hitboxBuffer;
             glyph.init();
             _trueGlyphs.push(glyph);
         }
@@ -74,7 +74,7 @@ class BodySegment {
             geometryBuffer.invalidate();
             fontBuffer.invalidate();
             colorBuffer.invalidate();
-            paintBuffer.invalidate();
+            hitboxBuffer.invalidate();
             indexBuffer.invalidate();
         }
     }
@@ -84,7 +84,7 @@ class BodySegment {
             geometryBuffer.upload();
             fontBuffer.upload();
             colorBuffer.upload();
-            paintBuffer.upload();
+            hitboxBuffer.upload();
             indexBuffer.upload();
         }
     }
@@ -103,13 +103,13 @@ class BodySegment {
         geometryBuffer.dispose();
         fontBuffer.dispose();
         colorBuffer.dispose();
-        paintBuffer.dispose();
+        hitboxBuffer.dispose();
         indexBuffer.dispose();
 
         fontBuffer = null;
         colorBuffer = null;
         geometryBuffer = null;
-        paintBuffer = null;
+        hitboxBuffer = null;
         indexBuffer = null;
         numGlyphs = -1;
         _trueGlyphs = null;

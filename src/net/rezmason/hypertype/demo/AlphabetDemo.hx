@@ -45,7 +45,7 @@ class AlphabetDemo {
                 char: Utf8.charCodeAt(CHARS, id % CHARS.length),
                 color: white,
                 i:0.1,
-                paint: glyph.id + 1
+                hitboxID: glyph.id + 1
             });
         }
     }
@@ -56,8 +56,8 @@ class AlphabetDemo {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {
-                    case ENTER: glyph.set_f(0.2);
-                    case EXIT: glyph.set_f(0);
+                    case ENTER: glyph.set_w(0.2);
+                    case EXIT: glyph.set_w(0);
                     case MOUSE_DOWN: glyph.set_p(0.01);
                     case MOUSE_UP, DROP: glyph.set_p(0);
                     case CLICK: glyph.set_s(3 - glyph.get_s());

@@ -13,9 +13,9 @@ class SplashPage extends NavPage {
     inline static var h:String = Strings.HARD_SPACE;
 
     inline static var BUTTON_STYLE:String = 
-    '§{name:splashUp,   p: 0.00, f: 0.0, r:0.7, g:0.7, b:0.7}' +
-    '§{name:splashOver, p:-0.01, f: 0.1, r:0.9, g:0.9, b:0.9}' +
-    '§{name:splashDown, p: 0.01, f:-0.1, r:0.5, g:0.5, b:0.5}' +
+    '§{name:splashUp,   p: 0.00, w: 0.0, r:0.7, g:0.7, b:0.7}' +
+    '§{name:splashOver, p:-0.01, w: 0.1, r:0.9, g:0.9, b:0.9}' +
+    '§{name:splashDown, p: 0.01, w:-0.1, r:0.5, g:0.5, b:0.5}' +
     'µ{name:splashButton, up:splashUp, over:splashOver, down:splashDown, period:0.2, i:1}§{}' +
     '¶{name:main, align:center}';
 

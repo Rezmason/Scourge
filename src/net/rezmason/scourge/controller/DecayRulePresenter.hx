@@ -8,7 +8,7 @@ class DecayRulePresenter extends RulePresenter {
 
     override function animateGlyphs() {
         var wither = createAnimation();
-        wither.topTo.SET({color:WHITE * 0.5 + wither.topTo.get_color() * 0.5, f:-0.1});
+        wither.topTo.SET({color:WHITE * 0.5 + wither.topTo.get_color() * 0.5, w:-0.1});
         wither.bottomTo.set_color(BLACK);
         
         wither.duration = 0.5;

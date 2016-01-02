@@ -15,7 +15,7 @@ class Style {
     public var name(default, null):String;
     public var basis(default, null):String;
 
-    static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 'f', 'a', 'h', 's', 'p'];
+    static var styleFields:Array<String> = ['r', 'g', 'b', 'i', 'w', 'a', 'h', 's', 'p'];
 
     public function new(dec:Dynamic):Void {
         stateStyles = [];
@@ -44,7 +44,7 @@ class Style {
             g:basics[1],
             b:basics[2],
             i:basics[3],
-            f:basics[4],
+            w:basics[4],
             a:basics[5],
             h:basics[6],
             s:basics[7],

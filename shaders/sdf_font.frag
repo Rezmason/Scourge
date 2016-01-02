@@ -1,5 +1,5 @@
-uniform sampler2D uSampler;
-uniform vec4 uDerivMult;
+uniform sampler2D uFontTexture;
+uniform vec4 uEpsilon;
 
 varying float vRange;
 varying vec2 vInnerUVBounds;
@@ -12,8 +12,8 @@ varying float vInverseVideo;
 void main(void) {
 
     vec2 uv = vUVCenter + 0.5 * vUVOffset;
-    float heightPercent = texture2D(uSampler, uv).r / vRange;
-    float deriv = uDerivMult.x * min(dFdx(uv.x), -dFdy(uv.y));
+    float heightPercent = texture2D(uFontTexture, uv).r / vRange;
+    float deriv = uEpsilon.x * min(dFdx(uv.x), -dFdy(uv.y));
     float brightness = 1.0 - smoothstep(vFontWeight - deriv, vFontWeight + deriv, heightPercent);
 
     brightness = clamp(brightness, 0.0, 1.0);

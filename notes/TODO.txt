@@ -1,10 +1,4 @@
 Cleanup
-    Rename f to w
-        Start with the styles
-    Rename uniforms in hitbox
-    Rename variables in hitbox
-    Rename uniforms in sdf
-    Rename variables in sdf
     Dial down SDF range
     Figure out focus
     Figure out bloom

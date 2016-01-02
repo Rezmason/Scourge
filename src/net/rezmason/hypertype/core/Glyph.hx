@@ -13,9 +13,9 @@ class Glyph {
     var geometryBuf:VertexBuffer;
     var colorBuf:VertexBuffer;
     var fontBuf:VertexBuffer;
-    var paintBuf:VertexBuffer;
+    var hitboxBuf:VertexBuffer;
     var color:Vec3;
-    var paintHex:Int;
+    var hitboxID:Int;
     var charCode:Int;
     var font:SDFFont;
 

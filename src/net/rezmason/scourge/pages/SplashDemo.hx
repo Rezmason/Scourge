@@ -69,7 +69,7 @@ class SplashDemo {
                 for (ike in 0...thickness) {
                     var glyph:Glyph = body.getGlyphByID(glyphID);
                     glyphTower.push(glyph);
-                    glyph.SET({x:x, y:y, z:z, a:a, color:color, i:0, char:charCode, paint:glyph.id});
+                    glyph.SET({x:x, y:y, z:z, a:a, color:color, i:0, char:charCode, hitboxID:glyph.id});
                     z += 0.01;
                     a += 0.5;
                     color = color * 0.2;
@@ -93,11 +93,11 @@ class SplashDemo {
             var topGlyph:Glyph = glyphTower[0];
 
             var d:Float = ike / glyphTowers.length;
-            var f:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.3 - 0.25;
+            var w:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.3 - 0.25;
             var s:Float = (Math.cos(time * 3 + d * 300) * 0.5 + 1) * 0.3 + 0.5;
 
             for (glyph in glyphTower) {
-                glyph.set_f(f);
+                glyph.set_w(w);
                 glyph.set_s(s * (2 * glyph.get_z() + 1));
                 s *= 2;
             }

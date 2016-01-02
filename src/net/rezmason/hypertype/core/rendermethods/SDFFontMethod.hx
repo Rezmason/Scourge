@@ -12,7 +12,7 @@ import net.rezmason.gl.VertexBuffer;
 
 class SDFFontMethod extends RenderMethod {
 
-    inline static var DERIV_MULT:Float = 80;
+    inline static var EPSILON:Float = 80;
 
     public function new():Void super();
 
@@ -21,7 +21,7 @@ class SDFFontMethod extends RenderMethod {
         glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         glSys.setDepthTest(false);
 
-        program.setFourProgramConstants('uDerivMult', [DERIV_MULT, 0, 0, 0]);
+        program.setFourProgramConstants('uEpsilon', [EPSILON, 0, 0, 0]);
     }
 
     override public function deactivate():Void {
@@ -51,27 +51,28 @@ class SDFFontMethod extends RenderMethod {
     }
 
     override function setBody(body:Body):Void {
-        program.setProgramConstantsFromMatrix('uCameraMat', body.scene.camera.transform);
-        program.setProgramConstantsFromMatrix('uBodyMat', body.concatenatedTransform);
+        program.setProgramConstantsFromMatrix('uCameraTransform', body.scene.camera.transform);
+        program.setProgramConstantsFromMatrix('uBodyTransform', body.concatenatedTransform);
         program.setFourProgramConstants('uFontGlyphData', body.glyphTexture.font.glyphData);
         program.setFourProgramConstants('uFontSDFData', body.glyphTexture.font.sdfData);
         program.setFourProgramConstants('uBodyParams', body.params);
-        program.setTextureAt('uSampler', body.glyphTexture.texture);
+        program.setTextureAt('uFontTexture', body.glyphTexture.texture);
     }
 
     override public function setSegment(segment:BodySegment):Void {
         var geometryBuffer = (segment == null) ? null : segment.geometryBuffer;
         var fontBuffer = (segment == null) ? null : segment.fontBuffer;
         var colorBuffer = (segment == null) ? null : segment.colorBuffer;
-        program.setVertexBufferAt('aPos',     geometryBuffer, 0, 3); // aPos : [x,y,z]
-        program.setVertexBufferAt('aCorner',  geometryBuffer, 3, 2); // aCorner : [ch,hv]
-        program.setVertexBufferAt('aDistort', geometryBuffer, 5, 3); // aScale : [h,s,p]
-        program.setVertexBufferAt('aColor',   colorBuffer, 0, 3); // aColor : [r,g,b]
-        program.setVertexBufferAt('aInverseVideo',      colorBuffer, 3, 1); // aFX : [i]
-        program.setVertexBufferAt('aAura',      colorBuffer, 4, 1); // aFX : [a]
-        
-        program.setVertexBufferAt('aUV',      fontBuffer, 0, 2); // aUV : [u,v]
-        program.setVertexBufferAt('aFontWeight',      fontBuffer, 2, 1); // aFX : [f]
+        program.setVertexBufferAt('aPosition',     geometryBuffer, 0, 3);
+        program.setVertexBufferAt('aCorner',  geometryBuffer, 3, 2);
+        program.setVertexBufferAt('aHorizontalStretch', geometryBuffer, 5, 1);
+        program.setVertexBufferAt('aScale', geometryBuffer, 6, 1);
+        program.setVertexBufferAt('aCameraSpaceZ', geometryBuffer, 7, 1);
+        program.setVertexBufferAt('aColor',   colorBuffer, 0, 3);
+        program.setVertexBufferAt('aInverseVideo',      colorBuffer, 3, 1);
+        program.setVertexBufferAt('aAura',      colorBuffer, 4, 1);
+        program.setVertexBufferAt('aUV',      fontBuffer, 0, 2);
+        program.setVertexBufferAt('aFontWeight',      fontBuffer, 2, 1);
     }
 
     override public function drawBody(body:Body) if (body.visible) super.drawBody(body);

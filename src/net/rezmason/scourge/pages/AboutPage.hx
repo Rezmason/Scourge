@@ -13,9 +13,9 @@ class AboutPage extends NavPage {
     inline static var h:String = Strings.HARD_SPACE;
 
     inline static var BUTTON_STYLE:String = 
-    '§{name:aboutUp,   p: 0.00, f: 0.0, r:0.7, g:0.7, b:0.7}' +
-    '§{name:aboutOver, p:-0.01, f: 0.1, r:0.9, g:0.9, b:0.9}' +
-    '§{name:aboutDown, p: 0.01, f:-0.1, r:0.5, g:0.5, b:0.5}' +
+    '§{name:aboutUp,   p: 0.00, w: 0.0, r:0.7, g:0.7, b:0.7}' +
+    '§{name:aboutOver, p:-0.01, w: 0.1, r:0.9, g:0.9, b:0.9}' +
+    '§{name:aboutDown, p: 0.01, w:-0.1, r:0.5, g:0.5, b:0.5}' +
     'µ{name:aboutButton, up:aboutUp, over:aboutOver, down:aboutDown, period:0.2, i:1}§{}' +
     '¶{name:nav, align:justify-center}' +
     '¶{name:paper, align:center}';

@@ -77,7 +77,7 @@ class BoardAnimator {
             // U
             // V
             // i:from.get_i() * inv + to.get_i() * frac,
-            f:from.get_f() * inv + to.get_f() * frac,
+            w:from.get_w() * inv + to.get_w() * frac,
             a:from.get_a() * inv + to.get_a() * frac,
             x:from.get_x() * inv + to.get_x() * frac,
             y:from.get_y() * inv + to.get_y() * frac,
@@ -91,7 +91,7 @@ class BoardAnimator {
 
         var fromChar = from.get_char();
         var toChar = to.get_char();
-        if (fromChar != toChar) glyph.set_f(Math.abs(frac - 0.5) - 0.5);
+        if (fromChar != toChar) glyph.set_w(Math.abs(frac - 0.5) - 0.5);
         glyph.set_char(frac < 0.5 ? fromChar : toChar);
     }
 }

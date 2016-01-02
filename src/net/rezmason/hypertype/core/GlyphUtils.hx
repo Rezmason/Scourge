@@ -65,17 +65,12 @@ class GlyphUtils {
         set_b(gl, get_b(gl) * val);
     }
 
-    public inline static function set_fx(gl:Glyph, i, f, a) {
-        set_i(gl, i);
-        set_f(gl, f);
-        set_a(gl, a);
-    }
-
     public inline static function createGlyph():Glyph {
         var gl = new Glyph();
+        gl.fontBuf = new VertexBuffer(VERTICES_PER_GLYPH, FONT_FLOATS_PER_VERTEX);
         gl.geometryBuf = new VertexBuffer(VERTICES_PER_GLYPH, GEOMETRY_FLOATS_PER_VERTEX);
         gl.colorBuf = new VertexBuffer(VERTICES_PER_GLYPH, COLOR_FLOATS_PER_VERTEX);
-        gl.paintBuf = new VertexBuffer(VERTICES_PER_GLYPH, PAINT_FLOATS_PER_VERTEX);
+        gl.hitboxBuf = new VertexBuffer(VERTICES_PER_GLYPH, HITBOX_FLOATS_PER_VERTEX);
         init(gl);
         return gl;
     }
@@ -89,20 +84,20 @@ class GlyphUtils {
     public static function copyFrom(gl:Glyph, src:Glyph):Glyph {
         var destGeometryAddress = gl.id * GEOMETRY_FLOATS_PER_GLYPH;
         var destColorAddress = gl.id * COLOR_FLOATS_PER_GLYPH;
-        var destPaintAddress = gl.id * PAINT_FLOATS_PER_GLYPH;
+        var destHitboxAddress = gl.id * HITBOX_FLOATS_PER_GLYPH;
         var srcGeometryAddress = src.id * GEOMETRY_FLOATS_PER_GLYPH;
         var srcColorAddress = src.id * COLOR_FLOATS_PER_GLYPH;
-        var srcPaintAddress = src.id * PAINT_FLOATS_PER_GLYPH;
+        var srcHitboxAddress = src.id * HITBOX_FLOATS_PER_GLYPH;
         for (ike in 0...GEOMETRY_FLOATS_PER_GLYPH) gl.geometryBuf.mod(destGeometryAddress + ike, src.geometryBuf.acc(srcGeometryAddress + ike));
         for (ike in 0...COLOR_FLOATS_PER_GLYPH) gl.colorBuf.mod(destColorAddress + ike, src.colorBuf.acc(srcColorAddress + ike));
-        for (ike in 0...PAINT_FLOATS_PER_GLYPH) gl.paintBuf.mod(destPaintAddress + ike, src.paintBuf.acc(srcPaintAddress + ike));
-        gl.paintHex = src.paintHex;
+        for (ike in 0...HITBOX_FLOATS_PER_GLYPH) gl.hitboxBuf.mod(destHitboxAddress + ike, src.hitboxBuf.acc(srcHitboxAddress + ike));
+        gl.hitboxID = src.hitboxID;
         gl.charCode = src.charCode;
         gl.font = src.font;
         return gl;
     }
 
-    // Shape
+    // Geometry
 
     public inline static function get_x(gl:Glyph) return gl.geometryBuf.acc(gl.id * GEOMETRY_FLOATS_PER_GLYPH + X_OFFSET);
     public inline static function set_x(gl:Glyph, v) return pop4(gl.geometryBuf, gl.id * GEOMETRY_FLOATS_PER_GLYPH, X_OFFSET, GEOMETRY_FLOATS_PER_VERTEX, v);
@@ -138,7 +133,7 @@ class GlyphUtils {
         set_p(gl, p);
     }
 
-    // Character
+    // Font
 
     public inline static function get_font(gl:Glyph) return gl.font;
 
@@ -178,35 +173,35 @@ class GlyphUtils {
         return code;
     }
 
-    public inline static function get_f(gl:Glyph) return gl.fontBuf.acc(gl.id * FONT_FLOATS_PER_GLYPH + F_OFFSET);
-    public inline static function set_f(gl:Glyph, v) return pop4(gl.fontBuf, gl.id * FONT_FLOATS_PER_GLYPH, F_OFFSET, FONT_FLOATS_PER_VERTEX, v);
+    public inline static function get_w(gl:Glyph) return gl.fontBuf.acc(gl.id * FONT_FLOATS_PER_GLYPH + W_OFFSET);
+    public inline static function set_w(gl:Glyph, v) return pop4(gl.fontBuf, gl.id * FONT_FLOATS_PER_GLYPH, W_OFFSET, FONT_FLOATS_PER_VERTEX, v);
 
-    // Paint
+    // Hitbox
 
-    public inline static function get_paint(gl:Glyph) return gl.paintHex;
+    public inline static function get_hitboxID(gl:Glyph) return gl.hitboxID;
 
-    public inline static function set_paint(gl:Glyph, val:Int) {
-        #if debug if (val > 0xFFFF) throw 'Glyph cannot be painted color ${Vec3.fromHex(val)}'; #end
-        if (gl.paintHex != val) {
+    public inline static function set_hitboxID(gl:Glyph, val:Int) {
+        #if debug if (val > 0xFFFF) throw 'Glyph cannot be hitboxed color ${Vec3.fromHex(val)}'; #end
+        if (gl.hitboxID != val) {
 
-            var paintR = ((val >>  8) & 0xFF) / 0xFF;
-            var paintG = ((val >>  0) & 0xFF) / 0xFF;
-            var glyphOffset:Int = gl.id * PAINT_FLOATS_PER_GLYPH;
+            var hitboxR = ((val >>  8) & 0xFF) / 0xFF;
+            var hitboxG = ((val >>  0) & 0xFF) / 0xFF;
+            var glyphOffset:Int = gl.id * HITBOX_FLOATS_PER_GLYPH;
 
-            pop4(gl.paintBuf, glyphOffset, PAINT_R_OFFSET, PAINT_FLOATS_PER_VERTEX, paintR);
-            pop4(gl.paintBuf, glyphOffset, PAINT_G_OFFSET, PAINT_FLOATS_PER_VERTEX, paintG);
+            pop4(gl.hitboxBuf, glyphOffset, HITBOX_R_OFFSET, HITBOX_FLOATS_PER_VERTEX, hitboxR);
+            pop4(gl.hitboxBuf, glyphOffset, HITBOX_G_OFFSET, HITBOX_FLOATS_PER_VERTEX, hitboxG);
 
-            gl.paintHex = val;
+            gl.hitboxID = val;
         }
 
-        return gl.paintHex;
+        return gl.hitboxID;
     }
 
-    public inline static function get_paint_s(gl:Glyph) return gl.paintBuf.acc(gl.id * PAINT_FLOATS_PER_GLYPH + PAINT_S_OFFSET);
-    public inline static function set_paint_s(gl:Glyph, v) return pop4(gl.paintBuf, gl.id * PAINT_FLOATS_PER_GLYPH, PAINT_S_OFFSET, PAINT_FLOATS_PER_VERTEX, v);
+    public inline static function get_hitboxS(gl:Glyph) return gl.hitboxBuf.acc(gl.id * HITBOX_FLOATS_PER_GLYPH + HITBOX_S_OFFSET);
+    public inline static function set_hitboxS(gl:Glyph, v) return pop4(gl.hitboxBuf, gl.id * HITBOX_FLOATS_PER_GLYPH, HITBOX_S_OFFSET, HITBOX_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_paint_h(gl:Glyph) return gl.paintBuf.acc(gl.id * PAINT_FLOATS_PER_GLYPH + PAINT_H_OFFSET);
-    public inline static function set_paint_h(gl:Glyph, v) return pop4(gl.paintBuf, gl.id * PAINT_FLOATS_PER_GLYPH, PAINT_H_OFFSET, PAINT_FLOATS_PER_VERTEX, v);
+    public inline static function get_hitboxH(gl:Glyph) return gl.hitboxBuf.acc(gl.id * HITBOX_FLOATS_PER_GLYPH + HITBOX_H_OFFSET);
+    public inline static function set_hitboxH(gl:Glyph, v) return pop4(gl.hitboxBuf, gl.id * HITBOX_FLOATS_PER_GLYPH, HITBOX_H_OFFSET, HITBOX_FLOATS_PER_VERTEX, v);
 
     public inline static function init(gl:Glyph):Void {
         // corner H
@@ -221,21 +216,23 @@ class GlyphUtils {
         pop1(gl.geometryBuf, glyphOffset, CORNER_V_OFFSET + 2 * GEOMETRY_FLOATS_PER_VERTEX, -1);
         pop1(gl.geometryBuf, glyphOffset, CORNER_V_OFFSET + 3 * GEOMETRY_FLOATS_PER_VERTEX, -1);
 
-        set_paint(gl, 0);
-        set_paint_h(gl, 1);
-        set_paint_s(gl, 1);
+        set_hitboxID(gl, 0);
+        set_hitboxH(gl, 1);
+        set_hitboxS(gl, 1);
 
         reset(gl);
     }
 
     public inline static function reset(gl:Glyph):Glyph {
-        set_distort(gl, 1, 1, 0); // h, s, p
-        set_xyz(gl, 0, 0, 0); // x, y, z
-        set_rgb(gl, 1, 1, 1); // r, g, b
-        set_fx(gl, 0, 0, 0); // i, f, a
+        set_distort(gl, 1, 1, 0);
+        set_xyz(gl, 0, 0, 0);
+        set_rgb(gl, 1, 1, 1);
+        set_i(gl, 0);
+        set_a(gl, 0);
+        set_w(gl, 0);
         // We don't reset the font.
         set_char(gl, -1);
-        // We don't reset the paint.
+        // We don't reset the hitbox.
         return gl;
     }
 
