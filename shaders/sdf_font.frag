@@ -6,19 +6,19 @@ varying vec2 vInnerUVBounds;
 varying vec2 vUVCenter;
 varying vec2 vUVOffset;
 varying vec3 vColor;
-varying vec3 vFX;
+varying float vFontWeight;
+varying float vInverseVideo;
 
 void main(void) {
 
     vec2 uv = vUVCenter + 0.5 * vUVOffset;
     float heightPercent = texture2D(uSampler, uv).r / vRange;
     float deriv = uDerivMult.x * min(dFdx(uv.x), -dFdy(uv.y));
-    float fat = vFX.y;
-    float brightness = 1.0 - smoothstep(fat - deriv, fat + deriv, heightPercent);
+    float brightness = 1.0 - smoothstep(vFontWeight - deriv, vFontWeight + deriv, heightPercent);
 
     brightness = clamp(brightness, 0.0, 1.0);
 
-    float inverseVideo = vFX.x;
+    float inverseVideo = vInverseVideo;
     vec2 compare = abs(vUVOffset / vInnerUVBounds);
     if (compare.x > 1.0 || compare.y > 1.0) inverseVideo = 0.0;
     if (inverseVideo >= 0.3) brightness *= -1.0;

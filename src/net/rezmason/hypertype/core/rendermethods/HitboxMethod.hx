@@ -31,10 +31,10 @@ class HitboxMethod extends RenderMethod {
     }
 
     override public function setSegment(segment:BodySegment):Void {
-        var shapeBuffer:VertexBuffer = (segment == null) ? null : segment.shapeBuffer;
+        var geometryBuffer:VertexBuffer = (segment == null) ? null : segment.geometryBuffer;
         var paintBuffer:VertexBuffer = (segment == null) ? null : segment.paintBuffer;
-        program.setVertexBufferAt('aPos',    shapeBuffer, 0, 3); // aPos : [x,y,z]
-        program.setVertexBufferAt('aCorner', shapeBuffer, 3, 2); // aCorner : [ch,hv]
+        program.setVertexBufferAt('aPos',    geometryBuffer, 0, 3); // aPos : [x,y,z]
+        program.setVertexBufferAt('aCorner', geometryBuffer, 3, 2); // aCorner : [ch,hv]
         program.setVertexBufferAt('aPaint',  paintBuffer, 0, 2); // aPaint : [paint_r,paint_g]
         program.setVertexBufferAt('aHitbox', paintBuffer, 2, 2); // aHitbox : [paint_h,paint_s]
     }

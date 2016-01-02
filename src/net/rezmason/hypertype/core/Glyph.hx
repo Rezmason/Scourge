@@ -10,7 +10,7 @@ class Glyph {
 
     public var id(default, null):Int;
 
-    var shapeBuf:VertexBuffer;
+    var geometryBuf:VertexBuffer;
     var colorBuf:VertexBuffer;
     var paintBuf:VertexBuffer;
     var color:Vec3;

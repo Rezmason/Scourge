@@ -76,7 +76,7 @@ class GlyphUtils {
 
     public inline static function createGlyph():Glyph {
         var gl = new Glyph();
-        gl.shapeBuf = new VertexBuffer(VERTICES_PER_GLYPH, SHAPE_FLOATS_PER_VERTEX);
+        gl.geometryBuf = new VertexBuffer(VERTICES_PER_GLYPH, GEOMETRY_FLOATS_PER_VERTEX);
         gl.colorBuf = new VertexBuffer(VERTICES_PER_GLYPH, COLOR_FLOATS_PER_VERTEX);
         gl.paintBuf = new VertexBuffer(VERTICES_PER_GLYPH, PAINT_FLOATS_PER_VERTEX);
         init(gl);
@@ -90,15 +90,15 @@ class GlyphUtils {
     }
 
     public static function copyFrom(gl:Glyph, src:Glyph):Glyph {
-        var shapeAddress = gl.id * SHAPE_FLOATS_PER_GLYPH;
-        var colorAddress = gl.id * COLOR_FLOATS_PER_GLYPH;
-        var paintAddress = gl.id * PAINT_FLOATS_PER_GLYPH;
-        var srcShapeAddress = src.id * SHAPE_FLOATS_PER_GLYPH;
+        var destGeometryAddress = gl.id * GEOMETRY_FLOATS_PER_GLYPH;
+        var destColorAddress = gl.id * COLOR_FLOATS_PER_GLYPH;
+        var destPaintAddress = gl.id * PAINT_FLOATS_PER_GLYPH;
+        var srcGeometryAddress = src.id * GEOMETRY_FLOATS_PER_GLYPH;
         var srcColorAddress = src.id * COLOR_FLOATS_PER_GLYPH;
         var srcPaintAddress = src.id * PAINT_FLOATS_PER_GLYPH;
-        for (ike in 0...SHAPE_FLOATS_PER_GLYPH) gl.shapeBuf.mod(shapeAddress + ike, src.shapeBuf.acc(srcShapeAddress + ike));
-        for (ike in 0...COLOR_FLOATS_PER_GLYPH) gl.colorBuf.mod(colorAddress + ike, src.colorBuf.acc(srcColorAddress + ike));
-        for (ike in 0...PAINT_FLOATS_PER_GLYPH) gl.paintBuf.mod(paintAddress + ike, src.paintBuf.acc(srcPaintAddress + ike));
+        for (ike in 0...GEOMETRY_FLOATS_PER_GLYPH) gl.geometryBuf.mod(destGeometryAddress + ike, src.geometryBuf.acc(srcGeometryAddress + ike));
+        for (ike in 0...COLOR_FLOATS_PER_GLYPH) gl.colorBuf.mod(destColorAddress + ike, src.colorBuf.acc(srcColorAddress + ike));
+        for (ike in 0...PAINT_FLOATS_PER_GLYPH) gl.paintBuf.mod(destPaintAddress + ike, src.paintBuf.acc(srcPaintAddress + ike));
         gl.paintHex = src.paintHex;
         gl.charCode = src.charCode;
         gl.font = src.font;
@@ -107,21 +107,21 @@ class GlyphUtils {
 
     // Shape
 
-    public inline static function get_x(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + X_OFFSET);
-    public inline static function set_x(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, X_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
-    public inline static function get_y(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + Y_OFFSET);
-    public inline static function set_y(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, Y_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
-    public inline static function get_z(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + Z_OFFSET);
-    public inline static function set_z(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, Z_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
+    public inline static function get_x(gl:Glyph) return gl.geometryBuf.acc(gl.id * GEOMETRY_FLOATS_PER_GLYPH + X_OFFSET);
+    public inline static function set_x(gl:Glyph, v) return pop4(gl.geometryBuf, gl.id * GEOMETRY_FLOATS_PER_GLYPH, X_OFFSET, GEOMETRY_FLOATS_PER_VERTEX, v);
+    public inline static function get_y(gl:Glyph) return gl.geometryBuf.acc(gl.id * GEOMETRY_FLOATS_PER_GLYPH + Y_OFFSET);
+    public inline static function set_y(gl:Glyph, v) return pop4(gl.geometryBuf, gl.id * GEOMETRY_FLOATS_PER_GLYPH, Y_OFFSET, GEOMETRY_FLOATS_PER_VERTEX, v);
+    public inline static function get_z(gl:Glyph) return gl.geometryBuf.acc(gl.id * GEOMETRY_FLOATS_PER_GLYPH + Z_OFFSET);
+    public inline static function set_z(gl:Glyph, v) return pop4(gl.geometryBuf, gl.id * GEOMETRY_FLOATS_PER_GLYPH, Z_OFFSET, GEOMETRY_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_s(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + S_OFFSET);
-    public inline static function set_s(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, S_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
+    public inline static function get_s(gl:Glyph) return gl.geometryBuf.acc(gl.id * GEOMETRY_FLOATS_PER_GLYPH + S_OFFSET);
+    public inline static function set_s(gl:Glyph, v) return pop4(gl.geometryBuf, gl.id * GEOMETRY_FLOATS_PER_GLYPH, S_OFFSET, GEOMETRY_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_p(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + P_OFFSET);
-    public inline static function set_p(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, P_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
+    public inline static function get_p(gl:Glyph) return gl.geometryBuf.acc(gl.id * GEOMETRY_FLOATS_PER_GLYPH + P_OFFSET);
+    public inline static function set_p(gl:Glyph, v) return pop4(gl.geometryBuf, gl.id * GEOMETRY_FLOATS_PER_GLYPH, P_OFFSET, GEOMETRY_FLOATS_PER_VERTEX, v);
 
-    public inline static function get_h(gl:Glyph) return gl.shapeBuf.acc(gl.id * SHAPE_FLOATS_PER_GLYPH + H_OFFSET);
-    public inline static function set_h(gl:Glyph, v) return pop4(gl.shapeBuf, gl.id * SHAPE_FLOATS_PER_GLYPH, H_OFFSET, SHAPE_FLOATS_PER_VERTEX, v);
+    public inline static function get_h(gl:Glyph) return gl.geometryBuf.acc(gl.id * GEOMETRY_FLOATS_PER_GLYPH + H_OFFSET);
+    public inline static function set_h(gl:Glyph, v) return pop4(gl.geometryBuf, gl.id * GEOMETRY_FLOATS_PER_GLYPH, H_OFFSET, GEOMETRY_FLOATS_PER_VERTEX, v);
 
     public inline static function set_xyz(gl:Glyph, x, y, z) {
         set_x(gl, x);
@@ -210,16 +210,16 @@ class GlyphUtils {
 
     public inline static function init(gl:Glyph):Void {
         // corner H
-        var glyphOffset:Int = gl.id * SHAPE_FLOATS_PER_GLYPH;
-        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX, -1);
-        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shapeBuf, glyphOffset, CORNER_H_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, -1);
+        var glyphOffset:Int = gl.id * GEOMETRY_FLOATS_PER_GLYPH;
+        pop1(gl.geometryBuf, glyphOffset, CORNER_H_OFFSET + 0 * GEOMETRY_FLOATS_PER_VERTEX, -1);
+        pop1(gl.geometryBuf, glyphOffset, CORNER_H_OFFSET + 1 * GEOMETRY_FLOATS_PER_VERTEX,  1);
+        pop1(gl.geometryBuf, glyphOffset, CORNER_H_OFFSET + 2 * GEOMETRY_FLOATS_PER_VERTEX,  1);
+        pop1(gl.geometryBuf, glyphOffset, CORNER_H_OFFSET + 3 * GEOMETRY_FLOATS_PER_VERTEX, -1);
         // corner V
-        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 0 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 1 * SHAPE_FLOATS_PER_VERTEX,  1);
-        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 2 * SHAPE_FLOATS_PER_VERTEX, -1);
-        pop1(gl.shapeBuf, glyphOffset, CORNER_V_OFFSET + 3 * SHAPE_FLOATS_PER_VERTEX, -1);
+        pop1(gl.geometryBuf, glyphOffset, CORNER_V_OFFSET + 0 * GEOMETRY_FLOATS_PER_VERTEX,  1);
+        pop1(gl.geometryBuf, glyphOffset, CORNER_V_OFFSET + 1 * GEOMETRY_FLOATS_PER_VERTEX,  1);
+        pop1(gl.geometryBuf, glyphOffset, CORNER_V_OFFSET + 2 * GEOMETRY_FLOATS_PER_VERTEX, -1);
+        pop1(gl.geometryBuf, glyphOffset, CORNER_V_OFFSET + 3 * GEOMETRY_FLOATS_PER_VERTEX, -1);
 
         set_paint(gl, 0);
         set_paint_h(gl, 1);

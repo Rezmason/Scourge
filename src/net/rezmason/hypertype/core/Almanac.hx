@@ -31,10 +31,10 @@ class Almanac {
     public inline static var INDICES_PER_GLYPH:Int = TRIANGLES_PER_GLYPH * INDICES_PER_TRIANGLE;
 
     public inline static var COLOR_FLOATS_PER_VERTEX:Int = 3 + 2 + 3; // R,G,B U,V I,F,A
-    public inline static var SHAPE_FLOATS_PER_VERTEX:Int = 3 + 2 + 3; // X,Y,Z CH,CV H,S,P
+    public inline static var GEOMETRY_FLOATS_PER_VERTEX:Int = 3 + 2 + 3; // X,Y,Z CH,CV H,S,P
     public inline static var PAINT_FLOATS_PER_VERTEX:Int = 2 + 2; // PAINT_R,PAINT_G PAINT_H,PAINT_S
 
-    public inline static var SHAPE_FLOATS_PER_GLYPH:Int = SHAPE_FLOATS_PER_VERTEX * VERTICES_PER_GLYPH;
+    public inline static var GEOMETRY_FLOATS_PER_GLYPH:Int = GEOMETRY_FLOATS_PER_VERTEX * VERTICES_PER_GLYPH;
     public inline static var COLOR_FLOATS_PER_GLYPH:Int = COLOR_FLOATS_PER_VERTEX * VERTICES_PER_GLYPH;
     public inline static var PAINT_FLOATS_PER_GLYPH:Int = PAINT_FLOATS_PER_VERTEX * VERTICES_PER_GLYPH;
 
