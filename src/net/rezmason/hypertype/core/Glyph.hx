@@ -12,6 +12,7 @@ class Glyph {
 
     var geometryBuf:VertexBuffer;
     var colorBuf:VertexBuffer;
+    var fontBuf:VertexBuffer;
     var paintBuf:VertexBuffer;
     var color:Vec3;
     var paintHex:Int;

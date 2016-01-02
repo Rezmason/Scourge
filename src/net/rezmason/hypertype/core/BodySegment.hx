@@ -15,6 +15,7 @@ class BodySegment {
     public var id(default, null):Int;
 
     public var colorBuffer(default, null):VertexBuffer;
+    public var fontBuffer(default, null):VertexBuffer;
     public var geometryBuffer(default, null):VertexBuffer;
     public var paintBuffer(default, null):VertexBuffer;
     public var indexBuffer(default, null):IndexBuffer;
@@ -41,6 +42,7 @@ class BodySegment {
 
         geometryBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.GEOMETRY_FLOATS_PER_VERTEX, bufferUsage);
         colorBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX, bufferUsage);
+        fontBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.FONT_FLOATS_PER_VERTEX, bufferUsage);
         paintBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.PAINT_FLOATS_PER_VERTEX, bufferUsage);
         indexBuffer = glSys.createIndexBuffer(numGlyphIndices, bufferUsage);
     }
@@ -52,6 +54,7 @@ class BodySegment {
             if (donor != null) glyph = donor._trueGlyphs[ike];
             if (glyph == null) glyph = new Glyph(ike);
             glyph.geometryBuf = geometryBuffer;
+            glyph.fontBuf = fontBuffer;
             glyph.colorBuf = colorBuffer;
             glyph.paintBuf = paintBuffer;
             glyph.init();
@@ -69,6 +72,7 @@ class BodySegment {
     public inline function invalidate():Void {
         if (numGlyphs > 0) {
             geometryBuffer.invalidate();
+            fontBuffer.invalidate();
             colorBuffer.invalidate();
             paintBuffer.invalidate();
             indexBuffer.invalidate();
@@ -78,6 +82,7 @@ class BodySegment {
     public inline function upload():Void {
         if (numGlyphs > 0) {
             geometryBuffer.upload();
+            fontBuffer.upload();
             colorBuffer.upload();
             paintBuffer.upload();
             indexBuffer.upload();
@@ -96,10 +101,12 @@ class BodySegment {
 
     public function destroy():Void {
         geometryBuffer.dispose();
+        fontBuffer.dispose();
         colorBuffer.dispose();
         paintBuffer.dispose();
         indexBuffer.dispose();
 
+        fontBuffer = null;
         colorBuffer = null;
         geometryBuffer = null;
         paintBuffer = null;

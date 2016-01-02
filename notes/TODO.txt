@@ -1,5 +1,4 @@
 Cleanup
-    Move fonts to new vertex buffer
     Rename f to w
         Start with the styles
     Rename uniforms in hitbox

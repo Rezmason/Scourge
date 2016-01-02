@@ -60,16 +60,18 @@ class SDFFontMethod extends RenderMethod {
     }
 
     override public function setSegment(segment:BodySegment):Void {
-        var geometryBuffer:VertexBuffer = (segment == null) ? null : segment.geometryBuffer;
-        var colorBuffer:VertexBuffer = (segment == null) ? null : segment.colorBuffer;
+        var geometryBuffer = (segment == null) ? null : segment.geometryBuffer;
+        var fontBuffer = (segment == null) ? null : segment.fontBuffer;
+        var colorBuffer = (segment == null) ? null : segment.colorBuffer;
         program.setVertexBufferAt('aPos',     geometryBuffer, 0, 3); // aPos : [x,y,z]
         program.setVertexBufferAt('aCorner',  geometryBuffer, 3, 2); // aCorner : [ch,hv]
         program.setVertexBufferAt('aDistort', geometryBuffer, 5, 3); // aScale : [h,s,p]
         program.setVertexBufferAt('aColor',   colorBuffer, 0, 3); // aColor : [r,g,b]
-        program.setVertexBufferAt('aUV',      colorBuffer, 3, 2); // aUV : [u,v]
-        program.setVertexBufferAt('aInverseVideo',      colorBuffer, 5, 1); // aFX : [i]
-        program.setVertexBufferAt('aFontWeight',      colorBuffer, 6, 1); // aFX : [f]
-        program.setVertexBufferAt('aAura',      colorBuffer, 7, 1); // aFX : [a]
+        program.setVertexBufferAt('aInverseVideo',      colorBuffer, 3, 1); // aFX : [i]
+        program.setVertexBufferAt('aAura',      colorBuffer, 4, 1); // aFX : [a]
+        
+        program.setVertexBufferAt('aUV',      fontBuffer, 0, 2); // aUV : [u,v]
+        program.setVertexBufferAt('aFontWeight',      fontBuffer, 2, 1); // aFX : [f]
     }
 
     override public function drawBody(body:Body) if (body.visible) super.drawBody(body);
