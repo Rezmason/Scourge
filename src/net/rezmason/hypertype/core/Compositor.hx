@@ -79,8 +79,8 @@ class Compositor {
             extensions = '$extensions\nprecision mediump float;';
         #end
 
-        var vertShader = extensions + getText('shaders/postprocess.vert');
-        var fragShader = extensions + getText('shaders/postprocess.frag');
+        var vertShader = extensions + getText('shaders/post_process.vert');
+        var fragShader = extensions + getText('shaders/post_process.frag');
         program = glSys.createProgram(vertShader, fragShader);
     }
 

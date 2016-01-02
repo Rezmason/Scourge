@@ -3,7 +3,7 @@ package net.rezmason.hypertype.core;
 import lime.Assets;
 import net.rezmason.hypertype.core.GlyphTexture;
 import net.rezmason.utils.Zig;
-import net.rezmason.utils.display.FlatFont;
+import net.rezmason.utils.display.SDFFont;
 
 class FontManager {
     var fontTextures:Map<String, GlyphTexture>;
@@ -13,7 +13,7 @@ class FontManager {
     public function new(fontNames:Array<String>):Void {
         fontTextures = new Map();
         for (name in fontNames) {
-            fontTextures[name] = cast new GlyphTexture(name, new FlatFont(Assets.getBytes('flatfonts/${name}.htf')));
+            fontTextures[name] = cast new GlyphTexture(name, new SDFFont(Assets.getBytes('sdffonts/${name}.htf')));
         }
 
         onFontChange = new Zig();

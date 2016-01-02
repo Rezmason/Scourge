@@ -10,7 +10,7 @@ import net.rezmason.gl.BlendFactor;
 import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.VertexBuffer;
 
-class PrettyMethod extends RenderMethod {
+class SDFFontMethod extends RenderMethod {
 
     inline static var DERIV_MULT:Float = 80;
 
@@ -31,9 +31,9 @@ class PrettyMethod extends RenderMethod {
     }
 
     override function composeShaders():Void {
-        vertShader = getText('shaders/glyphs.vert');
+        vertShader = getText('shaders/sdf_font.vert');
 
-        var frag:String = getText('shaders/glyphs.frag');
+        var frag:String = getText('shaders/sdf_font.frag');
 
         #if js
             glSys.enableExtension('OES_standard_derivatives');

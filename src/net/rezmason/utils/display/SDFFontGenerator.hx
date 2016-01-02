@@ -21,9 +21,9 @@ typedef CharacterSet = {
     var size2:Int;
 }
 
-class FlatFontGenerator {
+class SDFFontGenerator {
 
-    public static function flatten(characterSets:Array<CharacterSet>, glyphWidth, glyphHeight, spacing, range, cbk) {
+    public static function generate(characterSets:Array<CharacterSet>, glyphWidth, glyphHeight, spacing, range, cbk) {
 
         var pendingGlyphs:Map<String, GlyphData> = new Map();
         var computedGlyphs:Map<String, Array<Float>> = new Map();

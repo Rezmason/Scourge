@@ -8,7 +8,7 @@ import net.rezmason.gl.GLTypes;
 typedef CharCoord = {x:Int, y:Int};
 typedef UV = {u:Float, v:Float};
 
-class FlatFont {
+class SDFFont {
 
     var charCenterUVs:Map<UInt, UV>;
     

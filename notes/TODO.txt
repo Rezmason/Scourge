@@ -1,3 +1,16 @@
+Cleanup
+    Remove aura effect
+    Expand body ID
+    Move fonts to new vertex buffer
+    Rename uniforms in hitbox
+    Rename variables in hitbox
+    Rename uniforms in sdf
+    Rename variables in sdf
+    Dial down SDF range
+    Figure out focus
+    Figure out bloom
+
+
 MATRIX CODE
     Composed of two sheets of non-moving glyphs
         Each column in the sheet has a wave pool, and its glyphs are styled in response to its amplitude:

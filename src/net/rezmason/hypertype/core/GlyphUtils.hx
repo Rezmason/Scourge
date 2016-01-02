@@ -8,7 +8,7 @@ package net.rezmason.hypertype.core;
     import net.rezmason.math.Vec3;
     import net.rezmason.hypertype.core.Almanac.*;
     import net.rezmason.utils.FatChar;
-    import net.rezmason.utils.display.FlatFont;
+    import net.rezmason.utils.display.SDFFont;
 #end
 
 class GlyphUtils {
@@ -145,7 +145,7 @@ class GlyphUtils {
 
     public inline static function get_font(gl:Glyph) return gl.font;
 
-    public inline static function set_font(gl:Glyph, font:FlatFont) {
+    public inline static function set_font(gl:Glyph, font:SDFFont) {
         if (gl.font != font) {
             gl.font = font;
             if (gl.charCode != -1) {

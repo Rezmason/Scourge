@@ -9,7 +9,7 @@ import net.rezmason.hypertype.core.BodySegment;
 import net.rezmason.hypertype.core.GlyphTexture;
 import net.rezmason.hypertype.core.RenderMethod;
 
-class MouseMethod extends RenderMethod {
+class HitboxMethod extends RenderMethod {
 
     public function new():Void {
         super();
@@ -19,8 +19,8 @@ class MouseMethod extends RenderMethod {
     override public function activate():Void glSys.setProgram(program);
 
     override function composeShaders():Void {
-        vertShader = getText('shaders/mousepicking.vert');
-        fragShader = #if !desktop 'precision mediump float;' + #end getText('shaders/mousepicking.frag');
+        vertShader = getText('shaders/hitbox.vert');
+        fragShader = #if !desktop 'precision mediump float;' + #end getText('shaders/hitbox.frag');
     }
 
     override function setBody(body:Body):Void {

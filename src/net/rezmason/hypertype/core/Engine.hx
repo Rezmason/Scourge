@@ -26,8 +26,8 @@ class Engine extends Module {
     var compositor:Compositor;
     var mouseSystem:MouseSystem;
     var keyboardSystem:KeyboardSystem;
-    var mouseMethod:RenderMethod;
-    var prettyMethod:RenderMethod;
+    var hitboxMethod:RenderMethod;
+    var sdfFontMethod:RenderMethod;
     var presentationMethod:RenderMethod;
     #if debug_graphics public var debugGraphics(get, null):DebugGraphics; #end
     #if hxtelemetry var telemetry:HxTelemetry; #end
@@ -145,9 +145,9 @@ class Engine extends Module {
     function initRenderMethods():Void {
         compositor = new Compositor();
 
-        prettyMethod = new PrettyMethod();
-        mouseMethod = new MouseMethod();
-        presentationMethod = prettyMethod;
+        sdfFontMethod = new SDFFontMethod();
+        hitboxMethod = new HitboxMethod();
+        presentationMethod = sdfFontMethod;
 
         var window = Application.current.window;
         this.width = window.width;
@@ -156,7 +156,7 @@ class Engine extends Module {
     }
 
     function renderMouse():Void {
-        drawFrame(mouseMethod, mouseSystem.outputBuffer);
+        drawFrame(hitboxMethod, mouseSystem.outputBuffer);
     }
 
     function drawFrame(method:RenderMethod, outputBuffer:OutputBuffer):Void {
@@ -237,7 +237,7 @@ class Engine extends Module {
                 }
             case KEYBOARD(type, code, modifier):
                 switch (code) {
-                    case SPACE: presentationMethod = (modifier.ctrlKey && type != KEY_UP) ? mouseMethod : prettyMethod;
+                    case SPACE: presentationMethod = (modifier.ctrlKey && type != KEY_UP) ? hitboxMethod : sdfFontMethod;
                     case D: if (modifier.ctrlKey && type == KEY_UP) testDisconnect(1000);
                     case _:
                 }
