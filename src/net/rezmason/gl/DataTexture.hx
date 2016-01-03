@@ -3,7 +3,7 @@ package net.rezmason.gl;
 import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.TextureFormat;
 
-#if !flash
+#if ogl
     import lime.graphics.opengl.GL;
     import lime.graphics.PixelFormat;
 #end
@@ -25,7 +25,7 @@ class DataTexture extends Texture {
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-        #if !flash
+        #if ogl
             nativeTexture = GL.createTexture();
             GL.getExtension('OES_texture_float');
             GL.getExtension('OES_texture_float_linear');
@@ -36,13 +36,7 @@ class DataTexture extends Texture {
     inline function update():Void {
         var sizeChanged = nativeTexture == null;
         if (isConnectedToContext()) {
-            #if flash
-                if (sizeChanged) {
-                    if (nativeTexture != null) nativeTexture.dispose();
-                    nativeTexture = context.createRectangleTexture(width, height, cast TextureFormat.FLOAT, false);
-                }
-                (cast nativeTexture).uploadFromByteArray(data.buffer.getData(), 0);
-            #else
+            #if ogl
                 GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
                 // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
                 // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
@@ -60,7 +54,6 @@ class DataTexture extends Texture {
 
     override function disconnectFromContext():Void {
         super.disconnectFromContext();
-        #if flash nativeTexture.dispose(); #end
         nativeTexture = null;
     }
 }
