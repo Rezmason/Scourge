@@ -6,7 +6,7 @@ import net.rezmason.gl.GLTypes;
     import lime.graphics.opengl.GL;
 #end
 
-class ViewportOutputBuffer extends OutputBuffer {
+class ViewportRenderTarget extends RenderTarget {
 
     override public function connectToContext(context:Context):Void {
         super.connectToContext(context);

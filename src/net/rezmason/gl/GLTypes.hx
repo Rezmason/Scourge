@@ -1,7 +1,5 @@
 package net.rezmason.gl;
 
-typedef ReadbackData = #if ogl lime.utils.UInt8Array #end ;
-
 typedef AttribsLocation = #if ogl Int #end ;
 typedef UniformLocation = #if ogl lime.graphics.opengl.GLUniformLocation #end ;
 

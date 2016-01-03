@@ -5,11 +5,11 @@ import lime.graphics.Image;
 import net.rezmason.gl.BlendFactor;
 import net.rezmason.gl.GLSystem;
 import net.rezmason.gl.IndexBuffer;
-import net.rezmason.gl.OutputBuffer;
+import net.rezmason.gl.RenderTarget;
 import net.rezmason.gl.Program;
 import net.rezmason.gl.Texture;
 import net.rezmason.gl.VertexBuffer;
-import net.rezmason.gl.ViewportOutputBuffer;
+import net.rezmason.gl.ViewportRenderTarget;
 import net.rezmason.utils.santa.Present;
 #if debug_graphics 
     import lime.graphics.cairo.CairoImageSurface;
@@ -23,14 +23,14 @@ class Compositor {
     inline static var TOTAL_TRIANGLES:Int = 2;
     inline static var TOTAL_INDICES:Int = TOTAL_TRIANGLES * 3;
 
-    public var inputBuffer(default, null):OutputBuffer;
+    public var inputBuffer(default, null):RenderTarget;
     var inputTexture:Texture;
     #if debug_graphics 
         var debugTexture:ImageTexture;
         var debugSurface:CairoImageSurface;
         public var debugGraphics(default, null):DebugGraphics;
     #end
-    var viewportBuffer:ViewportOutputBuffer;
+    var viewportBuffer:ViewportRenderTarget;
     var glSys:GLSystem;
     var program:Program;
     var vertexBuffer:VertexBuffer;
@@ -42,10 +42,10 @@ class Compositor {
         glSys.enableExtension("OES_texture_float");
         glSys.enableExtension("OES_texture_float_linear");
         
-        var textureOutputBuffer = glSys.createTextureOutputBuffer();
-        inputTexture = textureOutputBuffer.texture;
-        inputBuffer = textureOutputBuffer;
-        viewportBuffer = glSys.viewportOutputBuffer;
+        var textureRenderTarget = glSys.createTextureRenderTarget(FLOAT);
+        inputTexture = textureRenderTarget.texture;
+        inputBuffer = textureRenderTarget;
+        viewportBuffer = glSys.viewportRenderTarget;
 
         #if debug_graphics 
             debugTexture = glSys.createImageTexture(new Image(null, 0, 0, 1, 1, 0x00000000));

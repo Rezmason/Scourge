@@ -4,7 +4,7 @@ import lime.app.Application;
 import lime.app.Module;
 
 import net.rezmason.gl.GLTypes;
-import net.rezmason.gl.OutputBuffer;
+import net.rezmason.gl.RenderTarget;
 import net.rezmason.gl.GLSystem;
 import net.rezmason.hypertype.core.rendermethods.*;
 import net.rezmason.utils.Zig;
@@ -156,16 +156,16 @@ class Engine extends Module {
     }
 
     function renderMouse():Void {
-        drawFrame(hitboxMethod, mouseSystem.outputBuffer);
+        drawFrame(hitboxMethod, mouseSystem.renderTarget);
     }
 
-    function drawFrame(method:SceneRenderMethod, outputBuffer:OutputBuffer):Void {
+    function drawFrame(method:SceneRenderMethod, renderTarget:RenderTarget):Void {
         //trace('rendering with method ${Std.is(method, PrettyMethod) ? "pretty" : "mouse"}');
         if (glSys.connected) {
             if (method == null) {
                 trace('Null method.');
             } else {
-                method.start(outputBuffer);
+                method.start(renderTarget);
                 for (scene in scenes) method.drawScene(scene);
                 method.finish();
             }

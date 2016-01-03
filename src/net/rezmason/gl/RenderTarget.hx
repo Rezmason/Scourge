@@ -2,7 +2,7 @@ package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
 
-class OutputBuffer extends Artifact {
+class RenderTarget extends Artifact {
 
     public var width(default, null):Int;
     public var height(default, null):Int;

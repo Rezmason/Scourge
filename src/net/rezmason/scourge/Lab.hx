@@ -109,7 +109,7 @@ class PostSystem extends LabSystem {
     var globTexture:Texture;
     var program:Program;
 
-    var buffer:OutputBuffer;
+    var buffer:RenderTarget;
 
     var vertexBuffer:VertexBuffer;
     var indexBuffer:IndexBuffer;
@@ -153,10 +153,10 @@ class PostSystem extends LabSystem {
 
         globMat = new Matrix4();
         
-        metaballTexture = cast(metaballSystem.buffer, TextureOutputBuffer).texture;
+        metaballTexture = cast(metaballSystem.buffer, TextureRenderTarget).texture;
         globTexture = glSys.createImageTexture(getImage('metaballs/glob.png'));
 
-        buffer = glSys.viewportOutputBuffer;
+        buffer = glSys.viewportRenderTarget;
         buffer.resize(width, height);
 
         var vertShader = '
@@ -305,7 +305,7 @@ class MetaballSystem extends LabSystem {
     var bodyTransform:Matrix4;
     var cameraTransform:Matrix4;
 
-    public var buffer:OutputBuffer;
+    public var buffer:RenderTarget;
 
     var phases:Array<Array<Null<Int>>>;
     var cavity:Array<Array<Null<Int>>>;
@@ -332,7 +332,7 @@ class MetaballSystem extends LabSystem {
         cameraTransform = new Matrix4();
         cameraTransform.rawData = cast [2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1];
 
-        buffer = glSys.createTextureOutputBuffer();
+        buffer = glSys.createTextureRenderTarget();
         buffer.resize(width, height);
 
         var vertShader = '
@@ -558,7 +558,7 @@ class DataSystem extends LabSystem {
     var dataTexture:Texture;
     var program:Program;
 
-    var buffer:OutputBuffer;
+    var buffer:RenderTarget;
 
     var vertexBuffer:VertexBuffer;
     var indexBuffer:IndexBuffer;
@@ -614,7 +614,7 @@ class DataSystem extends LabSystem {
 
         dataTexture = glSys.createHalfFloatTexture(width, height, output.getBytes());
 
-        buffer = glSys.viewportOutputBuffer;
+        buffer = glSys.viewportRenderTarget;
         buffer.resize(width, height);
 
         vertexBuffer = glSys.createVertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);

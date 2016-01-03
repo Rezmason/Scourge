@@ -6,6 +6,8 @@ import net.rezmason.gl.GLTypes;
 #if ogl
     import lime.graphics.Renderer;
     import lime.graphics.opengl.GL;
+    import lime.utils.Float32Array;
+    import lime.utils.UInt8Array;
 #end
 
 class GLSystem {
@@ -16,8 +18,8 @@ class GLSystem {
     var context:Context;
     var artifacts:Map<UInt, Artifact>;
 
-    public var currentOutputBuffer(default, null):OutputBuffer;
-    public var viewportOutputBuffer(get, null):ViewportOutputBuffer;
+    public var currentRenderTarget(default, null):RenderTarget;
+    public var viewportRenderTarget(get, null):ViewportRenderTarget;
     
     public function new():Void {
         connected = false;
@@ -75,14 +77,10 @@ class GLSystem {
         return registerArtifact(new Program(vertSource, fragSource));
     }
 
-    public inline function createTextureOutputBuffer():TextureOutputBuffer {
-        return registerArtifact(new TextureOutputBuffer());
+    public inline function createTextureRenderTarget(format:TextureFormat):TextureRenderTarget {
+        return registerArtifact(new TextureRenderTarget(format));
     }
 
-    public inline function createReadbackOutputBuffer():ReadbackOutputBuffer {
-        return registerArtifact(new ReadbackOutputBuffer());
-    }
-    
     public inline function createImageTexture(img:Image):ImageTexture {
         return registerArtifact(new ImageTexture(img));
     }
@@ -93,6 +91,18 @@ class GLSystem {
 
     public inline function createHalfFloatTexture(width:Int, height:Int, bytes:Bytes, ?singleChannel:Bool):HalfFloatTexture {
         return registerArtifact(new HalfFloatTexture(width, height, bytes, singleChannel));
+    }
+
+    public inline function createReadbackData(width:Int, height:Int, format:TextureFormat):Data {
+        var data:Data = null;
+        var len = width * height * 4;
+        #if ogl
+            switch (format) {
+                case FLOAT: data = new Float32Array(len);
+                case UNSIGNED_BYTE: data = new UInt8Array(len);
+            }
+        #end
+        return data;
     }
 
     public inline function setProgram(program:Program):Void {
@@ -136,24 +146,24 @@ class GLSystem {
         #end
     }
 
-    public inline function start(outputBuffer:OutputBuffer):Void {
-        if (currentOutputBuffer != outputBuffer) {
-            currentOutputBuffer = outputBuffer;
-            outputBuffer.activate();
+    public inline function start(renderTarget:RenderTarget):Void {
+        if (currentRenderTarget != renderTarget) {
+            currentRenderTarget = renderTarget;
+            renderTarget.activate();
         }
     }
 
     public inline function finish():Void {
-        if (currentOutputBuffer != null) {
-            currentOutputBuffer.deactivate();
-            currentOutputBuffer = null;
+        if (currentRenderTarget != null) {
+            currentRenderTarget.deactivate();
+            currentRenderTarget = null;
         }
     }
 
-    inline function get_viewportOutputBuffer():ViewportOutputBuffer {
-        if (viewportOutputBuffer == null) {
-            viewportOutputBuffer = registerArtifact(new ViewportOutputBuffer());
+    inline function get_viewportRenderTarget():ViewportRenderTarget {
+        if (viewportRenderTarget == null) {
+            viewportRenderTarget = registerArtifact(new ViewportRenderTarget());
         }
-        return viewportOutputBuffer;
+        return viewportRenderTarget;
     }
 }

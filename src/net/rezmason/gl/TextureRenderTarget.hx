@@ -1,18 +1,21 @@
 package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
+import net.rezmason.gl.TextureFormat;
 
 #if ogl
     import lime.graphics.opengl.GL;
 #end
 
-class TextureOutputBuffer extends OutputBuffer {
+class TextureRenderTarget extends RenderTarget {
 
     public var texture(default, null):BufferTexture;
+    var format:TextureFormat;
 
-    function new():Void {
+    function new(format):Void {
         super();
-        texture = new BufferTexture(FLOAT);
+        this.format = format;
+        texture = new BufferTexture(format);
     }
 
     override function connectToContext(context:Context):Void {
@@ -34,6 +37,13 @@ class TextureOutputBuffer extends OutputBuffer {
     override function activate():Void {
         #if ogl
             GL.bindFramebuffer(GL.FRAMEBUFFER, texture.frameBuffer);
+        #end
+    }
+
+    public function readBack(data:Data):Void {
+        #if ogl
+            GL.bindFramebuffer(GL.FRAMEBUFFER, texture.frameBuffer);
+            GL.readPixels(0, 0, width, height, GL.RGBA, texture.format, data);
         #end
     }
 }

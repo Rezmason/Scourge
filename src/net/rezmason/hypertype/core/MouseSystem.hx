@@ -3,7 +3,7 @@ package net.rezmason.hypertype.core;
 import net.rezmason.gl.GLTypes;
 
 import net.rezmason.gl.GLSystem;
-import net.rezmason.gl.ReadbackOutputBuffer;
+import net.rezmason.gl.TextureRenderTarget;
 import net.rezmason.gl.GLTypes;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
@@ -15,14 +15,14 @@ typedef Hit = {
     var glyphID:Null<Int>;
 }
 
-typedef XY = { x:Float, y:Float };
+typedef ReadbackData = #if ogl lime.utils.UInt8Array #end ;
 
 class MouseSystem {
 
     static var NULL_HIT:Hit = {bodyID:null, glyphID:null};
 
     public var active(default, set):Bool;
-    public var outputBuffer(default, null):ReadbackOutputBuffer;
+    public var renderTarget(default, null):TextureRenderTarget;
     public var invalid(default, null):Bool;
     public var interactSignal(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
     public var refreshSignal(default, null):Zig<Void->Void>;
@@ -57,7 +57,7 @@ class MouseSystem {
         initialized = false;
         invalidate();
 
-        outputBuffer = glSys.createReadbackOutputBuffer();
+        renderTarget = glSys.createTextureRenderTarget(UNSIGNED_BYTE);
     }
 
     public function setSize(width:Int, height:Int):Void {
@@ -127,7 +127,7 @@ class MouseSystem {
 
     function getHit(x:Float, y:Float):Hit {
 
-        if (data == null || data.length < cast width * height * 4) return NULL_HIT;
+        if (data == null) return NULL_HIT;
 
         if (x < 0) x = 0;
         if (x >= width) x = width - 1;
@@ -138,7 +138,7 @@ class MouseSystem {
         var rectLeft:Int = Std.int(x);
         var rectTop:Int = Std.int(#if ogl height - 1 - #end y);
         
-        var rawID:Int = getRawIDFromIndex((rectTop * width + rectLeft) * 4);
+        var rawID:Int = getRawIDFromCoord(rectLeft, rectTop);
         var bodyID:Null<Int> = null;
         var glyphID:Null<Int> = null;
 
@@ -165,7 +165,8 @@ class MouseSystem {
         return {bodyID:bodyID, glyphID:glyphID};
     }
 
-    inline function getRawIDFromIndex(index:Int):Int {
+    inline function getRawIDFromCoord(x:Int, y:Int):Int {
+        var index = (y * width + x) * 4;
         return (data[index] << 16) | (data[index + 1] << 8) | (data[index + 2] << 0);
     }
 
@@ -174,10 +175,10 @@ class MouseSystem {
     }
 
     inline function refresh() {
-        outputBuffer.resize(width, height);
-        if (data == null) data = outputBuffer.createReadbackData();
+        renderTarget.resize(width, height);
+        if (data == null) data = cast glSys.createReadbackData(width, height, UNSIGNED_BYTE);
         refreshSignal.dispatch();
-        outputBuffer.readBack(outputBuffer, data);
+        renderTarget.readBack(data);
         invalid = false;
     }
 
