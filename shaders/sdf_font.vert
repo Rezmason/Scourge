@@ -22,6 +22,7 @@ varying vec2 vUVOffset;
 varying vec3 vColor;
 varying float vFontWeight;
 varying float vInverseVideo;
+varying float vAura;
 
 void main(void) {
 
@@ -42,6 +43,7 @@ void main(void) {
     vUVOffset = vec2(1., -1.) * aCorner * uvInflate * glyphSize;
     vFontWeight = aFontWeight;
     vInverseVideo = aInverseVideo;
+    vAura = aAura;
     vRange = uFontSDFData.z;
 
     position.z = clamp(position.z, 0.0, 1.0);

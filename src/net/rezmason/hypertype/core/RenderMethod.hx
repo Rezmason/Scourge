@@ -10,12 +10,14 @@ class RenderMethod {
 
     public var program(default, null):Program;
     public var backgroundColor(default, null):Vec3;
+    public var backgroundAlpha:Float;
     var glSys:GLSystem;
     var vertShader:String;
     var fragShader:String;
 
     function new():Void {
         backgroundColor = new Vec3(0, 0, 0);
+        backgroundAlpha = 1;
         composeShaders();
         glSys = new Present(GLSystem);
         program = glSys.createProgram(vertShader, fragShader);
@@ -24,7 +26,7 @@ class RenderMethod {
     public inline function start(outputBuffer:OutputBuffer):Void {
         activate();
         glSys.start(outputBuffer);
-        glSys.clear(backgroundColor.r, backgroundColor.g, backgroundColor.b);
+        glSys.clear(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundAlpha);
     }
 
     public inline function finish():Void {

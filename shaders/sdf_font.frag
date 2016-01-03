@@ -8,6 +8,7 @@ varying vec2 vUVOffset;
 varying vec3 vColor;
 varying float vFontWeight;
 varying float vInverseVideo;
+varying float vAura;
 
 void main(void) {
 
@@ -24,5 +25,5 @@ void main(void) {
     if (inverseVideo >= 0.3) brightness *= -1.0;
     brightness += inverseVideo;
 
-    gl_FragColor = vec4(vColor * brightness, 1.0);
+    gl_FragColor = vec4(vColor * brightness, vAura);
 }

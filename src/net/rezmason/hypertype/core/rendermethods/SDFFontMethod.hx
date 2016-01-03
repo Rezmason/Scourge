@@ -14,7 +14,10 @@ class SDFFontMethod extends RenderMethod {
 
     inline static var EPSILON:Float = 160;
 
-    public function new():Void super();
+    public function new():Void {
+        super();
+        backgroundAlpha = 0;
+    }
 
     override public function activate():Void {
         glSys.setProgram(program);
