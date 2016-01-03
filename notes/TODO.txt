@@ -1,5 +1,4 @@
 Rethink how rendering is done
-    Isolate SceneRenderMethod from RenderMethod
     Create ScreenRenderMethod
     Switch Compositor to using ScreenRenderMethods
     Compositor should just be a map of graphs

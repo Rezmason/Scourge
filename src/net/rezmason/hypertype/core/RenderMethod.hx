@@ -8,9 +8,9 @@ import net.rezmason.utils.santa.Present;
 
 class RenderMethod {
 
-    public var program(default, null):Program;
     public var backgroundColor(default, null):Vec3;
     public var backgroundAlpha:Float;
+    var program:Program;
     var glSys:GLSystem;
     var vertShader:String;
     var fragShader:String;
@@ -23,34 +23,21 @@ class RenderMethod {
         program = glSys.createProgram(vertShader, fragShader);
     }
 
-    public inline function start(outputBuffer:OutputBuffer):Void {
+    public function start(outputBuffer:OutputBuffer):Void {
         activate();
         glSys.start(outputBuffer);
         glSys.clear(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundAlpha);
     }
 
-    public inline function finish():Void {
-        setSegment(null);
+    public function finish():Void {
         deactivate();
         glSys.finish();
     }
 
-    function activate():Void {}
+    function activate():Void glSys.setProgram(program);
     function deactivate():Void {}
-    function setBody(body:Body):Void { }
-
-    public function drawBody(body:Body):Void {
-        setBody(body);
-        for (segment in body.segments) {
-            setSegment(segment);
-            glSys.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
-        }
-    }
-
-    public function setSegment(segment:BodySegment):Void { }
-
-    function composeShaders():Void { }
-    function makeVertexShader():String { return ''; }
-    function makeFragmentShader():String { return ''; }
+    function composeShaders():Void {}
+    function makeVertexShader():String return '';
+    function makeFragmentShader():String return '';
 }
 

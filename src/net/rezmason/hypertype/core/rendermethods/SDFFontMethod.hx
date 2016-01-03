@@ -1,16 +1,10 @@
 package net.rezmason.hypertype.core.rendermethods;
 
 import lime.Assets.getText;
-
-import net.rezmason.hypertype.core.Almanac.*;
-import net.rezmason.hypertype.core.BodySegment;
-import net.rezmason.hypertype.core.GlyphTexture;
-import net.rezmason.hypertype.core.RenderMethod;
+import net.rezmason.hypertype.core.SceneRenderMethod;
 import net.rezmason.gl.BlendFactor;
-import net.rezmason.gl.GLTypes;
-import net.rezmason.gl.VertexBuffer;
 
-class SDFFontMethod extends RenderMethod {
+class SDFFontMethod extends SceneRenderMethod {
 
     inline static var EPSILON:Float = 160;
 
@@ -20,7 +14,7 @@ class SDFFontMethod extends RenderMethod {
     }
 
     override public function activate():Void {
-        glSys.setProgram(program);
+        super.activate();
         glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         glSys.setDepthTest(false);
 
@@ -53,16 +47,17 @@ class SDFFontMethod extends RenderMethod {
         #end
     }
 
-    override function setBody(body:Body):Void {
+    override function drawBody(body:Body):Void {
         program.setProgramConstantsFromMatrix('uCameraTransform', body.scene.camera.transform);
         program.setProgramConstantsFromMatrix('uBodyTransform', body.concatenatedTransform);
         program.setFourProgramConstants('uFontGlyphData', body.glyphTexture.font.glyphData);
         program.setFourProgramConstants('uFontSDFData', body.glyphTexture.font.sdfData);
         program.setFourProgramConstants('uBodyParams', body.params);
         program.setTextureAt('uFontTexture', body.glyphTexture.texture);
+        super.drawBody(body);
     }
 
-    override public function setSegment(segment:BodySegment):Void {
+    override function setSegment(segment:BodySegment):Void {
         var geometryBuffer = (segment == null) ? null : segment.geometryBuffer;
         var fontBuffer = (segment == null) ? null : segment.fontBuffer;
         var colorBuffer = (segment == null) ? null : segment.colorBuffer;
@@ -78,6 +73,6 @@ class SDFFontMethod extends RenderMethod {
         program.setVertexBufferAt('aFontWeight',      fontBuffer, 2, 1);
     }
 
-    override public function drawBody(body:Body) if (body.visible) super.drawBody(body);
+    override function shouldDrawBody(body:Body) return body.visible;
 }
 

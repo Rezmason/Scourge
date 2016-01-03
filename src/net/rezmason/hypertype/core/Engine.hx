@@ -26,9 +26,9 @@ class Engine extends Module {
     var compositor:Compositor;
     var mouseSystem:MouseSystem;
     var keyboardSystem:KeyboardSystem;
-    var hitboxMethod:RenderMethod;
-    var sdfFontMethod:RenderMethod;
-    var presentationMethod:RenderMethod;
+    var hitboxMethod:SceneRenderMethod;
+    var sdfFontMethod:SceneRenderMethod;
+    var presentationMethod:SceneRenderMethod;
     #if debug_graphics public var debugGraphics(get, null):DebugGraphics; #end
     #if hxtelemetry var telemetry:HxTelemetry; #end
 
@@ -45,7 +45,7 @@ class Engine extends Module {
         scenes = [];
 
         initInteractionSystems();
-        initRenderMethods();
+        initSceneRenderMethods();
     }
 
     public function addScene(scene:Scene):Void {
@@ -142,7 +142,7 @@ class Engine extends Module {
         keyboardSystem.interactSignal.add(handleInteraction);
     }
 
-    function initRenderMethods():Void {
+    function initSceneRenderMethods():Void {
         compositor = new Compositor();
 
         sdfFontMethod = new SDFFontMethod();
@@ -159,19 +159,14 @@ class Engine extends Module {
         drawFrame(hitboxMethod, mouseSystem.outputBuffer);
     }
 
-    function drawFrame(method:RenderMethod, outputBuffer:OutputBuffer):Void {
+    function drawFrame(method:SceneRenderMethod, outputBuffer:OutputBuffer):Void {
         //trace('rendering with method ${Std.is(method, PrettyMethod) ? "pretty" : "mouse"}');
         if (glSys.connected) {
             if (method == null) {
                 trace('Null method.');
             } else {
                 method.start(outputBuffer);
-                for (scene in scenes) {
-                    for (body in scene.bodies) {
-                        body.upload();
-                        if (body.numGlyphs > 0) method.drawBody(body);
-                    }
-                }
+                for (scene in scenes) method.drawScene(scene);
                 method.finish();
             }
         }
