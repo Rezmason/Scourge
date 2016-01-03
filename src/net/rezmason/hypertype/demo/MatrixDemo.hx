@@ -14,7 +14,7 @@ using net.rezmason.hypertype.core.GlyphUtils;
 class MatrixDemo {
 
     public var body(default, null):Body;
-    // var backSheet:MatrixSheet;
+    var backSheet:MatrixSheet;
     var frontSheet:MatrixSheet;
 
     public function new():Void {
@@ -24,7 +24,7 @@ class MatrixDemo {
 
         var fontManager:FontManager = new Present(FontManager);
         var matrixFont = fontManager.getFontByName('matrix');
-        // backSheet = new MatrixSheet(matrixFont, charCodes, 80, 80, true);
+        backSheet = new MatrixSheet(matrixFont, charCodes, 80, 80, true);
         frontSheet = new MatrixSheet(matrixFont, charCodes, 60, 60);
         body = new Body();
         // body.addChild(backSheet.body);
@@ -70,13 +70,12 @@ class MatrixSheet {
                 glyphs.push(glyph);
             }
             glyphs.reverse();
-            columns.push(new MatrixColumn(charCodes, glyphs, isBackground ? 0.3 : 1.0));
+            columns.push(new MatrixColumn(charCodes, glyphs, isBackground ? 0.1 : 1.0));
         }
 
-        var middleIndex = Std.int(columns.length * (0.5 + 0.3 * (Math.random() - 0.5)));
-        var middleColumn = isBackground ? null : columns[middleIndex];
-        for (column in columns) {
-            // if (column != middleColumn) column.position = -Math.random() * numRows;
+        if (!isBackground) {
+            var middleColumn = columns[Std.int(columns.length * (0.5 + 0.3 * (Math.random() - 0.5)))];
+            middleColumn.position = 0;
         }
 
         update(0);
@@ -89,6 +88,8 @@ class MatrixSheet {
 
 class MatrixColumn {
 
+    inline static var CYCLE_SPEED = 0.12;
+
     var glyphs:Array<Glyph>;
     var numGlyphs:UInt;
     var cycles:Array<Float>;
@@ -97,7 +98,7 @@ class MatrixColumn {
     var brightness:Float;
     
     public var position:Float;
-    var decay:Float;
+    var tailLength:Float;
     var speed:Float;
 
     public function new(charCodes, glyphs, brightness) {
@@ -107,37 +108,38 @@ class MatrixColumn {
         numGlyphs = glyphs.length;
         this.brightness = brightness;
         cycles = [for (ike in 0...numGlyphs) Math.random()];
-        
-        position = 0;
-        decay = 2 + Math.random() * 3;
-        speed = 0.3 + Math.random() * 0.3;
+        reinitialize();
     }
 
     public function update(delta:Float) {
         position = position + delta * speed;
-        if (position > 1) position = position % 1;
+        if (position > 1 + tailLength) reinitialize();
 
         for (ike in 0...numGlyphs) {
-            var val = 0.0;
-            var disp = ike / numGlyphs - position;
-            if (disp < 0) {
-                val = 1 + disp * decay;
-                if (val < 0) val = 0;
+            var glyph = glyphs[ike];
+            var disp = ike / numGlyphs;
+            var val = (disp - (position - tailLength)) / tailLength;
+            if (val < 0 || val > 1) val = 0;
+
+            if (val > 0) {
+                cycles[ike] = (cycles[ike] + delta * CYCLE_SPEED * (1 - val)) % 1;
+                var index = Std.int(numChars * cycles[ike]);
+                glyph.set_char(charCodes[index]);
             }
 
-            var vitality = 1 - Math.pow(1 - val, 5);
-            var sting = Math.pow(val, 2);
+            var green = (1 - Math.pow(1 - val, 5));
+            var nonGreen = Math.pow(val, 5);
 
-            cycles[ike] = (cycles[ike] + delta * 0.06 * (1 - vitality * 0.5)) % 1;
-            var index = Std.int(numChars * cycles[ike]);
-            
-            var glyph = glyphs[ike];
-            glyph.set_char(charCodes[index]);
-
-            glyph.set_r(brightness * 0.4 * sting * sting);
-            glyph.set_g(brightness * vitality);
-            glyph.set_b(brightness * 0.4 * sting);
-            glyph.set_a((val - 0.5) * 0.5);
+            glyph.set_g(brightness * green);
+            glyph.set_r(brightness * nonGreen * 0.7);
+            glyph.set_b(brightness * nonGreen * 0.7);
+            glyph.set_a(brightness * green);
         }
+    }
+
+    function reinitialize() {
+        tailLength = 0.2 + Math.random() * 0.6;
+        speed = 0.3 + Math.random() * 0.3;
+        position = -(speed + Math.random());
     }
 }

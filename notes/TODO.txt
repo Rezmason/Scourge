@@ -1,12 +1,8 @@
 MATRIX CODE
-    Figure out bloom
-    Composed of two sheets of non-moving glyphs
-        Each column in the sheet has a wave pool, and its glyphs are styled in response to its amplitude:
-            Aura
-            Color
-            Cycle speed
-        Sheet gives ripples to columns, and collect ripples that are done
-            TODO: figure out behavior of ripple emitter
+    Bloom
+    Raindrop traffic
+    Color match
+
 
 Improve feel of roll
 
