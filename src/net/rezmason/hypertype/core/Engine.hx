@@ -111,7 +111,7 @@ class Engine extends Module {
             telemetry.start_timing('.render');
         #end
 
-        drawFrame(presentationMethod, compositor.inputBuffer);
+        drawFrame(presentationMethod, compositor.inputRenderTarget);
         if (glSys.connected) compositor.draw();
 
         #if hxtelemetry
@@ -156,7 +156,7 @@ class Engine extends Module {
     }
 
     function renderMouse():Void {
-        drawFrame(hitboxMethod, mouseSystem.renderTarget);
+        drawFrame(hitboxMethod, mouseSystem.renderTargetTexture.renderTarget);
     }
 
     function drawFrame(method:SceneRenderMethod, renderTarget:RenderTarget):Void {

@@ -77,8 +77,8 @@ class GLSystem {
         return registerArtifact(new Program(vertSource, fragSource));
     }
 
-    public inline function createTextureRenderTarget(format:TextureFormat):TextureRenderTarget {
-        return registerArtifact(new TextureRenderTarget(format));
+    public inline function createRenderTargetTexture(format:TextureFormat):RenderTargetTexture {
+        return registerArtifact(new RenderTargetTexture(format));
     }
 
     public inline function createImageTexture(img:Image):ImageTexture {
@@ -149,15 +149,14 @@ class GLSystem {
     public inline function start(renderTarget:RenderTarget):Void {
         if (currentRenderTarget != renderTarget) {
             currentRenderTarget = renderTarget;
-            renderTarget.activate();
+            #if ogl
+                GL.bindFramebuffer(GL.FRAMEBUFFER, renderTarget.frameBuffer);
+            #end
         }
     }
 
     public inline function finish():Void {
-        if (currentRenderTarget != null) {
-            currentRenderTarget.deactivate();
-            currentRenderTarget = null;
-        }
+        currentRenderTarget = null;
     }
 
     inline function get_viewportRenderTarget():ViewportRenderTarget {

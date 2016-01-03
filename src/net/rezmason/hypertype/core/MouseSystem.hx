@@ -3,8 +3,8 @@ package net.rezmason.hypertype.core;
 import net.rezmason.gl.GLTypes;
 
 import net.rezmason.gl.GLSystem;
-import net.rezmason.gl.TextureRenderTarget;
 import net.rezmason.gl.GLTypes;
+import net.rezmason.gl.RenderTargetTexture;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
@@ -22,7 +22,7 @@ class MouseSystem {
     static var NULL_HIT:Hit = {bodyID:null, glyphID:null};
 
     public var active(default, set):Bool;
-    public var renderTarget(default, null):TextureRenderTarget;
+    public var renderTargetTexture(default, null):RenderTargetTexture;
     public var invalid(default, null):Bool;
     public var interactSignal(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
     public var refreshSignal(default, null):Zig<Void->Void>;
@@ -57,7 +57,7 @@ class MouseSystem {
         initialized = false;
         invalidate();
 
-        renderTarget = glSys.createTextureRenderTarget(UNSIGNED_BYTE);
+        renderTargetTexture = glSys.createRenderTargetTexture(UNSIGNED_BYTE);
     }
 
     public function setSize(width:Int, height:Int):Void {
@@ -175,10 +175,10 @@ class MouseSystem {
     }
 
     inline function refresh() {
-        renderTarget.resize(width, height);
+        renderTargetTexture.resize(width, height);
         if (data == null) data = cast glSys.createReadbackData(width, height, UNSIGNED_BYTE);
         refreshSignal.dispatch();
-        renderTarget.readBack(data);
+        renderTargetTexture.readBack(data);
         invalid = false;
     }
 

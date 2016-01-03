@@ -16,6 +16,7 @@ class ImageTexture extends Texture {
 
     public function new(image:Image):Void {
         super();
+        format = UNSIGNED_BYTE;
         this.image = image;
     }
 
@@ -40,7 +41,7 @@ class ImageTexture extends Texture {
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
                 
                 image.format = PixelFormat.RGBA32;
-                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, image.width, image.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, image.data);
+                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, image.width, image.height, 0, GL.RGBA, format, image.data);
                 image.format = PixelFormat.BGRA32;
                 
                 GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);

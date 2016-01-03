@@ -6,7 +6,8 @@ typedef UniformLocation = #if ogl lime.graphics.opengl.GLUniformLocation #end ;
 typedef NativeVertexBuffer = #if ogl lime.graphics.opengl.GLBuffer #end ;
 typedef NativeIndexBuffer = #if ogl lime.graphics.opengl.GLBuffer #end ;
 typedef NativeProgram = #if ogl lime.graphics.opengl.GLProgram #end ;
-typedef NativeTexture = #if ogl lime.graphics.opengl.GLTexture #end;
+typedef NativeTexture = #if ogl lime.graphics.opengl.GLTexture #end ;
+typedef NativeFramebuffer = #if ogl lime.graphics.opengl.GLFramebuffer #end ;
 
 typedef Context = #if ogl Class<lime.graphics.opengl.GL> #end ;
 typedef Rectangle = lime.math.Rectangle;

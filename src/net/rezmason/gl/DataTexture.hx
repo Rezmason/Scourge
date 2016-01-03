@@ -13,8 +13,7 @@ class DataTexture extends Texture {
     public var data(default, null):Data;
     public var width:Int = -1;
     public var height:Int = -1;
-    var format:TextureFormat;
-
+    
     public function new(width:Int, height:Int, format:TextureFormat, data:Data):Void {
         super();
         this.width = width;

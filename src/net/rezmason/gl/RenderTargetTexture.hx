@@ -1,6 +1,7 @@
 package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
+import net.rezmason.gl.RenderTarget;
 import net.rezmason.gl.TextureFormat;
 
 #if ogl
@@ -9,12 +10,11 @@ import net.rezmason.gl.TextureFormat;
     import lime.graphics.opengl.GLRenderbuffer;
 #end
 
-@:allow(net.rezmason.gl)
-class BufferTexture extends Texture {
+class RenderTargetTexture extends Texture {
 
-    var format:TextureFormat;
-    var width:Int;
-    var height:Int;
+    public var renderTarget(default, null):RenderTarget;
+    public var width(default, null):Int;
+    public var height(default, null):Int;
     #if ogl
         var frameBuffer:GLFramebuffer;
         var renderBuffer:GLRenderbuffer;
@@ -25,6 +25,7 @@ class BufferTexture extends Texture {
         this.format = format;
         width = 1;
         height = 1;
+        renderTarget = new RenderTarget();
     }
 
     override function connectToContext(context:Context):Void {
@@ -32,6 +33,7 @@ class BufferTexture extends Texture {
         #if ogl
             nativeTexture = GL.createTexture();
             frameBuffer = GL.createFramebuffer();
+            renderTarget.frameBuffer = frameBuffer;
             renderBuffer = GL.createRenderbuffer();
         #end
 
@@ -42,13 +44,13 @@ class BufferTexture extends Texture {
         super.disconnectFromContext();
         #if ogl
             frameBuffer = null;
+            renderTarget.frameBuffer = null;
             renderBuffer = null;
         #end
-        
         nativeTexture = null;
     }
 
-    function resize(width:Int, height:Int):Void {
+    public function resize(width:Int, height:Int):Void {
         if (width  < 1) width = 1;
         if (height < 1) height = 1;
         this.width = width;
@@ -76,5 +78,12 @@ class BufferTexture extends Texture {
                 GL.bindFramebuffer(GL.FRAMEBUFFER, null);
             #end
         }
+    }
+
+    public function readBack(data:Data):Void {
+        #if ogl
+            GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
+            GL.readPixels(0, 0, width, height, GL.RGBA, format, data);
+        #end
     }
 }
