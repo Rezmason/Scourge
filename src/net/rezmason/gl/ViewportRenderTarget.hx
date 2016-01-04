@@ -1,7 +1,5 @@
 package net.rezmason.gl;
 
-import net.rezmason.gl.GLTypes;
-
 #if ogl
     import lime.graphics.opengl.GL;
 #end

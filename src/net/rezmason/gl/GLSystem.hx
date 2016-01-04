@@ -4,7 +4,6 @@ import haxe.io.Bytes;
 import net.rezmason.gl.GLTypes;
 
 #if ogl
-    import lime.graphics.Renderer;
     import lime.graphics.opengl.GL;
     import lime.utils.Float32Array;
     import lime.utils.UInt8Array;

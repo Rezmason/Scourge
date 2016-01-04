@@ -3,7 +3,6 @@ package net.rezmason.gl;
 import haxe.io.Bytes;
 import haxe.io.BytesOutput;
 import lime.utils.Float32Array;
-
 import net.rezmason.utils.HalfFloatUtil;
 
 class HalfFloatTexture extends DataTexture {

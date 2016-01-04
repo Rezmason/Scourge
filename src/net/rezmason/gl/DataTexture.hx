@@ -1,11 +1,9 @@
 package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
-import net.rezmason.gl.TextureFormat;
 
 #if ogl
     import lime.graphics.opengl.GL;
-    import lime.graphics.PixelFormat;
 #end
 
 class DataTexture extends Texture {
