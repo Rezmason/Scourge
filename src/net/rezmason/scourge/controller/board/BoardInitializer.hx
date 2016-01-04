@@ -10,7 +10,6 @@ import net.rezmason.scourge.ScourgeColorPalette.*;
 import net.rezmason.scourge.View;
 import net.rezmason.hypertype.Strings.*;
 import net.rezmason.hypertype.core.Body;
-import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
 using net.rezmason.hypertype.core.GlyphUtils;
@@ -22,8 +21,6 @@ class BoardInitializer {
     var view:View;
     var ecce:Ecce;
     var qBoard:Query;
-
-    public var animCompleteSignal(default, null):Zig<Void->Void> = new Zig();
 
     public function new():Void {
         ecce = new Present(Ecce);

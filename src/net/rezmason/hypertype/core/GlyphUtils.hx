@@ -85,12 +85,15 @@ class GlyphUtils {
         var destGeometryAddress = gl.id * GEOMETRY_FLOATS_PER_GLYPH;
         var destColorAddress = gl.id * COLOR_FLOATS_PER_GLYPH;
         var destHitboxAddress = gl.id * HITBOX_FLOATS_PER_GLYPH;
+        var destFontAddress = gl.id * FONT_FLOATS_PER_GLYPH;
         var srcGeometryAddress = src.id * GEOMETRY_FLOATS_PER_GLYPH;
         var srcColorAddress = src.id * COLOR_FLOATS_PER_GLYPH;
         var srcHitboxAddress = src.id * HITBOX_FLOATS_PER_GLYPH;
+        var srcFontAddress = src.id * FONT_FLOATS_PER_GLYPH;
         for (ike in 0...GEOMETRY_FLOATS_PER_GLYPH) gl.geometryBuf.mod(destGeometryAddress + ike, src.geometryBuf.acc(srcGeometryAddress + ike));
         for (ike in 0...COLOR_FLOATS_PER_GLYPH) gl.colorBuf.mod(destColorAddress + ike, src.colorBuf.acc(srcColorAddress + ike));
         for (ike in 0...HITBOX_FLOATS_PER_GLYPH) gl.hitboxBuf.mod(destHitboxAddress + ike, src.hitboxBuf.acc(srcHitboxAddress + ike));
+        for (ike in 0...FONT_FLOATS_PER_GLYPH) gl.fontBuf.mod(destFontAddress + ike, src.fontBuf.acc(srcFontAddress + ike));
         gl.hitboxID = src.hitboxID;
         gl.charCode = src.charCode;
         gl.font = src.font;
@@ -125,12 +128,6 @@ class GlyphUtils {
         set_x(gl, pos.x);
         set_y(gl, pos.y);
         set_z(gl, pos.z);
-    }
-
-    public inline static function set_distort(gl:Glyph, h, s, p) {
-        set_h(gl, h);
-        set_s(gl, s);
-        set_p(gl, p);
     }
 
     // Font
@@ -224,9 +221,11 @@ class GlyphUtils {
     }
 
     public inline static function reset(gl:Glyph):Glyph {
-        set_distort(gl, 1, 1, 0);
         set_xyz(gl, 0, 0, 0);
         set_rgb(gl, 1, 1, 1);
+        set_s(gl, 1);
+        set_h(gl, 1);
+        set_p(gl, 0);
         set_i(gl, 0);
         set_a(gl, 0);
         set_w(gl, 0);

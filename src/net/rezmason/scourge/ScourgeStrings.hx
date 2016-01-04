@@ -5,7 +5,7 @@ using net.rezmason.utils.CharCode;
 class ScourgeStrings {
     public inline static var BODY_GLYPHS:String = ' пгчцълкпрншьэмж';
     public inline static var BOARD_CODE:Int = '+'.code(); // ¤
-    public inline static var WALL_CODE:Int = '╋'.code();
+    public inline static var WALL_CODE:Int = '┼'.code();
     public inline static var BODY_CODE:Int = '•'.code();
     public inline static var HEAD_CODE:Int = 'Ω'.code();
     public inline static var BITE_CODE:Int = ''.code();
