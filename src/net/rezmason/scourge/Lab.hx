@@ -38,13 +38,13 @@ class Lab {
     }
 
     public function render():Void {
-        /*
+        //*
         if (glSys.connected && metaballSystem.ready && postSystem.ready) {
             metaballSystem.render();
             postSystem.render();
         }
         /**/
-        //*
+        /*
         if (glSys.connected && dataSystem.ready) {
             dataSystem.render();
         }
@@ -109,7 +109,7 @@ class PostSystem extends LabSystem {
     var globTexture:Texture;
     var program:Program;
 
-    var buffer:RenderTarget;
+    var renderTarget:RenderTarget;
 
     var vertexBuffer:VertexBuffer;
     var indexBuffer:IndexBuffer;
@@ -153,11 +153,11 @@ class PostSystem extends LabSystem {
 
         globMat = new Matrix4();
         
-        metaballTexture = cast(metaballSystem.buffer, TextureRenderTarget).texture;
+        metaballTexture = metaballSystem.rtt;
         globTexture = glSys.createImageTexture(getImage('metaballs/glob.png'));
 
-        buffer = glSys.viewportRenderTarget;
-        buffer.resize(width, height);
+        renderTarget = glSys.viewportRenderTarget;
+        cast(renderTarget, ViewportRenderTarget).resize(width, height);
 
         var vertShader = '
             attribute vec3 aPos;
@@ -276,7 +276,7 @@ class PostSystem extends LabSystem {
         program.setVertexBufferAt('aPos',     vertexBuffer, 0, 3); // aPos contains x,y,z
         program.setVertexBufferAt('aUV',      vertexBuffer, 3, 2); // aUV contains u,v
 
-        glSys.start(buffer);
+        glSys.start(renderTarget);
         glSys.clear(0, 0, 0);
         glSys.draw(indexBuffer, 0, 2);
         glSys.finish();
@@ -305,7 +305,7 @@ class MetaballSystem extends LabSystem {
     var bodyTransform:Matrix4;
     var cameraTransform:Matrix4;
 
-    public var buffer:RenderTarget;
+    public var rtt:RenderTargetTexture;
 
     var phases:Array<Array<Null<Int>>>;
     var cavity:Array<Array<Null<Int>>>;
@@ -332,8 +332,8 @@ class MetaballSystem extends LabSystem {
         cameraTransform = new Matrix4();
         cameraTransform.rawData = cast [2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1];
 
-        buffer = glSys.createTextureRenderTarget();
-        buffer.resize(width, height);
+        rtt = glSys.createRenderTargetTexture(FLOAT);
+        rtt.resize(width, height);
 
         var vertShader = '
             attribute vec3 aPos;
@@ -534,7 +534,7 @@ class MetaballSystem extends LabSystem {
         program.setVertexBufferAt('aScale',   vertexBuffer, 5, 1); // aScale contains s
         program.setVertexBufferAt('aCav',     vertexBuffer, 6, 1); // aCav contains c
 
-        glSys.start(buffer);
+        glSys.start(rtt.renderTarget);
         glSys.clear(0, 0, 0);
         glSys.draw(indexBuffer, 0, TpB * NUM_BALLS);
         glSys.finish();
@@ -558,7 +558,7 @@ class DataSystem extends LabSystem {
     var dataTexture:Texture;
     var program:Program;
 
-    var buffer:RenderTarget;
+    var renderTarget:RenderTarget;
 
     var vertexBuffer:VertexBuffer;
     var indexBuffer:IndexBuffer;
@@ -614,8 +614,8 @@ class DataSystem extends LabSystem {
 
         dataTexture = glSys.createHalfFloatTexture(width, height, output.getBytes());
 
-        buffer = glSys.viewportRenderTarget;
-        buffer.resize(width, height);
+        renderTarget = glSys.viewportRenderTarget;
+        cast(renderTarget, ViewportRenderTarget).resize(width, height);
 
         vertexBuffer = glSys.createVertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
         var vertices = [
@@ -671,7 +671,7 @@ class DataSystem extends LabSystem {
         program.setVertexBufferAt('aPos', vertexBuffer, 0, 2);
         program.setVertexBufferAt('aUV',  vertexBuffer, 2, 2);
 
-        glSys.start(buffer);
+        glSys.start(renderTarget);
         glSys.clear(0, 0, 0);
         glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
         glSys.finish();
