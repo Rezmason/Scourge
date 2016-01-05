@@ -2,9 +2,9 @@ package net.rezmason.hypertype.core;
 
 class SceneRenderMethod extends RenderMethod {
 
-    override public function finish():Void {
+    override public function end():Void {
+        super.end();
         setSegment(null);
-        super.finish();
     }
 
     public function drawScene(scene:Scene) {

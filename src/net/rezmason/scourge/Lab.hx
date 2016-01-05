@@ -279,7 +279,7 @@ class PostSystem extends LabSystem {
         glSys.start(renderTarget);
         glSys.clear(0, 0, 0);
         glSys.draw(indexBuffer, 0, 2);
-        glSys.finish();
+        glSys.end();
 
         program.setVertexBufferAt('aPos',     null, 0, 3);
         program.setVertexBufferAt('aUV',      null, 3, 2);
@@ -537,7 +537,7 @@ class MetaballSystem extends LabSystem {
         glSys.start(rtt.renderTarget);
         glSys.clear(0, 0, 0);
         glSys.draw(indexBuffer, 0, TpB * NUM_BALLS);
-        glSys.finish();
+        glSys.end();
 
         program.setVertexBufferAt('aPos',     null, 0, 3);
         program.setVertexBufferAt('aCorner',  null, 3, 2);
@@ -674,7 +674,7 @@ class DataSystem extends LabSystem {
         glSys.start(renderTarget);
         glSys.clear(0, 0, 0);
         glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
-        glSys.finish();
+        glSys.end();
         
         program.setTextureAt('uDataSampler', null, 1);
         program.setVertexBufferAt('aPos', null, 0, 2);

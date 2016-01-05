@@ -7,7 +7,6 @@ import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.RenderTarget;
 import net.rezmason.gl.GLSystem;
 import net.rezmason.hypertype.core.rendermethods.*;
-import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 #if hxtelemetry import hxtelemetry.HxTelemetry; #end
 
@@ -160,15 +159,10 @@ class Engine extends Module {
     }
 
     function drawFrame(method:SceneRenderMethod, renderTarget:RenderTarget):Void {
-        //trace('rendering with method ${Std.is(method, PrettyMethod) ? "pretty" : "mouse"}');
         if (glSys.connected) {
-            if (method == null) {
-                trace('Null method.');
-            } else {
-                method.start(renderTarget);
-                for (scene in scenes) method.drawScene(scene);
-                method.finish();
-            }
+            method.start(renderTarget);
+            for (scene in scenes) method.drawScene(scene);
+            method.end();
         }
     }
 

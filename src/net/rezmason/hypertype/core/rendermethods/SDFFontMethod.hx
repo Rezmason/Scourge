@@ -13,38 +13,27 @@ class SDFFontMethod extends SceneRenderMethod {
         backgroundAlpha = 0;
     }
 
-    override public function activate():Void {
-        super.activate();
+    override public function start(_):Void {
+        super.start(_);
         glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         glSys.setDepthTest(false);
 
         program.setFourProgramConstants('uEpsilon', [EPSILON, 0, 0, 0]);
     }
 
-    override public function deactivate():Void {
+    override public function end():Void {
         program.setTextureAt('uSampler', null);
         glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         glSys.setDepthTest(true);
+        super.end();
     }
 
     override function composeShaders():Void {
         vertShader = getText('shaders/sdf_font.vert');
-
-        var frag:String = getText('shaders/sdf_font.frag');
-
-        #if js
-            glSys.enableExtension('OES_standard_derivatives');
-            glSys.enableExtension('OES_texture_float');
-            glSys.enableExtension('OES_texture_float_linear');
-            fragShader = '
-            #extension GL_OES_standard_derivatives : enable
-            #extension GL_OES_texture_float : enable
-            #extension GL_OES_texture_float_linear : enable
-            precision mediump float;
-            ' + frag;
-        #else
-            fragShader = frag;
-        #end
+        fragShader = getText('shaders/sdf_font.frag');
+        extensions.push('OES_standard_derivatives');
+        extensions.push('OES_texture_float');
+        extensions.push('OES_texture_float_linear');
     }
 
     override function drawBody(body:Body):Void {

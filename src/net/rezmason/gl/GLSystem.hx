@@ -154,7 +154,7 @@ class GLSystem {
         }
     }
 
-    public inline function finish():Void {
+    public inline function end():Void {
         currentRenderTarget = null;
     }
 

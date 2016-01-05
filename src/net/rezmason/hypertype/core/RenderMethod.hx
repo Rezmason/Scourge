@@ -14,28 +14,30 @@ class RenderMethod {
     var glSys:GLSystem;
     var vertShader:String;
     var fragShader:String;
+    var extensions:Array<String>;
 
     function new():Void {
+        glSys = new Present(GLSystem);
         backgroundColor = new Vec3(0, 0, 0);
         backgroundAlpha = 1;
+        extensions = [];
         composeShaders();
-        glSys = new Present(GLSystem);
-        program = glSys.createProgram(vertShader, fragShader);
+        var extensionPreamble = '\n';
+        for (extension in extensions) {
+            glSys.enableExtension(extension);
+            extensionPreamble += '#extension GL_$extension : enable\n';
+        }
+        #if !desktop extensionPreamble += 'precision mediump float;\n'; #end
+        program = glSys.createProgram(vertShader, extensionPreamble + fragShader);
     }
 
     public function start(renderTarget:RenderTarget):Void {
-        activate();
+        glSys.setProgram(program);
         glSys.start(renderTarget);
         glSys.clear(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundAlpha);
     }
 
-    public function finish():Void {
-        deactivate();
-        glSys.finish();
-    }
-
-    function activate():Void glSys.setProgram(program);
-    function deactivate():Void {}
+    public function end():Void glSys.end();
     function composeShaders():Void {}
     function makeVertexShader():String return '';
     function makeFragmentShader():String return '';

@@ -1,7 +1,6 @@
 Rethink how rendering is done
-    Create ScreenRenderMethod
-    Switch Compositor to using ScreenRenderMethods
     Compositor should just be a map of graphs
+    Dissolve abstractions that aren't useful
 Bloom
 
 MATRIX CODE

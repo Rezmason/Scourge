@@ -15,7 +15,7 @@ class HitboxMethod extends SceneRenderMethod {
 
     override function composeShaders():Void {
         vertShader = getText('shaders/hitbox.vert');
-        fragShader = #if !desktop 'precision mediump float;' + #end getText('shaders/hitbox.frag');
+        fragShader = getText('shaders/hitbox.frag');
     }
 
     override function drawBody(body:Body):Void {
