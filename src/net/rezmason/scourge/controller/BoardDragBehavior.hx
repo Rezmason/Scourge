@@ -11,7 +11,7 @@ import box2D.dynamics.B2World;
 import box2D.dynamics.joints.B2DistanceJoint;
 import box2D.dynamics.joints.B2DistanceJointDef;
 import net.rezmason.math.Vec3;
-import net.rezmason.hypertype.core.DebugGraphics;
+import net.rezmason.hypertype.core.DebugDisplay;
 import net.rezmason.hypertype.ui.DragBehavior;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
@@ -41,8 +41,8 @@ class BoardDragBehavior extends DragBehavior {
         
         #if debug_graphics
             var debugDraw = new B2CairoDebugDraw();
-            var cairo:DebugGraphics = new Present(DebugGraphics);
-            debugDraw.setCairo(cairo);
+            var debugDisplay:DebugDisplay = new Present(DebugDisplay);
+            debugDraw.setCairo(debugDisplay.cairo);
             debugDraw.setLineThickness(1 / 400);
             debugDraw.setDrawScale(1);
             world.setDebugDraw(debugDraw);

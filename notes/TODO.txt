@@ -1,12 +1,11 @@
-Rethink how rendering is done
-    Compositor should just be a map of graphs
-    Dissolve abstractions that aren't useful
+Move stuff from Engine into HypertypeContext
+Subpackage hypertype core
+Dissolve abstractions that aren't useful
 Bloom
 
 MATRIX CODE
     Raindrop traffic
     Color match
-
 
 Improve feel of roll
 

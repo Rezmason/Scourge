@@ -1,6 +1,5 @@
 package net.rezmason.hypertype.core;
 
-import net.rezmason.gl.BlendFactor;
 import net.rezmason.gl.GLSystem;
 import net.rezmason.gl.IndexBuffer;
 import net.rezmason.gl.Texture;
@@ -51,19 +50,7 @@ class ScreenRenderMethod extends RenderMethod {
         super.end();
     }
 
-    public function drawScreen(textures:Array<Texture>, debugTextures:Array<Texture>) {
-        glSys.setDepthTest(false);
+    public function drawScreen(textures:Map<String, Texture>) {
         
-        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);  
-        for (texture in textures) {
-            program.setTextureAt('uTexture', texture);
-            glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
-        }
-        
-        glSys.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE_MINUS_SOURCE_ALPHA);  
-        for (texture in debugTextures) {
-            program.setTextureAt('uTexture', texture);
-            glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
-        }
     }
 }

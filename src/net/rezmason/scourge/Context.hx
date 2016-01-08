@@ -4,7 +4,6 @@ import net.rezmason.scourge.errands.BeginNavErrand;
 import net.rezmason.hypertype.HypertypeContext;
 import net.rezmason.utils.santa.Santa;
 
-#if debug_graphics import net.rezmason.hypertype.core.DebugGraphics; #end
 #if hxtelemetry  import hxtelemetry.HxTelemetry; #end
 
 class Context {
@@ -27,10 +26,7 @@ class Context {
         
         new GameContext();
         
-        var engine = engineContext.engine;
-        var beginNavErrand = new BeginNavErrand(engine);
-        beginNavErrand.run();
-
+        new BeginNavErrand().run();
         // makeMatrix(engine);
     }
 

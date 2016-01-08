@@ -1,31 +1,26 @@
 package net.rezmason.hypertype.core;
 
-import net.rezmason.gl.GLTypes;
-
 import net.rezmason.gl.GLSystem;
 import net.rezmason.gl.GLTypes;
+import net.rezmason.gl.GLTypes;
+import net.rezmason.gl.RenderTarget;
 import net.rezmason.gl.RenderTargetTexture;
+import net.rezmason.hypertype.core.Interaction;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
-import net.rezmason.hypertype.core.Interaction;
-
-typedef Hit = {
-    var bodyID:Null<Int>;
-    var glyphID:Null<Int>;
-}
-
+typedef Hit = { bodyID:Null<Int>, glyphID:Null<Int> };
 typedef ReadbackData = #if ogl lime.utils.UInt8Array #end ;
 
 class MouseSystem {
 
     static var NULL_HIT:Hit = {bodyID:null, glyphID:null};
 
-    public var active(default, set):Bool;
-    public var renderTargetTexture(default, null):RenderTargetTexture;
+    public var renderTarget(default, null):RenderTarget;
     public var invalid(default, null):Bool;
     public var interactSignal(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
     public var refreshSignal(default, null):Zig<Void->Void>;
+    var rtt:RenderTargetTexture;
     var data:ReadbackData;
     var rectRegionsByID:Map<Int, Rectangle>;
     var lastRectRegionID:Null<Int>;
@@ -40,7 +35,6 @@ class MouseSystem {
     var glSys:GLSystem;
 
     public function new():Void {
-        active = false;
         interactSignal = new Zig();
         glSys = new Present(GLSystem);
         refreshSignal = new Zig();
@@ -48,16 +42,14 @@ class MouseSystem {
         lastRectRegionID = null;
         lastX = Math.NaN;
         lastY = Math.NaN;
-
         hoverHit = NULL_HIT;
         pressHit = NULL_HIT;
-
         width = 0;
         height = 0;
         initialized = false;
+        rtt = glSys.createRenderTargetTexture(UNSIGNED_BYTE);
+        renderTarget = rtt.renderTarget;
         invalidate();
-
-        renderTargetTexture = glSys.createRenderTargetTexture(UNSIGNED_BYTE);
     }
 
     public function setSize(width:Int, height:Int):Void {
@@ -76,12 +68,13 @@ class MouseSystem {
             lastRectRegionID = null;
             onMouseMove(lastX, lastY);
         }
+        invalidate();
     }
 
     public function invalidate():Void invalid = true;
 
     public function onMouseMove(x:Float, y:Float):Void {
-        if (!initialized || !active) return;
+        if (!initialized) return;
         if (invalid) refresh();
 
         var hit:Hit = getHit(x, y);
@@ -98,7 +91,7 @@ class MouseSystem {
     }
     
     public function onMouseDown(x:Float, y:Float, button:Int):Void {
-        if (!initialized || !active) return;
+        if (!initialized) return;
         if (invalid) refresh();
         pressHit = getHit(x, y);
         lastX = x;
@@ -107,7 +100,7 @@ class MouseSystem {
     }
 
     public function onMouseUp(x:Float, y:Float, button:Int):Void {
-        if (!initialized || !active) return;
+        if (!initialized) return;
         if (invalid) refresh();
         var hit:Hit = getHit(x, y);
         lastX = x;
@@ -117,27 +110,13 @@ class MouseSystem {
         pressHit = NULL_HIT;
     }
 
-    inline function set_active(val:Bool):Bool {
-        if (active != val) {
-            active = val;
-            if (active) invalidate();
-        }
-        return val;
-    }
-
     function getHit(x:Float, y:Float):Hit {
-
         if (data == null) return NULL_HIT;
-
-        if (x < 0) x = 0;
-        if (x >= width) x = width - 1;
-
-        if (y < 0) y = 0;
-        if (y >= height) y = height - 1;
+        x = Math.max(0, Math.min(width  - 1, x));
+        y = Math.max(0, Math.min(height - 1, y));
 
         var rectLeft:Int = Std.int(x);
         var rectTop:Int = Std.int(#if ogl height - 1 - #end y);
-        
         var rawID:Int = getRawIDFromCoord(rectLeft, rectTop);
         var bodyID:Null<Int> = null;
         var glyphID:Null<Int> = null;
@@ -175,10 +154,10 @@ class MouseSystem {
     }
 
     inline function refresh() {
-        renderTargetTexture.resize(width, height);
+        rtt.resize(width, height);
         if (data == null) data = cast glSys.createReadbackData(width, height, UNSIGNED_BYTE);
         refreshSignal.dispatch();
-        renderTargetTexture.readBack(data);
+        rtt.readBack(data);
         invalid = false;
     }
 
