@@ -1,17 +1,13 @@
 package net.rezmason.hypertype.core;
 
 import lime.app.Application;
-import lime.app.Module;
 import net.rezmason.gl.GLSystem;
 import net.rezmason.gl.RenderTarget;
 import net.rezmason.gl.RenderTargetTexture;
 import net.rezmason.gl.Texture;
 import net.rezmason.gl.ViewportRenderTarget;
-import net.rezmason.hypertype.core.CombineRenderMethod;
 import net.rezmason.hypertype.core.rendermethods.*;
 import net.rezmason.utils.santa.Present;
-
-#if hxtelemetry import hxtelemetry.HxTelemetry; #end
 
 class Engine {
 
@@ -23,12 +19,9 @@ class Engine {
     var hitboxMethod:SceneRenderMethod;
     var sdfFontMethod:SceneRenderMethod;
     var limeRelay:LimeRelay;
-    #if hxtelemetry var telemetry:HxTelemetry; #end
-
-    var inputRenderTarget:RenderTarget;
+    
     var debugDisplay:DebugDisplay;
-    var textures:Map<String, Texture> = new Map();
-    var inputTexture:RenderTargetTexture;
+    var sceneRTT:RenderTargetTexture;
     var viewport:ViewportRenderTarget;
     var combineMethod:CombineRenderMethod;
 
@@ -38,7 +31,6 @@ class Engine {
     var presentedPass:RenderPass;
 
     public function new():Void {
-        #if hxtelemetry telemetry = new Present(HxTelemetry); #end
         active = false;
         glSys = new Present(GLSystem);
         glSys.connect();
@@ -55,14 +47,9 @@ class Engine {
         keyboardSystem.interactSignal.add(sceneGraph.routeInteraction.bind(null, null));
 
         viewport = glSys.viewportRenderTarget;
-
-        inputTexture = glSys.createRenderTargetTexture(FLOAT);
-        inputRenderTarget = inputTexture.renderTarget;
-        textures['input'] = inputTexture;
-        
+        sceneRTT = glSys.createRenderTargetTexture(FLOAT);
         debugDisplay = new Present(DebugDisplay);
-        textures['debug'] = debugDisplay.texture;
-
+        
         combineMethod = new CombineRenderMethod();
         sdfFontMethod = new SDFFontMethod();
         hitboxMethod = new HitboxMethod();
@@ -75,17 +62,16 @@ class Engine {
         hitboxDebugPass.addStep(SceneStep(hitboxMethod, sceneGraph, viewport));
 
         sdfPass = new RenderPass();
-        sdfPass.addStep(SceneStep(sdfFontMethod, sceneGraph, inputRenderTarget));
-        sdfPass.addStep(ScreenStep(combineMethod, textures, viewport));
+        sdfPass.addStep(SceneStep(sdfFontMethod, sceneGraph, sceneRTT.renderTarget));
+        sdfPass.addStep(ScreenStep(combineMethod, ['input' => sceneRTT, 'debug' => debugDisplay.texture], viewport));
         presentedPass = sdfPass;
 
         limeRelay = new LimeRelay();
-        Application.current.addModule(limeRelay);
-        limeRelay.keyDownSignal.add(keyboardSystem.onKeyDown);
-        limeRelay.keyUpSignal.add(keyboardSystem.onKeyUp);
-        limeRelay.mouseMoveSignal.add(mouseSystem.onMouseMove);
-        limeRelay.mouseDownSignal.add(mouseSystem.onMouseDown);
-        limeRelay.mouseUpSignal.add(mouseSystem.onMouseUp);
+        limeRelay.keyDownSignal.add(keyboardSystem.receiveKeyDown);
+        limeRelay.keyUpSignal.add(keyboardSystem.receiveKeyUp);
+        limeRelay.mouseMoveSignal.add(mouseSystem.receiveMouseMove);
+        limeRelay.mouseDownSignal.add(mouseSystem.receiveMouseDown);
+        limeRelay.mouseUpSignal.add(mouseSystem.receiveMouseUp);
         limeRelay.windowActivateSignal.add(activate);
         limeRelay.windowDeactivateSignal.add(deactivate);
         limeRelay.windowEnterSignal.add(activate);
@@ -95,60 +81,31 @@ class Engine {
         limeRelay.renderContextRestoredSignal.add(glSys.connect);
         limeRelay.updateSignal.add(update);
         limeRelay.renderSignal.add(render);
-
-        var window = Application.current.window;
-        sceneGraph.setSize(window.width, window.height);
-        activate();
+        limeRelay.start();
     }
 
-    public function update(delta) {
-        if (!active) return;
-        
-        #if hxtelemetry
-            var stack = telemetry.unwind_stack();
-            telemetry.start_timing('.update');
-        #end
-
-        sceneGraph.update(delta);
-        
-        #if hxtelemetry
-            telemetry.end_timing('.update');
-            telemetry.rewind_stack(stack);
-        #end
+    function update(delta) {
+        var stack = Telemetry.startTiming('.update');
+        if (active) sceneGraph.update(delta);
+        Telemetry.stopTiming('.update', stack);
     }
 
-    public function render() {
-        if (!active) return;
-            
-        #if hxtelemetry
-            var stack = telemetry.unwind_stack();
-            telemetry.start_timing('.render');
-        #end
-
-        presentedPass.run();
-
-        #if hxtelemetry
-            telemetry.end_timing('.render');
-            telemetry.rewind_stack(stack);
-            telemetry.advance_frame();
-        #end
+    function render() {
+        var stack = Telemetry.startTiming('.render');
+        if (active) presentedPass.run();
+        Telemetry.stopTiming('.render', stack);
+        Telemetry.advanceFrame();
     }
 
     function setSize(width:Int, height:Int):Void {
         sceneGraph.setSize(width, height);
         mouseSystem.setSize(width, height);
-        inputTexture.resize(width, height);
+        sceneRTT.resize(width, height);
         debugDisplay.resize(width, height);
         viewport.resize(width, height);
     }
 
-    function activate():Void {
-        if (active) return;
-        active = true;
-        setSize(sceneGraph.width, sceneGraph.height);
-    }
-
+    function activate():Void active = true;
     function deactivate():Void active = false;
-
     function teaseHitboxes(val) presentedPass = val ? hitboxDebugPass : sdfPass;
 }

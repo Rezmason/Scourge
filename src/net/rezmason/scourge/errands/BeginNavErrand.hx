@@ -1,6 +1,5 @@
 package net.rezmason.scourge.errands;
 
-import net.rezmason.hypertype.core.SceneGraph;
 import net.rezmason.hypertype.nav.NavSystem;
 import net.rezmason.scourge.pages.*;
 import net.rezmason.utils.Errand;
@@ -12,9 +11,6 @@ class BeginNavErrand extends Errand<Void->Void> {
 
     override public function run():Void {
         var navSystem = new NavSystem();
-        var sceneGraph:SceneGraph = new Present(SceneGraph);
-        navSystem.addSceneSignal.add(sceneGraph.addScene);
-        navSystem.removeSceneSignal.add(sceneGraph.removeScene);
         navSystem.addPage(ScourgeNavPageAddresses.SPLASH, new SplashPage());
         navSystem.addPage(ScourgeNavPageAddresses.ABOUT, new AboutPage());
         navSystem.addPage(ScourgeNavPageAddresses.GAME, new GamePage());

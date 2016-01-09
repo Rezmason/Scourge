@@ -1,18 +1,18 @@
 package net.rezmason.hypertype.nav;
 
 import net.rezmason.hypertype.core.Scene;
-import net.rezmason.utils.Zig;
+import net.rezmason.hypertype.core.SceneGraph;
+import net.rezmason.utils.santa.Present;
 
 class NavSystem {
 
+    var sceneGraph:SceneGraph;
     var pages:Map<String, NavPage>;
     var pageHistory:Array<NavPage>;
     var currentPage:NavPage;
 
-    public var addSceneSignal(default, null):Zig<Scene->Void> = new Zig();
-    public var removeSceneSignal(default, null):Zig<Scene->Void> = new Zig();
-
     public function new():Void {
+        sceneGraph = new Present(SceneGraph);
         pages = new Map();
         pageHistory = [];
     }
@@ -51,8 +51,8 @@ class NavSystem {
     }
 
     private function setPageTo(page:NavPage):Void {
-        if (currentPage != null) for (scene in currentPage.eachScene()) removeSceneSignal.dispatch(scene);
+        if (currentPage != null) for (scene in currentPage.eachScene()) sceneGraph.removeScene(scene);
         currentPage = page;
-        if (currentPage != null) for (scene in currentPage.eachScene()) addSceneSignal.dispatch(scene);
+        if (currentPage != null) for (scene in currentPage.eachScene()) sceneGraph.addScene(scene);
     }
 }

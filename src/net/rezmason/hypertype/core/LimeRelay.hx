@@ -37,4 +37,11 @@ class LimeRelay extends Module {
     override public function update(milliseconds) updateSignal.dispatch(milliseconds / 1000);
     override public function render(_) renderSignal.dispatch();
     // override public function onTextInput(text) {}
+
+    public function start() {
+        Application.current.addModule(this);
+        var window = Application.current.window;
+        windowActivateSignal.dispatch();
+        windowResizeSignal.dispatch(window.width, window.height);
+    }
 }

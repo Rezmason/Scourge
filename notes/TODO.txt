@@ -1,4 +1,3 @@
-Move stuff from Engine into HypertypeContext
 Subpackage hypertype core
 Dissolve abstractions that aren't useful
 Bloom

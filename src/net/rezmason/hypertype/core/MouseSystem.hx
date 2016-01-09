@@ -66,14 +66,14 @@ class MouseSystem {
         this.rectRegionsByID = rectRegionsByID;
         if (lastRectRegionID != null && rectRegionsByID[lastRectRegionID] == null) {
             lastRectRegionID = null;
-            onMouseMove(lastX, lastY);
+            receiveMouseMove(lastX, lastY);
         }
         invalidate();
     }
 
     public function invalidate():Void invalid = true;
 
-    public function onMouseMove(x:Float, y:Float):Void {
+    public function receiveMouseMove(x:Float, y:Float):Void {
         if (!initialized) return;
         if (invalid) refresh();
 
@@ -90,7 +90,7 @@ class MouseSystem {
         lastY = y;
     }
     
-    public function onMouseDown(x:Float, y:Float, button:Int):Void {
+    public function receiveMouseDown(x:Float, y:Float, button:Int):Void {
         if (!initialized) return;
         if (invalid) refresh();
         pressHit = getHit(x, y);
@@ -99,7 +99,7 @@ class MouseSystem {
         sendInteraction(pressHit, x, y, MOUSE_DOWN);
     }
 
-    public function onMouseUp(x:Float, y:Float, button:Int):Void {
+    public function receiveMouseUp(x:Float, y:Float, button:Int):Void {
         if (!initialized) return;
         if (invalid) refresh();
         var hit:Hit = getHit(x, y);

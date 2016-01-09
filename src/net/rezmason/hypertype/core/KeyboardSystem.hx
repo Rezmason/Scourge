@@ -20,12 +20,12 @@ class KeyboardSystem {
 
     public function new():Void {}
 
-    public function onKeyDown(keyCode:KeyCode, modifier:KeyModifier):Void {
+    public function receiveKeyDown(keyCode:KeyCode, modifier:KeyModifier):Void {
         sendInteraction(keyCode, modifier, keysDown[keyCode] ? KEY_REPEAT : KEY_DOWN);
         keysDown[keyCode] = true;
     }
 
-    public function onKeyUp(keyCode:KeyCode, modifier:KeyModifier):Void {
+    public function receiveKeyUp(keyCode:KeyCode, modifier:KeyModifier):Void {
         sendInteraction(keyCode, modifier, KEY_UP);
         keysDown[keyCode] = false;
     }
