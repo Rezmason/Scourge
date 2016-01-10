@@ -1,7 +1,6 @@
 package net.rezmason.hypertype.core;
 
 #if macro
-    import haxe.macro.Context;
     import haxe.macro.Expr;
 #else
     import net.rezmason.gl.VertexBuffer;
@@ -258,12 +257,7 @@ class GlyphUtils {
     }
     #end
 
-    macro public static function SET(gl:Expr, params:Expr):Expr {
-        switch (Context.typeExpr(gl).t) {
-            case TInst(ref, _) if (ref.get().name == 'Glyph'):
-            case _: throw 'gl argument must be a Glyph.';
-        }
-
+    macro public static function SET(gl:ExprOf<Glyph>, params:Expr):Expr {
         var expressions = [macro var __gl__ = ${gl}];
         switch (params.expr) {
             case EObjectDecl(fields):
