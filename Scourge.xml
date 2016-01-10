@@ -12,8 +12,6 @@
     
     <classpath name="src"/>
     
-    <haxedef name="ogl"/>
-    
     <haxedef name="debug_graphics" if="mac" unless="release"/>
     <haxelib name="hxtelemetry" if="mac" unless="release"/>
 

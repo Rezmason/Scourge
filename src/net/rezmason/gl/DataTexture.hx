@@ -2,9 +2,7 @@ package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
 
-#if ogl
-    import lime.graphics.opengl.GL;
-#end
+import lime.graphics.opengl.GL;
 
 class DataTexture extends Texture {
 
@@ -22,30 +20,26 @@ class DataTexture extends Texture {
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-        #if ogl
-            nativeTexture = GL.createTexture();
-            GL.getExtension('OES_texture_float');
-            GL.getExtension('OES_texture_float_linear');
-        #end
+        nativeTexture = GL.createTexture();
+        GL.getExtension('OES_texture_float');
+        GL.getExtension('OES_texture_float_linear');
         update();
     }
 
     inline function update():Void {
         var sizeChanged = nativeTexture == null;
         if (isConnectedToContext()) {
-            #if ogl
-                GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
-                // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-                // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-                
-                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, format, data);
-                
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-                GL.bindTexture(GL.TEXTURE_2D, null);
-            #end
+            GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
+            // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+            // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+            
+            GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, format, data);
+            
+            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+            GL.bindTexture(GL.TEXTURE_2D, null);
         }
     }
 

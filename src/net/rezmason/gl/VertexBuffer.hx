@@ -1,17 +1,14 @@
 package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
-#if ogl 
-    import lime.graphics.opengl.GL;
-#end
-
-typedef VertexArray = #if ogl lime.utils.Float32Array #end ;
+import lime.graphics.opengl.GL;
+import lime.utils.Float32Array;
 
 @:allow(net.rezmason.gl)
 class VertexBuffer extends Artifact {
 
     var buf:NativeVertexBuffer;
-    var data:VertexArray;
+    var data:Float32Array;
     var usage:BufferUsage;
     var invalid:Bool;
     public var numVertices(default, null):Int;
@@ -23,16 +20,14 @@ class VertexBuffer extends Artifact {
         this.numVertices = numVertices;
         if (usage == null) usage = BufferUsage.STATIC_DRAW;
         this.usage = usage;
-        data = new VertexArray(footprint * numVertices);
+        data = new Float32Array(footprint * numVertices);
     }
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-        #if ogl
-            buf = GL.createBuffer();
-            GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-            GL.bufferData(GL.ARRAY_BUFFER, data, usage);
-        #end
+        buf = GL.createBuffer();
+        GL.bindBuffer(GL.ARRAY_BUFFER, buf);
+        GL.bufferData(GL.ARRAY_BUFFER, data, usage);
         invalidate();
         upload();
     }
@@ -46,10 +41,8 @@ class VertexBuffer extends Artifact {
 
     public inline function upload():Void {
         if (invalid && isConnectedToContext()) {
-            #if ogl
-                GL.bindBuffer(GL.ARRAY_BUFFER, buf);
-                GL.bufferData(GL.ARRAY_BUFFER, data, usage);
-            #end
+            GL.bindBuffer(GL.ARRAY_BUFFER, buf);
+            GL.bufferData(GL.ARRAY_BUFFER, data, usage);
             invalid = false;
         }
     }

@@ -316,9 +316,7 @@ class UIElement {
     }
 
     inline function getScreenDPI():Float {
-        #if ogl
-            return NATIVE_DPI; // God damn it
-        #end
+        return NATIVE_DPI; // God damn it
     }
 
     inline function set_hasScrollBar(val:Bool):Bool {

@@ -3,11 +3,9 @@ package net.rezmason.gl;
 import haxe.io.Bytes;
 import net.rezmason.gl.GLTypes;
 
-#if ogl
-    import lime.graphics.opengl.GL;
-    import lime.utils.Float32Array;
-    import lime.utils.UInt8Array;
-#end
+import lime.graphics.opengl.GL;
+import lime.utils.Float32Array;
+import lime.utils.UInt8Array;
 
 class GLSystem {
 
@@ -31,10 +29,8 @@ class GLSystem {
     }
 
     function init():Void {
-        #if ogl
-            context = GL;
-            onInit();
-        #end
+        context = GL;
+        onInit();
     }
 
     function onInit():Void {
@@ -92,65 +88,39 @@ class GLSystem {
         return registerArtifact(new HalfFloatTexture(width, height, bytes, singleChannel));
     }
 
-    public inline function createReadbackData(width:Int, height:Int, format:TextureFormat):Data {
-        var data:Data = null;
-        var len = width * height * 4;
-        #if ogl
-            switch (format) {
-                case FLOAT: data = new Float32Array(len);
-                case UNSIGNED_BYTE: data = new UInt8Array(len);
-            }
-        #end
-        return data;
-    }
-
     public inline function setProgram(program:Program):Void {
-        #if ogl 
-            GL.useProgram(program.prog);
-        #end
+        GL.useProgram(program.prog);
     }
 
     public inline function setBlendFactors(sourceFactor:BlendFactor, destinationFactor:BlendFactor):Void {
-        #if ogl
-            GL.enable(GL.BLEND);
-            GL.blendFunc(sourceFactor, destinationFactor);
-        #end
+        GL.enable(GL.BLEND);
+        GL.blendFunc(sourceFactor, destinationFactor);
     }
 
     public inline function setDepthTest(enabled:Bool):Void {
-        #if ogl
-            if (enabled) GL.enable(GL.DEPTH_TEST);
-            else GL.disable(GL.DEPTH_TEST);
-        #end
+        if (enabled) GL.enable(GL.DEPTH_TEST);
+        else GL.disable(GL.DEPTH_TEST);
     }
 
     public inline function enableExtension(extName:String):Void {
-        #if ogl
-            GL.getExtension(extName);
-        #end
+        GL.getExtension(extName);
     }
 
     public inline function clear(red:Float, green:Float, blue:Float, alpha:Float = 1):Void {
-        #if ogl
-            GL.clearColor(red, green, blue, alpha);
-            GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-        #end
+        GL.clearColor(red, green, blue, alpha);
+        GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
     }
 
     public inline function draw(indexBuffer:IndexBuffer, firstIndex:UInt = 0, numTriangles:UInt = 0):Void {
-        #if ogl
-            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buf);
-            GL.drawElements(GL.TRIANGLES, numTriangles * 3, GL.UNSIGNED_SHORT, firstIndex);
-            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
-        #end
+        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buf);
+        GL.drawElements(GL.TRIANGLES, numTriangles * 3, GL.UNSIGNED_SHORT, firstIndex);
+        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
     }
 
     public inline function start(renderTarget:RenderTarget):Void {
         if (currentRenderTarget != renderTarget) {
             currentRenderTarget = renderTarget;
-            #if ogl
-                GL.bindFramebuffer(GL.FRAMEBUFFER, renderTarget.frameBuffer);
-            #end
+            GL.bindFramebuffer(GL.FRAMEBUFFER, renderTarget.frameBuffer);
         }
     }
 

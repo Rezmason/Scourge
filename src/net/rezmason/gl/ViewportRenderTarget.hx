@@ -1,8 +1,6 @@
 package net.rezmason.gl;
 
-#if ogl
-    import lime.graphics.opengl.GL;
-#end
+import lime.graphics.opengl.GL;
 
 class ViewportRenderTarget extends RenderTarget {
 
@@ -23,8 +21,6 @@ class ViewportRenderTarget extends RenderTarget {
     inline function setSize(width, height) {
         this.width = width;
         this.height = height;
-        #if ogl
-            GL.viewport(0, 0, width, height);
-        #end
+        GL.viewport(0, 0, width, height);
     }
 }

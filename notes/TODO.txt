@@ -1,5 +1,5 @@
-Subpackage hypertype core
 Dissolve abstractions that aren't useful
+Subpackage hypertype core
 Bloom
 
 MATRIX CODE

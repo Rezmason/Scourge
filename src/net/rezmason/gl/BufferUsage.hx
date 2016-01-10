@@ -1,10 +1,7 @@
 package net.rezmason.gl;
 
-#if ogl
-    import lime.graphics.opengl.GL;
-    @:enum abstract BufferUsage(Int) to Int {
-        var STATIC_DRAW = GL.STATIC_DRAW;
-        var DYNAMIC_DRAW = GL.DYNAMIC_DRAW;
-    }
-#end
-
+import lime.graphics.opengl.GL;
+@:enum abstract BufferUsage(Int) to Int {
+    var STATIC_DRAW = GL.STATIC_DRAW;
+    var DYNAMIC_DRAW = GL.DYNAMIC_DRAW;
+}

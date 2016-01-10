@@ -8,9 +8,9 @@ import net.rezmason.gl.RenderTargetTexture;
 import net.rezmason.hypertype.core.Interaction;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
+import lime.utils.UInt8Array;
 
 typedef Hit = { bodyID:Null<Int>, glyphID:Null<Int> };
-typedef ReadbackData = #if ogl lime.utils.UInt8Array #end ;
 
 class MouseSystem {
 
@@ -21,7 +21,7 @@ class MouseSystem {
     public var interactSignal(default, null):Zig<Null<Int>->Null<Int>->Interaction->Void>;
     public var refreshSignal(default, null):Zig<Void->Void>;
     var rtt:RenderTargetTexture;
-    var data:ReadbackData;
+    var data:UInt8Array;
     var rectRegionsByID:Map<Int, Rectangle>;
     var lastRectRegionID:Null<Int>;
     var lastX:Float;
@@ -116,7 +116,7 @@ class MouseSystem {
         y = Math.max(0, Math.min(height - 1, y));
 
         var rectLeft:Int = Std.int(x);
-        var rectTop:Int = Std.int(#if ogl height - 1 - #end y);
+        var rectTop:Int = Std.int(height - 1 - y);
         var rawID:Int = getRawIDFromCoord(rectLeft, rectTop);
         var bodyID:Null<Int> = null;
         var glyphID:Null<Int> = null;
@@ -155,7 +155,7 @@ class MouseSystem {
 
     inline function refresh() {
         rtt.resize(width, height);
-        if (data == null) data = cast glSys.createReadbackData(width, height, UNSIGNED_BYTE);
+        if (data == null) data = new UInt8Array(width * height * 4);
         refreshSignal.dispatch();
         rtt.readBack(data);
         invalid = false;

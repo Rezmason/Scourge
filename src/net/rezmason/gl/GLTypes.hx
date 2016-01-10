@@ -1,22 +1,22 @@
 package net.rezmason.gl;
 
-typedef AttribsLocation = #if ogl Int #end ;
-typedef UniformLocation = #if ogl lime.graphics.opengl.GLUniformLocation #end ;
+typedef AttribsLocation = Int;
+typedef UniformLocation = lime.graphics.opengl.GLUniformLocation;
 
-typedef NativeVertexBuffer = #if ogl lime.graphics.opengl.GLBuffer #end ;
-typedef NativeIndexBuffer = #if ogl lime.graphics.opengl.GLBuffer #end ;
-typedef NativeProgram = #if ogl lime.graphics.opengl.GLProgram #end ;
-typedef NativeTexture = #if ogl lime.graphics.opengl.GLTexture #end ;
-typedef NativeFramebuffer = #if ogl lime.graphics.opengl.GLFramebuffer #end ;
+typedef NativeVertexBuffer = lime.graphics.opengl.GLBuffer;
+typedef NativeIndexBuffer = lime.graphics.opengl.GLBuffer;
+typedef NativeProgram = lime.graphics.opengl.GLProgram;
+typedef NativeTexture = lime.graphics.opengl.GLTexture;
+typedef NativeFramebuffer = lime.graphics.opengl.GLFramebuffer;
 
-typedef Context = #if ogl Class<lime.graphics.opengl.GL> #end ;
+typedef Context = Class<lime.graphics.opengl.GL>;
 typedef Rectangle = lime.math.Rectangle;
 typedef Image = lime.graphics.Image;
 typedef Data = lime.utils.ArrayBufferView;
-typedef Vector4 = #if ogl lime.math.Vector4 #end ;
+typedef Vector4 = lime.math.Vector4;
 
 
-private typedef _Matrix4 = #if ogl lime.math.Matrix4 #end ;
+private typedef _Matrix4 = lime.math.Matrix4;
 @:forward
 abstract Matrix4(_Matrix4) {
     public var rawData(get, set):Array<Float>;
@@ -24,15 +24,11 @@ abstract Matrix4(_Matrix4) {
     @:to public inline function toMat() return this;
     
     inline function get_rawData():Array<Float> {
-        #if ogl
-            return [for (ike in 0...16) this[ike]];
-        #end
+        return [for (ike in 0...16) this[ike]];
     }
 
     inline function set_rawData(array:Array<Float>) {
-        #if ogl
-            this.copythisFrom(new lime.utils.Float32Array(array));
-        #end
+        this.copythisFrom(new lime.utils.Float32Array(array));
         return array;
     }
 

@@ -1,18 +1,14 @@
 package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
-
-#if ogl
-    import lime.graphics.opengl.GL;
-#end
-
-private typedef IndexArray = #if ogl lime.utils.Int16Array #end ;
+import lime.graphics.opengl.GL;
+import lime.utils.Int16Array;
 
 @:allow(net.rezmason.gl) 
 class IndexBuffer extends Artifact {
 
     var buf:NativeIndexBuffer;
-    var data:IndexArray;
+    var data:Int16Array;
     var usage:BufferUsage;
     var invalid:Bool;
     public var numIndices(default, null):Int;
@@ -20,20 +16,17 @@ class IndexBuffer extends Artifact {
 
     function new(numIndices:Int, ?usage:BufferUsage):Void {
         super();
-        
         this.numIndices = numIndices;
         if (usage == null) usage = BufferUsage.STATIC_DRAW;
         this.usage = usage;
-        data = new IndexArray(numIndices);
+        data = new Int16Array(numIndices);
     }
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-        #if ogl
-            buf = GL.createBuffer();
-            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
-            GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
-        #end
+        buf = GL.createBuffer();
+        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
+        GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
         invalidate();
         upload();
     }
@@ -47,10 +40,8 @@ class IndexBuffer extends Artifact {
 
     public inline function upload():Void {
         if (invalid && isConnectedToContext()) {
-            #if ogl
-                GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
-                GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
-            #end
+            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
+            GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
             invalid = false;
         }
     }

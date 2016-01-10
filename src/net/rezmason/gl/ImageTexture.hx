@@ -2,10 +2,8 @@ package net.rezmason.gl;
 
 import net.rezmason.gl.GLTypes;
 
-#if ogl
-    import lime.graphics.opengl.GL;
-    import lime.graphics.PixelFormat;
-#end
+import lime.graphics.opengl.GL;
+import lime.graphics.PixelFormat;
 
 class ImageTexture extends Texture {
 
@@ -21,9 +19,7 @@ class ImageTexture extends Texture {
 
     override function connectToContext(context:Context):Void {
         super.connectToContext(context);
-        #if ogl
-            nativeTexture = GL.createTexture();
-        #end
+        nativeTexture = GL.createTexture();
         update();
     }
 
@@ -32,21 +28,19 @@ class ImageTexture extends Texture {
         width = image.width;
         height = image.height;
         if (isConnectedToContext()) {
-            #if ogl
-                GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
-                // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-                // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-                
-                image.format = PixelFormat.RGBA32;
-                GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, image.width, image.height, 0, GL.RGBA, format, image.data);
-                image.format = PixelFormat.BGRA32;
-                
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-                GL.bindTexture(GL.TEXTURE_2D, null);
-            #end
+            GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
+            // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+            // GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+            
+            image.format = PixelFormat.RGBA32;
+            GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, image.width, image.height, 0, GL.RGBA, format, image.data);
+            image.format = PixelFormat.BGRA32;
+            
+            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+            GL.bindTexture(GL.TEXTURE_2D, null);
         }
     }
 
