@@ -18,6 +18,12 @@ class HitboxMethod extends SceneRenderMethod {
         fragShader = getText('shaders/hitbox.frag');
     }
 
+    public override function start(renderTarget, args) {
+        super.start(renderTarget, args);
+        glSys.setDepthTest(false);
+        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
+    }
+
     override function drawBody(body:Body):Void {
         program.setProgramConstantsFromMatrix('uCameraTransform', body.scene.camera.transform);
         program.setProgramConstantsFromMatrix('uBodyTransform', body.concatenatedTransform);

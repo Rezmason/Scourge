@@ -22,8 +22,12 @@ class Engine {
     
     var debugDisplay:DebugDisplay;
     var sceneRTT:RenderTargetTexture;
+    var bloomRTT1:RenderTargetTexture;
+    var bloomRTT2:RenderTargetTexture;
+
     var viewport:ViewportRenderTarget;
-    var combineMethod:CombineRenderMethod;
+    var combineMethod:CombineMethod;
+    var bloomMethod:BloomMethod;
 
     var hitboxPass:RenderPass;
     var sdfPass:RenderPass;
@@ -48,11 +52,14 @@ class Engine {
 
         viewport = glSys.viewportRenderTarget;
         sceneRTT = glSys.createRenderTargetTexture(FLOAT);
+        bloomRTT1 = glSys.createRenderTargetTexture(FLOAT);
+        bloomRTT2 = glSys.createRenderTargetTexture(FLOAT);
         debugDisplay = new Present(DebugDisplay);
         
-        combineMethod = new CombineRenderMethod();
+        combineMethod = new CombineMethod();
         sdfFontMethod = new SDFFontMethod();
         hitboxMethod = new HitboxMethod();
+        bloomMethod = new BloomMethod();
         
         hitboxPass = new RenderPass();
         mouseSystem.refreshSignal.add(hitboxPass.run);
@@ -63,7 +70,12 @@ class Engine {
 
         sdfPass = new RenderPass();
         sdfPass.addStep(SceneStep(sdfFontMethod, sceneGraph, sceneRTT.renderTarget));
-        sdfPass.addStep(ScreenStep(combineMethod, ['input' => sceneRTT, 'debug' => debugDisplay.texture], viewport));
+
+        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT2.renderTarget, [[0, 1, 0, 0]]));
+
+        // sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT1.renderTarget, [[0, 1, 0, 0]]));
+        // sdfPass.addStep(ScreenStep(bloomMethod, ['input' => bloomRTT1], bloomRTT2.renderTarget, [[1, 0, 0, 0]]));
+        sdfPass.addStep(ScreenStep(combineMethod, ['input' => sceneRTT, 'bloom' => bloomRTT2, 'debug' => debugDisplay.texture], viewport));
         presentedPass = sdfPass;
 
         limeRelay = new LimeRelay();
@@ -101,6 +113,8 @@ class Engine {
         sceneGraph.setSize(width, height);
         mouseSystem.setSize(width, height);
         sceneRTT.resize(width, height);
+        bloomRTT1.resize(width, height); // TODO: fractional size
+        bloomRTT2.resize(width, height);
         debugDisplay.resize(width, height);
         viewport.resize(width, height);
     }

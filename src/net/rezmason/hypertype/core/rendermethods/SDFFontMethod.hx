@@ -13,8 +13,8 @@ class SDFFontMethod extends SceneRenderMethod {
         backgroundAlpha = 0;
     }
 
-    override public function start(_):Void {
-        super.start(_);
+    override public function start(renderTarget, args):Void {
+        super.start(renderTarget, args);
         glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         glSys.setDepthTest(false);
 
@@ -23,8 +23,6 @@ class SDFFontMethod extends SceneRenderMethod {
 
     override public function end():Void {
         program.setTextureAt('uSampler', null);
-        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
-        glSys.setDepthTest(true);
         super.end();
     }
 

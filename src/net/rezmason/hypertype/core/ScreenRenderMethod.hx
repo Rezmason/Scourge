@@ -39,8 +39,8 @@ class ScreenRenderMethod extends RenderMethod {
         backgroundColor = new Vec3(1, 0, 1);
     }
 
-    override public function start(renderTarget) {
-        super.start(renderTarget);
+    override public function start(renderTarget, args) {
+        super.start(renderTarget, args);
         program.setVertexBufferAt('aPos', vertexBuffer, 0, 2);
     }
 

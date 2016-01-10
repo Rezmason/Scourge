@@ -31,7 +31,7 @@ class RenderMethod {
         program = glSys.createProgram(vertShader, extensionPreamble + fragShader);
     }
 
-    public function start(renderTarget:RenderTarget):Void {
+    public function start(renderTarget:RenderTarget, args:Array<Dynamic>):Void {
         glSys.setProgram(program);
         glSys.start(renderTarget);
         glSys.clear(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundAlpha);

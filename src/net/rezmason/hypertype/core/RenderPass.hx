@@ -20,12 +20,12 @@ class RenderPass {
         if (!glSys.connected) return;
         for (step in steps) {
             switch (step) {
-                case SceneStep(method, sceneGraph, renderTarget):
-                    method.start(renderTarget);
+                case SceneStep(method, sceneGraph, renderTarget, args):
+                    method.start(renderTarget, args);
                     for (scene in sceneGraph.eachScene()) method.drawScene(scene);
                     method.end();
-                case ScreenStep(method, inputTextures, renderTarget):
-                    method.start(renderTarget);
+                case ScreenStep(method, inputTextures, renderTarget, args):
+                    method.start(renderTarget, args);
                     method.drawScreen(inputTextures);
                     method.end();
             }
@@ -34,6 +34,6 @@ class RenderPass {
 }
 
 enum RenderStep {
-    SceneStep(method:SceneRenderMethod, sceneGraph:SceneGraph, renderTarget:RenderTarget);
-    ScreenStep(method:ScreenRenderMethod, inputTextures:Map<String, Texture>, renderTarget:RenderTarget);
+    SceneStep(method:SceneRenderMethod, sceneGraph:SceneGraph, renderTarget:RenderTarget, ?args:Array<Dynamic>);
+    ScreenStep(method:ScreenRenderMethod, inputTextures:Map<String, Texture>, renderTarget:RenderTarget, ?args:Array<Dynamic>);
 }
