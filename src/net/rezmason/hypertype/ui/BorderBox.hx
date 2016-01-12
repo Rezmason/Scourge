@@ -21,7 +21,7 @@ class BorderBox {
 
     public function redraw() {
         if (body.scene == null) return;
-        body.glyphScale = glyphWidth * body.scene.camera.rect.width / body.glyphTexture.font.glyphRatio;
+        body.glyphScale = glyphWidth * body.scene.camera.rect.width / body.font.glyphRatio;
         var numGlyphsWide = Std.int(Math.ceil(width / glyphWidth));
         var numGlyphsHigh = Std.int(Math.ceil(height / glyphWidth));
         var requiredGlyphs = 4 + 2 * (numGlyphsWide + numGlyphsHigh);
@@ -29,7 +29,7 @@ class BorderBox {
             body.growTo(requiredGlyphs * 2);
             for (ike in requiredGlyphs...body.numGlyphs) body.getGlyphByID(ike).reset();
         }
-        var stretch = body.glyphTexture.font.glyphRatio;
+        var stretch = body.font.glyphRatio;
         var top = (height + glyphWidth) / 2;
         var left = -(width + glyphWidth) / 2;
         var itr = 0;

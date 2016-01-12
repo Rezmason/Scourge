@@ -1,6 +1,6 @@
 package net.rezmason.scourge.pages;
 
-import net.rezmason.gl.GLTypes;
+import lime.math.Rectangle;
 import net.rezmason.scourge.View;
 import net.rezmason.scourge.useractions.PlayGameAction;
 import net.rezmason.hypertype.console.*;

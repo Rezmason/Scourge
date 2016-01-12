@@ -2,9 +2,9 @@ package net.rezmason.hypertype.core.rendermethods;
 
 import lime.Assets.getText;
 import net.rezmason.gl.BlendFactor;
-import net.rezmason.math.Vec3;
 import net.rezmason.hypertype.core.BodySegment;
 import net.rezmason.hypertype.core.SceneRenderMethod;
+import net.rezmason.math.Vec3;
 
 class HitboxMethod extends SceneRenderMethod {
 
@@ -20,14 +20,14 @@ class HitboxMethod extends SceneRenderMethod {
 
     public override function start(renderTarget, args) {
         super.start(renderTarget, args);
-        glSys.setDepthTest(false);
-        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
+        program.setDepthTest(false);
+        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
     }
 
     override function drawBody(body:Body):Void {
-        program.setProgramConstantsFromMatrix('uCameraTransform', body.scene.camera.transform);
-        program.setProgramConstantsFromMatrix('uBodyTransform', body.concatenatedTransform);
-        program.setFourProgramConstants('uFontSDFData', body.glyphTexture.font.sdfData);
+        program.setMatrix4('uCameraTransform', body.scene.camera.transform);
+        program.setMatrix4('uBodyTransform', body.concatenatedTransform);
+        program.setFourProgramConstants('uFontSDFData', body.font.sdfData);
         program.setFourProgramConstants('uBodyParams', body.params);
         super.drawBody(body);
     }

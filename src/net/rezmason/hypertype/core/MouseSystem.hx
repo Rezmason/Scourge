@@ -1,14 +1,11 @@
 package net.rezmason.hypertype.core;
 
-import net.rezmason.gl.GLSystem;
-import net.rezmason.gl.GLTypes;
-import net.rezmason.gl.GLTypes;
+import lime.math.Rectangle;
+import lime.utils.UInt8Array;
 import net.rezmason.gl.RenderTarget;
 import net.rezmason.gl.RenderTargetTexture;
 import net.rezmason.hypertype.core.Interaction;
 import net.rezmason.utils.Zig;
-import net.rezmason.utils.santa.Present;
-import lime.utils.UInt8Array;
 
 typedef Hit = { bodyID:Null<Int>, glyphID:Null<Int> };
 
@@ -32,11 +29,9 @@ class MouseSystem {
     var width:Int;
     var height:Int;
     var initialized:Bool;
-    var glSys:GLSystem;
 
     public function new():Void {
         interactSignal = new Zig();
-        glSys = new Present(GLSystem);
         refreshSignal = new Zig();
         rectRegionsByID = null;
         lastRectRegionID = null;
@@ -47,7 +42,7 @@ class MouseSystem {
         width = 0;
         height = 0;
         initialized = false;
-        rtt = glSys.createRenderTargetTexture(UNSIGNED_BYTE);
+        rtt = new RenderTargetTexture(UNSIGNED_BYTE);
         renderTarget = rtt.renderTarget;
         invalidate();
     }

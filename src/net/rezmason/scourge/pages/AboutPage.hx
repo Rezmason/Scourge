@@ -1,7 +1,7 @@
 package net.rezmason.scourge.pages;
 
 import lime.Assets;
-import net.rezmason.gl.GLTypes;
+import lime.math.Rectangle;
 import net.rezmason.hypertype.core.Interaction;
 import net.rezmason.hypertype.nav.NavPage;
 import net.rezmason.hypertype.ui.UIElement;

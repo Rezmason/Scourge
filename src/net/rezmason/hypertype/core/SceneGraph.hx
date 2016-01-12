@@ -1,7 +1,7 @@
 package net.rezmason.hypertype.core;
 
-import net.rezmason.gl.GLTypes;
 import net.rezmason.utils.Zig;
+import lime.math.Rectangle;
 using Lambda;
 
 class SceneGraph {
@@ -15,7 +15,6 @@ class SceneGraph {
     public var rectsByBodyID(default, null):Map<Int, Rectangle> = new Map();
     public var teaseHitboxesSignal(default, null):Zig<Bool->Void> = new Zig();
     public var updateRectsSignal(default, null):Zig<Map<Int, Rectangle>->Void> = new Zig();
-    public var testDisconnectSignal(default, null):Zig<Void->Void> = new Zig();
 
     public function new() {}
 
@@ -83,7 +82,6 @@ class SceneGraph {
                 target = bodiesByID[keyboardFocusBodyID];
                 switch (code) {
                     case SPACE: teaseHitboxesSignal.dispatch(modifier.ctrlKey && type != KEY_UP);
-                    case D: if (modifier.ctrlKey && type == KEY_UP) testDisconnectSignal.dispatch();
                     case _:
                 }
         }

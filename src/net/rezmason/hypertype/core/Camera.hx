@@ -1,7 +1,9 @@
 package net.rezmason.hypertype.core;
 
-import net.rezmason.gl.GLTypes;
+import lime.math.Matrix4;
+import lime.math.Rectangle;
 import lime.math.Vector2;
+import lime.utils.Float32Array;
 
 class Camera {
 
@@ -100,20 +102,20 @@ class Camera {
     }
 
     inline function applyVP(x:Float, y:Float):Void {
-        var rawData:Array<Float> = transform.rawData;
+        var rawData:Float32Array = transform;
         rawData[8] =  ((x + vanishingPoint.x) * 2 - 1);
         rawData[9] = -((y + vanishingPoint.y) * 2 - 1);
-        transform.rawData = rawData;
+        transform = rawData;
     }
 
     inline function makeProjection():Matrix4 {
         var mat:Matrix4 = new Matrix4();
-        var rawData:Array<Float> = mat.rawData;
+        var rawData:Float32Array = mat;
         rawData[10] =  2;
         rawData[11] =  1;
         rawData[14] = -2;
         rawData[15] =  0;
-        mat.rawData = rawData;
+        mat = rawData;
         return mat;
     }
 

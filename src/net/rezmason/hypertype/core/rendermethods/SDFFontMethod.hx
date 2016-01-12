@@ -15,9 +15,8 @@ class SDFFontMethod extends SceneRenderMethod {
 
     override public function start(renderTarget, args):Void {
         super.start(renderTarget, args);
-        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
-        glSys.setDepthTest(false);
-
+        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        program.setDepthTest(false);
         program.setFourProgramConstants('uEpsilon', [EPSILON, 0, 0, 0]);
     }
 
@@ -35,12 +34,12 @@ class SDFFontMethod extends SceneRenderMethod {
     }
 
     override function drawBody(body:Body):Void {
-        program.setProgramConstantsFromMatrix('uCameraTransform', body.scene.camera.transform);
-        program.setProgramConstantsFromMatrix('uBodyTransform', body.concatenatedTransform);
-        program.setFourProgramConstants('uFontGlyphData', body.glyphTexture.font.glyphData);
-        program.setFourProgramConstants('uFontSDFData', body.glyphTexture.font.sdfData);
+        program.setMatrix4('uCameraTransform', body.scene.camera.transform);
+        program.setMatrix4('uBodyTransform', body.concatenatedTransform);
+        program.setFourProgramConstants('uFontGlyphData', body.font.glyphData);
+        program.setFourProgramConstants('uFontSDFData', body.font.sdfData);
         program.setFourProgramConstants('uBodyParams', body.params);
-        program.setTextureAt('uFontTexture', body.glyphTexture.texture);
+        program.setTextureAt('uFontTexture', body.font.texture);
         super.drawBody(body);
     }
 

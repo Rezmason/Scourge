@@ -1,41 +1,42 @@
 package net.rezmason.gl;
 
-import net.rezmason.gl.GLTypes;
-
 import lime.graphics.opengl.GL;
+import lime.graphics.opengl.GLProgram;
+import lime.graphics.opengl.GLUniformLocation;
+import lime.math.Matrix4;
 import lime.utils.GLUtils;
 
 @:allow(net.rezmason.gl)
 class Program extends Artifact {
 
-    var prog:NativeProgram;
+    var nativeProgram:GLProgram;
     var vertSource:String;
     var fragSource:String;
 
-    var uniformLocations:Map<String, UniformLocation>;
-    var attribsLocations:Map<String, AttribsLocation>;
+    var uniformLocations:Map<String, GLUniformLocation>;
+    var attribsLocations:Map<String, Int>;
     
-    function new(vertSource:String, fragSource:String):Void {
-        super();
+    public function new(vertSource:String, fragSource:String, extensions:Array<String> = null):Void {
+
+        if (extensions != null) {
+            var extensionPreamble = '\n';
+            for (extension in extensions) {
+                GL.getExtension(extension);
+                extensionPreamble += '#extension GL_$extension : enable\n';
+            }
+            #if !desktop extensionPreamble += 'precision mediump float;\n'; #end
+            fragSource = extensionPreamble + fragSource;
+        }
+
         this.vertSource = vertSource;
         this.fragSource = fragSource;
-    }
-
-    override function connectToContext(context:Context):Void {
+        
         uniformLocations = new Map();
         attribsLocations = new Map();
-        super.connectToContext(context);
-        prog = GLUtils.createProgram(vertSource, fragSource);
+        nativeProgram = GLUtils.createProgram(vertSource, fragSource);
     }
 
-    override function disconnectFromContext():Void {
-        super.disconnectFromContext();
-        prog = null;
-        uniformLocations = null;
-        attribsLocations = null;
-    }
-
-    public inline function setProgramConstantsFromMatrix(uName:String, matrix:Matrix4):Void {
+    public inline function setMatrix4(uName:String, matrix:Matrix4):Void {
         var location = getUniformLocation(uName);
         if (location != null) {
             GL.uniformMatrix4fv(location, false, matrix);
@@ -64,7 +65,7 @@ class Program extends Artifact {
         if (location != null) {
             if (size < 0) size = buffer.footprint;
             if (buffer != null) {
-                GL.bindBuffer(GL.ARRAY_BUFFER, buffer.buf);
+                GL.bindBuffer(GL.ARRAY_BUFFER, buffer.nativeBuffer);
                 GL.vertexAttribPointer(location, size, GL.FLOAT, false, 4 * buffer.footprint, 4 * offset);
                 GL.enableVertexAttribArray(location);
             } else {
@@ -73,16 +74,38 @@ class Program extends Artifact {
         }
     }
 
-    inline function getUniformLocation(name:String):Null<UniformLocation> {
+    public inline function use() GL.useProgram(nativeProgram);
+
+    public inline function setBlendFactors(sourceFactor:BlendFactor, destinationFactor:BlendFactor):Void {
+        GL.enable(GL.BLEND);
+        GL.blendFunc(sourceFactor, destinationFactor);
+    }
+
+    public inline function setDepthTest(enabled:Bool):Void {
+        if (enabled) GL.enable(GL.DEPTH_TEST);
+        else GL.disable(GL.DEPTH_TEST);
+    }
+
+    public inline function clear(r:Float, g:Float, b:Float, a:Float) {
+        GL.clearColor(r, g, b, a);
+        GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+    }
+
+    public inline function draw(indexBuffer:IndexBuffer, firstIndex:UInt = 0, numTriangles:UInt = 0):Void {
+        indexBuffer.bind();
+        GL.drawElements(GL.TRIANGLES, numTriangles * 3, GL.UNSIGNED_SHORT, firstIndex);
+    }
+
+    inline function getUniformLocation(name:String):Null<GLUniformLocation> {
         if (!uniformLocations.exists(name)) {
-            uniformLocations[name] = GL.getUniformLocation(prog, name);
+            uniformLocations[name] = GL.getUniformLocation(nativeProgram, name);
         }
         return uniformLocations[name];
     }
 
-    inline function getAttribsLocation(name:String):Null<AttribsLocation> {
+    inline function getAttribsLocation(name:String):Null<Int> {
         if (!attribsLocations.exists(name)) {
-            attribsLocations[name] = GL.getAttribLocation(prog, name);
+            attribsLocations[name] = GL.getAttribLocation(nativeProgram, name);
         }
         return attribsLocations[name];
     }

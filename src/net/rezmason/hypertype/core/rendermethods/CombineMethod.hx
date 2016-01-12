@@ -13,17 +13,17 @@ class CombineMethod extends ScreenRenderMethod {
     }
 
     override public function drawScreen(textures:Map<String, Texture>) {
-        glSys.setDepthTest(false);
-        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
+        program.setDepthTest(false);
+        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         program.setTextureAt('uTexture', textures['input']);
-        glSys.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
-        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
+        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         program.setTextureAt('uTexture', textures['bloom']);
-        glSys.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
+        program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
         #if debug
-            glSys.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE_MINUS_SOURCE_ALPHA);  
+            program.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE_MINUS_SOURCE_ALPHA);  
             program.setTextureAt('uTexture', textures['debug']);
-            glSys.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
+            program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
         #end
     }
 }

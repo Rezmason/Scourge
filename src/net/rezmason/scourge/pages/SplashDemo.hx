@@ -1,11 +1,11 @@
 package net.rezmason.scourge.pages;
 
 import lime.Assets;
-import net.rezmason.gl.GLTypes;
+import lime.math.Rectangle;
+import lime.math.Vector4;
 import net.rezmason.math.Vec3;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Glyph;
-import net.rezmason.hypertype.core.GlyphTexture;
 import net.rezmason.hypertype.core.Interaction;
 
 using net.rezmason.hypertype.core.GlyphUtils;

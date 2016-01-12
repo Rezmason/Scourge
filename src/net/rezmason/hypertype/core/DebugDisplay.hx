@@ -1,17 +1,14 @@
 package net.rezmason.hypertype.core;
 
 import lime.graphics.Image;
-import net.rezmason.gl.GLSystem;
-import net.rezmason.gl.Texture;
-import net.rezmason.utils.santa.Present;
+import net.rezmason.gl.ImageTexture;
 #if debug_graphics 
     import lime.graphics.cairo.CairoImageSurface;
-    import net.rezmason.gl.ImageTexture;
     import lime.graphics.cairo.Cairo;
 #end
 
 class DebugDisplay {
-    public var texture(default, null):Texture;
+    public var texture(default, null):ImageTexture;
     public var image(default, null):Image;
     #if debug_graphics 
         var debugSurface:CairoImageSurface;
@@ -19,9 +16,8 @@ class DebugDisplay {
     #end
     
     public function new() {
-        var glSys:GLSystem = new Present(GLSystem);
         image = new Image(null, 0, 0, 1, 1, 0x00000000);
-        texture = glSys.createImageTexture(image);
+        texture = new ImageTexture(image);
         #if debug_graphics 
             debugSurface = CairoImageSurface.fromImage(image);
             cairo = new Cairo(debugSurface);

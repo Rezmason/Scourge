@@ -2,11 +2,7 @@ package net.rezmason.hypertype.core;
 
 import net.rezmason.gl.IndexBuffer;
 import net.rezmason.gl.BufferUsage;
-import net.rezmason.gl.GLTypes;
 import net.rezmason.gl.VertexBuffer;
-import net.rezmason.gl.GLSystem;
-
-import net.rezmason.utils.santa.Present;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 
@@ -29,22 +25,22 @@ class BodySegment {
     public function new(segmentID:Int, numGlyphs:Int, donor:BodySegment = null):Void {
         if (numGlyphs < 0) numGlyphs = 0;
         id = segmentID;
-        createBuffersAndVectors(numGlyphs, new Present(GLSystem));
+        createBuffersAndVectors(numGlyphs);
         createGlyphs(numGlyphs, donor);
         this.numGlyphs = numGlyphs;
         upload();
     }
 
-    inline function createBuffersAndVectors(numGlyphs:Int, glSys:GLSystem):Void {
+    inline function createBuffersAndVectors(numGlyphs:Int):Void {
         var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
         var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
         var bufferUsage:BufferUsage = DYNAMIC_DRAW;
 
-        geometryBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.GEOMETRY_FLOATS_PER_VERTEX, bufferUsage);
-        colorBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX, bufferUsage);
-        fontBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.FONT_FLOATS_PER_VERTEX, bufferUsage);
-        hitboxBuffer = glSys.createVertexBuffer(numGlyphVertices, Almanac.HITBOX_FLOATS_PER_VERTEX, bufferUsage);
-        indexBuffer = glSys.createIndexBuffer(numGlyphIndices, bufferUsage);
+        geometryBuffer = new VertexBuffer(numGlyphVertices, Almanac.GEOMETRY_FLOATS_PER_VERTEX, bufferUsage);
+        colorBuffer = new VertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX, bufferUsage);
+        fontBuffer = new VertexBuffer(numGlyphVertices, Almanac.FONT_FLOATS_PER_VERTEX, bufferUsage);
+        hitboxBuffer = new VertexBuffer(numGlyphVertices, Almanac.HITBOX_FLOATS_PER_VERTEX, bufferUsage);
+        indexBuffer = new IndexBuffer(numGlyphIndices, bufferUsage);
     }
 
     inline function createGlyphs(numGlyphs:Int, donor:BodySegment):Void {

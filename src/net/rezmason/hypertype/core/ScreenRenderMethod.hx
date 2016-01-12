@@ -1,11 +1,9 @@
 package net.rezmason.hypertype.core;
 
-import net.rezmason.gl.GLSystem;
 import net.rezmason.gl.IndexBuffer;
 import net.rezmason.gl.Texture;
 import net.rezmason.gl.VertexBuffer;
 import net.rezmason.math.Vec3;
-import net.rezmason.utils.santa.Present;
 
 class ScreenRenderMethod extends RenderMethod {
 
@@ -19,9 +17,8 @@ class ScreenRenderMethod extends RenderMethod {
 
     public function new() {
         super();
-        glSys = new Present(GLSystem);
         if (vertexBuffer == null) {
-            vertexBuffer = glSys.createVertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
+            vertexBuffer = new VertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
             var verts = [
                 -1, -1, 0, 0,
                 -1,  1, 0, 1,
@@ -31,7 +28,7 @@ class ScreenRenderMethod extends RenderMethod {
             for (ike in 0...verts.length) vertexBuffer.mod(ike, verts[ike]);
             vertexBuffer.upload();
 
-            indexBuffer = glSys.createIndexBuffer(TOTAL_INDICES);
+            indexBuffer = new IndexBuffer(TOTAL_INDICES);
             var ind = [0, 1, 2, 1, 2, 3,];
             for (ike in 0...TOTAL_INDICES) indexBuffer.mod(ike, ind[ike]);
             indexBuffer.upload();

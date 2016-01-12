@@ -1,12 +1,12 @@
 package net.rezmason.hypertype.ui;
 
 import lime.math.Rectangle;
-import net.rezmason.gl.GLTypes;
+import lime.math.Matrix4;
 
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.CameraScaleMode;
 import net.rezmason.hypertype.core.Glyph;
-import net.rezmason.hypertype.core.GlyphTexture;
+import net.rezmason.hypertype.core.GlyphFont;
 import net.rezmason.hypertype.core.Interaction;
 import net.rezmason.hypertype.core.Scene;
 
@@ -79,7 +79,7 @@ class UIElement {
 
         glyphHeightInPoints = DEFAULT_GLYPH_HEIGHT_IN_POINTS;
         glyphHeightInPixels = glyphHeightInPoints * getScreenDPI() / NATIVE_DPI;
-        glyphWidthInPixels = glyphHeightInPixels / body.glyphTexture.font.glyphRatio;
+        glyphWidthInPixels = glyphHeightInPixels / body.font.glyphRatio;
 
         currentScrollPos = Math.NaN;
         scrollY = 0;
@@ -113,11 +113,11 @@ class UIElement {
         return worked;
     }
 
-    public function setFontTexture(tex:GlyphTexture):Bool {
+    public function setFont(font:GlyphFont):Bool {
         var worked:Bool = false;
-        if (tex != null) {
+        if (font != null) {
             worked = true;
-            body.glyphTexture = tex;
+            body.font = font;
             recalculateGeometry();
         }
         return worked;
@@ -224,7 +224,7 @@ class UIElement {
     function recalculateGeometry():Void {
         if (viewPixelWidth == 0 || viewPixelHeight == 0) return;
 
-        glyphWidthInPixels = glyphHeightInPixels / body.glyphTexture.font.glyphRatio;
+        glyphWidthInPixels = glyphHeightInPixels / body.font.glyphRatio;
         glyphWidth = glyphWidthInPixels / viewPixelWidth * scene.camera.rect.width;
         glyphHeight = glyphHeightInPixels / viewPixelHeight * scene.camera.rect.height;
         

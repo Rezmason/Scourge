@@ -3,7 +3,6 @@ package net.rezmason.utils.display;
 import haxe.Utf8;
 import haxe.io.Bytes;
 import haxe.io.BytesInput;
-import net.rezmason.gl.GLTypes;
 
 typedef CharCoord = {x:Int, y:Int};
 typedef UV = {u:Float, v:Float};

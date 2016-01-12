@@ -1,6 +1,7 @@
 package net.rezmason.hypertype.demo;
 
-import net.rezmason.gl.GLTypes;
+import lime.math.Matrix4;
+import lime.math.Vector4;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Interaction;
 

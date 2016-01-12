@@ -5,7 +5,6 @@ import net.rezmason.math.Vec3;
 import net.rezmason.hypertype.core.Glyph;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Interaction;
-import net.rezmason.hypertype.core.GlyphTexture;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 

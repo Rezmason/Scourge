@@ -5,7 +5,6 @@ import net.rezmason.hypertype.console.ConsoleTypes;
 import net.rezmason.hypertype.console.ConsoleTypes.ConsoleRestriction.*;
 import net.rezmason.hypertype.console.ConsoleUtils.*;
 import net.rezmason.hypertype.core.FontManager;
-import net.rezmason.hypertype.core.GlyphTexture;
 import net.rezmason.hypertype.ui.UIElement;
 import net.rezmason.utils.santa.Present;
 
@@ -63,7 +62,7 @@ class SetFontAction extends UserAction {
 
         var fontName:String = args.keyValuePairs['fontName'];
         if (fontName != null) {
-            uiBody.setFontTexture(fontManager.getFontByName(fontName));
+            uiBody.setFont(fontManager.getFontByName(fontName));
             outputSignal.dispatch('Font set to $fontName.', false);
         }
 

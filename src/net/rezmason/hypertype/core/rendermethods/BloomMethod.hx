@@ -18,9 +18,9 @@ class BloomMethod extends ScreenRenderMethod {
     }
 
     override public function drawScreen(textures:Map<String, Texture>) {
-        glSys.setDepthTest(false);
-        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
+        program.setDepthTest(false);
+        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         program.setTextureAt('uTexture', textures['input']);
-        glSys.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
+        program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
     }
 }

@@ -1,16 +1,6 @@
 package net.rezmason.gl;
 
-import net.rezmason.gl.GLTypes;
-
-@:allow(net.rezmason.gl.GLSystem)
 class Artifact {
-    static var _ids:Int = 0;
-    public var id(default, null):Int = ++_ids;
-    var context:Context;
-    public var isDisposed(default, null):Bool;
-    function new():Void isDisposed = false;
-    function connectToContext(context:Context):Void this.context = context;
-    function disconnectFromContext():Void context = null;
-    public inline function isConnectedToContext():Bool return context != null;
-    public function dispose():Void isDisposed = true;
+    public var isDisposed(default, null):Bool = false;
+    public function dispose() isDisposed = true;
 }

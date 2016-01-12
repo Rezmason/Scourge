@@ -6,7 +6,6 @@ import motion.easing.Quad;
 import motion.easing.Quint;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Glyph;
-import net.rezmason.hypertype.core.GlyphTexture;
 import net.rezmason.hypertype.core.Interaction;
 import net.rezmason.math.Vec3;
 

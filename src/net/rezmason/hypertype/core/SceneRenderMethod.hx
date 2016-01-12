@@ -19,7 +19,7 @@ class SceneRenderMethod extends RenderMethod {
     function drawBody(body:Body):Void {
         for (segment in body.segments) {
             setSegment(segment);
-            glSys.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+            program.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
         }
     }
 

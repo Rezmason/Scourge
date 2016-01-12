@@ -2,8 +2,10 @@ package net.rezmason.scourge;
 
 import haxe.io.BytesOutput;
 import lime.Assets.*;
+import lime.math.Matrix4;
+import lime.math.Vector4;
+import lime.utils.Float32Array;
 import net.rezmason.gl.*;
-import net.rezmason.gl.GLTypes;
 import net.rezmason.math.FelzenszwalbSDF;
 import net.rezmason.scourge.waves.Ripple;
 import net.rezmason.scourge.waves.WaveFunctions;
@@ -15,7 +17,6 @@ class Lab {
 
     var width:Int;
     var height:Int;
-    var glSys:GLSystem;
     var metaballSystem:MetaballSystem;
     var postSystem:PostSystem;
     var dataSystem:DataSystem;
@@ -23,64 +24,28 @@ class Lab {
     public function new(width:Int, height:Int):Void {
         this.width = width;
         this.height = height;
-        glSys = new GLSystem();
-        glSys.onConnected = onConnect;
-        glSys.connect();
-    }
 
-    function onConnect():Void {
-        metaballSystem = new MetaballSystem(glSys, width, height);
-        postSystem = new PostSystem(glSys, width, height, metaballSystem);
+        metaballSystem = new MetaballSystem(width, height);
+        postSystem = new PostSystem(width, height, metaballSystem);
         metaballSystem.init();
         postSystem.init();
-        dataSystem = new DataSystem(glSys, width, height);
+        dataSystem = new DataSystem(width, height);
         dataSystem.init();
     }
 
     public function render():Void {
-        //*
-        if (glSys.connected && metaballSystem.ready && postSystem.ready) {
-            metaballSystem.render();
-            postSystem.render();
-        }
-        /**/
-        /*
-        if (glSys.connected && dataSystem.ready) {
-            dataSystem.render();
-        }
-        /**/
-    }
-
-    public static function makeExtensions(glSys:GLSystem):String {
-        var str = '';
-        #if js
-            var extensions = [];
-
-            glSys.enableExtension("OES_texture_float");
-            extensions.push('#extension GL_OES_texture_float : enable');
-
-            glSys.enableExtension("OES_standard_derivatives");
-            extensions.push('#extension GL_OES_standard_derivatives : enable');
-
-            glSys.enableExtension("OES_texture_float_linear");
-            extensions.push('#extension GL_OES_texture_float_linear : enable');
-
-            str = '${extensions.join("\n")}\nprecision mediump float;';
-        #end
-        return str;
+        metaballSystem.render();
+        postSystem.render();
+        // dataSystem.render();
     }
 }
 
 class LabSystem {
-    public var ready:Bool;
-    var glSys:GLSystem;
     var width:Int;
     var height:Int;
-    public function new(glSys:GLSystem, width:Int, height:Int):Void {
-        this.glSys = glSys;
+    public function new(width:Int, height:Int):Void {
         this.width = width;
         this.height = height;
-        ready = false;
     }
 
     public function init():Void {
@@ -91,10 +56,8 @@ class LabSystem {
     function draw():Void {}
 
     public function render():Void {
-        if (ready) {
-            update();
-            draw();
-        }
+        update();
+        draw();
     }
 }
 
@@ -123,8 +86,8 @@ class PostSystem extends LabSystem {
     var globMat:Matrix4;
     var time:Float;
 
-    public function new(glSys:GLSystem, width:Int, height:Int, metaballSystem:MetaballSystem):Void {
-        super(glSys, width, height);
+    public function new(width:Int, height:Int, metaballSystem:MetaballSystem):Void {
+        super(width, height);
         this.metaballSystem = metaballSystem;
     }
 
@@ -154,9 +117,9 @@ class PostSystem extends LabSystem {
         globMat = new Matrix4();
         
         metaballTexture = metaballSystem.rtt;
-        globTexture = glSys.createImageTexture(getImage('metaballs/glob.png'));
+        globTexture = new ImageTexture(getImage('metaballs/glob.png'));
 
-        renderTarget = glSys.viewportRenderTarget;
+        renderTarget = new ViewportRenderTarget();
         cast(renderTarget, ViewportRenderTarget).resize(width, height);
 
         var vertShader = '
@@ -224,9 +187,7 @@ class PostSystem extends LabSystem {
             }
         ';
 
-        fragShader = Lab.makeExtensions(glSys) + fragShader;
-
-        vertexBuffer = glSys.createVertexBuffer(VpB, FpV);
+        vertexBuffer = new VertexBuffer(VpB, FpV);
         var vert = [
             -1, -1, 0, 0, 1,
             -1,  1, 0, 0, 0,
@@ -236,7 +197,7 @@ class PostSystem extends LabSystem {
         for (ike in 0...VpB * FpV) vertexBuffer.mod(ike, vert[ike]);
         vertexBuffer.upload();
 
-        indexBuffer = glSys.createIndexBuffer(6);
+        indexBuffer = new IndexBuffer(6);
         var ind = [
             0, 1, 2,
             0, 2, 3,
@@ -244,8 +205,8 @@ class PostSystem extends LabSystem {
         for (ike in 0...6) indexBuffer.mod(ike, ind[ike]);
         indexBuffer.upload();
 
-        program = glSys.createProgram(vertShader, fragShader);
-        ready = true;
+        var extensions = ['OES_texture_float', 'OES_standard_derivatives', 'OES_texture_float_linear'];
+        program = new Program(vertShader, fragShader, extensions);
     }
 
     override function update():Void {
@@ -261,9 +222,9 @@ class PostSystem extends LabSystem {
     }
 
     override function draw():Void {
-        glSys.setProgram(program);
-        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
-        glSys.setDepthTest(false);
+        program.use();
+        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        program.setDepthTest(false);
 
         program.setTextureAt('uMetaballSampler', metaballTexture); // uMetaballSampler contains our metaballTexture
         program.setTextureAt('uGlobSampler', globTexture, 1); // uGlobSampler contains our glob texture
@@ -271,15 +232,14 @@ class PostSystem extends LabSystem {
         program.setFourProgramConstants('uParams2', params2);
         program.setFourProgramConstants('uColor', color);
         program.setFourProgramConstants('uLight', light);
-        program.setProgramConstantsFromMatrix('uGlobMat', globMat);
+        program.setMatrix4('uGlobMat', globMat);
         
         program.setVertexBufferAt('aPos',     vertexBuffer, 0, 3); // aPos contains x,y,z
         program.setVertexBufferAt('aUV',      vertexBuffer, 3, 2); // aUV contains u,v
 
-        glSys.start(renderTarget);
-        glSys.clear(0, 0, 0);
-        glSys.draw(indexBuffer, 0, 2);
-        glSys.end();
+        renderTarget.bind();
+        program.clear(0, 0, 0, 1);
+        program.draw(indexBuffer, 0, 2);
 
         program.setVertexBufferAt('aPos',     null, 0, 3);
         program.setVertexBufferAt('aUV',      null, 3, 2);
@@ -325,14 +285,16 @@ class MetaballSystem extends LabSystem {
 
         time = 0;
 
-        Lab.makeExtensions(glSys); // THIS IS NEEDED for all textures to be floating point
-        metaballTexture = glSys.createImageTexture(getImage('metaballs/metaball.png'));
+        metaballTexture = new ImageTexture(getImage('metaballs/metaball.png'));
 
         bodyTransform = new Matrix4();
         cameraTransform = new Matrix4();
-        cameraTransform.rawData = cast [2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1];
+        var rawData:Float32Array = cameraTransform;
+        var ike = 0;
+        for (val in [2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1]) rawData[ike++] = val;
+        cameraTransform = rawData;
 
-        rtt = glSys.createRenderTargetTexture(FLOAT);
+        rtt = new RenderTargetTexture(FLOAT);
         rtt.resize(width, height);
 
         var vertShader = '
@@ -371,8 +333,6 @@ class MetaballSystem extends LabSystem {
             }
         ';
 
-        fragShader = Lab.makeExtensions(glSys) + fragShader;
-
         phases = [];
         cavity = [];
         twitches = [];
@@ -382,8 +342,8 @@ class MetaballSystem extends LabSystem {
             twitches.push([]);
         }
         
-        vertexBuffer = glSys.createVertexBuffer(NUM_BALLS * VpB, FpBV);
-        indexBuffer = glSys.createIndexBuffer(NUM_BALLS * IpB);
+        vertexBuffer = new VertexBuffer(NUM_BALLS * VpB, FpBV);
+        indexBuffer = new IndexBuffer(NUM_BALLS * IpB);
 
         var drunkX:Int = Std.int(GRID_WIDTH / 2);
         var drunkY:Int = Std.int(GRID_WIDTH / 2);
@@ -468,8 +428,8 @@ class MetaballSystem extends LabSystem {
             indexBuffer.mod(ike * IpB + 5, ike * VpB + 3);
         }
 
-        program = glSys.createProgram(vertShader, fragShader);
-        ready = true;
+        var extensions = ['OES_texture_float', 'OES_standard_derivatives', 'OES_texture_float_linear'];
+        program = new Program(vertShader, fragShader, extensions);
     }
 
     override function update():Void {
@@ -520,12 +480,12 @@ class MetaballSystem extends LabSystem {
     }
 
     override function draw():Void {
-        glSys.setProgram(program);
-        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
-        glSys.setDepthTest(false);
+        program.use();
+        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        program.setDepthTest(false);
 
-        program.setProgramConstantsFromMatrix('uBodyMat', bodyTransform); // uBodyMat contains the body's matrix
-        program.setProgramConstantsFromMatrix('uCameraMat', cameraTransform); // uCameraMat contains the camera matrix
+        program.setMatrix4('uBodyMat', bodyTransform); // uBodyMat contains the body's matrix
+        program.setMatrix4('uCameraMat', cameraTransform); // uCameraMat contains the camera matrix
         
         program.setTextureAt('uSampler', metaballTexture); // uSampler contains our metaballTexture
         
@@ -534,10 +494,9 @@ class MetaballSystem extends LabSystem {
         program.setVertexBufferAt('aScale',   vertexBuffer, 5, 1); // aScale contains s
         program.setVertexBufferAt('aCav',     vertexBuffer, 6, 1); // aCav contains c
 
-        glSys.start(rtt.renderTarget);
-        glSys.clear(0, 0, 0);
-        glSys.draw(indexBuffer, 0, TpB * NUM_BALLS);
-        glSys.end();
+        rtt.renderTarget.bind();
+        program.clear(0, 0, 0, 1);
+        program.draw(indexBuffer, 0, TpB * NUM_BALLS);
 
         program.setVertexBufferAt('aPos',     null, 0, 3);
         program.setVertexBufferAt('aCorner',  null, 3, 2);
@@ -612,12 +571,12 @@ class DataSystem extends LabSystem {
             }
         }
 
-        dataTexture = glSys.createHalfFloatTexture(width, height, output.getBytes());
+        dataTexture = new HalfFloatTexture(width, height, output.getBytes());
 
-        renderTarget = glSys.viewportRenderTarget;
+        renderTarget = new ViewportRenderTarget();
         cast(renderTarget, ViewportRenderTarget).resize(width, height);
 
-        vertexBuffer = glSys.createVertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
+        vertexBuffer = new VertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
         var vertices = [
             -1, -1,  0,  0, 
             -1,  1,  0,  1, 
@@ -627,14 +586,12 @@ class DataSystem extends LabSystem {
         for (ike in 0...vertices.length) vertexBuffer.mod(ike, vertices[ike]);
         vertexBuffer.upload();
 
-        indexBuffer = glSys.createIndexBuffer(TOTAL_INDICES);
+        indexBuffer = new IndexBuffer(TOTAL_INDICES);
         var ind = [0, 1, 2, 1, 2, 3,];
         for (ike in 0...TOTAL_INDICES) indexBuffer.mod(ike, ind[ike]);
         indexBuffer.upload();
 
-        var extensions = Lab.makeExtensions(glSys);
-        
-        var vertShader = extensions + '
+        var vertShader = '
             attribute vec2 aPos;
             attribute vec2 aUV;
             varying vec2 vUV;
@@ -647,7 +604,7 @@ class DataSystem extends LabSystem {
             '
             ;
         
-        var fragShader = extensions + '
+        var fragShader = '
             varying vec2 vUV;
             uniform sampler2D uDataSampler;
 
@@ -656,25 +613,24 @@ class DataSystem extends LabSystem {
             }
             ';
 
-        program = glSys.createProgram(vertShader, fragShader);
-        ready = true;
+        var extensions = ['OES_texture_float', 'OES_standard_derivatives', 'OES_texture_float_linear'];
+        program = new Program(vertShader, fragShader, extensions);
     }
 
     override function update():Void {}
 
     override function draw():Void {
-        glSys.setProgram(program);
-        glSys.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
-        glSys.setDepthTest(false);
+        program.use();
+        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        program.setDepthTest(false);
 
         program.setTextureAt('uDataSampler', dataTexture, 1); // uDataSampler contains our data texture
         program.setVertexBufferAt('aPos', vertexBuffer, 0, 2);
         program.setVertexBufferAt('aUV',  vertexBuffer, 2, 2);
 
-        glSys.start(renderTarget);
-        glSys.clear(0, 0, 0);
-        glSys.draw(indexBuffer, 0, TOTAL_TRIANGLES);
-        glSys.end();
+        renderTarget.bind();
+        program.clear(0, 0, 0, 1);
+        program.draw(indexBuffer, 0, TOTAL_TRIANGLES);
         
         program.setTextureAt('uDataSampler', null, 1);
         program.setVertexBufferAt('aPos', null, 0, 2);

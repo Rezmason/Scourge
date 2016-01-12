@@ -1,58 +1,45 @@
 package net.rezmason.gl;
 
-import net.rezmason.gl.GLTypes;
 import lime.graphics.opengl.GL;
+import lime.graphics.opengl.GLBuffer;
 import lime.utils.Int16Array;
 
 @:allow(net.rezmason.gl) 
 class IndexBuffer extends Artifact {
 
-    var buf:NativeIndexBuffer;
+    var nativeBuffer:GLBuffer;
     var data:Int16Array;
     var usage:BufferUsage;
     var invalid:Bool;
     public var numIndices(default, null):Int;
 
-
-    function new(numIndices:Int, ?usage:BufferUsage):Void {
-        super();
+    public function new(numIndices:Int, ?usage:BufferUsage):Void {
         this.numIndices = numIndices;
         if (usage == null) usage = BufferUsage.STATIC_DRAW;
         this.usage = usage;
         data = new Int16Array(numIndices);
-    }
-
-    override function connectToContext(context:Context):Void {
-        super.connectToContext(context);
-        buf = GL.createBuffer();
-        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
-        GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
+    
+        nativeBuffer = GL.createBuffer();
         invalidate();
         upload();
-    }
-
-    override function disconnectFromContext():Void {
-        super.disconnectFromContext();
-        buf = null;
     }
 
     public inline function invalidate():Void invalid = true;
 
     public inline function upload():Void {
-        if (invalid && isConnectedToContext()) {
-            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, buf);
-            GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
-            invalid = false;
-        }
+        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, nativeBuffer);
+        GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
+        invalid = false;
     }
 
     override public function dispose():Void {
         super.dispose();
-        buf = null;
+        nativeBuffer = null;
         data = null;
         numIndices = -1;
-
     }
+
+    public function bind() GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, nativeBuffer);
 
     public inline function acc(index:UInt) return data[index];
 

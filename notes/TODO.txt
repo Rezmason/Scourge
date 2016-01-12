@@ -1,4 +1,4 @@
-Dissolve abstractions that aren't useful
+Extend SDFFont, don't hijack it
 Subpackage hypertype core
 Bloom
 

@@ -1,6 +1,6 @@
 package net.rezmason.scourge.pages;
 
-import net.rezmason.gl.GLTypes;
+import lime.math.Rectangle;
 import net.rezmason.hypertype.core.Interaction;
 import net.rezmason.hypertype.core.Scene;
 import net.rezmason.hypertype.nav.NavPage;

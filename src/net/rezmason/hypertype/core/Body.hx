@@ -1,7 +1,6 @@
 package net.rezmason.hypertype.core;
 
-import net.rezmason.gl.GLTypes;
-
+import lime.math.Matrix4;
 import net.rezmason.ds.SceneNode;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
@@ -17,7 +16,7 @@ class Body extends SceneNode<Body> {
     public var transform(default, null):Matrix4 = new Matrix4();
     public var concatenatedTransform(get, null):Matrix4;
     public var glyphScale(default, set):Float;
-    public var glyphTexture(default, set):GlyphTexture;
+    public var font(default, set):GlyphFont;
     public var scene(default, null):Scene;
     public var mouseEnabled:Bool = true;
     public var visible:Bool = true;
@@ -38,8 +37,8 @@ class Body extends SceneNode<Body> {
     public function new():Void {
         super();
         var fontManager:FontManager = new Present(FontManager);
-        fontManager.onFontChange.add(updateGlyphTexture);
-        glyphTexture = fontManager.defaultFont;
+        fontManager.onFontChange.add(updateFont);
+        font = fontManager.defaultFont;
         params = [0, 0, 0, 0];
         params[2] = id / 0xFF;
         glyphScale = 1;
@@ -111,7 +110,7 @@ class Body extends SceneNode<Body> {
             }
         }
         this.numGlyphs = numGlyphs;
-        for (glyph in glyphs) glyph.set_font(glyphTexture.font);
+        for (glyph in glyphs) glyph.set_font(font);
     }
 
     @:allow(net.rezmason.hypertype.core)
@@ -131,11 +130,11 @@ class Body extends SceneNode<Body> {
         sceneSetSignal.dispatch();
     }
 
-    function updateGlyphTexture(glyphTexture:GlyphTexture):Void {
-        if (this.glyphTexture != glyphTexture) {
-            this.glyphTexture = glyphTexture;
+    function updateFont(font:GlyphFont):Void {
+        if (this.font != font) {
+            this.font = font;
             updateGlyphTransform();
-            for (glyph in glyphs) glyph.set_font(glyphTexture.font);
+            for (glyph in glyphs) glyph.set_font(font);
         }
     }
 
@@ -145,16 +144,16 @@ class Body extends SceneNode<Body> {
         return glyphScale;
     }
 
-    inline function set_glyphTexture(tex:GlyphTexture):GlyphTexture {
-        if (tex != null) {
-            this.glyphTexture = tex;
+    inline function set_font(font:GlyphFont) {
+        if (font != null) {
+            this.font = font;
             fontChangedSignal.dispatch();
         }
-        return glyphTexture;
+        return this.font;
     }
 
     inline function updateGlyphTransform():Void {
-        if (glyphTexture != null && scene != null) {
+        if (scene != null) {
             params[0] = glyphScale * scene.camera.glyphScale;
             params[1] = glyphScale * scene.camera.glyphScale * scene.stageWidth / scene.stageHeight;
         }

@@ -1,7 +1,6 @@
 package net.rezmason.hypertype.demo;
 
 import haxe.Utf8;
-import net.rezmason.gl.GLTypes;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.FontManager;
 import net.rezmason.hypertype.core.Glyph;
@@ -53,7 +52,7 @@ class MatrixSheet {
         body = new Body();
         body.updateSignal.add(update);
         body.glyphScale = 1 / Math.max(numRows, numColumns);
-        body.glyphTexture = font;
+        body.font = font;
 
         columns = [];
         var glowCode = Utf8.charCodeAt('U', 0);
