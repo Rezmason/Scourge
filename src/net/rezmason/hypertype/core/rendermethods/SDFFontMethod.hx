@@ -1,8 +1,9 @@
 package net.rezmason.hypertype.core.rendermethods;
 
 import lime.Assets.getText;
-import net.rezmason.hypertype.core.SceneRenderMethod;
+import lime.math.Vector4;
 import net.rezmason.gl.BlendFactor;
+import net.rezmason.hypertype.core.SceneRenderMethod;
 
 class SDFFontMethod extends SceneRenderMethod {
 
@@ -17,7 +18,7 @@ class SDFFontMethod extends SceneRenderMethod {
         super.start(renderTarget, args);
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         program.setDepthTest(false);
-        program.setFourProgramConstants('uEpsilon', [EPSILON, 0, 0, 0]);
+        program.setFloat('uEpsilon', EPSILON);
     }
 
     override public function end():Void {
@@ -36,9 +37,9 @@ class SDFFontMethod extends SceneRenderMethod {
     override function drawBody(body:Body):Void {
         program.setMatrix4('uCameraTransform', body.scene.camera.transform);
         program.setMatrix4('uBodyTransform', body.concatenatedTransform);
-        program.setFourProgramConstants('uFontGlyphData', body.font.glyphData);
-        program.setFourProgramConstants('uFontSDFData', body.font.sdfData);
-        program.setFourProgramConstants('uBodyParams', body.params);
+        program.setVector4('uFontGlyphData', body.font.glyphData);
+        program.setVector4('uFontSDFData', body.font.sdfData);
+        program.setVector4('uBodyParams', body.params);
         program.setTextureAt('uFontTexture', body.font.texture);
         super.drawBody(body);
     }

@@ -228,10 +228,10 @@ class PostSystem extends LabSystem {
 
         program.setTextureAt('uMetaballSampler', metaballTexture); // uMetaballSampler contains our metaballTexture
         program.setTextureAt('uGlobSampler', globTexture, 1); // uGlobSampler contains our glob texture
-        program.setFourProgramConstants('uParams', params);
-        program.setFourProgramConstants('uParams2', params2);
-        program.setFourProgramConstants('uColor', color);
-        program.setFourProgramConstants('uLight', light);
+        program.setVector4('uParams', params);
+        program.setVector4('uParams2', params2);
+        program.setVector4('uColor', color);
+        program.setVector4('uLight', light);
         program.setMatrix4('uGlobMat', globMat);
         
         program.setVertexBufferAt('aPos',     vertexBuffer, 0, 3); // aPos contains x,y,z

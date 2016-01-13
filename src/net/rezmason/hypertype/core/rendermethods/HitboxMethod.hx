@@ -27,8 +27,8 @@ class HitboxMethod extends SceneRenderMethod {
     override function drawBody(body:Body):Void {
         program.setMatrix4('uCameraTransform', body.scene.camera.transform);
         program.setMatrix4('uBodyTransform', body.concatenatedTransform);
-        program.setFourProgramConstants('uFontSDFData', body.font.sdfData);
-        program.setFourProgramConstants('uBodyParams', body.params);
+        program.setVector4('uFontSDFData', body.font.sdfData);
+        program.setVector4('uBodyParams', body.params);
         super.drawBody(body);
     }
 

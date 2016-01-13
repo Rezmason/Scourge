@@ -1,6 +1,6 @@
-Extend SDFFont, don't hijack it
-Subpackage hypertype core
+Program constant macro
 Bloom
+Try rendering glyphs as points
 
 MATRIX CODE
     Raindrop traffic
@@ -100,8 +100,6 @@ Implement noneuclidean walking and running
     walk() and run() functions should operate on heading data
     heading data should be available after a walk
     Turtle?
-
-It'd be fun to make a branch that renders glyphs as points
 
 Finalize Praxis classes
 

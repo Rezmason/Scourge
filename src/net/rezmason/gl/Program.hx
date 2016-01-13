@@ -4,10 +4,19 @@ import lime.graphics.opengl.GL;
 import lime.graphics.opengl.GLProgram;
 import lime.graphics.opengl.GLUniformLocation;
 import lime.math.Matrix4;
+import lime.math.Vector4;
+import lime.utils.Float32Array;
 import lime.utils.GLUtils;
 
 @:allow(net.rezmason.gl)
 class Program extends Artifact {
+
+    static var floatVecFuncs:Map<UInt, GLUniformLocation->Float32Array->Void> = [
+        1 => GL.uniform1fv,
+        2 => GL.uniform2fv,
+        3 => GL.uniform3fv,
+        4 => GL.uniform4fv,
+    ];
 
     var nativeProgram:GLProgram;
     var vertSource:String;
@@ -38,19 +47,29 @@ class Program extends Artifact {
 
     public inline function setMatrix4(uName:String, matrix:Matrix4):Void {
         var location = getUniformLocation(uName);
-        if (location != null) {
-            GL.uniformMatrix4fv(location, false, matrix);
-        }
+        if (location != null) GL.uniformMatrix4fv(location, false, matrix);
     }
 
-    public inline function setFourProgramConstants(uName:String, vals:Array<Float>):Void {
+    public inline function setVector4(uName:String, vec4:Vector4):Void {
+        var location = getUniformLocation(uName);
+        if (location != null) GL.uniform4f(location, vec4.x, vec4.y, vec4.z, vec4.w);
+    }
+
+    public inline function setFloat(uName:String, x:Float, ?y:Float, ?z:Float, ?w:Float):Void {
         var location = getUniformLocation(uName);
         if (location != null) {
-            if (vals == null) GL.uniform4f(location, 0, 0, 0, 0);
-            else GL.uniform4f(location, vals[0], vals[1], vals[2], vals[3]);
+            if (w != null) GL.uniform4f(location, x, y, z, w);
+            else if (z != null) GL.uniform3f(location, x, y, z);
+            else if (y != null) GL.uniform2f(location, x, y);
+            else GL.uniform1f(location, x);
         }
     }
 
+    public inline function setFloatVec(uName:String, degree:UInt, vec:Float32Array):Void {
+        var location = getUniformLocation(uName);
+        if (location != null) floatVecFuncs[degree](location, vec);
+    }
+    
     public inline function setTextureAt(uName:String, texture:Texture, index:Int = 0):Void {
         var location = getUniformLocation(uName);
         if (location != null && texture != null) {

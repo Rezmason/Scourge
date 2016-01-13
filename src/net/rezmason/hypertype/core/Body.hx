@@ -1,6 +1,7 @@
 package net.rezmason.hypertype.core;
 
 import lime.math.Matrix4;
+import lime.math.Vector4;
 import net.rezmason.ds.SceneNode;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
@@ -28,7 +29,7 @@ class Body extends SceneNode<Body> {
     public var drawSignal(default, null):Zig<Void->Void> = new Zig();
 
     @:allow(net.rezmason.hypertype.core) var segments(default, null):Array<BodySegment> = [];
-    @:allow(net.rezmason.hypertype.core) var params(default, null):Array<Float>;
+    @:allow(net.rezmason.hypertype.core) var params(default, null):Vector4;
     
     var trueNumGlyphs:Int = 0;
     var concatMat:Matrix4 = new Matrix4();
@@ -39,8 +40,8 @@ class Body extends SceneNode<Body> {
         var fontManager:FontManager = new Present(FontManager);
         fontManager.onFontChange.add(updateFont);
         font = fontManager.defaultFont;
-        params = [0, 0, 0, 0];
-        params[2] = id / 0xFF;
+        params = new Vector4();
+        params.z = id / 0xFF;
         glyphScale = 1;
     }
 
@@ -154,8 +155,8 @@ class Body extends SceneNode<Body> {
 
     inline function updateGlyphTransform():Void {
         if (scene != null) {
-            params[0] = glyphScale * scene.camera.glyphScale;
-            params[1] = glyphScale * scene.camera.glyphScale * scene.stageWidth / scene.stageHeight;
+            params.x = glyphScale * scene.camera.glyphScale;
+            params.y = glyphScale * scene.camera.glyphScale * scene.stageWidth / scene.stageHeight;
         }
     }
 
