@@ -55,7 +55,7 @@ class Engine {
         combineMethod = new CombineMethod();
         sdfFontMethod = new SDFFontMethod();
         hitboxMethod = new HitboxMethod();
-        bloomMethod = new BloomMethod();
+        bloomMethod = new BloomMethod(10);
         
         hitboxPass = new RenderPass();
         mouseSystem.refreshSignal.add(hitboxPass.run);
@@ -67,10 +67,8 @@ class Engine {
         sdfPass = new RenderPass();
         sdfPass.addStep(SceneStep(sdfFontMethod, sceneGraph, sceneRTT.renderTarget));
 
-        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT2.renderTarget, [new Vector4(0, 1, 0, 0)]));
-
-        // sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT1.renderTarget, [new Vector4(0, 1, 0, 0)]));
-        // sdfPass.addStep(ScreenStep(bloomMethod, ['input' => bloomRTT1], bloomRTT2.renderTarget, [new Vector4(1, 0, 0, 0)]));
+        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT1.renderTarget, [new Vector4(0, 0.002, 0, 0)]));
+        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => bloomRTT1], bloomRTT2.renderTarget, [new Vector4(0.002, 0, 0, 0)]));
         sdfPass.addStep(ScreenStep(combineMethod, ['input' => sceneRTT, 'bloom' => bloomRTT2, 'debug' => debugDisplay.texture], viewport));
         presentedPass = sdfPass;
 

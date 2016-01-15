@@ -6,6 +6,7 @@ import lime.graphics.opengl.GLUniformLocation;
 import lime.math.Matrix4;
 import lime.math.Vector4;
 import lime.utils.Float32Array;
+import lime.utils.Int32Array;
 import lime.utils.GLUtils;
 
 @:allow(net.rezmason.gl)
@@ -16,6 +17,13 @@ class Program extends Artifact {
         2 => GL.uniform2fv,
         3 => GL.uniform3fv,
         4 => GL.uniform4fv,
+    ];
+
+    static var intVecFuncs:Map<UInt, GLUniformLocation->Int32Array->Void> = [
+        1 => GL.uniform1iv,
+        2 => GL.uniform2iv,
+        3 => GL.uniform3iv,
+        4 => GL.uniform4iv,
     ];
 
     var nativeProgram:GLProgram;
@@ -68,6 +76,21 @@ class Program extends Artifact {
     public inline function setFloatVec(uName:String, degree:UInt, vec:Float32Array):Void {
         var location = getUniformLocation(uName);
         if (location != null) floatVecFuncs[degree](location, vec);
+    }
+
+    public inline function setInt(uName:String, x:Int, ?y:Int, ?z:Int, ?w:Int):Void {
+        var location = getUniformLocation(uName);
+        if (location != null) {
+            if (w != null) GL.uniform4i(location, x, y, z, w);
+            else if (z != null) GL.uniform3i(location, x, y, z);
+            else if (y != null) GL.uniform2i(location, x, y);
+            else GL.uniform1i(location, x);
+        }
+    }
+
+    public inline function setIntVec(uName:String, degree:UInt, vec:Int32Array):Void {
+        var location = getUniformLocation(uName);
+        if (location != null) intVecFuncs[degree](location, vec);
     }
     
     public inline function setTextureAt(uName:String, texture:Texture, index:Int = 0):Void {

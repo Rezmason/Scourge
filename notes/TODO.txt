@@ -1,4 +1,3 @@
-Program constant macro
 Bloom
 Try rendering glyphs as points
 
