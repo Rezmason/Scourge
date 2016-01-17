@@ -17,7 +17,7 @@ class CombineMethod extends ScreenRenderMethod {
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         program.setTextureAt('uTexture', textures['input']);
         program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
-        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
+        program.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE);
         program.setTextureAt('uTexture', textures['bloom']);
         program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
         #if debug

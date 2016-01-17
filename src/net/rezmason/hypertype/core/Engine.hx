@@ -7,7 +7,6 @@ import net.rezmason.gl.Texture;
 import net.rezmason.gl.ViewportRenderTarget;
 import net.rezmason.hypertype.core.rendermethods.*;
 import net.rezmason.utils.santa.Present;
-import lime.math.Vector4;
 
 class Engine {
 
@@ -55,7 +54,7 @@ class Engine {
         combineMethod = new CombineMethod();
         sdfFontMethod = new SDFFontMethod();
         hitboxMethod = new HitboxMethod();
-        bloomMethod = new BloomMethod(10);
+        bloomMethod = new BloomMethod(5);
         
         hitboxPass = new RenderPass();
         mouseSystem.refreshSignal.add(hitboxPass.run);
@@ -67,8 +66,8 @@ class Engine {
         sdfPass = new RenderPass();
         sdfPass.addStep(SceneStep(sdfFontMethod, sceneGraph, sceneRTT.renderTarget));
 
-        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT1.renderTarget, [new Vector4(0, 0.002, 0, 0)]));
-        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => bloomRTT1], bloomRTT2.renderTarget, [new Vector4(0.002, 0, 0, 0)]));
+        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT1.renderTarget, [0, 0.002]));
+        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => bloomRTT1], bloomRTT2.renderTarget, [0.002, 0]));
         sdfPass.addStep(ScreenStep(combineMethod, ['input' => sceneRTT, 'bloom' => bloomRTT2, 'debug' => debugDisplay.texture], viewport));
         presentedPass = sdfPass;
 

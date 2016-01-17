@@ -12,8 +12,8 @@ class Context {
         Telemetry.init();
         new HypertypeContext();
         new GameContext();
-        // new BeginNavErrand().run();
-        makeMatrix();
+        new BeginNavErrand().run();
+        // makeMatrix();
     }
 
     function makeMatrix() {

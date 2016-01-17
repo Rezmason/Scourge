@@ -43,9 +43,10 @@ class BloomMethod extends ScreenRenderMethod {
 
     override public function start(renderTarget, args) {
         super.start(renderTarget, args);
-        program.setVector4('uBlurDirection', args[0]);
+        program.setFloat('uBlurDirection', args[0], args[1]);
         program.setFloatVec('uKernel', 1, kernel);
-        program.setInt('uKernelSize', kernel.length);
+        program.setInt('uIntKernelSize', kernel.length);
+        program.setFloat('uFloatKernelSize', kernel.length);
     }
 
     override public function drawScreen(textures:Map<String, Texture>) {

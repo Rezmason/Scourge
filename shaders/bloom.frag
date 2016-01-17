@@ -1,21 +1,15 @@
 varying vec2 vUV;
 uniform sampler2D uTexture;
-uniform vec4 uBlurDirection;
+uniform vec2 uBlurDirection;
 uniform float uKernel[25];
-uniform int uKernelSize;
+uniform int uIntKernelSize;
 
 void main(void) {
-    vec3 sum = vec3(0.0);
-    float alphaSum = 0.0;
-    vec2 uv = vUV - uBlurDirection.xy * float(uKernelSize) / 2.0;
-    
-    for ( int ike = 0; ike < uKernelSize; ike++ ) {
-        vec4 color = texture2D(uTexture, uv);
-        float alpha = color.a * uKernel[ike];
-        sum += color.rgb * alpha;
-        alphaSum += alpha;
-        uv += uBlurDirection.xy;
+    vec4 sum = vec4(0.0);
+    vec2 uv = vUV;
+    for ( int ike = 0; ike < uIntKernelSize; ike++ ) {
+        sum += texture2D( uTexture, uv ) * uKernel[ike];
+        uv += uBlurDirection;
     };
-
-    gl_FragColor = vec4(sum, alphaSum);
+    gl_FragColor = sum;
 }
