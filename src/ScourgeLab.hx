@@ -1,16 +1,20 @@
 package;
 
 import lime.app.Application;
-import net.rezmason.scourge.Lab;
+import net.rezmason.scourge.lab.*;
 
 class ScourgeLab extends Application {
 
-    var lab:Lab;
+    var labs:Array<Lab> = [];
 
     override public function onPreloadComplete() {
         super.onPreloadComplete();
-        lab = new Lab(window.width, window.height);
+        var width = window.width;
+        var height = window.height;
+
+        labs.push(new MetaballSlimeLab(width, height));
+        // labs.push(new HalfFloatLab(width, height));
     }
 
-    override public function render(_) lab.render();
+    override public function render(_) for (lab in labs) lab.render();
 }
