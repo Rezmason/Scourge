@@ -88,15 +88,15 @@ class Engine {
     }
 
     function update(delta) {
-        var stack = Telemetry.startTiming('.update');
+        Telemetry.changeName('.update');
         if (active) sceneGraph.update(delta);
-        Telemetry.stopTiming('.update', stack);
+        Telemetry.changeName('.lime');
     }
 
     function render() {
-        var stack = Telemetry.startTiming('.render');
+        Telemetry.changeName('.render');
         if (active) presentedPass.run();
-        Telemetry.stopTiming('.render', stack);
+        Telemetry.changeName('.lime');
         Telemetry.advanceFrame();
     }
 

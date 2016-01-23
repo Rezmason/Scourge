@@ -10,10 +10,12 @@ import net.rezmason.utils.santa.Present;
 class Context {
     public function new():Void {
         Telemetry.init();
+        Telemetry.changeName('.init');
         new HypertypeContext();
         new GameContext();
         new BeginNavErrand().run();
         // makeMatrix();
+        Telemetry.changeName('.lime');
     }
 
     function makeMatrix() {
