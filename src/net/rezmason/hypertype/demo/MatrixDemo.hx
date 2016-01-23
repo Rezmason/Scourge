@@ -13,7 +13,7 @@ using net.rezmason.hypertype.core.GlyphUtils;
 class MatrixDemo {
 
     public var body(default, null):Body;
-    var backSheet:MatrixSheet;
+    // var backSheet:MatrixSheet;
     var frontSheet:MatrixSheet;
 
     public function new():Void {
@@ -23,7 +23,7 @@ class MatrixDemo {
 
         var fontManager:FontManager = new Present(FontManager);
         var matrixFont = fontManager.getFontByName('matrix');
-        backSheet = new MatrixSheet(matrixFont, charCodes, 80, 80, true);
+        // backSheet = new MatrixSheet(matrixFont, charCodes, 80, 80, true);
         frontSheet = new MatrixSheet(matrixFont, charCodes, 60, 60);
         body = new Body();
         // body.addChild(backSheet.body);
@@ -65,7 +65,7 @@ class MatrixSheet {
                 var glyph = body.getGlyphByID(index);
                 var glyphX = column / (numColumns - 1) - 0.5;
                 var glyphY = row / (numRows - 1) - 0.5;
-                glyph.SET({x:glyphX, y:glyphY});
+                glyph.SET({x:glyphX, y:glyphY, a:1});
                 glyphs.push(glyph);
             }
             glyphs.reverse();
@@ -92,7 +92,8 @@ class MatrixColumn {
     var glyphs:Array<Glyph>;
     var numGlyphs:UInt;
     var cycles:Array<Float>;
-    var charCodes:Array<UInt>;
+    var glyphIndices:Array<Int>;
+    var charCodes:Array<Int>;
     var numChars:UInt;
     var brightness:Float;
     
@@ -107,32 +108,28 @@ class MatrixColumn {
         numGlyphs = glyphs.length;
         this.brightness = brightness;
         cycles = [for (ike in 0...numGlyphs) Math.random()];
+        glyphIndices = [];
         reinitialize();
     }
 
     public function update(delta:Float) {
         position = position + delta * speed;
         if (position > 1 + tailLength) reinitialize();
-
         for (ike in 0...numGlyphs) {
             var glyph = glyphs[ike];
             var disp = ike / numGlyphs;
             var val = (disp - (position - tailLength)) / tailLength;
             if (val < 0 || val > 1) val = 0;
-
             if (val > 0) {
                 cycles[ike] = (cycles[ike] + delta * CYCLE_SPEED * (1 - val)) % 1;
                 var index = Std.int(numChars * cycles[ike]);
-                glyph.set_char(charCodes[index]);
+                if (glyphIndices[ike] != index) {
+                    glyphIndices[ike] = index;
+                    glyph.set_char(charCodes[index]);
+                }
             }
-
-            var green = val;
-            var nonGreen = 1 - val;
-
-            glyph.set_g(brightness * green);
-            glyph.set_r(brightness * green * 0.1);
-            glyph.set_b(brightness * green * 0.1);
-            glyph.set_a(brightness * green);
+            val *= brightness;
+            glyph.SET({r:val * 0.1, g:val, b:val * 0.2});
         }
     }
 

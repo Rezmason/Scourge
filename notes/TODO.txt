@@ -1,6 +1,5 @@
 MATRIX CODE
     Raindrop traffic
-    Color match
 
 Improve feel of roll
 
