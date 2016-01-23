@@ -126,12 +126,12 @@ class MatrixColumn {
                 glyph.set_char(charCodes[index]);
             }
 
-            var green = (1 - Math.pow(1 - val, 5));
-            var nonGreen = Math.pow(val, 5);
+            var green = val;
+            var nonGreen = 1 - val;
 
             glyph.set_g(brightness * green);
-            glyph.set_r(brightness * nonGreen * 0.7);
-            glyph.set_b(brightness * nonGreen * 0.7);
+            glyph.set_r(brightness * green * 0.1);
+            glyph.set_b(brightness * green * 0.1);
             glyph.set_a(brightness * green);
         }
     }

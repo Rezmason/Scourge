@@ -52,7 +52,7 @@ class BloomMethod extends ScreenRenderMethod {
     override public function drawScreen(textures:Map<String, Texture>) {
         program.setDepthTest(false);
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
-        program.setTextureAt('uTexture', textures['input']);
+        program.setTexture('uTexture', textures['input']);
         program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
     }
 }

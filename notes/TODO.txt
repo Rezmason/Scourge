@@ -1,7 +1,3 @@
-Bloom
-    Too expensive! Reduce the resolution of the RTTs
-Try rendering glyphs as points
-
 MATRIX CODE
     Raindrop traffic
     Color match

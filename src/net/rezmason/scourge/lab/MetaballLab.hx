@@ -1,17 +1,13 @@
 package net.rezmason.scourge.lab;
 
-import haxe.io.BytesOutput;
 import lime.Assets.*;
 import lime.math.Matrix4;
 import lime.math.Vector4;
 import lime.utils.Float32Array;
 import net.rezmason.gl.*;
-import net.rezmason.math.FelzenszwalbSDF;
 import net.rezmason.scourge.waves.Ripple;
 import net.rezmason.scourge.waves.WaveFunctions;
 import net.rezmason.scourge.waves.WavePool;
-import net.rezmason.utils.HalfFloatUtil;
-import net.rezmason.utils.Zig;
 
 class MetaballLab extends Lab {
 
@@ -253,22 +249,22 @@ class MetaballLab extends Lab {
         program.setMatrix4('uBodyMat', bodyTransform); // uBodyMat contains the body's matrix
         program.setMatrix4('uCameraMat', cameraTransform); // uCameraMat contains the camera matrix
         
-        program.setTextureAt('uSampler', metaballTexture); // uSampler contains our metaballTexture
+        program.setTexture('uSampler', metaballTexture); // uSampler contains our metaballTexture
         
-        program.setVertexBufferAt('aPos',     vertexBuffer, 0, 3); // aPos contains x,y,z
-        program.setVertexBufferAt('aCorner',  vertexBuffer, 3, 2); // aCorner contains h,v
-        program.setVertexBufferAt('aScale',   vertexBuffer, 5, 1); // aScale contains s
-        program.setVertexBufferAt('aCav',     vertexBuffer, 6, 1); // aCav contains c
+        program.setVertexBuffer('aPos',     vertexBuffer, 0, 3); // aPos contains x,y,z
+        program.setVertexBuffer('aCorner',  vertexBuffer, 3, 2); // aCorner contains h,v
+        program.setVertexBuffer('aScale',   vertexBuffer, 5, 1); // aScale contains s
+        program.setVertexBuffer('aCav',     vertexBuffer, 6, 1); // aCav contains c
 
-        rtt.renderTarget.bind();
+        program.setRenderTarget(rtt.renderTarget);
         program.clear(0, 0, 0, 1);
         program.draw(indexBuffer, 0, TpB * NUM_BALLS);
 
-        program.setVertexBufferAt('aPos',     null, 0, 3);
-        program.setVertexBufferAt('aCorner',  null, 3, 2);
-        program.setVertexBufferAt('aScale',   null, 5, 1);
-        program.setVertexBufferAt('aCav',     null, 6, 1);
+        program.setVertexBuffer('aPos',     null, 0, 3);
+        program.setVertexBuffer('aCorner',  null, 3, 2);
+        program.setVertexBuffer('aScale',   null, 5, 1);
+        program.setVertexBuffer('aCav',     null, 6, 1);
 
-        program.setTextureAt('uSampler', null);
+        program.setTexture('uSampler', null);
     }
 }

@@ -92,17 +92,23 @@ class Program extends Artifact {
         var location = getUniformLocation(uName);
         if (location != null) intVecFuncs[degree](location, vec);
     }
+
+    public inline function setRenderTarget(renderTarget:RenderTarget):Void {
+        GL.bindFramebuffer(GL.FRAMEBUFFER, renderTarget.frameBuffer);
+        GL.viewport(0, 0, renderTarget.width, renderTarget.height);
+    }
     
-    public inline function setTextureAt(uName:String, texture:Texture, index:Int = 0):Void {
+    public inline function setTexture(uName:String, texture:Texture, index:Int = 0):Void {
         var location = getUniformLocation(uName);
-        if (location != null && texture != null) {
+        var nativeTexture = texture != null ? texture.nativeTexture : null;
+        if (location != null) {
             GL.activeTexture(GL.TEXTURE0 + index);
-            GL.bindTexture (GL.TEXTURE_2D, texture.nativeTexture);
+            GL.bindTexture (GL.TEXTURE_2D, nativeTexture);
             GL.uniform1i(location, index);
         }
     }
 
-    public inline function setVertexBufferAt(aName:String, buffer:VertexBuffer, offset:UInt, size:UInt):Void {
+    public inline function setVertexBuffer(aName:String, buffer:VertexBuffer, offset:UInt, size:UInt):Void {
         var location = getAttribsLocation(aName);
         if (location != null) {
             if (size < 0) size = buffer.footprint;
@@ -134,7 +140,7 @@ class Program extends Artifact {
     }
 
     public inline function draw(indexBuffer:IndexBuffer, firstIndex:UInt = 0, numTriangles:UInt = 0):Void {
-        indexBuffer.bind();
+        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.nativeBuffer);
         GL.drawElements(GL.TRIANGLES, numTriangles * 3, GL.UNSIGNED_SHORT, firstIndex);
     }
 

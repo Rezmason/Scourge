@@ -20,6 +20,8 @@ class RenderTargetTexture extends Texture {
         nativeTexture = GL.createTexture();
         frameBuffer = GL.createFramebuffer();
         renderTarget.frameBuffer = frameBuffer;
+        renderTarget._width = width;
+        renderTarget._height = height;
         resize(width, height);
     }
 
@@ -28,6 +30,8 @@ class RenderTargetTexture extends Texture {
         if (height < 1) height = 1;
         this.width = width;
         this.height = height;
+        renderTarget._width = width;
+        renderTarget._height = height;
         GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
         GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
         GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);

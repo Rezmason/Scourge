@@ -39,8 +39,6 @@ class IndexBuffer extends Artifact {
         numIndices = -1;
     }
 
-    public function bind() GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, nativeBuffer);
-
     public inline function acc(index:UInt) return data[index];
 
     public inline function mod(index:UInt, val:UInt):UInt {

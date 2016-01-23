@@ -104,8 +104,8 @@ class Engine {
         sceneGraph.setSize(width, height);
         mouseSystem.setSize(width, height);
         sceneRTT.resize(width, height);
-        bloomRTT1.resize(width, height); // TODO: fractional size
-        bloomRTT2.resize(width, height);
+        bloomRTT1.resize(Std.int(width / 4), Std.int(height / 4));
+        bloomRTT2.resize(Std.int(width / 4), Std.int(height / 4));
         debugDisplay.resize(width, height);
         viewport.resize(width, height);
     }

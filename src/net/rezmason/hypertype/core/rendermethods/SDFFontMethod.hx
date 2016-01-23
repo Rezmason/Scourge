@@ -22,7 +22,7 @@ class SDFFontMethod extends SceneRenderMethod {
     }
 
     override public function end():Void {
-        program.setTextureAt('uSampler', null);
+        program.setTexture('uSampler', null);
         super.end();
     }
 
@@ -40,7 +40,7 @@ class SDFFontMethod extends SceneRenderMethod {
         program.setVector4('uFontGlyphData', body.font.glyphData);
         program.setVector4('uFontSDFData', body.font.sdfData);
         program.setVector4('uBodyParams', body.params);
-        program.setTextureAt('uFontTexture', body.font.texture);
+        program.setTexture('uFontTexture', body.font.texture);
         super.drawBody(body);
     }
 
@@ -48,16 +48,16 @@ class SDFFontMethod extends SceneRenderMethod {
         var geometryBuffer = (segment == null) ? null : segment.geometryBuffer;
         var fontBuffer = (segment == null) ? null : segment.fontBuffer;
         var colorBuffer = (segment == null) ? null : segment.colorBuffer;
-        program.setVertexBufferAt('aPosition',     geometryBuffer, 0, 3);
-        program.setVertexBufferAt('aCorner',  geometryBuffer, 3, 2);
-        program.setVertexBufferAt('aHorizontalStretch', geometryBuffer, 5, 1);
-        program.setVertexBufferAt('aScale', geometryBuffer, 6, 1);
-        program.setVertexBufferAt('aCameraSpaceZ', geometryBuffer, 7, 1);
-        program.setVertexBufferAt('aColor',   colorBuffer, 0, 3);
-        program.setVertexBufferAt('aInverseVideo',      colorBuffer, 3, 1);
-        program.setVertexBufferAt('aAura',      colorBuffer, 4, 1);
-        program.setVertexBufferAt('aUV',      fontBuffer, 0, 2);
-        program.setVertexBufferAt('aFontWeight',      fontBuffer, 2, 1);
+        program.setVertexBuffer('aPosition',     geometryBuffer, 0, 3);
+        program.setVertexBuffer('aCorner',  geometryBuffer, 3, 2);
+        program.setVertexBuffer('aHorizontalStretch', geometryBuffer, 5, 1);
+        program.setVertexBuffer('aScale', geometryBuffer, 6, 1);
+        program.setVertexBuffer('aCameraSpaceZ', geometryBuffer, 7, 1);
+        program.setVertexBuffer('aColor',   colorBuffer, 0, 3);
+        program.setVertexBuffer('aInverseVideo',      colorBuffer, 3, 1);
+        program.setVertexBuffer('aAura',      colorBuffer, 4, 1);
+        program.setVertexBuffer('aUV',      fontBuffer, 0, 2);
+        program.setVertexBuffer('aFontWeight',      fontBuffer, 2, 1);
     }
 
     override function shouldDrawBody(body:Body) return body.visible;

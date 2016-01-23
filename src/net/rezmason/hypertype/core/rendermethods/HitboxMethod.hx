@@ -35,11 +35,11 @@ class HitboxMethod extends SceneRenderMethod {
     override function setSegment(segment:BodySegment):Void {
         var geometryBuffer = (segment == null) ? null : segment.geometryBuffer;
         var hitboxBuffer = (segment == null) ? null : segment.hitboxBuffer;
-        program.setVertexBufferAt('aPosition',    geometryBuffer, 0, 3);
-        program.setVertexBufferAt('aCorner', geometryBuffer, 3, 2);
-        program.setVertexBufferAt('aGlyphID',  hitboxBuffer, 0, 2);
-        program.setVertexBufferAt('aHorizontalStretch', hitboxBuffer, 2, 1);
-        program.setVertexBufferAt('aScale', hitboxBuffer, 3, 1);
+        program.setVertexBuffer('aPosition',    geometryBuffer, 0, 3);
+        program.setVertexBuffer('aCorner', geometryBuffer, 3, 2);
+        program.setVertexBuffer('aGlyphID',  hitboxBuffer, 0, 2);
+        program.setVertexBuffer('aHorizontalStretch', hitboxBuffer, 2, 1);
+        program.setVertexBuffer('aScale', hitboxBuffer, 3, 1);
     }
 
     override function shouldDrawBody(body:Body) return body.mouseEnabled && body.visible;

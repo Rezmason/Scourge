@@ -1,17 +1,9 @@
 package net.rezmason.scourge.lab;
 
-import haxe.io.BytesOutput;
 import lime.Assets.*;
 import lime.math.Matrix4;
 import lime.math.Vector4;
-import lime.utils.Float32Array;
 import net.rezmason.gl.*;
-import net.rezmason.math.FelzenszwalbSDF;
-import net.rezmason.scourge.waves.Ripple;
-import net.rezmason.scourge.waves.WaveFunctions;
-import net.rezmason.scourge.waves.WavePool;
-import net.rezmason.utils.HalfFloatUtil;
-import net.rezmason.utils.Zig;
 
 class MetaballSlimeLab extends Lab {
 
@@ -180,25 +172,25 @@ class MetaballSlimeLab extends Lab {
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         program.setDepthTest(false);
 
-        program.setTextureAt('uMetaballSampler', metaballTexture); // uMetaballSampler contains our metaballTexture
-        program.setTextureAt('uGlobSampler', globTexture, 1); // uGlobSampler contains our glob texture
+        program.setTexture('uMetaballSampler', metaballTexture); // uMetaballSampler contains our metaballTexture
+        program.setTexture('uGlobSampler', globTexture, 1); // uGlobSampler contains our glob texture
         program.setVector4('uParams', params);
         program.setVector4('uParams2', params2);
         program.setVector4('uColor', color);
         program.setVector4('uLight', light);
         program.setMatrix4('uGlobMat', globMat);
         
-        program.setVertexBufferAt('aPos',     vertexBuffer, 0, 3); // aPos contains x,y,z
-        program.setVertexBufferAt('aUV',      vertexBuffer, 3, 2); // aUV contains u,v
+        program.setVertexBuffer('aPos',     vertexBuffer, 0, 3); // aPos contains x,y,z
+        program.setVertexBuffer('aUV',      vertexBuffer, 3, 2); // aUV contains u,v
 
-        renderTarget.bind();
+        program.setRenderTarget(renderTarget);
         program.clear(0, 0, 0, 1);
         program.draw(indexBuffer, 0, 2);
 
-        program.setVertexBufferAt('aPos',     null, 0, 3);
-        program.setVertexBufferAt('aUV',      null, 3, 2);
+        program.setVertexBuffer('aPos',     null, 0, 3);
+        program.setVertexBuffer('aUV',      null, 3, 2);
 
-        program.setTextureAt('uMetaballSampler', null);
-        program.setTextureAt('uGlobSampler', null, 1);
+        program.setTexture('uMetaballSampler', null);
+        program.setTexture('uGlobSampler', null, 1);
     }
 }

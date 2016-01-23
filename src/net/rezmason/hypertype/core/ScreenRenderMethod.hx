@@ -38,12 +38,12 @@ class ScreenRenderMethod extends RenderMethod {
 
     override public function start(renderTarget, args) {
         super.start(renderTarget, args);
-        program.setVertexBufferAt('aPos', vertexBuffer, 0, 2);
+        program.setVertexBuffer('aPos', vertexBuffer, 0, 2);
     }
 
     override public function end() {
-        program.setTextureAt('uTexture', null);
-        program.setVertexBufferAt('aPos', null, 0, 2);
+        program.setTexture('uTexture', null);
+        program.setVertexBuffer('aPos', null, 0, 2);
         super.end();
     }
 

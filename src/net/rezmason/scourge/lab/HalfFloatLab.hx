@@ -1,17 +1,9 @@
 package net.rezmason.scourge.lab;
 
 import haxe.io.BytesOutput;
-import lime.Assets.*;
-import lime.math.Matrix4;
-import lime.math.Vector4;
-import lime.utils.Float32Array;
 import net.rezmason.gl.*;
 import net.rezmason.math.FelzenszwalbSDF;
-import net.rezmason.scourge.waves.Ripple;
-import net.rezmason.scourge.waves.WaveFunctions;
-import net.rezmason.scourge.waves.WavePool;
 import net.rezmason.utils.HalfFloatUtil;
-import net.rezmason.utils.Zig;
 
 class HalfFloatLab extends Lab {
 
@@ -132,16 +124,16 @@ class HalfFloatLab extends Lab {
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         program.setDepthTest(false);
 
-        program.setTextureAt('uDataSampler', dataTexture, 1); // uDataSampler contains our data texture
-        program.setVertexBufferAt('aPos', vertexBuffer, 0, 2);
-        program.setVertexBufferAt('aUV',  vertexBuffer, 2, 2);
+        program.setTexture('uDataSampler', dataTexture, 1); // uDataSampler contains our data texture
+        program.setVertexBuffer('aPos', vertexBuffer, 0, 2);
+        program.setVertexBuffer('aUV',  vertexBuffer, 2, 2);
 
-        renderTarget.bind();
+        program.setRenderTarget(renderTarget);
         program.clear(0, 0, 0, 1);
         program.draw(indexBuffer, 0, TOTAL_TRIANGLES);
         
-        program.setTextureAt('uDataSampler', null, 1);
-        program.setVertexBufferAt('aPos', null, 0, 2);
-        program.setVertexBufferAt('aUV',  null, 2, 2);
+        program.setTexture('uDataSampler', null, 1);
+        program.setVertexBuffer('aPos', null, 0, 2);
+        program.setVertexBuffer('aUV',  null, 2, 2);
     }
 }

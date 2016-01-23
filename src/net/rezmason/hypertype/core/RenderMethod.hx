@@ -25,7 +25,7 @@ class RenderMethod {
 
     public function start(renderTarget:RenderTarget, args:Array<Dynamic>):Void {
         program.use();
-        renderTarget.bind();
+        program.setRenderTarget(renderTarget);
         program.clear(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundAlpha);
     }
 

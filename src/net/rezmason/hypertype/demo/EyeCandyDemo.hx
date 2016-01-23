@@ -68,7 +68,7 @@ class EyeCandyDemo {
             var g:Float = ramp(y + 0.5);
             var b:Float = ramp(z + 0.5);
 
-            body.getGlyphByID(ike).SET({x:x, y:y, z:z, r:r, g:g, b:b, char:charCode, hitboxID:ike});
+            body.getGlyphByID(ike).SET({x:x, y:y, z:z, r:r, g:g, b:b, char:charCode, hitboxID:ike, a:1});
             
             _z -= dZ;
             theta += dTheta;
