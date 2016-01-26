@@ -21,15 +21,17 @@ class ScourgeAssetGen extends Application {
 
         var matrixChars:String = Strings.MATRIX_CHARS + Strings.MATRIX_UNUSED_CHARS;
 
-        var characterSets:Array<CharacterSet> = [
+        var characterSets:Array<FontCharacterSet> = [
             {chars:profontChars, size:300, size2:300, fontID:'ProFont'},
             {chars:Strings.SMALL_CYRILLICS, size:400, size2:300, fontID:'ProFont_Cy'},
             {chars:Strings.BOX_SYMBOLS, size:300, size2:300, fontID:'SourceProFont'},
         ];
-        SDFFontGenerator.generate(characterSets, 72, 72, 1, 20, deployFont.bind('full'));
+        var glyphs = SDFFontGenerator.extractGlyphsFromFonts(characterSets);
+        SDFFontGenerator.generate(glyphs, 72, 72, 1, 20, deployFont.bind('full'));
 
         characterSets = [{chars:matrixChars, size:218, size2:218, fontID:'MatrixCode'}];
-        SDFFontGenerator.generate(characterSets, 72, 72, 1, 20, deployFont.bind('matrix'));
+        var glyphs = SDFFontGenerator.extractGlyphsFromFonts(characterSets);
+        SDFFontGenerator.generate(glyphs, 72, 72, 1, 20, deployFont.bind('matrix'));
 
         // MetaballTextureGenerator.makeTexture(30, 0.62, 20, deployImage.bind(_, "metaball"));
         // GlobTextureGenerator.makeTexture(512, deployImage.bind(_, "glob"));

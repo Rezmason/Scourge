@@ -10,48 +10,112 @@ import net.rezmason.math.FelzenszwalbSDF;
 using net.rezmason.utils.Alphabetizer;
 
 typedef GlyphData = {
-    var image:Image;
+    var data:Array<Bool>;
     var bounds:Rectangle;
 };
 
-typedef CharacterSet = {
+typedef FontCharacterSet = {
     var fontID:String;
     var chars:String;
     var size:Int;
     var size2:Int;
 }
 
+typedef ImageCharacterSet = {
+    var imageID:String;
+    var chars:String;
+    var rows:UInt;
+    var columns:UInt;
+};
+
 class SDFFontGenerator {
 
-    public static function generate(characterSets:Array<CharacterSet>, glyphWidth, glyphHeight, spacing, range, cbk) {
-
-        var pendingGlyphs:Map<String, GlyphData> = new Map();
-        var computedGlyphs:Map<String, Array<Float>> = new Map();
-        var totalBounds:Rectangle = null;
-
+    public static function extractGlyphsFromFonts(characterSets:Array<FontCharacterSet>):Map<String, GlyphData> {
+        var glyphs:Map<String, GlyphData> = new Map();
         for (characterSet in characterSets) {
             var font = Assets.getFont(characterSet.fontID);
             for (index in 0...Utf8.length(characterSet.chars)) {
                 var char = Utf8.sub(characterSet.chars, index, 1);
-                if (pendingGlyphs.exists(char)) continue;
+                if (glyphs.exists(char) || char == ' ') continue;
                 var glyph = font.getGlyph(char);
                 if (glyph == 0) continue;
-                var renderedGlyph = font.renderGlyph(glyph, characterSet.size);
-                if (renderedGlyph == null) continue;
+                var image = font.renderGlyph(glyph, characterSet.size);
+                if (image == null) continue;
 
                 // Based on explanation at http://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html
                 var metrics = font.getGlyphMetrics(glyph);
-                var unit = renderedGlyph.height / metrics.height;
+                var unit = image.height / metrics.height;
                 var offsetX = Std.int(metrics.horizontalBearing.x * unit);
                 var offsetY = Std.int(characterSet.size2 - metrics.horizontalBearing.y * unit);
 
-                var bounds = renderedGlyph.rect;
+                var bounds = image.rect;
                 bounds.x = offsetX;
                 bounds.y = offsetY;
-                pendingGlyphs[char] = {image:renderedGlyph, bounds:bounds};
-                if (totalBounds == null) totalBounds = bounds;
-                else totalBounds = totalBounds.union(bounds);
+
+                var data = [for (val in image.data) val != 0];
+
+                glyphs[char] = {data:data, bounds:bounds};
             }
+        }
+        return glyphs;
+    }
+
+    public static function extractGlyphsFromImages(characterSets:Array<ImageCharacterSet>):Map<String, GlyphData> {
+        var glyphs:Map<String, GlyphData> = new Map();
+        for (characterSet in characterSets) {
+            var atlas = Assets.getImage(characterSet.imageID);
+            var glyphWidth:UInt = Std.int(atlas.width / characterSet.columns);
+            var glyphHeight:UInt = Std.int(atlas.height / characterSet.rows);
+            var image = new Image(null, 0, 0, glyphWidth, glyphHeight, 0x0);
+            var rect = image.rect;
+            var bounds = image.rect;
+            var topLeft = new lime.math.Vector2(0, 0);
+            var row = 0;
+            var column = 0;
+            for (index in 0...Utf8.length(characterSet.chars)) {
+                var char = Utf8.sub(characterSet.chars, index, 1);
+                if (!(glyphs.exists(char) || char == ' ')) {
+                    rect.x = glyphWidth * column;
+                    rect.y = glyphHeight * row;
+                    image.copyPixels(atlas, rect, topLeft);
+                    var data = [];
+                    for (ike in 0...glyphWidth * glyphHeight) {
+                        var val = 0;
+                        val = val | image.data[ike * 4 + 0]; // R
+                        val = val | image.data[ike * 4 + 1]; // G
+                        val = val | image.data[ike * 4 + 2]; // B
+                        // val = val | image.data[ike * 4 + 3]; // A
+                        data[ike] = val != 0;
+                    }
+                    glyphs[char] = {data:data, bounds:bounds};
+                }
+                column++;
+                if (column >= characterSet.columns) {
+                    column = 0;
+                    row++;
+                    if (row > characterSet.rows) {
+                        break;
+                    }
+                }
+            }
+        }
+        return glyphs;
+    }
+
+    static function charFor(val:Float):String {
+        var isNeg = val < 0;
+        var char = String.fromCharCode(65 + Std.int(Math.abs(val)));
+        if (isNeg) char = char.toLowerCase();
+        return char;
+    }
+
+    public static function generate(glyphs:Map<String, GlyphData>, glyphWidth, glyphHeight, spacing, range, cbk) {
+        var computedGlyphs:Map<String, Array<Float>> = new Map();
+        var totalBounds:Rectangle = null;
+
+        for (glyph in glyphs) {
+            if (totalBounds == null) totalBounds = glyph.bounds;
+            else totalBounds = totalBounds.union(glyph.bounds);
         }
 
         totalBounds.left = Math.floor(totalBounds.left);
@@ -68,23 +132,24 @@ class SDFFontGenerator {
         var sdfHeight = totalHeight + 2 * range;
         var numChars = 1;
         computedGlyphs[' '] = [for (ike in 0...glyphWidth * glyphHeight) cast range];
-        for (char in pendingGlyphs.keys().a2z()) {
-            var pendingGlyph = pendingGlyphs[char];
-            var data = pendingGlyph.image.data;
+        for (char in glyphs.keys().a2z()) {
+            var glyph = glyphs[char];
+            var glyphBounds = glyph.bounds;
+            var glyphData = glyph.data;
             var sdfInput = [for (ike in 0...sdfWidth * sdfHeight) 0.];
-            for (y in 0...pendingGlyph.image.height) {
-                for (x in 0...pendingGlyph.image.width) {
-                    var val:UInt = data[(y * pendingGlyph.image.width + x) * 1];
-                    var outputX = Std.int(x + pendingGlyph.bounds.x + range + offsetX);
-                    var outputY = Std.int(y + pendingGlyph.bounds.y + range + offsetY);
-                    sdfInput[outputY * sdfWidth + outputX] = val == 0 ? 0 : 1;
+            for (y in 0...Std.int(glyphBounds.height)) {
+                for (x in 0...Std.int(glyphBounds.width)) {
+                    var outputX = Std.int(x + glyphBounds.x + range + offsetX);
+                    var outputY = Std.int(y + glyphBounds.y + range + offsetY);
+                    var val = glyphData[(y * Std.int(glyphBounds.width) + x)] ? 1 : 0;
+                    sdfInput[outputY * sdfWidth + outputX] = val;
                 }
             }
 
             var sdfOutput = FelzenszwalbSDF.computeSignedDistanceField(sdfWidth, sdfHeight, sdfInput);
             // var sdfOutput = sdfInput;
             sdfOutput = resize(sdfWidth, sdfHeight, sdfOutput, glyphWidth, glyphHeight);
-            
+
             numChars++;
             computedGlyphs[char] = sdfOutput;
             Sys.print(char);
