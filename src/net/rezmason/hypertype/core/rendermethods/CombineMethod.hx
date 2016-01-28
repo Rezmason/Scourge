@@ -15,14 +15,13 @@ class CombineMethod extends ScreenRenderMethod {
     override public function drawScreen(textures:Map<String, Texture>) {
         program.setDepthTest(false);
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
-        program.setTexture('uTexture', textures['input']);
-        program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
-        program.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE);
-        program.setTexture('uTexture', textures['bloom']);
+        program.setTexture('uBaseTexture', textures['input'], 0);
+        program.setTexture('uAlphaMultipliedTexture', textures['bloom'], 1);
         program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
         #if debug
             program.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE_MINUS_SOURCE_ALPHA);  
-            program.setTexture('uTexture', textures['debug']);
+            program.setTexture('uBaseTexture', textures['debug'], 0);
+            program.setTexture('uAlphaMultipliedTexture', null, 1);
             program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
         #end
     }

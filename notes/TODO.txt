@@ -1,8 +1,3 @@
-Matrix code
-    Brighten initial characters
-        Find a way to make alpha > 0 work out
-            Perform the math within combine shader
-
 Improve feel of roll
 
 Wrap interactive board UI in loupe
