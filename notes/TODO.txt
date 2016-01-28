@@ -1,5 +1,7 @@
-MATRIX CODE
-    Raindrop traffic
+Matrix code
+    Brighten initial characters
+        Find a way to make alpha > 0 work out
+            Perform the math within combine shader
 
 Improve feel of roll
 

@@ -72,6 +72,7 @@ class MatrixSheet {
             columns.push(new MatrixColumn(charCodes, glyphs, isBackground ? 0.1 : 1.0));
         }
 
+        for (column in columns) column.position = -(column.speed + Math.random());
         if (!isBackground) {
             var middleColumn = columns[Std.int(columns.length * (0.5 + 0.3 * (Math.random() - 0.5)))];
             middleColumn.position = 0;
@@ -99,7 +100,7 @@ class MatrixColumn {
     
     public var position:Float;
     var tailLength:Float;
-    var speed:Float;
+    public var speed:Float;
 
     public function new(charCodes, glyphs, brightness) {
         this.charCodes = charCodes;
@@ -135,7 +136,7 @@ class MatrixColumn {
 
     function reinitialize() {
         tailLength = 0.2 + Math.random() * 0.6;
-        speed = 0.3 + Math.random() * 0.3;
-        position = -(speed + Math.random());
+        speed = 0.4 + Math.random() * 0.4;
+        position = -(speed * Math.random() * 0.5);
     }
 }

@@ -34,12 +34,14 @@ class GamePage extends NavPage {
         var alphabetDemo:AlphabetDemo = new AlphabetDemo();
         var glyphDemo:GlyphDemo = new GlyphDemo();
         var eyeCandyDemo:EyeCandyDemo = new EyeCandyDemo();
+        var matrixDemo:MatrixDemo = new MatrixDemo();
         var view:View = new Present(View);
 
         bodiesByName = new Map();
         bodiesByName['alphabet'] = alphabetDemo.body;
         bodiesByName['sdf']      = glyphDemo.body;
         bodiesByName['test']     = eyeCandyDemo.body;
+        bodiesByName['matrix']   = matrixDemo.body;
         bodiesByName['board']    = view.body;
 
         // console.hasScrollBar = true;
