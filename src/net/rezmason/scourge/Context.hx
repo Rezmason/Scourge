@@ -13,8 +13,8 @@ class Context {
         Telemetry.changeName('.init');
         new HypertypeContext();
         new GameContext();
-        // new BeginNavErrand().run();
-        makeMatrix();
+        new BeginNavErrand().run();
+        // makeMatrix();
         Telemetry.changeName('.lime');
     }
 
