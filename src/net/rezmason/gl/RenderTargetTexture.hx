@@ -11,8 +11,9 @@ class RenderTargetTexture extends Texture {
     public var height(default, null):Int;
     var frameBuffer:GLFramebuffer;
 
-    public function new(format:TextureFormat):Void {
-        this.format = format;
+    public function new(type:DataType):Void {
+        this.type = type;
+        format = RGBA;
         width = 1;
         height = 1;
         renderTarget = new RenderTarget();
@@ -38,7 +39,7 @@ class RenderTargetTexture extends Texture {
         GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
         GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
         GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-        GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, format, null);
+        GL.texImage2D(GL.TEXTURE_2D, 0, format, width, height, 0, format, type, null);
         GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, nativeTexture, 0);
         GL.bindTexture(GL.TEXTURE_2D, null);
         GL.bindRenderbuffer(GL.RENDERBUFFER, null);
@@ -47,6 +48,6 @@ class RenderTargetTexture extends Texture {
 
     public function readBack(data:ArrayBufferView):Void {
         GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
-        GL.readPixels(0, 0, width, height, GL.RGBA, format, data);
+        GL.readPixels(0, 0, width, height, GL.RGBA, type, data);
     }
 }

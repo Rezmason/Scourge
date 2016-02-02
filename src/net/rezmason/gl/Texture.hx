@@ -4,6 +4,7 @@ import lime.graphics.opengl.GLTexture;
 
 @:allow(net.rezmason.gl) 
 class Texture extends Artifact {
-    public var format(default, null):TextureFormat;
+    public var type(default, null):DataType;
+    public var format(default, null):PixelFormat;
     var nativeTexture:GLTexture;
 }

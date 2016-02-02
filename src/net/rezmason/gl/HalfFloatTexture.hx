@@ -13,6 +13,6 @@ class HalfFloatTexture extends DataTexture {
             var halfFloat:UInt = (!singleChannel || ike % 4 == 0) ? input.readUInt16() : 0;
             output.writeFloat(HalfFloatUtil.halfFloatToFloat(halfFloat));
         }
-        super(width, height, FLOAT, Float32Array.fromBytes(output.getBytes()));
+        super(width, height, RGBA, FLOAT, Float32Array.fromBytes(output.getBytes()));
     }
 }
