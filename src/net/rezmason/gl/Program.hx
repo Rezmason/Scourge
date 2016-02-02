@@ -42,6 +42,7 @@ class Program extends Artifact {
                 extensionPreamble += '#extension GL_$extension : enable\n';
             }
             #if !desktop extensionPreamble += 'precision mediump float;\n'; #end
+            vertSource = extensionPreamble + vertSource;
             fragSource = extensionPreamble + fragSource;
         }
 

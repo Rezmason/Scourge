@@ -11,9 +11,9 @@ class BloomMethod extends ScreenRenderMethod {
     var kernel:Float32Array;
 
     public function new(amount:UInt) {
-        super();
         this.amount = amount;
         kernel = buildKernel(amount);
+        super();
     }
 
     // Grabbed from the same place @alteredq grabbed it from for the three.js example ;-)
@@ -39,6 +39,8 @@ class BloomMethod extends ScreenRenderMethod {
         extensions.push('OES_texture_float_linear');
         vertShader = getText('shaders/bloom.vert');
         fragShader = getText('shaders/bloom.frag');
+
+        fragShader = new EReg('INT_KERNEL_SIZE', 'g').replace(fragShader, Std.string(kernel.length));
     }
 
     override public function start(renderTarget, args) {
