@@ -94,6 +94,7 @@ class Engine {
 
     function render() {
         Telemetry.changeName('.render');
+        #if debug_graphics if (active) debugDisplay.refresh(); #end
         if (active) presentedPass.run();
         Telemetry.changeName('.lime');
         Telemetry.advanceFrame();

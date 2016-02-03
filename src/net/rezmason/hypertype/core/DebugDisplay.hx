@@ -41,5 +41,5 @@ class DebugDisplay {
         #end
     }
 
-    public function refresh() (cast texture).update();
+    public function refresh() texture.update();
 }
