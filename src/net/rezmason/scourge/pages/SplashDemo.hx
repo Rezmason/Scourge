@@ -7,10 +7,11 @@ import net.rezmason.math.Vec3;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Glyph;
 import net.rezmason.hypertype.core.Interaction;
+import net.rezmason.hypertype.demo.Demo;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 
-class SplashDemo {
+class SplashDemo extends Demo {
 
     static var SPLASH_COLORS = [
         'S' => new Vec3(1.00, 0.00, 0.56),
@@ -23,15 +24,11 @@ class SplashDemo {
     ];
     static var WHITE = new Vec3(1, 1, 1);
 
-    public var body(default, null):Body;
     var glyphTowers:Array<Array<Glyph>>;
-    var time:Float;
     var lines:Array<String>;
 
     public function new():Void {
-        body = new Body();
-        body.updateSignal.add(update);
-        time = 0;
+        super();
         lines = Assets.getText('text/splash.txt').split('\n');
         lines.pop();
 
@@ -85,8 +82,8 @@ class SplashDemo {
         body.transform.appendRotation(20, Vector4.X_AXIS);
     }
 
-    function update(delta:Float):Void {
-        time += delta;
+    override function update(delta:Float):Void {
+        super.update(delta);
 
         for (ike in 0...glyphTowers.length) {
             var glyphTower:Array<Glyph> = glyphTowers[ike];

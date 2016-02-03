@@ -10,14 +10,13 @@ import net.rezmason.utils.santa.Present;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 
-class MatrixDemo {
+class MatrixDemo extends Demo {
 
-    public var body(default, null):Body;
     // var backSheet:MatrixSheet;
     var frontSheet:MatrixSheet;
 
     public function new():Void {
-
+        super();
         var chars = Strings.MATRIX_CHARS;
         var charCodes = [for (ike in 0...Utf8.length(chars)) Utf8.charCodeAt(chars, ike)];
 
@@ -25,13 +24,11 @@ class MatrixDemo {
         var matrixFont = fontManager.getFontByName('matrix');
         // backSheet = new MatrixSheet(matrixFont, charCodes, 80, 80, true);
         frontSheet = new MatrixSheet(matrixFont, charCodes, 60, 60);
-        body = new Body();
         // body.addChild(backSheet.body);
         body.addChild(frontSheet.body);
-        body.interactionSignal.add(receiveInteraction);
     }
 
-    function receiveInteraction(id:Int, interaction:Interaction):Void {
+    override function receiveInteraction(id:Int, interaction:Interaction):Void {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {

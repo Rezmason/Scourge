@@ -2,7 +2,6 @@ package net.rezmason.hypertype.demo;
 
 import haxe.Utf8;
 import motion.easing.Linear;
-import motion.easing.Quad;
 import motion.easing.Quint;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Glyph;
@@ -11,7 +10,7 @@ import net.rezmason.math.Vec3;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 
-class GlyphDemo {
+class GlyphDemo extends Demo {
 
     static var COLORS:Array<Vec3> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Vec3.fromHex);
     inline static var TWEEN_LENGTH:Float = 0.25;
@@ -23,17 +22,14 @@ class GlyphDemo {
     static var tweens:Array<Float->Float> = [Quint.easeOut.calculate, Linear.easeNone.calculate, Quint.easeIn.calculate];
     inline static var CHARS:String = 'ΩSCOURGE';
 
-    public var body(default, null):Body = new Body();
     var glyph:Glyph;
     var currentCharIndex = 0;
-    var time:Float = 0;
     var currentPhase = 1;
     var currentColor = 0;
     var mouseIsDown = false;
 
     public function new():Void {
-        body.interactionSignal.add(receiveInteraction);
-        body.updateSignal.add(update);
+        super();
         body.glyphScale = 0.6;
         body.growTo(1);
 
@@ -42,7 +38,7 @@ class GlyphDemo {
         glyph.set_color(COLORS[currentColor]);
     }
 
-    function update(delta:Float):Void {
+    override function update(delta:Float):Void {
         time += delta * (mouseIsDown ? 0.2 : 1);
 
         if (time > periods[currentPhase]) {
@@ -60,11 +56,11 @@ class GlyphDemo {
         var val:Float = tweens[currentPhase](percent);
         val = tweenData[currentPhase][0] * (1 - val) + tweenData[currentPhase][1] * val;
 
-        glyph.set_w(val * 0.1 + (1 - val) * -0.25);
-        glyph.set_color(COLORS[currentColor] * Quad.easeIn.calculate(val));
+        glyph.set_w(val * 0.1 + (1 - val) * -0.7);
+        glyph.set_color(COLORS[currentColor]);
     }
 
-    function receiveInteraction(id:Int, interaction:Interaction):Void {
+    override function receiveInteraction(id:Int, interaction:Interaction):Void {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {

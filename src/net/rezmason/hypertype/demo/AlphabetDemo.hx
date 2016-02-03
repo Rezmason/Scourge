@@ -8,7 +8,7 @@ import net.rezmason.hypertype.core.Interaction;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 
-class AlphabetDemo {
+class AlphabetDemo extends Demo {
 
     inline static var CHARS:String =
         Strings.ALPHANUMERICS +
@@ -17,10 +17,8 @@ class AlphabetDemo {
         Strings.BOX_SYMBOLS +
     '';
 
-    public var body(default, null):Body;
-
     public function new():Void {
-
+        super();
         var totalChars:Int = Utf8.length(CHARS);
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));
         var numCols:Int = Std.int(Math.ceil(totalChars / numRows));
@@ -31,7 +29,6 @@ class AlphabetDemo {
         body.glyphScale = 0.025;
         body.transform.identity();
         body.transform.appendScale(1, -1, 1);
-        body.interactionSignal.add(receiveInteraction);
 
         for (glyph in body.eachGlyph()) {
             var id:Int = glyph.id;
@@ -49,7 +46,7 @@ class AlphabetDemo {
         }
     }
 
-    function receiveInteraction(id:Int, interaction:Interaction):Void {
+    override function receiveInteraction(id:Int, interaction:Interaction):Void {
         if (id == 0) return;
         var glyph:Glyph = body.getGlyphByID(id - 1);
         switch (interaction) {

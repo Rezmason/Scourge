@@ -7,14 +7,10 @@ import net.rezmason.hypertype.core.Interaction;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 
-class EyeCandyDemo {
+class EyeCandyDemo extends Demo {
 
     static var CHARS = Strings.ALPHANUMERICS;
     static var NUM_CHARS = CHARS.length;
-
-    public var body(default, null):Body;
-
-    var time:Float;
 
     var dragging:Bool;
     var dragX:Float;
@@ -24,14 +20,8 @@ class EyeCandyDemo {
     var setBackTransform:Matrix4;
 
     public function new(num:Int = 2400):Void {
-
-        body = new Body();
-        body.interactionSignal.add(receiveInteraction);
-        body.updateSignal.add(update);
+        super();
         body.glyphScale = 0.007;
-
-        time = 0;
-
         dragging = false;
         dragStartTransform = new Matrix4();
         rawTransform = new Matrix4();
@@ -77,12 +67,13 @@ class EyeCandyDemo {
 
     inline function ramp(num:Float):Float return (2 - num) * num;
 
-    public function update(delta:Float):Void {
+    override function update(delta:Float):Void {
         time += delta;
 
         body.transform.identity();
         body.transform.appendRotation(time * 30, Vector4.Z_AXIS);
         body.transform.append(setBackTransform);
+        body.transform.appendTranslation(0, 0, Math.sin(time) * 0.5 - 0.5);
 
         for (glyph in body.eachGlyph()) {
             glyph.set_p(Math.cos(time * 4 + glyph.get_x() * 20) * 0.200 + 0.4);
@@ -91,7 +82,7 @@ class EyeCandyDemo {
         }
     }
 
-    function receiveInteraction(id:Int, interaction:Interaction):Void {
+    override function receiveInteraction(id:Int, interaction:Interaction):Void {
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {
