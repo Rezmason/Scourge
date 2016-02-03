@@ -14,6 +14,7 @@ class SceneGraph {
     public var height(default, null):Int = 1;
     public var rectsByBodyID(default, null):Map<Int, Rectangle> = new Map();
     public var teaseHitboxesSignal(default, null):Zig<Bool->Void> = new Zig();
+    public var toggleConsoleSignal(default, null):Zig<Void->Void> = new Zig();
     public var updateRectsSignal(default, null):Zig<Map<Int, Rectangle>->Void> = new Zig();
 
     public function new() {}
@@ -43,7 +44,8 @@ class SceneGraph {
 
     public function setKeyboardFocus(body:Body):Void {
         fetchBodies();
-        if (bodiesByID[body.id] == body) keyboardFocusBodyID = body.id;
+        if (body == null) keyboardFocusBodyID = null;
+        else if (bodiesByID[body.id] == body) keyboardFocusBodyID = body.id;
     }
 
     public function update(delta) {
@@ -82,6 +84,7 @@ class SceneGraph {
                 target = bodiesByID[keyboardFocusBodyID];
                 switch (code) {
                     case SPACE: teaseHitboxesSignal.dispatch(modifier.ctrlKey && type != KEY_UP);
+                    case GRAVE: if (type == KEY_DOWN) toggleConsoleSignal.dispatch();
                     case _:
                 }
         }

@@ -49,11 +49,14 @@ class Interpreter {
     var cHistory:Array<String>;
     var mHistory:Array<String>;
     var mHistIndex:Int = 0;
+    var restrictedCodes:Array<Bool>;
 
     var tokensByID:Map<String, ConsoleToken>;
     var hintsByID:Map<String, ConsoleToken>;
 
-    public function new(console:ConsoleUIMediator):Void {
+    public function new(console:ConsoleUIMediator, restrictedCodes:Array<KeyCode> = null):Void {
+        this.restrictedCodes = [];
+        if (restrictedCodes != null) for (code in restrictedCodes) this.restrictedCodes[code] = true;
         setPrompt('user', Vec3.fromHex(0x3060FF));
         this.console = console;
         this.console.keyboardSignal.add(handleKeyboard);
@@ -128,7 +131,7 @@ class Interpreter {
             case DOWN: handleDown();
             case TAB: handleTab();
             case _:
-                if (keyCode != UNKNOWN) {
+                if (keyCode != UNKNOWN && !restrictedCodes[keyCode]) {
                     if (modifier.ctrlKey) handleHotKey(keyCode, modifier.altKey);
                     else handleChar(keyCode, modifier.shiftKey);
                 }
