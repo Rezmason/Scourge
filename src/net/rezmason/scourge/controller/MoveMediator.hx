@@ -24,6 +24,7 @@ import net.rezmason.hypertype.ui.BorderBox;
 import net.rezmason.hypertype.ui.DragBehavior;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
+import net.rezmason.hypertype.ui.LoopingDragBehavior;
 
 using net.rezmason.grid.GridUtils;
 using net.rezmason.hypertype.core.GlyphUtils;
@@ -62,7 +63,7 @@ class MoveMediator {
     var biteTargetSpace:Entity;
     var bitSpacesByID:Map<Int, Entity>;
 
-    var boardDragBehavior:BoardDragBehavior;
+    var dragBehavior:LoopingDragBehavior;
 
     public function new() {
         var view:View = new Present(View);
@@ -81,9 +82,9 @@ class MoveMediator {
         board.interactionSignal.add(handleBoardInteraction);
         board.updateSignal.add(update);
 
-        boardDragBehavior = new BoardDragBehavior();
-        boardDragBehavior.horizontalWrapSignal.add(onWrap.bind(_, 0));
-        boardDragBehavior.verticalWrapSignal.add(onWrap.bind(0, _));
+        dragBehavior = new LoopingDragBehavior();
+        dragBehavior.horizontalWrapSignal.add(onWrap.bind(_, 0));
+        dragBehavior.verticalWrapSignal.add(onWrap.bind(0, _));
     }
 
     public function beginGame(config, game) {
@@ -278,8 +279,8 @@ class MoveMediator {
     }
 
     function update(delta) {
-        if (boardDragBehavior.active) {
-            boardDragBehavior.update(delta);
+        if (dragBehavior.active) {
+            dragBehavior.update(delta);
             updatePiecePosition();
         }
     }
@@ -288,7 +289,7 @@ class MoveMediator {
         if (selectedSpace != null) {
             piece.transform.identity();
 
-            var offset = boardDragBehavior.displacement;
+            var offset = dragBehavior.displacement;
             var dH = offset.x < 0 ? W : E;
             var dV = offset.y < 0 ? S : N;
             var hMag = Math.abs(offset.x);
@@ -305,19 +306,22 @@ class MoveMediator {
                 hvGlyph = boardSpacesByID[oCell.neighbors[dV].neighbors[dH].id].get(BoardSpaceView).over;
             }
 
+            hMag = Math.pow(hMag * 2, 3) / 2;
+            vMag = Math.pow(vMag * 2, 3) / 2;
+
             var interpX = bilinearInterpolate(oGlyph.get_x(), hGlyph.get_x(), vGlyph.get_x(), hvGlyph.get_x(), hMag, vMag);
             var interpY = bilinearInterpolate(oGlyph.get_y(), hGlyph.get_y(), vGlyph.get_y(), hvGlyph.get_y(), hMag, vMag);
             var interpZ = bilinearInterpolate(oGlyph.get_z(), hGlyph.get_z(), vGlyph.get_z(), hvGlyph.get_z(), hMag, vMag);
 
-            // TODO: proper use of boardDragBehavior.displacement
+            // TODO: proper use of dragBehavior.displacement
             piece.transform.appendTranslation(interpX, interpY, interpZ);
             piece.transform.append(board.transform);
 
             /*
             loupe.body.transform.identity();
             loupe.body.transform.appendTranslation(
-                boardDragBehavior.displacement.x / boardScale,
-                boardDragBehavior.displacement.y / boardScale,
+                dragBehavior.displacement.x / boardScale,
+                dragBehavior.displacement.y / boardScale,
                 0
             );
             */
@@ -355,7 +359,7 @@ class MoveMediator {
     function updateDragWalls() {
         if (selectedSpace != null) {
             var cell = selectedSpace.get(BoardSpaceState).cell;
-            boardDragBehavior.setWalls( 
+            dragBehavior.setWalls( 
                 !isNotWall(cell.n()), 
                 !isNotWall(cell.s()), 
                 !isNotWall(cell.e()), 
@@ -473,18 +477,18 @@ class MoveMediator {
                 }
             case MOUSE(type, x, y): 
                 switch (type) {
-                    case CLICK if (!boardDragBehavior.dragging && boardSpacesByID.exists(glyphID)):
+                    case CLICK if (!dragBehavior.dragging && boardSpacesByID.exists(glyphID)):
                         selectedSpace = boardSpacesByID[glyphID];
                         var selectedGlyph = selectedSpace.get(BoardSpaceView).over;
                         updateDragWalls();
                         updatePiecePosition();
                         updatePiece();
                         updateBite();
-                    case DROP, CLICK if (boardDragBehavior.dragging): boardDragBehavior.stopDrag();
-                    case ENTER, EXIT, MOVE if (boardDragBehavior.dragging): 
-                        boardDragBehavior.updateDrag(x * 20, -y * 20);
+                    case DROP, CLICK if (dragBehavior.dragging): dragBehavior.stopDrag();
+                    case ENTER, EXIT, MOVE if (dragBehavior.dragging): 
+                        dragBehavior.updateDrag(x * 20, -y * 20);
                     case MOUSE_DOWN if (selectedSpace != null):
-                        boardDragBehavior.startDrag(x * 20, -y * 20);
+                        dragBehavior.startDrag(x * 20, -y * 20);
                     case _:
                 }
             case _:

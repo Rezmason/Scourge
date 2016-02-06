@@ -1,4 +1,7 @@
 Improve feel of roll
+    NO RESISTANCE during drag
+    SNAP IN PLACE when settling
+    Remove box2d, it doesn't seem worth it after all
 
 Wrap interactive board UI in loupe
 Shelf of tools, and, like, you drag 'em
