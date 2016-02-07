@@ -32,6 +32,8 @@ class Engine {
     var hitboxDebugPass:RenderPass;
     var presentedPass:RenderPass;
 
+    inline static var BLOOM_DOWNSCALE = #if js 8 #else 4 #end ;
+
     public function new():Void {
         active = false;
         
@@ -104,8 +106,8 @@ class Engine {
         sceneGraph.setSize(width, height);
         mouseSystem.setSize(width, height);
         sceneRTT.resize(width, height);
-        bloomRTT1.resize(Std.int(width / 4), Std.int(height / 4));
-        bloomRTT2.resize(Std.int(width / 4), Std.int(height / 4));
+        bloomRTT1.resize(Std.int(width / BLOOM_DOWNSCALE), Std.int(height / BLOOM_DOWNSCALE));
+        bloomRTT2.resize(Std.int(width / BLOOM_DOWNSCALE), Std.int(height / BLOOM_DOWNSCALE));
         debugDisplay.resize(width, height);
         viewport.resize(width, height);
     }
