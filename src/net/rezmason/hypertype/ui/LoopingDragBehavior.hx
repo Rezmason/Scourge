@@ -30,7 +30,7 @@ class LoopingDragBehavior extends DragBehavior {
             super.updateDrag(x, y);
             marblePos.x += pos.x - lastPos.x;
             marblePos.y += pos.y - lastPos.y;
-
+            
             if (southBlocked && marblePos.y < -0.3) marblePos.y = -0.3;
             if (northBlocked && marblePos.y >  0.3) marblePos.y =  0.3;
             if (eastBlocked  && marblePos.x >  0.3) marblePos.x =  0.3;

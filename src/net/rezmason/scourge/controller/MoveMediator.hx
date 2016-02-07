@@ -306,9 +306,6 @@ class MoveMediator {
                 hvGlyph = boardSpacesByID[oCell.neighbors[dV].neighbors[dH].id].get(BoardSpaceView).over;
             }
 
-            hMag = Math.pow(hMag * 2, 3) / 2;
-            vMag = Math.pow(vMag * 2, 3) / 2;
-
             var interpX = bilinearInterpolate(oGlyph.get_x(), hGlyph.get_x(), vGlyph.get_x(), hvGlyph.get_x(), hMag, vMag);
             var interpY = bilinearInterpolate(oGlyph.get_y(), hGlyph.get_y(), vGlyph.get_y(), hvGlyph.get_y(), hMag, vMag);
             var interpZ = bilinearInterpolate(oGlyph.get_z(), hGlyph.get_z(), vGlyph.get_z(), hvGlyph.get_z(), hMag, vMag);
