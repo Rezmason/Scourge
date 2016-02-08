@@ -91,5 +91,6 @@ class GamePage extends NavPage {
         currentBodyName = name;
         mainScene.root.addChild(bodiesByName[currentBodyName]);
         mainScene.focus = bodiesByName[currentBodyName];
+        mainScene.invalidate();
     }
 }
