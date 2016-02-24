@@ -7,12 +7,12 @@ package net.rezmason.polyform;
     var CORNER = '+';
     var EDGE = 'o';
 
-    var NORTH = '“';
-    var EAST = '»';
-    var SOUTH = '„';
-    var WEST = '«';
+    var NORTH = '^';
+    var EAST = '>';
+    var SOUTH = 'v';
+    var WEST = '<';
     
-    var STEP_LEFT = '+';
-    var STEP_RIGHT = '◊';
-    var STEP_STRAIGHT = '#';
+    var STEP_LEFT = 'L';
+    var STEP_RIGHT = 'R';
+    var STEP_STRAIGHT = 'S';
 }

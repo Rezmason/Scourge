@@ -21,6 +21,7 @@ class PolyformGenerator {
             [R, S] => [S, R, R, L],
             [S, S] => [L, R, R, L],
             [R, L, R] => [S, R, S],
+            [R, L, S] => [S, R, L],
         ];
 
         var stringRules = new Map();
