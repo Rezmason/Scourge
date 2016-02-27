@@ -34,8 +34,8 @@ class GamePage extends NavPage {
         console = new UIElement(consoleMed);
 
         var alphabetDemo:AlphabetDemo = new AlphabetDemo();
-        var glyphDemo:GlyphDemo = new GlyphDemo();
-        var eyeCandyDemo:EyeCandyDemo = new EyeCandyDemo();
+        var sdfFontDemo:SDFFontDemo = new SDFFontDemo();
+        var colorSolidDemo:ColorSolidDemo = new ColorSolidDemo();
         var matrixDemo:MatrixDemo = new MatrixDemo();
         var view:View = new Present(View);
 
@@ -43,11 +43,11 @@ class GamePage extends NavPage {
         sceneGraph.toggleConsoleSignal.add(toggleConsole);
 
         bodiesByName = new Map();
-        bodiesByName['alphabet'] = alphabetDemo.body;
-        bodiesByName['sdf']      = glyphDemo.body;
-        bodiesByName['test']     = eyeCandyDemo.body;
-        bodiesByName['matrix']   = matrixDemo.body;
-        bodiesByName['board']    = view.body;
+        bodiesByName['alphabet']   = alphabetDemo.body;
+        bodiesByName['sdf']        = sdfFontDemo.body;
+        bodiesByName['colorSolid'] = colorSolidDemo.body;
+        bodiesByName['matrix']     = matrixDemo.body;
+        bodiesByName['board']      = view.body;
 
         // console.hasScrollBar = true;
         console.setLayout(0.25, 0.25, 0.5, 0.5);
@@ -77,7 +77,7 @@ class GamePage extends NavPage {
             outputSignal.dispatch(message, true);
         }));
 
-        showBodyByName('test');
+        showBodyByName('colorSolid');
     }
 
     function toggleConsole() {

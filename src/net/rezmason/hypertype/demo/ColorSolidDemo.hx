@@ -7,7 +7,7 @@ import net.rezmason.hypertype.core.Interaction;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 
-class EyeCandyDemo extends Demo {
+class ColorSolidDemo extends Demo {
 
     static var CHARS = Strings.ALPHANUMERICS;
     static var NUM_CHARS = CHARS.length;

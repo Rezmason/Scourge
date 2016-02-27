@@ -10,7 +10,7 @@ import net.rezmason.math.Vec3;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 
-class GlyphDemo extends Demo {
+class SDFFontDemo extends Demo {
 
     static var COLORS:Array<Vec3> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Vec3.fromHex);
     inline static var TWEEN_LENGTH:Float = 0.25;
