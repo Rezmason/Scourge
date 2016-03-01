@@ -5,7 +5,7 @@ import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.FontManager;
 import net.rezmason.hypertype.core.Glyph;
 import net.rezmason.hypertype.core.Interaction;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 import net.rezmason.utils.santa.Present;
 
 using net.rezmason.hypertype.core.GlyphUtils;

@@ -4,13 +4,13 @@ import lime.Assets.getText;
 import net.rezmason.gl.BlendFactor;
 import net.rezmason.hypertype.core.BodySegment;
 import net.rezmason.hypertype.core.SceneRenderMethod;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 
 class HitboxMethod extends SceneRenderMethod {
 
     public function new():Void {
         super();
-        backgroundColor = new Vec3(1, 1, 1);
+        backgroundColor = new Vec4(1, 1, 1);
     }
 
     override function composeShaders():Void {

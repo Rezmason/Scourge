@@ -4,7 +4,7 @@ import haxe.Timer;
 import haxe.Utf8;
 import lime.ui.KeyCode;
 import lime.ui.KeyModifier;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 import net.rezmason.hypertype.console.ConsoleTypes;
 import net.rezmason.hypertype.console.ConsoleUtils.*;
 import net.rezmason.hypertype.core.MouseInteractionType;
@@ -57,7 +57,7 @@ class Interpreter {
     public function new(console:ConsoleUIMediator, restrictedCodes:Array<KeyCode> = null):Void {
         this.restrictedCodes = [];
         if (restrictedCodes != null) for (code in restrictedCodes) this.restrictedCodes[code] = true;
-        setPrompt('user', Vec3.fromHex(0x3060FF));
+        setPrompt('user', Vec4.fromHex(0x3060FF));
         this.console = console;
         this.console.keyboardSignal.add(handleKeyboard);
         this.console.mouseSignal.add(handleMouseInteraction);
@@ -105,7 +105,7 @@ class Interpreter {
      * If two human players are taking turns playing on one computer, this prompt will serve to indicate
      * to them whose turn it is.
      */
-    public function setPrompt(name:String, color:Vec3):Void {
+    public function setPrompt(name:String, color:Vec4):Void {
         var r:Float = color.r;
         var g:Float = color.g;
         var b:Float = color.b;

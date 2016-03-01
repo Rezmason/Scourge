@@ -1,7 +1,7 @@
 package net.rezmason.hypertype.demo;
 
 import haxe.Utf8;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 import net.rezmason.hypertype.core.Glyph;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Interaction;
@@ -22,7 +22,7 @@ class AlphabetDemo extends Demo {
         var totalChars:Int = Utf8.length(CHARS);
         var numRows:Int = Std.int(Math.ceil(Math.sqrt(totalChars)));
         var numCols:Int = Std.int(Math.ceil(totalChars / numRows));
-        var white = new Vec3(1, 1, 1);
+        var white = new Vec4(1, 1, 1);
 
         body = new Body();
         body.growTo(totalChars);

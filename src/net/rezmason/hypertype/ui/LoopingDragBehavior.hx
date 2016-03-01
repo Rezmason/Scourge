@@ -1,6 +1,6 @@
 package net.rezmason.hypertype.ui;
 
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 import net.rezmason.utils.Zig;
 
 class LoopingDragBehavior extends DragBehavior {
@@ -15,7 +15,7 @@ class LoopingDragBehavior extends DragBehavior {
     var westBlocked:Bool = false;
     var eastBlocked:Bool = false;
 
-    var marblePos:Vec3 = new Vec3(0, 0, 0);
+    var marblePos:Vec4 = new Vec4(0, 0, 0);
 
     override public function update(delta:Float) {
         settling = !dragging && !isSettled();

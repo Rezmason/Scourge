@@ -1,6 +1,6 @@
 package net.rezmason.hypertype.ui;
 
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 
 class DragBehavior {
     inline static var SETTLE_FRICTION:Float = 0.925;
@@ -9,13 +9,13 @@ class DragBehavior {
     public var dragging(default, null):Bool = false;
     public var settling(default, null):Bool = false;
     public var active(get, null):Bool;
-    public var displacement(get, null):Vec3;
+    public var displacement(get, null):Vec4;
     
-    var pos:Vec3 = new Vec3(0, 0, 0);
-    var startPos:Vec3 = new Vec3(0, 0, 0);
-    var lastPos:Vec3 = new Vec3(0, 0, 0);
+    var pos:Vec4 = new Vec4(0, 0, 0);
+    var startPos:Vec4 = new Vec4(0, 0, 0);
+    var lastPos:Vec4 = new Vec4(0, 0, 0);
     var delta:Float;
-    var settleVel:Vec3 = new Vec3(0, 0, 0);
+    var settleVel:Vec4 = new Vec4(0, 0, 0);
 
     public function new() {}
 

@@ -6,13 +6,13 @@ import motion.easing.Quint;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Glyph;
 import net.rezmason.hypertype.core.Interaction;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 
 class SDFFontDemo extends Demo {
 
-    static var COLORS:Array<Vec3> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Vec3.fromHex);
+    static var COLORS:Array<Vec4> = [0xFF0090, 0xFFC800, 0x30FF00, 0x00C0FF, 0xFF6000, 0xC000FF, 0x0030FF, 0x606060, ].map(Vec4.fromHex);
     inline static var TWEEN_LENGTH:Float = 0.25;
     inline static var WAIT_LENGTH:Float = 0.5;
 

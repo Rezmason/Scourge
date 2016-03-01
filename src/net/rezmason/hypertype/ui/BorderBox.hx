@@ -1,6 +1,6 @@
 package net.rezmason.hypertype.ui;
 
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 import net.rezmason.hypertype.Strings.*;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Glyph;
@@ -11,7 +11,7 @@ using net.rezmason.utils.CharCode;
 class BorderBox {
 
     public var body(default, null):Body = new Body();
-    public var color(default, set):Vec3 = new Vec3(1, 1, 1);
+    public var color(default, set):Vec4 = new Vec4(1, 1, 1);
     public var width(default, set):Float = 0;
     public var height(default, set):Float = 0;
     public var glyphWidth(default, set):Float = 0.1;

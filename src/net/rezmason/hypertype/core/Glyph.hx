@@ -1,7 +1,7 @@
 package net.rezmason.hypertype.core;
 
 import net.rezmason.gl.VertexBuffer;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 
 @:allow(net.rezmason.hypertype.core.BodySegment)
 @:allow(net.rezmason.hypertype.core.GlyphUtils)
@@ -13,7 +13,7 @@ class Glyph {
     var colorBuf:VertexBuffer;
     var fontBuf:VertexBuffer;
     var hitboxBuf:VertexBuffer;
-    var color:Vec3;
+    var color:Vec4;
     var hitboxID:Int;
     var charCode:Int;
     var font:GlyphFont;

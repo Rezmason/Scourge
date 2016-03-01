@@ -3,7 +3,7 @@ package net.rezmason.hypertype.core;
 import net.rezmason.gl.IndexBuffer;
 import net.rezmason.gl.Texture;
 import net.rezmason.gl.VertexBuffer;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 
 class ScreenRenderMethod extends RenderMethod {
 
@@ -33,7 +33,7 @@ class ScreenRenderMethod extends RenderMethod {
             for (ike in 0...TOTAL_INDICES) indexBuffer.mod(ike, ind[ike]);
             indexBuffer.upload();
         }
-        backgroundColor = new Vec3(1, 0, 1);
+        backgroundColor = new Vec4(1, 0, 1);
     }
 
     override public function start(renderTarget, args) {

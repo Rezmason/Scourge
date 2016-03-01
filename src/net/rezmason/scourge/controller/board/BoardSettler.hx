@@ -4,7 +4,7 @@ import haxe.Utf8;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.ecce.Query;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 import net.rezmason.praxis.Reckoner;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
@@ -20,7 +20,7 @@ using net.rezmason.grid.GridUtils;
 
 class BoardSettler extends Reckoner {
 
-    static var nudgeArray:Array<Vec3> = makeNudgeArray();
+    static var nudgeArray:Array<Vec4> = makeNudgeArray();
 
     var ecce:Ecce;
     var qBoard:Query;
@@ -112,27 +112,27 @@ class BoardSettler extends Reckoner {
         return animationEntities;
     }
 
-    static function makeNudgeArray():Array<Vec3> {
+    static function makeNudgeArray():Array<Vec4> {
         var up:Float = 1;
         var lt:Float = -1;
         var dn:Float = -up;
         var rt:Float = -lt;
         return [
-            new Vec3(0       , 0       , 0), // 
-            new Vec3(0       , up      , 0), // ╹
-            new Vec3(rt      , 0       , 0), // ╺
-            new Vec3(rt      , up      , 0), // ┗
-            new Vec3(0       , dn      , 0), // ╻
-            new Vec3(0       , 0       , 0), // ┃
-            new Vec3(rt      , dn      , 0), // ┏
-            new Vec3(rt * 0.5, 0       , 0), // ┣
-            new Vec3(lt      , 0       , 0), // ╸
-            new Vec3(lt      , up      , 0), // ┛
-            new Vec3(0       , 0       , 0), // ━
-            new Vec3(0       , up * 0.5, 0), // ┻
-            new Vec3(lt      , dn      , 0), // ┓
-            new Vec3(lt * 0.5, 0       , 0), // ┫
-            new Vec3(0       , dn * 0.5, 0), // ┳
+            new Vec4(0       , 0       , 0), // 
+            new Vec4(0       , up      , 0), // ╹
+            new Vec4(rt      , 0       , 0), // ╺
+            new Vec4(rt      , up      , 0), // ┗
+            new Vec4(0       , dn      , 0), // ╻
+            new Vec4(0       , 0       , 0), // ┃
+            new Vec4(rt      , dn      , 0), // ┏
+            new Vec4(rt * 0.5, 0       , 0), // ┣
+            new Vec4(lt      , 0       , 0), // ╸
+            new Vec4(lt      , up      , 0), // ┛
+            new Vec4(0       , 0       , 0), // ━
+            new Vec4(0       , up * 0.5, 0), // ┻
+            new Vec4(lt      , dn      , 0), // ┓
+            new Vec4(lt * 0.5, 0       , 0), // ┫
+            new Vec4(0       , dn * 0.5, 0), // ┳
             null, // ╋
         ];
     }

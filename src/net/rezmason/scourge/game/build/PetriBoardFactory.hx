@@ -1,7 +1,7 @@
 package net.rezmason.scourge.game.build;
 
 import net.rezmason.grid.GridDirection.*;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 import net.rezmason.scourge.game.build.PetriTypes;
 
 using net.rezmason.grid.GridUtils;
@@ -28,10 +28,10 @@ class PetriBoardFactory {
 
         // First, find the bounds of the rectangle containing all heads as if they were arranged on a circle
 
-        var headCoords:Array<Vec3> = [];
+        var headCoords:Array<Vec4> = [];
         for (ike in 0...numPlayers) {
             var angle:Float = Math.PI * (ike * headAngle + START_ANGLE);
-            var coord:Vec3 = new Vec3(0, 0, 0);
+            var coord:Vec4 = new Vec4(0, 0, 0);
             headCoords.push(coord);
             coord.x = Math.cos(angle) * innerRadius;
             coord.y = Math.sin(angle) * innerRadius;
@@ -111,7 +111,7 @@ class PetriBoardFactory {
     }
 
     inline static function addCell(grid:PetriGrid, x:Float, y:Float):PetriCell {
-        return grid.addCell({pos:new Vec3(x, y, 0), isWall:false, isHead:false, owner:-1});
+        return grid.addCell({pos:new Vec4(x, y, 0), isWall:false, isHead:false, owner:-1});
     }
 
     inline static function obstructGridRim(grid:PetriCell):Void {
@@ -121,9 +121,9 @@ class PetriBoardFactory {
         for (cell in grid.run(E).walk(S)) cell.value.isWall = true;
     }
 
-    inline static function populateGridHeads(grid:PetriCell, headCoords:Array<Vec3>):Void {
+    inline static function populateGridHeads(grid:PetriCell, headCoords:Array<Vec4>):Void {
         for (ike in 0...headCoords.length) {
-            var coord:Vec3 = headCoords[ike];
+            var coord:Vec4 = headCoords[ike];
             var head = grid.run(E, Std.int(coord.x)).run(S, Std.int(coord.y)).value;
             head.isHead = true;
             head.owner = ike;

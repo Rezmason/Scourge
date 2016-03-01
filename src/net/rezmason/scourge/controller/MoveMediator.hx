@@ -4,7 +4,7 @@ import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
 import net.rezmason.ecce.Query;
 import net.rezmason.grid.GridDirection;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 import net.rezmason.praxis.PraxisTypes;
 import net.rezmason.praxis.aspect.Aspect.*;
 import net.rezmason.praxis.play.Game;
@@ -106,7 +106,7 @@ class MoveMediator {
             var glyph = bite.getGlyphByID(id);
             glyph.SET({color:WHITE, x:id, s:0, p:-0.03, hitboxS:0, a:0.2});
         }
-        bite.getGlyphByID(0).set_color(new Vec3(1, 0, 0));
+        bite.getGlyphByID(0).set_color(new Vec4(1, 0, 0));
         pieceTableIndex_ = game.plan.onGlobal(PieceAspect.PIECE_TABLE_INDEX);
         pieceReflection_ = game.plan.onGlobal(PieceAspect.PIECE_REFLECTION);
         pieceRotation_ = game.plan.onGlobal(PieceAspect.PIECE_ROTATION);

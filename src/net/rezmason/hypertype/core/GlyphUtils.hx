@@ -4,7 +4,7 @@ package net.rezmason.hypertype.core;
     import haxe.macro.Expr;
 #else
     import net.rezmason.gl.VertexBuffer;
-    import net.rezmason.math.Vec3;
+    import net.rezmason.math.Vec4;
     import net.rezmason.hypertype.core.Almanac.*;
     import net.rezmason.utils.FatChar;
 #end
@@ -37,15 +37,15 @@ class GlyphUtils {
         set_b(gl, b);
     }
 
-    public inline static function get_color(gl:Glyph):Vec3 {
-        if (gl.color == null) gl.color = new Vec3(0, 0, 0);
+    public inline static function get_color(gl:Glyph):Vec4 {
+        if (gl.color == null) gl.color = new Vec4(0, 0, 0);
         gl.color.r = get_r(gl);
         gl.color.g = get_g(gl);
         gl.color.b = get_b(gl);
         return gl.color;
     }
 
-    public inline static function set_color(gl:Glyph, color:Vec3) {
+    public inline static function set_color(gl:Glyph, color:Vec4) {
         set_r(gl, color.r);
         set_g(gl, color.g);
         set_b(gl, color.b);
@@ -122,7 +122,7 @@ class GlyphUtils {
         set_z(gl, z);
     }
 
-    public inline static function set_pos(gl:Glyph, pos:Vec3) {
+    public inline static function set_pos(gl:Glyph, pos:Vec4) {
         set_x(gl, pos.x);
         set_y(gl, pos.y);
         set_z(gl, pos.z);
@@ -176,7 +176,7 @@ class GlyphUtils {
     public inline static function get_hitboxID(gl:Glyph) return gl.hitboxID;
 
     public inline static function set_hitboxID(gl:Glyph, val:Int) {
-        #if debug if (val > 0xFFFF) throw 'Glyph cannot be hitboxed color ${Vec3.fromHex(val)}'; #end
+        #if debug if (val > 0xFFFF) throw 'Glyph cannot be hitboxed color ${Vec4.fromHex(val)}'; #end
         if (gl.hitboxID != val) {
 
             var hitboxR = ((val >>  8) & 0xFF) / 0xFF;

@@ -11,7 +11,7 @@ class SDFFontMethod extends SceneRenderMethod {
 
     public function new():Void {
         super();
-        backgroundAlpha = 0;
+        backgroundColor.a = 0;
     }
 
     override public function start(renderTarget, args):Void {

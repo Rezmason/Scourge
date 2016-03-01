@@ -135,8 +135,8 @@ class Program extends Artifact {
         else GL.disable(GL.DEPTH_TEST);
     }
 
-    public inline function clear(r:Float, g:Float, b:Float, a:Float) {
-        GL.clearColor(r, g, b, a);
+    public inline function clear(color:Vector4) {
+        GL.clearColor(color.x, color.y, color.z, color.w);
         GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
     }
 

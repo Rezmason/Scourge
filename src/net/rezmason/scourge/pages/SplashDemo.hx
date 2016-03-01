@@ -3,7 +3,7 @@ package net.rezmason.scourge.pages;
 import lime.Assets;
 import lime.math.Rectangle;
 import lime.math.Vector4;
-import net.rezmason.math.Vec3;
+import net.rezmason.math.Vec4;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Glyph;
 import net.rezmason.hypertype.core.Interaction;
@@ -14,15 +14,15 @@ using net.rezmason.hypertype.core.GlyphUtils;
 class SplashDemo extends Demo {
 
     static var SPLASH_COLORS = [
-        'S' => new Vec3(1.00, 0.00, 0.56),
-        'C' => new Vec3(1.00, 0.78, 0.00),
-        'O' => new Vec3(0.18, 1.00, 0.00),
-        'U' => new Vec3(0.00, 0.75, 1.00),
-        'R' => new Vec3(1.00, 0.37, 0.00),
-        'G' => new Vec3(0.75, 0.00, 1.00),
-        'E' => new Vec3(0.18, 0.18, 1.00),
+        'S' => new Vec4(1.00, 0.00, 0.56),
+        'C' => new Vec4(1.00, 0.78, 0.00),
+        'O' => new Vec4(0.18, 1.00, 0.00),
+        'U' => new Vec4(0.00, 0.75, 1.00),
+        'R' => new Vec4(1.00, 0.37, 0.00),
+        'G' => new Vec4(0.75, 0.00, 1.00),
+        'E' => new Vec4(0.18, 0.18, 1.00),
     ];
-    static var WHITE = new Vec3(1, 1, 1);
+    static var WHITE = new Vec4(1, 1, 1);
 
     var glyphTowers:Array<Array<Glyph>>;
     var lines:Array<String>;
@@ -55,7 +55,7 @@ class SplashDemo extends Demo {
 
                 var charCode:Int = lines[row].charCodeAt(col);
 
-                var color:Vec3 = SPLASH_COLORS[lines[row].charAt(col)];
+                var color:Vec4 = SPLASH_COLORS[lines[row].charAt(col)];
                 if (color == null) color = WHITE;
 
                 var s:Float = 1;
