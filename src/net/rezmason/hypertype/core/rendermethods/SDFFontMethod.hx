@@ -44,10 +44,10 @@ class SDFFontMethod extends SceneRenderMethod {
         super.drawBody(body);
     }
 
-    override function setSegment(segment:BodySegment):Void {
-        var geometryBuffer = (segment == null) ? null : segment.geometryBuffer;
-        var fontBuffer = (segment == null) ? null : segment.fontBuffer;
-        var colorBuffer = (segment == null) ? null : segment.colorBuffer;
+    override function setGlyphBatch(batch:GlyphBatch):Void {
+        var geometryBuffer = (batch == null) ? null : batch.geometryBuffer;
+        var fontBuffer = (batch == null) ? null : batch.fontBuffer;
+        var colorBuffer = (batch == null) ? null : batch.colorBuffer;
         program.setVertexBuffer('aPosition',     geometryBuffer, 0, 3);
         program.setVertexBuffer('aCorner',  geometryBuffer, 3, 2);
         program.setVertexBuffer('aHorizontalStretch', geometryBuffer, 5, 1);

@@ -2,7 +2,7 @@ package net.rezmason.hypertype.core.rendermethods;
 
 import lime.Assets.getText;
 import net.rezmason.gl.BlendFactor;
-import net.rezmason.hypertype.core.BodySegment;
+import net.rezmason.hypertype.core.GlyphBatch;
 import net.rezmason.hypertype.core.SceneRenderMethod;
 import net.rezmason.math.Vec4;
 
@@ -32,9 +32,9 @@ class HitboxMethod extends SceneRenderMethod {
         super.drawBody(body);
     }
 
-    override function setSegment(segment:BodySegment):Void {
-        var geometryBuffer = (segment == null) ? null : segment.geometryBuffer;
-        var hitboxBuffer = (segment == null) ? null : segment.hitboxBuffer;
+    override function setGlyphBatch(batch:GlyphBatch):Void {
+        var geometryBuffer = (batch == null) ? null : batch.geometryBuffer;
+        var hitboxBuffer = (batch == null) ? null : batch.hitboxBuffer;
         program.setVertexBuffer('aPosition',    geometryBuffer, 0, 3);
         program.setVertexBuffer('aCorner', geometryBuffer, 3, 2);
         program.setVertexBuffer('aGlyphID',  hitboxBuffer, 0, 2);

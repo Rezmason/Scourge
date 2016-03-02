@@ -6,7 +6,7 @@ import net.rezmason.gl.VertexBuffer;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 
-class BodySegment {
+class GlyphBatch {
 
     public var id(default, null):Int;
 
@@ -17,14 +17,13 @@ class BodySegment {
     public var indexBuffer(default, null):IndexBuffer;
 
     public var numGlyphs(default, set):Int;
-    public var glyphs(get, null):Array<Glyph>;
+    public var glyphs(default, null):Array<Glyph>;
 
-    var _trueGlyphs:Array<Glyph>;
-    var _glyphs:Array<Glyph>;
+    var trueGlyphs:Array<Glyph>;
 
-    public function new(segmentID:Int, numGlyphs:Int, donor:BodySegment = null):Void {
+    public function new(id:Int, numGlyphs:Int, donor:GlyphBatch = null):Void {
         if (numGlyphs < 0) numGlyphs = 0;
-        id = segmentID;
+        this.id = id;
         createBuffersAndVectors(numGlyphs);
         createGlyphs(numGlyphs, donor);
         this.numGlyphs = numGlyphs;
@@ -43,22 +42,23 @@ class BodySegment {
         indexBuffer = new IndexBuffer(numGlyphIndices, bufferUsage);
     }
 
-    inline function createGlyphs(numGlyphs:Int, donor:BodySegment):Void {
-        _trueGlyphs = [];
+    inline function createGlyphs(numGlyphs:Int, donor:GlyphBatch):Void {
+        trueGlyphs = [];
         for (ike in 0...numGlyphs) {
             var glyph:Glyph = null;
-            if (donor != null) glyph = donor._trueGlyphs[ike];
+            if (donor != null) glyph = donor.trueGlyphs[ike];
             if (glyph == null) glyph = new Glyph(ike);
             glyph.geometryBuf = geometryBuffer;
             glyph.fontBuf = fontBuffer;
             glyph.colorBuf = colorBuffer;
             glyph.hitboxBuf = hitboxBuffer;
             glyph.init();
-            _trueGlyphs.push(glyph);
+            trueGlyphs.push(glyph);
         }
-
+        if (donor != null) donor.destroy();
+        
         var order:Array<UInt> = Almanac.VERT_ORDER;
-        for (glyph in _trueGlyphs) {
+        for (glyph in trueGlyphs) {
             var indexAddress:Int = glyph.id * Almanac.INDICES_PER_GLYPH;
             var firstVertIndex:Int = glyph.id * Almanac.VERTICES_PER_GLYPH;
             for (ike in 0...order.length) indexBuffer.mod(indexAddress + ike, firstVertIndex + order[ike]);
@@ -85,12 +85,10 @@ class BodySegment {
         }
     }
 
-    inline function get_glyphs():Array<Glyph> return _glyphs;
-
     inline function set_numGlyphs(val:Int):Int {
         if (val < 0) val = 0;
-        if (val > _trueGlyphs.length) throw "Body segments cannot expand beyond their initial size.";
-        _glyphs = _trueGlyphs.slice(0, val);
+        if (val > trueGlyphs.length) throw "Glyph batches cannot expand beyond their initial size.";
+        glyphs = trueGlyphs.slice(0, val);
         numGlyphs = val;
         return val;
     }
@@ -108,8 +106,8 @@ class BodySegment {
         hitboxBuffer = null;
         indexBuffer = null;
         numGlyphs = -1;
-        _trueGlyphs = null;
-        _glyphs = null;
+        trueGlyphs = null;
+        glyphs = null;
         id = -1;
     }
 }

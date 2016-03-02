@@ -4,7 +4,7 @@ class SceneRenderMethod extends RenderMethod {
 
     override public function end():Void {
         super.end();
-        setSegment(null);
+        setGlyphBatch(null);
     }
 
     public function drawScene(scene:Scene) {
@@ -17,12 +17,12 @@ class SceneRenderMethod extends RenderMethod {
     }
 
     function drawBody(body:Body):Void {
-        for (segment in body.segments) {
-            setSegment(segment);
-            program.draw(segment.indexBuffer, 0, segment.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+        for (batch in body.glyphBatches) {
+            setGlyphBatch(batch);
+            program.draw(batch.indexBuffer, 0, batch.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
         }
     }
 
     function shouldDrawBody(body:Body) return true;
-    function setSegment(segment:BodySegment):Void {}
+    function setGlyphBatch(batch:GlyphBatch):Void {}
 }

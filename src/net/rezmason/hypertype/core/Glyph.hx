@@ -3,7 +3,7 @@ package net.rezmason.hypertype.core;
 import net.rezmason.gl.VertexBuffer;
 import net.rezmason.math.Vec4;
 
-@:allow(net.rezmason.hypertype.core.BodySegment)
+@:allow(net.rezmason.hypertype.core.GlyphBatch)
 @:allow(net.rezmason.hypertype.core.GlyphUtils)
 class Glyph {
 

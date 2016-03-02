@@ -28,7 +28,7 @@ class Body extends SceneNode<Body> {
     public var sceneSetSignal(default, null):Zig<Void->Void> = new Zig();
     public var drawSignal(default, null):Zig<Void->Void> = new Zig();
 
-    @:allow(net.rezmason.hypertype.core) var segments(default, null):Array<BodySegment> = [];
+    @:allow(net.rezmason.hypertype.core) var glyphBatches(default, null):Array<GlyphBatch> = [];
     @:allow(net.rezmason.hypertype.core) var params(default, null):Vector4;
     
     var trueNumGlyphs:Int = 0;
@@ -71,42 +71,41 @@ class Body extends SceneNode<Body> {
     public function growTo(numGlyphs:Int):Void {
         if (trueNumGlyphs < numGlyphs) {
 
-            var oldSegments:Array<BodySegment> = segments;
+            var oldBatches:Array<GlyphBatch> = glyphBatches;
             var oldGlyphs:Array<Glyph> = glyphs;
 
             glyphs = [];
-            segments = [];
+            glyphBatches = [];
 
             var remainingGlyphs:Int = numGlyphs;
             var startGlyph:Int = 0;
-            var segmentID:Int = 0;
+            var batchID:Int = 0;
 
             while (startGlyph < numGlyphs) {
                 var len:Int = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
-                var segment:BodySegment = null;
-                var donor:BodySegment = oldSegments[segmentID];
+                var batch:GlyphBatch = null;
+                var donor:GlyphBatch = oldBatches[batchID];
 
                 if (donor != null && donor.numGlyphs == len) {
-                    segment = donor;
-                    segment.numGlyphs = len;
+                    batch = donor;
+                    batch.numGlyphs = len;
                 } else {
-                    segment = new BodySegment(segmentID, len, donor);
-                    if (donor != null) donor.destroy();
+                    batch = new GlyphBatch(batchID, len, donor);
                 }
 
-                segments.push(segment);
-                glyphs = glyphs.concat(segment.glyphs);
+                glyphBatches.push(batch);
+                glyphs = glyphs.concat(batch.glyphs);
                 startGlyph += Almanac.BUFFER_CHUNK;
                 remainingGlyphs -= Almanac.BUFFER_CHUNK;
-                segmentID++;
+                batchID++;
             }
 
             trueNumGlyphs = numGlyphs;
 
         } else {
             var remainingGlyphs:Int = numGlyphs;
-            for (segment in segments) {
-                segment.numGlyphs = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
+            for (batch in glyphBatches) {
+                batch.numGlyphs = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
                 remainingGlyphs -= Almanac.BUFFER_CHUNK;
             }
         }
@@ -118,7 +117,7 @@ class Body extends SceneNode<Body> {
     function update(delta:Float):Void updateSignal.dispatch(delta);
 
     @:allow(net.rezmason.hypertype.core)
-    function upload():Void for (segment in segments) segment.upload();
+    function upload():Void for (batch in glyphBatches) batch.upload();
 
     @:allow(net.rezmason.hypertype.core)
     function setScene(scene:Scene):Void {

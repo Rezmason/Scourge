@@ -1,10 +1,15 @@
 Wrap interactive board UI in loupe
-Shelf of tools, and, like, you drag 'em
-Add UIElement to Loupe that "encases" content
-Make the border box grow to surround the UIElement, not just the board glyphs
-Create puppet
 
-There could be WAY more symbols than spaces, and it might look nicer
+UI basis
+    New text primitive, similar to BorderBox
+    Set console stuff aside
+    Make it easier to draw two different things with the same body
+    Draw out the UI
+        Shelf of tools, and, like, you drag 'em
+    Build each Loupe
+        Build each state
+
+Create puppet
 
 We can support more Bodies by making IDs dynamic
     Engine, render methods create them from display list
