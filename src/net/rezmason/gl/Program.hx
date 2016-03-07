@@ -49,9 +49,19 @@ class Program extends Artifact {
         this.vertSource = vertSource;
         this.fragSource = fragSource;
         
-        uniformLocations = new Map();
-        attribsLocations = new Map();
         nativeProgram = GLUtils.createProgram(vertSource, fragSource);
+
+        uniformLocations = new Map();
+        for (ike in 0...GL.getProgramParameter(nativeProgram, GL.ACTIVE_UNIFORMS)) {
+            var activeUniform = GL.getActiveUniform(nativeProgram, ike);
+            var uniformLocation = GL.getUniformLocation(nativeProgram, activeUniform.name);
+            uniformLocations[activeUniform.name.split('[')[0]] = uniformLocation;
+        }
+
+        attribsLocations = new Map();
+        for (ike in 0...GL.getProgramParameter(nativeProgram, GL.ACTIVE_ATTRIBUTES)) {
+            attribsLocations[GL.getActiveAttrib(nativeProgram, ike).name.split('[')[0]] = ike;
+        }
     }
 
     public inline function setMatrix4(uName:String, matrix:Matrix4):Void {
@@ -145,17 +155,7 @@ class Program extends Artifact {
         GL.drawElements(GL.TRIANGLES, numTriangles * 3, GL.UNSIGNED_SHORT, firstIndex);
     }
 
-    inline function getUniformLocation(name:String):Null<GLUniformLocation> {
-        if (!uniformLocations.exists(name)) {
-            uniformLocations[name] = GL.getUniformLocation(nativeProgram, name);
-        }
-        return uniformLocations[name];
-    }
+    inline function getUniformLocation(name:String):Null<GLUniformLocation> return uniformLocations[name];
 
-    inline function getAttribsLocation(name:String):Null<Int> {
-        if (!attribsLocations.exists(name)) {
-            attribsLocations[name] = GL.getAttribLocation(nativeProgram, name);
-        }
-        return attribsLocations[name];
-    }
+    inline function getAttribsLocation(name:String):Null<Int> return attribsLocations[name];
 }
