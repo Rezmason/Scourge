@@ -8,6 +8,7 @@ import net.rezmason.gl.*;
 import net.rezmason.scourge.waves.Ripple;
 import net.rezmason.scourge.waves.WaveFunctions;
 import net.rezmason.scourge.waves.WavePool;
+import net.rezmason.math.Vec4;
 
 class MetaballLab extends Lab {
 
@@ -257,7 +258,7 @@ class MetaballLab extends Lab {
         program.setVertexBuffer('aCav',     vertexBuffer, 6, 1); // aCav contains c
 
         program.setRenderTarget(rtt.renderTarget);
-        program.clear(0, 0, 0, 1);
+        program.clear(new Vec4(0, 0, 0, 1));
         program.draw(indexBuffer, 0, TpB * NUM_BALLS);
 
         program.setVertexBuffer('aPos',     null, 0, 3);

@@ -4,6 +4,7 @@ import lime.Assets.*;
 import lime.math.Matrix4;
 import lime.math.Vector4;
 import net.rezmason.gl.*;
+import net.rezmason.math.Vec4;
 
 class MetaballSlimeLab extends Lab {
 
@@ -184,7 +185,7 @@ class MetaballSlimeLab extends Lab {
         program.setVertexBuffer('aUV',      vertexBuffer, 3, 2); // aUV contains u,v
 
         program.setRenderTarget(renderTarget);
-        program.clear(0, 0, 0, 1);
+        program.clear(new Vec4(0, 0, 0, 1));
         program.draw(indexBuffer, 0, 2);
 
         program.setVertexBuffer('aPos',     null, 0, 3);

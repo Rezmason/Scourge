@@ -3,6 +3,7 @@ package net.rezmason.scourge.lab;
 import lime.math.Matrix4;
 import lime.math.Vector4;
 import net.rezmason.gl.*;
+import net.rezmason.math.Vec4;
 
 class RTTLab extends Lab {
 
@@ -78,14 +79,14 @@ class RTTLab extends Lab {
         program.setVertexBuffer('aPos',     vertexBuffer, 0, 2);
         
         program.setRenderTarget(rtt.renderTarget);
-        program.clear(0, 0, 0, 1);
+        program.clear(new Vec4(0, 0, 0, 1));
         color.x = 1;
         program.setVector4('uColor', color);
         program.draw(indexBuffer, 0, 2);
         color.x = 0;
 
         program.setRenderTarget(viewportRT);
-        program.clear(0, 0, 0, 1);
+        program.clear(new Vec4(0, 0, 0, 1));
         program.setTexture('uRTT', rtt);
         color.y = 1;
         program.setVector4('uColor', color);

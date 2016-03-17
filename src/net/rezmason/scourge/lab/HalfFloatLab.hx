@@ -4,6 +4,7 @@ import haxe.io.BytesOutput;
 import net.rezmason.gl.*;
 import net.rezmason.math.FelzenszwalbSDF;
 import net.rezmason.utils.HalfFloatUtil;
+import net.rezmason.math.Vec4;
 
 class HalfFloatLab extends Lab {
 
@@ -129,7 +130,7 @@ class HalfFloatLab extends Lab {
         program.setVertexBuffer('aUV',  vertexBuffer, 2, 2);
 
         program.setRenderTarget(renderTarget);
-        program.clear(0, 0, 0, 1);
+        program.clear(new Vec4(0, 0, 0, 1));
         program.draw(indexBuffer, 0, TOTAL_TRIANGLES);
         
         program.setTexture('uDataSampler', null, 1);
