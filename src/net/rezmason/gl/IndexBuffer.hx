@@ -28,12 +28,13 @@ class IndexBuffer extends Artifact {
 
     public inline function upload():Void {
         GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, nativeBuffer);
-        GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, GL.STATIC_DRAW);
+        GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, usage);
         invalid = false;
     }
 
     override public function dispose():Void {
         super.dispose();
+        GL.deleteBuffer(nativeBuffer);
         nativeBuffer = null;
         data = null;
         numIndices = -1;

@@ -35,7 +35,7 @@ class ColorSolidDemo extends Demo {
     }
 
     inline function setSize(num:Int):Void {
-        body.growTo(num);
+        body.size = num;
 
         var dTheta:Float = Math.PI * (3 - Math.sqrt(5));
         var dZ:Float = 2 / (num + 1);
@@ -94,8 +94,8 @@ class ColorSolidDemo extends Demo {
             case KEYBOARD(type, keyCode, modifier):
                 if (type == KEY_DOWN) {
                     switch (keyCode) {
-                        case LEFT:  setSize(Std.int(body.numGlyphs * (modifier.shiftKey ? 0.666 : 0.9)));
-                        case RIGHT: setSize(Std.int(body.numGlyphs * (modifier.shiftKey ? 1.500 : 1.1)));
+                        case LEFT:  setSize(Std.int(body.size * (modifier.shiftKey ? 0.666 : 0.9)));
+                        case RIGHT: setSize(Std.int(body.size * (modifier.shiftKey ? 1.500 : 1.1)));
                         case _: setGlobalChar(cast keyCode);
                     }
                 }

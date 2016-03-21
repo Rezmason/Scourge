@@ -38,6 +38,7 @@ class VertexBuffer extends Artifact {
 
     override public function dispose():Void {
         super.dispose();
+        GL.deleteBuffer(nativeBuffer);
         data = null;
         nativeBuffer = null;
         footprint = -1;

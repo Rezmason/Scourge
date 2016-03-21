@@ -8,65 +8,50 @@ using net.rezmason.hypertype.core.GlyphUtils;
 
 class GlyphBatch {
 
-    public var id(default, null):Int;
-
     public var colorBuffer(default, null):VertexBuffer;
     public var fontBuffer(default, null):VertexBuffer;
     public var geometryBuffer(default, null):VertexBuffer;
     public var hitboxBuffer(default, null):VertexBuffer;
     public var indexBuffer(default, null):IndexBuffer;
-
-    public var numGlyphs(default, set):Int;
+    public var size(default, set):UInt;
+    public var capacity(default, null):UInt;
     public var glyphs(default, null):Array<Glyph>;
+    var allGlyphs:Array<Glyph>;
 
-    var trueGlyphs:Array<Glyph>;
-
-    public function new(id:Int, numGlyphs:Int, donor:GlyphBatch = null):Void {
-        if (numGlyphs < 0) numGlyphs = 0;
-        this.id = id;
-        createBuffersAndVectors(numGlyphs);
-        createGlyphs(numGlyphs, donor);
-        this.numGlyphs = numGlyphs;
-        upload();
-    }
-
-    inline function createBuffersAndVectors(numGlyphs:Int):Void {
-        var numGlyphVertices:Int = numGlyphs * Almanac.VERTICES_PER_GLYPH;
-        var numGlyphIndices:Int = numGlyphs * Almanac.INDICES_PER_GLYPH;
-        var bufferUsage:BufferUsage = DYNAMIC_DRAW;
-
-        geometryBuffer = new VertexBuffer(numGlyphVertices, Almanac.GEOMETRY_FLOATS_PER_VERTEX, bufferUsage);
-        colorBuffer = new VertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX, bufferUsage);
-        fontBuffer = new VertexBuffer(numGlyphVertices, Almanac.FONT_FLOATS_PER_VERTEX, bufferUsage);
-        hitboxBuffer = new VertexBuffer(numGlyphVertices, Almanac.HITBOX_FLOATS_PER_VERTEX, bufferUsage);
-        indexBuffer = new IndexBuffer(numGlyphIndices, bufferUsage);
-    }
-
-    inline function createGlyphs(numGlyphs:Int, donor:GlyphBatch):Void {
-        trueGlyphs = [];
-        for (ike in 0...numGlyphs) {
-            var glyph:Glyph = null;
-            if (donor != null) glyph = donor.trueGlyphs[ike];
-            if (glyph == null) glyph = new Glyph(ike);
+    public function new(capacity:UInt, offset:UInt, donor:GlyphBatch = null):Void {
+        this.capacity = capacity;
+        var numGlyphVertices:UInt = capacity * Almanac.VERTICES_PER_GLYPH;
+        geometryBuffer = new VertexBuffer(numGlyphVertices, Almanac.GEOMETRY_FLOATS_PER_VERTEX, DYNAMIC_DRAW);
+        colorBuffer = new VertexBuffer(numGlyphVertices, Almanac.COLOR_FLOATS_PER_VERTEX, DYNAMIC_DRAW);
+        fontBuffer = new VertexBuffer(numGlyphVertices, Almanac.FONT_FLOATS_PER_VERTEX, DYNAMIC_DRAW);
+        hitboxBuffer = new VertexBuffer(numGlyphVertices, Almanac.HITBOX_FLOATS_PER_VERTEX, DYNAMIC_DRAW);
+        var numGlyphIndices:UInt = capacity * Almanac.INDICES_PER_GLYPH;
+        indexBuffer = new IndexBuffer(numGlyphIndices, DYNAMIC_DRAW);
+        allGlyphs = [];
+        var donorGlyphs = donor != null ? donor.allGlyphs : [];
+        var indexAddress:UInt = 0;
+        var firstVertIndex:UInt = 0;
+        for (ike in allGlyphs.length...capacity) allGlyphs.push(new Glyph());
+        for (ike in 0...capacity) {
+            var glyph = allGlyphs[ike];
+            glyph.id = ike + offset;
             glyph.geometryBuf = geometryBuffer;
             glyph.fontBuf = fontBuffer;
             glyph.colorBuf = colorBuffer;
             glyph.hitboxBuf = hitboxBuffer;
             glyph.init();
-            trueGlyphs.push(glyph);
-        }
-        if (donor != null) donor.destroy();
-        
-        var order:Array<UInt> = Almanac.VERT_ORDER;
-        for (glyph in trueGlyphs) {
-            var indexAddress:Int = glyph.id * Almanac.INDICES_PER_GLYPH;
-            var firstVertIndex:Int = glyph.id * Almanac.VERTICES_PER_GLYPH;
+            if (donorGlyphs[ike] != null) glyph.copyFrom(donorGlyphs[ike]);
+            var order:Array<UInt> = Almanac.VERT_ORDER;
             for (ike in 0...order.length) indexBuffer.mod(indexAddress + ike, firstVertIndex + order[ike]);
+            indexAddress += Almanac.INDICES_PER_GLYPH;
+            firstVertIndex += Almanac.VERTICES_PER_GLYPH;
         }
+        set_size(capacity);
+        if (donor != null) donor.destroy();
     }
 
     public inline function invalidate():Void {
-        if (numGlyphs > 0) {
+        if (size > 0) {
             geometryBuffer.invalidate();
             fontBuffer.invalidate();
             colorBuffer.invalidate();
@@ -76,7 +61,7 @@ class GlyphBatch {
     }
 
     public inline function upload():Void {
-        if (numGlyphs > 0) {
+        if (size > 0) {
             geometryBuffer.upload();
             fontBuffer.upload();
             colorBuffer.upload();
@@ -85,29 +70,31 @@ class GlyphBatch {
         }
     }
 
-    inline function set_numGlyphs(val:Int):Int {
-        if (val < 0) val = 0;
-        if (val > trueGlyphs.length) throw "Glyph batches cannot expand beyond their initial size.";
-        glyphs = trueGlyphs.slice(0, val);
-        numGlyphs = val;
+    inline function set_size(val:UInt):UInt {
+        if (size != val) {
+            if (val < 0) throw 'Invalid GlyphBatch size $val.';
+            if (val > capacity) throw "Glyph batches cannot expand beyond their capacity.";
+            glyphs = allGlyphs.slice(0, val);
+            if (size < val) for (ike in size...val) glyphs[ike].reset();
+            size = val;
+        }
         return val;
     }
 
     public function destroy():Void {
+        size = 0;
         geometryBuffer.dispose();
         fontBuffer.dispose();
         colorBuffer.dispose();
         hitboxBuffer.dispose();
         indexBuffer.dispose();
-
         fontBuffer = null;
         colorBuffer = null;
         geometryBuffer = null;
         hitboxBuffer = null;
         indexBuffer = null;
-        numGlyphs = -1;
-        trueGlyphs = null;
+        allGlyphs = null;
         glyphs = null;
-        id = -1;
+        capacity = 0;
     }
 }

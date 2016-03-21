@@ -54,7 +54,7 @@ class MatrixSheet {
         columns = [];
         var glowCode = Utf8.charCodeAt('U', 0);
 
-        body.growTo(numRows * numColumns);
+        body.size = numRows * numColumns;
         for (column in 0...numColumns) {
             var glyphs = [];
             for (row in 0...numRows) {

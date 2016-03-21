@@ -72,7 +72,7 @@ class BoardInitializer {
 
         // Second pass: populate views with glyphs, draw the walls (which don't change)
         var itr = 0;
-        board.growTo(numSpacesThatMatter * 3);
+        board.size = numSpacesThatMatter * 3;
         var stretch = board.font.glyphRatio;
         for (entity in qBoard) {
             var view = entity.get(BoardSpaceView);

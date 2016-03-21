@@ -8,7 +8,6 @@ import net.rezmason.math.Vec4;
 class Glyph {
 
     public var id(default, null):Int;
-
     var geometryBuf:VertexBuffer;
     var colorBuf:VertexBuffer;
     var fontBuf:VertexBuffer;
@@ -18,5 +17,5 @@ class Glyph {
     var charCode:Int;
     var font:GlyphFont;
 
-    function new(id:Int = 0):Void this.id = id;
+    function new() {}
 }

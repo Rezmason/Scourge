@@ -25,9 +25,9 @@ class BorderBox {
         var numGlyphsWide = Std.int(Math.ceil(width / glyphWidth));
         var numGlyphsHigh = Std.int(Math.ceil(height / glyphWidth));
         var requiredGlyphs = 4 + 2 * (numGlyphsWide + numGlyphsHigh);
-        if (body.numGlyphs != requiredGlyphs) {
-            body.growTo(requiredGlyphs * 2);
-            for (ike in requiredGlyphs...body.numGlyphs) body.getGlyphByID(ike).reset();
+        if (body.size != requiredGlyphs) {
+            body.size = requiredGlyphs * 2;
+            for (ike in requiredGlyphs...body.size) body.getGlyphByID(ike).reset();
         }
         var stretch = body.font.glyphRatio;
         var top = (height + glyphWidth) / 2;

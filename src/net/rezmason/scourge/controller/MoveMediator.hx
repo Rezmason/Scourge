@@ -96,13 +96,13 @@ class MoveMediator {
         allowFlipping = this.config.pieceParams.allowFlipping;
         allowRotating = this.config.pieceParams.allowRotating;
         allowSkipping = this.config.pieceParams.allowSkipping;
-        piece.growTo(pieceLib.maxSize());
-        for (id in 0...piece.numGlyphs) {
+        piece.size = pieceLib.maxSize();
+        for (id in 0...piece.size) {
             var glyph = piece.getGlyphByID(id);
             glyph.SET({color:WHITE, x:id, s:0, p:-0.03, hitboxS:0, a:0.2});
         }
-        bite.growTo(this.config.biteParams.maxReach + 1);
-        for (id in 0...bite.numGlyphs) {
+        bite.size = this.config.biteParams.maxReach + 1;
+        for (id in 0...bite.size) {
             var glyph = bite.getGlyphByID(id);
             glyph.SET({color:WHITE, x:id, s:0, p:-0.03, hitboxS:0, a:0.2});
         }

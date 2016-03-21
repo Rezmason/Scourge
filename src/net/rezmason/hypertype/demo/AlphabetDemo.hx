@@ -25,7 +25,7 @@ class AlphabetDemo extends Demo {
         var white = new Vec4(1, 1, 1);
 
         body = new Body();
-        body.growTo(totalChars);
+        body.size = totalChars;
         body.glyphScale = 0.025;
         body.transform.identity();
         body.transform.appendScale(1, -1, 1);

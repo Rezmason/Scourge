@@ -32,7 +32,7 @@ class SplashDemo extends Demo {
         lines = Assets.getText('text/splash.txt').split('\n');
         lines.pop();
 
-        body.growTo(3 * lines.length * lines[0].length);
+        body.size = 3 * lines.length * lines[0].length;
         body.glyphScale = 0.015;
 
         var numRows:Int = lines.length;

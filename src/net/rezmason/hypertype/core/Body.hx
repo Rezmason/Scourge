@@ -3,6 +3,7 @@ package net.rezmason.hypertype.core;
 import lime.math.Matrix4;
 import lime.math.Vector4;
 import net.rezmason.ds.SceneNode;
+import net.rezmason.hypertype.core.Almanac.*;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
@@ -12,7 +13,8 @@ class Body extends SceneNode<Body> {
 
     static var _ids:Int = 0;
 
-    public var numGlyphs(default, null):Int = 0;
+    public var size(default, set):UInt = 0;
+    public var capacity(default, null):UInt = 0;
     public var id(default, null):Int = ++_ids;
     public var transform(default, null):Matrix4 = new Matrix4();
     public var concatenatedTransform(get, null):Matrix4;
@@ -31,12 +33,13 @@ class Body extends SceneNode<Body> {
     @:allow(net.rezmason.hypertype.core) var glyphBatches(default, null):Array<GlyphBatch> = [];
     @:allow(net.rezmason.hypertype.core) var params(default, null):Vector4;
     
-    var trueNumGlyphs:Int = 0;
+    var growRate:Float;
     var concatMat:Matrix4 = new Matrix4();
     var glyphs:Array<Glyph> = [];
 
-    public function new():Void {
+    public function new(growRate = 1.5):Void {
         super();
+        this.growRate = growRate;
         var fontManager:FontManager = new Present(FontManager);
         fontManager.onFontChange.add(updateFont);
         font = fontManager.defaultFont;
@@ -68,49 +71,43 @@ class Body extends SceneNode<Body> {
 
     public inline function eachGlyph():Iterator<Glyph> return glyphs.iterator();
 
-    public function growTo(numGlyphs:Int):Void {
-        if (trueNumGlyphs < numGlyphs) {
-
-            var oldBatches:Array<GlyphBatch> = glyphBatches;
-            var oldGlyphs:Array<Glyph> = glyphs;
+    public function set_size(val:UInt) {
+        if (size != val) {
+            if (capacity < val) {
+                capacity = val;
+                var remainingCapacity = val;
+                var batchIndex = 0;
+                var offset = 0;
+                var oldGlyphBatches = glyphBatches;
+                glyphBatches = [];
+                while (remainingCapacity > 0) {
+                    var batchCapacity = remainingCapacity < BUFFER_CHUNK ? remainingCapacity : BUFFER_CHUNK;
+                    var batch = oldGlyphBatches[batchIndex];
+                    if (batch == null) batch = new GlyphBatch(batchCapacity, offset);
+                    else if (batch.capacity < batchCapacity) batch = new GlyphBatch(batchCapacity, offset, batch);
+                    glyphBatches.push(batch);
+                    remainingCapacity -= batch.capacity;
+                    offset += batch.capacity;
+                    batchIndex++;
+                }
+            } else {
+                var remainingSize = val;
+                var batchIndex = 0;
+                while (remainingSize > 0) {
+                    var batch = glyphBatches[batchIndex];
+                    batch.size = remainingSize < batch.capacity ? remainingSize : batch.capacity;
+                    remainingSize -= batch.size;
+                    batchIndex++;
+                }
+            }
 
             glyphs = [];
-            glyphBatches = [];
-
-            var remainingGlyphs:Int = numGlyphs;
-            var startGlyph:Int = 0;
-            var batchID:Int = 0;
-
-            while (startGlyph < numGlyphs) {
-                var len:Int = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
-                var batch:GlyphBatch = null;
-                var donor:GlyphBatch = oldBatches[batchID];
-
-                if (donor != null && donor.numGlyphs == len) {
-                    batch = donor;
-                    batch.numGlyphs = len;
-                } else {
-                    batch = new GlyphBatch(batchID, len, donor);
-                }
-
-                glyphBatches.push(batch);
-                glyphs = glyphs.concat(batch.glyphs);
-                startGlyph += Almanac.BUFFER_CHUNK;
-                remainingGlyphs -= Almanac.BUFFER_CHUNK;
-                batchID++;
-            }
-
-            trueNumGlyphs = numGlyphs;
-
-        } else {
-            var remainingGlyphs:Int = numGlyphs;
-            for (batch in glyphBatches) {
-                batch.numGlyphs = Std.int(Math.min(remainingGlyphs, Almanac.BUFFER_CHUNK));
-                remainingGlyphs -= Almanac.BUFFER_CHUNK;
-            }
+            for (batch in glyphBatches) glyphs = glyphs.concat(batch.glyphs);
+            for (glyph in glyphs) glyph.set_font(font);
+            size = val;
         }
-        this.numGlyphs = numGlyphs;
-        for (glyph in glyphs) glyph.set_font(font);
+        
+        return val;
     }
 
     @:allow(net.rezmason.hypertype.core)

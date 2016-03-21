@@ -234,10 +234,10 @@ class UIElement {
         numCols = Std.int(viewPixelWidth  / glyphWidthInPixels );
         numTextCols = Std.int(Math.max(0, numCols + (hasScrollBar ? -1 : 0)));
         
-        body.growTo(numRows * numTextCols + 2 + 1);
-        for (ike in numRows * numTextCols...body.numGlyphs) body.getGlyphByID(ike).reset();
+        body.size = numRows * numTextCols + 2 + 1;
+        for (ike in numRows * numTextCols...body.size) body.getGlyphByID(ike).reset();
 
-        caretGlyph = body.getGlyphByID(body.numGlyphs - 1);
+        caretGlyph = body.getGlyphByID(body.size - 1);
         if (hasScrollBar) {
             scrollBar.setGlyphs(body.getGlyphByID(numRows * numTextCols), body.getGlyphByID(numRows * numTextCols + 1));
         }

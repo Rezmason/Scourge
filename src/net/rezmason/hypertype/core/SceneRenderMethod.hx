@@ -9,7 +9,7 @@ class SceneRenderMethod extends RenderMethod {
 
     public function drawScene(scene:Scene) {
         for (body in scene.bodies) {
-            if (body.numGlyphs > 0 && shouldDrawBody(body)) {
+            if (body.size > 0 && shouldDrawBody(body)) {
                 body.upload();
                 drawBody(body);
             }
@@ -19,7 +19,7 @@ class SceneRenderMethod extends RenderMethod {
     function drawBody(body:Body):Void {
         for (batch in body.glyphBatches) {
             setGlyphBatch(batch);
-            program.draw(batch.indexBuffer, 0, batch.numGlyphs * Almanac.TRIANGLES_PER_GLYPH);
+            program.draw(batch.indexBuffer, 0, batch.size * Almanac.TRIANGLES_PER_GLYPH);
         }
     }
 

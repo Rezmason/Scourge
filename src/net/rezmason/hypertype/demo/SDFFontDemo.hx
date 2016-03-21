@@ -31,7 +31,7 @@ class SDFFontDemo extends Demo {
     public function new():Void {
         super();
         body.glyphScale = 0.6;
-        body.growTo(1);
+        body.size = 1;
 
         glyph = body.getGlyphByID(0);
         glyph.set_char(Utf8.charCodeAt(CHARS, currentCharIndex));
