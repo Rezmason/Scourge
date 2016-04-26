@@ -14,6 +14,7 @@ using net.rezmason.hypertype.core.GlyphUtils;
 class SplashDemo extends Demo {
 
     static var SPLASH_COLORS = [
+    /*
         'S' => new Vec4(1.00, 0.00, 0.56),
         'C' => new Vec4(1.00, 0.78, 0.00),
         'O' => new Vec4(0.18, 1.00, 0.00),
@@ -21,6 +22,13 @@ class SplashDemo extends Demo {
         'R' => new Vec4(1.00, 0.37, 0.00),
         'G' => new Vec4(0.75, 0.00, 1.00),
         'E' => new Vec4(0.18, 0.18, 1.00),
+    */
+        'M' => new Vec4(1.00, 0.00, 0.56),
+        'Y' => new Vec4(1.00, 0.78, 0.00),
+        'C' => new Vec4(0.18, 1.00, 0.00),
+        'O' => new Vec4(0.00, 0.75, 1.00),
+        'T' => new Vec4(1.00, 0.37, 0.00),
+        'A' => new Vec4(0.75, 0.00, 1.00),
     ];
     static var WHITE = new Vec4(1, 1, 1);
 
@@ -32,11 +40,12 @@ class SplashDemo extends Demo {
         lines = Assets.getText('text/splash.txt').split('\n');
         lines.pop();
 
-        body.size = 3 * lines.length * lines[0].length;
-        body.glyphScale = 0.015;
-
         var numRows:Int = lines.length;
-        var numCols:Int = lines[0].length;
+        var numCols = 0;
+        for (line in lines) if (numCols < line.length) numCols = line.length;
+
+        body.size = 3 * numRows * numCols;
+        body.glyphScale = 0.015;
 
         glyphTowers = [];
 
@@ -48,7 +57,7 @@ class SplashDemo extends Demo {
             for (col in 0...numCols) {
 
                 var x:Float = ((col + 0.5) / numCols - 0.5);
-                var y:Float = ((row + 0.5) / numRows - 0.5) * 0.15;
+                var y:Float = ((row + 0.5) / numRows - 0.5) * 0.3;
                 var z:Float = 0.;
 
                 if (lines[row].charAt(col) == ' ') continue;
@@ -56,7 +65,8 @@ class SplashDemo extends Demo {
                 var charCode:Int = lines[row].charCodeAt(col);
 
                 var color:Vec4 = SPLASH_COLORS[lines[row].charAt(col)];
-                if (color == null) color = WHITE;
+                var boring = color == null;
+                if (boring) color = WHITE;
 
                 var s:Float = 1;
                 var a:Float = 0;
@@ -66,9 +76,12 @@ class SplashDemo extends Demo {
                 for (ike in 0...thickness) {
                     var glyph:Glyph = body.getGlyphByID(glyphID);
                     glyphTower.push(glyph);
-                    glyph.SET({x:x, y:y, z:z, a:a, color:color, i:0, char:charCode, hitboxID:glyph.id});
+                    glyph.set_x(x + (boring ? 0 : (Math.random() - 0.5) * 0.01));
+                    glyph.set_y(y + (boring ? 0 : (Math.random() - 0.5) * 0.01));
+                    glyph.set_z(z + (boring ? 0 : (Math.random() - 0.5) * 0.01));
+                    glyph.SET({a:a, color:color, i:0, char:charCode, hitboxID:glyph.id});
                     z += 0.01;
-                    a += 0.5;
+                    a += boring ? 0.2 : 0.5;
                     color = color * 0.2;
                     glyphID++;
                 }
@@ -79,7 +92,7 @@ class SplashDemo extends Demo {
 
         body.transform.appendScale(1, -1, 1);
         body.transform.appendScale(0.9, 0.9, 0.9);
-        body.transform.appendRotation(20, Vector4.X_AXIS);
+        body.transform.appendRotation(-40, Vector4.X_AXIS);
     }
 
     override function update(delta:Float):Void {

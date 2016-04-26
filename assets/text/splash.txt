@@ -1,7 +1,16 @@
- SSSSS    CCCCC    OOOOO   UU   UU  RRRRRR    GGGGG    EEEEE 
-SS       CC   CC  OO   OO  UU   UU  RR   RR  GG       EE   EE
-SSSSSSS  CC       OO   OO  UU   UU  RRRRRR   GG  GGG  EEEEEEE
-     SS  CC   CC  OO   OO  UU   UU  RR   RR  GG   GG  EE     
- SSSSS    CCCCC    OOOOO    UUUUU   RR   RR   GGGGG    EEEEE 
-                                                             
-Spectrally Controlled Organisms, Using Remote Gene Expression
+
+  M     M                                    TTTTT   A      
+  MM   MMM   YY      YY     CCCCC  TTTTTTTTTTTT    AAAA     
+  MMM MM MM   YY      YY   CCC  CC     TTTTT      AA  AAA   
+ MM MMM   MM   YY    YY   CC              TT     AA     AA  
+ MM  M     MM  YY    YY  CC       OOOO     TT     AA     AA 
+ MM        MM  YY   YY  CC      OOO  OOO    TT    AA      AA
+MMM        MM  YY   YY  CC     OO     OOO    TT  AA  AAAA AA
+MM        MM    YYY YY  CC      OO      OO  TT  AAAAA   AAAA
+MM      MMM      YYYY   CCC      OO    OO   TT  AA        AA
+MM            YYYYY      CCC  CC  OOOOOO    TT   A        AA
+ MM        YYYYY          CCCCC             T              A
+
+
+
+Multihyphal  Yeast  Compute  Optimal  Tessellated  Aggregate
