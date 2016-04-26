@@ -97,15 +97,9 @@ class MoveMediator {
         allowRotating = this.config.pieceParams.allowRotating;
         allowSkipping = this.config.pieceParams.allowSkipping;
         piece.size = pieceLib.maxSize();
-        for (id in 0...piece.size) {
-            var glyph = piece.getGlyphByID(id);
-            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, hitboxS:0, a:0.2});
-        }
+        for (glyph in piece.eachGlyph()) glyph.SET({color:WHITE, s:0, p:-0.03, hitboxS:0, a:0.2});
         bite.size = this.config.biteParams.maxReach + 1;
-        for (id in 0...bite.size) {
-            var glyph = bite.getGlyphByID(id);
-            glyph.SET({color:WHITE, x:id, s:0, p:-0.03, hitboxS:0, a:0.2});
-        }
+        for (glyph in bite.eachGlyph()) glyph.SET({color:WHITE, s:0, p:-0.03, hitboxS:0, a:0.2});
         bite.getGlyphByID(0).set_color(new Vec4(1, 0, 0));
         pieceTableIndex_ = game.plan.onGlobal(PieceAspect.PIECE_TABLE_INDEX);
         pieceReflection_ = game.plan.onGlobal(PieceAspect.PIECE_REFLECTION);

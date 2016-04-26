@@ -1,7 +1,9 @@
+New text primitive, similar to BorderBox
+
 Wrap interactive board UI in loupe
+    About time I thought this through. Reacclimate with MoveMediator
 
 UI basis
-    New text primitive, similar to BorderBox
     Set console stuff aside
     Draw out the UI
         Shelf of tools, and, like, you drag 'em
