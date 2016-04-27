@@ -32,13 +32,13 @@ class ParagraphStyle {
 
     static function makeParagraphAlignByName():Map<String, ParagraphAlign> {
         return [
-            'left' => ALIGN_LEFT,
-            'center' => ALIGN_CENTER,
-            'right' => ALIGN_RIGHT,
-            'justify' => ALIGN_JUSTIFY(ALIGN_LEFT),
-            'justify-left' => ALIGN_JUSTIFY(ALIGN_LEFT),
-            'justify-center' => ALIGN_JUSTIFY(ALIGN_CENTER),
-            'justify-right' => ALIGN_JUSTIFY(ALIGN_RIGHT),
+            'left' => LEFT,
+            'center' => CENTER,
+            'right' => RIGHT,
+            'justify' => JUSTIFY(LEFT),
+            'justify-left' => JUSTIFY(LEFT),
+            'justify-center' => JUSTIFY(CENTER),
+            'justify-right' => JUSTIFY(RIGHT),
         ];
     }
 }

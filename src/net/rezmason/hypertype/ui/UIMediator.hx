@@ -157,15 +157,15 @@ class UIMediator {
         // Pads a string until its length, ignoring sigils, is numCols
 
         switch (paragraph.style.align) {
-            case ALIGN_LEFT: line = rpad(line, ' ', numCols + numSigils);
-            case ALIGN_RIGHT: line = lpad(line, ' ', numCols + numSigils);
-            case ALIGN_CENTER: line = cpad(line, ' ', numCols + numSigils);
-            case ALIGN_JUSTIFY(secondaryAlign): 
+            case LEFT: line = rpad(line, ' ', numCols + numSigils);
+            case RIGHT: line = lpad(line, ' ', numCols + numSigils);
+            case CENTER: line = cpad(line, ' ', numCols + numSigils);
+            case JUSTIFY(secondaryAlign): 
                 if (isFinal) {
                     var secondary = rpad;
                     switch (secondaryAlign) {
-                        case ALIGN_RIGHT: secondary = lpad;
-                        case ALIGN_CENTER: secondary = cpad;
+                        case RIGHT: secondary = lpad;
+                        case CENTER: secondary = cpad;
                         case _:
                     }
                     line = secondary(line, ' ', numCols + numSigils);
