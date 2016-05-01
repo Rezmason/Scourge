@@ -1,5 +1,7 @@
 New text primitive, similar to BorderBox
 
+I have GOT to switch all this to pixels
+
 Wrap interactive board UI in loupe
     About time I thought this through. Reacclimate with MoveMediator
 

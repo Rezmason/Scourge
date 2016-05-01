@@ -72,7 +72,7 @@ class BorderBox {
             body.getGlyphByID(itr++).SET({s:s, h:stretch / s, x:-left, y:y, char:VERTICAL.code()});
         }
 
-        for (glyph in body.eachGlyph()) glyph.set_color(color);
+        for (ike in 0...requiredGlyphs) body.getGlyphByID(ike).set_color(color);
     }
     
     inline function set_color(color) return this.color = color;
