@@ -10,35 +10,18 @@ import net.rezmason.hypertype.text.ParagraphAlign; // TODO: move to UI
 using net.rezmason.hypertype.core.GlyphUtils;
 using net.rezmason.utils.CharCode;
 
-class TextBox {
+class TextBox extends TextObject {
 
-    inline static var NEWLINE = 10;
-
-    public var body(default, null):Body = new Body();
-    public var color(default, set):Vec4 = new Vec4(1, 1, 1);
     public var width(default, set):Float = 0;
     public var height(default, set):Float = 0;
-    public var glyphWidth(default, set):Float = 0.1;
-    var redrawDeferred = false;
-    public var text(default, set):String = null;
-    public var align(default, set):ParagraphAlign = LEFT;
+
+    var numGlyphsWide:UInt;
+    var numGlyphsHigh:UInt;
     
-    public function new() body.sceneSetSignal.add(redraw);
-
-    public function redraw() {
-        if (body.scene == null) return;
-        body.glyphScale = glyphWidth * body.scene.camera.rect.width / body.font.glyphRatio;
-        var numGlyphsWide = Std.int(Math.ceil(width / glyphWidth));
-        var numGlyphsHigh = Std.int(Math.ceil(height / glyphWidth));
-
-        var glyphOffsetX = width / numGlyphsWide;
-        var glyphOffsetY = height / numGlyphsHigh;
-
-        var requiredGlyphs = (numGlyphsWide + 2) * numGlyphsHigh + 2;
-        if (body.size != requiredGlyphs) {
-            body.size = requiredGlyphs * 2;
-            for (ike in requiredGlyphs...body.size) body.getGlyphByID(ike).reset();
-        }
+    override function processText() {
+        numGlyphsWide = Std.int(Math.ceil(width / glyphWidth));
+        numGlyphsHigh = Std.int(Math.ceil(height / glyphWidth));
+        numRequiredGlyphs = (numGlyphsWide + 2) * numGlyphsHigh + 2;
 
         var spanSets = [for (passage in text.split('\n')) passage.split(' ')]; 
 
@@ -60,10 +43,6 @@ class TextBox {
         // Size and position top spacer and bottom spacer
     }
     
-    inline function set_color(color) return this.color = color;
     inline function set_width(width:Float) return this.width = (width < 0 || Math.isNaN(width)) ? 0 : width;
     inline function set_height(height:Float) return this.height = (height < 0 || Math.isNaN(height)) ? 0 : height;
-    inline function set_glyphWidth(glyphWidth:Float) return this.glyphWidth = (glyphWidth < 0 || Math.isNaN(glyphWidth)) ? 0 : glyphWidth;
-    inline function set_text(text) return this.text = text;
-    inline function set_align(align) return this.align = align;
 }
