@@ -33,6 +33,7 @@ class TextLabel extends TextObject {
             case BOTTOM: startY = lines.length * glyphHeight;
             case _:
         }
+        startY -= glyphHeight / 2;
 
         for (ike in 0...lines.length) {
             var line = lines[ike];
@@ -42,10 +43,12 @@ class TextLabel extends TextObject {
                 case RIGHT: startX = -line.length * glyphWidth;
                 case _:
             }
+            startX += glyphWidth  / 2;
+
             for (jen in 0...line.length) {
                 body.getGlyphByID(glyphIndex).SET({
-                    x: startX + xOffset + jen * glyphWidth, 
-                    y: startY + yOffset - ike * glyphHeight, 
+                    x: startX + jen * glyphWidth, 
+                    y: startY - ike * glyphHeight, 
                     char:line.charCodeAt(jen),
                     color:color,
                 });

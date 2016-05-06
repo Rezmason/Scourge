@@ -63,6 +63,7 @@ class SplashDemo extends Demo {
                 if (lines[row].charAt(col) == ' ') continue;
 
                 var charCode:Int = lines[row].charCodeAt(col);
+                if (charCode == 0) charCode = -1;
 
                 var color:Vec4 = SPLASH_COLORS[lines[row].charAt(col)];
                 var boring = color == null;

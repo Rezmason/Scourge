@@ -1,4 +1,4 @@
-New text primitive, similar to BorderBox
+Fix BorderBox drawing
 
 I have GOT to switch all this to pixels
 

@@ -12,35 +12,93 @@ using net.rezmason.utils.CharCode;
 
 class TextBox extends TextObject {
 
-    public var width(default, set):Float = 0;
-    public var height(default, set):Float = 0;
+    public var width(default, set):Float = 1;
+    public var height(default, set):Float = 1;
 
     var numGlyphsWide:UInt;
     var numGlyphsHigh:UInt;
+    var lines:Array<String>;
+    var earlyTerminatingLines:Array<UInt>;
     
     override function processText() {
-        numGlyphsWide = Std.int(Math.ceil(width / glyphWidth));
-        numGlyphsHigh = Std.int(Math.ceil(height / glyphWidth));
-        numRequiredGlyphs = (numGlyphsWide + 2) * numGlyphsHigh + 2;
+        numGlyphsWide = Std.int(width / glyphWidth);
 
-        var spanSets = [for (passage in text.split('\n')) passage.split(' ')]; 
-
-        // At this point the number of lines is known, and each line has a character budget
-        // Assign successive NonBreakingSpans to a Line while the span length is less than the remainder of the budget
-        // Spans longer than the character budget must be broken
-        // A Line 'terminatesEarly' unless it is the last Line for a given Array<NonbreakingSpan>
-
-        // Now we have distinct Lines
-        // Left, right, and centered lines have constant (standard) glyph width, resizing edge spacers
-        // A justified Line that 'terminatesEarly' use its secondary align behavior
-        // Otherwise a justified Line has zero-size left and right spacers, and variable width spaces
-        // For now, the width for every space is the remaining budget divided by the number of spaces
-        // TODO: enforceMonospace
+        var wordSequences = [for (passage in text.split('\n')) passage.split(' ')];
+        lines = [];
+        earlyTerminatingLines = [];
+        var currentLine = '';
+        for (sequence in wordSequences) {
+            var space = '';
+            for (originalWord in sequence) {
+                if (currentLine.length + space.length + originalWord.length <= numGlyphsWide) {
+                    currentLine += space + originalWord;
+                } else {
+                    space = '';
+                    var word = originalWord;
+                    while (word.length > 0) {
+                        lines.push(currentLine);
+                        currentLine = word.substr(0, numGlyphsWide);
+                        word = word.substr(numGlyphsWide);
+                    }
+                }
+                space = ' ';
+            }
+            earlyTerminatingLines.push(lines.length);
+            lines.push(currentLine);
+            currentLine = '';
+        }
+        if (currentLine.length > 0) lines.push(currentLine);
         
-        // Now we have an Array<Array<Glyph>>
-        // Position each glyph from left to right
-        // TODO: verticalAlign
-        // Size and position top spacer and bottom spacer
+        numGlyphsHigh = Std.int(height / glyphHeight);
+        if (numGlyphsHigh > lines.length) numGlyphsHigh = lines.length;
+        numRequiredGlyphs = 0;
+        for (ike in 0...numGlyphsHigh) numRequiredGlyphs += lines[ike].length;
+    }
+
+    override function updateGlyphs() {
+
+        var glyphIndex = 0;
+        var xOffset =  glyphWidth  / 2;
+        var yOffset = -glyphHeight / 2;
+
+        var startY:Float = 0;
+        switch (verticalAlign) {
+            case MIDDLE: startY = (-height + numGlyphsHigh * glyphHeight) / 2;
+            case BOTTOM: startY = -height + numGlyphsHigh * glyphHeight;
+            case _:
+        }
+        startY -= glyphHeight / 2;
+
+        var y = startY;
+        for (ike in 0...numGlyphsHigh) {
+            var line = lines[ike];
+            var terminatesEarly = earlyTerminatingLines.indexOf(ike) != -1;
+            var startX:Float = 0;
+            var spaceWidth = 1.0;
+            switch (align) {
+                case LEFT: startX = 0;
+                case JUSTIFY(LEFT) if (terminatesEarly): startX = 0;
+                case CENTER: startX = (width - line.length * glyphWidth )/ 2;
+                case JUSTIFY(CENTER) if (terminatesEarly): startX = (width - line.length * glyphWidth )/ 2;
+                case RIGHT: startX = width - line.length * glyphWidth;
+                case JUSTIFY(RIGHT) if (terminatesEarly): startX = width - line.length * glyphWidth;
+                case JUSTIFY(_):
+                    var numSpaces = line.split(' ').length - 1;
+                    var diff = width / glyphWidth - line.length;
+                    spaceWidth = 1 + diff / numSpaces;
+            }
+            startX += glyphWidth  / 2;
+
+            var x = startX;
+            for (jen in 0...line.length) {
+                var charCode = line.charCodeAt(jen);
+                body.getGlyphByID(glyphIndex).SET({x: x, y: y,  char:charCode, color:color});
+                if (charCode == 32) x += spaceWidth * glyphWidth;
+                else x += glyphWidth;
+                glyphIndex++;
+            }
+            y -= glyphHeight;
+        }
     }
     
     inline function set_width(width:Float) return this.width = (width < 0 || Math.isNaN(width)) ? 0 : width;
