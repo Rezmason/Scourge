@@ -10,6 +10,7 @@ using net.rezmason.utils.CharCode;
 
 class BorderBox {
 
+    inline static var MIN_GLYPH_WIDTH = 0.001;
     public var body(default, null):Body = new Body();
     public var width(default, set):Float = 0;
     public var height(default, set):Float = 0;
@@ -21,9 +22,16 @@ class BorderBox {
 
     public function redraw() {
         if (body.scene == null) return;
+        
         var displayedGlyphWidth = glyphWidth;
         if (displayedGlyphWidth > width  && width  > 0) displayedGlyphWidth = width;
         if (displayedGlyphWidth > height && height > 0) displayedGlyphWidth = height;
+
+        if (displayedGlyphWidth < MIN_GLYPH_WIDTH) {
+            for (ike in 0...body.size) body.getGlyphByID(ike).reset();
+            body.size = 0;
+            return;
+        }
 
         body.glyphScale = displayedGlyphWidth * body.scene.camera.rect.width / body.font.glyphRatio;
 
