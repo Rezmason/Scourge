@@ -42,10 +42,10 @@ class BorderBox {
         var stretch = body.font.glyphRatio;
         var itr = 0;
 
-        body.getGlyphByID(itr++).SET({i:0.5, s:1, h:stretch, x:    0, y:       0, char:rounded ?     ROUNDED_TOP_LEFT.code() :     SHARP_TOP_LEFT.code()});
-        body.getGlyphByID(itr++).SET({i:0.5, s:1, h:stretch, x:width, y:       0, char:rounded ?    ROUNDED_TOP_RIGHT.code() :    SHARP_TOP_RIGHT.code()});
-        body.getGlyphByID(itr++).SET({i:0.5, s:1, h:stretch, x:    0, y: -height, char:rounded ?  ROUNDED_BOTTOM_LEFT.code() :  SHARP_BOTTOM_LEFT.code()});
-        body.getGlyphByID(itr++).SET({i:0.5, s:1, h:stretch, x:width, y: -height, char:rounded ? ROUNDED_BOTTOM_RIGHT.code() : SHARP_BOTTOM_RIGHT.code()});
+        body.getGlyphByID(itr++).SET({s:1, h:stretch, x:    0, y:       0, char:rounded ?     ROUNDED_TOP_LEFT.code() :     SHARP_TOP_LEFT.code()});
+        body.getGlyphByID(itr++).SET({s:1, h:stretch, x:width, y:       0, char:rounded ?    ROUNDED_TOP_RIGHT.code() :    SHARP_TOP_RIGHT.code()});
+        body.getGlyphByID(itr++).SET({s:1, h:stretch, x:    0, y: -height, char:rounded ?  ROUNDED_BOTTOM_LEFT.code() :  SHARP_BOTTOM_LEFT.code()});
+        body.getGlyphByID(itr++).SET({s:1, h:stretch, x:width, y: -height, char:rounded ? ROUNDED_BOTTOM_RIGHT.code() : SHARP_BOTTOM_RIGHT.code()});
 
         var split = 1 - numGlyphsWide % 2;
         var earlyEnd = Std.int(Math.floor(numGlyphsWide * 0.5)) - split;
@@ -61,8 +61,8 @@ class BorderBox {
                 h = stretch * centerDim;
             }
             var s = 1.;
-            body.getGlyphByID(itr++).SET({i:0.5, s:s, h:h, x: x, y:       0, char:HORIZONTAL.code()});
-            body.getGlyphByID(itr++).SET({i:0.5, s:s, h:h, x: x, y: -height, char:HORIZONTAL.code()});
+            body.getGlyphByID(itr++).SET({s:s, h:h, x: x, y:       0, char:HORIZONTAL.code()});
+            body.getGlyphByID(itr++).SET({s:s, h:h, x: x, y: -height, char:HORIZONTAL.code()});
         }
 
         split = 1 - numGlyphsHigh % 2;
@@ -79,8 +79,8 @@ class BorderBox {
                 s = centerDim;
             }
             var h = stretch / s;
-            body.getGlyphByID(itr++).SET({i:0.5, s:s, h:h, x: 0,     y: y, char:VERTICAL.code()});
-            body.getGlyphByID(itr++).SET({i:0.5, s:s, h:h, x: width, y: y, char:VERTICAL.code()});
+            body.getGlyphByID(itr++).SET({s:s, h:h, x: 0,     y: y, char:VERTICAL.code()});
+            body.getGlyphByID(itr++).SET({s:s, h:h, x: width, y: y, char:VERTICAL.code()});
         }
 
         for (ike in 0...requiredGlyphs) body.getGlyphByID(ike).set_color(color);
