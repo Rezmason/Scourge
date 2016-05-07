@@ -24,13 +24,18 @@ class Strings {
     public inline static var SYMBOLS:String = '<>[]{}-=!@#$$%^*()_+';
     public inline static var WEIRD_SYMBOLS:String = '¤¬øΔΩ•◊';
     
-    //public inline static var BOX_SYMBOLS:String = ' ╵╶└╷│┌├╴┘─┴┐┤┬┼';
-    public inline static var BOX_SYMBOLS:String = ' ╵╶╰╷│╭├╴╯─┴╮┤┬┼';
-    
-    public inline static var BOTTOM_LEFT = '╰';
-    public inline static var BOTTOM_RIGHT = '╯';
-    public inline static var TOP_LEFT = '╭';
-    public inline static var TOP_RIGHT = '╮';
     public inline static var HORIZONTAL = '─';
     public inline static var VERTICAL = '│';
+
+    public inline static var SHARP_BOX_SYMBOLS:String = ' ╵╶└╷│┌├╴┘─┴┐┤┬┼';
+    public inline static var SHARP_BOTTOM_LEFT = '└';
+    public inline static var SHARP_BOTTOM_RIGHT = '┘';
+    public inline static var SHARP_TOP_LEFT = '┌';
+    public inline static var SHARP_TOP_RIGHT = '┐';
+    
+    public inline static var ROUNDED_BOX_SYMBOLS:String = ' ╵╶╰╷│╭├╴╯─┴╮┤┬┼';
+    public inline static var ROUNDED_BOTTOM_LEFT = '╰';
+    public inline static var ROUNDED_BOTTOM_RIGHT = '╯';
+    public inline static var ROUNDED_TOP_LEFT = '╭';
+    public inline static var ROUNDED_TOP_RIGHT = '╮';
 }

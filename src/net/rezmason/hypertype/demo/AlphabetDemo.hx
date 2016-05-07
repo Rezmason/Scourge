@@ -14,7 +14,6 @@ class AlphabetDemo extends Demo {
         Strings.ALPHANUMERICS +
         Strings.SYMBOLS +
         Strings.WEIRD_SYMBOLS +
-        Strings.BOX_SYMBOLS +
     '';
 
     public function new():Void {

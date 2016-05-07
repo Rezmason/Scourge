@@ -24,7 +24,8 @@ class ScourgeAssetGen extends Application {
         var characterSets:Array<FontCharacterSet> = [
             {chars:profontChars, size:300, size2:300, fontID:'ProFont'},
             {chars:Strings.SMALL_CYRILLICS, size:400, size2:300, fontID:'ProFont_Cy'},
-            {chars:Strings.BOX_SYMBOLS, size:300, size2:300, fontID:'SourceProFont'},
+            {chars:Strings.SHARP_BOX_SYMBOLS, size:300, size2:300, fontID:'SourceProFont'},
+            {chars:Strings.ROUNDED_BOX_SYMBOLS, size:300, size2:300, fontID:'SourceProFont'},
         ];
         var glyphs = SDFFontGenerator.extractGlyphsFromFonts(characterSets);
         SDFFontGenerator.generate(glyphs, 72, 72, 1, 20, deployFont.bind('full'));

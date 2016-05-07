@@ -92,7 +92,7 @@ class BoardInitializer {
                     }
                     numNeighbors++;
                 }
-                var char = Utf8.charCodeAt(BOX_SYMBOLS, bitfield);
+                var char = Utf8.charCodeAt(ROUNDED_BOX_SYMBOLS, bitfield);
                 bottom.SET({char:char, color:BOARD_COLOR, h:stretch});
                 top.SET({char:char, color:WALL_COLOR, h:stretch});
             } else {
