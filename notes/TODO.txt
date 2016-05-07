@@ -1,5 +1,3 @@
-Fix BorderBox drawing
-
 I have GOT to switch all this to pixels
 
 Wrap interactive board UI in loupe

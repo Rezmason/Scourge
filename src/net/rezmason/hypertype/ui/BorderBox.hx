@@ -21,55 +21,66 @@ class BorderBox {
 
     public function redraw() {
         if (body.scene == null) return;
-        body.glyphScale = glyphWidth * body.scene.camera.rect.width / body.font.glyphRatio;
-        var numGlyphsWide = Std.int(Math.ceil(width / glyphWidth));
-        var numGlyphsHigh = Std.int(Math.ceil(height / glyphWidth));
+        var displayedGlyphWidth = glyphWidth;
+        if (displayedGlyphWidth > width  && width  > 0) displayedGlyphWidth = width;
+        if (displayedGlyphWidth > height && height > 0) displayedGlyphWidth = height;
+
+        body.glyphScale = displayedGlyphWidth * body.scene.camera.rect.width / body.font.glyphRatio;
+
+        var displayedWidth  = Math.max(0, width   - displayedGlyphWidth);
+        var displayedHeight = Math.max(0, height  - displayedGlyphWidth);
+
+        var numGlyphsWide = Std.int(Math.ceil(displayedWidth  / displayedGlyphWidth));
+        var numGlyphsHigh = Std.int(Math.ceil(displayedHeight / displayedGlyphWidth));
+
         var requiredGlyphs = 4 + 2 * (numGlyphsWide + numGlyphsHigh);
         if (body.size != requiredGlyphs) {
             body.size = requiredGlyphs * 2;
             for (ike in requiredGlyphs...body.size) body.getGlyphByID(ike).reset();
         }
+
         var stretch = body.font.glyphRatio;
-        var top = (height + glyphWidth) / 2;
-        var left = -(width + glyphWidth) / 2;
         var itr = 0;
-        body.getGlyphByID(itr++).SET({s:1, h:stretch, x: left, y: top, char:    TOP_LEFT.code()});
-        body.getGlyphByID(itr++).SET({s:1, h:stretch, x:-left, y: top, char:   TOP_RIGHT.code()});
-        body.getGlyphByID(itr++).SET({s:1, h:stretch, x: left, y:-top, char: BOTTOM_LEFT.code()});
-        body.getGlyphByID(itr++).SET({s:1, h:stretch, x:-left, y:-top, char:BOTTOM_RIGHT.code()});
-        
+
+        body.getGlyphByID(itr++).SET({s:1, h:stretch, x:    0, y:       0, char:    TOP_LEFT.code()});
+        body.getGlyphByID(itr++).SET({s:1, h:stretch, x:width, y:       0, char:   TOP_RIGHT.code()});
+        body.getGlyphByID(itr++).SET({s:1, h:stretch, x:    0, y: -height, char: BOTTOM_LEFT.code()});
+        body.getGlyphByID(itr++).SET({s:1, h:stretch, x:width, y: -height, char:BOTTOM_RIGHT.code()});
+
         var split = 1 - numGlyphsWide % 2;
-        var earlyEnd = Std.int(Math.floor(numGlyphsWide / 2)) - split;
-        var lateStart = Std.int(Math.ceil(numGlyphsWide / 2)) + split;
-        var centerDim = 1 - ((numGlyphsWide - width / glyphWidth) * (1 - 0.5 * split));
+        var earlyEnd = Std.int(Math.floor(numGlyphsWide * 0.5)) - split;
+        var lateStart = Std.int(Math.ceil(numGlyphsWide * 0.5)) + split;
+        var centerDim = 1 - ((numGlyphsWide - displayedWidth / displayedGlyphWidth) * (1 - 0.5 * split));
         for (ike in 0...numGlyphsWide) {
-            var x = -left - (ike + 1 - lateStart) * glyphWidth;
+            var x = width - (ike + 1 - lateStart) * displayedGlyphWidth;
             var h = stretch;
             if (ike < earlyEnd) {
-                x = left + (ike + 1) * glyphWidth;
+                x = (ike + 1) * displayedGlyphWidth;
             } else if (ike < lateStart) {
-                x = (ike - earlyEnd - 0.5 * split) * glyphWidth * centerDim;
+                x = width * 0.5 + (ike - earlyEnd - 0.5 * split) * displayedGlyphWidth * centerDim;
                 h = stretch * centerDim;
             }
-            body.getGlyphByID(itr++).SET({s:1, h:h, x:x, y: top, char:HORIZONTAL.code()});
-            body.getGlyphByID(itr++).SET({s:1, h:h, x:x, y:-top, char:HORIZONTAL.code()});
+            var s = 1.;
+            body.getGlyphByID(itr++).SET({s:s, h:h, x: x, y:       0, char:HORIZONTAL.code()});
+            body.getGlyphByID(itr++).SET({s:s, h:h, x: x, y: -height, char:HORIZONTAL.code()});
         }
 
         split = 1 - numGlyphsHigh % 2;
-        earlyEnd = Std.int(Math.floor(numGlyphsHigh / 2)) - split;
-        lateStart = Std.int(Math.ceil(numGlyphsHigh / 2)) + split;
-        centerDim = 1 - ((numGlyphsHigh - height / glyphWidth) * (1 - 0.5 * split));
+        earlyEnd = Std.int(Math.floor(numGlyphsHigh * 0.5)) - split;
+        lateStart = Std.int(Math.ceil(numGlyphsHigh * 0.5)) + split;
+        centerDim = 1 - ((numGlyphsHigh - displayedHeight / displayedGlyphWidth) * (1 - 0.5 * split));
         for (ike in 0...numGlyphsHigh) {
-            var y = top - (ike + 1 - lateStart) * glyphWidth;
+            var y = -(ike + 1 - lateStart) * displayedGlyphWidth;
             var s = 1.;
             if (ike < earlyEnd) {
-                y = -top + (ike + 1) * glyphWidth;
+                y = -height + (ike + 1) * displayedGlyphWidth;
             } else if (ike < lateStart) {
-                y = (ike - earlyEnd - 0.5 * split) * glyphWidth * centerDim;
+                y = -height * 0.5 + (ike - earlyEnd - 0.5 * split) * displayedGlyphWidth * centerDim;
                 s = centerDim;
             }
-            body.getGlyphByID(itr++).SET({s:s, h:stretch / s, x: left, y:y, char:VERTICAL.code()});
-            body.getGlyphByID(itr++).SET({s:s, h:stretch / s, x:-left, y:y, char:VERTICAL.code()});
+            var h = stretch / s;
+            body.getGlyphByID(itr++).SET({s:s, h:h, x: 0,     y: y, char:VERTICAL.code()});
+            body.getGlyphByID(itr++).SET({s:s, h:h, x: width, y: y, char:VERTICAL.code()});
         }
 
         for (ike in 0...requiredGlyphs) body.getGlyphByID(ike).set_color(color);
