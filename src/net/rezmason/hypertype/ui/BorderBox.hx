@@ -27,12 +27,6 @@ class BorderBox {
         if (displayedGlyphWidth > width  && width  > 0) displayedGlyphWidth = width;
         if (displayedGlyphWidth > height && height > 0) displayedGlyphWidth = height;
 
-        if (displayedGlyphWidth < MIN_GLYPH_WIDTH) {
-            for (ike in 0...body.size) body.getGlyphByID(ike).reset();
-            body.size = 0;
-            return;
-        }
-
         body.glyphScale = displayedGlyphWidth * body.scene.camera.rect.width / body.font.glyphRatio;
 
         var displayedWidth  = Math.max(0, width   - displayedGlyphWidth);
@@ -40,6 +34,12 @@ class BorderBox {
 
         var numGlyphsWide = Std.int(Math.ceil(displayedWidth  / displayedGlyphWidth));
         var numGlyphsHigh = Std.int(Math.ceil(displayedHeight / displayedGlyphWidth));
+
+        if (displayedWidth * displayedHeight == 0 || displayedGlyphWidth < MIN_GLYPH_WIDTH) {
+            for (ike in 0...body.size) body.getGlyphByID(ike).reset();
+            body.size = 0;
+            return;
+        }
 
         var requiredGlyphs = 4 + 2 * (numGlyphsWide + numGlyphsHigh);
         if (body.size != requiredGlyphs) {
