@@ -1,29 +1,29 @@
 package net.rezmason.scourge.waves;
 
-import flash.display.Sprite;
+import net.rezmason.hypertype.demo.Demo;
 
-class WaveDemo {
-    public function new(scene:Sprite):Void {
-        var container:Sprite = new Sprite();
+using net.rezmason.hypertype.core.GlyphUtils;
+using net.rezmason.utils.CharCode;
 
-        var w:Int = Std.int(scene.stage.stageWidth );
-        var h:Int = Std.int(scene.stage.stageHeight);
+class WaveDemo extends Demo {
 
+    var pool:WavePool = new WavePool(100);
+    var bolus = WaveFunctions.bolus; // WaveFunctions.photocopy(bolus, 10);
+    var heartbeat = WaveFunctions.heartbeat; // WaveFunctions.photocopy(heartbeat, 10);
+    
+    public function new() {
+        super();
+        pool.addRipple(new Ripple(bolus,     0.2, 20, 0.95, 30));
+        pool.addRipple(new Ripple(bolus,     0.1, 10, 0.99,  6));
+        pool.addRipple(new Ripple(heartbeat, 0.1, 15, 0.99, 15));
 
-        var wavePoolShape:WavePoolShape = new WavePoolShape(w + 1);
+        body.size = pool.size;
+        body.glyphScale = 0.01;
+        for (glyph in body.eachGlyph()) glyph.SET({char:'•'.code(), x:glyph.id / pool.size - 0.5});
+    }
 
-        var bolus = WaveFunctions.bolus;
-        var heartbeat = WaveFunctions.heartbeat;
-
-        // bolus = WaveFunctions.photocopy(bolus, 10);
-        // heartbeat = WaveFunctions.photocopy(heartbeat, 10);
-
-        wavePoolShape.pool.addRipple(new Ripple(bolus,     200, 200, 0.95, 300));
-        wavePoolShape.pool.addRipple(new Ripple(bolus,     100, 100, 0.99, 060));
-        wavePoolShape.pool.addRipple(new Ripple(heartbeat, 100, 150, 0.99, 150));
-
-        container.y = h / 2;
-        container.addChild(wavePoolShape);
-        scene.addChild(container);
+    override function update(delta) {
+        pool.update(delta);
+        for (ike in 0...pool.size) body.getGlyphByID(ike).set_y(-pool.getHeightAtIndex(ike));
     }
 }

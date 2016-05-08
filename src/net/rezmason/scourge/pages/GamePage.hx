@@ -10,6 +10,7 @@ import net.rezmason.hypertype.ui.UIElement;
 import net.rezmason.hypertype.useractions.*;
 import net.rezmason.scourge.View;
 import net.rezmason.scourge.useractions.PlayGameAction;
+import net.rezmason.scourge.waves.WaveDemo;
 import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
@@ -37,6 +38,7 @@ class GamePage extends NavPage {
         var sdfFontDemo:SDFFontDemo = new SDFFontDemo();
         var colorSolidDemo:ColorSolidDemo = new ColorSolidDemo();
         var matrixDemo:MatrixDemo = new MatrixDemo();
+        var waveDemo:WaveDemo = new WaveDemo();
         var view:View = new Present(View);
 
         sceneGraph = new Present(SceneGraph);
@@ -47,6 +49,7 @@ class GamePage extends NavPage {
         bodiesByName['sdf']        = sdfFontDemo.body;
         bodiesByName['colorSolid'] = colorSolidDemo.body;
         bodiesByName['matrix']     = matrixDemo.body;
+        bodiesByName['waves']      = waveDemo.body;
         bodiesByName['board']      = view.body;
 
         // console.hasScrollBar = true;
