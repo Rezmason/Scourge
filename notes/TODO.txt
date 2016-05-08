@@ -1,6 +1,3 @@
-Fix the camera space
-Abolish camera resize logic
-
 Wrap interactive board UI in loupe
     About time I thought this through. Reacclimate with MoveMediator
 

@@ -5,6 +5,8 @@ import lime.app.Application;
 import lime.graphics.Image;
 import net.rezmason.hypertype.Strings;
 import net.rezmason.utils.display.SDFFontGenerator;
+import net.rezmason.utils.display.MetaballTextureGenerator;
+import net.rezmason.utils.display.GlobTextureGenerator;
 import sys.io.File;
 
 class ScourgeAssetGen extends Application {
@@ -34,8 +36,8 @@ class ScourgeAssetGen extends Application {
         var glyphs = SDFFontGenerator.extractGlyphsFromFonts(characterSets);
         SDFFontGenerator.generate(glyphs, 72, 72, 1, 20, deployFont.bind('matrix'));
 
-        // MetaballTextureGenerator.makeTexture(30, 0.62, 20, deployImage.bind(_, "metaball"));
-        // GlobTextureGenerator.makeTexture(512, deployImage.bind(_, "glob"));
+        deployImage('metaballs', 'metaball', MetaballTextureGenerator.makeTexture(30, 0.62, 20));
+        deployImage('metaballs', 'glob', GlobTextureGenerator.makeTexture(512));
 
         Sys.exit(0);
     }
@@ -43,11 +45,11 @@ class ScourgeAssetGen extends Application {
     static function deployFont(id:String, htf:Bytes, image:Image):Void {
         var path = '../../../../../../../../assets/sdffonts/';
         File.saveBytes('$path${id}.htf', htf);
-        File.saveContent('${path}${id}.png', image.encode().toString());
+        File.saveContent('$path${id}.png', image.encode().toString());
     }
 
-    static function deployImage(image:Image, id:String):Void {
+    static function deployImage(dirPath:String, id:String, image:Image):Void {
         var path = '../../../../../../../../assets/';
-        File.saveContent('${path}${id}.png', image.encode().toString());
+        File.saveContent('$path$dirPath/${id}.png', image.encode().toString());
     }
 }

@@ -1,42 +1,41 @@
 package net.rezmason.utils.display;
 
-import flash.display.BitmapData;
-import flash.display.BlendMode;
-import flash.display.Shape;
-import flash.display.GradientType;
-import flash.filters.BlurFilter;
-import flash.geom.Matrix;
+import lime.graphics.Image;
+import lime.graphics.cairo.Cairo;
+import lime.graphics.cairo.CairoImageSurface;
+import lime.graphics.cairo.CairoPattern;
 
 class GlobTextureGenerator {
 
-    public static function makeTexture(size:Int, cbk:BitmapData->Void):Void {
-        var glob:Shape = new Shape();
+    public static function makeTexture(size:Int):Image {
 
-        var mat:Matrix = new Matrix();
-        mat.tx = mat.ty = size / 2;
-        var bmd:BitmapData = new BitmapData(size, size, false, 0x0);
+        var image = new Image(null, 0, 0, size, size);
+        image.fillRect(image.rect, 0x000000FF, BGRA32);
         
-        glob.graphics.clear();
+        var cairo = new Cairo(CairoImageSurface.fromImage(image));
+
+        cairo.setSourceRGBA(0, 1, 0, 1); // BGRA
         for (ike in 0...1000) {
             var theta:Float = Math.random() * Math.PI * 2;
             var rad:Float = Math.pow(Math.random(), 0.5) * 0.5 * size;
-
-            glob.graphics.beginFill(0x00FF00);
-            glob.graphics.drawCircle(Math.cos(theta) * rad, Math.sin(theta) * rad, Math.random() * size / 100);
-            glob.graphics.endFill();
+            cairo.arc(
+                size / 2 + Math.cos(theta) * rad, 
+                size / 2 + Math.sin(theta) * rad, 
+                Math.random() * size / 100, 0, Math.PI * 2
+            );
+            cairo.fill();
         }
-        bmd.draw(glob, mat, null, BlendMode.ADD);
 
-        bmd.applyFilter(bmd, bmd.rect, bmd.rect.topLeft, new BlurFilter(10, 10, 3));
+        for (ike in 0...4) Blur2D.apply(image, 10, 10);
 
-        var grad:Matrix = new Matrix();
-        glob.graphics.clear();
-        grad.createGradientBox(size, size, 0, -size / 2, -size / 2);
-        glob.graphics.beginGradientFill(GradientType.RADIAL, [0x00, 0x00, 0x00, 0x00], [1, 0, 0, 1], [0x00, 0x80, 0xEE, 0xFF], grad);
-        glob.graphics.drawRect(-size, -size, size * 2, size * 2);
-        glob.graphics.endFill();
-        bmd.draw(glob, mat);
-
-        cbk(bmd);
+        var pattern = CairoPattern.createRadial(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+        pattern.addColorStopRGBA(0.0, 0, 0, 0, 1); // BGRA
+        pattern.addColorStopRGBA(0.5, 0, 0, 0, 0); // BGRA
+        pattern.addColorStopRGBA(0.9, 0, 0, 0, 0); // BGRA
+        pattern.addColorStopRGBA(1.0, 0, 0, 0, 1); // BGRA
+        cairo.source = pattern;
+        cairo.paint();
+        
+        return image;
     }
 }
