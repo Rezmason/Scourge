@@ -195,7 +195,7 @@ class MoveMediator {
                 var cell = selectedCell.runEuclidean(x, y);
                 ids.push(cell.id);
                 var nr = fixedPiece.cells[ike] == fixedPiece.closestCellToCenter ? 0 : 1;
-                piece.getGlyphByID(ike).SET({s:2, x:-x, y:y, g:nr, b:nr});
+                piece.getGlyphByID(ike).SET({s:2, x:-x, y:-y, g:nr, b:nr}); // Seems weird.
             }
             if (dropMovesByKey != null) dropMove = dropMovesByKey[getDropMoveKey(ids)];
             var char = dropMove == null ? ScourgeStrings.ILLEGAL_BODY_CODE : ScourgeStrings.BODY_CODE;

@@ -112,7 +112,7 @@ class ColorSolidDemo extends Demo {
     inline function updateDrag(x:Float, y:Float):Void {
         rawTransform.copyFrom(dragStartTransform);
         rawTransform.appendRotation((dragX - x) * 180, Vector4.Y_AXIS);
-        rawTransform.appendRotation((dragY - y) * 180, Vector4.X_AXIS);
+        rawTransform.appendRotation((y - dragY) * 180, Vector4.X_AXIS);
         setBackTransform.copyFrom(rawTransform);
         setBackTransform.appendTranslation(0, 0, 0.5);
     }

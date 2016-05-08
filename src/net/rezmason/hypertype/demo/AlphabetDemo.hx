@@ -23,11 +23,8 @@ class AlphabetDemo extends Demo {
         var numCols:Int = Std.int(Math.ceil(totalChars / numRows));
         var white = new Vec4(1, 1, 1);
 
-        body = new Body();
         body.size = totalChars;
         body.glyphScale = 0.025;
-        body.transform.identity();
-        body.transform.appendScale(1, -1, 1);
 
         for (glyph in body.eachGlyph()) {
             var id:Int = glyph.id;
@@ -40,14 +37,14 @@ class AlphabetDemo extends Demo {
                 char: Utf8.charCodeAt(CHARS, id % CHARS.length),
                 color: white,
                 i:0.1,
-                hitboxID: glyph.id + 1
+                hitboxID: glyph.id
             });
         }
     }
-
+    
     override function receiveInteraction(id:Int, interaction:Interaction):Void {
         if (id == 0) return;
-        var glyph:Glyph = body.getGlyphByID(id - 1);
+        var glyph:Glyph = body.getGlyphByID(id);
         switch (interaction) {
             case MOUSE(type, x, y):
                 switch (type) {
@@ -58,7 +55,8 @@ class AlphabetDemo extends Demo {
                     case CLICK: glyph.set_s(3 - glyph.get_s());
                     case _:
                 }
-            case KEYBOARD(type, keyCode, modifier):
+            case _:
         }
     }
+    
 }

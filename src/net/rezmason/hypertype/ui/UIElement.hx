@@ -29,8 +29,7 @@ class UIElement {
     var glyphHeightInPixels:Float;
     var glyphWidth:Float;
     var glyphHeight:Float;
-    var baseTransform:Matrix4;
-
+    
     var viewPixelWidth:Float;
     var viewPixelHeight:Float;
 
@@ -73,9 +72,6 @@ class UIElement {
         dragBehavior = new DragBehavior();
         
         spaceCode = ' '.charCodeAt(0);
-
-        baseTransform = new Matrix4();
-        baseTransform.appendScale(1, -1, 1);
 
         glyphHeightInPoints = DEFAULT_GLYPH_HEIGHT_IN_POINTS;
         glyphHeightInPixels = glyphHeightInPoints * getScreenDPI() / NATIVE_DPI;
@@ -271,7 +267,6 @@ class UIElement {
         scrollY = (currentScrollPos - scrollStartIndex) / (numRows - 1);
         scrollBarX = ((numTextCols + 0.5) / numCols - 0.5);
         body.transform.identity();
-        body.transform.append(baseTransform);
         body.transform.appendTranslation(0, scrollY, 0);
         updateScrollBarPosition();
     }

@@ -1,4 +1,5 @@
-I have GOT to switch all this to pixels
+Fix the camera space
+Abolish camera resize logic
 
 Wrap interactive board UI in loupe
     About time I thought this through. Reacclimate with MoveMediator

@@ -84,8 +84,9 @@ class Camera {
         transform.identity();
         transform.appendScale(scaleX, scaleY, 1);
         transform.appendScale(rect.width * 2, rect.height * 2, 1);
-        transform.appendTranslation(rect.x * 2 + rect.width - 1, -(rect.y * 2 + rect.height - 1), 0);
+        transform.appendTranslation(rect.x * 2 + rect.width - 1, rect.y * 2 + rect.height - 1, 0);
         transform.appendTranslation(0, 0, 1); // Set the camera back one unit
+        transform.appendScale(1, -1, 1);
         transform.append(projection); // Apply perspective
 
         vanishingPoint.x = (rect.left + rect.right) * 0.5;
