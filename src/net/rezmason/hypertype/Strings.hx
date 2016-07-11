@@ -22,7 +22,7 @@ class Strings {
     public inline static var MATRIX_CHARS:String = 'yD3C HvsqSeEjuJBNIdUQrp0RMOwAgaToilLnK7mkbz152xFc4Gft68h0';
 
     public inline static var SYMBOLS:String = '<>[]{}-=!@#$$%^*()_+';
-    public inline static var WEIRD_SYMBOLS:String = '¤¬øΔΩ•◊';
+    public inline static var WEIRD_SYMBOLS:String = '¤¬øΔΩ•◊ßŒ£∑¶¥';
     
     public inline static var HORIZONTAL = '─';
     public inline static var VERTICAL = '│';

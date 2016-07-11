@@ -7,6 +7,7 @@
     <set name="BUILD_DIR" value="Export/ScourgeAssetGen"/>
     <classpath name="src"/>
     <haxelib name="lime"/>
+    <haxelib name="polygonal-core"/>
 
     <assets path="assets/fonts/ProFontX.ttf" rename="ProFont"/>
     <assets path="assets/fonts/werf - Profont Cyrillic/werfProFont.ttf" rename="ProFont_Cy"/>

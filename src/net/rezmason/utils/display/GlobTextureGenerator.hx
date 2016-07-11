@@ -1,9 +1,12 @@
 package net.rezmason.utils.display;
 
+import de.polygonal.core.math.random.ParkMiller;
+
 import lime.graphics.Image;
 import lime.graphics.cairo.Cairo;
 import lime.graphics.cairo.CairoImageSurface;
 import lime.graphics.cairo.CairoPattern;
+
 
 class GlobTextureGenerator {
 
@@ -13,15 +16,16 @@ class GlobTextureGenerator {
         image.fillRect(image.rect, 0x000000FF, BGRA32);
         
         var cairo = new Cairo(CairoImageSurface.fromImage(image));
+        var rng = new ParkMiller();
 
         cairo.setSourceRGBA(0, 1, 0, 1); // BGRA
         for (ike in 0...1000) {
-            var theta:Float = Math.random() * Math.PI * 2;
-            var rad:Float = Math.pow(Math.random(), 0.5) * 0.5 * size;
+            var theta:Float = rng.randomFloat() * Math.PI * 2;
+            var rad:Float = Math.pow(rng.randomFloat(), 0.5) * 0.5 * size;
             cairo.arc(
                 size / 2 + Math.cos(theta) * rad, 
                 size / 2 + Math.sin(theta) * rad, 
-                Math.random() * size / 100, 0, Math.PI * 2
+                rng.randomFloat() * size / 100, 0, Math.PI * 2
             );
             cairo.fill();
         }
