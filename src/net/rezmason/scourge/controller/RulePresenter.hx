@@ -1,5 +1,6 @@
 package net.rezmason.scourge.controller;
 
+import haxe.Utf8;
 import motion.easing.*;
 import net.rezmason.ecce.Ecce;
 import net.rezmason.ecce.Entity;
@@ -87,7 +88,7 @@ class RulePresenter extends Reckoner {
             var color = TEAM_COLORS[occupier];
             if (isFilled) {
                 var code = BODY_CODE;
-                if (getPlayer(occupier)[head_] == getID(values)) code = HEAD_CODE;
+                if (getPlayer(occupier)[head_] == getID(values)) code = Utf8.charCodeAt(HEAD_GLYPHS, occupier);
                 bottomGlyph.SET({char:code, color:color * 0.3, s:2.5});
                 topGlyph.SET({char:code, color:color, w:0.1, s:1.5});
             } else {

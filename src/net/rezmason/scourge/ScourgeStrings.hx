@@ -8,7 +8,6 @@ class ScourgeStrings {
     public inline static var BOARD_CODE:Int = '+'.code(); // ¤
     public inline static var WALL_CODE:Int = '┼'.code();
     public inline static var BODY_CODE:Int = '•'.code();
-    public inline static var HEAD_CODE:Int = 'Ω'.code();
     public inline static var BITE_CODE:Int = ''.code();
     public inline static var ILLEGAL_BITE_CODE:Int = '◊'.code();
     public inline static var ILLEGAL_BODY_CODE:Int = 'ø'.code();
