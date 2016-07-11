@@ -1,12 +1,55 @@
-Wrap interactive board UI in loupe
-    About time I thought this through. Reacclimate with MoveMediator
-
 UI basis
-    Set console stuff aside
-    Draw out the UI
-        Shelf of tools, and, like, you drag 'em
-    Build each Loupe
-        Build each state
+
+    What information is needed?
+        Board
+        Current player
+        Current action
+        Player bite size
+        Player num bites
+        Player num swaps
+
+    What actions are possible?
+        Forfeit
+        Skip
+        Place piece
+        Bite
+        Swap piece
+
+    Nice to haves:
+        Room for any number of actions
+        Room for log
+
+    PHONE VIEW
+        Orientation independent
+        Overview info appears
+            During turn
+                Scrollable, one square entry for each player
+                    Player head
+                    Number of bites (in diamond icons)
+                    Number of swaps (in shuffle icons)
+                    Bite Size
+                Current player has icon next to name
+                    If there's a timer, countdown appears next to icon
+            During board changes
+                Each kind of event shows relevant info
+                    Who just died and how
+                    Changes in size
+        Icons for actions appear in list that scrolls perpendicular to board
+            Bite, Drop, Swap, Forfeit, Skip
+        Pressing action button changes board to reflect action
+            Bite: legal bite init locations
+            Drop: total legal drop location silhouette
+        Pressed action button replaces scrolling list with action specific view
+            Action button "becomes" back button
+            Drop: Confirm drop, rotate, flip
+            Bite: Confirm bite, add bite, subtract bite
+            Swap: Commit Swap, Current Piece, Num Swaps Remaining
+            Skip: Confirm Skip
+            Forfeit: Confirm Forfeit
+    
+    Break MoveMediator into appropriate pieces
+
+And if you need more symbols, just, fuckin', go add a monochrome emoji font, man.
 
 Create puppet
 
@@ -15,8 +58,6 @@ We can support more Bodies by making IDs dynamic
 
 Settings page
 Game config page
-
-"MYCOTA" sounds like a nice name
 
 Compress the HTFs
 
