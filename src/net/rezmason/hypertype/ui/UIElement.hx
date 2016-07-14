@@ -128,7 +128,7 @@ class UIElement {
             uiMediator.updateDirtyText();
             if (Math.isNaN(currentScrollPos)) setScrollPos(uiMediator.bottomPos());
             glideTextToPos(uiMediator.bottomPos());
-            scene.redrawHitSignal.dispatch();
+            scene.invalidateHitboxesSignal.dispatch();
         }
 
         updateGlide(delta);
@@ -304,7 +304,7 @@ class UIElement {
                 setScrollPos(glideGoal);
                 if (lastRedrawPos != glideGoal) {
                     lastRedrawPos = glideGoal;
-                    scene.redrawHitSignal.dispatch();
+                    scene.invalidateHitboxesSignal.dispatch();
                 }
             }
         }

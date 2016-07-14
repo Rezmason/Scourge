@@ -42,7 +42,8 @@ class Engine {
         
         mouseSystem = new MouseSystem();
         mouseSystem.interactSignal.add(sceneGraph.routeInteraction);
-        sceneGraph.updateRectsSignal.add(mouseSystem.setRectRegions);
+        sceneGraph.updateFocusRegionsSignal.add(mouseSystem.setFocusRegions);
+        sceneGraph.invalidateHitboxesSignal.add(mouseSystem.invalidate);
 
         keyboardSystem = new KeyboardSystem();
         keyboardSystem.interactSignal.add(sceneGraph.routeInteraction.bind(null, null));

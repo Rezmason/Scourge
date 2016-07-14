@@ -19,8 +19,8 @@ class MouseSystem {
     public var refreshSignal(default, null):Zig<Void->Void>;
     var rtt:RenderTargetTexture;
     var data:UInt8Array;
-    var rectRegionsByID:Map<Int, Rectangle>;
-    var lastRectRegionID:Null<Int>;
+    var focusRegionsByID:Map<Int, Rectangle>;
+    var lastFocusRegionID:Null<Int>;
     var lastX:Float;
     var lastY:Float;
     
@@ -33,8 +33,8 @@ class MouseSystem {
     public function new():Void {
         interactSignal = new Zig();
         refreshSignal = new Zig();
-        rectRegionsByID = null;
-        lastRectRegionID = null;
+        focusRegionsByID = null;
+        lastFocusRegionID = null;
         lastX = Math.NaN;
         lastY = Math.NaN;
         hoverHit = NULL_HIT;
@@ -57,10 +57,10 @@ class MouseSystem {
         }
     }
 
-    public function setRectRegions(rectRegionsByID:Map<Int, Rectangle>):Void {
-        this.rectRegionsByID = rectRegionsByID;
-        if (lastRectRegionID != null && rectRegionsByID[lastRectRegionID] == null) {
-            lastRectRegionID = null;
+    public function setFocusRegions(focusRegionsByID:Map<Int, Rectangle>):Void {
+        this.focusRegionsByID = focusRegionsByID;
+        if (lastFocusRegionID != null && focusRegionsByID[lastFocusRegionID] == null) {
+            lastFocusRegionID = null;
             receiveMouseMove(lastX, lastY);
         }
         invalidate();
@@ -117,21 +117,21 @@ class MouseSystem {
         var glyphID:Null<Int> = null;
 
         if (rawID == 0xFFFFFF) {
-            if (rectRegionsByID != null) {
-                if (lastRectRegionID != null && rectRegionsByID[lastRectRegionID].contains(x / width, y / height)) {
-                    bodyID = lastRectRegionID;
+            if (focusRegionsByID != null) {
+                if (lastFocusRegionID != null && focusRegionsByID[lastFocusRegionID].contains(x / width, y / height)) {
+                    bodyID = lastFocusRegionID;
                 } else {
-                    for (id in rectRegionsByID.keys()) {
-                        if (rectRegionsByID[id].contains(x / width, y / height)) {
+                    for (id in focusRegionsByID.keys()) {
+                        if (focusRegionsByID[id].contains(x / width, y / height)) {
                             bodyID = id;
                             break;
                         }
                     }
                 }
             }
-            lastRectRegionID = bodyID;
+            lastFocusRegionID = bodyID;
         } else {
-            lastRectRegionID = null;
+            lastFocusRegionID = null;
             bodyID = rawID >> 16 & 0xFF;
             glyphID = rawID & 0xFFFF;
         }

@@ -42,6 +42,6 @@ class HitboxMethod extends SceneRenderMethod {
         program.setVertexBuffer('aScale', hitboxBuffer, 3, 1);
     }
 
-    override function shouldDrawBody(body:Body) return body.mouseEnabled && body.visible;
+    override function shouldDrawBody(body:Body) return body.isInteractive;
 }
 

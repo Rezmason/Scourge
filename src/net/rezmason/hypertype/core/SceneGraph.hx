@@ -15,14 +15,16 @@ class SceneGraph {
     public var rectsByBodyID(default, null):Map<Int, Rectangle> = new Map();
     public var teaseHitboxesSignal(default, null):Zig<Bool->Void> = new Zig();
     public var toggleConsoleSignal(default, null):Zig<Void->Void> = new Zig();
-    public var updateRectsSignal(default, null):Zig<Map<Int, Rectangle>->Void> = new Zig();
+    public var updateFocusRegionsSignal(default, null):Zig<Map<Int, Rectangle>->Void> = new Zig();
+    public var invalidateHitboxesSignal(default, null):Zig<Void->Void> = new Zig();
 
     public function new() {}
 
     public function addScene(scene:Scene):Void {
         if (!scenes.has(scene)) {
             scenes.push(scene);
-            scene.redrawHitSignal.add(updateRects);
+            scene.invalidateHitboxesSignal.add(invalidateHitboxesSignal.dispatch);
+            scene.redrawFocusRectsSignal.add(updateRects);
             scene.invalidatedSignal.add(invalidateScene);
             scene.resize(width, height);
             invalidateScene();
@@ -33,7 +35,8 @@ class SceneGraph {
     public function removeScene(scene:Scene):Void {
         if (scenes.has(scene)) {
             scenes.remove(scene);
-            scene.redrawHitSignal.remove(updateRects);
+            scene.invalidateHitboxesSignal.add(invalidateHitboxesSignal.dispatch);
+            scene.redrawFocusRectsSignal.remove(updateRects);
             scene.invalidatedSignal.remove(invalidateScene);
             invalidateScene();
             updateRects();
@@ -60,10 +63,10 @@ class SceneGraph {
     }
 
     function updateRects():Void {
-        fetchBodies();
+        fetchBodies(false);
         for (key in rectsByBodyID.keys()) rectsByBodyID.remove(key);
         for (scene in scenes) if (scene.focus != null) rectsByBodyID[scene.focus.id] = scene.camera.rect;
-        updateRectsSignal.dispatch(rectsByBodyID);
+        updateFocusRegionsSignal.dispatch(rectsByBodyID);
     }
 
     public function routeInteraction(bodyID:Null<Int>, glyphID:Null<Int>, interaction:Interaction):Void {
@@ -93,11 +96,12 @@ class SceneGraph {
 
     inline function invalidateScene() invalid = true;
 
-    inline function fetchBodies():Void {
+    inline function fetchBodies(broadcast = true):Void {
         if (invalid) {
             invalid = false;
             for (bodyID in bodiesByID.keys()) bodiesByID.remove(bodyID);
             for (scene in scenes) for (body in scene.bodies) bodiesByID[body.id] = body;
+            if (broadcast) updateFocusRegionsSignal.dispatch(rectsByBodyID);
         }
     }
 }

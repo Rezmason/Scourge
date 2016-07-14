@@ -21,14 +21,14 @@ class Body extends SceneNode<Body> {
     public var glyphScale(default, set):Float;
     public var font(default, set):GlyphFont;
     public var scene(default, null):Scene;
-    public var mouseEnabled:Bool = true;
-    public var visible:Bool = true;
+    public var mouseEnabled(default, set):Bool = true;
+    public var visible(default, set):Bool = true;
+    public var isInteractive(get, null):Bool;
     
     public var fontChangedSignal(default, null):Zig<Void->Void> = new Zig();
     public var interactionSignal(default, null):Zig<Int->Interaction->Void> = new Zig();
     public var updateSignal(default, null):Zig<Float->Void> = new Zig();
     public var sceneSetSignal(default, null):Zig<Void->Void> = new Zig();
-    public var drawSignal(default, null):Zig<Void->Void> = new Zig();
 
     @:allow(net.rezmason.hypertype.core) var glyphBatches(default, null):Array<GlyphBatch> = [];
     @:allow(net.rezmason.hypertype.core) var params(default, null):Vector4;
@@ -148,6 +148,22 @@ class Body extends SceneNode<Body> {
         }
         return this.font;
     }
+
+    inline function set_visible(visible:Bool) {
+        var isInteractive = this.isInteractive;
+        this.visible = visible;
+        if (isInteractive != this.isInteractive && scene != null) scene.invalidateHitboxesSignal.dispatch();
+        return this.visible;
+    }
+
+    inline function set_mouseEnabled(mouseEnabled:Bool) {
+        var isInteractive = this.isInteractive;
+        this.mouseEnabled = mouseEnabled;
+        if (isInteractive != this.isInteractive && scene != null) scene.invalidateHitboxesSignal.dispatch();
+        return this.mouseEnabled;
+    }
+
+    inline function get_isInteractive() return visible && mouseEnabled;
 
     inline function updateGlyphTransform():Void {
         if (scene != null) {
