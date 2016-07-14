@@ -11,7 +11,6 @@ import net.rezmason.hypertype.useractions.*;
 import net.rezmason.scourge.View;
 import net.rezmason.scourge.useractions.PlayGameAction;
 import net.rezmason.scourge.waves.WaveDemo;
-import net.rezmason.utils.Zig;
 import net.rezmason.utils.santa.Present;
 
 class GamePage extends NavPage {
@@ -62,6 +61,7 @@ class GamePage extends NavPage {
         interpreter.addAction(new SetNameAction(interpreter));
         interpreter.addAction(new PrintAction());
         interpreter.addAction(new PlayGameAction(showBodyByName.bind('board')));
+        interpreter.addAction(new SetWindowSizeAction());
         
         interpreter.addAction(new SimpleAction('clear', function (args, outputSignal) {
             consoleMed.clearText();

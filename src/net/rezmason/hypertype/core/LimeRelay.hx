@@ -42,4 +42,6 @@ class LimeRelay extends Module {
         windowActivateSignal.dispatch();
         windowResizeSignal.dispatch(window.width, window.height);
     }
+
+    public function resizeWindow(width, height) Application.current.window.resize(width, height);
 }

@@ -12,6 +12,7 @@ class Engine {
 
     var active:Bool;
     var sceneGraph:SceneGraph;
+    var systemCalls:SystemCalls;
     var mouseSystem:MouseSystem;
     var keyboardSystem:KeyboardSystem;
     var hitboxMethod:SceneRenderMethod;
@@ -36,6 +37,9 @@ class Engine {
 
     public function new():Void {
         active = false;
+
+        systemCalls = new Present(SystemCalls);
+        systemCalls.resizeWindowSignal.add(resizeWindow);
         
         sceneGraph = new Present(SceneGraph);
         sceneGraph.teaseHitboxesSignal.add(teaseHitboxes);
@@ -113,6 +117,7 @@ class Engine {
         viewport.resize(width, height);
     }
 
+    function resizeWindow(width:Int, height:Int) limeRelay.resizeWindow(width, height);
     function activate():Void active = true;
     function deactivate():Void active = false;
     function teaseHitboxes(val) presentedPass = val ? hitboxDebugPass : sdfPass;
