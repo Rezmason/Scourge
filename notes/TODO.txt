@@ -1,3 +1,12 @@
+Simplify the scene graph tremendously
+    ONE ROOT DAMN IT
+    One scene; integrate scene and scene graph
+    All bodies are in a Map, forever
+    All hotspots are in a Map, forever
+        owned by the MouseSystem, updated by engine in response to signals
+    No camera
+        Sizing logic doesn't belong in a scene graph
+
 UI basis
 
     What information is needed?
