@@ -73,14 +73,14 @@ class SceneGraph {
         fetchBodies();
         var target = null;
         switch (interaction) {
-            case MOUSE(type, oX, oY):
+            case MOUSE(type, x, y):
                 target = bodiesByID[bodyID];
                 if (type == CLICK) keyboardFocusBodyID = bodyID;
                 if (target != null) {
                     var camera = target.scene.camera;
                     var rect = camera.rect;
-                    var nX = ((oX / width  - rect.x) / rect.width ) / camera.scaleX;
-                    var nY = ((oY / height - rect.y) / rect.height) / camera.scaleY;
+                    var nX = ((x - rect.x) / rect.width ) / camera.scaleX;
+                    var nY = ((y - rect.y) / rect.height) / camera.scaleY;
                     interaction = MOUSE(type, nX, nY);
                 }
             case KEYBOARD(type, code, modifier):

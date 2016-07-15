@@ -145,7 +145,7 @@ class MouseSystem {
     }
 
     inline function sendInteraction(hit:Hit, x:Float, y:Float, type:MouseInteractionType):Void {
-        if (hit.bodyID != null) interactSignal.dispatch(hit.bodyID, hit.glyphID, MOUSE(type, x, y));
+        if (hit.bodyID != null) interactSignal.dispatch(hit.bodyID, hit.glyphID, MOUSE(type, x / width, y / height));
     }
 
     inline function refresh() {
