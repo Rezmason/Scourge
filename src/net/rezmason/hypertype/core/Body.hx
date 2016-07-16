@@ -44,7 +44,7 @@ class Body extends SceneNode<Body> {
         fontManager.onFontChange.add(updateFont);
         font = fontManager.defaultFont;
         params = new Vector4();
-        params.z = id / 0xFF;
+        params.y = id / 0xFF;
         glyphScale = 1;
     }
 
@@ -168,7 +168,6 @@ class Body extends SceneNode<Body> {
     inline function updateGlyphTransform():Void {
         if (scene != null) {
             params.x = glyphScale * scene.camera.glyphScale;
-            params.y = glyphScale * scene.camera.glyphScale * scene.stageWidth / scene.stageHeight;
         }
     }
 

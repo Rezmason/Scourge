@@ -1,5 +1,6 @@
 package net.rezmason.hypertype.core;
 
+import lime.math.Vector4;
 import net.rezmason.utils.Zig;
 
 class Scene {
@@ -10,10 +11,12 @@ class Scene {
     public var root(default, null):Body;
     public var stageWidth(default, null):Int;
     public var stageHeight(default, null):Int;
+    public var apsectRatio(get, null):Float;
 
     public var invalidatedSignal(default, null):Zig<Void->Void>;
     public var invalidateHitboxesSignal(default, null):Zig<Void->Void>;
     public var resizeSignal(default, null):Zig<Void->Void>;
+    @:allow(net.rezmason.hypertype.core) var screenParams(default, null):Vector4;
     
     var bodiesByID:Map<Int, Body>;
 
@@ -24,12 +27,15 @@ class Scene {
         camera = new Camera();
         root = new Body();
         root.setScene(this);
+        screenParams = new Vector4();
+        screenParams.x = 1;
         valid = false;
     }
     
     public inline function resize(stageWidth:Int, stageHeight:Int):Void {
         this.stageWidth = stageWidth;
         this.stageHeight = stageHeight;
+        screenParams.x = stageWidth / stageHeight;
         camera.resize(stageWidth, stageHeight);
         resizeSignal.dispatch();
     }
@@ -63,4 +69,6 @@ class Scene {
         focus = (body == null || bodiesByID[body.id] == null) ? null : body;
         return focus;
     }
+
+    inline function get_apsectRatio() return stageWidth / stageHeight;
 }
