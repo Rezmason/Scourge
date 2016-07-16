@@ -40,7 +40,7 @@ class GlyphBatch {
             glyph.colorBuf = colorBuffer;
             glyph.hitboxBuf = hitboxBuffer;
             glyph.init();
-            if (donorGlyphs[ike] != null) glyph.copyFrom(donorGlyphs[ike]);
+            if (donorGlyphs[ike] != null) glyph.COPY(donorGlyphs[ike]);
             var order:Array<UInt> = Almanac.VERT_ORDER;
             for (ike in 0...order.length) indexBuffer.mod(indexAddress + ike, firstVertIndex + order[ike]);
             indexAddress += Almanac.INDICES_PER_GLYPH;

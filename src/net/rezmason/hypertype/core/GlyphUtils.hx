@@ -73,31 +73,6 @@ class GlyphUtils {
         return gl;
     }
 
-    public inline static function clone(src:Glyph):Glyph {
-        var gl = createGlyph();
-        copyFrom(gl, src);
-        return gl;
-    }
-
-    public static function copyFrom(gl:Glyph, src:Glyph):Glyph {
-        var destGeometryAddress = gl.id * GEOMETRY_FLOATS_PER_GLYPH;
-        var destColorAddress = gl.id * COLOR_FLOATS_PER_GLYPH;
-        var destHitboxAddress = gl.id * HITBOX_FLOATS_PER_GLYPH;
-        var destFontAddress = gl.id * FONT_FLOATS_PER_GLYPH;
-        var srcGeometryAddress = src.id * GEOMETRY_FLOATS_PER_GLYPH;
-        var srcColorAddress = src.id * COLOR_FLOATS_PER_GLYPH;
-        var srcHitboxAddress = src.id * HITBOX_FLOATS_PER_GLYPH;
-        var srcFontAddress = src.id * FONT_FLOATS_PER_GLYPH;
-        for (ike in 0...GEOMETRY_FLOATS_PER_GLYPH) gl.geometryBuf.mod(destGeometryAddress + ike, src.geometryBuf.acc(srcGeometryAddress + ike));
-        for (ike in 0...COLOR_FLOATS_PER_GLYPH) gl.colorBuf.mod(destColorAddress + ike, src.colorBuf.acc(srcColorAddress + ike));
-        for (ike in 0...HITBOX_FLOATS_PER_GLYPH) gl.hitboxBuf.mod(destHitboxAddress + ike, src.hitboxBuf.acc(srcHitboxAddress + ike));
-        for (ike in 0...FONT_FLOATS_PER_GLYPH) gl.fontBuf.mod(destFontAddress + ike, src.fontBuf.acc(srcFontAddress + ike));
-        gl.hitboxID = src.hitboxID;
-        gl.charCode = src.charCode;
-        gl.font = src.font;
-        return gl;
-    }
-
     // Geometry
 
     public inline static function get_x(gl:Glyph) return gl.geometryBuf.acc(gl.id * GEOMETRY_FLOATS_PER_GLYPH + X_OFFSET);
@@ -265,6 +240,39 @@ class GlyphUtils {
                 }
             case EBlock(exprs) if (exprs.length == 0):
             case _: throw 'params argument must be an anonymous object.';
+        }
+        expressions.push(macro __gl__);
+        return macro $b{expressions};
+    }
+
+    macro public static function COPY(gl:ExprOf<Glyph>, src:ExprOf<Glyph>, ?params:Expr):Expr {
+        var expressions = [];
+        expressions.push(macro var __gl__ = ${gl});
+        expressions.push(macro var __src__ = ${src});
+        var fieldNames = [];
+        switch (params.expr) {
+            case EArrayDecl(exprs):
+                for (expr in exprs) {
+                    switch (expr.expr) {
+                        case EConst(CIdent(s)):
+                            fieldNames.push(s);
+                        case _: throw 'properties must be glyph identifiers.';
+                    }
+                }
+            case EConst(CIdent(s)) if (s == 'null'):
+                fieldNames = [
+                    'r', 'g', 'b', 'i', 'a',
+                    'x', 'y', 'z', 's', 'p', 'h',
+                    'font', 'char', 'w',
+                    'hitboxID', 'hitboxS', 'hitboxH',
+                ];
+            case _: 
+                throw 'params argument must be an Array.';
+        }
+        for (fieldName in fieldNames) {
+            var getter = macro $p{['GlyphUtils', 'get_' + fieldName]};
+            var setter = macro $p{['GlyphUtils', 'set_' + fieldName]}
+            expressions.push(macro ${setter}(__gl__, ${getter}(__src__)));
         }
         expressions.push(macro __gl__);
         return macro $b{expressions};

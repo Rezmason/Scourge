@@ -4,9 +4,12 @@ import lime.math.Rectangle;
 import net.rezmason.hypertype.core.Interaction;
 import net.rezmason.hypertype.core.Scene;
 import net.rezmason.hypertype.nav.NavPage;
-import net.rezmason.hypertype.ui.UIElement;
-import net.rezmason.hypertype.ui.UIMediator;
 import net.rezmason.hypertype.Strings;
+import net.rezmason.hypertype.core.Body;
+import net.rezmason.hypertype.ui.TextLabel;
+import net.rezmason.scourge.ScourgeColorPalette.*;
+
+using net.rezmason.hypertype.core.GlyphUtils;
 
 class SplashPage extends NavPage {
 
@@ -21,8 +24,7 @@ class SplashPage extends NavPage {
 
     var splashScene:Scene;
     var splashDemo:SplashDemo;
-    var nav:UIElement;
-    var navMed:UIMediator;
+    var nav:Body;
 
     public function new():Void {
         super();
@@ -45,28 +47,48 @@ class SplashPage extends NavPage {
         box.redraw();
         */
 
-        navMed = new UIMediator();
-        nav = new UIElement(navMed);
-        var uiRect:Rectangle = new Rectangle(0.0, 0.5, 1.0, 0.5);
-        uiRect.inflate(-0.02, -0.02);
-        nav.scene.camera.rect = uiRect;
-        nav.setFontSize(28);
-        scenes.push(nav.scene);
+        nav = new Body();
+        
+        var navScene = new Scene();
+        var navRect:Rectangle = new Rectangle(0.0, 0.5, 1.0, 0.5);
+        navRect.inflate(-0.02, -0.02);
+        navScene.camera.rect = navRect;
+        navScene.root.addChild(nav);
+        scenes.push(navScene);
 
-        var buttons:Array<String> = [
-            makeButton('BEGIN', playGame),
-            makeButton('ABOUT', aboutGame),
-            makeButton('LEAVE', quitGame),
-        ];
+        var beginButton = makeButton('BEGIN', playGame);
+        var aboutButton = makeButton('ABOUT', aboutGame);
+        var leaveButton = makeButton('LEAVE', quitGame);
 
-        var uiText:String = BUTTON_STYLE + buttons.join('  ');
-        navMed.setText(uiText);
+        nav.addChild(beginButton.body);
+        nav.addChild(aboutButton.body);
+        nav.addChild(leaveButton.body);
+        beginButton.body.transform.appendTranslation(-0.8, 0, 0);
+        leaveButton.body.transform.appendTranslation( 0.8, 0, 0);
     }
 
-    public function makeButton(text:String, cbk:Void->Void):String {
-        var id:String = 'button_' + text;
-        navMed.mouseSignal.add(function(str, type) if (str == id && type == CLICK) cbk());
-        return 'µ{name:splashButton, id:$id}$h$h$h$text$h$h$h§{}';
+    public function makeButton(text:String, cbk:Void->Void):TextLabel {
+        var label = new TextLabel();
+        label.text = text;
+        label.align = CENTER;
+        label.style.set_color(GREY);
+        label.body.interactionSignal.add(function(_, interaction) {
+            switch (interaction) {
+                case MOUSE(type, _, _):
+                    switch (type) {
+                        case CLICK: cbk();
+                        case ENTER: 
+                            label.style.SET({color:WHITE, w:0.3});
+                            label.redraw();
+                        case EXIT:
+                            label.style.SET({color:GREY, w:0});
+                            label.redraw();
+                        case _:
+                    }
+                case _:
+            }
+        });
+        return label;
     }
 
     private function playGame():Void {

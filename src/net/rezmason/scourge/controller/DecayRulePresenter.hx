@@ -15,8 +15,8 @@ class DecayRulePresenter extends RulePresenter {
         wither.ease = Linear.easeNone.calculate;
 
         var fade = createAnimation();
-        fade.topFrom.copyFrom(wither.topTo);
-        fade.bottomFrom.copyFrom(wither.bottomTo);
+        fade.topFrom.COPY(wither.topTo);
+        fade.bottomFrom.COPY(wither.bottomTo);
         populateGlyphs(fade.topTo, fade.bottomTo, spaceState.values, spaceState.petriData);
         fade.topTo.set_p(0.02);
         fade.startTime = wither.duration + Math.random() * 0.5;

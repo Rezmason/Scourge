@@ -48,8 +48,8 @@ class BoardAnimator {
                 var frac = anim.ease(percent);
                 var view = anim.subject.get(BoardSpaceView);
                 if (percent >= 1) {
-                    view.top.copyFrom(anim.topTo);
-                    view.bottom.copyFrom(anim.bottomTo);
+                    view.top.COPY(anim.topTo);
+                    view.bottom.COPY(anim.bottomTo);
                     anim.subject = null;
                     ecce.collect(e);
                     count--;

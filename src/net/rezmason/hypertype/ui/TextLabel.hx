@@ -46,11 +46,13 @@ class TextLabel extends TextObject {
             startX += glyphWidth  / 2;
 
             for (jen in 0...line.length) {
-                body.getGlyphByID(glyphIndex).SET({
+                var glyph = body.getGlyphByID(glyphIndex);
+                glyph.COPY(style, [r, g, b, i, a, w, hitboxID, hitboxS, hitboxH]);
+                glyph.SET({
                     x: startX + jen * glyphWidth, 
                     y: startY - ike * glyphHeight, 
                     char:line.charCodeAt(jen),
-                    color:color,
+                    // r:1, g:1, b:1,
                 });
                 glyphIndex++;
             }

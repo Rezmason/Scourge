@@ -99,8 +99,8 @@ class BoardInitializer {
                 over.SET({s:0, hitboxID:spaceState.cell.id});
             }
 
-            view.lastTopTo = GlyphUtils.createGlyph().copyFrom(top);
-            view.lastBottomTo = GlyphUtils.createGlyph().copyFrom(bottom);
+            view.lastTopTo = GlyphUtils.createGlyph().COPY(top);
+            view.lastBottomTo = GlyphUtils.createGlyph().COPY(bottom);
 
             itr += 3;
         }

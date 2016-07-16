@@ -6,7 +6,6 @@ import net.rezmason.hypertype.core.Scene;
 import net.rezmason.hypertype.core.SceneGraph;
 import net.rezmason.hypertype.demo.*;
 import net.rezmason.hypertype.nav.NavPage;
-import net.rezmason.hypertype.ui.UIElement;
 import net.rezmason.hypertype.useractions.*;
 import net.rezmason.scourge.View;
 import net.rezmason.scourge.useractions.PlayGameAction;
@@ -16,8 +15,8 @@ import net.rezmason.utils.santa.Present;
 class GamePage extends NavPage {
 
     var bodiesByName:Map<String, Body>;
-    var console:UIElement;
-    var consoleMed:ConsoleUIMediator;
+    // var console:UIElement;
+    // var consoleMed:ConsoleUIMediator;
     var currentBodyName:String;
     var mainScene:Scene;
     var sceneGraph:SceneGraph;
@@ -29,9 +28,9 @@ class GamePage extends NavPage {
         mainScene.camera.glyphScaleMode = SCALE_WITH_MIN;
         scenes.push(mainScene);
         
-        consoleMed = new ConsoleUIMediator();
-        var interpreter = new Interpreter(consoleMed, [GRAVE]);
-        console = new UIElement(consoleMed);
+        // consoleMed = new ConsoleUIMediator();
+        // var interpreter = new Interpreter(consoleMed, [GRAVE]);
+        // console = new UIElement(consoleMed);
 
         var alphabetDemo:AlphabetDemo = new AlphabetDemo();
         var sdfFontDemo:SDFFontDemo = new SDFFontDemo();
@@ -52,11 +51,11 @@ class GamePage extends NavPage {
         bodiesByName['board']      = view.body;
 
         // console.hasScrollBar = true;
-        console.setLayout(0.25, 0.25, 0.5, 0.5);
-        console.body.visible = false;
-        scenes.push(console.scene);
+        // console.setLayout(0.25, 0.25, 0.5, 0.5);
+        // console.body.visible = false;
+        // scenes.push(console.scene);
 
-        interpreter.addAction(new SetFontAction(console));
+        /*
         interpreter.addAction(new SetLayoutAction(console));
         interpreter.addAction(new SetNameAction(interpreter));
         interpreter.addAction(new PrintAction());
@@ -79,14 +78,15 @@ class GamePage extends NavPage {
             }
             outputSignal.dispatch(message, true);
         }));
+        */
 
         showBodyByName('colorSolid');
     }
 
     function toggleConsole() {
-        console.body.visible = !console.body.visible;
-        if (console.body.visible) sceneGraph.setKeyboardFocus(console.body);
-        else sceneGraph.setKeyboardFocus(null);
+        // console.body.visible = !console.body.visible;
+        // if (console.body.visible) sceneGraph.setKeyboardFocus(console.body);
+        // else sceneGraph.setKeyboardFocus(null);
     }
 
     function showBodyByName(name:String):Void {

@@ -72,15 +72,15 @@ class BoardSettler extends Reckoner {
             
             if (view.changed) {
                 view.changed = false;
-                anim.topFrom.copyFrom(view.lastTopTo);
-                anim.topTo.copyFrom(view.lastTopTo);
-                anim.bottomFrom.copyFrom(view.lastBottomTo);
-                anim.bottomTo.copyFrom(view.lastBottomTo);
+                anim.topFrom.COPY(view.lastTopTo);
+                anim.topTo.COPY(view.lastTopTo);
+                anim.bottomFrom.COPY(view.lastBottomTo);
+                anim.bottomTo.COPY(view.lastBottomTo);
             } else {
-                anim.topFrom.copyFrom(view.top);
-                anim.topTo.copyFrom(view.top);
-                anim.bottomFrom.copyFrom(view.bottom);
-                anim.bottomTo.copyFrom(view.bottom);
+                anim.topFrom.COPY(view.top);
+                anim.topTo.COPY(view.top);
+                anim.bottomFrom.COPY(view.bottom);
+                anim.bottomTo.COPY(view.bottom);
             }
             
             anim.topTo.set_p(-0.01);
@@ -104,7 +104,7 @@ class BoardSettler extends Reckoner {
                 var y = nudge == null ? Math.random() * 0.4 - 0.2 : nudge.y;
                 var char = Utf8.charCodeAt(ScourgeStrings.BODY_GLYPHS, bitfield);
                 anim.topTo.SET({x:pos.x + x * 0.2, y:pos.y + y * 0.2, char:char});
-                view.lastTopTo.copyFrom(anim.topTo);
+                view.lastTopTo.COPY(anim.topTo);
             }
 
         }

@@ -92,7 +92,9 @@ class TextBox extends TextObject {
             var x = startX;
             for (jen in 0...line.length) {
                 var charCode = line.charCodeAt(jen);
-                body.getGlyphByID(glyphIndex).SET({x: x, y: y,  char:charCode, color:color});
+                var glyph = body.getGlyphByID(glyphIndex);
+                glyph.COPY(style, [r, g, b, i, a, w, hitboxID, hitboxS, hitboxH]);
+                glyph.SET({x: x, y: y, char:charCode});
                 if (charCode == 32) x += spaceWidth * glyphWidth;
                 else x += glyphWidth;
                 glyphIndex++;

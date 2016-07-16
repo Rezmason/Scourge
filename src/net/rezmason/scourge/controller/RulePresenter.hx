@@ -49,8 +49,8 @@ class RulePresenter extends Reckoner {
         if (entities != null) {
             var lastAnim = entities[entities.length - 1].get(GlyphAnimation);
             spaceView.changed = true;
-            spaceView.lastTopTo.copyFrom(lastAnim.topTo);
-            spaceView.lastBottomTo.copyFrom(lastAnim.bottomTo);
+            spaceView.lastTopTo.COPY(lastAnim.topTo);
+            spaceView.lastBottomTo.COPY(lastAnim.bottomTo);
         }
         return entities;
     }
@@ -72,10 +72,10 @@ class RulePresenter extends Reckoner {
         anim.duration = 0.125;
         anim.ease = Quad.easeInOut.calculate;
 
-        anim.topFrom.copyFrom(spaceView.lastTopTo);
-        anim.topTo.copyFrom(spaceView.lastTopTo);
-        anim.bottomFrom.copyFrom(spaceView.lastBottomTo);
-        anim.bottomTo.copyFrom(spaceView.lastBottomTo);
+        anim.topFrom.COPY(spaceView.lastTopTo);
+        anim.topTo.COPY(spaceView.lastTopTo);
+        anim.bottomFrom.COPY(spaceView.lastBottomTo);
+        anim.bottomTo.COPY(spaceView.lastBottomTo);
 
         return anim;
     }

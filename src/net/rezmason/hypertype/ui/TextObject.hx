@@ -16,7 +16,7 @@ class TextObject {
     var numRequiredGlyphs:UInt;
 
     public var body(default, null):Body = new Body();
-    public var color:Vec4 = new Vec4(1, 1, 1);
+    public var style:Glyph = GlyphUtils.createGlyph();
     public var glyphWidth:Float = 0.1;
     public var text:String = null;
     public var align:ParagraphAlign = LEFT;

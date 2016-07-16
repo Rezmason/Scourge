@@ -18,8 +18,8 @@ class DropPieceRulePresenter extends RulePresenter {
         slam.ease = Linear.easeNone.calculate;
 
         var cool = createAnimation();
-        cool.topFrom.copyFrom(slam.topTo);
-        cool.bottomFrom.copyFrom(slam.bottomTo);
+        cool.topFrom.COPY(slam.topTo);
+        cool.bottomFrom.COPY(slam.bottomTo);
         populateGlyphs(cool.topTo, cool.bottomTo, spaceState.values, spaceState.petriData);
         cool.bottomTo.set_pos(spaceState.petriData.pos);
         cool.topTo.set_pos(spaceState.petriData.pos);

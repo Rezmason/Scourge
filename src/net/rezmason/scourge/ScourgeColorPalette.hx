@@ -18,4 +18,5 @@ class ScourgeColorPalette {
     public static var UI_COLOR:Vec4 = Vec4.fromHex(0xFFFFFF);
     public static var BLACK:Vec4 = new Vec4(0, 0, 0);
     public static var WHITE:Vec4 = new Vec4(1, 1, 1);
+    public static var GREY:Vec4 = new Vec4(0.5, 0.5, 0.5);
 }
