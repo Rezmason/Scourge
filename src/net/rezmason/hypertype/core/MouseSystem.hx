@@ -1,6 +1,5 @@
 package net.rezmason.hypertype.core;
 
-import lime.math.Rectangle;
 import lime.utils.UInt8Array;
 import net.rezmason.gl.RenderTarget;
 import net.rezmason.gl.RenderTargetTexture;
@@ -19,7 +18,6 @@ class MouseSystem {
     public var refreshSignal(default, null):Zig<Void->Void>;
     var rtt:RenderTargetTexture;
     var data:UInt8Array;
-    var focusRegionsByID:Map<Int, Rectangle>;
     var lastFocusRegionID:Null<Int>;
     var lastX:Float;
     var lastY:Float;
@@ -33,7 +31,6 @@ class MouseSystem {
     public function new():Void {
         interactSignal = new Zig();
         refreshSignal = new Zig();
-        focusRegionsByID = null;
         lastFocusRegionID = null;
         lastX = Math.NaN;
         lastY = Math.NaN;
@@ -55,15 +52,6 @@ class MouseSystem {
             data = null;
             invalidate();
         }
-    }
-
-    public function setFocusRegions(focusRegionsByID:Map<Int, Rectangle>):Void {
-        this.focusRegionsByID = focusRegionsByID;
-        if (lastFocusRegionID != null && focusRegionsByID[lastFocusRegionID] == null) {
-            lastFocusRegionID = null;
-            receiveMouseMove(lastX, lastY);
-        }
-        invalidate();
     }
 
     public function invalidate():Void invalid = true;
@@ -117,19 +105,7 @@ class MouseSystem {
         var glyphID:Null<Int> = null;
 
         if (rawID == 0xFFFFFF) {
-            if (focusRegionsByID != null) {
-                if (lastFocusRegionID != null && focusRegionsByID[lastFocusRegionID].contains(x / width, y / height)) {
-                    bodyID = lastFocusRegionID;
-                } else {
-                    for (id in focusRegionsByID.keys()) {
-                        if (focusRegionsByID[id].contains(x / width, y / height)) {
-                            bodyID = id;
-                            break;
-                        }
-                    }
-                }
-            }
-            lastFocusRegionID = bodyID;
+            // TODO: broad interaction regions
         } else {
             lastFocusRegionID = null;
             bodyID = rawID >> 16 & 0xFF;

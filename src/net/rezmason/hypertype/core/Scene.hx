@@ -13,7 +13,6 @@ class Scene {
 
     public var invalidatedSignal(default, null):Zig<Void->Void>;
     public var invalidateHitboxesSignal(default, null):Zig<Void->Void>;
-    public var redrawFocusRectsSignal(default, null):Zig<Void->Void>;
     public var resizeSignal(default, null):Zig<Void->Void>;
     
     var bodiesByID:Map<Int, Body>;
@@ -21,7 +20,6 @@ class Scene {
     public function new():Void {
         invalidatedSignal = new Zig();
         invalidateHitboxesSignal = new Zig();
-        redrawFocusRectsSignal = new Zig();
         resizeSignal = new Zig();
         camera = new Camera();
         root = new Body();
@@ -63,7 +61,6 @@ class Scene {
     inline function set_focus(body:Body):Body {
         fetchBodies();
         focus = (body == null || bodiesByID[body.id] == null) ? null : body;
-        redrawFocusRectsSignal.dispatch();
         return focus;
     }
 }

@@ -15,7 +15,6 @@ class SceneGraph {
     public var rectsByBodyID(default, null):Map<Int, Rectangle> = new Map();
     public var teaseHitboxesSignal(default, null):Zig<Bool->Void> = new Zig();
     public var toggleConsoleSignal(default, null):Zig<Void->Void> = new Zig();
-    public var updateFocusRegionsSignal(default, null):Zig<Map<Int, Rectangle>->Void> = new Zig();
     public var invalidateHitboxesSignal(default, null):Zig<Void->Void> = new Zig();
 
     public function new() {}
@@ -24,11 +23,9 @@ class SceneGraph {
         if (!scenes.has(scene)) {
             scenes.push(scene);
             scene.invalidateHitboxesSignal.add(invalidateHitboxesSignal.dispatch);
-            scene.redrawFocusRectsSignal.add(updateRects);
             scene.invalidatedSignal.add(invalidateScene);
             scene.resize(width, height);
             invalidateScene();
-            updateRects();
         }
     }
 
@@ -36,10 +33,8 @@ class SceneGraph {
         if (scenes.has(scene)) {
             scenes.remove(scene);
             scene.invalidateHitboxesSignal.add(invalidateHitboxesSignal.dispatch);
-            scene.redrawFocusRectsSignal.remove(updateRects);
             scene.invalidatedSignal.remove(invalidateScene);
             invalidateScene();
-            updateRects();
         }
     }
 
@@ -60,13 +55,6 @@ class SceneGraph {
         this.width = width;
         this.height = height;
         for (scene in scenes) scene.resize(width, height);
-    }
-
-    function updateRects():Void {
-        fetchBodies(false);
-        for (key in rectsByBodyID.keys()) rectsByBodyID.remove(key);
-        for (scene in scenes) if (scene.focus != null) rectsByBodyID[scene.focus.id] = scene.camera.rect;
-        updateFocusRegionsSignal.dispatch(rectsByBodyID);
     }
 
     public function routeInteraction(bodyID:Null<Int>, glyphID:Null<Int>, interaction:Interaction):Void {
@@ -101,7 +89,6 @@ class SceneGraph {
             invalid = false;
             for (bodyID in bodiesByID.keys()) bodiesByID.remove(bodyID);
             for (scene in scenes) for (body in scene.bodies) bodiesByID[body.id] = body;
-            if (broadcast) updateFocusRegionsSignal.dispatch(rectsByBodyID);
         }
     }
 }
