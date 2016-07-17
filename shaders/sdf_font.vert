@@ -12,6 +12,7 @@ attribute float aAura;
 uniform mat4 uBodyTransform;
 uniform mat4 uCameraTransform;
 uniform vec4 uBodyParams;
+uniform vec4 uCameraParams;
 uniform vec4 uScreenParams;
 uniform vec4 uFontGlyphData;
 uniform vec4 uFontSDFData;
@@ -35,7 +36,7 @@ void main(void) {
     vec2 glyphRatio = vec2(1.0, uFontSDFData.w);
     vec2 aspectRatio = vec2(1.0, uScreenParams.x);
     vec2 positionInflate = 1.0 + (1.0 / uFontSDFData.xy - 1.0) * inflation;
-    position.xy += uBodyParams.x * aCorner * vec2(aHorizontalStretch, 1.0) * aScale * glyphRatio * aspectRatio * positionInflate;
+    position.xy += uBodyParams.x * uCameraParams.x * aCorner * vec2(aHorizontalStretch, 1.0) * aScale * glyphRatio * aspectRatio * positionInflate;
 
     vColor = aColor * clamp(2.0 - position.z, 0.0, 1.0);
     vec2 glyphSize = uFontGlyphData.zw / uFontGlyphData.xy;

@@ -64,13 +64,13 @@ class Engine {
         
         hitboxPass = new RenderPass();
         mouseSystem.refreshSignal.add(hitboxPass.run);
-        hitboxPass.addStep(SceneStep(hitboxMethod, sceneGraph, mouseSystem.renderTarget));
+        hitboxPass.addStep(SceneGraphStep(hitboxMethod, sceneGraph, mouseSystem.renderTarget));
 
         hitboxDebugPass = new RenderPass();
-        hitboxDebugPass.addStep(SceneStep(hitboxMethod, sceneGraph, viewport));
+        hitboxDebugPass.addStep(SceneGraphStep(hitboxMethod, sceneGraph, viewport));
 
         sdfPass = new RenderPass();
-        sdfPass.addStep(SceneStep(sdfFontMethod, sceneGraph, sceneRTT.renderTarget));
+        sdfPass.addStep(SceneGraphStep(sdfFontMethod, sceneGraph, sceneRTT.renderTarget));
         sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT1.renderTarget, [0, 0.002]));
         sdfPass.addStep(ScreenStep(bloomMethod, ['input' => bloomRTT1], bloomRTT2.renderTarget, [0.002, 0]));
         sdfPass.addStep(ScreenStep(combineMethod, ['input' => sceneRTT, 'bloom' => bloomRTT2, 'debug' => debugDisplay.texture], viewport));

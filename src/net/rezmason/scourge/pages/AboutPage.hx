@@ -33,15 +33,15 @@ class AboutPage extends NavPage {
         paperMed = new UIMediator();
         paper = new UIElement(paperMed);
         paper.setFontSize(14);
-        paper.scene.camera.rect = new Rectangle(0.1, 0, 0.8, 0.9);
-        paper.scene.root.addChild(paper.body);
+        paper.sceneGraph.camera.rect = new Rectangle(0.1, 0, 0.8, 0.9);
+        paper.sceneGraph.root.addChild(paper.body);
         scenes.push(paper.scene);
 
         navMed = new UIMediator();
         nav = new UIElement(navMed);
         nav.setFontSize(14);
-        nav.scene.camera.rect = new Rectangle(0, 0.9, 1, 0.1);
-        nav.scene.root.addChild(nav.body);
+        nav.sceneGraph.camera.rect = new Rectangle(0, 0.9, 1, 0.1);
+        nav.sceneGraph.root.addChild(nav.body);
         scenes.push(nav.scene);
 
         var buttons:Array<String> = [

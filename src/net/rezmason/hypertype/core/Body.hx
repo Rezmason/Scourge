@@ -20,15 +20,12 @@ class Body extends SceneNode<Body> {
     public var concatenatedTransform(get, null):Matrix4;
     public var glyphScale(default, set):Float;
     public var font(default, set):GlyphFont;
-    public var scene(default, null):SceneGraph;
     public var mouseEnabled(default, set):Bool = true;
     public var visible(default, set):Bool = true;
     public var isInteractive(get, null):Bool;
-    
-    public var fontChangedSignal(default, null):Zig<Void->Void> = new Zig();
     public var interactionSignal(default, null):Zig<Int->Interaction->Void> = new Zig();
     public var updateSignal(default, null):Zig<Float->Void> = new Zig();
-    public var sceneSetSignal(default, null):Zig<Void->Void> = new Zig();
+    public var invalidateSignal(default, null):Zig<Void->Void> = new Zig();
 
     @:allow(net.rezmason.hypertype.core) var glyphBatches(default, null):Array<GlyphBatch> = [];
     @:allow(net.rezmason.hypertype.core) var params(default, null):Vector4;
@@ -44,16 +41,17 @@ class Body extends SceneNode<Body> {
         fontManager.onFontChange.add(updateFont);
         font = fontManager.defaultFont;
         params = new Vector4();
-        params.y = id / 0xFF;
         glyphScale = 1;
+        params.x = glyphScale;
+        params.y = id / 0xFF;
     }
 
     override public function addChild(node:Body):Bool {
         var success = super.addChild(node);
         if (success) {
-            node.setScene(scene);
             node.update(0);
-            if (scene != null) scene.invalidate();
+            node.invalidateSignal.add(invalidateSignal.dispatch);
+            invalidateSignal.dispatch();
         }
         return success;
     }
@@ -61,8 +59,8 @@ class Body extends SceneNode<Body> {
     override public function removeChild(node:Body):Bool {
         var success = super.removeChild(node);
         if (success) {
-            node.setScene(null);
-            if (scene != null) scene.invalidate();
+            node.invalidateSignal.remove(invalidateSignal.dispatch);
+            invalidateSignal.dispatch();
         }
         return success;
     }
@@ -114,62 +112,45 @@ class Body extends SceneNode<Body> {
     function update(delta:Float):Void updateSignal.dispatch(delta);
 
     @:allow(net.rezmason.hypertype.core)
-    function upload():Void for (batch in glyphBatches) batch.upload();
+    function interact(glyphID:Int, interaction:Interaction):Void interactionSignal.dispatch(glyphID, interaction);
 
     @:allow(net.rezmason.hypertype.core)
-    function setScene(scene:SceneGraph):Void {
-        var lastScene:SceneGraph = this.scene;
-        if (this.scene != null) this.scene.resizeSignal.remove(updateGlyphTransform);
-        this.scene = scene;
-        updateGlyphTransform();
-        if (this.scene != null) this.scene.resizeSignal.add(updateGlyphTransform);
-        for (child in children()) child.setScene(scene);
-        sceneSetSignal.dispatch();
-    }
+    function upload():Void for (batch in glyphBatches) batch.upload();
 
     function updateFont(font:GlyphFont):Void {
         if (this.font != font) {
             this.font = font;
-            updateGlyphTransform();
+            params.x = glyphScale;
             for (glyph in glyphs) glyph.set_font(font);
         }
     }
 
     inline function set_glyphScale(val:Float):Float {
         glyphScale = val;
-        updateGlyphTransform();
+        params.x = glyphScale;
         return glyphScale;
     }
 
     inline function set_font(font:GlyphFont) {
-        if (font != null) {
-            this.font = font;
-            fontChangedSignal.dispatch();
-        }
+        if (font != null) this.font = font;
         return this.font;
     }
 
     inline function set_visible(visible:Bool) {
         var isInteractive = this.isInteractive;
         this.visible = visible;
-        if (isInteractive != this.isInteractive && scene != null) scene.invalidateHitboxesSignal.dispatch();
+        if (isInteractive != this.isInteractive) invalidateSignal.dispatch();
         return this.visible;
     }
 
     inline function set_mouseEnabled(mouseEnabled:Bool) {
         var isInteractive = this.isInteractive;
         this.mouseEnabled = mouseEnabled;
-        if (isInteractive != this.isInteractive && scene != null) scene.invalidateHitboxesSignal.dispatch();
+        if (isInteractive != this.isInteractive) invalidateSignal.dispatch();
         return this.mouseEnabled;
     }
 
     inline function get_isInteractive() return visible && mouseEnabled;
-
-    inline function updateGlyphTransform():Void {
-        if (scene != null) {
-            params.x = glyphScale * scene.camera.glyphScale;
-        }
-    }
 
     function get_concatenatedTransform():Matrix4 {
         concatMat.copyFrom(transform);

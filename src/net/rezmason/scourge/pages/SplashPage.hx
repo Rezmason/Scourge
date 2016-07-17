@@ -30,17 +30,18 @@ class SplashPage extends NavPage {
         splashDemo = new SplashDemo();
         body.addChild(splashDemo.body);
 
+        nav = new Body();
+        nav.transform.appendTranslation(0, 0.5, 0);
+        body.addChild(nav);
+
         /*
         var box = new net.rezmason.hypertype.ui.BorderBox();
         body.addChild(box.body);
         box.width = 0.85;
         box.height = 0.75;
         box.redraw();
+        body.addChild(box.body);
         */
-
-        nav = new Body();
-        nav.transform.appendTranslation(0, 0.5, 0);
-        body.addChild(nav);
 
         var beginButton = makeButton('BEGIN', playGame);
         var aboutButton = makeButton('ABOUT', aboutGame);
@@ -59,6 +60,7 @@ class SplashPage extends NavPage {
         label.glyphWidth = 0.08;
         label.align = CENTER;
         label.style.set_color(GREY);
+        label.redraw();
         label.body.interactionSignal.add(function(_, interaction) {
             switch (interaction) {
                 case MOUSE(type, _, _):

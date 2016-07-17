@@ -23,10 +23,9 @@ class TextObject {
     public var verticalAlign:VerticalAlign = TOP;
     var glyphHeight:Float;
     
-    public function new() body.sceneSetSignal.add(redraw);
+    public function new() {}
 
     public function redraw() {
-        if (body.scene == null) return;
         body.glyphScale = glyphWidth;
         glyphHeight = glyphWidth * body.font.glyphRatio;
         processText();

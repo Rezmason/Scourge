@@ -17,17 +17,15 @@ class BorderBox {
     public var glyphWidth(default, set):Float = 0.1;
     public var rounded:Bool;
     public var color:Vec4 = new Vec4(1, 1, 1);
-    
-    public function new() body.sceneSetSignal.add(redraw);
 
+    public function new() {}
+    
     public function redraw() {
-        if (body.scene == null) return;
-        
         var displayedGlyphWidth = glyphWidth;
         if (displayedGlyphWidth > width  && width  > 0) displayedGlyphWidth = width;
         if (displayedGlyphWidth > height && height > 0) displayedGlyphWidth = height;
 
-        body.glyphScale = displayedGlyphWidth * body.scene.camera.rect.width / body.font.glyphRatio;
+        body.glyphScale = displayedGlyphWidth / body.font.glyphRatio;
 
         var displayedWidth  = Math.max(0, width   - displayedGlyphWidth);
         var displayedHeight = Math.max(0, height  - displayedGlyphWidth);

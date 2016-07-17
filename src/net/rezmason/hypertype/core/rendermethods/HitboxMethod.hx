@@ -24,13 +24,14 @@ class HitboxMethod extends SceneRenderMethod {
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
     }
 
-    override function drawBody(body:Body):Void {
-        program.setMatrix4('uCameraTransform', body.scene.camera.transform);
+    override function drawBody(sceneGraph:SceneGraph, body:Body):Void {
+        program.setMatrix4('uCameraTransform', sceneGraph.camera.transform);
         program.setMatrix4('uBodyTransform', body.concatenatedTransform);
         program.setVector4('uFontSDFData', body.font.sdfData);
         program.setVector4('uBodyParams', body.params);
-        program.setVector4('uScreenParams', body.scene.screenParams);
-        super.drawBody(body);
+        program.setVector4('uCameraParams', sceneGraph.camera.params);
+        program.setVector4('uScreenParams', sceneGraph.screenParams);
+        super.drawBody(sceneGraph, body);
     }
 
     override function setGlyphBatch(batch:GlyphBatch):Void {

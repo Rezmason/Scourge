@@ -3,6 +3,7 @@ package net.rezmason.hypertype.core;
 import lime.math.Matrix4;
 import lime.math.Rectangle;
 import lime.math.Vector2;
+import lime.math.Vector4;
 import lime.utils.Float32Array;
 
 class Camera {
@@ -12,8 +13,9 @@ class Camera {
     public var transform(default, null):Matrix4;
     public var scaleMode(default, set):CameraScaleMode;
     public var glyphScaleMode(default, set):CameraGlyphScaleMode;
-    public var rect(default, set):Rectangle;
+    public var rect(default, null):Rectangle;
     public var glyphScale(default, null):Float;
+    public var params(default, null):Vector4;
 
     public var scaleX(default, null):Float;
     public var scaleY(default, null):Float;
@@ -34,6 +36,8 @@ class Camera {
         transform = new Matrix4();
         projection = makeProjection();
         vanishingPoint = new Vector2();
+        params = new Vector4();
+        params.x = glyphScale;
         
         rect = DEFAULT_VIEW_RECT();
         scaleMode = SHOW_ALL;
@@ -93,12 +97,15 @@ class Camera {
         vanishingPoint.y = (rect.top + rect.bottom) * 0.5;
         applyVP(0, 0);
 
-        if (glyphScaleMode != null) glyphScale = switch (glyphScaleMode) {
-            case SCALE_WITH_WIDTH: scaleX;
-            case SCALE_WITH_HEIGHT: scaleY;
-            case SCALE_WITH_MIN: Math.min(scaleX, scaleY);
-            case SCALE_WITH_MAX: Math.max(scaleX, scaleY);
-            case SCALE_NONE: 1;
+        if (glyphScaleMode != null) {
+            glyphScale = switch (glyphScaleMode) {
+                case SCALE_WITH_WIDTH: scaleX;
+                case SCALE_WITH_HEIGHT: scaleY;
+                case SCALE_WITH_MIN: Math.min(scaleX, scaleY);
+                case SCALE_WITH_MAX: Math.max(scaleX, scaleY);
+                case SCALE_NONE: 1;
+            }
+            params.x = glyphScale;
         }
     }
 
@@ -118,14 +125,6 @@ class Camera {
         rawData[15] =  0;
         mat = rawData;
         return mat;
-    }
-
-    inline function set_rect(val:Rectangle):Rectangle {
-        if (val == null) val = DEFAULT_VIEW_RECT();
-        if (val.width <= 0 || val.height <= 0) throw 'Camera rects cannot be null.';
-        rect = val;
-        resize(stageWidth, stageHeight);
-        return val;
     }
 
     inline function set_scaleMode(mode:CameraScaleMode):CameraScaleMode {

@@ -15,9 +15,9 @@ class RenderPass {
     public function run() {
         for (step in steps) {
             switch (step) {
-                case SceneStep(method, sceneGraph, renderTarget, args):
+                case SceneGraphStep(method, sceneGraph, renderTarget, args):
                     method.start(renderTarget, args);
-                    method.drawScene(sceneGraph);
+                    method.drawSceneGraph(sceneGraph);
                     method.end();
                 case ScreenStep(method, inputTextures, renderTarget, args):
                     method.start(renderTarget, args);
@@ -29,6 +29,6 @@ class RenderPass {
 }
 
 enum RenderStep {
-    SceneStep(method:SceneRenderMethod, sceneGraph:SceneGraph, renderTarget:RenderTarget, ?args:Array<Dynamic>);
+    SceneGraphStep(method:SceneRenderMethod, sceneGraph:SceneGraph, renderTarget:RenderTarget, ?args:Array<Dynamic>);
     ScreenStep(method:ScreenRenderMethod, inputTextures:Map<String, Texture>, renderTarget:RenderTarget, ?args:Array<Dynamic>);
 }

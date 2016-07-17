@@ -7,16 +7,16 @@ class SceneRenderMethod extends RenderMethod {
         setGlyphBatch(null);
     }
 
-    public function drawScene(scene:SceneGraph) {
-        for (body in scene.bodies) {
+    public function drawSceneGraph(sceneGraph:SceneGraph) {
+        for (body in sceneGraph.bodies) {
             if (body.size > 0 && shouldDrawBody(body)) {
                 body.upload();
-                drawBody(body);
+                drawBody(sceneGraph, body);
             }
         }
     }
 
-    function drawBody(body:Body):Void {
+    function drawBody(sceneGraph:SceneGraph, body:Body):Void {
         for (batch in body.glyphBatches) {
             setGlyphBatch(batch);
             program.draw(batch.indexBuffer, 0, batch.size * Almanac.TRIANGLES_PER_GLYPH);
