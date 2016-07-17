@@ -13,8 +13,8 @@ Simplify the scene graph tremendously
         3. Get everything to work as children of one scene (DONE)
         4. Merge scene and scene graph (DONE)
         5. Convert stage size to inches (DONE)
-        6. Hoist Container from Body
-        7. Make SceneGraph into Stage, extends Container
+        6. Hoist Container from Body (DONE)
+        7. Make SceneGraph into Stage, extends Container (DONE)
         8. Create LetterBox from Container
         9. Start letterboxing things
         ...

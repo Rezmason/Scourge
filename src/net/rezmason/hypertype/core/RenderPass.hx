@@ -3,7 +3,7 @@ package net.rezmason.hypertype.core;
 import net.rezmason.gl.RenderTarget;
 import net.rezmason.gl.Texture;
 import net.rezmason.hypertype.core.RenderMethod;
-import net.rezmason.hypertype.core.SceneGraph;
+import net.rezmason.hypertype.core.Stage;
 import net.rezmason.hypertype.core.SceneRenderMethod;
 import net.rezmason.hypertype.core.ScreenRenderMethod;
 
@@ -15,9 +15,9 @@ class RenderPass {
     public function run() {
         for (step in steps) {
             switch (step) {
-                case SceneGraphStep(method, sceneGraph, renderTarget, args):
+                case SceneStep(method, stage, renderTarget, args):
                     method.start(renderTarget, args);
-                    method.drawSceneGraph(sceneGraph);
+                    method.drawScene(stage);
                     method.end();
                 case ScreenStep(method, inputTextures, renderTarget, args):
                     method.start(renderTarget, args);
@@ -29,6 +29,6 @@ class RenderPass {
 }
 
 enum RenderStep {
-    SceneGraphStep(method:SceneRenderMethod, sceneGraph:SceneGraph, renderTarget:RenderTarget, ?args:Array<Dynamic>);
+    SceneStep(method:SceneRenderMethod, stage:Stage, renderTarget:RenderTarget, ?args:Array<Dynamic>);
     ScreenStep(method:ScreenRenderMethod, inputTextures:Map<String, Texture>, renderTarget:RenderTarget, ?args:Array<Dynamic>);
 }

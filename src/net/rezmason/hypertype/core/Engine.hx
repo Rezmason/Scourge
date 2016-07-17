@@ -11,7 +11,7 @@ import net.rezmason.utils.santa.Present;
 class Engine {
 
     var active:Bool;
-    var sceneGraph:SceneGraph;
+    var stage:Stage;
     var systemCalls:SystemCalls;
     var mouseSystem:MouseSystem;
     var keyboardSystem:KeyboardSystem;
@@ -41,15 +41,15 @@ class Engine {
         systemCalls = new Present(SystemCalls);
         systemCalls.resizeWindowSignal.add(resizeWindow);
         
-        sceneGraph = new Present(SceneGraph);
-        sceneGraph.teaseHitboxesSignal.add(teaseHitboxes);
+        stage = new Present(Stage);
+        stage.teaseHitboxesSignal.add(teaseHitboxes);
         
         mouseSystem = new MouseSystem();
-        mouseSystem.interactSignal.add(sceneGraph.routeInteraction);
-        sceneGraph.invalidateHitboxesSignal.add(mouseSystem.invalidate);
+        mouseSystem.interactSignal.add(stage.routeInteraction);
+        stage.invalidateHitboxesSignal.add(mouseSystem.invalidate);
 
         keyboardSystem = new KeyboardSystem();
-        keyboardSystem.interactSignal.add(sceneGraph.routeInteraction.bind(null, null));
+        keyboardSystem.interactSignal.add(stage.routeInteraction.bind(null, null));
 
         viewport = new ViewportRenderTarget();
         sceneRTT = new RenderTargetTexture(FLOAT);
@@ -64,13 +64,13 @@ class Engine {
         
         hitboxPass = new RenderPass();
         mouseSystem.refreshSignal.add(hitboxPass.run);
-        hitboxPass.addStep(SceneGraphStep(hitboxMethod, sceneGraph, mouseSystem.renderTarget));
+        hitboxPass.addStep(SceneStep(hitboxMethod, stage, mouseSystem.renderTarget));
 
         hitboxDebugPass = new RenderPass();
-        hitboxDebugPass.addStep(SceneGraphStep(hitboxMethod, sceneGraph, viewport));
+        hitboxDebugPass.addStep(SceneStep(hitboxMethod, stage, viewport));
 
         sdfPass = new RenderPass();
-        sdfPass.addStep(SceneGraphStep(sdfFontMethod, sceneGraph, sceneRTT.renderTarget));
+        sdfPass.addStep(SceneStep(sdfFontMethod, stage, sceneRTT.renderTarget));
         sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT1.renderTarget, [0, 0.002]));
         sdfPass.addStep(ScreenStep(bloomMethod, ['input' => bloomRTT1], bloomRTT2.renderTarget, [0.002, 0]));
         sdfPass.addStep(ScreenStep(combineMethod, ['input' => sceneRTT, 'bloom' => bloomRTT2, 'debug' => debugDisplay.texture], viewport));
@@ -94,7 +94,7 @@ class Engine {
 
     function update(delta) {
         Telemetry.changeName('.update');
-        if (active) sceneGraph.update(delta);
+        if (active) stage.update(delta);
         Telemetry.changeName('.lime');
     }
 
@@ -107,7 +107,7 @@ class Engine {
     }
 
     function setSize(width:Int, height:Int):Void {
-        sceneGraph.setSize(width, height, 72);
+        stage.setSize(width, height, 72);
         mouseSystem.setSize(width, height);
         sceneRTT.resize(width, height);
         bloomRTT1.resize(Std.int(width / BLOOM_DOWNSCALE), Std.int(height / BLOOM_DOWNSCALE));

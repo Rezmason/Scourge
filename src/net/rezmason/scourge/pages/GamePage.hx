@@ -2,7 +2,7 @@ package net.rezmason.scourge.pages;
 
 import net.rezmason.hypertype.console.*;
 import net.rezmason.hypertype.core.Body;
-import net.rezmason.hypertype.core.SceneGraph;
+import net.rezmason.hypertype.core.Stage;
 import net.rezmason.hypertype.demo.*;
 import net.rezmason.hypertype.nav.NavPage;
 import net.rezmason.hypertype.useractions.*;
@@ -17,7 +17,7 @@ class GamePage extends NavPage {
     // var console:UIElement;
     // var consoleMed:ConsoleUIMediator;
     var currentBodyName:String;
-    var sceneGraph:SceneGraph;
+    var stage:Stage;
 
     public function new():Void {
         super();
@@ -33,8 +33,8 @@ class GamePage extends NavPage {
         var waveDemo:WaveDemo = new WaveDemo();
         var view:View = new Present(View);
 
-        sceneGraph = new Present(SceneGraph);
-        sceneGraph.toggleConsoleSignal.add(toggleConsole);
+        stage = new Present(Stage);
+        stage.toggleConsoleSignal.add(toggleConsole);
 
         bodiesByName = new Map();
         bodiesByName['alphabet']   = alphabetDemo.body;
@@ -79,14 +79,13 @@ class GamePage extends NavPage {
 
     function toggleConsole() {
         // console.body.visible = !console.body.visible;
-        // if (console.body.visible) sceneGraph.setKeyboardFocus(console.body);
-        // else sceneGraph.setKeyboardFocus(null);
+        // if (console.body.visible) stage.setKeyboardFocus(console.body);
+        // else stage.setKeyboardFocus(null);
     }
 
     function showBodyByName(name:String):Void {
         if (currentBodyName != null) body.removeChild(bodiesByName[currentBodyName]);
         currentBodyName = name;
         body.addChild(bodiesByName[currentBodyName]);
-        sceneGraph.invalidate();
     }
 }

@@ -1,17 +1,16 @@
 package net.rezmason.hypertype.nav;
 
-import net.rezmason.hypertype.core.SceneGraph;
-import net.rezmason.utils.santa.Present;
+import net.rezmason.hypertype.core.Body;
 
 class NavSystem {
 
-    var sceneGraph:SceneGraph;
+    public var body(default, null):Body;
     var pages:Map<String, NavPage>;
     var pageHistory:Array<NavPage>;
     var currentPage:NavPage;
 
     public function new():Void {
-        sceneGraph = new Present(SceneGraph);
+        body = new Body();
         pages = new Map();
         pageHistory = [];
     }
@@ -50,8 +49,8 @@ class NavSystem {
     }
 
     private function setPageTo(page:NavPage):Void {
-        if (currentPage != null) sceneGraph.root.removeChild(currentPage.body);
+        if (currentPage != null) body.removeChild(currentPage.body);
         currentPage = page;
-        if (currentPage != null) sceneGraph.root.addChild(currentPage.body);
+        if (currentPage != null) body.addChild(currentPage.body);
     }
 }

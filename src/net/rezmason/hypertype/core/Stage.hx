@@ -4,8 +4,7 @@ import lime.math.Vector4;
 import net.rezmason.utils.Zig;
 using Lambda;
 
-class SceneGraph {
-
+class Stage extends Container {
     var bodiesByID:Map<Int, Body>;
     var keyboardFocusBody:Body = null;
     var pixelWidth:UInt = 72;
@@ -15,7 +14,6 @@ class SceneGraph {
     public var heightInInches(get, null):Float;
     public var aspectRatio(get, null):Float;
     public var camera(default, null):Camera = new Camera();
-    public var root(default, null):Body = new Body();
     public var bodies(get, null):Iterator<Body>;
     public var focus(default, set):Body;
     public var teaseHitboxesSignal(default, null):Zig<Bool->Void> = new Zig();
@@ -25,14 +23,15 @@ class SceneGraph {
     @:allow(net.rezmason.hypertype.core) var screenParams(default, null):Vector4 = new Vector4();
 
     public function new() {
-        root.invalidateSignal.add(invalidate);
+        super();
+        invalidateSignal.add(invalidate);
         screenParams.x = 1;
         setSize(pixelWidth, pixelHeight, pixelsPerInch);
     }
 
     public function setKeyboardFocus(body:Body):Void keyboardFocusBody = body;
 
-    public function update(delta) {
+    override public function update(delta) {
         fetchBodies();
         for (body in bodiesByID) body.update(delta);
     }
@@ -65,22 +64,25 @@ class SceneGraph {
         if (target != null) target.interact(glyphID, interaction);
     }
 
-    public inline function invalidate():Void {
+    function invalidate():Void {
         bodiesByID = null;
         invalidateHitboxesSignal.dispatch();
     }
 
     inline function fetchBodies():Void {
         if (bodiesByID == null) {
-            bodiesByID = [root.id => root];
-            mapBodyChildren(root);
+            bodiesByID = new Map();
+            mapBodyChildren(this);
         }
     }
 
-    function mapBodyChildren(base:Body):Void {
-        for (body in base.children()) {
-            bodiesByID[body.id] = body;
-            mapBodyChildren(body);
+    function mapBodyChildren(container:Container):Void {
+        for (child in container.children()) {
+            if (Std.is(child, Body)) {
+                var body:Body = cast child;
+                bodiesByID[body.id] = body;
+            }
+            mapBodyChildren(child);
         }
     }
 

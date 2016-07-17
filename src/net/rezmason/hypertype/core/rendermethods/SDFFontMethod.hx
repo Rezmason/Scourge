@@ -34,16 +34,16 @@ class SDFFontMethod extends SceneRenderMethod {
         extensions.push('OES_texture_float_linear');
     }
 
-    override function drawBody(sceneGraph:SceneGraph, body:Body):Void {
-        program.setMatrix4('uCameraTransform', sceneGraph.camera.transform);
+    override function drawBody(body:Body):Void {
+        program.setMatrix4('uCameraTransform', body.stage.camera.transform);
         program.setMatrix4('uBodyTransform', body.concatenatedTransform);
         program.setVector4('uFontGlyphData', body.font.glyphData);
         program.setVector4('uFontSDFData', body.font.sdfData);
         program.setVector4('uBodyParams', body.concatenatedParams);
-        program.setVector4('uCameraParams', sceneGraph.camera.params);
-        program.setVector4('uScreenParams', sceneGraph.screenParams);
+        program.setVector4('uCameraParams', body.stage.camera.params);
+        program.setVector4('uScreenParams', body.stage.screenParams);
         program.setTexture('uFontTexture', body.font.texture);
-        super.drawBody(sceneGraph, body);
+        super.drawBody(body);
     }
 
     override function setGlyphBatch(batch:GlyphBatch):Void {
