@@ -22,7 +22,6 @@ class SplashPage extends NavPage {
     'µ{name:splashButton, up:splashUp, over:splashOver, down:splashDown, period:0.2, i:1}§{}' +
     '¶{name:main, align:center}';
 
-    var splashScene:Scene;
     var splashDemo:SplashDemo;
     var nav:Body;
 
@@ -30,31 +29,19 @@ class SplashPage extends NavPage {
         super();
 
         splashDemo = new SplashDemo();
-        splashScene = new Scene();
-        splashScene.camera.scaleMode = WIDTH_FIT;
-        splashScene.camera.rect = new Rectangle(0.0, 0.0, 1.0, 0.5);
-        splashScene.root.addChild(splashDemo.body);
-        scenes.push(splashScene);
+        body.addChild(splashDemo.body);
 
         /*
         var box = new net.rezmason.hypertype.ui.BorderBox();
-        var boxScene = new Scene();
-        boxScene.camera.rect = new Rectangle(0, 0, 1, 1);
-        boxScene.root.addChild(box.body);
-        scenes.push(boxScene);
+        body.addChild(box.body);
         box.width = 0.85;
         box.height = 0.75;
         box.redraw();
         */
 
         nav = new Body();
-        
-        var navScene = new Scene();
-        var navRect:Rectangle = new Rectangle(0.0, 0.5, 1.0, 0.5);
-        navRect.inflate(-0.02, -0.02);
-        navScene.camera.rect = navRect;
-        navScene.root.addChild(nav);
-        scenes.push(navScene);
+        nav.transform.appendTranslation(0, 0.5, 0);
+        body.addChild(nav);
 
         var beginButton = makeButton('BEGIN', playGame);
         var aboutButton = makeButton('ABOUT', aboutGame);
@@ -63,13 +50,14 @@ class SplashPage extends NavPage {
         nav.addChild(beginButton.body);
         nav.addChild(aboutButton.body);
         nav.addChild(leaveButton.body);
-        beginButton.body.transform.appendTranslation(-0.8, 0, 0);
-        leaveButton.body.transform.appendTranslation( 0.8, 0, 0);
+        beginButton.body.transform.appendTranslation(-0.5, 0, 0);
+        leaveButton.body.transform.appendTranslation( 0.5, 0, 0);
     }
 
     public function makeButton(text:String, cbk:Void->Void):TextLabel {
         var label = new TextLabel();
         label.text = text;
+        label.glyphWidth = 0.08;
         label.align = CENTER;
         label.style.set_color(GREY);
         label.body.interactionSignal.add(function(_, interaction) {

@@ -20,11 +20,7 @@ class Context {
 
     function makeMatrix() {
         var demo = new net.rezmason.hypertype.demo.MatrixDemo();
-        var scene = new net.rezmason.hypertype.core.Scene();
-        scene.camera.scaleMode = net.rezmason.hypertype.core.CameraScaleMode.NO_BORDER;
-        scene.root.addChild(demo.body);
-        scene.focus = demo.body;
         var sceneGraph:SceneGraph = new Present(SceneGraph);
-        sceneGraph.addScene(scene);
+        sceneGraph.scene.root.addChild(demo.body);
     }
 }

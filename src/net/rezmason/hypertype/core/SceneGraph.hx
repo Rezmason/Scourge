@@ -8,7 +8,7 @@ class SceneGraph {
 
     var invalid:Bool = false;
     var bodiesByID:Map<Int, Body> = new Map();
-    var scenes:Array<Scene> = [];
+    public var scene(default, null):Scene;
     var keyboardFocusBodyID:Null<Int> = null;
     public var width(default, null):Int = 1;
     public var height(default, null):Int = 1;
@@ -17,28 +17,13 @@ class SceneGraph {
     public var toggleConsoleSignal(default, null):Zig<Void->Void> = new Zig();
     public var invalidateHitboxesSignal(default, null):Zig<Void->Void> = new Zig();
 
-    public function new() {}
-
-    public function addScene(scene:Scene):Void {
-        if (!scenes.has(scene)) {
-            scenes.push(scene);
-            scene.invalidateHitboxesSignal.add(invalidateHitboxesSignal.dispatch);
-            scene.invalidatedSignal.add(invalidateScene);
-            scene.resize(width, height);
-            invalidateScene();
-        }
+    public function new() {
+        scene = new Scene();
+        scene.invalidateHitboxesSignal.add(invalidateHitboxesSignal.dispatch);
+        scene.invalidatedSignal.add(invalidateScene);
+        scene.resize(width, height);
+        invalidateScene();
     }
-
-    public function removeScene(scene:Scene):Void {
-        if (scenes.has(scene)) {
-            scenes.remove(scene);
-            scene.invalidateHitboxesSignal.add(invalidateHitboxesSignal.dispatch);
-            scene.invalidatedSignal.remove(invalidateScene);
-            invalidateScene();
-        }
-    }
-
-    public function eachScene():Iterator<Scene> return scenes.iterator();
 
     public function setKeyboardFocus(body:Body):Void {
         fetchBodies();
@@ -54,7 +39,7 @@ class SceneGraph {
     public function setSize(width:Int, height:Int):Void {
         this.width = width;
         this.height = height;
-        for (scene in scenes) scene.resize(width, height);
+        scene.resize(width, height);
     }
 
     public function routeInteraction(bodyID:Null<Int>, glyphID:Null<Int>, interaction:Interaction):Void {
@@ -65,7 +50,7 @@ class SceneGraph {
                 target = bodiesByID[bodyID];
                 if (type == CLICK) keyboardFocusBodyID = bodyID;
                 if (target != null) {
-                    var camera = target.scene.camera;
+                    var camera = scene.camera;
                     var rect = camera.rect;
                     var nX = ((x - rect.x) / rect.width ) / camera.scaleX;
                     var nY = ((y - rect.y) / rect.height) / camera.scaleY;
@@ -88,7 +73,7 @@ class SceneGraph {
         if (invalid) {
             invalid = false;
             for (bodyID in bodiesByID.keys()) bodiesByID.remove(bodyID);
-            for (scene in scenes) for (body in scene.bodies) bodiesByID[body.id] = body;
+            for (body in scene.bodies) bodiesByID[body.id] = body;
         }
     }
 }

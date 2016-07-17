@@ -52,7 +52,6 @@ class TextLabel extends TextObject {
                     x: startX + jen * glyphWidth, 
                     y: startY - ike * glyphHeight, 
                     char:line.charCodeAt(jen),
-                    // r:1, g:1, b:1,
                 });
                 glyphIndex++;
             }

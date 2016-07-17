@@ -18,16 +18,11 @@ class GamePage extends NavPage {
     // var console:UIElement;
     // var consoleMed:ConsoleUIMediator;
     var currentBodyName:String;
-    var mainScene:Scene;
     var sceneGraph:SceneGraph;
 
     public function new():Void {
         super();
 
-        mainScene = new Scene();
-        mainScene.camera.glyphScaleMode = SCALE_WITH_MIN;
-        scenes.push(mainScene);
-        
         // consoleMed = new ConsoleUIMediator();
         // var interpreter = new Interpreter(consoleMed, [GRAVE]);
         // console = new UIElement(consoleMed);
@@ -90,10 +85,9 @@ class GamePage extends NavPage {
     }
 
     function showBodyByName(name:String):Void {
-        if (currentBodyName != null) mainScene.root.removeChild(bodiesByName[currentBodyName]);
+        if (currentBodyName != null) body.removeChild(bodiesByName[currentBodyName]);
         currentBodyName = name;
-        mainScene.root.addChild(bodiesByName[currentBodyName]);
-        mainScene.focus = bodiesByName[currentBodyName];
-        mainScene.invalidate();
+        body.addChild(bodiesByName[currentBodyName]);
+        sceneGraph.scene.invalidate();
     }
 }
