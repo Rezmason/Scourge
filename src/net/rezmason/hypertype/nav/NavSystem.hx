@@ -1,16 +1,16 @@
 package net.rezmason.hypertype.nav;
 
-import net.rezmason.hypertype.core.Body;
+import net.rezmason.hypertype.core.Container;
 
 class NavSystem {
 
-    public var body(default, null):Body;
+    public var container(default, null):Container;
     var pages:Map<String, NavPage>;
     var pageHistory:Array<NavPage>;
     var currentPage:NavPage;
 
     public function new():Void {
-        body = new Body();
+        container = new Container();
         pages = new Map();
         pageHistory = [];
     }
@@ -49,8 +49,8 @@ class NavSystem {
     }
 
     private function setPageTo(page:NavPage):Void {
-        if (currentPage != null) body.removeChild(currentPage.body);
+        if (currentPage != null) container.removeChild(currentPage.container);
         currentPage = page;
-        if (currentPage != null) body.addChild(currentPage.body);
+        if (currentPage != null) container.addChild(currentPage.container);
     }
 }

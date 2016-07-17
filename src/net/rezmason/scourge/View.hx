@@ -1,11 +1,12 @@
 package net.rezmason.scourge;
 
 import net.rezmason.hypertype.core.Body;
+import net.rezmason.hypertype.core.Container;
 import net.rezmason.hypertype.ui.BorderBox;
 
 class View {
 
-    public var body(default, null):Body;
+    public var container(default, null):Container;
     public var board(default, null):Body;
     public var loupe(default, null):BorderBox;
     public var piece(default, null):Body;
@@ -14,7 +15,7 @@ class View {
     public var boardScale:Float;
 
     public function new():Void {
-        body = new Body();
+        container = new Container();
         board = new Body();
         loupe = new BorderBox();
         loupe.glyphWidth = 0.05;
@@ -22,10 +23,10 @@ class View {
         bite = new Body();
         boardScale = 1;
 
-        body.addChild(board);
-        body.addChild(loupe.body);
-        body.addChild(piece);
-        body.addChild(bite);
+        container.addChild(board);
+        container.addChild(loupe.body);
+        container.addChild(piece);
+        container.addChild(bite);
     }
 }
     

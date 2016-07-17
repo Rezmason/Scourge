@@ -4,7 +4,7 @@ import lime.math.Rectangle;
 import net.rezmason.hypertype.core.Interaction;
 import net.rezmason.hypertype.nav.NavPage;
 import net.rezmason.hypertype.Strings;
-import net.rezmason.hypertype.core.Body;
+import net.rezmason.hypertype.core.Container;
 import net.rezmason.hypertype.ui.TextLabel;
 import net.rezmason.scourge.ScourgeColorPalette.*;
 
@@ -22,24 +22,24 @@ class SplashPage extends NavPage {
     '¶{name:main, align:center}';
 
     var splashDemo:SplashDemo;
-    var nav:Body;
+    var nav:Container;
 
     public function new():Void {
         super();
 
         splashDemo = new SplashDemo();
-        body.addChild(splashDemo.body);
+        container.addChild(splashDemo.body);
 
-        nav = new Body();
+        nav = new Container();
         nav.transform.appendTranslation(0, 0.5, 0);
-        body.addChild(nav);
+        container.addChild(nav);
 
         var box = new net.rezmason.hypertype.ui.BorderBox();
-        body.addChild(box.body);
+        container.addChild(box.body);
         box.width = 4;
         box.height = 3;
         box.redraw();
-        body.addChild(box.body);
+        container.addChild(box.body);
         
         var beginButton = makeButton('BEGIN', playGame);
         var aboutButton = makeButton('ABOUT', aboutGame);

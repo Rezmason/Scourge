@@ -13,7 +13,7 @@ class BeginNavErrand extends Errand<Void->Void> {
     override public function run():Void {
         var stage:Stage = new Present(Stage);
         var navSystem = new NavSystem();
-        stage.addChild(navSystem.body);
+        stage.addChild(navSystem.container);
         navSystem.addPage(ScourgeNavPageAddresses.SPLASH, new SplashPage());
         navSystem.addPage(ScourgeNavPageAddresses.ABOUT, new AboutPage());
         navSystem.addPage(ScourgeNavPageAddresses.GAME, new GamePage());

@@ -1,7 +1,7 @@
 package net.rezmason.scourge.pages;
 
 import net.rezmason.hypertype.console.*;
-import net.rezmason.hypertype.core.Body;
+import net.rezmason.hypertype.core.Container;
 import net.rezmason.hypertype.core.Stage;
 import net.rezmason.hypertype.demo.*;
 import net.rezmason.hypertype.nav.NavPage;
@@ -13,7 +13,7 @@ import net.rezmason.utils.santa.Present;
 
 class GamePage extends NavPage {
 
-    var bodiesByName:Map<String, Body>;
+    var containersByName:Map<String, Container>;
     // var console:UIElement;
     // var consoleMed:ConsoleUIMediator;
     var currentBodyName:String;
@@ -36,13 +36,13 @@ class GamePage extends NavPage {
         stage = new Present(Stage);
         stage.toggleConsoleSignal.add(toggleConsole);
 
-        bodiesByName = new Map();
-        bodiesByName['alphabet']   = alphabetDemo.body;
-        bodiesByName['sdf']        = sdfFontDemo.body;
-        bodiesByName['colorSolid'] = colorSolidDemo.body;
-        bodiesByName['matrix']     = matrixDemo.body;
-        bodiesByName['waves']      = waveDemo.body;
-        bodiesByName['board']      = view.body;
+        containersByName = new Map();
+        containersByName['alphabet']   = alphabetDemo.body;
+        containersByName['sdf']        = sdfFontDemo.body;
+        containersByName['colorSolid'] = colorSolidDemo.body;
+        containersByName['matrix']     = matrixDemo.body;
+        containersByName['waves']      = waveDemo.body;
+        containersByName['board']      = view.container;
 
         // console.hasScrollBar = true;
         // console.setLayout(0.25, 0.25, 0.5, 0.5);
@@ -64,7 +64,7 @@ class GamePage extends NavPage {
         interpreter.addAction(new SimpleAction('show', function (args, outputSignal) {
             var bodyName:String = args.tail;
             var message:String = null;
-            if (bodiesByName[bodyName] != null) {
+            if (containersByName[bodyName] != null) {
                 showBodyByName(bodyName);
                 message = 'Showing $bodyName.';
             } else {
@@ -84,8 +84,8 @@ class GamePage extends NavPage {
     }
 
     function showBodyByName(name:String):Void {
-        if (currentBodyName != null) body.removeChild(bodiesByName[currentBodyName]);
+        if (currentBodyName != null) container.removeChild(containersByName[currentBodyName]);
         currentBodyName = name;
-        body.addChild(bodiesByName[currentBodyName]);
+        container.addChild(containersByName[currentBodyName]);
     }
 }
