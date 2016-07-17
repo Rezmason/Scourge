@@ -34,15 +34,13 @@ class SplashPage extends NavPage {
         nav.transform.appendTranslation(0, 0.5, 0);
         body.addChild(nav);
 
-        /*
         var box = new net.rezmason.hypertype.ui.BorderBox();
         body.addChild(box.body);
-        box.width = 0.85;
-        box.height = 0.75;
+        box.width = 4;
+        box.height = 3;
         box.redraw();
         body.addChild(box.body);
-        */
-
+        
         var beginButton = makeButton('BEGIN', playGame);
         var aboutButton = makeButton('ABOUT', aboutGame);
         var leaveButton = makeButton('LEAVE', quitGame);
@@ -57,7 +55,6 @@ class SplashPage extends NavPage {
     public function makeButton(text:String, cbk:Void->Void):TextLabel {
         var label = new TextLabel();
         label.text = text;
-        label.glyphWidth = 0.08;
         label.align = CENTER;
         label.style.set_color(GREY);
         label.redraw();

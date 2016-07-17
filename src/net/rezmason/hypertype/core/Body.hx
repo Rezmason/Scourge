@@ -19,6 +19,7 @@ class Body extends SceneNode<Body> {
     public var transform(default, null):Matrix4 = new Matrix4();
     public var concatenatedTransform(get, null):Matrix4;
     public var glyphScale(default, set):Float;
+    public var concatenatedParams(get, null):Vector4;
     public var font(default, set):GlyphFont;
     public var mouseEnabled(default, set):Bool = true;
     public var visible(default, set):Bool = true;
@@ -28,10 +29,11 @@ class Body extends SceneNode<Body> {
     public var invalidateSignal(default, null):Zig<Void->Void> = new Zig();
 
     @:allow(net.rezmason.hypertype.core) var glyphBatches(default, null):Array<GlyphBatch> = [];
-    @:allow(net.rezmason.hypertype.core) var params(default, null):Vector4;
     
     var growRate:Float;
-    var concatMat:Matrix4 = new Matrix4();
+    var concatTransform:Matrix4 = new Matrix4();
+    var params:Vector4;
+    var concatParams:Vector4 = new Vector4();
     var glyphs:Array<Glyph> = [];
 
     public function new(growRate = 1.5):Void {
@@ -153,8 +155,20 @@ class Body extends SceneNode<Body> {
     inline function get_isInteractive() return visible && mouseEnabled;
 
     function get_concatenatedTransform():Matrix4 {
-        concatMat.copyFrom(transform);
-        if (parent != null) concatMat.append(parent.concatenatedTransform);
-        return concatMat;
+        concatTransform.copyFrom(transform);
+        if (parent != null) concatTransform.append(parent.concatenatedTransform);
+        return concatTransform;
+    }
+
+    function get_concatenatedParams():Vector4 {
+        concatParams.copyFrom(params);
+        if (parent != null) {
+            var parentParams = parent.concatenatedParams;
+            concatParams.x *= parentParams.x;
+            concatParams.y *= parentParams.y;
+            concatParams.z *= parentParams.z;
+            concatParams.w *= parentParams.w;
+        }
+        return concatParams;
     }
 }

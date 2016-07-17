@@ -107,7 +107,7 @@ class Engine {
     }
 
     function setSize(width:Int, height:Int):Void {
-        sceneGraph.setSize(width, height);
+        sceneGraph.setSize(width, height, 72);
         mouseSystem.setSize(width, height);
         sceneRTT.resize(width, height);
         bloomRTT1.resize(Std.int(width / BLOOM_DOWNSCALE), Std.int(height / BLOOM_DOWNSCALE));
@@ -116,7 +116,7 @@ class Engine {
         viewport.resize(width, height);
     }
 
-    function resizeWindow(width:Int, height:Int) limeRelay.resizeWindow(width, height);
+    function resizeWindow(pixelWidth:UInt, pixelHeight:UInt) limeRelay.resizeWindow(pixelWidth, pixelHeight);
     function activate():Void active = true;
     function deactivate():Void active = false;
     function teaseHitboxes(val) presentedPass = val ? hitboxDebugPass : sdfPass;

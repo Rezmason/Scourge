@@ -14,7 +14,7 @@ class BorderBox {
     public var body(default, null):Body = new Body();
     public var width(default, set):Float = 0;
     public var height(default, set):Float = 0;
-    public var glyphWidth(default, set):Float = 0.1;
+    public var glyphWidth(default, set):Float = 1;
     public var rounded:Bool;
     public var color:Vec4 = new Vec4(1, 1, 1);
 

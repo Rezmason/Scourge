@@ -8,14 +8,16 @@ class SceneGraph {
 
     var bodiesByID:Map<Int, Body>;
     var keyboardFocusBody:Body = null;
-    var width:Int = 1;
-    var height:Int = 1;
-    public var aspectRatio(default, null):Float = 1;
+    var pixelWidth:UInt = 72;
+    var pixelHeight:UInt = 72;
+    var pixelsPerInch:UInt = 72;
+    public var widthInInches(get, null):Float;
+    public var heightInInches(get, null):Float;
+    public var aspectRatio(get, null):Float;
     public var camera(default, null):Camera = new Camera();
     public var root(default, null):Body = new Body();
     public var bodies(get, null):Iterator<Body>;
     public var focus(default, set):Body;
-
     public var teaseHitboxesSignal(default, null):Zig<Bool->Void> = new Zig();
     public var toggleConsoleSignal(default, null):Zig<Void->Void> = new Zig();
     public var invalidateHitboxesSignal(default, null):Zig<Void->Void> = new Zig();
@@ -25,7 +27,7 @@ class SceneGraph {
     public function new() {
         root.invalidateSignal.add(invalidate);
         screenParams.x = 1;
-        setSize(width, height);
+        setSize(pixelWidth, pixelHeight, pixelsPerInch);
     }
 
     public function setKeyboardFocus(body:Body):Void keyboardFocusBody = body;
@@ -35,12 +37,12 @@ class SceneGraph {
         for (body in bodiesByID) body.update(delta);
     }
 
-    public function setSize(width:Int, height:Int):Void {
-        this.width = width;
-        this.height = height;
-        aspectRatio = width / height;
+    public function setSize(pixelWidth:UInt, pixelHeight:UInt, pixelsPerInch:UInt):Void {
+        this.pixelWidth = pixelWidth;
+        this.pixelHeight = pixelHeight;
+        this.pixelsPerInch = pixelsPerInch;
         screenParams.x = aspectRatio;
-        camera.resize(width, height);
+        camera.resize(widthInInches, heightInInches);
         resizeSignal.dispatch();
     }
 
@@ -51,12 +53,7 @@ class SceneGraph {
             case MOUSE(type, x, y):
                 target = bodiesByID[bodyID];
                 if (type == CLICK) keyboardFocusBody = target;
-                if (target != null) {
-                    var rect = camera.rect;
-                    var nX = ((x - rect.x) / rect.width ) / camera.scaleX;
-                    var nY = ((y - rect.y) / rect.height) / camera.scaleY;
-                    interaction = MOUSE(type, nX, nY);
-                }
+                if (target != null) interaction = MOUSE(type, x, y);
             case KEYBOARD(type, code, modifier):
                 target = keyboardFocusBody;
                 switch (code) {
@@ -80,11 +77,6 @@ class SceneGraph {
         }
     }
 
-    inline function get_bodies():Iterator<Body> {
-        fetchBodies();
-        return bodiesByID.iterator();
-    }
-
     function mapBodyChildren(base:Body):Void {
         for (body in base.children()) {
             bodiesByID[body.id] = body;
@@ -92,9 +84,18 @@ class SceneGraph {
         }
     }
 
+    inline function get_bodies():Iterator<Body> {
+        fetchBodies();
+        return bodiesByID.iterator();
+    }
+
     inline function set_focus(body:Body):Body {
         fetchBodies();
         focus = (body == null || bodiesByID[body.id] == null) ? null : body;
         return focus;
     }
+
+    inline function get_aspectRatio() return pixelWidth / pixelHeight;
+    inline function get_widthInInches() return pixelWidth / pixelsPerInch;
+    inline function get_heightInInches() return pixelHeight / pixelsPerInch;
 }
