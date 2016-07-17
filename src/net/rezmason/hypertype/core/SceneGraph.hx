@@ -1,27 +1,47 @@
 package net.rezmason.hypertype.core;
 
-import net.rezmason.utils.Zig;
 import lime.math.Rectangle;
+import lime.math.Vector4;
+import net.rezmason.utils.Zig;
 using Lambda;
 
 class SceneGraph {
 
     var invalid:Bool = false;
-    var bodiesByID:Map<Int, Body> = new Map();
-    public var scene(default, null):Scene;
     var keyboardFocusBodyID:Null<Int> = null;
     public var width(default, null):Int = 1;
     public var height(default, null):Int = 1;
     public var rectsByBodyID(default, null):Map<Int, Rectangle> = new Map();
     public var teaseHitboxesSignal(default, null):Zig<Bool->Void> = new Zig();
     public var toggleConsoleSignal(default, null):Zig<Void->Void> = new Zig();
-    public var invalidateHitboxesSignal(default, null):Zig<Void->Void> = new Zig();
+    public var valid(default, null):Bool;
+    public var camera(default, null):Camera;
+    public var bodies(get, null):Iterator<Body>;
+    public var focus(default, set):Body;
+    public var root(default, null):Body;
+    public var stageWidth(default, null):Int;
+    public var stageHeight(default, null):Int;
+    public var apsectRatio(get, null):Float;
+
+    public var invalidatedSignal(default, null):Zig<Void->Void>;
+    public var invalidateHitboxesSignal(default, null):Zig<Void->Void>;
+    public var resizeSignal(default, null):Zig<Void->Void>;
+    @:allow(net.rezmason.hypertype.core) var screenParams(default, null):Vector4;
+    
+    var bodiesByID:Map<Int, Body>;
 
     public function new() {
-        scene = new Scene();
-        scene.invalidateHitboxesSignal.add(invalidateHitboxesSignal.dispatch);
-        scene.invalidatedSignal.add(invalidateScene);
-        scene.resize(width, height);
+        invalidatedSignal = new Zig();
+        invalidateHitboxesSignal = new Zig();
+        resizeSignal = new Zig();
+        camera = new Camera();
+        root = new Body();
+        root.setScene(this);
+        screenParams = new Vector4();
+        screenParams.x = 1;
+        valid = false;
+        invalidatedSignal.add(invalidateScene);
+        resize(width, height);
         invalidateScene();
     }
 
@@ -39,7 +59,7 @@ class SceneGraph {
     public function setSize(width:Int, height:Int):Void {
         this.width = width;
         this.height = height;
-        scene.resize(width, height);
+        resize(width, height);
     }
 
     public function routeInteraction(bodyID:Null<Int>, glyphID:Null<Int>, interaction:Interaction):Void {
@@ -50,7 +70,6 @@ class SceneGraph {
                 target = bodiesByID[bodyID];
                 if (type == CLICK) keyboardFocusBodyID = bodyID;
                 if (target != null) {
-                    var camera = scene.camera;
                     var rect = camera.rect;
                     var nX = ((x - rect.x) / rect.width ) / camera.scaleX;
                     var nY = ((y - rect.y) / rect.height) / camera.scaleY;
@@ -67,13 +86,45 @@ class SceneGraph {
         if (target != null) target.interactionSignal.dispatch(glyphID, interaction);
     }
 
-    inline function invalidateScene() invalid = true;
+    public inline function resize(stageWidth:Int, stageHeight:Int):Void {
+        this.stageWidth = stageWidth;
+        this.stageHeight = stageHeight;
+        screenParams.x = stageWidth / stageHeight;
+        camera.resize(stageWidth, stageHeight);
+        resizeSignal.dispatch();
+    }
 
-    inline function fetchBodies(broadcast = true):Void {
-        if (invalid) {
-            invalid = false;
-            for (bodyID in bodiesByID.keys()) bodiesByID.remove(bodyID);
-            for (body in scene.bodies) bodiesByID[body.id] = body;
+    public inline function invalidate():Void {
+        bodiesByID = null;
+        invalidatedSignal.dispatch();
+    }
+
+    inline function fetchBodies():Void {
+        if (bodiesByID == null) {
+            bodiesByID = [root.id => root];
+            mapBodyChildren(root);
         }
     }
+
+    inline function get_bodies():Iterator<Body> {
+        fetchBodies();
+        return bodiesByID.iterator();
+    }
+
+    function mapBodyChildren(base:Body):Void {
+        for (body in base.children()) {
+            bodiesByID[body.id] = body;
+            mapBodyChildren(body);
+        }
+    }
+
+    inline function set_focus(body:Body):Body {
+        fetchBodies();
+        focus = (body == null || bodiesByID[body.id] == null) ? null : body;
+        return focus;
+    }
+
+    inline function get_apsectRatio() return stageWidth / stageHeight;
+
+    inline function invalidateScene() invalid = true;
 }

@@ -11,7 +11,8 @@ Simplify the scene graph tremendously
         1. Get rid of focus rects (DONE)
         2. Get rid of UIElement dependencies (DONE)
         3. Get everything to work as children of one scene (DONE)
-        4. Merge scene and scene graph
+        4. Merge scene and scene graph (DONE)
+        CLEAN UP
         5. Convert stage size to inches
         6. Get everything to work with camera origin at 0,0
         ...

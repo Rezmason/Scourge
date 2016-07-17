@@ -17,7 +17,7 @@ class RenderPass {
             switch (step) {
                 case SceneStep(method, sceneGraph, renderTarget, args):
                     method.start(renderTarget, args);
-                    method.drawScene(sceneGraph.scene);
+                    method.drawScene(sceneGraph);
                     method.end();
                 case ScreenStep(method, inputTextures, renderTarget, args):
                     method.start(renderTarget, args);

@@ -2,7 +2,6 @@ package net.rezmason.scourge.pages;
 
 import lime.math.Rectangle;
 import net.rezmason.hypertype.core.Interaction;
-import net.rezmason.hypertype.core.Scene;
 import net.rezmason.hypertype.nav.NavPage;
 import net.rezmason.hypertype.Strings;
 import net.rezmason.hypertype.core.Body;

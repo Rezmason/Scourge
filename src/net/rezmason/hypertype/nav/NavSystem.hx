@@ -50,8 +50,8 @@ class NavSystem {
     }
 
     private function setPageTo(page:NavPage):Void {
-        if (currentPage != null) sceneGraph.scene.root.removeChild(currentPage.body);
+        if (currentPage != null) sceneGraph.root.removeChild(currentPage.body);
         currentPage = page;
-        if (currentPage != null) sceneGraph.scene.root.addChild(currentPage.body);
+        if (currentPage != null) sceneGraph.root.addChild(currentPage.body);
     }
 }

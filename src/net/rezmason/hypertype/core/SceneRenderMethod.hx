@@ -7,7 +7,7 @@ class SceneRenderMethod extends RenderMethod {
         setGlyphBatch(null);
     }
 
-    public function drawScene(scene:Scene) {
+    public function drawScene(scene:SceneGraph) {
         for (body in scene.bodies) {
             if (body.size > 0 && shouldDrawBody(body)) {
                 body.upload();

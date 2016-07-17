@@ -20,7 +20,7 @@ class Body extends SceneNode<Body> {
     public var concatenatedTransform(get, null):Matrix4;
     public var glyphScale(default, set):Float;
     public var font(default, set):GlyphFont;
-    public var scene(default, null):Scene;
+    public var scene(default, null):SceneGraph;
     public var mouseEnabled(default, set):Bool = true;
     public var visible(default, set):Bool = true;
     public var isInteractive(get, null):Bool;
@@ -117,8 +117,8 @@ class Body extends SceneNode<Body> {
     function upload():Void for (batch in glyphBatches) batch.upload();
 
     @:allow(net.rezmason.hypertype.core)
-    function setScene(scene:Scene):Void {
-        var lastScene:Scene = this.scene;
+    function setScene(scene:SceneGraph):Void {
+        var lastScene:SceneGraph = this.scene;
         if (this.scene != null) this.scene.resizeSignal.remove(updateGlyphTransform);
         this.scene = scene;
         updateGlyphTransform();

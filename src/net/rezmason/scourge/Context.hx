@@ -21,6 +21,6 @@ class Context {
     function makeMatrix() {
         var demo = new net.rezmason.hypertype.demo.MatrixDemo();
         var sceneGraph:SceneGraph = new Present(SceneGraph);
-        sceneGraph.scene.root.addChild(demo.body);
+        sceneGraph.root.addChild(demo.body);
     }
 }

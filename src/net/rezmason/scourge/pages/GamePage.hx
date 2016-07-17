@@ -2,7 +2,6 @@ package net.rezmason.scourge.pages;
 
 import net.rezmason.hypertype.console.*;
 import net.rezmason.hypertype.core.Body;
-import net.rezmason.hypertype.core.Scene;
 import net.rezmason.hypertype.core.SceneGraph;
 import net.rezmason.hypertype.demo.*;
 import net.rezmason.hypertype.nav.NavPage;
@@ -88,6 +87,6 @@ class GamePage extends NavPage {
         if (currentBodyName != null) body.removeChild(bodiesByName[currentBodyName]);
         currentBodyName = name;
         body.addChild(bodiesByName[currentBodyName]);
-        sceneGraph.scene.invalidate();
+        sceneGraph.invalidate();
     }
 }
