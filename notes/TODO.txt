@@ -77,9 +77,6 @@ And if you need more symbols, just, fuckin', go add a monochrome emoji font, man
 
 Create puppet
 
-We can support more Bodies by making IDs dynamic
-    Engine, render methods create them from display list
-
 Settings page
 Game config page
 

@@ -11,11 +11,9 @@ using net.rezmason.hypertype.core.GlyphUtils;
 
 class Body extends Container {
 
-    static var _ids:Int = 0;
-
     public var size(default, set):UInt = 0;
     public var capacity(default, null):UInt = 0;
-    public var id(default, null):Int = ++_ids;
+    public var interactiveID(default, set):UInt;
     public var font(default, set):GlyphFont;
     
     @:allow(net.rezmason.hypertype.core) var glyphBatches(default, null):Array<GlyphBatch> = [];
@@ -29,7 +27,6 @@ class Body extends Container {
         var fontManager:FontManager = new Present(FontManager);
         fontManager.onFontChange.add(updateFont);
         font = fontManager.defaultFont;
-        params.y = id / 0xFF;
     }
 
     public inline function getGlyphByID(id:Int):Glyph return glyphs[id];
@@ -89,5 +86,11 @@ class Body extends Container {
     inline function set_font(font:GlyphFont) {
         if (font != null) this.font = font;
         return this.font;
+    }
+
+    inline function set_interactiveID(interactiveID:UInt) {
+        this.interactiveID = interactiveID;
+        params.y = interactiveID / 0xFF;
+        return this.interactiveID;
     }
 }

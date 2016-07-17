@@ -8,7 +8,7 @@ class SceneRenderMethod extends RenderMethod {
     }
 
     public function drawScene(stage:Stage) {
-        for (body in stage.bodies) {
+        for (body in stage.eachBody()) {
             if (body.size > 0 && shouldDrawBody(body)) {
                 body.upload();
                 drawBody(body);

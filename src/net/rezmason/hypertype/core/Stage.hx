@@ -5,21 +5,22 @@ import net.rezmason.utils.Zig;
 using Lambda;
 
 class Stage extends Container {
-    var bodiesByID:Map<Int, Body>;
+    var interactiveBodiesByID:Map<Int, Body>;
+    var bodies:Array<Body> = null;
     var keyboardFocusBody:Body = null;
     var pixelWidth:UInt = 72;
     var pixelHeight:UInt = 72;
     var pixelsPerInch:UInt = 72;
+    var numInteractiveBodies:UInt;
     public var widthInInches(get, null):Float;
     public var heightInInches(get, null):Float;
     public var aspectRatio(get, null):Float;
     public var camera(default, null):Camera = new Camera();
-    public var bodies(get, null):Iterator<Body>;
-    public var focus(default, set):Body;
     public var teaseHitboxesSignal(default, null):Zig<Bool->Void> = new Zig();
     public var toggleConsoleSignal(default, null):Zig<Void->Void> = new Zig();
     public var invalidateHitboxesSignal(default, null):Zig<Void->Void> = new Zig();
     public var resizeSignal(default, null):Zig<Void->Void> = new Zig();
+    public var focus:Body;
     @:allow(net.rezmason.hypertype.core) var screenParams(default, null):Vector4 = new Vector4();
 
     public function new() {
@@ -33,7 +34,7 @@ class Stage extends Container {
 
     override public function update(delta) {
         fetchBodies();
-        for (body in bodiesByID) body.update(delta);
+        for (body in bodies) body.update(delta);
     }
 
     public function setSize(pixelWidth:UInt, pixelHeight:UInt, pixelsPerInch:UInt):Void {
@@ -45,12 +46,17 @@ class Stage extends Container {
         resizeSignal.dispatch();
     }
 
+    public function eachBody():Iterator<Body> {
+        fetchBodies();
+        return bodies.iterator();
+    }
+
     public function routeInteraction(bodyID:Null<Int>, glyphID:Null<Int>, interaction:Interaction):Void {
         fetchBodies();
         var target = null;
         switch (interaction) {
             case MOUSE(type, x, y):
-                target = bodiesByID[bodyID];
+                target = interactiveBodiesByID[bodyID];
                 if (type == CLICK) keyboardFocusBody = target;
                 if (target != null) interaction = MOUSE(type, x, y);
             case KEYBOARD(type, code, modifier):
@@ -65,13 +71,16 @@ class Stage extends Container {
     }
 
     function invalidate():Void {
-        bodiesByID = null;
+        interactiveBodiesByID = null;
+        bodies = null;
         invalidateHitboxesSignal.dispatch();
     }
 
     inline function fetchBodies():Void {
-        if (bodiesByID == null) {
-            bodiesByID = new Map();
+        if (bodies == null) {
+            numInteractiveBodies = 0;
+            bodies = [];
+            interactiveBodiesByID = new Map();
             mapBodyChildren(this);
         }
     }
@@ -80,21 +89,15 @@ class Stage extends Container {
         for (child in container.children()) {
             if (Std.is(child, Body)) {
                 var body:Body = cast child;
-                bodiesByID[body.id] = body;
+                bodies.push(body);
+                if (body.isInteractive) {
+                    body.interactiveID = numInteractiveBodies;
+                    interactiveBodiesByID[numInteractiveBodies] = body;
+                    numInteractiveBodies++;
+                }
             }
             mapBodyChildren(child);
         }
-    }
-
-    inline function get_bodies():Iterator<Body> {
-        fetchBodies();
-        return bodiesByID.iterator();
-    }
-
-    inline function set_focus(body:Body):Body {
-        fetchBodies();
-        focus = (body == null || bodiesByID[body.id] == null) ? null : body;
-        return focus;
     }
 
     inline function get_aspectRatio() return pixelWidth / pixelHeight;
