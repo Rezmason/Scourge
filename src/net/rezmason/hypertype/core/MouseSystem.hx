@@ -58,7 +58,7 @@ class MouseSystem {
 
     public function receiveMouseMove(x:Float, y:Float):Void {
         if (!initialized) return;
-        if (invalid) refresh();
+        refresh();
 
         var hit:Hit = getHit(x, y);
         if (hitsEqual(hit, hoverHit)) {
@@ -75,7 +75,7 @@ class MouseSystem {
     
     public function receiveMouseDown(x:Float, y:Float, button:Int):Void {
         if (!initialized) return;
-        if (invalid) refresh();
+        refresh();
         pressHit = getHit(x, y);
         lastX = x;
         lastY = y;
@@ -84,7 +84,7 @@ class MouseSystem {
 
     public function receiveMouseUp(x:Float, y:Float, button:Int):Void {
         if (!initialized) return;
-        if (invalid) refresh();
+        refresh();
         var hit:Hit = getHit(x, y);
         lastX = x;
         lastY = y;
@@ -125,11 +125,13 @@ class MouseSystem {
     }
 
     inline function refresh() {
-        rtt.resize(width, height);
-        if (data == null) data = new UInt8Array(width * height * 4);
-        refreshSignal.dispatch();
-        rtt.readBack(data);
-        invalid = false;
+        if (invalid) {
+            rtt.resize(width, height);
+            if (data == null) data = new UInt8Array(width * height * 4);
+            refreshSignal.dispatch();
+            rtt.readBack(data);
+            invalid = false;
+        }
     }
 
     inline function hitsEqual(h1:Hit, h2:Hit):Bool {

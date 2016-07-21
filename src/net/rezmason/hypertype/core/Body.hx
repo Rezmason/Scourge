@@ -1,7 +1,6 @@
 package net.rezmason.hypertype.core;
 
 import lime.math.Matrix4;
-import lime.math.Vector4;
 import net.rezmason.ds.SceneNode;
 import net.rezmason.hypertype.core.Almanac.*;
 import net.rezmason.utils.Zig;
@@ -11,9 +10,10 @@ using net.rezmason.hypertype.core.GlyphUtils;
 
 class Body extends Container {
 
-    public var size(default, set):UInt = 0;
+    public var interactiveID:UInt;
+    public var glyphScale:Float;
     public var capacity(default, null):UInt = 0;
-    public var interactiveID(default, set):UInt;
+    public var size(default, set):UInt = 0;
     public var font(default, set):GlyphFont;
     
     @:allow(net.rezmason.hypertype.core) var glyphBatches(default, null):Array<GlyphBatch> = [];
@@ -27,6 +27,7 @@ class Body extends Container {
         var fontManager:FontManager = new Present(FontManager);
         fontManager.onFontChange.add(updateFont);
         font = fontManager.defaultFont;
+        glyphScale = 1;
     }
 
     public inline function getGlyphByID(id:Int):Glyph return glyphs[id];
@@ -69,28 +70,20 @@ class Body extends Container {
             size = val;
         }
         
-        return val;
+        return size;
     }
 
-    @:allow(net.rezmason.hypertype.core)
-    function upload():Void for (batch in glyphBatches) batch.upload();
+    @:allow(net.rezmason.hypertype.core) function upload():Void for (batch in glyphBatches) batch.upload();
 
     function updateFont(font:GlyphFont):Void {
         if (this.font != font) {
             this.font = font;
-            params.x = glyphScale;
             for (glyph in glyphs) glyph.set_font(font);
         }
     }
 
-    inline function set_font(font:GlyphFont) {
-        if (font != null) this.font = font;
-        return this.font;
-    }
-
-    inline function set_interactiveID(interactiveID:UInt) {
-        this.interactiveID = interactiveID;
-        params.y = interactiveID / 0xFF;
-        return this.interactiveID;
+    inline function set_font(val:GlyphFont) {
+        if (val != null) font = val;
+        return font;
     }
 }

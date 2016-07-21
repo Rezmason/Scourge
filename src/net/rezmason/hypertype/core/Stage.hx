@@ -1,8 +1,6 @@
 package net.rezmason.hypertype.core;
 
-import lime.math.Vector4;
 import net.rezmason.utils.Zig;
-using Lambda;
 
 class Stage extends Container {
     var interactiveBodiesByID:Map<Int, Body>;
@@ -19,14 +17,11 @@ class Stage extends Container {
     public var teaseHitboxesSignal(default, null):Zig<Bool->Void> = new Zig();
     public var toggleConsoleSignal(default, null):Zig<Void->Void> = new Zig();
     public var invalidateHitboxesSignal(default, null):Zig<Void->Void> = new Zig();
-    public var resizeSignal(default, null):Zig<Void->Void> = new Zig();
     public var focus:Body;
-    @:allow(net.rezmason.hypertype.core) var screenParams(default, null):Vector4 = new Vector4();
 
     public function new() {
         super();
         invalidateSignal.add(invalidate);
-        screenParams.x = 1;
         setSize(pixelWidth, pixelHeight, pixelsPerInch);
     }
 
@@ -41,9 +36,8 @@ class Stage extends Container {
         this.pixelWidth = pixelWidth;
         this.pixelHeight = pixelHeight;
         this.pixelsPerInch = pixelsPerInch;
-        screenParams.x = aspectRatio;
         camera.resize(widthInInches, heightInInches);
-        resizeSignal.dispatch();
+        resizeSignal.dispatch(this, widthInInches, heightInInches);
     }
 
     public function eachBody():Iterator<Body> {

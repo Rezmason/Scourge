@@ -1,6 +1,7 @@
 package net.rezmason.scourge.pages;
 
 import lime.math.Rectangle;
+import lime.math.Vector4;
 import net.rezmason.hypertype.core.Interaction;
 import net.rezmason.hypertype.nav.NavPage;
 import net.rezmason.hypertype.Strings;
@@ -28,10 +29,12 @@ class SplashPage extends NavPage {
         super();
 
         splashDemo = new SplashDemo();
+        splashDemo.body.glyphScale = 0.25;
+        splashDemo.body.transform.appendRotation(-40, Vector4.X_AXIS);
         container.addChild(splashDemo.body);
 
         nav = new Container();
-        nav.transform.appendTranslation(0, 0.5, 0);
+        nav.transform.appendTranslation(4, 4, 0);
         container.addChild(nav);
 
         var box = new net.rezmason.hypertype.ui.BorderBox();
@@ -40,7 +43,18 @@ class SplashPage extends NavPage {
         box.height = 3;
         box.redraw();
         container.addChild(box.body);
-        
+        box.body.transform.appendTranslation(1, 1, 0);
+
+        var label = new TextLabel();
+        label.text = 'Oberon';
+        label.align = CENTER;
+        label.style.set_color(TEAM_COLORS[0]);
+        label.style.set_i(0.8);
+        label.redraw();
+        label.body.transform.appendScale(2, 2, 1);
+        label.body.transform.appendTranslation(6, 6, 0);
+        container.addChild(label.body);
+
         var beginButton = makeButton('BEGIN', playGame);
         var aboutButton = makeButton('ABOUT', aboutGame);
         var leaveButton = makeButton('LEAVE', quitGame);
@@ -48,8 +62,8 @@ class SplashPage extends NavPage {
         nav.addChild(beginButton.body);
         nav.addChild(aboutButton.body);
         nav.addChild(leaveButton.body);
-        beginButton.body.transform.appendTranslation(-0.5, 0, 0);
-        leaveButton.body.transform.appendTranslation( 0.5, 0, 0);
+        beginButton.body.transform.appendTranslation(-5, 0, 0);
+        leaveButton.body.transform.appendTranslation( 5, 0, 0);
     }
 
     public function makeButton(text:String, cbk:Void->Void):TextLabel {

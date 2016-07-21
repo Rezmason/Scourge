@@ -4,6 +4,7 @@ import lime.graphics.opengl.GL;
 import lime.graphics.opengl.GLProgram;
 import lime.graphics.opengl.GLUniformLocation;
 import lime.math.Matrix4;
+import lime.math.Vector2;
 import lime.math.Vector4;
 import lime.utils.Float32Array;
 import lime.utils.Int32Array;
@@ -67,6 +68,11 @@ class Program extends Artifact {
     public inline function setMatrix4(uName:String, matrix:Matrix4):Void {
         var location = getUniformLocation(uName);
         if (location != null) GL.uniformMatrix4fv(location, false, matrix);
+    }
+
+    public inline function setVector2(uName:String, vec2:Vector2):Void {
+        var location = getUniformLocation(uName);
+        if (location != null) GL.uniform2f(location, vec2.x, vec2.y);
     }
 
     public inline function setVector4(uName:String, vec4:Vector4):Void {

@@ -23,18 +23,16 @@ class TextLabel extends TextObject {
     }
 
     override function updateGlyphs() {
-        var glyphIndex = 0;
-        var xOffset =  glyphWidth  / 2;
-        var yOffset = -glyphHeight / 2;
-
         var startY:Float = 0;
         switch (verticalAlign) {
-            case MIDDLE: startY = lines.length * glyphHeight / 2;
-            case BOTTOM: startY = lines.length * glyphHeight;
+            case MIDDLE: startY = -lines.length * glyphHeight / 2;
+            case BOTTOM: startY = -lines.length * glyphHeight;
             case _:
         }
-        startY -= glyphHeight / 2;
+        startY += glyphHeight / 2;
 
+        var glyphIndex = 0;
+        var y = startY;
         for (ike in 0...lines.length) {
             var line = lines[ike];
             var startX:Float = 0;
@@ -45,16 +43,16 @@ class TextLabel extends TextObject {
             }
             startX += glyphWidth  / 2;
 
+            var x = startX;
             for (jen in 0...line.length) {
+                var charCode = line.charCodeAt(jen);
                 var glyph = body.getGlyphByID(glyphIndex);
                 glyph.COPY(style, [r, g, b, i, a, w, hitboxID, hitboxS, hitboxH]);
-                glyph.SET({
-                    x: startX + jen * glyphWidth, 
-                    y: startY - ike * glyphHeight, 
-                    char:line.charCodeAt(jen),
-                });
+                glyph.SET({x: x, y: y, char:charCode});
+                x += glyphWidth;
                 glyphIndex++;
             }
+            y += glyphHeight;
         }
     }
 }

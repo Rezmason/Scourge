@@ -15,8 +15,11 @@ Simplify the scene graph tremendously
         5. Convert stage size to inches (DONE)
         6. Hoist Container from Body (DONE)
         7. Make SceneGraph into Stage, extends Container (DONE)
-        8. Create LetterBox from Container
-        9. Start letterboxing things
+        
+        8. How to tie the glyph scale to the body XY scale for bodies that face the camera?
+        
+        9. Create LetterBox from Container
+        10. Start letterboxing things
         ...
         N-3. Make hotspots
         N-2. Make a TextObject UIElement replacement

@@ -12,8 +12,8 @@ using net.rezmason.utils.CharCode;
 
 class TextBox extends TextObject {
 
-    public var width(default, set):Float = 1;
-    public var height(default, set):Float = 1;
+    public var width(default, set):Float = 10;
+    public var height(default, set):Float = 10;
 
     var numGlyphsWide:UInt;
     var numGlyphsHigh:UInt;
@@ -56,19 +56,15 @@ class TextBox extends TextObject {
     }
 
     override function updateGlyphs() {
-
-        var glyphIndex = 0;
-        var xOffset =  glyphWidth  / 2;
-        var yOffset = -glyphHeight / 2;
-
         var startY:Float = 0;
         switch (verticalAlign) {
             case MIDDLE: startY = (-height + numGlyphsHigh * glyphHeight) / 2;
             case BOTTOM: startY = -height + numGlyphsHigh * glyphHeight;
             case _:
         }
-        startY -= glyphHeight / 2;
+        startY += glyphHeight / 2;
 
+        var glyphIndex = 0;
         var y = startY;
         for (ike in 0...numGlyphsHigh) {
             var line = lines[ike];
@@ -99,7 +95,7 @@ class TextBox extends TextObject {
                 else x += glyphWidth;
                 glyphIndex++;
             }
-            y -= glyphHeight;
+            y += glyphHeight;
         }
     }
     

@@ -17,7 +17,7 @@ class TextObject {
 
     public var body(default, null):Body = new Body();
     public var style:Glyph = GlyphUtils.createGlyph();
-    public var glyphWidth:Float = 0.1;
+    public var glyphWidth:Float = 1;
     public var text:String = null;
     public var align:ParagraphAlign = LEFT;
     public var verticalAlign:VerticalAlign = TOP;
