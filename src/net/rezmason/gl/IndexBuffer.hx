@@ -14,6 +14,7 @@ class IndexBuffer extends Artifact {
     public var numIndices(default, null):Int;
 
     public function new(numIndices:Int, ?usage:BufferUsage):Void {
+        super();
         this.numIndices = numIndices;
         if (usage == null) usage = BufferUsage.STATIC_DRAW;
         this.usage = usage;

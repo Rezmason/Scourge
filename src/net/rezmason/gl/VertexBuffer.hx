@@ -15,6 +15,7 @@ class VertexBuffer extends Artifact {
     public var footprint(default, null):Int;
 
     public function new(numVertices:Int, footprint:Int, ?usage:BufferUsage):Void {
+        super();
         this.footprint = footprint;
         this.numVertices = numVertices;
         if (usage == null) usage = BufferUsage.STATIC_DRAW;

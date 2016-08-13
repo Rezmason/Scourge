@@ -34,7 +34,7 @@ class Program extends Artifact {
     var attribsLocations:Map<String, Int>;
     
     public function new(vertSource:String, fragSource:String, extensions:Array<String> = null):Void {
-
+        super(extensions);
         if (extensions != null) {
             var extensionPreamble = '\n';
             for (extension in extensions) {

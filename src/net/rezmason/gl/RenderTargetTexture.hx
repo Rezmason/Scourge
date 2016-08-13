@@ -12,6 +12,7 @@ class RenderTargetTexture extends Texture {
     var frameBuffer:GLFramebuffer;
 
     public function new(type:DataType):Void {
+        super(Utils.extensionsForTypes[type]);
         this.type = type;
         format = RGBA;
         width = 1;
