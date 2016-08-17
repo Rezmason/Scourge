@@ -26,8 +26,6 @@ class MetaballLab extends Lab {
     var bodyTransform:Matrix4;
     var cameraTransform:Matrix4;
 
-    public var rtt:RenderTargetTexture;
-
     var phases:Array<Array<Null<Int>>>;
     var cavity:Array<Array<Null<Int>>>;
     var twitches:Array<Array<Null<Float>>>;
@@ -39,9 +37,7 @@ class MetaballLab extends Lab {
 
     var pool:WavePool;
 
-    public function new(width, height):Void {
-
-        super(width, height);
+    override function init() {
 
         pool = new WavePool(1);
         pool.addRipple(new Ripple(WaveFunctions.bolus, 0.5, 5., 1.0, 2, true));
@@ -56,9 +52,6 @@ class MetaballLab extends Lab {
         var ike = 0;
         for (val in [2,0,0,0,0,2,0,0,0,-0,2,1,0,0,0,1]) rawData[ike++] = val;
         cameraTransform = rawData;
-
-        rtt = new RenderTargetTexture(FLOAT);
-        rtt.resize(width, height);
 
         var vertShader = '
             attribute vec3 aPos;
@@ -257,7 +250,7 @@ class MetaballLab extends Lab {
         program.setVertexBuffer('aScale',   vertexBuffer, 5, 1); // aScale contains s
         program.setVertexBuffer('aCav',     vertexBuffer, 6, 1); // aCav contains c
 
-        program.setRenderTarget(rtt.renderTarget);
+        program.setRenderTarget(renderTarget);
         program.clear(new Vec4(0, 0, 0, 1));
         program.draw(indexBuffer, 0, TpB * NUM_BALLS);
 

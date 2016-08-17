@@ -6,7 +6,7 @@ class ViewportRenderTarget extends RenderTarget {
 
     public function new() super();
 
-    public function resize(width:Int, height:Int) {
+    public function resize(width:UInt, height:UInt) {
         _width = width;
         _height = height;
     }
