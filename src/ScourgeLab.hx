@@ -12,7 +12,8 @@ class ScourgeLab extends Application {
         var width = window.width;
         var height = window.height;
 
-        labs.push(new MetaballSlimeLab(width, height));
+        labs.push(new CubeLab(width, height));
+        // labs.push(new MetaballSlimeLab(width, height));
         // labs.push(new HalfFloatLab(width, height));
         // labs.push(new RTTLab(width, height));
     }
