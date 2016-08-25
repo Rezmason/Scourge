@@ -136,6 +136,7 @@ class CubeLab extends Lab {
 
     override function draw():Void {
         program.use();
+        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         program.setDepthTest(true);
         program.setVertexBuffer('aPos',     vertexBuffer, 0, 3);
         program.setVertexBuffer('aColor',   vertexBuffer, 3, 3);
@@ -144,5 +145,10 @@ class CubeLab extends Lab {
         program.setRenderTarget(renderTarget);
         program.clear(new Vec4(0, 0, 0, 1));
         program.draw(indexBuffer, 0, NUM_TRIANGLES);
+
+        program.setVertexBuffer('aPos', null, 0, 3);
+        program.setVertexBuffer('aColor', null, 3, 3);
+        program.setMatrix4('uBodyMat', null);
+        program.setMatrix4('uCameraMat', null);
     }
 }
