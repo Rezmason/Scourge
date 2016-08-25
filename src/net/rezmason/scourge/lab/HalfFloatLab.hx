@@ -16,14 +16,10 @@ class HalfFloatLab extends Lab {
     var dataTexture:Texture;
     var program:Program;
 
-    var renderTarget:RenderTarget;
-
     var vertexBuffer:VertexBuffer;
     var indexBuffer:IndexBuffer;
 
-    public function new(width, height):Void {
-
-        super(width, height);
+    override function init() {
 
         //*
         function traceData(data:Array<Float>, width, height) {
@@ -73,9 +69,6 @@ class HalfFloatLab extends Lab {
         }
 
         dataTexture = new HalfFloatTexture(width, height, output.getBytes());
-
-        renderTarget = new ViewportRenderTarget();
-        cast(renderTarget, ViewportRenderTarget).resize(width, height);
 
         vertexBuffer = new VertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
         var vertices = [

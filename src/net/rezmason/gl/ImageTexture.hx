@@ -11,6 +11,7 @@ class ImageTexture extends Texture {
     var height:Int = -1;
 
     public function new(image:Image):Void {
+        super();
         type = UNSIGNED_BYTE;
         format = RGBA;
         this.image = image;

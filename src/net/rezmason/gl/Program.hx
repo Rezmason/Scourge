@@ -35,7 +35,7 @@ class Program extends Artifact {
     var attribsLocations:Map<String, Int>;
     
     public function new(vertSource:String, fragSource:String, extensions:Array<String> = null):Void {
-
+        super(extensions);
         if (extensions != null) {
             var extensionPreamble = '\n';
             for (extension in extensions) {
@@ -67,7 +67,7 @@ class Program extends Artifact {
 
     public inline function setMatrix4(uName:String, matrix:Matrix4):Void {
         var location = getUniformLocation(uName);
-        if (location != null) GL.uniformMatrix4fv(location, false, matrix);
+        if (location != null && matrix != null) GL.uniformMatrix4fv(location, false, matrix);
     }
 
     public inline function setVector2(uName:String, vec2:Vector2):Void {
@@ -77,7 +77,7 @@ class Program extends Artifact {
 
     public inline function setVector4(uName:String, vec4:Vector4):Void {
         var location = getUniformLocation(uName);
-        if (location != null) GL.uniform4f(location, vec4.x, vec4.y, vec4.z, vec4.w);
+        if (location != null && vec4 != null) GL.uniform4f(location, vec4.x, vec4.y, vec4.z, vec4.w);
     }
 
     public inline function setFloat(uName:String, x:Float, ?y:Float, ?z:Float, ?w:Float):Void {
@@ -92,7 +92,7 @@ class Program extends Artifact {
 
     public inline function setFloatVec(uName:String, degree:UInt, vec:Float32Array):Void {
         var location = getUniformLocation(uName);
-        if (location != null) floatVecFuncs[degree](location, vec);
+        if (location != null && vec != null) floatVecFuncs[degree](location, vec);
     }
 
     public inline function setInt(uName:String, x:Int, ?y:Int, ?z:Int, ?w:Int):Void {
@@ -107,7 +107,7 @@ class Program extends Artifact {
 
     public inline function setIntVec(uName:String, degree:UInt, vec:Int32Array):Void {
         var location = getUniformLocation(uName);
-        if (location != null) intVecFuncs[degree](location, vec);
+        if (location != null && vec != null) intVecFuncs[degree](location, vec);
     }
 
     public inline function setRenderTarget(renderTarget:RenderTarget):Void {
@@ -149,6 +149,15 @@ class Program extends Artifact {
     public inline function setDepthTest(enabled:Bool):Void {
         if (enabled) GL.enable(GL.DEPTH_TEST);
         else GL.disable(GL.DEPTH_TEST);
+    }
+
+    public inline function setFaceCulling(culling:Null<FaceCulling>):Void {
+        if (culling != null) {
+            GL.enable(GL.CULL_FACE);
+            GL.cullFace(culling);
+        } else {
+            GL.disable(GL.CULL_FACE);
+        }
     }
 
     public inline function clear(color:Vector4) {

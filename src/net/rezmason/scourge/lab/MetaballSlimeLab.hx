@@ -17,8 +17,6 @@ class MetaballSlimeLab extends Lab {
     var globTexture:Texture;
     var program:Program;
 
-    var renderTarget:RenderTarget;
-
     var vertexBuffer:VertexBuffer;
     var indexBuffer:IndexBuffer;
 
@@ -31,10 +29,9 @@ class MetaballSlimeLab extends Lab {
     var globMat:Matrix4;
     var time:Float;
 
-    public function new(width:Int, height:Int):Void {
-        super(width, height);
-
-        metaballLab = new MetaballLab(width, height);
+    override function init() {
+        
+        metaballLab = new MetaballLab(width, height, FLOAT);
 
         time = 0;
         var heightThreshold:Float = 0.7;
@@ -58,11 +55,8 @@ class MetaballSlimeLab extends Lab {
 
         globMat = new Matrix4();
         
-        metaballTexture = metaballLab.rtt;
+        metaballTexture = metaballLab.outputTexture;
         globTexture = new ImageTexture(getImage('metaballs/glob.png'));
-
-        renderTarget = new ViewportRenderTarget();
-        cast(renderTarget, ViewportRenderTarget).resize(width, height);
 
         var vertShader = '
             attribute vec3 aPos;

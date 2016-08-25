@@ -17,8 +17,7 @@ class DataTexture extends Texture {
         this.data = data;
     
         nativeTexture = GL.createTexture();
-        GL.getExtension('OES_texture_float');
-        GL.getExtension('OES_texture_float_linear');
+        super(Utils.extensionsForTypes[type]);
         update();
     }
 

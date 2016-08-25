@@ -13,20 +13,14 @@ class RTTLab extends Lab {
     var program:Program;
     var vertexBuffer:VertexBuffer;
     var indexBuffer:IndexBuffer;
-    var viewportRT:ViewportRenderTarget;
     var rtt:RenderTargetTexture;
 
     var color:Vector4;
 
-    public function new(width:Int, height:Int):Void {
-
-        super(width, height);
+    override function init() {
 
         rtt = new RenderTargetTexture(UNSIGNED_BYTE);
         rtt.resize(Std.int(width / 16), Std.int(height / 16));
-
-        viewportRT = new ViewportRenderTarget();
-        viewportRT.resize(width, height);
 
         var vertShader = '
             attribute vec2 aPos;
@@ -76,7 +70,10 @@ class RTTLab extends Lab {
 
     override function draw():Void {
         program.use();
-        program.setVertexBuffer('aPos',     vertexBuffer, 0, 2);
+        program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
+        program.setDepthTest(false);
+
+        program.setVertexBuffer('aPos', vertexBuffer, 0, 2);
         
         program.setRenderTarget(rtt.renderTarget);
         program.clear(new Vec4(0, 0, 0, 1));
@@ -85,13 +82,17 @@ class RTTLab extends Lab {
         program.draw(indexBuffer, 0, 2);
         color.x = 0;
 
-        program.setRenderTarget(viewportRT);
+        program.setRenderTarget(renderTarget);
         program.clear(new Vec4(0, 0, 0, 1));
         program.setTexture('uRTT', rtt);
         color.y = 1;
         program.setVector4('uColor', color);
         program.draw(indexBuffer, 0, 2);
-        program.setTexture('uRTT', null);
+
         color.y = 0;
+
+        program.setTexture('uRTT', null);
+        program.setVector4('uColor', null);
+        program.setVertexBuffer('aPos', null, 0, 2);
     }
 }

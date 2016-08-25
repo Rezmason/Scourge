@@ -15,5 +15,5 @@ class RenderTarget extends Artifact {
     inline function get_width() return _width;
     inline function get_height() return _height;
     
-    function new() {}
+    function new() super();
 }
