@@ -145,6 +145,15 @@ class Program extends Artifact {
         else GL.disable(GL.DEPTH_TEST);
     }
 
+    public inline function setFaceCulling(culling:Null<FaceCulling>):Void {
+        if (culling != null) {
+            GL.enable(GL.CULL_FACE);
+            GL.cullFace(culling);
+        } else {
+            GL.disable(GL.CULL_FACE);
+        }
+    }
+
     public inline function clear(color:Vector4) {
         GL.clearColor(color.x, color.y, color.z, color.w);
         GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
