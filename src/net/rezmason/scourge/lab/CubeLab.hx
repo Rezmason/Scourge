@@ -20,20 +20,39 @@ class CubeLab extends Lab {
     var sceneTransform:Matrix4;
     var fullTransform:Matrix4;
     var cameraTransform:Matrix4;
+
+    var time:Float = 0;
     
+    function perspectiveRH(width, height, zNear, zFar) {
+        var mat = new Matrix4();
+
+        mat.set(0, 2 * zNear / width);
+        mat.set(5, 2 * zNear / height);
+        mat.set(10, zFar / (zNear - zFar));
+        mat.set(11, -1);
+        mat.set(14, zNear * zFar / (zNear - zFar));
+
+        return mat;
+    }
+
     override function init() {
 
         bodyTransform = new Matrix4();
-        bodyTransform.appendScale(0.5, 0.5, 0.5);
+        // bodyTransform.appendScale(0.5, 0.5, 0.5);
+        bodyTransform.appendRotation(135, Vector4.Y_AXIS);
+        bodyTransform.appendRotation(Math.acos(1 / Math.sqrt(3)) * 180 / Math.PI, Vector4.X_AXIS);
 
         sceneTransform = new Matrix4();
-        sceneTransform.appendTranslation(0, 0, -0.5);
+        sceneTransform.appendTranslation(0, 0, -3);
 
         fullTransform = new Matrix4();
 
-        cameraTransform = new Matrix4();
-        var values = [2, 0, 0, 0, 0, -3, 0, 0, 0, 0.5, 2, 1, 0, 0.5, 0, 1];
-        for (ike in 0...values.length) cameraTransform.set(ike, values[ike]);
+        // cameraTransform = new Matrix4();
+        // cameraTransform.set(10,  2);
+        // cameraTransform.set(11,  1);
+        // cameraTransform.set(14, -2);
+        // cameraTransform.set(15,  0);
+        cameraTransform = perspectiveRH(1, 1, 1, 10);
 
         var vertShader = '
             attribute vec3 aPos;
@@ -57,31 +76,31 @@ class CubeLab extends Lab {
         vertexBuffer = new VertexBuffer(NUM_VERTICES, FpV);
         var vert = [
         //   X   Y   Z  
-            -1, -1, -1,  0, 0, 0,
-            -1, -1,  1,  0, 0, 1,
-            -1,  1, -1,  0, 1, 0,
-            -1,  1,  1,  0, 1, 1,
              1, -1, -1,  1, 0, 0,
              1, -1,  1,  1, 0, 1,
              1,  1, -1,  1, 1, 0,
              1,  1,  1,  1, 1, 1,
+            -1, -1, -1,  0, 0, 0,
+            -1, -1,  1,  0, 0, 1,
+            -1,  1, -1,  0, 1, 0,
+            -1,  1,  1,  0, 1, 1,
         ];
 
         /*
 
            Y
 
-           2---------6
-          /|        /|
-         / |       / |
-        3---------7  |
-        |  |      |  |
-        |  |      |  |
-        |  |      |  |
-        |  0------|--4   X
-        | /       | /
-        |/        |/
-        1---------5
+           2------------6
+          /|           /|
+         / |          / |
+        3------------7  |
+        |  |         |  |
+        |  |         |  |
+        |  |         |  |
+        |  0---------|--4   X
+        | /          | /
+        |/           |/
+        1------------5
 
       Z
 
@@ -106,7 +125,10 @@ class CubeLab extends Lab {
     }
 
     override function update():Void {
+        time += 0.01;
         bodyTransform.appendRotation(2, Vector4.Y_AXIS);
+        sceneTransform.identity();
+        sceneTransform.appendTranslation(0, Math.sin(time * 7) * 0.1, -3);
         fullTransform.identity();
         fullTransform.append(bodyTransform);
         fullTransform.append(sceneTransform);
