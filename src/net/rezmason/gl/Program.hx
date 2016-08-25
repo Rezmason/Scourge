@@ -66,12 +66,12 @@ class Program extends Artifact {
 
     public inline function setMatrix4(uName:String, matrix:Matrix4):Void {
         var location = getUniformLocation(uName);
-        if (location != null) GL.uniformMatrix4fv(location, false, matrix);
+        if (location != null && matrix != null) GL.uniformMatrix4fv(location, false, matrix);
     }
 
     public inline function setVector4(uName:String, vec4:Vector4):Void {
         var location = getUniformLocation(uName);
-        if (location != null) GL.uniform4f(location, vec4.x, vec4.y, vec4.z, vec4.w);
+        if (location != null && vec4 != null) GL.uniform4f(location, vec4.x, vec4.y, vec4.z, vec4.w);
     }
 
     public inline function setFloat(uName:String, x:Float, ?y:Float, ?z:Float, ?w:Float):Void {
@@ -86,7 +86,7 @@ class Program extends Artifact {
 
     public inline function setFloatVec(uName:String, degree:UInt, vec:Float32Array):Void {
         var location = getUniformLocation(uName);
-        if (location != null) floatVecFuncs[degree](location, vec);
+        if (location != null && vec != null) floatVecFuncs[degree](location, vec);
     }
 
     public inline function setInt(uName:String, x:Int, ?y:Int, ?z:Int, ?w:Int):Void {
@@ -101,7 +101,7 @@ class Program extends Artifact {
 
     public inline function setIntVec(uName:String, degree:UInt, vec:Int32Array):Void {
         var location = getUniformLocation(uName);
-        if (location != null) intVecFuncs[degree](location, vec);
+        if (location != null && vec != null) intVecFuncs[degree](location, vec);
     }
 
     public inline function setRenderTarget(renderTarget:RenderTarget):Void {
