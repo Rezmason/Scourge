@@ -4,7 +4,7 @@
     <app title="ScourgeLab" file="ScourgeLab" main="ScourgeLab" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net"/>
     
     <set name="fullscreen" unless="mac"/>
-    <window width="720" height="720" fps="60" orientation="portrait" background="#000000" resizable="false"/>
+    <window width="720" height="720" fps="60" vsync="true" orientation="portrait" background="#000000" resizable="false"/>
     
     <set name="BUILD_DIR" value="Export/ScourgeLab/release" unless="debug"/>
     <set name="BUILD_DIR" value="Export/ScourgeLab/debug" if="debug"/>
