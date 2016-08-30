@@ -72,6 +72,7 @@ class RTTLab extends Lab {
         program.use();
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         program.setDepthTest(false);
+        program.setFaceCulling(null);
 
         program.setVertexBuffer('aPos', vertexBuffer, 0, 2);
         

@@ -138,6 +138,7 @@ class CubeLab extends Lab {
         program.use();
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         program.setDepthTest(true);
+        program.setFaceCulling(BACK);
         program.setVertexBuffer('aPos',     vertexBuffer, 0, 3);
         program.setVertexBuffer('aColor',   vertexBuffer, 3, 3);
         program.setMatrix4('uBodyMat', fullTransform);

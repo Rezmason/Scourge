@@ -117,6 +117,7 @@ class HalfFloatLab extends Lab {
         program.use();
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         program.setDepthTest(false);
+        program.setFaceCulling(null);
 
         program.setTexture('uDataSampler', dataTexture, 1); // uDataSampler contains our data texture
         program.setVertexBuffer('aPos', vertexBuffer, 0, 2);

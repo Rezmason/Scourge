@@ -178,7 +178,7 @@ class BillboardLab extends Lab {
         billboardProgram = new Program(vertShader, fragShader, []);
     }
 
-    function fillDown(src:Array<Float>, dst:Array<Float>, span:UInt, elementOffset:UInt, numElements:UInt, ?repeat:UInt) {
+    function fillDown(src:Array<Float>, dst:Array<Float>, span:UInt, elementOffset:UInt, numElements:UInt, repeat:UInt = 0) {
         if (repeat == 0) repeat = 1;
         var dstOffsets = [for (ike in 0...Std.int(Math.ceil(dst.length /        span))) 
             ike * span
@@ -186,6 +186,8 @@ class BillboardLab extends Lab {
         var srcOffsets = [for (ike in 0...Std.int(Math.ceil(src.length / numElements))) 
             for (jen in 0...repeat) ike * numElements
         ];
+
+        if (srcOffsets.length == 0) throw 'FUCK';
         while (srcOffsets.length < dstOffsets.length) srcOffsets = srcOffsets.concat(srcOffsets);
         for (ike in 0...dstOffsets.length) {
             var srcOffset = srcOffsets[ike];
@@ -213,6 +215,7 @@ class BillboardLab extends Lab {
         cubeProgram.use();
         cubeProgram.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
         cubeProgram.setDepthTest(true);
+        cubeProgram.setFaceCulling(BACK);
 
         cubeProgram.setRenderTarget(renderTarget);
         cubeProgram.clear(new Vec4(0, 0, 0, 1));
@@ -236,6 +239,7 @@ class BillboardLab extends Lab {
         billboardProgram.use();
         billboardProgram.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         billboardProgram.setDepthTest(false);
+        billboardProgram.setFaceCulling(null);
 
         billboardProgram.setMatrix4('uBodyMat', fullTransform);
         billboardProgram.setMatrix4('uCameraMat', cameraTransform);

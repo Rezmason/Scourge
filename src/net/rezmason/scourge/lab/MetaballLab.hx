@@ -239,6 +239,7 @@ class MetaballLab extends Lab {
         program.use();
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         program.setDepthTest(false);
+        program.setFaceCulling(null);
 
         program.setMatrix4('uBodyMat', bodyTransform); // uBodyMat contains the body's matrix
         program.setMatrix4('uCameraMat', cameraTransform); // uCameraMat contains the camera matrix

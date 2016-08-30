@@ -166,6 +166,7 @@ class MetaballSlimeLab extends Lab {
         program.use();
         program.setBlendFactors(BlendFactor.ONE, BlendFactor.ONE);
         program.setDepthTest(false);
+        program.setFaceCulling(null);
 
         program.setTexture('uMetaballSampler', metaballTexture); // uMetaballSampler contains our metaballTexture
         program.setTexture('uGlobSampler', globTexture, 1); // uGlobSampler contains our glob texture
