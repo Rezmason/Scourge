@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+    <meta title="OGLDebug" description="" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net"/>
+    <app title="OGLDebug" file="OGLDebug" main="OGLDebug" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net"/>
+    
+    <set name="fullscreen" unless="desktop"/>
+    <window width="720" height="720" fps="60" vsync="true" orientation="portrait" background="#000000" resizable="false"/>
+    
+    <set name="BUILD_DIR" value="Export/OGLDebug/release" unless="debug"/>
+    <set name="BUILD_DIR" value="Export/OGLDebug/debug" if="debug"/>
+    
+    <classpath name="src"/>
+
+    <haxedef name="ogl"/>
+    
+    <haxelib name="lime"/>
+    
+    <assets path="shaders" include="*.vert|*.frag"/>
+</project>
