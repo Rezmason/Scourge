@@ -67,8 +67,8 @@ class FloatRTTTest {
             0, 2, 3,
         ];
         for (ike in 0...6) indexData[ike] = ind[ike];
-        GL.bindBuffer(GL.ARRAY_BUFFER, indexBuffer);
-        GL.bufferData(GL.ARRAY_BUFFER, indexData, GL.STATIC_DRAW);
+        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, indexData, GL.STATIC_DRAW);
 
         var rttVertShader = '
             attribute vec2 aPos;
@@ -180,7 +180,7 @@ class FloatRTTTest {
         GL.drawElements(GL.TRIANGLES, 2 * 3, GL.UNSIGNED_SHORT, 0);
         GL.disableVertexAttribArray(postPosLocation);
         GL.activeTexture(GL.TEXTURE0);
-        GL.bindTexture (GL.TEXTURE_2D, null);
+        GL.bindTexture(GL.TEXTURE_2D, null);
         GL.uniform1i(postSamplerLocation, 0);
     }
 }
