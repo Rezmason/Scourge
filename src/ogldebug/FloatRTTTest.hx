@@ -23,7 +23,7 @@ class FloatRTTTest {
     var postSamplerLocation:GLUniformLocation;
 
     var rttFrameBuffer:GLFramebuffer;
-    var rttPhaseLocation:Int;
+    var rttPhaseLocation:GLUniformLocation;
     var rttPosLocation:Int;
     var rttProgram:GLProgram;
     var rttTexture:GLTexture;
