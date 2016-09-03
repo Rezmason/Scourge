@@ -60,7 +60,9 @@ class Program extends Artifact {
 
         attribsLocations = new Map();
         for (ike in 0...GL.getProgramParameter(nativeProgram, GL.ACTIVE_ATTRIBUTES)) {
-            attribsLocations[GL.getActiveAttrib(nativeProgram, ike).name.split('[')[0]] = ike;
+            var activeAttrib = GL.getActiveAttrib(nativeProgram, ike);
+            var attribLocation = GL.getAttribLocation(nativeProgram, activeAttrib.name);
+            attribsLocations[activeAttrib.name.split('[')[0]] = attribLocation;
         }
     }
 
@@ -141,8 +143,12 @@ class Program extends Artifact {
     }
 
     public inline function setDepthTest(enabled:Bool):Void {
-        if (enabled) GL.enable(GL.DEPTH_TEST);
-        else GL.disable(GL.DEPTH_TEST);
+        if (enabled) {
+            GL.enable(GL.DEPTH_TEST);
+            GL.depthFunc(GL.LESS);
+        } else {
+            GL.disable(GL.DEPTH_TEST);
+        }
     }
 
     public inline function setFaceCulling(culling:Null<FaceCulling>):Void {
