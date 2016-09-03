@@ -11,6 +11,9 @@ import lime.utils.GLUtils;
 import lime.utils.Int16Array;
 
 class FloatRTTTest {
+
+    inline static var RGBA32F = 0x8814;
+
     var width:UInt;
     var height:UInt;
     var time:Float = 0;
@@ -42,7 +45,7 @@ class FloatRTTTest {
         GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
         GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
         GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-        GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.FLOAT, null);
+        GL.texImage2D(GL.TEXTURE_2D, 0, #if desktop RGBA32F #else GL.RGBA #end, width, height, 0, GL.RGBA, GL.FLOAT, null);
         GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, rttTexture, 0);
         GL.bindTexture(GL.TEXTURE_2D, null);
         GL.bindRenderbuffer(GL.RENDERBUFFER, null);
