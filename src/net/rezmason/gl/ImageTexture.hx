@@ -11,9 +11,10 @@ class ImageTexture extends Texture {
     var height:Int = -1;
 
     public function new(image:Image):Void {
-        super();
-        type = UNSIGNED_BYTE;
-        format = RGBA;
+        dataType = UNSIGNED_BYTE;
+        pixelFormat = RGBA;
+        super(Utils.getExtensions(dataType, pixelFormat));
+        dataFormat = Utils.getDataFormat(dataType, pixelFormat);
         this.image = image;
     
         nativeTexture = GL.createTexture();
@@ -29,7 +30,7 @@ class ImageTexture extends Texture {
         GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
         
         image.format = PixelFormat.RGBA32;
-        GL.texImage2D(GL.TEXTURE_2D, 0, format, image.width, image.height, 0, format, type, image.data);
+        GL.texImage2D(GL.TEXTURE_2D, 0, dataFormat, image.width, image.height, 0, pixelFormat, dataType, image.data);
         image.format = PixelFormat.BGRA32;
         
         GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
