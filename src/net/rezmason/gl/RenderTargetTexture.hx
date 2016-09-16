@@ -13,9 +13,10 @@ class RenderTargetTexture extends Texture {
 
     public function new(dataType) {
         pixelFormat = RGBA;
-        super(Utils.getExtensions(dataType, RGBA));
+        var format = TextureFormatTable.getFormat(dataType, pixelFormat);
+        super(format.extensions);
         this.dataType = dataType;
-        this.dataFormat = Utils.getDataFormat(dataType, pixelFormat);
+        this.dataFormat = format.dataFormat;
         width = 1;
         height = 1;
         renderTarget = new RenderTarget();

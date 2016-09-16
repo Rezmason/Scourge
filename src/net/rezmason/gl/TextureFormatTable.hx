@@ -1,13 +1,14 @@
 package net.rezmason.gl;
 
-typedef FormatRequirement = {
-    var extensions: Array<String>;
-    var dataFormat: DataFormat;
+typedef TextureFormat = {
+    var extensions(default, null): Array<String>;
+    var dataFormat(default, null): DataFormat;
+    var unpackAlignment(default, null): UInt;
 }
 
-class Utils {
+class TextureFormatTable {
 
-    static var requirements:Map<DataType, Map<PixelFormat, FormatRequirement>> = [
+    static var requirements:Map<DataType, Map<PixelFormat, TextureFormat>> = [
         FLOAT => [
             RGBA => {
                 extensions: [
@@ -15,6 +16,7 @@ class Utils {
                     'OES_texture_float_linear',
                 ],
                 dataFormat: RGBA_FLOAT,
+                unpackAlignment: 4,
             },
             SINGLE_CHANNEL => {
                 extensions: [
@@ -22,6 +24,7 @@ class Utils {
                     'OES_texture_float_linear',
                 ],
                 dataFormat: SINGLE_CHANNEL_FLOAT,
+                unpackAlignment: 1,
             },
         ],
         HALF_FLOAT => [
@@ -33,6 +36,7 @@ class Utils {
                     'OES_texture_half_float_linear',
                 ],
                 dataFormat: RGBA_HALF_FLOAT,
+                unpackAlignment: 4,
             },
             SINGLE_CHANNEL => {
                 extensions: [
@@ -42,20 +46,22 @@ class Utils {
                     'OES_texture_half_float_linear',
                 ],
                 dataFormat: SINGLE_CHANNEL_HALF_FLOAT,
+                unpackAlignment: 1,
             },
         ],
         UNSIGNED_BYTE => [
             RGBA => {
                 extensions: [],
                 dataFormat: RGBA_UNSIGNED_BYTE,
+                unpackAlignment: 4,
             },
             SINGLE_CHANNEL => {
                 extensions: [],
                 dataFormat: SINGLE_CHANNEL_UNSIGNED_BYTE,
+                unpackAlignment: 1,
             },
         ],
     ];
 
-    public static function getExtensions(dataType, pixelFormat) return requirements[dataType][pixelFormat].extensions;
-    public static function getDataFormat(dataType, pixelFormat) return requirements[dataType][pixelFormat].dataFormat;
+    public static function getFormat(dataType, pixelFormat) return requirements[dataType][pixelFormat];
 }

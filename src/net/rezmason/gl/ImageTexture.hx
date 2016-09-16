@@ -13,8 +13,9 @@ class ImageTexture extends Texture {
     public function new(image:Image):Void {
         dataType = UNSIGNED_BYTE;
         pixelFormat = RGBA;
-        super(Utils.getExtensions(dataType, pixelFormat));
-        dataFormat = Utils.getDataFormat(dataType, pixelFormat);
+        var format = TextureFormatTable.getFormat(dataType, pixelFormat);
+        super(format.extensions);
+        dataFormat = format.dataFormat;
         this.image = image;
     
         nativeTexture = GL.createTexture();
