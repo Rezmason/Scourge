@@ -16,6 +16,7 @@ class CubeLab extends Lab {
     var vertexBuffer:VertexBuffer;
     var indexBuffer:IndexBuffer;
 
+    var bodyTilt:Matrix4;
     var bodyTransform:Matrix4;
     var sceneTransform:Matrix4;
     var fullTransform:Matrix4;
@@ -37,10 +38,11 @@ class CubeLab extends Lab {
 
     override function init() {
 
+        bodyTilt = new Matrix4();
+        bodyTilt.appendRotation(135, Vector4.Y_AXIS);
+        bodyTilt.appendRotation(Math.acos(1 / Math.sqrt(3)) * 180 / Math.PI, Vector4.X_AXIS);
+        
         bodyTransform = new Matrix4();
-        // bodyTransform.appendScale(0.5, 0.5, 0.5);
-        bodyTransform.appendRotation(135, Vector4.Y_AXIS);
-        bodyTransform.appendRotation(Math.acos(1 / Math.sqrt(3)) * 180 / Math.PI, Vector4.X_AXIS);
 
         sceneTransform = new Matrix4();
         sceneTransform.appendTranslation(0, 0, -3);
@@ -126,10 +128,15 @@ class CubeLab extends Lab {
 
     override function update():Void {
         time += 0.01;
-        bodyTransform.appendRotation(2, Vector4.Y_AXIS);
+        
+        bodyTransform.identity();
+        bodyTransform.appendRotation(200 * time, Vector4.Y_AXIS);
+        
         sceneTransform.identity();
         sceneTransform.appendTranslation(0, Math.sin(time * 7) * 0.1, -3);
+        
         fullTransform.identity();
+        fullTransform.append(bodyTilt);
         fullTransform.append(bodyTransform);
         fullTransform.append(sceneTransform);
     }
