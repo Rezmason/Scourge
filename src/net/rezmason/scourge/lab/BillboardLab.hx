@@ -8,12 +8,16 @@ import net.rezmason.math.Vec4;
 
 class BillboardLab extends Lab {
 
-    inline static var CUBE_FpV:Int = 3 + 3; // floats per vertex
+    inline static var SOLID_FpV:Int = 3 + 3; // floats per vertex
     inline static var CUBE_NUM_VERTICES = 8;
     inline static var CUBE_NUM_TRIANGLES = 12;
-    var cubeProgram:Program;
+    inline static var PLANE_NUM_VERTICES = 4;
+    inline static var PLANE_NUM_TRIANGLES = 2;
+    var solidProgram:Program;
     var cubeVertexBuffer:VertexBuffer;
     var cubeIndexBuffer:IndexBuffer;
+    var planeVertexBuffer:VertexBuffer;
+    var planeIndexBuffer:IndexBuffer;
 
     inline static var BILLBOARD_FpV:Int = 3 + 2 + 1; // floats per vertex
     inline static var BILLBOARD_NUM_VERTICES_PER_BILLBOARD = 4;
@@ -24,8 +28,9 @@ class BillboardLab extends Lab {
     var billboardVertexBuffer:VertexBuffer;
     var billboardIndexBuffer:IndexBuffer;
 
-    var bodyTilt:Matrix4;
-    var bodyTransform:Matrix4;
+    var cubeTilt:Matrix4;
+    var cubeTransform:Matrix4;
+    var planeTransform:Matrix4;
     var sceneTransform:Matrix4;
     var fullTransform:Matrix4;
     var perspectiveTransform:Matrix4;
@@ -47,21 +52,22 @@ class BillboardLab extends Lab {
 
     override function init() {
 
-        bodyTilt = new Matrix4();
-        bodyTilt.appendRotation(135, Vector4.Y_AXIS);
-        bodyTilt.appendRotation(Math.acos(1 / Math.sqrt(3)) * 180 / Math.PI, Vector4.X_AXIS);
-        bodyTransform = new Matrix4();
+        cubeTilt = new Matrix4();
+        cubeTilt.appendRotation(135, Vector4.Y_AXIS);
+        cubeTilt.appendRotation(Math.acos(1 / Math.sqrt(3)) * 180 / Math.PI, Vector4.X_AXIS);
+        cubeTransform = new Matrix4();
+        planeTransform = new Matrix4();
         sceneTransform = new Matrix4();
         sceneTransform.appendTranslation(0, 0, -3);
         fullTransform = new Matrix4();
         cameraTransform = new Matrix4();
         perspectiveTransform = perspectiveRH(1, 1, 1, 10);
 
-        makeCube();
+        makeSolids();
         makeBillboards();
     }
 
-    function makeCube() {
+    function makeSolids() {
         var vertShader = '
             attribute vec3 aPos;
             attribute vec3 aColor;
@@ -82,8 +88,10 @@ class BillboardLab extends Lab {
             }
         ';
 
-        cubeVertexBuffer = new VertexBuffer(CUBE_NUM_VERTICES, CUBE_FpV);
-        var vert = [
+        // cube
+
+        cubeVertexBuffer = new VertexBuffer(CUBE_NUM_VERTICES, SOLID_FpV);
+        var cubeVert = [
         //   X   Y   Z  
              1, -1, -1,  0.1, 0.0, 0.0,
              1, -1,  1,  0.1, 0.0, 0.1,
@@ -95,11 +103,11 @@ class BillboardLab extends Lab {
             -1,  1,  1,  0.0, 0.1, 0.1,
         ];
 
-        for (ike in 0...cubeVertexBuffer.numVertices * CUBE_FpV) cubeVertexBuffer.mod(ike, vert[ike]);
+        for (ike in 0...cubeVertexBuffer.numVertices * SOLID_FpV) cubeVertexBuffer.mod(ike, cubeVert[ike]);
         cubeVertexBuffer.upload();
 
         cubeIndexBuffer = new IndexBuffer(CUBE_NUM_TRIANGLES * 3);
-        var ind = [
+        var cubeInd = [
             0, 2, 3,   3, 1, 0,
             0, 4, 6,   6, 2, 0,
             0, 1, 5,   5, 4, 0,
@@ -107,10 +115,31 @@ class BillboardLab extends Lab {
             7, 5, 1,   1, 3, 7,
             7, 3, 2,   2, 6, 7,
         ];
-        for (ike in 0...cubeIndexBuffer.numIndices) cubeIndexBuffer.mod(ike, ind[ike]);
+        for (ike in 0...cubeIndexBuffer.numIndices) cubeIndexBuffer.mod(ike, cubeInd[ike]);
         cubeIndexBuffer.upload();
 
-        cubeProgram = new Program(vertShader, fragShader, []);
+        // plane
+
+        planeVertexBuffer = new VertexBuffer(PLANE_NUM_VERTICES, SOLID_FpV);
+        var planeVert = [
+        //   X   Y   Z  
+             1,  0,  1,  0.4, 0.0, 0.0,
+             1,  0, -1,  0.2, 0.2, 0.0,
+            -1,  0, -1,  0.0, 0.4, 0.0,
+            -1,  0,  1,  0.0, 0.0, 0.4,
+        ];
+
+        for (ike in 0...planeVertexBuffer.numVertices * SOLID_FpV) planeVertexBuffer.mod(ike, planeVert[ike]);
+        planeVertexBuffer.upload();
+
+        planeIndexBuffer = new IndexBuffer(PLANE_NUM_TRIANGLES * 3);
+        var planeInd = [
+            0, 1, 2, 0, 2, 3,
+        ];
+        for (ike in 0...planeIndexBuffer.numIndices) planeIndexBuffer.mod(ike, planeInd[ike]);
+        planeIndexBuffer.upload();
+
+        solidProgram = new Program(vertShader, fragShader, []);
     }
 
     function makeBillboards() {
@@ -121,11 +150,13 @@ class BillboardLab extends Lab {
             uniform mat4 uBodyMat;
             uniform mat4 uCameraMat;
             uniform mat4 uPerspectiveMat;
+            uniform float uBodyScreenScale;
             varying vec4 vColor;
             void main(void) {
                 vColor = vec4((aCorner + 1.0) * 0.5, 0.5, 1.0);
                 vec4 position = uPerspectiveMat * uCameraMat * uBodyMat * vec4(aPos, 1.0);
-                position.xy += aCorner * aScale;
+
+                position.xy += aCorner * aScale * uBodyScreenScale;
                 gl_Position = position;
             }
         ';
@@ -202,50 +233,65 @@ class BillboardLab extends Lab {
         time += 0.01;
 
         // Body's scale is oscillating,
-        var scale = Math.sin(time * 3) * 0.5 + 0.5;
-        bodyTransform.identity();
-        bodyTransform.appendScale(scale, scale, scale);
+        var cubeScale = Math.sin(time * 3) * 0.3 + 0.7;
+        cubeTransform.identity();
+        cubeTransform.appendScale(cubeScale, cubeScale, cubeScale);
+
+        planeTransform.identity();
+        planeTransform.appendScale(2, 2, 2);
+        planeTransform.appendTranslation(0, -2, 0);
 
         // Scene's Y is oscillating,
         sceneTransform.identity();
         sceneTransform.appendTranslation(0, Math.sin(time * 2) * 0.1, 0);
 
         // Camera's rotation-Y is oscillating
+        var cameraScale = Math.sin(time * 4) * 0.3 + 0.7;
         cameraTransform.identity();
-        cameraTransform.appendRotation(100 * time, Vector4.Y_AXIS);
+        cameraTransform.appendRotation(50 * time, Vector4.Y_AXIS);
+        cameraTransform.appendScale(cameraScale, cameraScale, cameraScale);
         cameraTransform.appendTranslation(0, 0, -3);
-        
-        fullTransform.identity();
-        fullTransform.append(bodyTilt);
-        fullTransform.append(bodyTransform);
-        fullTransform.append(sceneTransform);
     }
 
     override function draw():Void {
         
-        // cube
+        // solid
         
-        cubeProgram.use();
-        cubeProgram.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
-        cubeProgram.setDepthTest(true);
-        cubeProgram.setFaceCulling(BACK);
+        solidProgram.use();
+        solidProgram.setBlendFactors(BlendFactor.ONE, BlendFactor.ZERO);
+        solidProgram.setDepthTest(true);
+        solidProgram.setFaceCulling(BACK);
 
-        cubeProgram.setRenderTarget(renderTarget);
-        cubeProgram.clear(new Vec4(0, 0, 0, 1));
+        solidProgram.setRenderTarget(renderTarget);
+        solidProgram.clear(new Vec4(0, 0, 0, 1));
 
-        cubeProgram.setMatrix4('uBodyMat', fullTransform);
-        cubeProgram.setMatrix4('uCameraMat', cameraTransform);
-        cubeProgram.setMatrix4('uPerspectiveMat', perspectiveTransform);
+        solidProgram.setMatrix4('uCameraMat', cameraTransform);
+        solidProgram.setMatrix4('uPerspectiveMat', perspectiveTransform);
 
-        cubeProgram.setVertexBuffer('aPos',     cubeVertexBuffer, 0, 3);
-        cubeProgram.setVertexBuffer('aColor',   cubeVertexBuffer, 3, 3);
-        cubeProgram.draw(cubeIndexBuffer, 0, CUBE_NUM_TRIANGLES);
-        cubeProgram.setVertexBuffer('aPos', null, 0, 3);
-        cubeProgram.setVertexBuffer('aColor', null, 3, 3);
+        fullTransform.identity();
+        fullTransform.append(cubeTilt);
+        fullTransform.append(cubeTransform);
+        fullTransform.append(sceneTransform);
+        solidProgram.setMatrix4('uBodyMat', fullTransform);
+        solidProgram.setVertexBuffer('aPos',     cubeVertexBuffer, 0, 3);
+        solidProgram.setVertexBuffer('aColor',   cubeVertexBuffer, 3, 3);
+        solidProgram.draw(cubeIndexBuffer, 0, CUBE_NUM_TRIANGLES);
+        solidProgram.setVertexBuffer('aPos', null, 0, 3);
+        solidProgram.setVertexBuffer('aColor', null, 3, 3);
+
+        fullTransform.identity();
+        fullTransform.append(planeTransform);
+        fullTransform.append(sceneTransform);
+        solidProgram.setMatrix4('uBodyMat', fullTransform);
+        solidProgram.setVertexBuffer('aPos',     planeVertexBuffer, 0, 3);
+        solidProgram.setVertexBuffer('aColor',   planeVertexBuffer, 3, 3);
+        solidProgram.draw(planeIndexBuffer, 0, PLANE_NUM_TRIANGLES);
+        solidProgram.setVertexBuffer('aPos', null, 0, 3);
+        solidProgram.setVertexBuffer('aColor', null, 3, 3);
         
-        cubeProgram.setMatrix4('uBodyMat', null);
-        cubeProgram.setMatrix4('uCameraMat', null);
-        cubeProgram.setMatrix4('uPerspectiveMat', null);
+        solidProgram.setMatrix4('uBodyMat', null);
+        solidProgram.setMatrix4('uCameraMat', null);
+        solidProgram.setMatrix4('uPerspectiveMat', null);
 
         // billboards
         
@@ -254,9 +300,22 @@ class BillboardLab extends Lab {
         billboardProgram.setDepthTest(false);
         billboardProgram.setFaceCulling(null);
 
-        billboardProgram.setMatrix4('uBodyMat', fullTransform);
         billboardProgram.setMatrix4('uCameraMat', cameraTransform);
         billboardProgram.setMatrix4('uPerspectiveMat', perspectiveTransform);
+
+        fullTransform.identity();
+        fullTransform.append(cubeTilt);
+        fullTransform.append(cubeTransform);
+        fullTransform.append(sceneTransform);
+        billboardProgram.setMatrix4('uBodyMat', fullTransform);
+
+        // The particles should not be affected by the camera rotating and translating
+        // The particles should be affected by the camera scaling
+        // The particles should not be affected by the fullTransform rotating and translating
+        // The particles should be affected by the fullTransform scaling
+
+        var dammit = 1;
+        billboardProgram.setFloat('uBodyScreenScale', dammit);
 
         billboardProgram.setVertexBuffer('aPos',     billboardVertexBuffer, 0, 3);
         billboardProgram.setVertexBuffer('aCorner',  billboardVertexBuffer, 3, 2);
