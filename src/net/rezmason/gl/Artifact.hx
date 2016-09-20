@@ -7,7 +7,9 @@ class Artifact {
     public var isDisposed(default, null):Bool = false;
     public function dispose() isDisposed = true;
     
-    inline function new(?extensions) {
+    inline function new(?extensions) updateExtensions(extensions);
+
+    function updateExtensions(extensions) {
         this.extensions = extensions;
         if (this.extensions != null) for (extension in extensions) GL.getExtension(extension);
     }

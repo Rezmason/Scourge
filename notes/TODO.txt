@@ -1,3 +1,6 @@
+Remove unnecessary extensions from methods
+    Systematically determine they're unnecessary across all platforms– Chrome, Safari, Mac, Windows
+
 Simplify the scene graph tremendously
     ONE ROOT DAMN IT
     One scene; integrate scene and scene graph

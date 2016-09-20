@@ -7,9 +7,9 @@ class Camera {
 
     public var transform(default, null):Matrix4 = new Matrix4();
     public var screenSize(default, null):Vector2 = new Vector2();
-    var projection:Matrix4 = makeProjection();
+    var projection:Matrix4;
 
-    public function new():Void {}
+    public function new():Void projection = makeProjection();
 
     public function resize(width:Float, height:Float):Void {
         transform.identity();
