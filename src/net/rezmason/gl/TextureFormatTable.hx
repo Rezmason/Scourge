@@ -30,8 +30,8 @@ class TextureFormatTable {
         HALF_FLOAT => [
             RGBA => {
                 extensions: [
-                    'OES_texture_float', // may be unnecessary
-                    'OES_texture_float_linear', // may be unnecessary
+                    // 'OES_texture_float', // may be unnecessary
+                    // 'OES_texture_float_linear', // may be unnecessary
                     'OES_texture_half_float',
                     'OES_texture_half_float_linear',
                 ],
@@ -40,8 +40,8 @@ class TextureFormatTable {
             },
             SINGLE_CHANNEL => {
                 extensions: [
-                    'OES_texture_float', // may be unnecessary
-                    'OES_texture_float_linear', // may be unnecessary
+                    // 'OES_texture_float', // may be unnecessary
+                    // 'OES_texture_float_linear', // may be unnecessary
                     'OES_texture_half_float',
                     'OES_texture_half_float_linear',
                 ],

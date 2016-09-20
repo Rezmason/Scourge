@@ -30,8 +30,6 @@ class SDFFontMethod extends SceneRenderMethod {
         vertShader = getText('shaders/sdf_font.vert');
         fragShader = getText('shaders/sdf_font.frag');
         extensions.push('OES_standard_derivatives');
-        extensions.push('OES_texture_float');
-        extensions.push('OES_texture_float_linear');
     }
 
     override function drawBody(body:Body):Void {

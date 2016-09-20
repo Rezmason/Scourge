@@ -39,7 +39,7 @@ class Program extends Artifact {
         if (extensions != null) {
             var extensionPreamble = '\n';
             for (extension in extensions) {
-                GL.getExtension(extension);
+                // GL.getExtension(extension); // may be unnecessary
                 extensionPreamble += '#extension GL_$extension : enable\n';
             }
             #if !desktop extensionPreamble += 'precision mediump float;\n'; #end

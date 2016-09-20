@@ -35,11 +35,8 @@ class BloomMethod extends ScreenRenderMethod {
     }
 
     override function composeShaders() {
-        extensions.push('OES_texture_float');
-        extensions.push('OES_texture_float_linear');
         vertShader = getText('shaders/bloom.vert');
         fragShader = getText('shaders/bloom.frag');
-
         fragShader = new EReg('INT_KERNEL_SIZE', 'g').replace(fragShader, Std.string(kernel.length));
     }
 
