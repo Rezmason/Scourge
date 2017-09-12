@@ -11,5 +11,5 @@ typedef BiteParams = {
     orthoOnly:Bool,
     startingBites:Int,
 
-    ?allowBiting:Bool,
+    allowBiting:Bool,
 }
