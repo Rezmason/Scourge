@@ -32,8 +32,8 @@ class VertexBuffer extends Artifact {
     public inline function upload():Void {
         checkContext();
         if (invalid) {
-            context.bindBuffer(GL.ARRAY_BUFFER, nativeBuffer);
-            context.bufferData(GL.ARRAY_BUFFER, data, usage);
+            context.bindBuffer(context.ARRAY_BUFFER, nativeBuffer);
+            context.bufferData(context.ARRAY_BUFFER, data, usage);
             invalid = false;
         }
     }

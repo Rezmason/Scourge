@@ -42,14 +42,14 @@ class Program extends Artifact {
         nativeProgram = GLUtils.createProgram(vertSource, fragSource);
 
         uniformLocations = new Map();
-        for (ike in 0...context.getProgramParameter(nativeProgram, GL.ACTIVE_UNIFORMS)) {
+        for (ike in 0...context.getProgramParameter(nativeProgram, context.ACTIVE_UNIFORMS)) {
             var activeUniform = context.getActiveUniform(nativeProgram, ike);
             var uniformLocation = context.getUniformLocation(nativeProgram, activeUniform.name);
             uniformLocations[activeUniform.name.split('[')[0]] = uniformLocation;
         }
 
         attribsLocations = new Map();
-        for (ike in 0...context.getProgramParameter(nativeProgram, GL.ACTIVE_ATTRIBUTES)) {
+        for (ike in 0...context.getProgramParameter(nativeProgram, context.ACTIVE_ATTRIBUTES)) {
             var activeAttrib = context.getActiveAttrib(nativeProgram, ike);
             var attribLocation = context.getAttribLocation(nativeProgram, activeAttrib.name);
             attribsLocations[activeAttrib.name.split('[')[0]] = attribLocation;
@@ -102,7 +102,7 @@ class Program extends Artifact {
 
     public inline function setRenderTarget(renderTarget:RenderTarget):Void {
         checkContext();
-        context.bindFramebuffer(GL.FRAMEBUFFER, renderTarget.frameBuffer);
+        context.bindFramebuffer(context.FRAMEBUFFER, renderTarget.frameBuffer);
         context.viewport(0, 0, renderTarget.width, renderTarget.height);
     }
     
@@ -111,8 +111,8 @@ class Program extends Artifact {
         var location = getUniformLocation(uName);
         var nativeTexture = texture != null ? texture.nativeTexture : null;
         if (location != null) {
-            context.activeTexture(GL.TEXTURE0 + index);
-            GL.bindTexture (GL.TEXTURE_2D, nativeTexture);
+            context.activeTexture(context.TEXTURE0 + index);
+            context.bindTexture (context.TEXTURE_2D, nativeTexture);
             context.uniform1i(location, index);
         }
     }
@@ -123,8 +123,8 @@ class Program extends Artifact {
         if (location != null) {
             if (size < 0) size = buffer.footprint;
             if (buffer != null) {
-                context.bindBuffer(GL.ARRAY_BUFFER, buffer.nativeBuffer);
-                context.vertexAttribPointer(location, size, GL.FLOAT, false, 4 * buffer.footprint, 4 * offset);
+                context.bindBuffer(context.ARRAY_BUFFER, buffer.nativeBuffer);
+                context.vertexAttribPointer(location, size, context.FLOAT, false, 4 * buffer.footprint, 4 * offset);
                 context.enableVertexAttribArray(location);
             } else {
                 context.disableVertexAttribArray(location);
@@ -139,40 +139,40 @@ class Program extends Artifact {
 
     public inline function setBlendFactors(sourceFactor:BlendFactor, destinationFactor:BlendFactor):Void {
         checkContext();
-        context.enable(GL.BLEND);
+        context.enable(context.BLEND);
         context.blendFunc(sourceFactor, destinationFactor);
     }
 
     public inline function setDepthTest(enabled:Bool):Void {
         checkContext();
         if (enabled) {
-            context.enable(GL.DEPTH_TEST);
-            context.depthFunc(GL.LESS);
+            context.enable(context.DEPTH_TEST);
+            context.depthFunc(context.LESS);
         } else {
-            context.disable(GL.DEPTH_TEST);
+            context.disable(context.DEPTH_TEST);
         }
     }
 
     public inline function setFaceCulling(culling:Null<FaceCulling>):Void {
         checkContext();
         if (culling != null) {
-            context.enable(GL.CULL_FACE);
+            context.enable(context.CULL_FACE);
             context.cullFace(culling);
         } else {
-            context.disable(GL.CULL_FACE);
+            context.disable(context.CULL_FACE);
         }
     }
 
     public inline function clear(color:Vector4) {
         checkContext();
         context.clearColor(color.x, color.y, color.z, color.w);
-        context.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+        context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
     }
 
     public inline function draw(indexBuffer:IndexBuffer, firstIndex:UInt = 0, numTriangles:UInt = 0):Void {
         checkContext();
-        context.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.nativeBuffer);
-        context.drawElements(GL.TRIANGLES, numTriangles * 3, GL.UNSIGNED_SHORT, firstIndex);
+        context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, indexBuffer.nativeBuffer);
+        context.drawElements(context.TRIANGLES, numTriangles * 3, context.UNSIGNED_SHORT, firstIndex);
     }
 
     inline function getUniformLocation(name:String):Null<GLUniformLocation> return uniformLocations[name];

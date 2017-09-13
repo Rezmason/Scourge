@@ -37,22 +37,22 @@ class RenderTargetTexture extends Texture {
         this.height = height;
         renderTarget._width = width;
         renderTarget._height = height;
-        context.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
-        context.bindTexture(GL.TEXTURE_2D, nativeTexture);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-        context.texImage2D(GL.TEXTURE_2D, 0, dataFormat, width, height, 0, pixelFormat, dataType, null);
-        context.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, nativeTexture, 0);
-        context.bindTexture(GL.TEXTURE_2D, null);
-        context.bindRenderbuffer(GL.RENDERBUFFER, null);
-        context.bindFramebuffer(GL.FRAMEBUFFER, null);
+        context.bindFramebuffer(context.FRAMEBUFFER, frameBuffer);
+        context.bindTexture(context.TEXTURE_2D, nativeTexture);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+        context.texImage2D(context.TEXTURE_2D, 0, dataFormat, width, height, 0, pixelFormat, dataType, null);
+        context.framebufferTexture2D(context.FRAMEBUFFER, context.COLOR_ATTACHMENT0, context.TEXTURE_2D, nativeTexture, 0);
+        context.bindTexture(context.TEXTURE_2D, null);
+        context.bindRenderbuffer(context.RENDERBUFFER, null);
+        context.bindFramebuffer(context.FRAMEBUFFER, null);
     }
 
     public function readBack(data:ArrayBufferView):Void {
         checkContext();
-        context.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
-        context.readPixels(0, 0, width, height, GL.RGBA, dataType, data);
+        context.bindFramebuffer(context.FRAMEBUFFER, frameBuffer);
+        context.readPixels(0, 0, width, height, context.RGBA, dataType, data);
     }
 }

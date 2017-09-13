@@ -29,8 +29,8 @@ class IndexBuffer extends Artifact {
 
     public inline function upload():Void {
         checkContext();
-        context.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, nativeBuffer);
-        context.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, usage);
+        context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, nativeBuffer);
+        context.bufferData(context.ELEMENT_ARRAY_BUFFER, data, usage);
         invalid = false;
     }
 

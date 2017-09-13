@@ -27,15 +27,15 @@ class DataTexture extends Texture {
 
     inline function update():Void {
         checkContext();
-        var oldUnpackAlignment = context.getParameter(GL.UNPACK_ALIGNMENT);
-        context.pixelStorei(GL.UNPACK_ALIGNMENT, unpackAlignment);
-        context.bindTexture(GL.TEXTURE_2D, nativeTexture);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-        context.texImage2D(GL.TEXTURE_2D, 0, dataFormat, width, height, 0, pixelFormat, dataType, data);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-        context.bindTexture(GL.TEXTURE_2D, null);
-        context.pixelStorei(GL.UNPACK_ALIGNMENT, oldUnpackAlignment);
+        var oldUnpackAlignment = context.getParameter(context.UNPACK_ALIGNMENT);
+        context.pixelStorei(context.UNPACK_ALIGNMENT, unpackAlignment);
+        context.bindTexture(context.TEXTURE_2D, nativeTexture);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+        context.texImage2D(context.TEXTURE_2D, 0, dataFormat, width, height, 0, pixelFormat, dataType, data);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+        context.bindTexture(context.TEXTURE_2D, null);
+        context.pixelStorei(context.UNPACK_ALIGNMENT, oldUnpackAlignment);
     }
 }

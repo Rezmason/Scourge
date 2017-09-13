@@ -27,16 +27,16 @@ class ImageTexture extends Texture {
         var sizeChanged = nativeTexture == null || width != image.width || height != image.height;
         width = image.width;
         height = image.height;
-        context.bindTexture(GL.TEXTURE_2D, nativeTexture);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+        context.bindTexture(context.TEXTURE_2D, nativeTexture);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
         
         image.format = PixelFormat.RGBA32;
-        context.texImage2D(GL.TEXTURE_2D, 0, dataFormat, image.width, image.height, 0, pixelFormat, dataType, image.data);
+        context.texImage2D(context.TEXTURE_2D, 0, dataFormat, image.width, image.height, 0, pixelFormat, dataType, image.data);
         image.format = PixelFormat.BGRA32;
         
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-        context.bindTexture(GL.TEXTURE_2D, null);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+        context.bindTexture(context.TEXTURE_2D, null);
     }
 }
