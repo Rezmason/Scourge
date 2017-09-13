@@ -2,13 +2,17 @@ package net.rezmason.scourge.game.bite;
 
 import net.rezmason.praxis.config.Module;
 import net.rezmason.praxis.config.RuleComposition;
+import net.rezmason.praxis.config.RuleType;
 
 class BiteModule extends Module<BiteParams> {
 
     override public function composeRules():Map<String, RuleComposition<BiteParams>> {
-        return [
-            'bite' => {type:Action(null, new BiteSurveyor(), new BiteActor(), null, null, null), isIncluded:function(p) return p.allowBiting},
-        ];
+        var rules:Map<String, RuleComposition<BiteParams>> = new Map();
+        rules['bite'] = {
+            type:Action(null, new BiteSurveyor(), new BiteActor(), null, null, null), 
+            isIncluded:function(p:BiteParams) return p.allowBiting == true,
+        };
+        return rules;
     }
 
     override public function makeDefaultParams() {
@@ -22,7 +26,7 @@ class BiteModule extends Module<BiteParams> {
             biteHeads: true,
             orthoOnly: true,
             startingBites: 5,
-
+            
             allowBiting:true,
         };
     }

@@ -40,6 +40,7 @@ class BiteRuleTest extends ScourgeRuleTest
     public function straightBite1():Void {
 
         var biteParams:BiteParams = {
+            allowBiting:true,
             startingBites:100,
             minReach:1,
             maxReach:1,
@@ -77,6 +78,7 @@ class BiteRuleTest extends ScourgeRuleTest
     public function straightBite3():Void {
 
         var biteParams:BiteParams = {
+            allowBiting:true,
             startingBites:100,
             minReach:1,
             maxReach:3,
@@ -120,6 +122,7 @@ class BiteRuleTest extends ScourgeRuleTest
     public function diagonalStraightBite3():Void {
 
         var biteParams:BiteParams = {
+            allowBiting:true,
             startingBites:100,
             minReach:1,
             maxReach:3,
@@ -165,6 +168,7 @@ class BiteRuleTest extends ScourgeRuleTest
     public function omnidirectionalBite2():Void {
 
         var biteParams:BiteParams = {
+            allowBiting:true,
             startingBites:100,
             minReach:1,
             maxReach:2,
@@ -208,6 +212,7 @@ class BiteRuleTest extends ScourgeRuleTest
     public function straightBiteThroughHeads():Void {
 
         var biteParams:BiteParams = {
+            allowBiting:true,
             startingBites:100,
             minReach:1,
             maxReach:1,
@@ -254,6 +259,7 @@ class BiteRuleTest extends ScourgeRuleTest
     public function straightBiteBasedOnThickness():Void {
 
         var biteParams:BiteParams = {
+            allowBiting:true,
             startingBites:100,
             minReach:1,
             maxReach:20,
@@ -300,6 +306,7 @@ class BiteRuleTest extends ScourgeRuleTest
     public function cavityBite():Void {
 
         var biteParams:BiteParams = {
+            allowBiting:true,
             startingBites:100,
             minReach:1,
             maxReach:2,

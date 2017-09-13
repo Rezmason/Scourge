@@ -547,8 +547,12 @@ class Interpreter {
      * All unused keys and flags that match the input text are made into hints and returned in an array.
      */
     function makeKeyFlagHints(text:String):Array<ConsoleToken> {
-        var keys = cState.keyReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.keyReg, text));
-        var flags = cState.flagReg.keys().intoArray().filter(isUnusedMatch.bind(_, cState.flagReg, text));
+
+        function isUnusedKeyMatch(key) return isUnusedMatch(key, cState.keyReg, text);
+        function isUnusedFlagMatch(flag) return isUnusedMatch(flag, cState.flagReg, text);
+
+        var keys = cState.keyReg.keys().intoArray().filter(isUnusedKeyMatch);
+        var flags = cState.flagReg.keys().intoArray().filter(isUnusedFlagMatch);
 
         var keyHints:Array<ConsoleToken> = keys.map(argToHint.bind(_, Key));
         var flagHints:Array<ConsoleToken> = flags.map(argToHint.bind(_, Flag));
@@ -667,7 +671,7 @@ class Interpreter {
         var str:String = token.text;
         var styleName:String = ConsoleStrings.INPUT_STYLENAME;
         if (token == currentToken && includeCaret) {
-            str = sub(str, 0, caretIndex) + CARET + sub(str, caretIndex);
+            str = sub(str, 0, caretIndex) + CARET_SIGIL + sub(str, caretIndex);
         }
         if (token.next == null && (cState.completeError != null || cState.hintError != null)) {
             styleName = ConsoleStrings.ERROR_INPUT_STYLENAME;

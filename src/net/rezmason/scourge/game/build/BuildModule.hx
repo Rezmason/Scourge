@@ -2,6 +2,7 @@ package net.rezmason.scourge.game.build;
 
 import net.rezmason.praxis.config.Module;
 import net.rezmason.praxis.config.RuleComposition;
+import net.rezmason.praxis.config.RuleType;
 
 class BuildModule extends Module<BuildParams> {
 
@@ -13,11 +14,11 @@ class BuildModule extends Module<BuildParams> {
     }
 
     override public function composeRules():Map<String, RuleComposition<BuildParams>> {
-        return [
-            'buildGlobal'   => {type:Builder(new GlobalBuilder())},
-            'buildPlayers'  => {type:Builder(new PlayerBuilder())},
-            'buildBoard'    => {type:Builder(new BoardBuilder())},
-        ];
+        var rules:Map<String, RuleComposition<BuildParams>> = new Map();
+        rules[ 'buildGlobal'] = {type:Builder(new GlobalBuilder()), isIncluded:null};
+        rules['buildPlayers'] = {type:Builder(new PlayerBuilder()), isIncluded:null};
+        rules[  'buildBoard'] = {type:Builder(new  BoardBuilder()), isIncluded:null};
+        return rules;
     }
 
     override public function makeDefaultParams() {

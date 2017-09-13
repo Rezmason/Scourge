@@ -21,8 +21,8 @@ class RenderTargetTexture extends Texture {
         height = 1;
         renderTarget = new RenderTarget();
     
-        nativeTexture = GL.createTexture();
-        frameBuffer = GL.createFramebuffer();
+        nativeTexture = context.createTexture();
+        frameBuffer = context.createFramebuffer();
         renderTarget.frameBuffer = frameBuffer;
         renderTarget._width = width;
         renderTarget._height = height;
@@ -30,27 +30,29 @@ class RenderTargetTexture extends Texture {
     }
 
     public function resize(width:UInt, height:UInt):Void {
+        checkContext();
         if (width  < 1) width = 1;
         if (height < 1) height = 1;
         this.width = width;
         this.height = height;
         renderTarget._width = width;
         renderTarget._height = height;
-        GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
-        GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-        GL.texImage2D(GL.TEXTURE_2D, 0, dataFormat, width, height, 0, pixelFormat, dataType, null);
-        GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, nativeTexture, 0);
-        GL.bindTexture(GL.TEXTURE_2D, null);
-        GL.bindRenderbuffer(GL.RENDERBUFFER, null);
-        GL.bindFramebuffer(GL.FRAMEBUFFER, null);
+        context.bindFramebuffer(context.FRAMEBUFFER, frameBuffer);
+        context.bindTexture(context.TEXTURE_2D, nativeTexture);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+        context.texImage2D(context.TEXTURE_2D, 0, dataFormat, width, height, 0, pixelFormat, dataType, null);
+        context.framebufferTexture2D(context.FRAMEBUFFER, context.COLOR_ATTACHMENT0, context.TEXTURE_2D, nativeTexture, 0);
+        context.bindTexture(context.TEXTURE_2D, null);
+        context.bindRenderbuffer(context.RENDERBUFFER, null);
+        context.bindFramebuffer(context.FRAMEBUFFER, null);
     }
 
     public function readBack(data:ArrayBufferView):Void {
-        GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
-        GL.readPixels(0, 0, width, height, GL.RGBA, dataType, data);
+        checkContext();
+        context.bindFramebuffer(context.FRAMEBUFFER, frameBuffer);
+        context.readPixels(0, 0, width, height, context.RGBA, dataType, data);
     }
 }

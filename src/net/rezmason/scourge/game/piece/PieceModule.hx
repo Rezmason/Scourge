@@ -2,6 +2,7 @@ package net.rezmason.scourge.game.piece;
 
 import net.rezmason.praxis.config.Module;
 import net.rezmason.praxis.config.RuleComposition;
+import net.rezmason.praxis.config.RuleType;
 import net.rezmason.utils.openfl.Resource;
 
 #if !HEADLESS
@@ -18,15 +19,20 @@ class PieceModule extends Module<PieceParams> {
     }
 
     override public function composeRules():Map<String, RuleComposition<PieceParams>> {
-        return [
-            'swap' => {type:Action(null, new SwapPieceSurveyor(), new SwapPieceActor(), null, null, null), 
-                isIncluded:function(p) return !p.allowAllPieces && p.allowSwapping,
-            },
-            'pick' => {type:Action(new PickPieceBuilder(), new PickPieceSurveyor(), new PickPieceActor(), null, null, function(p) return !p.allowPiecePick), 
-                isIncluded:function(p) return !p.allowAllPieces,
-            },
-            'drop' => {type:Action(null, new DropPieceSurveyor(), new DropPieceActor(), #if HEADLESS null #else new DropPieceRulePresenter() #end, null, null)},
-        ];
+        var rules:Map<String, RuleComposition<PieceParams>> = new Map();
+        rules['swap'] = {
+            type:Action(null, new SwapPieceSurveyor(), new SwapPieceActor(), null, null, null), 
+            isIncluded:function(p:PieceParams) return (!p.allowAllPieces && p.allowSwapping) == true,
+        };
+        rules['pick'] = {
+            type:Action(new PickPieceBuilder(), new PickPieceSurveyor(), new PickPieceActor(), null, null, function(p) return !p.allowPiecePick), 
+            isIncluded:function(p:PieceParams) return !p.allowAllPieces,
+        };
+        rules['drop'] = {
+            type:Action(null, new DropPieceSurveyor(), new DropPieceActor(), #if HEADLESS null #else new DropPieceRulePresenter() #end, null, null),
+            isIncluded: null,
+        };
+        return rules;
     }
 
     override public function makeDefaultParams() {

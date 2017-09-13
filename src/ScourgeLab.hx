@@ -19,7 +19,7 @@ class ScourgeLab extends Application {
         labs.push(new MetaballSlimeLab(width, height));
     }
 
-    override public function render(_) labs[0].render();
+    override public function render(_) if (labs.length > 0) labs[0].render();
 
     override public function onMouseDown(_, _, _, button) {
         if (button == 0) labs.push(labs.shift());
