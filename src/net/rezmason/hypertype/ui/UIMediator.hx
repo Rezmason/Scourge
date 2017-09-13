@@ -68,12 +68,12 @@ class UIMediator {
             for (index in 0...length(line)) {
                 var charCode:Int = Utf8.charCodeAt(line, index);
                 switch (charCode) {
-                    case STYLE_CODE:
+                    case STYLE_SIGIL_CODE:
                         spanIndex++;
                         currentSpan = compositeDoc.getSpanByIndex(spanIndex);
-                    case CARET_CODE:
+                    case CARET_SIGIL_CODE:
                         caretGlyphID = id;
-                    case PARAGRAPH_STYLE_CODE:
+                    case PARAGRAPH_STYLE_SIGIL_CODE:
                         // nada
                     case _:
                         var glyph:Glyph = body.getGlyphByID(id);
@@ -118,10 +118,10 @@ class UIMediator {
                 var lineParagraphIndex:Int = 0;
                 for (ike in 0...page.length) {
                     var line = page[ike];
-                    lineStyleIndex += line.split(STYLE).length - 1;
+                    lineStyleIndex += line.split(STYLE_SIGIL).length - 1;
                     lineStyleIndices.push(lineStyleIndex);
 
-                    lineParagraphIndex += line.split(PARAGRAPH_STYLE).length - 1;
+                    lineParagraphIndex += line.split(PARAGRAPH_STYLE_SIGIL).length - 1;
                     var isFinal:Bool = ike == page.length - 1 || lengthWithoutSigils(page[ike + 1]) == 0;
                     page[ike] = padLineWithParagraph(line, compositeDoc.getParagraphByIndex(lineParagraphIndex), isFinal);
                 }
@@ -145,7 +145,7 @@ class UIMediator {
     inline function lengthWithoutSigils(line:String):Int {
         var count:Int = 0;
         function check(char:Int):Void {
-           if (char == STYLE_CODE || char == CARET_CODE || char == PARAGRAPH_STYLE_CODE) count++;
+           if (char == STYLE_SIGIL_CODE || char == CARET_SIGIL_CODE || char == PARAGRAPH_STYLE_SIGIL_CODE) count++;
         }
         Utf8.iter(line, check);
         return length(line) - count;
@@ -194,7 +194,7 @@ class UIMediator {
         
         while (index < len) {
             var char:Int = charCodes[index];
-            if (char != STYLE_CODE && char != CARET_CODE && char != PARAGRAPH_STYLE_CODE) {
+            if (char != STYLE_SIGIL_CODE && char != CARET_SIGIL_CODE && char != PARAGRAPH_STYLE_SIGIL_CODE) {
                 count++;
                 countFromLastSpaceIndex++;
                 if (char == Strings.SPACE_CODE) {

@@ -11,9 +11,9 @@ class Parser {
     static var defaultParagraphStyle(default, null):ParagraphStyle = makeDefaultParagraphStyle();
 
     static var styleTypes:Map<String, Class<Style>> = [
-        STYLE => Style,
-        ANIMATED_STYLE => AnimatedStyle,
-        BUTTON_STYLE => ButtonStyle,
+        STYLE_SIGIL => Style,
+        ANIMATED_STYLE_SIGIL => AnimatedStyle,
+        BUTTON_STYLE_SIGIL => ButtonStyle,
     ];
 
     public inline static function makeEmptyOutput():ParsedOutput {
@@ -76,12 +76,12 @@ class Parser {
 
             // Find the next sigil
 
-            for (sigil in [STYLE, ANIMATED_STYLE, BUTTON_STYLE, PARAGRAPH_STYLE]) {
+            for (sigil in [STYLE_SIGIL, ANIMATED_STYLE_SIGIL, BUTTON_STYLE_SIGIL, PARAGRAPH_STYLE_SIGIL]) {
                 var index:Int = right.indexOf(sigil);
                 if (index != -1 && (startIndex == -1 || startIndex > index)) {
                     startIndex = index;
                     styleType = styleTypes[sigil];
-                    isParagraphStyle = sigil == PARAGRAPH_STYLE;
+                    isParagraphStyle = sigil == PARAGRAPH_STYLE_SIGIL;
                 }
             }
 
@@ -113,12 +113,12 @@ class Parser {
                         right = right.substr(endIndex, right.length);
                         right = Utf8.sub(right, 1, Utf8.length(right));
 
-                        if (right.indexOf(PARAGRAPH_STYLE) != 0) {
+                        if (right.indexOf(PARAGRAPH_STYLE_SIGIL) != 0) {
                             var paragraph:Paragraph = getParagraph(recycledParagraphs, paragraphStyle, tag.id);
                             paragraphs.push(paragraph);
                             paragraphsByParagraphStyleName[paragraphStyle.name].push(paragraph);
 
-                            left = left + PARAGRAPH_STYLE;
+                            left = left + PARAGRAPH_STYLE_SIGIL;
                         }
 
                     } else {
@@ -133,7 +133,7 @@ class Parser {
                         right = Utf8.sub(right, 1, Utf8.length(right));
 
                         var skipSpan:Bool = false;
-                        for (sigil in [STYLE, ANIMATED_STYLE, BUTTON_STYLE]) {
+                        for (sigil in [STYLE_SIGIL, ANIMATED_STYLE_SIGIL, BUTTON_STYLE_SIGIL]) {
                             if (right.indexOf(sigil) == 0) {
                                 skipSpan = true;
                                 break;
@@ -150,7 +150,7 @@ class Parser {
                                 currentMouseID++;
                             }
 
-                            left = left + STYLE;
+                            left = left + STYLE_SIGIL;
                         }
                     }
                 }
