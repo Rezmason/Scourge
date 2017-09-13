@@ -1,14 +1,14 @@
 package net.rezmason.gl;
 
 import lime.graphics.opengl.GL;
-import lime.graphics.opengl.WebGL2Context;
+import lime.graphics.opengl.WebGLContext;
 
 class Artifact {
     public var extensions(default, null):Array<String>;
     public var isDisposed(default, null):Bool = false;
     public function dispose() isDisposed = true;
 
-    var context:WebGL2Context;
+    var context:WebGLContext;
     
     inline function new(?extensions) {
         context = GL.context;

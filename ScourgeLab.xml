@@ -14,6 +14,8 @@
     <haxedef name="ogl"/>
     
     <haxelib name="lime"/>
+
+    <haxedef name="webgl1" if="html5"/>
     
     <assets path="shaders" include="*.vert|*.frag"/>
 
