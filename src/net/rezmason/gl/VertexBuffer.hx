@@ -22,7 +22,7 @@ class VertexBuffer extends Artifact {
         this.usage = usage;
         data = new Float32Array(footprint * numVertices);
     
-        nativeBuffer = GL.createBuffer();
+        nativeBuffer = context.createBuffer();
         invalidate();
         upload();
     }
@@ -30,16 +30,18 @@ class VertexBuffer extends Artifact {
     public inline function invalidate():Void invalid = true;
 
     public inline function upload():Void {
+        checkContext();
         if (invalid) {
-            GL.bindBuffer(GL.ARRAY_BUFFER, nativeBuffer);
-            GL.bufferData(GL.ARRAY_BUFFER, data, usage);
+            context.bindBuffer(GL.ARRAY_BUFFER, nativeBuffer);
+            context.bufferData(GL.ARRAY_BUFFER, data, usage);
             invalid = false;
         }
     }
 
     override public function dispose():Void {
         super.dispose();
-        GL.deleteBuffer(nativeBuffer);
+        checkContext();
+        context.deleteBuffer(nativeBuffer);
         data = null;
         nativeBuffer = null;
         footprint = -1;

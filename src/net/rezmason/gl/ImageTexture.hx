@@ -18,24 +18,25 @@ class ImageTexture extends Texture {
         dataFormat = format.dataFormat;
         this.image = image;
     
-        nativeTexture = GL.createTexture();
+        nativeTexture = context.createTexture();
         update();
     }
 
     public inline function update():Void {
+        checkContext();
         var sizeChanged = nativeTexture == null || width != image.width || height != image.height;
         width = image.width;
         height = image.height;
-        GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+        context.bindTexture(GL.TEXTURE_2D, nativeTexture);
+        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
         
         image.format = PixelFormat.RGBA32;
-        GL.texImage2D(GL.TEXTURE_2D, 0, dataFormat, image.width, image.height, 0, pixelFormat, dataType, image.data);
+        context.texImage2D(GL.TEXTURE_2D, 0, dataFormat, image.width, image.height, 0, pixelFormat, dataType, image.data);
         image.format = PixelFormat.BGRA32;
         
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-        GL.bindTexture(GL.TEXTURE_2D, null);
+        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+        context.bindTexture(GL.TEXTURE_2D, null);
     }
 }

@@ -21,20 +21,21 @@ class DataTexture extends Texture {
         this.height = height;
         this.data = data;
     
-        nativeTexture = GL.createTexture();
+        nativeTexture = context.createTexture();
         update();
     }
 
     inline function update():Void {
-        var oldUnpackAlignment = GL.getParameter(GL.UNPACK_ALIGNMENT);
-        GL.pixelStorei(GL.UNPACK_ALIGNMENT, unpackAlignment);
-        GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-        GL.texImage2D(GL.TEXTURE_2D, 0, dataFormat, width, height, 0, pixelFormat, dataType, data);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-        GL.bindTexture(GL.TEXTURE_2D, null);
-        GL.pixelStorei(GL.UNPACK_ALIGNMENT, oldUnpackAlignment);
+        checkContext();
+        var oldUnpackAlignment = context.getParameter(GL.UNPACK_ALIGNMENT);
+        context.pixelStorei(GL.UNPACK_ALIGNMENT, unpackAlignment);
+        context.bindTexture(GL.TEXTURE_2D, nativeTexture);
+        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
+        context.texImage2D(GL.TEXTURE_2D, 0, dataFormat, width, height, 0, pixelFormat, dataType, data);
+        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+        context.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+        context.bindTexture(GL.TEXTURE_2D, null);
+        context.pixelStorei(GL.UNPACK_ALIGNMENT, oldUnpackAlignment);
     }
 }

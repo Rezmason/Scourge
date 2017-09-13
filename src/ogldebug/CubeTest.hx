@@ -4,6 +4,7 @@ import lime.graphics.opengl.GL;
 import lime.graphics.opengl.GLBuffer;
 import lime.graphics.opengl.GLProgram;
 import lime.graphics.opengl.GLUniformLocation;
+import lime.graphics.opengl.WebGLContext;
 import lime.math.Matrix4;
 import lime.math.Vector4;
 import lime.utils.Float32Array;
@@ -16,6 +17,8 @@ class CubeTest {
     inline static var NUM_VERTICES = 8;
     inline static var NUM_TRIANGLES = 12;
     
+    var context:WebGLContext;
+
     var width:UInt;
     var height:UInt;
     
@@ -36,6 +39,9 @@ class CubeTest {
     var cameraMatLocation:GLUniformLocation;
     
     public function new(width, height) {
+
+        context = GL.context;
+
         this.width = width;
         this.height = height;
         
@@ -69,7 +75,7 @@ class CubeTest {
             }
         ';
 
-        vertexBuffer = GL.createBuffer();
+        vertexBuffer = context.createBuffer();
         var vertexData = new Float32Array(NUM_VERTICES * FpV);
         var vert = [
              1, -1, -1,  1, 0, 0,
@@ -83,10 +89,10 @@ class CubeTest {
         ];
 
         for (ike in 0...NUM_VERTICES * FpV) vertexData[ike] = vert[ike];
-        GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-        GL.bufferData(GL.ARRAY_BUFFER, vertexData, GL.STATIC_DRAW);
+        context.bindBuffer(context.ARRAY_BUFFER, vertexBuffer);
+        context.bufferData(context.ARRAY_BUFFER, vertexData, context.STATIC_DRAW);
 
-        indexBuffer = GL.createBuffer();
+        indexBuffer = context.createBuffer();
         var numIndices = NUM_TRIANGLES * 3;
         var indexData = new Int16Array(numIndices);
         var ind = [
@@ -98,8 +104,8 @@ class CubeTest {
             7, 3, 2,   2, 6, 7,
         ];
         for (ike in 0...numIndices) indexData[ike] = ind[ike];
-        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, indexData, GL.STATIC_DRAW);
+        context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        context.bufferData(context.ELEMENT_ARRAY_BUFFER, indexData, context.STATIC_DRAW);
 
         #if !desktop
             vertShader = 'precision mediump float;\n' + vertShader;
@@ -107,10 +113,10 @@ class CubeTest {
         #end
 
         program = GLUtils.createProgram(vertShader, fragShader);
-        posLocation = GL.getAttribLocation(program, 'aPos');
-        colorLocation = GL.getAttribLocation(program, 'aColor');
-        bodyMatLocation = GL.getUniformLocation(program, 'uBodyMat');
-        cameraMatLocation = GL.getUniformLocation(program, 'uCameraMat');
+        posLocation = context.getAttribLocation(program, 'aPos');
+        colorLocation = context.getAttribLocation(program, 'aColor');
+        bodyMatLocation = context.getUniformLocation(program, 'uBodyMat');
+        cameraMatLocation = context.getUniformLocation(program, 'uCameraMat');
     }
 
     function perspectiveRH(width, height, zNear, zFar) {
@@ -134,27 +140,27 @@ class CubeTest {
         fullTransform.append(bodyTransform);
         fullTransform.append(sceneTransform);
 
-        GL.useProgram(program);
-        GL.enable(GL.DEPTH_TEST);
+        context.useProgram(program);
+        context.enable(context.DEPTH_TEST);
 
-        GL.enable(GL.CULL_FACE);
-        GL.cullFace(GL.BACK);
+        context.enable(context.CULL_FACE);
+        context.cullFace(context.BACK);
         
-        GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+        context.bindBuffer(context.ARRAY_BUFFER, vertexBuffer);
         
-        GL.vertexAttribPointer(posLocation, 3, GL.FLOAT, false, 4 * FpV, 4 * 0);
-        GL.enableVertexAttribArray(posLocation);
+        context.vertexAttribPointer(posLocation, 3, context.FLOAT, false, 4 * FpV, 4 * 0);
+        context.enableVertexAttribArray(posLocation);
 
-        GL.vertexAttribPointer(colorLocation, 3, GL.FLOAT, false, 4 * FpV, 4 * 3);
-        GL.enableVertexAttribArray(colorLocation);
+        context.vertexAttribPointer(colorLocation, 3, context.FLOAT, false, 4 * FpV, 4 * 3);
+        context.enableVertexAttribArray(colorLocation);
 
-        GL.uniformMatrix4fv(bodyMatLocation, false, fullTransform);
-        GL.uniformMatrix4fv(cameraMatLocation, false, cameraTransform);
+        context.uniformMatrix4fv(bodyMatLocation, false, fullTransform);
+        context.uniformMatrix4fv(cameraMatLocation, false, cameraTransform);
 
-        GL.viewport(0, 0, width, height);
-        GL.clearColor(0, 0, 0, 1);
-        GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        GL.drawElements(GL.TRIANGLES, NUM_TRIANGLES * 3, GL.UNSIGNED_SHORT, 0);
+        context.viewport(0, 0, width, height);
+        context.clearColor(0, 0, 0, 1);
+        context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+        context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        context.drawElements(context.TRIANGLES, NUM_TRIANGLES * 3, context.UNSIGNED_SHORT, 0);
     }
 }

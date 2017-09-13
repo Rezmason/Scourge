@@ -20,7 +20,7 @@ class IndexBuffer extends Artifact {
         this.usage = usage;
         data = new Int16Array(numIndices);
     
-        nativeBuffer = GL.createBuffer();
+        nativeBuffer = context.createBuffer();
         invalidate();
         upload();
     }
@@ -28,14 +28,15 @@ class IndexBuffer extends Artifact {
     public inline function invalidate():Void invalid = true;
 
     public inline function upload():Void {
-        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, nativeBuffer);
-        GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, usage);
+        checkContext();
+        context.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, nativeBuffer);
+        context.bufferData(GL.ELEMENT_ARRAY_BUFFER, data, usage);
         invalid = false;
     }
 
     override public function dispose():Void {
         super.dispose();
-        GL.deleteBuffer(nativeBuffer);
+        context.deleteBuffer(nativeBuffer);
         nativeBuffer = null;
         data = null;
         numIndices = -1;

@@ -7,6 +7,7 @@ import lime.graphics.opengl.GLFramebuffer;
 import lime.graphics.opengl.GLProgram;
 import lime.graphics.opengl.GLTexture;
 import lime.graphics.opengl.GLUniformLocation;
+import lime.graphics.opengl.WebGLContext;
 import lime.utils.ArrayBufferView;
 import lime.utils.Float32Array;
 import lime.utils.GLUtils;
@@ -28,6 +29,7 @@ class FloatRTTTest {
     inline static var RGBA16F    = 0x881A;
     inline static var R16F       = 0x822D;
 
+    var context:WebGLContext;
 
     var width:UInt;
     var height:UInt;
@@ -49,6 +51,9 @@ class FloatRTTTest {
     var halfFloatTexture:GLTexture;
 
     public function new(width:UInt, height:UInt):Void {
+
+        context = GL.context;
+
         this.width = width;
         this.height = height;
 
@@ -61,23 +66,23 @@ class FloatRTTTest {
             // 'EXT_color_buffer_float', // WebGL 2 
         ];
 
-        for (extension in extensions) GL.getExtension(extension);
+        for (extension in extensions) context.getExtension(extension);
 
-        rttTexture = GL.createTexture();
-        rttFrameBuffer = GL.createFramebuffer();
-        GL.bindFramebuffer(GL.FRAMEBUFFER, rttFrameBuffer);
-        GL.bindTexture(GL.TEXTURE_2D, rttTexture);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-        GL.texImage2D(GL.TEXTURE_2D, 0, #if desktop RGBA32F #else GL.RGBA #end, width, height, 0, GL.RGBA, GL.FLOAT, null);
-        GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, rttTexture, 0);
-        GL.bindTexture(GL.TEXTURE_2D, null);
-        GL.bindRenderbuffer(GL.RENDERBUFFER, null);
-        GL.bindFramebuffer(GL.FRAMEBUFFER, null);
+        rttTexture = context.createTexture();
+        rttFrameBuffer = context.createFramebuffer();
+        context.bindFramebuffer(context.FRAMEBUFFER, rttFrameBuffer);
+        context.bindTexture(context.TEXTURE_2D, rttTexture);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+        context.texImage2D(context.TEXTURE_2D, 0, #if desktop RGBA32F #else context.RGBA #end, width, height, 0, context.RGBA, context.FLOAT, null);
+        context.framebufferTexture2D(context.FRAMEBUFFER, context.COLOR_ATTACHMENT0, context.TEXTURE_2D, rttTexture, 0);
+        context.bindTexture(context.TEXTURE_2D, null);
+        context.bindRenderbuffer(context.RENDERBUFFER, null);
+        context.bindFramebuffer(context.FRAMEBUFFER, null);
 
-        vertexBuffer = GL.createBuffer();
+        vertexBuffer = context.createBuffer();
         var vertexData = new Float32Array(4 * 2);
         var vert = [
             -1, -1,
@@ -86,18 +91,18 @@ class FloatRTTTest {
              1, -1,
         ];
         for (ike in 0...4 * 2) vertexData[ike] = vert[ike];
-        GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-        GL.bufferData(GL.ARRAY_BUFFER, vertexData, GL.STATIC_DRAW);
+        context.bindBuffer(context.ARRAY_BUFFER, vertexBuffer);
+        context.bufferData(context.ARRAY_BUFFER, vertexData, context.STATIC_DRAW);
 
-        indexBuffer = GL.createBuffer();
+        indexBuffer = context.createBuffer();
         var indexData = new Int16Array(6);
         var ind = [
             0, 1, 2,
             0, 2, 3,
         ];
         for (ike in 0...6) indexData[ike] = ind[ike];
-        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, indexData, GL.STATIC_DRAW);
+        context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        context.bufferData(context.ELEMENT_ARRAY_BUFFER, indexData, context.STATIC_DRAW);
 
         var rttVertShader = '
             attribute vec2 aPos;
@@ -163,16 +168,16 @@ class FloatRTTTest {
 
         postProgram = makeProgram(postVertShader, postFragShader, ['OES_texture_float', 'OES_texture_float_linear']);
 
-        rttPosLocation = GL.getAttribLocation(rttProgram, 'aPos');
-        rttPhaseLocation = GL.getUniformLocation(rttProgram, 'uPhase');
-        postPosLocation = GL.getAttribLocation(postProgram, 'aPos');
-        postSamplerLocation = GL.getUniformLocation(postProgram, 'uSampler');
+        rttPosLocation = context.getAttribLocation(rttProgram, 'aPos');
+        rttPhaseLocation = context.getUniformLocation(rttProgram, 'uPhase');
+        postPosLocation = context.getAttribLocation(postProgram, 'aPos');
+        postSamplerLocation = context.getUniformLocation(postProgram, 'uSampler');
     }
 
     public function makeProgram(vertSource:String, fragSource:String, extensions:Array<String>):GLProgram {
         var extensionPreamble = '\n';
         for (extension in extensions) {
-            GL.getExtension(extension);
+            context.getExtension(extension);
             extensionPreamble += '#extension GL_$extension : enable\n';
         }
         #if !desktop extensionPreamble += 'precision mediump float;\n'; #end
@@ -185,42 +190,42 @@ class FloatRTTTest {
 
         time += 0.01;
 
-        GL.useProgram(rttProgram);
-        GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
-        GL.vertexAttribPointer(rttPosLocation, 2, GL.FLOAT, false, 4 * 2, 0);
-        GL.enableVertexAttribArray(rttPosLocation);
-        GL.uniform1f(rttPhaseLocation, time);
+        context.useProgram(rttProgram);
+        context.bindBuffer(context.ARRAY_BUFFER, vertexBuffer);
+        context.vertexAttribPointer(rttPosLocation, 2, context.FLOAT, false, 4 * 2, 0);
+        context.enableVertexAttribArray(rttPosLocation);
+        context.uniform1f(rttPhaseLocation, time);
         
-        GL.bindFramebuffer(GL.FRAMEBUFFER, rttFrameBuffer);
+        context.bindFramebuffer(context.FRAMEBUFFER, rttFrameBuffer);
         
-        GL.viewport(0, 0, width, height);
-        GL.clearColor(0, 0, 0, 1);
-        GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        GL.drawElements(GL.TRIANGLES, 2 * 3, GL.UNSIGNED_SHORT, 0);
-        GL.disableVertexAttribArray(rttPosLocation);
+        context.viewport(0, 0, width, height);
+        context.clearColor(0, 0, 0, 1);
+        context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+        context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        context.drawElements(context.TRIANGLES, 2 * 3, context.UNSIGNED_SHORT, 0);
+        context.disableVertexAttribArray(rttPosLocation);
         
         // return;
 
-        GL.useProgram(postProgram);
-        GL.vertexAttribPointer(postPosLocation, 2, GL.FLOAT, false, 4 * 2, 0);
-        GL.enableVertexAttribArray(postPosLocation);
-        GL.activeTexture(GL.TEXTURE0);
+        context.useProgram(postProgram);
+        context.vertexAttribPointer(postPosLocation, 2, context.FLOAT, false, 4 * 2, 0);
+        context.enableVertexAttribArray(postPosLocation);
+        context.activeTexture(context.TEXTURE0);
         
-        GL.bindTexture(GL.TEXTURE_2D, halfFloatTexture); // rttTexture | halfFloatTexture
+        context.bindTexture(context.TEXTURE_2D, halfFloatTexture); // rttTexture | halfFloatTexture
 
 
-        GL.uniform1i(postSamplerLocation, 0);
-        GL.bindFramebuffer(GL.FRAMEBUFFER, null);
-        GL.viewport(0, 0, width, height);
-        GL.clearColor(0, 0, 0, 1);
-        GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-        GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        GL.drawElements(GL.TRIANGLES, 2 * 3, GL.UNSIGNED_SHORT, 0);
-        GL.disableVertexAttribArray(postPosLocation);
-        GL.activeTexture(GL.TEXTURE0);
-        GL.bindTexture(GL.TEXTURE_2D, null);
-        GL.uniform1i(postSamplerLocation, 0);
+        context.uniform1i(postSamplerLocation, 0);
+        context.bindFramebuffer(context.FRAMEBUFFER, null);
+        context.viewport(0, 0, width, height);
+        context.clearColor(0, 0, 0, 1);
+        context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+        context.bindBuffer(context.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        context.drawElements(context.TRIANGLES, 2 * 3, context.UNSIGNED_SHORT, 0);
+        context.disableVertexAttribArray(postPosLocation);
+        context.activeTexture(context.TEXTURE0);
+        context.bindTexture(context.TEXTURE_2D, null);
+        context.uniform1i(postSamplerLocation, 0);
     }
 
     function generateHalfFloatLuminanceTexture(halfFloat, singleChannel) {
@@ -282,7 +287,7 @@ class FloatRTTTest {
             }
         }
 
-        var type = halfFloat ? HALF_FLOAT : GL.FLOAT;
+        var type = halfFloat ? HALF_FLOAT : context.FLOAT;
         
         var textureData:ArrayBufferView;
         if (halfFloat) textureData = UInt16Array.fromBytes(output.getBytes());
@@ -290,27 +295,27 @@ class FloatRTTTest {
 
         var internalFormat;
         if (halfFloat) {
-            if (singleChannel) internalFormat = #if desktop R16F #else GL.LUMINANCE #end ;
-            else internalFormat = #if desktop RGBA16F #else GL.RGBA #end;
+            if (singleChannel) internalFormat = #if desktop R16F #else context.LUMINANCE #end ;
+            else internalFormat = #if desktop RGBA16F #else context.RGBA #end;
         } else {
-            if (singleChannel) internalFormat = #if desktop R32F #else GL.LUMINANCE #end ;
-            else internalFormat = #if desktop RGBA32F #else GL.RGBA #end;
+            if (singleChannel) internalFormat = #if desktop R32F #else context.LUMINANCE #end ;
+            else internalFormat = #if desktop RGBA32F #else context.RGBA #end;
         }
 
         trace(type.hex(), halfFloat, singleChannel, internalFormat.hex());
         
         var format;
-        if (singleChannel) format = #if desktop RED #else GL.LUMINANCE #end ;
-        else format = GL.RGBA;
+        if (singleChannel) format = #if desktop RED #else context.LUMINANCE #end ;
+        else format = context.RGBA;
 
-        var nativeTexture = GL.createTexture();
-        GL.bindTexture(GL.TEXTURE_2D, nativeTexture);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-        GL.texImage2D(GL.TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, textureData);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-        GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-        GL.bindTexture(GL.TEXTURE_2D, null);
+        var nativeTexture = context.createTexture();
+        context.bindTexture(context.TEXTURE_2D, nativeTexture);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+        context.texImage2D(context.TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, textureData);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+        context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.LINEAR);
+        context.bindTexture(context.TEXTURE_2D, null);
 
         return nativeTexture;
     }
