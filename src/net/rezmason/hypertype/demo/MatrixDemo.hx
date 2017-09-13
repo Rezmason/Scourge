@@ -62,7 +62,7 @@ class MatrixSheet {
                 var glyph = body.getGlyphByID(index);
                 var glyphX = column / (numColumns - 1) - 0.5;
                 var glyphY = row / (numRows - 1) - 0.5;
-                glyph.SET({x:glyphX, y:glyphY});
+                glyph.SET({x:glyphX, y:-glyphY});
                 glyphs.push(glyph);
             }
             glyphs.reverse();
