@@ -64,8 +64,9 @@ class Program extends Artifact {
     }
 
     public inline function setVector2(uName:String, vec2:Vector2):Void {
+        checkContext();
         var location = getUniformLocation(uName);
-        if (location != null) GL.uniform2f(location, vec2.x, vec2.y);
+        if (location != null) context.uniform2f(location, vec2.x, vec2.y);
     }
 
     public inline function setVector4(uName:String, vec4:Vector4):Void {
