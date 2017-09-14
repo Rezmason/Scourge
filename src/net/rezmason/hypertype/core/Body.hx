@@ -15,6 +15,7 @@ class Body extends Container {
     public var capacity(default, null):UInt = 0;
     public var size(default, set):UInt = 0;
     public var font(default, set):GlyphFont;
+    public var transformGlyphs:Bool = false;
     
     @:allow(net.rezmason.hypertype.core) var glyphBatches(default, null):Array<GlyphBatch> = [];
     

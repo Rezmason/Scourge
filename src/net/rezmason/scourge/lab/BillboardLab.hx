@@ -185,7 +185,7 @@ class BillboardLab extends Lab {
              1,  0,
              0,  1,
         ];
-        var billboardScales:Array<Float> = [0.2];
+        var billboardScales:Array<Float> = [1];
         var vert:Array<Float> = [for (ike in 0...billboardVertexBuffer.numVertices * BILLBOARD_FpV) 0];
 
         fillDown(billboardPositions, vert, BILLBOARD_FpV, 0, 3, BILLBOARD_NUM_VERTICES_PER_BILLBOARD);
@@ -314,7 +314,14 @@ class BillboardLab extends Lab {
         // The particles should not be affected by the fullTransform rotating and translating
         // The particles should be affected by the fullTransform scaling
 
-        var dammit = 1;
+        var tfm = fullTransform.clone();
+        tfm.append(cameraTransform);
+
+        var x = Math.sqrt(tfm[0] * tfm[0] + tfm[1] * tfm[1] + tfm[ 2] * tfm[ 2]);
+        var y = Math.sqrt(tfm[4] * tfm[4] + tfm[5] * tfm[5] + tfm[ 6] * tfm[ 6]);
+        var z = Math.sqrt(tfm[8] * tfm[8] + tfm[9] * tfm[9] + tfm[10] * tfm[10]);
+
+        var dammit = Math.pow(x * y * z, 1/3);
         billboardProgram.setFloat('uBodyScreenScale', dammit);
 
         billboardProgram.setVertexBuffer('aPos',     billboardVertexBuffer, 0, 3);

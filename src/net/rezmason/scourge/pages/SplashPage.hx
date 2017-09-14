@@ -31,7 +31,7 @@ class SplashPage extends NavPage {
         splashDemo = new SplashDemo();
         splashDemo.body.glyphScale = 0.25;
         splashDemo.body.transform.appendRotation(-40, Vector4.X_AXIS);
-        container.addChild(splashDemo.body);
+        // container.addChild(splashDemo.body);
 
         nav = new Container();
         nav.transform.appendTranslation(4, 4, 0);
@@ -40,19 +40,29 @@ class SplashPage extends NavPage {
         var box = new net.rezmason.hypertype.ui.BorderBox();
         container.addChild(box.body);
         box.width = 4;
-        box.height = 3;
+        box.height = 4;
         box.redraw();
         container.addChild(box.body);
-        box.body.transform.appendTranslation(1, 1, 0);
+        box.body.transform.appendTranslation(0, 0, 0);
 
         var label = new TextLabel();
         label.text = 'Oberon';
         label.align = CENTER;
+        label.verticalAlign = MIDDLE;
         label.style.set_color(TEAM_COLORS[0]);
         label.style.set_i(0.8);
         label.redraw();
-        label.body.transform.appendScale(2, 2, 1);
-        label.body.transform.appendTranslation(6, 6, 0);
+        
+        var time = 0.;
+        label.body.updateSignal.add(function(delta) {
+            time += delta;
+            label.body.transform.identity();
+            // var scale = Math.sin(time / 100) * 1.5;
+            // label.body.transform.appendScale(scale, scale, scale);
+            label.body.transform.appendRotation(time * 10, Vector4.X_AXIS);
+            label.body.transform.appendTranslation(4, 4, 0);
+        });
+
         container.addChild(label.body);
 
         var beginButton = makeButton('BEGIN', playGame);

@@ -39,6 +39,7 @@ class SDFFontMethod extends SceneRenderMethod {
         program.setVector4('uFontSDFData', body.font.sdfData);
         program.setFloat('uBodyGlyphScale', body.glyphScale);
         program.setVector2('uScreenSize', body.stage.camera.screenSize);
+        program.setFloat('uTransformWithBody', body.transformGlyphs ? 1 : 0);
         program.setTexture('uFontTexture', body.font.texture);
         super.drawBody(body);
     }

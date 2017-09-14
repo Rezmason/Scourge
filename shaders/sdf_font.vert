@@ -17,6 +17,7 @@ uniform float uBodyGlyphScale;
 uniform vec4 uFontGlyphData;
 uniform vec4 uFontSDFData;
 uniform vec2 uScreenSize;
+uniform float uTransformWithBody;
 
 varying float vRange;
 varying vec2 vInnerUVBounds;
@@ -33,17 +34,34 @@ void main(void) {
     float inflation = max(0.0, aFontWeight);
     vec2 positionInflate = 1.0 + (1.0 / uFontSDFData.xy - 1.0) * inflation;
     vec2 glyphScale = vec2(aHorizontalStretch, 1.0) * aScale;
-    vec4 position = uBodyTransform * vec4(aPosition, 1.0);
-    position.z += aCameraSpaceZ;
-    position = uCameraTransform * position;
-    position.xy += 
+    vec4 position = vec4(aPosition, 1.0);
+    vec2 offset = 
         aCorner
         * fontGlyphRatio
         * uBodyGlyphScale 
         * glyphScale
         * positionInflate
-        / uScreenSize
     ;
+
+    if (uTransformWithBody == 1.0) {
+        // offset = offset / uScreenSize;
+        offset *= vec2(0.5, -0.5); // TODO: this may be necessary for non-
+        position.xy += offset;
+    }
+
+    position = uBodyTransform * position;
+    position.z += aCameraSpaceZ;
+    position = uCameraTransform * position;
+    // if (uTransformWithBody == 1.0) {
+    //     offset.x *= -1.0;
+    //     offset = (uBodyTransform * vec4(offset, 0, 0)).xy;
+    //     offset.x *= -1.0;
+    // }
+    
+    if (uTransformWithBody != 1.0) {
+        offset = offset / uScreenSize;
+        position.xy += offset;
+    }
 
     vColor = aColor * clamp(2.0 - position.z, 0.0, 1.0);
     vec2 glyphSize = uFontGlyphData.zw / uFontGlyphData.xy;

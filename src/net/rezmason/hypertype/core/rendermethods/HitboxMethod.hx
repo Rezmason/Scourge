@@ -31,6 +31,7 @@ class HitboxMethod extends SceneRenderMethod {
         program.setFloat('uBodyGlyphScale', body.glyphScale);
         program.setFloat('uBodyID', body.interactiveID / 0xFF);
         program.setVector2('uScreenSize', body.stage.camera.screenSize);
+        program.setFloat('uTransformWithBody', body.transformGlyphs ? 1 : 0);
         super.drawBody(body);
     }
 

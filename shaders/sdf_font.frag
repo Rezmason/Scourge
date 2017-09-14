@@ -14,7 +14,7 @@ void main(void) {
 
     vec2 uv = vUVCenter + 0.5 * vUVOffset;
     float heightPercent = texture2D(uFontTexture, uv).r / vRange;
-    float deriv = uEpsilon * min(dFdx(uv.x), -dFdy(uv.y));
+    float deriv = uEpsilon * min(abs(dFdx(uv.x)), abs(dFdy(uv.y)));
     float brightness = 1.0 - smoothstep(vFontWeight - deriv, vFontWeight + deriv, heightPercent);
 
     brightness = clamp(brightness, 0.0, 1.0);

@@ -15,14 +15,7 @@ Simplify the scene graph tremendously
         5. Convert stage size to inches (DONE)
         6. Hoist Container from Body (DONE)
         7. Make SceneGraph into Stage, extends Container (DONE)
-        
-        8. How to tie the glyph scale to the body XY scale for bodies that face the camera?
-            BillboardLab
-                Draws a standard, non-rotating cube for reference
-                Draws eight billboards on top, at the eight corners
-                Has "camera" transform separate from projection transform
-                Rotate camera transform on update
-                http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/billboards
+        8. Bodies can specify that their glyphs transform with them (DONE)
         
         9. Create LetterBox from Container
         10. Start letterboxing things
