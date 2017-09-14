@@ -4,7 +4,7 @@
     <app title="Scourge" file="Scourge" main="Scourge" package="net.rezmason.scourge" version="1.0.0" company="Rezmason.net"/>
     
     <set name="fullscreen" unless="desktop"/>
-    <window width="0" height="0" fps="60" vsync="true" orientation="portrait" background="#000000" resizable="true" unless="desktop"/>
+    <window width="0" height="0" fps="60" vsync="true" orientation="portrait" background="#000000" allow-high-dpi="true" resizable="true" unless="desktop"/>
     <window width="1152" height="720" fps="60" vsync="true" orientation="portrait" background="#000000" allow-high-dpi="true" resizable="true" borderless="true" if="desktop"/>
     
     <set name="BUILD_DIR" value="Export/Scourge/release" unless="debug"/>
