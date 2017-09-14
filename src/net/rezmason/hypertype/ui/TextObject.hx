@@ -23,9 +23,7 @@ class TextObject {
     public var verticalAlign:VerticalAlign = TOP;
     var glyphHeight:Float;
     
-    public function new() {
-        body.transformGlyphs = true;
-    }
+    public function new() body.transformGlyphs = true;
 
     public function redraw() {
         body.glyphScale = glyphWidth;

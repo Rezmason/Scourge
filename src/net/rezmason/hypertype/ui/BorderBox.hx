@@ -18,7 +18,7 @@ class BorderBox {
     public var rounded:Bool;
     public var color:Vec4 = new Vec4(1, 1, 1);
 
-    public function new() {}
+    public function new() body.transformGlyphs = true;
     
     public function redraw() {
         var displayedGlyphWidth = glyphWidth;

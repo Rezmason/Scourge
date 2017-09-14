@@ -7,6 +7,7 @@ import net.rezmason.hypertype.nav.NavPage;
 import net.rezmason.hypertype.Strings;
 import net.rezmason.hypertype.core.Container;
 import net.rezmason.hypertype.ui.TextLabel;
+import net.rezmason.hypertype.ui.TextBox;
 import net.rezmason.scourge.ScourgeColorPalette.*;
 
 using net.rezmason.hypertype.core.GlyphUtils;
@@ -41,9 +42,49 @@ class SplashPage extends NavPage {
         container.addChild(box.body);
         box.width = 4;
         box.height = 4;
+        box.color = TEAM_COLORS[0];
         box.redraw();
         container.addChild(box.body);
         box.body.transform.appendTranslation(0, 0, 0);
+
+        box = new net.rezmason.hypertype.ui.BorderBox();
+        container.addChild(box.body);
+        box.width = 4;
+        box.height = 4;
+        box.color = TEAM_COLORS[1];
+        box.redraw();
+        box.body.transform.appendTranslation(4, 4, 0);
+        container.addChild(box.body);
+
+        box = new net.rezmason.hypertype.ui.BorderBox();
+        container.addChild(box.body);
+        box.width = 4;
+        box.height = 4;
+        box.color = TEAM_COLORS[2];
+        box.redraw();
+        box.body.transform.appendTranslation(8, 8, 0);
+        container.addChild(box.body);
+
+        box = new net.rezmason.hypertype.ui.BorderBox();
+        container.addChild(box.body);
+        box.width = 4;
+        box.height = 4;
+        box.color = TEAM_COLORS[3];
+        box.redraw();
+        box.body.transform.appendRotation(45, Vector4.Z_AXIS);
+        box.body.transform.appendTranslation(8, 0, 0);
+        container.addChild(box.body);
+
+        var textBox = new TextBox();
+        textBox.width = 6;
+        textBox.height = 4;
+        textBox.glyphWidth = 0.5;
+        textBox.text = 'one two three one two three';
+        textBox.align = CENTER;
+        textBox.verticalAlign = MIDDLE;
+        textBox.style.set_color(TEAM_COLORS[1]);
+        textBox.redraw();
+        container.addChild(textBox.body);
 
         var label = new TextLabel();
         label.text = 'Oberon';
@@ -52,19 +93,22 @@ class SplashPage extends NavPage {
         label.style.set_color(TEAM_COLORS[0]);
         label.style.set_i(0.8);
         label.redraw();
+        container.addChild(label.body);
         
+        /*
         var time = 0.;
         label.body.updateSignal.add(function(delta) {
             time += delta;
             label.body.transform.identity();
             // var scale = Math.sin(time / 100) * 1.5;
             // label.body.transform.appendScale(scale, scale, scale);
-            label.body.transform.appendRotation(time * 10, Vector4.X_AXIS);
+            label.body.transform.appendRotation(time * 10, Vector4.Z_AXIS);
             label.body.transform.appendTranslation(4, 4, 0);
         });
+        */
 
-        container.addChild(label.body);
 
+        /*
         var beginButton = makeButton('BEGIN', playGame);
         var aboutButton = makeButton('ABOUT', aboutGame);
         var leaveButton = makeButton('LEAVE', quitGame);
@@ -74,6 +118,7 @@ class SplashPage extends NavPage {
         nav.addChild(leaveButton.body);
         beginButton.body.transform.appendTranslation(-5, 0, 0);
         leaveButton.body.transform.appendTranslation( 5, 0, 0);
+        */
     }
 
     public function makeButton(text:String, cbk:Void->Void):TextLabel {
