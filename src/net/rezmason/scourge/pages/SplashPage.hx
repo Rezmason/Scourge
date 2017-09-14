@@ -95,7 +95,6 @@ class SplashPage extends NavPage {
         label.redraw();
         container.addChild(label.body);
         
-        /*
         var time = 0.;
         label.body.updateSignal.add(function(delta) {
             time += delta;
@@ -105,10 +104,7 @@ class SplashPage extends NavPage {
             label.body.transform.appendRotation(time * 10, Vector4.Z_AXIS);
             label.body.transform.appendTranslation(4, 4, 0);
         });
-        */
 
-
-        /*
         var beginButton = makeButton('BEGIN', playGame);
         var aboutButton = makeButton('ABOUT', aboutGame);
         var leaveButton = makeButton('LEAVE', quitGame);
@@ -118,7 +114,6 @@ class SplashPage extends NavPage {
         nav.addChild(leaveButton.body);
         beginButton.body.transform.appendTranslation(-5, 0, 0);
         leaveButton.body.transform.appendTranslation( 5, 0, 0);
-        */
     }
 
     public function makeButton(text:String, cbk:Void->Void):TextLabel {
