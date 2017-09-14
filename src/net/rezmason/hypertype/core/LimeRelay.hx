@@ -16,7 +16,7 @@ class LimeRelay extends Module {
     public var windowDeactivateSignal(default, null):Zig<Void->Void> = new Zig();
     public var windowEnterSignal(default, null):Zig<Void->Void> = new Zig();
     public var windowLeaveSignal(default, null):Zig<Void->Void> = new Zig();
-    public var windowResizeSignal(default, null):Zig<Int->Int->Void> = new Zig();
+    public var windowResizeSignal(default, null):Zig<Int->Int->Float->Void> = new Zig();
     public var updateSignal(default, null):Zig<Float->Void> = new Zig();
     public var renderSignal(default, null):Zig<Void->Void> = new Zig();
 
@@ -29,7 +29,7 @@ class LimeRelay extends Module {
     override public function onWindowDeactivate(_) windowDeactivateSignal.dispatch();
     override public function onWindowEnter(_) windowEnterSignal.dispatch();
     override public function onWindowLeave(_) windowLeaveSignal.dispatch();
-    override public function onWindowResize(_, width, height) windowResizeSignal.dispatch(width, height);
+    override public function onWindowResize(_, width, height) windowResizeSignal.dispatch(width, height, Application.current.window.scale);
     override public function update(milliseconds) updateSignal.dispatch(milliseconds / 1000);
     override public function render(_) renderSignal.dispatch();
     // override public function onTextInput(_) {}
@@ -40,7 +40,7 @@ class LimeRelay extends Module {
         Application.current.addModule(this);
         var window = Application.current.window;
         windowActivateSignal.dispatch();
-        windowResizeSignal.dispatch(window.width, window.height);
+        windowResizeSignal.dispatch(window.width, window.height, window.scale);
     }
 
     public function resizeWindow(width, height) Application.current.window.resize(width, height);

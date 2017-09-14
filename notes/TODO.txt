@@ -1,28 +1,14 @@
 Simplify the scene graph tremendously
-    ONE ROOT DAMN IT
-    One scene; integrate scene and scene graph
-    All bodies are in a Map, forever
     All hotspots are in a Map, forever
         owned by the MouseSystem, updated by engine in response to signals
-    No camera
-        Sizing logic doesn't belong in a scene graph
-
-    So how do I get there?
-        1. Get rid of focus rects (DONE)
-        2. Get rid of UIElement dependencies (DONE)
-        3. Get everything to work as children of one scene (DONE)
-        4. Merge scene and scene graph (DONE)
-        5. Convert stage size to inches (DONE)
-        6. Hoist Container from Body (DONE)
-        7. Make SceneGraph into Stage, extends Container (DONE)
-        8. Bodies can specify that their glyphs transform with them (DONE)
-        
-        9. Create LetterBox from Container
-        10. Start letterboxing things
-        ...
-        N-3. Make hotspots
-        N-2. Make a TextObject UIElement replacement
-        N-1. Bring back the console
+    Bounded Container subclass to simplify layout
+        x, y, width, height
+        left, right, top, bottom
+    Build UI from Container subclasses
+        Make demos not look like shit
+    Make hotspots
+    Make a TextObject UIElement replacement
+    Bring back the console
 
 UI basis
 

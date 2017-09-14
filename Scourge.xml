@@ -5,7 +5,7 @@
     
     <set name="fullscreen" unless="desktop"/>
     <window width="0" height="0" fps="60" vsync="true" orientation="portrait" background="#000000" resizable="true" unless="desktop"/>
-    <window width="1152" height="720" fps="60" vsync="true" orientation="portrait" background="#000000" resizable="true" borderless="true" if="desktop"/>
+    <window width="1152" height="720" fps="60" vsync="true" orientation="portrait" background="#000000" allow-high-dpi="true" resizable="true" borderless="true" if="desktop"/>
     
     <set name="BUILD_DIR" value="Export/Scourge/release" unless="debug"/>
     <set name="BUILD_DIR" value="Export/Scourge/debug" if="debug"/>

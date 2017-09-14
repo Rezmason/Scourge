@@ -106,9 +106,13 @@ class Engine {
         Telemetry.advanceFrame();
     }
 
-    function setSize(width:Int, height:Int):Void {
+    function setSize(width:Int, height:Int, scale:Float):Void {
         stage.setSize(width, height, 72);
         mouseSystem.setSize(width, height);
+
+        width  = Std.int(Math.ceil(scale * width ));
+        height = Std.int(Math.ceil(scale * height));
+
         sceneRTT.resize(width, height);
         bloomRTT1.resize(Std.int(width / BLOOM_DOWNSCALE), Std.int(height / BLOOM_DOWNSCALE));
         bloomRTT2.resize(Std.int(width / BLOOM_DOWNSCALE), Std.int(height / BLOOM_DOWNSCALE));

@@ -8,7 +8,7 @@ class Stage extends Container {
     var keyboardFocusBody:Body = null;
     var pixelWidth:UInt = 72;
     var pixelHeight:UInt = 72;
-    var pixelsPerInch:UInt = 72;
+    var pixelsPerInch:Float = 72;
     var numInteractiveBodies:UInt;
     public var widthInInches(get, null):Float;
     public var heightInInches(get, null):Float;
@@ -32,7 +32,7 @@ class Stage extends Container {
         for (body in bodies) body.update(delta);
     }
 
-    public function setSize(pixelWidth:UInt, pixelHeight:UInt, pixelsPerInch:UInt):Void {
+    public function setSize(pixelWidth:UInt, pixelHeight:UInt, pixelsPerInch:Float):Void {
         this.pixelWidth = pixelWidth;
         this.pixelHeight = pixelHeight;
         this.pixelsPerInch = pixelsPerInch;
