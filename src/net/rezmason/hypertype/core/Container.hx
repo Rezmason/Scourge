@@ -15,17 +15,17 @@ class Container extends SceneNode<Container> {
     public var isInteractive(get, null):Bool;
     public var interactionSignal(default, null):Zig<Int->Interaction->Void> = new Zig();
     public var updateSignal(default, null):Zig<Float->Void> = new Zig();
-    public var resizeSignal(default, null):Zig<Container->Float->Float->Void> = new Zig();
     public var invalidateSignal(default, null):Zig<Void->Void> = new Zig();
     public var stage(get, null):Stage;
+    public var boundingBox(default, null):BoundingBox = new BoundingBox();
     var concatTransform:Matrix4 = new Matrix4();
 
     override public function addChild(node:Container):Bool {
         var success = super.addChild(node);
         if (success) {
+            node.updateBoundingBox();
             node.update(0);
             node.invalidateSignal.add(invalidateSignal.dispatch);
-            resizeSignal.add(node.resizeSignal.dispatch);
             invalidateSignal.dispatch();
         }
         return success;
@@ -35,7 +35,6 @@ class Container extends SceneNode<Container> {
         var success = super.removeChild(node);
         if (success) {
             node.invalidateSignal.remove(invalidateSignal.dispatch);
-            resizeSignal.add(node.resizeSignal.dispatch);
             invalidateSignal.dispatch();
         }
         return success;
@@ -70,4 +69,10 @@ class Container extends SceneNode<Container> {
     }
 
     inline function get_stage() return cast root;
+
+    public function updateBoundingBox() {
+        boundingBox.solve((parent == null) ? null : parent.boundingBox.output);
+        // TODO: do something with it
+        for (child in children()) child.updateBoundingBox();
+    }
 }

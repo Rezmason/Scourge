@@ -1,14 +1,10 @@
-Simplify the scene graph tremendously
-    All hotspots are in a Map, forever
-        owned by the MouseSystem, updated by engine in response to signals
-    Bounded Container subclass to simplify layout
-        x, y, width, height
-        left, right, top, bottom
-    Build UI from Container subclasses
-        Make demos not look like shit
-    Make hotspots
-    Make a TextObject UIElement replacement
-    Bring back the console
+Container should do something with BoundingBox
+Build out UI (see below)
+Make demos not look like shit
+MouseSystem "raycasts" BoundedContainers
+    Two interaction signals, one for glyphs and one for bounding boxes
+Make a TextObject UIElement replacement
+Bring back the console
 
 UI basis
 
