@@ -7,7 +7,7 @@ import net.rezmason.math.Vec4;
 @:allow(net.rezmason.hypertype.core.GlyphUtils)
 class Glyph {
 
-    public var id(default, null):Int;
+    public var id(default, null):Int = 0;
     var geometryBuf:VertexBuffer;
     var colorBuf:VertexBuffer;
     var fontBuf:VertexBuffer;
