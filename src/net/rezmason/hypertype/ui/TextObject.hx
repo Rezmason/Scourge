@@ -5,8 +5,8 @@ import net.rezmason.math.Vec4;
 import net.rezmason.hypertype.Strings.*;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Glyph;
-import net.rezmason.hypertype.text.ParagraphAlign; // TODO: move to UI
-import net.rezmason.hypertype.text.VerticalAlign; // TODO: move to UI
+import net.rezmason.hypertype.core.VerticalAlign;
+import net.rezmason.hypertype.ui.TextAlign;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 using net.rezmason.utils.CharCode;
@@ -19,7 +19,7 @@ class TextObject {
     public var style:Glyph = GlyphUtils.createGlyph();
     public var glyphWidth:Float = 1;
     public var text:String = null;
-    public var align:ParagraphAlign = LEFT;
+    public var textAlign:TextAlign = SIMPLE(LEFT);
     public var verticalAlign:VerticalAlign = TOP;
     var glyphHeight:Float;
     

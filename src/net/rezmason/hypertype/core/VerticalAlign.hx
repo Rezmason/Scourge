@@ -1,4 +1,4 @@
-package net.rezmason.hypertype.text;
+package net.rezmason.hypertype.core;
 
 enum VerticalAlign {
     TOP;

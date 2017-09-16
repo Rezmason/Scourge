@@ -5,7 +5,6 @@ import net.rezmason.math.Vec4;
 import net.rezmason.hypertype.Strings.*;
 import net.rezmason.hypertype.core.Body;
 import net.rezmason.hypertype.core.Glyph;
-import net.rezmason.hypertype.text.ParagraphAlign; // TODO: move to UI
 
 using net.rezmason.hypertype.core.GlyphUtils;
 using net.rezmason.utils.CharCode;
@@ -71,17 +70,23 @@ class TextBox extends TextObject {
             var terminatesEarly = earlyTerminatingLines.indexOf(ike) != -1;
             var startX:Float = 0;
             var spaceWidth = 1.0;
-            switch (align) {
-                case LEFT: startX = 0;
-                case JUSTIFY(LEFT) if (terminatesEarly): startX = 0;
-                case CENTER: startX = (width - line.length * glyphWidth )/ 2;
-                case JUSTIFY(CENTER) if (terminatesEarly): startX = (width - line.length * glyphWidth )/ 2;
-                case RIGHT: startX = width - line.length * glyphWidth;
-                case JUSTIFY(RIGHT) if (terminatesEarly): startX = width - line.length * glyphWidth;
-                case JUSTIFY(_):
-                    var numSpaces = line.split(' ').length - 1;
-                    var diff = width / glyphWidth - line.length;
-                    spaceWidth = 1 + diff / numSpaces;
+            switch (textAlign) {
+                case SIMPLE(align):
+                    switch (align) {
+                        case LEFT: startX = 0;
+                        case CENTER: startX = (width - line.length * glyphWidth )/ 2;
+                        case RIGHT: startX = width - line.length * glyphWidth;
+                    }
+                case JUSTIFY(align):
+                    switch (align) {
+                        case LEFT if (terminatesEarly): startX = 0;
+                        case CENTER if (terminatesEarly): startX = (width - line.length * glyphWidth )/ 2;
+                        case RIGHT if (terminatesEarly): startX = width - line.length * glyphWidth;
+                        case _:
+                            var numSpaces = line.split(' ').length - 1;
+                            var diff = width / glyphWidth - line.length;
+                            spaceWidth = 1 + diff / numSpaces;
+                    }
             }
             startX += glyphWidth  / 2;
 

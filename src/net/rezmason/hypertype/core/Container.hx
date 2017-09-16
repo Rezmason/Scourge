@@ -71,7 +71,7 @@ class Container extends SceneNode<Container> {
     inline function get_stage() return cast root;
 
     public function updateBoundingBox() {
-        boundingBox.solve((parent == null) ? null : parent.boundingBox.output);
+        boundingBox.solve((parent == null) ? null : parent.boundingBox);
         // TODO: do something with it
         for (child in children()) child.updateBoundingBox();
     }

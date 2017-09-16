@@ -80,7 +80,7 @@ class SplashPage extends NavPage {
         textBox.height = 4;
         textBox.glyphWidth = 0.5;
         textBox.text = 'one two three one two three';
-        textBox.align = CENTER;
+        textBox.textAlign = SIMPLE(CENTER);
         textBox.verticalAlign = MIDDLE;
         textBox.style.set_color(TEAM_COLORS[1]);
         textBox.redraw();
@@ -88,7 +88,7 @@ class SplashPage extends NavPage {
 
         var label = new TextLabel();
         label.text = 'Oberon';
-        label.align = CENTER;
+        label.textAlign = SIMPLE(CENTER);
         label.verticalAlign = MIDDLE;
         label.style.set_color(TEAM_COLORS[0]);
         label.style.set_i(0.8);
@@ -119,7 +119,7 @@ class SplashPage extends NavPage {
     public function makeButton(text:String, cbk:Void->Void):TextLabel {
         var label = new TextLabel();
         label.text = text;
-        label.align = CENTER;
+        label.textAlign = SIMPLE(CENTER);
         label.style.set_color(GREY);
         label.redraw();
         label.body.interactionSignal.add(function(_, interaction) {

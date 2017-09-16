@@ -2,7 +2,7 @@ package net.rezmason.hypertype.ui;
 
 import haxe.Utf8;
 import net.rezmason.math.Vec4;
-import net.rezmason.hypertype.text.ParagraphAlign;
+import net.rezmason.hypertype.core.Align;
 
 using net.rezmason.hypertype.core.GlyphUtils;
 using net.rezmason.utils.CharCode;
@@ -36,7 +36,12 @@ class TextLabel extends TextObject {
         for (ike in 0...lines.length) {
             var line = lines[ike];
             var startX:Float = 0;
-            switch (align) {
+            var simpleAlign:Align = LEFT;
+            switch (textAlign) {
+                case SIMPLE(align): simpleAlign = align;
+                case _:
+            }
+            switch (simpleAlign) {
                 case CENTER: startX = -line.length * glyphWidth / 2;
                 case RIGHT: startX = -line.length * glyphWidth;
                 case _:
