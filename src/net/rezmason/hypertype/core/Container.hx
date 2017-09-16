@@ -18,6 +18,7 @@ class Container extends SceneNode<Container> {
     public var invalidateSignal(default, null):Zig<Void->Void> = new Zig();
     public var stage(get, null):Stage;
     public var boundingBox(default, null):BoundingBox = new BoundingBox();
+    public var boxed:Bool = true;
     var concatTransform:Matrix4 = new Matrix4();
 
     override public function addChild(node:Container):Bool {
@@ -63,6 +64,7 @@ class Container extends SceneNode<Container> {
     inline function get_isInteractive() return visible && mouseEnabled;
 
     function get_concatenatedTransform():Matrix4 {
+        // TODO: use bounding box transforms in certain situations
         concatTransform.copyFrom(transform);
         if (parent != null) concatTransform.append(parent.concatenatedTransform);
         return concatTransform;
@@ -72,7 +74,6 @@ class Container extends SceneNode<Container> {
 
     public function updateBoundingBox() {
         boundingBox.solve((parent == null) ? null : parent.boundingBox);
-        // TODO: do something with it
         for (child in children()) child.updateBoundingBox();
     }
 }

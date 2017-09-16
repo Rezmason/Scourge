@@ -11,11 +11,12 @@ using net.rezmason.hypertype.core.GlyphUtils;
 class Body extends Container {
 
     public var interactiveID:UInt;
-    public var glyphScale:Float;
+    public var concatenatedGlyphScale(get, null):Float;
+    public var glyphScale:Float = 1;
     public var capacity(default, null):UInt = 0;
     public var size(default, set):UInt = 0;
     public var font(default, set):GlyphFont;
-    public var transformGlyphs:Bool = false;
+    public var transformGlyphs:Bool = true;
     
     @:allow(net.rezmason.hypertype.core) var glyphBatches(default, null):Array<GlyphBatch> = [];
     
@@ -28,7 +29,6 @@ class Body extends Container {
         var fontManager:FontManager = new Present(FontManager);
         fontManager.onFontChange.add(updateFont);
         font = fontManager.defaultFont;
-        glyphScale = 1;
     }
 
     public inline function getGlyphByID(id:Int):Glyph return glyphs[id];
@@ -72,6 +72,11 @@ class Body extends Container {
         }
         
         return size;
+    }
+
+    inline function get_concatenatedGlyphScale() {
+        // TODO: multiply by bounding box scale in certain situations
+        return glyphScale;
     }
 
     @:allow(net.rezmason.hypertype.core) function upload():Void for (batch in glyphBatches) batch.upload();

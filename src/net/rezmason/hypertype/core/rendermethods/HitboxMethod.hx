@@ -28,7 +28,7 @@ class HitboxMethod extends SceneRenderMethod {
         program.setMatrix4('uCameraTransform', body.stage.camera.transform);
         program.setMatrix4('uBodyTransform', body.concatenatedTransform);
         program.setVector4('uFontSDFData', body.font.sdfData);
-        program.setFloat('uBodyGlyphScale', body.glyphScale);
+        program.setFloat('uBodyGlyphScale', body.concatenatedGlyphScale);
         program.setFloat('uBodyID', body.interactiveID / 0xFF);
         program.setVector2('uScreenSize', body.stage.camera.screenSize);
         program.setFloat('uTransformWithBody', body.transformGlyphs ? 1 : 0);

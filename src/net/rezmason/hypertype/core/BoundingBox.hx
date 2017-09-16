@@ -15,6 +15,7 @@ class BoundingBox {
     public var rect(default, null):Rectangle = UNIT_RECT.clone();
     public var transform(default, null):Matrix4 = new Matrix4();
     public var contentTransform(default, null):Matrix4 = new Matrix4();
+    public var scale(default, null):Float = 1;
     public var left:Null<LayoutValue>;
     public var right:Null<LayoutValue>;
     public var width:Null<LayoutValue>;
@@ -50,27 +51,27 @@ class BoundingBox {
         var contentY = rect.height * switch (verticalAlign) { case  TOP: 0; case MIDDLE: 0.5; case BOTTOM: 1; };
         contentTransform.appendTranslation(contentX, contentY, 0);
         // Scale the content according to scale mode
-        var xScale:Float = 1;
-        var yScale:Float = 1;
+        var xScale:Float = Math.NaN;
+        var yScale:Float = Math.NaN;
         switch (scaleMode) {
             case EXACT_FIT:
                 xScale = rect.width;
                 yScale = rect.height;
+                scale = yScale;
             case NO_BORDER:
-                xScale = Math.max(rect.width, rect.height);
-                yScale = xScale;
+                scale = Math.max(rect.width, rect.height);
             case SHOW_ALL:
-                xScale = Math.min(rect.width, rect.height);
-                yScale = xScale;
+                scale = Math.min(rect.width, rect.height);
             case WIDTH_FIT:
-                xScale = rect.width;
-                yScale = xScale;
+                scale = rect.width;
             case HEIGHT_FIT:
-                yScale = rect.height;
-                xScale = yScale;
+                scale = rect.height;
             case NO_SCALE:
-                xScale = 1;
-                yScale = 1;
+                scale = 1;
+        }
+        if (Math.isNaN(xScale)) {
+            xScale = scale;
+            yScale = scale;
         }
         contentTransform.appendScale(xScale, yScale, 1);
     }
