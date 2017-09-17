@@ -93,8 +93,7 @@ class SplashDemo extends Demo {
 
         body.transform.appendScale(0.9, 0.9, 0.9);
         body.transform.appendRotation(-40, Vector4.X_AXIS);
-        body.transformGlyphs = false;
-        body.glyphScale = 0.015;
+        body.glyphScale = 0.022;
     }
 
     override function update(delta:Float):Void {

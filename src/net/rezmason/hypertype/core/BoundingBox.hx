@@ -47,16 +47,57 @@ class BoundingBox {
     public function new() {}
 
     public function solve(parent:BoundingBox) {
+
         var parentRect = (parent == null) ? UNIT_RECT : parent.rect;
         
         // Resolve rect using layout values
         rect.copyFrom(UNIT_RECT);
-        if (left != null) rect.left = parentRect.left + derive(parentRect.width, left);
-        if (right != null) rect.right = parentRect.right - derive(parentRect.width, right);
-        if (width != null) rect.width = derive(parentRect.width, width);
-        if (top != null) rect.top = parentRect.top + derive(parentRect.height, top);
-        if (bottom != null) rect.bottom = parentRect.bottom - derive(parentRect.height, bottom);
-        if (height != null) rect.height = derive(parentRect.height, height);
+
+        if (left != null && right != null) {
+            width = null;
+            rect.left = parentRect.left + derive(parentRect.width, left);
+            rect.right = parentRect.right - derive(parentRect.width, right);
+        } else if (left != null && width != null) {
+            right = null;
+            rect.left = parentRect.left + derive(parentRect.width, left);
+            rect.width = derive(parentRect.width, width);
+        } else if (right != null && width != null) {
+            left = null;
+            rect.width = derive(parentRect.width, width);
+            var rectRight = parentRect.right - derive(parentRect.width, right);
+            rect.x = rectRight - rect.width;
+        } else if (left != null) {
+            var rectLeft = parentRect.left + derive(parentRect.width, left);
+            rect.x = rectLeft;
+        } else if (right != null) {
+            var rectRight = parentRect.left + derive(parentRect.width, left);
+            rect.x = rectRight - rect.width;
+        } else if (width != null) {
+            rect.width = derive(parentRect.width, width);
+        }
+
+        if (top != null && bottom != null) {
+            height = null;
+            rect.top = parentRect.top + derive(parentRect.height, top);
+            rect.bottom = parentRect.bottom - derive(parentRect.height, bottom);
+        } else if (top != null && height != null) {
+            bottom = null;
+            rect.top = parentRect.top + derive(parentRect.height, top);
+            rect.height = derive(parentRect.height, height);
+        } else if (bottom != null && height != null) {
+            top = null;
+            rect.height = derive(parentRect.height, height);
+            var rectBottom = parentRect.bottom - derive(parentRect.height, bottom);
+            rect.y = rectBottom - rect.height;
+        } else if (top != null) {
+            var rectTop = parentRect.top + derive(parentRect.height, top);
+            rect.y = rectTop;
+        } else if (bottom != null) {
+            var rectBottom = parentRect.top + derive(parentRect.height, top);
+            rect.y = rectBottom - rect.height;
+        } else if (height != null) {
+            rect.height = derive(parentRect.height, height);
+        }
 
         // Create transform that places top left in world space
         transform.identity();
@@ -93,6 +134,10 @@ class BoundingBox {
         var contentX = rect.width  * switch (        align) { case LEFT: 0; case CENTER: 0.5;  case RIGHT: 1; };
         var contentY = rect.height * switch (verticalAlign) { case  TOP: 0; case MIDDLE: 0.5; case BOTTOM: 1; };
         contentTransform.appendTranslation(contentX, contentY, 0);
+
+        // trace('solving: left $left right $right width $width top $top bottom $bottom height $height');
+        // trace('with parent: x ${parentRect.x} y ${parentRect.y} width ${parentRect.width} height ${parentRect.height}');
+        // trace('yields: x ${rect.x} y ${rect.y} width ${rect.width} height ${rect.height}');
     }
 
     public function set(properties:Properties) {

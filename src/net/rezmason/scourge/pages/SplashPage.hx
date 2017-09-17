@@ -23,7 +23,7 @@ class SplashPage extends NavPage {
         var splashContainer = new Container();
         splashContainer.boundingBox.set({
             width:REL(1),
-            height:REL(0.5),
+            height:REL(0.3),
             align:CENTER,
             verticalAlign:MIDDLE,
             scaleMode:WIDTH_FIT
@@ -38,8 +38,9 @@ class SplashPage extends NavPage {
         nav.boundingBox.set({
             align:CENTER,
             verticalAlign:MIDDLE,
-            width:ABS(4),
-            height:ABS(4),
+            width:REL(1),
+            height:REL(0.5),
+            bottom:ZERO,
             // scaleMode:WIDTH_FIT;
         });
         nav.boxed = true;

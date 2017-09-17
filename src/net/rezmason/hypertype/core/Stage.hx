@@ -39,6 +39,7 @@ class Stage extends Container {
         camera.resize(widthInInches, heightInInches);
         boundingBox.width = ABS(widthInInches);
         boundingBox.height = ABS(heightInInches);
+        boxed = true;
         updateBoundingBox();
     }
 

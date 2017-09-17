@@ -86,10 +86,12 @@ class Body extends Container {
             }
         } else {
             concatGlyphScale *= glyphScale;
-            for (node in lineage()) {
-                if (node.boxed) {
-                    concatGlyphScale *= node.boundingBox.scale;
-                    break;
+            if (!transformGlyphs) {
+                for (node in lineage()) {
+                    if (node.boxed) {
+                        concatGlyphScale *= node.boundingBox.scale;
+                        break;
+                    }
                 }
             }
         }

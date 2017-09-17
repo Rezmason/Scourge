@@ -93,8 +93,8 @@ class Container extends SceneNode<Container> {
         if (boxed) strings.push('boxed: ' + [boundingBox.rect.x, boundingBox.rect.y, boundingBox.rect.width, boundingBox.rect.height].join(' '));
         var matData:lime.utils.Float32Array = transform;
         strings.push([for (i in 0...matData.length) matData[i]].join(","));
-        var output = strings.join('\n');
-        var padding = [for (i in 0...depth) ' '].join("");
-        return [for (string in output.split('\n')) padding + string].join('\n');
+        var childPrint = [for (child in children()) child.print(depth + 1)].join('\n');
+        if (childPrint.length > 0) for (line in childPrint.split('\n')) strings.push('  $line');
+        return strings.join('\n');
     }
 }
