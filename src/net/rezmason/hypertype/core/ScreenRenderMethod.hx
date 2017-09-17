@@ -1,5 +1,8 @@
 package net.rezmason.hypertype.core;
 
+import lime.graphics.Image;
+
+import net.rezmason.gl.ImageTexture;
 import net.rezmason.gl.IndexBuffer;
 import net.rezmason.gl.Texture;
 import net.rezmason.gl.VertexBuffer;
@@ -14,9 +17,11 @@ class ScreenRenderMethod extends RenderMethod {
 
     static var vertexBuffer:VertexBuffer;
     static var indexBuffer:IndexBuffer;
+    static var emptyTexture:Texture;
 
     public function new() {
         super();
+        if (emptyTexture == null) emptyTexture = new ImageTexture(new Image(null, 0, 0, 1, 1, 0x00000000));
         if (vertexBuffer == null) {
             vertexBuffer = new VertexBuffer(TOTAL_VERTICES, FLOATS_PER_VERTEX);
             var verts = [

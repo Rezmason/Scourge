@@ -19,8 +19,13 @@ class CombineMethod extends ScreenRenderMethod {
         #if debug
             program.setBlendFactors(BlendFactor.SOURCE_ALPHA, BlendFactor.ONE_MINUS_SOURCE_ALPHA);  
             program.setTexture('uBaseTexture', textures['debug'], 0);
-            program.setTexture('uAlphaMultipliedTexture', null, 1);
+            program.setTexture('uAlphaMultipliedTexture', ScreenRenderMethod.emptyTexture, 1);
             program.draw(ScreenRenderMethod.indexBuffer, 0, ScreenRenderMethod.TOTAL_TRIANGLES);
         #end
+    }
+
+    override public function end() {
+        program.setTexture('uAlphaMultipliedTexture', null, 1);
+        super.end();
     }
 }
