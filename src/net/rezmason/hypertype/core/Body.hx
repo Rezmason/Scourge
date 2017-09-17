@@ -75,8 +75,25 @@ class Body extends Container {
     }
 
     inline function get_concatenatedGlyphScale() {
-        // TODO: multiply by bounding box scale in certain situations
-        return glyphScale;
+        var concatGlyphScale = 1.0;
+        if (boxed) {
+            concatGlyphScale *= boundingBox.scale;
+            for (node in lineage()) {
+                if (!node.boxed && Std.is(node, Body)) {
+                    concatGlyphScale *= cast(node, Body).glyphScale;
+                    break;
+                }
+            }
+        } else {
+            concatGlyphScale *= glyphScale;
+            for (node in lineage()) {
+                if (node.boxed) {
+                    concatGlyphScale *= node.boundingBox.scale;
+                    break;
+                }
+            }
+        }
+        return concatGlyphScale;
     }
 
     @:allow(net.rezmason.hypertype.core) function upload():Void for (batch in glyphBatches) batch.upload();

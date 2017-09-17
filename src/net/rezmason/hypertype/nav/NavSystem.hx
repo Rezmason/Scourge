@@ -11,8 +11,8 @@ class NavSystem {
 
     public function new():Void {
         container = new Container();
-        container.boundingBox.width  = Proportion(1);
-        container.boundingBox.height = Proportion(1);
+        container.boundingBox.set({width:REL(1), height:REL(1)});
+        container.boxed = true;
         pages = new Map();
         pageHistory = [];
     }

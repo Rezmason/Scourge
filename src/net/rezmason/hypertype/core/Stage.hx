@@ -37,8 +37,8 @@ class Stage extends Container {
         this.pixelHeight = pixelHeight;
         this.pixelsPerInch = pixelsPerInch;
         camera.resize(widthInInches, heightInInches);
-        boundingBox.width = Unit(widthInInches);
-        boundingBox.height = Unit(heightInInches);
+        boundingBox.width = ABS(widthInInches);
+        boundingBox.height = ABS(heightInInches);
         updateBoundingBox();
     }
 

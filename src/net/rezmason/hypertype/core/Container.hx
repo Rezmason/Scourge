@@ -18,7 +18,7 @@ class Container extends SceneNode<Container> {
     public var invalidateSignal(default, null):Zig<Void->Void> = new Zig();
     public var stage(get, null):Stage;
     public var boundingBox(default, null):BoundingBox = new BoundingBox();
-    public var boxed:Bool = true;
+    public var boxed:Bool = false;
     var concatTransform:Matrix4 = new Matrix4();
 
     override public function addChild(node:Container):Bool {
@@ -64,9 +64,20 @@ class Container extends SceneNode<Container> {
     inline function get_isInteractive() return visible && mouseEnabled;
 
     function get_concatenatedTransform():Matrix4 {
-        // TODO: use bounding box transforms in certain situations
-        concatTransform.copyFrom(transform);
-        if (parent != null) concatTransform.append(parent.concatenatedTransform);
+        concatTransform.identity();
+        if (boxed) {
+            concatTransform.append(boundingBox.contentTransform); // TODO: swap these? not sure
+            concatTransform.append(boundingBox.transform);
+            for (node in lineage()) {
+                if (!node.boxed) {
+                    concatTransform.append(node.concatenatedTransform);
+                    break;
+                }
+            }
+        } else {
+            concatTransform.append(transform);
+            if (parent != null) concatTransform.append(parent.concatenatedTransform);
+        }
         return concatTransform;
     }
 
@@ -75,5 +86,15 @@ class Container extends SceneNode<Container> {
     public function updateBoundingBox() {
         boundingBox.solve((parent == null) ? null : parent.boundingBox);
         for (child in children()) child.updateBoundingBox();
+    }
+
+    public function print(depth = 0):String {
+        var strings = [];
+        if (boxed) strings.push('boxed: ' + [boundingBox.rect.x, boundingBox.rect.y, boundingBox.rect.width, boundingBox.rect.height].join(' '));
+        var matData:lime.utils.Float32Array = transform;
+        strings.push([for (i in 0...matData.length) matData[i]].join(","));
+        var output = strings.join('\n');
+        var padding = [for (i in 0...depth) ' '].join("");
+        return [for (string in output.split('\n')) padding + string].join('\n');
     }
 }

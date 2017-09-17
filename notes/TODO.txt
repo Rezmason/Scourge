@@ -1,4 +1,12 @@
-Container should do something with BoundingBox
+If HxScout crashes on load, empty the "temp" folder in its app bundle
+
+
+
+TODO
+================================================================================
+
+Build out splash page
+
 Build out UI (see below)
 Make demos not look like shit
 MouseSystem "raycasts" BoundedContainers

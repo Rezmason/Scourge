@@ -62,7 +62,7 @@ class SplashDemo extends Demo {
 
                 if (lines[row].charAt(col) == ' ') continue;
 
-                var charCode:Int = lines[row].charCodeAt(col);
+                var charCode:Int = Std.int(lines[row].charCodeAt(col));
                 if (charCode == 0) charCode = -1;
 
                 var color:Vec4 = SPLASH_COLORS[lines[row].charAt(col)];
@@ -93,6 +93,8 @@ class SplashDemo extends Demo {
 
         body.transform.appendScale(0.9, 0.9, 0.9);
         body.transform.appendRotation(-40, Vector4.X_AXIS);
+        body.transformGlyphs = false;
+        body.glyphScale = 0.015;
     }
 
     override function update(delta:Float):Void {
@@ -102,7 +104,7 @@ class SplashDemo extends Demo {
             var glyphTower:Array<Glyph> = glyphTowers[ike];
             var topGlyph:Glyph = glyphTower[0];
 
-            var d:Float = ike / glyphTowers.length;
+            var d:Float = 1 - ike / glyphTowers.length;
             var w:Float = (Math.cos(time * 3 + d * 200) * 0.5 + 1) * 0.3 - 0.25;
             var s:Float = (Math.cos(time * 3 + d * 300) * 0.5 + 1) * 0.3 + 0.5;
 

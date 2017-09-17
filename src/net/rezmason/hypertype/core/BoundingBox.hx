@@ -4,14 +4,31 @@ import lime.math.Rectangle;
 import lime.math.Matrix4;
 
 enum LayoutValue {
-    Proportion(value:Float);
-    Unit(value:Float);
-    Zero;
+    REL(value:Float);
+    ABS(value:Float);
+    ZERO;
+}
+
+typedef Properties = {
+    @:optional var left:LayoutValue;
+    @:optional var right:LayoutValue;
+    @:optional var width:LayoutValue;
+    @:optional var top:LayoutValue;
+    @:optional var bottom:LayoutValue;
+    @:optional var height:LayoutValue;
+
+    @:optional var align:Align;
+    @:optional var verticalAlign:VerticalAlign;
+    @:optional var scaleMode:ScaleMode;
 }
 
 class BoundingBox {
 
     static var UNIT_RECT:Rectangle = new Rectangle(0, 0, 1, 1);
+    static var DEFAULT_ALIGN:Align = LEFT;
+    static var DEFAULT_VERTICAL_ALIGN:VerticalAlign = TOP;
+    static var DEFAULT_SCALE_MODE:ScaleMode = NO_SCALE;
+
     public var rect(default, null):Rectangle = UNIT_RECT.clone();
     public var transform(default, null):Matrix4 = new Matrix4();
     public var contentTransform(default, null):Matrix4 = new Matrix4();
@@ -23,9 +40,9 @@ class BoundingBox {
     public var bottom:Null<LayoutValue>;
     public var height:Null<LayoutValue>;
 
-    public var align:Align = LEFT;
-    public var verticalAlign:VerticalAlign = TOP;
-    public var scaleMode:ScaleMode = NO_SCALE;
+    public var align:Align = DEFAULT_ALIGN;
+    public var verticalAlign:VerticalAlign = DEFAULT_VERTICAL_ALIGN;
+    public var scaleMode:ScaleMode = DEFAULT_SCALE_MODE;
 
     public function new() {}
 
@@ -45,11 +62,8 @@ class BoundingBox {
         transform.identity();
         transform.appendTranslation(rect.x - parentRect.x, rect.y - parentRect.y, 0);
 
-        // Create contentTransform that places origin in local space
         contentTransform.identity();
-        var contentX = rect.width  * switch (        align) { case LEFT: 0; case CENTER: 0.5;  case RIGHT: 1; };
-        var contentY = rect.height * switch (verticalAlign) { case  TOP: 0; case MIDDLE: 0.5; case BOTTOM: 1; };
-        contentTransform.appendTranslation(contentX, contentY, 0);
+
         // Scale the content according to scale mode
         var xScale:Float = Math.NaN;
         var yScale:Float = Math.NaN;
@@ -74,13 +88,31 @@ class BoundingBox {
             yScale = scale;
         }
         contentTransform.appendScale(xScale, yScale, 1);
+
+        // place the origin in local space
+        var contentX = rect.width  * switch (        align) { case LEFT: 0; case CENTER: 0.5;  case RIGHT: 1; };
+        var contentY = rect.height * switch (verticalAlign) { case  TOP: 0; case MIDDLE: 0.5; case BOTTOM: 1; };
+        contentTransform.appendTranslation(contentX, contentY, 0);
+    }
+
+    public function set(properties:Properties) {
+        left = properties.left;
+        right = properties.right;
+        width = properties.width;
+        top = properties.top;
+        bottom = properties.bottom;
+        height = properties.height;
+
+        align = (properties.align == null) ? DEFAULT_ALIGN : properties.align;
+        verticalAlign = (properties.verticalAlign == null) ? DEFAULT_VERTICAL_ALIGN : properties.verticalAlign;
+        scaleMode = (properties.scaleMode == null) ? DEFAULT_SCALE_MODE : properties.scaleMode;
     }
 
     inline function derive(inherited:Float, layoutValue:LayoutValue) {
         return switch (layoutValue) {
-            case Proportion(value): value * inherited;
-            case Unit(value): value;
-            case Zero: 0;
+            case REL(value): value * inherited;
+            case ABS(value): value;
+            case ZERO: 0;
         }
     }
 }
