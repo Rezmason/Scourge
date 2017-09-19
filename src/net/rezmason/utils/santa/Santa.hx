@@ -11,18 +11,20 @@ enum InjectionType<T> {
 
 class Santa {
 
-    static var classMap:ObjectMap<Dynamic, InjectionType<Dynamic>> = new ObjectMap();
-    static var idClassMap:ObjectMap<Dynamic, Map<String, InjectionType<Dynamic>>> = new ObjectMap();
+    static var classMap:Map<String, InjectionType<Dynamic>> = new Map();
+    static var idClassMap:Map<String, Map<String, InjectionType<Dynamic>>> = new Map();
 
     public inline static function mapToClass<T>(clazz:Class<T>, present:InjectionType<T>):Bool {
-        var replacing:Bool = classMap.exists(clazz);
-        classMap.set(clazz, present);
+        var className = Type.getClassName(clazz);
+        var replacing:Bool = classMap.exists(className);
+        classMap.set(className, present);
         return replacing;
     }
 
     public inline static function mapToID<T>(clazz:Class<T>, id:String, present:InjectionType<T>):Bool {
-        if (!idClassMap.exists(clazz)) idClassMap.set(clazz, new Map());
-        var idMap = idClassMap.get(clazz);
+        var className = Type.getClassName(clazz);
+        if (!idClassMap.exists(className)) idClassMap.set(className, new Map());
+        var idMap = idClassMap.get(className);
         var replacing:Bool = idMap.exists(id);
         idMap.set(id, present);
         return replacing;
@@ -30,10 +32,12 @@ class Santa {
 
     @:allow(net.rezmason.utils.santa)
     inline static function askFor<T>(clazz:Class<T>, ?id:String):T {
+        var className = Type.getClassName(clazz);
         var result:T = null;
         var type = null;
-        if (id == null) type = classMap.get(clazz);
-        else if (idClassMap.exists(clazz)) type = idClassMap.get(clazz).get(id);
+        if (id == null) type = classMap.get(className);
+        else if (idClassMap.exists(className)) type = idClassMap.get(className).get(id);
+
         switch (type) {
             case null: throw 'Santa can\'t give you a ${clazz}';
             case Instance(inst): result = inst();
