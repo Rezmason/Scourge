@@ -113,6 +113,8 @@ class Engine {
         width  = Std.int(Math.ceil(scale * width ));
         height = Std.int(Math.ceil(scale * height));
 
+        bloomMethod.amount = Std.int(scale * 5);
+
         sceneRTT.resize(width, height);
         bloomRTT1.resize(Std.int(width / BLOOM_DOWNSCALE), Std.int(height / BLOOM_DOWNSCALE));
         bloomRTT2.resize(Std.int(width / BLOOM_DOWNSCALE), Std.int(height / BLOOM_DOWNSCALE));

@@ -7,13 +7,22 @@ import net.rezmason.gl.Texture;
 
 class BloomMethod extends ScreenRenderMethod {
 
-    var amount:UInt;
+    public var amount(default, set):UInt = -1;
     var kernel:Float32Array;
 
     public function new(amount:UInt) {
         this.amount = amount;
-        kernel = buildKernel(amount);
         super();
+    }
+
+    function set_amount(value) {
+        if (this.amount != value) {
+            this.amount = value;
+            kernel = buildKernel(amount);
+            composeFragmentShader();
+            if (program != null) program.setFragSource(fragShader);
+        }
+        return this.amount;
     }
 
     // Grabbed from the same place @alteredq grabbed it from for the three.js example ;-)
@@ -36,6 +45,10 @@ class BloomMethod extends ScreenRenderMethod {
 
     override function composeShaders() {
         vertShader = getText('shaders/bloom.vert');
+        composeFragmentShader();
+    }
+
+    function composeFragmentShader() {
         fragShader = getText('shaders/bloom.frag');
         fragShader = new EReg('INT_KERNEL_SIZE', 'g').replace(fragShader, Std.string(kernel.length));
     }

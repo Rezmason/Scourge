@@ -2,6 +2,7 @@ package net.rezmason.gl;
 
 import lime.graphics.opengl.GL;
 import lime.graphics.opengl.GLProgram;
+import lime.graphics.opengl.GLShader;
 import lime.graphics.opengl.GLUniformLocation;
 import lime.math.Matrix4;
 import lime.math.Vector2;
@@ -13,9 +14,12 @@ import lime.utils.GLUtils;
 @:allow(net.rezmason.gl)
 class Program extends Artifact {
 
+    var nativeVertShader:GLShader;
+    var nativeFragShader:GLShader;
     var nativeProgram:GLProgram;
     var vertSource:String;
     var fragSource:String;
+    var preamble:String;
 
     var floatVecFuncs:Map<UInt, GLUniformLocation->Float32Array->Void>;
     var intVecFuncs:Map<UInt, GLUniformLocation->Int32Array->Void>;
@@ -26,34 +30,62 @@ class Program extends Artifact {
     public function new(vertSource:String, fragSource:String, extensions:Array<String> = null):Void {
         super(extensions);
         repopulateVecFunctions();
+        preamble = '\n';
         if (extensions != null) {
-            var extensionPreamble = '\n';
             for (extension in extensions) {
                 // context.getExtension(extension); // may be unnecessary
-                extensionPreamble += '#extension GL_$extension : enable\n';
+                preamble += '#extension GL_$extension : enable\n';
             }
-            #if !desktop extensionPreamble += 'precision mediump float;\n'; #end
-            vertSource = extensionPreamble + vertSource;
-            fragSource = extensionPreamble + fragSource;
         }
-
-        this.vertSource = vertSource;
-        this.fragSource = fragSource;
+        #if !desktop preamble += 'precision mediump float;\n'; #end
         
-        nativeProgram = GLUtils.createProgram(vertSource, fragSource);
-
-        uniformLocations = new Map();
-        for (ike in 0...context.getProgramParameter(nativeProgram, context.ACTIVE_UNIFORMS)) {
-            var activeUniform = context.getActiveUniform(nativeProgram, ike);
-            var uniformLocation = context.getUniformLocation(nativeProgram, activeUniform.name);
-            uniformLocations[activeUniform.name.split('[')[0]] = uniformLocation;
+        nativeProgram = context.createProgram();
+        setVertSource(vertSource);
+        setFragSource(fragSource);
+    }
+    
+    public inline function setVertSource(vertSource:String):Void {
+        checkContext();
+        if (nativeVertShader != null) {
+            context.detachShader(nativeProgram, nativeVertShader);
+            context.deleteShader(nativeVertShader);
         }
+        this.vertSource = vertSource;
+        nativeVertShader = GLUtils.compileShader(preamble + vertSource, GL.VERTEX_SHADER);
+        context.attachShader(nativeProgram, nativeVertShader);
+        link();
+    }
 
-        attribsLocations = new Map();
-        for (ike in 0...context.getProgramParameter(nativeProgram, context.ACTIVE_ATTRIBUTES)) {
-            var activeAttrib = context.getActiveAttrib(nativeProgram, ike);
-            var attribLocation = context.getAttribLocation(nativeProgram, activeAttrib.name);
-            attribsLocations[activeAttrib.name.split('[')[0]] = attribLocation;
+    public inline function setFragSource(vertSource:String):Void {
+        checkContext();
+        if (nativeFragShader != null) {
+            context.detachShader(nativeProgram, nativeFragShader);
+            context.deleteShader(nativeFragShader);
+        }
+        this.vertSource = vertSource;
+        nativeFragShader = GLUtils.compileShader(preamble + vertSource, GL.FRAGMENT_SHADER);
+        context.attachShader(nativeProgram, nativeFragShader);
+        link();
+    }
+
+    inline function link() {
+        if (nativeVertShader != null && nativeFragShader != null) {
+            context.linkProgram(nativeProgram);
+            if (context.getProgramParameter(nativeProgram, GL.LINK_STATUS) == 0) throw 'Bad shader program';
+
+            uniformLocations = new Map();
+            for (ike in 0...context.getProgramParameter(nativeProgram, context.ACTIVE_UNIFORMS)) {
+                var activeUniform = context.getActiveUniform(nativeProgram, ike);
+                var uniformLocation = context.getUniformLocation(nativeProgram, activeUniform.name);
+                uniformLocations[activeUniform.name.split('[')[0]] = uniformLocation;
+            }
+
+            attribsLocations = new Map();
+            for (ike in 0...context.getProgramParameter(nativeProgram, context.ACTIVE_ATTRIBUTES)) {
+                var activeAttrib = context.getActiveAttrib(nativeProgram, ike);
+                var attribLocation = context.getAttribLocation(nativeProgram, activeAttrib.name);
+                attribsLocations[activeAttrib.name.split('[')[0]] = attribLocation;
+            }
         }
     }
 
