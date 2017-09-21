@@ -37,11 +37,11 @@ class GamePage extends NavPage {
         stage.toggleConsoleSignal.add(toggleConsole);
 
         containersByName = new Map();
-        containersByName['alphabet']   = alphabetDemo.body;
-        containersByName['sdf']        = sdfFontDemo.body;
-        containersByName['colorSolid'] = colorSolidDemo.body;
-        containersByName['matrix']     = matrixDemo.body;
-        containersByName['waves']      = waveDemo.body;
+        containersByName['alphabet']   = alphabetDemo.container;
+        containersByName['sdf']        = sdfFontDemo.container;
+        containersByName['colorSolid'] = colorSolidDemo.container;
+        containersByName['matrix']     = matrixDemo.container;
+        containersByName['waves']      = waveDemo.container;
         containersByName['board']      = view.container;
 
         // console.hasScrollBar = true;
@@ -74,6 +74,7 @@ class GamePage extends NavPage {
         }));
         */
 
+        container.boundingBox.scaleMode = SHOW_ALL;
         showBodyByName('colorSolid');
     }
 

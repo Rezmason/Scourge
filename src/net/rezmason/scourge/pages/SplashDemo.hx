@@ -91,7 +91,6 @@ class SplashDemo extends Demo {
             }
         }
 
-        body.transform.appendScale(0.9, 0.9, 0.9);
         body.transform.appendRotation(-40, Vector4.X_AXIS);
         body.glyphScale = 0.022;
     }

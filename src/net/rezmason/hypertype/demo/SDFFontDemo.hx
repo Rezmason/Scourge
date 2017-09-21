@@ -20,7 +20,7 @@ class SDFFontDemo extends Demo {
     static var periods:Array<Float> = [TWEEN_LENGTH, WAIT_LENGTH, TWEEN_LENGTH];
     static var tweenData:Array<Array<Float>> = [[0,1],[1,1],[1,0]];
     static var tweens:Array<Float->Float> = [Quint.easeOut.calculate, Linear.easeNone.calculate, Quint.easeIn.calculate];
-    inline static var CHARS:String = 'ΩSCOURGE';
+    inline static var CHARS:String = 'ΩMYCOTA';
 
     var glyph:Glyph;
     var currentCharIndex = 0;

@@ -20,19 +20,17 @@ class SplashPage extends NavPage {
     public function new():Void {
         super();
 
-        var splashContainer = new Container();
-        splashContainer.boundingBox.set({
-            width:REL(1),
-            height:REL(0.3),
+        splashDemo = new SplashDemo();
+        splashDemo.container.boundingBox.set({
+            left:REL(0.08),
+            right:REL(0.08),
+            top:REL(0.08),
+            bottom:REL(0.5),
             align:CENTER,
             verticalAlign:MIDDLE,
             scaleMode:WIDTH_FIT
         });
-        splashContainer.boxed = true;
-        container.addChild(splashContainer);
-
-        splashDemo = new SplashDemo();
-        splashContainer.addChild(splashDemo.body);
+        container.addChild(splashDemo.container);
 
         nav = new Container();
         nav.boundingBox.set({
@@ -53,13 +51,19 @@ class SplashPage extends NavPage {
         nav.addChild(beginButton.body);
         nav.addChild(aboutButton.body);
         nav.addChild(leaveButton.body);
+
+        aboutButton.body.transform.appendTranslation( 0, 0, 0);
+        beginButton.body.transform.appendTranslation(-6, 0, 0);
+        leaveButton.body.transform.appendTranslation( 6, 0, 0);
     }
 
     public function makeButton(text:String, cbk:Void->Void):TextLabel {
         var label = new TextLabel();
         label.text = text;
         label.textAlign = SIMPLE(CENTER);
+        label.verticalAlign = MIDDLE;
         label.style.set_color(GREY);
+        label.glyphWidth = 0.75;
         label.redraw();
         label.body.interactionSignal.add(function(_, interaction) {
             switch (interaction) {

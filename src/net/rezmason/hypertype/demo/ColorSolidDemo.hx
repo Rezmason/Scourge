@@ -22,6 +22,7 @@ class ColorSolidDemo extends Demo {
     public function new(num:Int = 2400):Void {
         super();
         body.glyphScale = 0.007;
+        body.transformGlyphs = false;
         dragging = false;
         dragStartTransform = new Matrix4();
         rawTransform = new Matrix4();

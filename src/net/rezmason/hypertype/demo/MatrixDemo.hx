@@ -17,6 +17,7 @@ class MatrixDemo extends Demo {
 
     public function new():Void {
         super();
+        container.boundingBox.scaleMode = NO_BORDER;
         var chars = Strings.MATRIX_CHARS;
         var charCodes = [for (ike in 0...Utf8.length(chars)) Utf8.charCodeAt(chars, ike)];
 
