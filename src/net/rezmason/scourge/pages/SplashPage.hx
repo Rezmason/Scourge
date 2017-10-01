@@ -10,6 +10,12 @@ import net.rezmason.hypertype.ui.TextLabel;
 import net.rezmason.hypertype.ui.TextBox;
 import net.rezmason.scourge.ScourgeColorPalette.*;
 
+import net.rezmason.scourge.game.ScourgeGameConfig;
+import net.rezmason.scourge.game.build.PetriBoardFactory;
+import net.rezmason.scourge.errands.BeginGameErrand;
+import net.rezmason.scourge.game.bite.BiteAspect;
+import net.rezmason.scourge.game.piece.SwapAspect;
+
 using net.rezmason.hypertype.core.GlyphUtils;
 
 class SplashPage extends NavPage {
@@ -85,6 +91,33 @@ class SplashPage extends NavPage {
     }
 
     private function playGame():Void {
+
+        var cfg:ScourgeGameConfig = new ScourgeGameConfig();
+
+        var circular = false;
+        var playerPattern = 'bb'.split('');
+        var thinkPeriod = 1000;
+        var animationLength = 1;
+        var isReplay = false;
+        var seed = Std.int(Math.random() * 0x7FFFFFFF);
+
+        var numPlayers = playerPattern.length;
+        var pieceLib = cfg.pieceParams.pieceLib;
+        var pieceIDs:Array<String> = [];
+        for (ike in 0...4) for (piece in pieceLib.getPiecesOfSize(ike + 1)) pieceIDs.push(piece.id);
+        cfg.buildParams.numPlayers = numPlayers;
+        cfg.buildParams.cells = PetriBoardFactory.create(numPlayers, circular);
+        cfg.pieceParams.pieceIDs = pieceIDs;
+        cfg.pieceParams.allowRotating = true;
+        cfg.pieceParams.allowSkipping = false;
+        cfg.bodyParams.includeCavities = true;
+
+        cfg.metaParams.globalProperties[SwapAspect.NUM_SWAPS.id].maxAmount = 5;
+        cfg.metaParams.globalProperties[BiteAspect.NUM_BITES.id].maxAmount = 5;
+
+        var errand = new BeginGameErrand(cfg, playerPattern, thinkPeriod, animationLength, isReplay, seed);
+        errand.run();
+
         navToSignal.dispatch(Page(ScourgeNavPageAddresses.GAME));
     }
 

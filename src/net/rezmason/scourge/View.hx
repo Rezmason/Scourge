@@ -18,7 +18,7 @@ class View {
         container = new Container();
         board = new Body();
         loupe = new BorderBox();
-        loupe.glyphWidth = 0.05;
+        loupe.glyphWidth = 0.5;
         piece = new Body();
         bite = new Body();
         boardScale = 1;

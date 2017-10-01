@@ -61,9 +61,10 @@ class BoardInitializer {
 
         // Scale board so that board fits within scene's bounds
         board.transform.identity();
+        board.transformGlyphs = true;
         var boardScale = 0.9 / Math.sqrt(maxDistSquared * 2);
         board.transform.appendScale(boardScale, boardScale, boardScale);
-        board.glyphScale = boardScale * 0.5;
+        board.glyphScale = 0.5;
         view.boardScale = boardScale;
         view.piece.glyphScale = board.glyphScale;
         view.piece.transform.copyFrom(board.transform);
