@@ -17,6 +17,7 @@ class BeginNavErrand extends Errand<Void->Void> {
         navSystem.addPage(ScourgeNavPageAddresses.SPLASH, new SplashPage());
         navSystem.addPage(ScourgeNavPageAddresses.ABOUT, new AboutPage());
         navSystem.addPage(ScourgeNavPageAddresses.GAME, new GamePage());
+        navSystem.addPage(ScourgeNavPageAddresses.DEMO, new DemoPage());
         navSystem.goto(Page(ScourgeNavPageAddresses.SPLASH));
         onComplete.dispatch();
     }

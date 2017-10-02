@@ -1,7 +1,8 @@
 package net.rezmason.scourge;
 
-class ScourgeNavPageAddresses {
-    public inline static var GAME:String = 'game';
-    public inline static var SPLASH:String = 'splash';
-    public inline static var ABOUT:String = 'about';
+@:enum abstract ScourgeNavPageAddresses(String) to String {
+    var GAME         = 'game';
+    var SPLASH       = 'splash';
+    var ABOUT        = 'about';
+    var DEMO         = 'demo';
 }
