@@ -29,6 +29,6 @@ class RenderPass {
 }
 
 enum RenderStep {
-    SceneStep(method:SceneRenderMethod, stage:Stage, renderTarget:RenderTarget, ?args:Array<Dynamic>);
-    ScreenStep(method:ScreenRenderMethod, inputTextures:Map<String, Texture>, renderTarget:RenderTarget, ?args:Array<Dynamic>);
+    SceneStep(method:SceneRenderMethod, stage:Stage, renderTarget:RenderTarget, ?params:Map<String, Any>);
+    ScreenStep(method:ScreenRenderMethod, inputTextures:Map<String, Texture>, renderTarget:RenderTarget, ?params:Map<String, Any>);
 }

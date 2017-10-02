@@ -21,7 +21,7 @@ class RenderMethod {
         program = new Program(vertShader, fragShader, extensions);
     }
 
-    public function start(renderTarget:RenderTarget, args:Array<Dynamic>):Void {
+    public function start(renderTarget:RenderTarget, params:Map<String, Any>):Void {
         program.use();
         program.setRenderTarget(renderTarget);
         program.clear(backgroundColor);

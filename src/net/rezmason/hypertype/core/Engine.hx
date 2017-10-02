@@ -71,8 +71,8 @@ class Engine {
 
         sdfPass = new RenderPass();
         sdfPass.addStep(SceneStep(sdfFontMethod, stage, sceneRTT.renderTarget));
-        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT1.renderTarget, [0, 0.002]));
-        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => bloomRTT1], bloomRTT2.renderTarget, [0.002, 0]));
+        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => sceneRTT], bloomRTT1.renderTarget, ['blurDirectionX' => 0, 'blurDirectionY' => 0.002]));
+        sdfPass.addStep(ScreenStep(bloomMethod, ['input' => bloomRTT1], bloomRTT2.renderTarget, ['blurDirectionX' => 0.002, 'blurDirectionY' => 0]));
         sdfPass.addStep(ScreenStep(combineMethod, ['input' => sceneRTT, 'bloom' => bloomRTT2, 'debug' => debugDisplay.texture], viewport));
         presentedPass = sdfPass;
 

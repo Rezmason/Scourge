@@ -53,9 +53,9 @@ class BloomMethod extends ScreenRenderMethod {
         fragShader = new EReg('INT_KERNEL_SIZE', 'g').replace(fragShader, Std.string(kernel.length));
     }
 
-    override public function start(renderTarget, args) {
-        super.start(renderTarget, args);
-        program.setFloat('uBlurDirection', args[0], args[1]);
+    override public function start(renderTarget, params) {
+        super.start(renderTarget, params);
+        program.setFloat('uBlurDirection', params['blurDirectionX'], params['blurDirectionY']);
         program.setFloatVec('uKernel', 1, kernel);
         program.setInt('uIntKernelSize', kernel.length);
         program.setFloat('uFloatKernelSize', kernel.length);
